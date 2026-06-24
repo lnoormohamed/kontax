@@ -63,6 +63,8 @@ const syncMutation = z.object({
   diffs: z.array(fieldDiffSchema).optional(),
   syncAccountId: z.string().optional(),
   syncAccountLabel: z.string().optional(),
+  unsupportedFieldFamilies: z.array(z.string().min(1)).optional(),
+  unsupportedFieldCount: z.number().int().nonnegative().optional(),
 });
 
 const syncConflictDetected = z.object({

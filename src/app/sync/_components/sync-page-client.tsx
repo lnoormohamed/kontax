@@ -97,6 +97,9 @@ export type SyncAccountData = {
     | "retired";
   lastSyncedAtRelative: string | null;
   lastErrorMessage: string | null;
+  capabilityNoteTitle: string | null;
+  capabilityNoteBody: string | null;
+  capabilityUnsupportedFieldFamilies: string[];
   consecutiveFailures: number;
   // P23-05: account auto-paused because the manual conflict queue is full.
   conflictQueueFull: boolean;
@@ -1011,6 +1014,53 @@ function DuplicatesBanner({ count }: { count: number }) {
       >
         Review suggestions →
       </Link>
+    </div>
+  );
+}
+
+function CapabilityNote({
+  title,
+  body,
+}: {
+  title: string;
+  body: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+        background: "#f2f4f0",
+        border: "1px solid #d8ddd6",
+        borderRadius: 10,
+        padding: "12px 14px",
+        marginBottom: 22,
+      }}
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={T.ink2}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ flexShrink: 0, marginTop: 1 }}
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 10v5" />
+        <path d="M12 7h.01" />
+      </svg>
+      <div>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: T.ink }}>
+          {title}
+        </div>
+        <div style={{ fontSize: 13, color: T.ink2, marginTop: 3, lineHeight: 1.5 }}>
+          {body}
+        </div>
+      </div>
     </div>
   );
 }
@@ -2699,6 +2749,12 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
         {selectedAccount.duplicatesDetected > 0 && (
           <DuplicatesBanner count={selectedAccount.duplicatesDetected} />
         )}
+        {selectedAccount.capabilityNoteTitle && selectedAccount.capabilityNoteBody && (
+          <CapabilityNote
+            title={selectedAccount.capabilityNoteTitle}
+            body={selectedAccount.capabilityNoteBody}
+          />
+        )}
         <AccountHeader
           account={selectedAccount}
           vHealth={vHealth}
@@ -2769,6 +2825,20 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
               Both Kontax and the remote changed these contacts after the last healthy sync. Resolve
               each below.
             </p>
+            {selectedAccount.capabilityUnsupportedFieldFamilies.length > 0 ? (
+              <p
+                style={{
+                  fontSize: 12.5,
+                  color: T.ink2,
+                  marginBottom: 12,
+                  maxWidth: 560,
+                  marginTop: 0,
+                }}
+              >
+                Provider-limited fields that the remote cannot store stay in Kontax and do not
+                open conflicts on their own.
+              </p>
+            ) : null}
             <div style={{ borderBottom: `1px solid ${T.line2}` }}>
               {selectedAccount.conflicts.map((cf) => (
                 <ConflictRow key={cf.id} cf={cf} redirectTo={redirectTo} />

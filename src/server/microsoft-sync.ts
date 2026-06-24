@@ -16,8 +16,10 @@ import {
 
 import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
+import { emitEvent } from "~/lib/activity";
 import { db } from "~/server/db";
 import {
+  parseContactDateEntries,
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -43,6 +45,7 @@ import {
   type RemoteContactItem,
 } from "~/server/sync-import-engine";
 import {
+  buildProviderCapabilityDiagnostics,
   buildProviderSupportedContactShadow,
   resolveSyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
@@ -535,6 +538,7 @@ const pushContactSelect = {
   department: true,
   jobTitle: true,
   birthday: true,
+  significantDates: true,
   address: true,
   postalAddresses: true,
   notes: true,
@@ -569,6 +573,46 @@ const buildMicrosoftPushContact = (c: PushContactRow): MicrosoftPushContact => (
   postalAddresses: c.postalAddresses,
   notes: c.notes,
 });
+
+const buildMicrosoftCapabilityDiagnostics = (contact: PushContactRow) =>
+  buildProviderCapabilityDiagnostics(
+    {
+      fullName: contact.fullName,
+      firstName: contact.firstName,
+      middleName: contact.middleName,
+      lastName: contact.lastName,
+      namePrefix: contact.namePrefix,
+      nameSuffix: contact.nameSuffix,
+      nickname: contact.nickname,
+      email: contact.email,
+      emailAddresses: parseContactStringArray(contact.emailAddresses),
+      emailEntries: parseValueEntries(contact.emailEntries),
+      phone: contact.phone,
+      phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+      phoneEntries: parseValueEntries(contact.phoneEntries),
+      company: contact.company,
+      department: contact.department,
+      jobTitle: contact.jobTitle,
+      website: contact.website,
+      websiteEntries: parseValueEntries(contact.websiteEntries),
+      birthday: contact.birthday,
+      significantDates: parseContactDateEntries(contact.significantDates),
+      address: contact.address,
+      postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+      notes: contact.notes,
+    },
+    MICROSOFT_CAPABILITY_PROFILE,
+  );
+
+const microsoftCapabilityDiagnosticsPayload = (contact: PushContactRow) => {
+  const diagnostics = buildMicrosoftCapabilityDiagnostics(contact);
+  return diagnostics
+    ? {
+        unsupportedFieldFamilies: diagnostics.unsupportedFieldFamilies,
+        unsupportedFieldCount: diagnostics.unsupportedFieldCount,
+      }
+    : {};
+};
 
 const buildMicrosoftPushShadow = (contact: MicrosoftPushContact) =>
   buildProviderSupportedContactShadow(
@@ -632,6 +676,18 @@ const createMicrosoftContactRemote = async (
         buildMicrosoftPushContact(contact),
       ) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
+    },
+  });
+  await emitEvent(db, {
+    userId: account.userId,
+    contactId: contact.id,
+    eventType: "SYNC_PUSHED",
+    actor: "SYNC",
+    actorDetail: account.label,
+    payload: {
+      syncAccountId: account.id,
+      syncAccountLabel: account.label,
+      ...microsoftCapabilityDiagnosticsPayload(contact),
     },
   });
   return true;
@@ -702,6 +758,18 @@ export const pushLocalChangesToMicrosoft = async (
       buildMicrosoftPushContact(link.contact),
     );
     if (result.ok) {
+      await emitEvent(db, {
+        userId: account.userId,
+        contactId: link.contactId,
+        eventType: "SYNC_PUSHED",
+        actor: "SYNC",
+        actorDetail: account.label,
+        payload: {
+          syncAccountId: account.id,
+          syncAccountLabel: account.label,
+          ...microsoftCapabilityDiagnosticsPayload(link.contact),
+        },
+      });
       updated += 1;
     } else {
       conflicts += 1;

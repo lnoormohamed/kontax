@@ -22,6 +22,19 @@ export type SyncProviderCapabilityProfile = {
   };
 };
 
+export type ProviderCapabilityUnsupportedFieldFamily = "significantDates";
+
+export type ProviderCapabilityDiagnostics = {
+  unsupportedFieldFamilies: ProviderCapabilityUnsupportedFieldFamily[];
+  unsupportedFieldCount: number;
+};
+
+export type ProviderCapabilityNotice = {
+  title: string;
+  body: string;
+  unsupportedFieldFamilies: ProviderCapabilityUnsupportedFieldFamily[];
+};
+
 export type ProviderSupportedContactShadow = {
   fullName: string;
   firstName: string | null;
@@ -174,6 +187,52 @@ export const providerSupportsSignificantDates = (
   profile: SyncProviderCapabilityProfile,
 ) => profile.fields.significantDates === "full";
 
+export const getSyncProviderCapabilityProfileDisplayName = (
+  profile: SyncProviderCapabilityProfile,
+) => {
+  switch (profile.id) {
+    case "carddav-icloud":
+      return "iCloud";
+    case "carddav-fastmail":
+      return "Fastmail";
+    case "google":
+      return "Google Contacts";
+    case "microsoft":
+      return "Outlook";
+    default:
+      return "this provider";
+  }
+};
+
+export const formatProviderCapabilityFamilies = (
+  families: ProviderCapabilityUnsupportedFieldFamily[],
+) => {
+  const unique = [...new Set(families)];
+
+  if (unique.length === 0) {
+    return "unsupported fields";
+  }
+
+  const labels = unique.map((family) => {
+    switch (family) {
+      case "significantDates":
+        return "significant dates";
+      default:
+        return "unsupported fields";
+    }
+  });
+
+  if (labels.length === 1) {
+    return labels[0]!;
+  }
+
+  if (labels.length === 2) {
+    return `${labels[0]} and ${labels[1]}`;
+  }
+
+  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+};
+
 const normalizeSignificantDates = (
   significantDates: ContactDateEntryInput[] | null | undefined,
 ) => {
@@ -181,6 +240,60 @@ const normalizeSignificantDates = (
     return undefined;
   }
   return significantDates;
+};
+
+const countUnsupportedSignificantDates = (
+  significantDates: ContactDateEntryInput[] | null | undefined,
+) => normalizeSignificantDatesForShadow(significantDates).length;
+
+export const buildProviderCapabilityDiagnostics = (
+  contact: PortableContactInput,
+  profile: SyncProviderCapabilityProfile,
+): ProviderCapabilityDiagnostics | null => {
+  const unsupportedFieldFamilies: ProviderCapabilityUnsupportedFieldFamily[] = [];
+  let unsupportedFieldCount = 0;
+
+  if (!providerSupportsSignificantDates(profile)) {
+    const significantDateCount = countUnsupportedSignificantDates(
+      contact.significantDates,
+    );
+    if (significantDateCount > 0) {
+      unsupportedFieldFamilies.push("significantDates");
+      unsupportedFieldCount += significantDateCount;
+    }
+  }
+
+  if (unsupportedFieldCount === 0) {
+    return null;
+  }
+
+  return {
+    unsupportedFieldFamilies,
+    unsupportedFieldCount,
+  };
+};
+
+export const getProviderCapabilityNotice = (
+  profile: SyncProviderCapabilityProfile,
+): ProviderCapabilityNotice | null => {
+  const unsupportedFieldFamilies: ProviderCapabilityUnsupportedFieldFamily[] = [];
+
+  if (!providerSupportsSignificantDates(profile)) {
+    unsupportedFieldFamilies.push("significantDates");
+  }
+
+  if (unsupportedFieldFamilies.length === 0) {
+    return null;
+  }
+
+  const providerName = getSyncProviderCapabilityProfileDisplayName(profile);
+  const familyLabel = formatProviderCapabilityFamilies(unsupportedFieldFamilies);
+
+  return {
+    title: "Some fields stay in Kontax",
+    body: `Some providers do not support every contact field. ${providerName} does not currently store ${familyLabel}, so those values stay in Kontax and in providers that support them.`,
+    unsupportedFieldFamilies,
+  };
 };
 
 export const projectPortableContactForProvider = (

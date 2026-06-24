@@ -123,6 +123,59 @@ const getPayloadString = (payload: unknown, key: string): string | null =>
     ? payload[key].trim()
     : null;
 
+const getUnsupportedFieldFamilies = (payload: unknown): string[] =>
+  isRecord(payload) && Array.isArray(payload.unsupportedFieldFamilies)
+    ? payload.unsupportedFieldFamilies.filter(
+        (value): value is string => typeof value === "string" && value.trim().length > 0,
+      )
+    : [];
+
+const getUnsupportedFieldCount = (payload: unknown): number =>
+  isRecord(payload) && typeof payload.unsupportedFieldCount === "number"
+    ? payload.unsupportedFieldCount
+    : 0;
+
+const formatUnsupportedFieldFamilies = (families: string[]) => {
+  const labels = [...new Set(families)].map((family) => {
+    switch (family) {
+      case "significantDates":
+        return "significant dates";
+      default:
+        return "unsupported fields";
+    }
+  });
+
+  if (labels.length === 0) {
+    return "unsupported fields";
+  }
+  if (labels.length === 1) {
+    return labels[0]!;
+  }
+  if (labels.length === 2) {
+    return `${labels[0]} and ${labels[1]}`;
+  }
+  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+};
+
+const formatUnsupportedFieldSuffix = (payload: unknown) => {
+  const families = getUnsupportedFieldFamilies(payload);
+  if (families.length === 0) {
+    return "";
+  }
+
+  const familyLabel = formatUnsupportedFieldFamilies(families);
+  const unsupportedFieldCount = getUnsupportedFieldCount(payload);
+
+  if (unsupportedFieldCount > 0) {
+    return ` · ${familyLabel} kept in Kontax (${plural(
+      unsupportedFieldCount,
+      "field",
+    )})`;
+  }
+
+  return ` · ${familyLabel} kept in Kontax`;
+};
+
 /** One-line human summary for an activity event. */
 export function formatEventSummary(
   eventType: EventType,
@@ -160,10 +213,13 @@ export function formatEventSummary(
     case "SYNC_PULLED": {
       const n = countDiffs(payload);
       const from = detail ? ` from ${detail}` : "";
-      return n > 0 ? `Pulled${from} · ${plural(n, "field")} updated` : `Pulled${from}`;
+      const base = n > 0 ? `Pulled${from} · ${plural(n, "field")} updated` : `Pulled${from}`;
+      return `${base}${formatUnsupportedFieldSuffix(payload)}`;
     }
-    case "SYNC_PUSHED":
-      return detail ? `Pushed to ${detail}` : "Pushed";
+    case "SYNC_PUSHED": {
+      const base = detail ? `Pushed to ${detail}` : "Pushed";
+      return `${base}${formatUnsupportedFieldSuffix(payload)}`;
+    }
     case "SYNC_CONFLICT_DETECTED":
       return detail ? `Sync conflict detected with ${detail}` : "Sync conflict detected";
     case "SYNC_CONFLICT_RESOLVED": {

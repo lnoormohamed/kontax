@@ -790,6 +790,45 @@ export function ConnectionSettings({
       </div>
 
       <div style={{ maxWidth: 520 }}>
+        {account.capabilityNoteTitle && account.capabilityNoteBody ? (
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              alignItems: "flex-start",
+              padding: "12px 14px",
+              borderRadius: 10,
+              background: "#f2f4f0",
+              border: `1px solid ${T.line}`,
+              marginBottom: 22,
+            }}
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={T.ink2}
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ flexShrink: 0, marginTop: 1 }}
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 10v5" />
+              <path d="M12 7h.01" />
+            </svg>
+            <div>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: T.ink }}>
+                {account.capabilityNoteTitle}
+              </div>
+              <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.5, marginTop: 3 }}>
+                {account.capabilityNoteBody}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {/* §1 Direction */}
         <OptSection label="Direction">
           <OptCards value={draft.direction} options={DIR_OPTS} onChange={(v) => patch({ direction: v })} disabledMap={dirDisabled} />

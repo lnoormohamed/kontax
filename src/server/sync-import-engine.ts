@@ -24,7 +24,9 @@ import {
 } from "~/server/sync-contact-mapping";
 import { MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
 import {
+  buildProviderCapabilityDiagnostics,
   buildProviderSupportedContactShadow,
+  type ProviderCapabilityDiagnostics,
   providerSupportedShadowsEqual,
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
@@ -138,6 +140,16 @@ const linkedContactToPortable = (
   notes: contact.notes,
 });
 
+const capabilityDiagnosticsToEventPayload = (
+  diagnostics: ProviderCapabilityDiagnostics | null,
+) =>
+  diagnostics
+    ? {
+        unsupportedFieldFamilies: diagnostics.unsupportedFieldFamilies,
+        unsupportedFieldCount: diagnostics.unsupportedFieldCount,
+      }
+    : {};
+
 // One normalised remote record. `mapped` is null to skip (unmappable); `deleted`
 // flags a tombstone; `remoteSnapshot` is the raw remote object stored on
 // conflict rows.
@@ -209,6 +221,7 @@ export const applyRemoteToContact = async (
   remoteUid: string,
   etag: string | null,
   now: Date,
+  capabilityDiagnostics: ProviderCapabilityDiagnostics | null = null,
 ) => {
   const data = mappedContactToWriteData(mapped);
   const supportedFieldShadow = buildProviderSupportedContactShadow(
@@ -245,7 +258,11 @@ export const applyRemoteToContact = async (
       eventType: "SYNC_PULLED",
       actor: "SYNC",
       actorDetail: account.label,
-      payload: { syncAccountId: account.id, syncAccountLabel: account.label },
+      payload: {
+        syncAccountId: account.id,
+        syncAccountLabel: account.label,
+        ...capabilityDiagnosticsToEventPayload(capabilityDiagnostics),
+      },
     });
   });
 };
@@ -540,6 +557,10 @@ export const importRemoteContactBatch = async (
           item.remoteUid,
           item.etag,
           now,
+          buildProviderCapabilityDiagnostics(
+            linkedContactToPortable(link.contact),
+            account.capabilityProfile,
+          ),
         );
         await recordAutoResolved(account, link, link.contact, item.remoteSnapshot, item.etag, "KEEP_REMOTE", now);
         summary.updated += 1;
@@ -562,6 +583,10 @@ export const importRemoteContactBatch = async (
         item.remoteUid,
         item.etag,
         now,
+        buildProviderCapabilityDiagnostics(
+          linkedContactToPortable(link.contact),
+          account.capabilityProfile,
+        ),
       );
       summary.updated += 1;
       continue;

@@ -20,6 +20,10 @@ import {
   getSyncAccountOperationalHealth,
 } from "~/server/sync-health";
 import {
+  getProviderCapabilityNotice,
+  resolveSyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
+import {
   SyncPageClient,
   type SyncAccountData,
   type SyncJobRow,
@@ -299,6 +303,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
     ]);
 
   const serialiseSyncAccount = (acct: (typeof rawAccounts)[number]): SyncAccountData => {
+    const capabilityProfile = resolveSyncProviderCapabilityProfile({
+      provider: acct.provider,
+      baseUrl: acct.baseUrl,
+      addressBookUrl: acct.addressBookUrl,
+      label: acct.label,
+    });
+    const capabilityNotice = getProviderCapabilityNotice(capabilityProfile);
     const recentJobs = acct.syncJobs.map((j) => ({
       status: j.status,
       errorCode: j.errorCode,
@@ -386,6 +397,10 @@ export default async function SyncPage({ searchParams }: PageProps) {
       health,
       lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
       lastErrorMessage: acct.lastErrorMessage ?? null,
+      capabilityNoteTitle: capabilityNotice?.title ?? null,
+      capabilityNoteBody: capabilityNotice?.body ?? null,
+      capabilityUnsupportedFieldFamilies:
+        capabilityNotice?.unsupportedFieldFamilies ?? [],
       consecutiveFailures: getConsecutiveFailureStreak(recentJobs),
       // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
       conflictQueueFull:

@@ -25,7 +25,9 @@ import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
 import {
+  buildProviderCapabilityDiagnostics,
   buildProviderSupportedContactShadow,
+  type ProviderCapabilityDiagnostics,
   providerSupportsSignificantDates,
   providerSupportedShadowsEqual,
   resolveSyncProviderCapabilityProfile,
@@ -237,6 +239,16 @@ const cardDavCardToPortable = (card: CardDavContactCard): PortableContactInput =
   addressEntries: card.addressEntries,
   notes: card.notes,
 });
+
+const capabilityDiagnosticsToEventPayload = (
+  diagnostics: ProviderCapabilityDiagnostics | null,
+) =>
+  diagnostics
+    ? {
+        unsupportedFieldFamilies: diagnostics.unsupportedFieldFamilies,
+        unsupportedFieldCount: diagnostics.unsupportedFieldCount,
+      }
+    : {};
 
 const cardDavPushContactSelect = {
   id: true,
@@ -1033,6 +1045,7 @@ export const runQueuedSyncJobs = async ({
         contactId: string;
         remoteETag: string | null;
         remoteSnapshot: unknown;
+        capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
       let deferredLocalChangesCount = 0;
       const canWrite = job.syncDirection !== "IMPORT_ONLY";
@@ -1040,7 +1053,8 @@ export const runQueuedSyncJobs = async ({
         linkId: string;
         remoteHref: string;
         remoteUid: string;
-        contact: SyncContactRow;
+        contact: SyncPushContactRow;
+        capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
       const localDeleteCandidates: Array<{
         linkId: string;
@@ -1149,6 +1163,10 @@ export const runQueuedSyncJobs = async ({
               contactId: link.contact.id,
               remoteETag: remoteEntry.etag ?? null,
               remoteSnapshot: remoteCard,
+              capabilityDiagnostics: buildProviderCapabilityDiagnostics(
+                contactToPortable(link.contact),
+                capabilityProfile,
+              ),
             });
             // P23-05: record an AUTO_RESOLVED audit row for the applied conflict.
             autoResolvedEntries.push({
@@ -1200,6 +1218,10 @@ export const runQueuedSyncJobs = async ({
               remoteHref: link.remoteHref,
               remoteUid: remoteUid ?? link.remoteHref,
               contact: link.contact,
+              capabilityDiagnostics: buildProviderCapabilityDiagnostics(
+                contactToPortable(link.contact),
+                capabilityProfile,
+              ),
             });
           } else {
             deferredLocalChangesCount += 1;
@@ -1213,6 +1235,10 @@ export const runQueuedSyncJobs = async ({
             contactId: link.contact.id,
             remoteETag: remoteEntry.etag ?? null,
             remoteSnapshot: remoteCard,
+            capabilityDiagnostics: buildProviderCapabilityDiagnostics(
+              contactToPortable(link.contact),
+              capabilityProfile,
+            ),
           });
           continue;
         }
@@ -1238,6 +1264,7 @@ export const runQueuedSyncJobs = async ({
         remoteETag: string | null;
         supportedFieldShadow: ReturnType<typeof buildProviderSupportedContactShadow>;
         lastSyncedAt: Date;
+        capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
       const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = [];
 
@@ -1281,6 +1308,10 @@ export const runQueuedSyncJobs = async ({
               capabilityProfile,
             ),
             lastSyncedAt: contact.updatedAt,
+            capabilityDiagnostics: buildProviderCapabilityDiagnostics(
+              contactToPortable(contact),
+              capabilityProfile,
+            ),
           });
         } catch (err) {
           console.error(`[sync] CardDAV create failed for contact ${contact.id}:`, err);
@@ -1536,7 +1567,13 @@ export const runQueuedSyncJobs = async ({
             eventType: "SYNC_PULLED",
             actor: "SYNC",
             actorDetail: scopeLabel,
-            payload: { syncAccountId: job.syncAccountId, syncAccountLabel: job.syncAccount.label },
+            payload: {
+              syncAccountId: job.syncAccountId,
+              syncAccountLabel: job.syncAccount.label,
+              ...capabilityDiagnosticsToEventPayload(
+                remoteApply.capabilityDiagnostics,
+              ),
+            },
           });
         }
 
@@ -1589,6 +1626,40 @@ export const runQueuedSyncJobs = async ({
               lastSyncedAt: now,
               lastErrorCode: null,
               lastErrorMessage: null,
+            },
+          });
+
+          if (pushedLink) {
+            await emitEvent(tx, {
+              userId: job.syncAccount.userId,
+              contactId: pushedLink.contact.id,
+              eventType: "SYNC_PUSHED",
+              actor: "SYNC",
+              actorDetail: scopeLabel,
+              payload: {
+                syncAccountId: job.syncAccountId,
+                syncAccountLabel: job.syncAccount.label,
+                ...capabilityDiagnosticsToEventPayload(
+                  pushedLink.capabilityDiagnostics,
+                ),
+              },
+            });
+          }
+        }
+
+        for (const created of createdLinks) {
+          await emitEvent(tx, {
+            userId: job.syncAccount.userId,
+            contactId: created.contactId,
+            eventType: "SYNC_PUSHED",
+            actor: "SYNC",
+            actorDetail: scopeLabel,
+            payload: {
+              syncAccountId: job.syncAccountId,
+              syncAccountLabel: job.syncAccount.label,
+              ...capabilityDiagnosticsToEventPayload(
+                created.capabilityDiagnostics,
+              ),
             },
           });
         }
