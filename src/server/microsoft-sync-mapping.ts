@@ -101,6 +101,7 @@ const mapGraphAddressEntry = (
     ...(a.countryOrRegion?.trim() ? { countryOrRegion: a.countryOrRegion.trim() } : {}),
     ...(a.street?.trim() ? { streetLine1: a.street.trim() } : {}),
     ...(a.city?.trim() ? { cityOrTown: a.city.trim() } : {}),
+    ...(a.state?.trim() ? { stateOrProvince: a.state.trim() } : {}),
     ...(a.postalCode?.trim() ? { postcode: a.postalCode.trim() } : {}),
   };
 };

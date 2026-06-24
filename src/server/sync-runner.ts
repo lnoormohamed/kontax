@@ -127,6 +127,12 @@ const safeAddressEntries = (value: unknown) =>
               typeof (entry as { cityOrTown?: unknown }).cityOrTown === "string"
                 ? (entry as { cityOrTown: string }).cityOrTown
                 : undefined,
+            stateOrProvince:
+              typeof (entry as { stateOrProvince?: unknown }).stateOrProvince === "string"
+                ? (entry as { stateOrProvince: string }).stateOrProvince
+                : typeof (entry as { state?: unknown }).state === "string"
+                  ? (entry as { state: string }).state
+                  : undefined,
             postcode:
               typeof (entry as { postcode?: unknown }).postcode === "string"
                 ? (entry as { postcode: string }).postcode

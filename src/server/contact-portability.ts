@@ -40,6 +40,7 @@ export type ContactAddressEntryInput = {
   streetLine1?: string;
   streetLine2?: string;
   cityOrTown?: string;
+  stateOrProvince?: string;
   postcode?: string;
   poBox?: string;
 };
@@ -1486,7 +1487,7 @@ export const contactsToVCard = (
               entry.streetLine2,
               entry.streetLine1 ?? entry.formatted,
               entry.cityOrTown,
-              undefined,
+              entry.stateOrProvince,
               entry.postcode,
               entry.countryOrRegion,
             ]),

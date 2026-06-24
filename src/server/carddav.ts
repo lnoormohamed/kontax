@@ -66,6 +66,7 @@ export type CardDavContactCard = CardDavAddressBookEntry & {
     streetLine1?: string;
     streetLine2?: string;
     cityOrTown?: string;
+    stateOrProvince?: string;
     postcode?: string;
     poBox?: string;
   }>;
@@ -531,6 +532,7 @@ const parseAdrValue = (value: string, label: string) => {
     streetLine1: streetLine1 ?? undefined,
     streetLine2: streetLine2 ?? undefined,
     cityOrTown: cityOrTown ?? undefined,
+    stateOrProvince: region ?? undefined,
     postcode: postcode ?? undefined,
     poBox: poBox ?? undefined,
   };

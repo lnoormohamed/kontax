@@ -12,6 +12,7 @@ export type AddressEntry = {
   streetLine1?: string;
   streetLine2?: string;
   cityOrTown?: string;
+  stateOrProvince?: string;
   postcode?: string;
   poBox?: string;
 };

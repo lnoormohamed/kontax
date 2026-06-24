@@ -172,6 +172,7 @@ export const mapGooglePersonToContact = (
       ...(a.streetAddress?.trim() ? { streetLine1: a.streetAddress.trim() } : {}),
       ...(a.extendedAddress?.trim() ? { streetLine2: a.extendedAddress.trim() } : {}),
       ...(a.city?.trim() ? { cityOrTown: a.city.trim() } : {}),
+      ...(a.region?.trim() ? { stateOrProvince: a.region.trim() } : {}),
       ...(a.postalCode?.trim() ? { postcode: a.postalCode.trim() } : {}),
       ...(a.poBox?.trim() ? { poBox: a.poBox.trim() } : {}),
     }));
