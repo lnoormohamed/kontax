@@ -8,7 +8,11 @@ import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
-import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
+import {
+  parseContactDateEntries,
+  parseContactPostalAddresses,
+  parseContactStringArray,
+} from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
@@ -232,6 +236,7 @@ const toPortableSyncContact = (contact: {
   jobTitle: string | null;
   website: string | null;
   birthday: string | null;
+  significantDates?: unknown;
   address: string | null;
   postalAddresses: unknown;
   notes: string | null;
@@ -246,6 +251,7 @@ const toPortableSyncContact = (contact: {
   jobTitle: contact.jobTitle,
   website: contact.website,
   birthday: contact.birthday,
+  significantDates: parseContactDateEntries(contact.significantDates),
   address: contact.address,
   postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
   notes: contact.notes,
@@ -288,6 +294,9 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     website: typeof snapshot.website === "string" ? snapshot.website : null,
     websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
     birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
+    significantDates: Array.isArray(snapshot.significantDates)
+      ? snapshot.significantDates
+      : undefined,
     address: typeof snapshot.address === "string" ? snapshot.address : null,
     postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
     addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
@@ -425,6 +434,10 @@ const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unkno
     getSnapshotObjectList(localSnapshot, "addressEntries"),
     getSnapshotObjectList(remoteSnapshot, "addressEntries"),
   );
+  const significantDates = mergeUniqueObjects(
+    getSnapshotObjectList(localSnapshot, "significantDates"),
+    getSnapshotObjectList(remoteSnapshot, "significantDates"),
+  );
 
   return {
     fullName,
@@ -465,6 +478,7 @@ const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unkno
     birthday:
       getSnapshotStringValue(localSnapshot, "birthday") ??
       getSnapshotStringValue(remoteSnapshot, "birthday"),
+    significantDates: significantDates.length > 0 ? significantDates : undefined,
     address:
       getSnapshotStringValue(localSnapshot, "address") ??
       getSnapshotStringValue(remoteSnapshot, "address"),
@@ -1503,6 +1517,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           jobTitle: true,
           website: true,
           birthday: true,
+          significantDates: true,
           address: true,
           postalAddresses: true,
           notes: true,
@@ -1622,6 +1637,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
         jobTitle: conflict.contact.jobTitle,
         website: conflict.contact.website,
         birthday: conflict.contact.birthday,
+        significantDates: parseContactDateEntries(conflict.contact.significantDates),
         address: conflict.contact.address,
         postalAddresses: parseContactPostalAddresses(conflict.contact.postalAddresses),
         notes: conflict.contact.notes,
@@ -1722,6 +1738,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
         website: mergedWriteData.website,
         websiteEntries: mergedWriteData.websiteEntries as Prisma.InputJsonValue | undefined,
         birthday: mergedWriteData.birthday,
+        significantDates: mergedWriteData.significantDates as Prisma.InputJsonValue | undefined,
         address: mergedWriteData.address,
         postalAddresses: mergedWriteData.postalAddresses as Prisma.InputJsonValue | undefined,
         addressEntries: mergedWriteData.addressEntries as Prisma.InputJsonValue | undefined,
@@ -1751,6 +1768,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
         jobTitle: mergedWriteData.jobTitle ?? null,
         website: mergedWriteData.website ?? null,
         birthday: mergedWriteData.birthday ?? null,
+        significantDates: parseContactDateEntries(mergedWriteData.significantDates ?? []),
         address: mergedWriteData.address ?? null,
         postalAddresses: parseContactPostalAddresses(mergedWriteData.postalAddresses ?? []),
         notes: mergedWriteData.notes ?? null,

@@ -56,6 +56,7 @@ export type CardDavContactCard = CardDavAddressBookEntry & {
   website: string | null;
   websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }>;
   birthday: string | null;
+  significantDates: Array<{ label: string; date: string; isPrimary: boolean }>;
   address: string | null;
   postalAddresses: Array<{ label: string; formatted: string }>;
   addressEntries: Array<{
@@ -538,6 +539,22 @@ const parseAdrValue = (value: string, label: string) => {
   };
 };
 
+const parseSignificantDateValue = (
+  value: string,
+  label: string,
+): { label: string; date: string; isPrimary: boolean } | null => {
+  const normalizedDate = normalizeBirthdayValue(value);
+  if (!normalizedDate) {
+    return null;
+  }
+
+  return {
+    label,
+    date: normalizedDate,
+    isPrimary: false,
+  };
+};
+
 const parseCardDavContactCard = (
   entry: CardDavAddressBookEntry,
   addressData: string,
@@ -617,6 +634,27 @@ const parseCardDavContactCard = (
       ...entry,
       isPrimary: index === 0,
     }));
+  const significantDates = lines
+    .filter((line) => line.name === "X-ABDATE")
+    .map((line) =>
+      parseSignificantDateValue(
+        line.value,
+        getLineCustomLabel(lines, line) ?? "Anniversary",
+      ),
+    )
+    .filter(
+      (
+        entry,
+      ): entry is {
+        label: string;
+        date: string;
+        isPrimary: boolean;
+      } => entry != null,
+    )
+    .map((entry, index) => ({
+      ...entry,
+      isPrimary: index === 0,
+    }));
   const postalAddresses = addressEntries.map((entry) => ({
     label: entry.label,
     formatted: entry.formatted,
@@ -654,6 +692,7 @@ const parseCardDavContactCard = (
     website: websiteEntries[0]?.value ?? null,
     websiteEntries,
     birthday: normalizeBirthdayValue(bdayLine?.value ?? null),
+    significantDates,
     address: addressEntries[0]?.formatted ?? null,
     postalAddresses,
     addressEntries,

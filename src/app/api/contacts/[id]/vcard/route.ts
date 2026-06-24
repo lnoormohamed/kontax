@@ -2,6 +2,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import {
   contactsToVCard,
+  parseContactDateEntries,
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -37,6 +38,7 @@ export async function GET(
       jobTitle: true,
       website: true,
       birthday: true,
+      significantDates: true,
       address: true,
       postalAddresses: true,
       notes: true,
@@ -52,6 +54,7 @@ export async function GET(
       ...contact,
       emailAddresses: parseContactStringArray(contact.emailAddresses),
       phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+      significantDates: parseContactDateEntries(contact.significantDates),
       postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
     },
   ]);

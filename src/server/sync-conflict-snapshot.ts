@@ -3,6 +3,7 @@
 // P23-05 resolution UI reads is identical across providers.
 import { Prisma } from "../../generated/prisma";
 import {
+  parseContactDateEntries,
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -29,6 +30,7 @@ export const contactConflictSelect = Prisma.validator<Prisma.ContactSelect>()({
   jobTitle: true,
   website: true,
   birthday: true,
+  significantDates: true,
   address: true,
   postalAddresses: true,
   notes: true,
@@ -53,6 +55,7 @@ export type ContactConflictSnapshotInput = {
   jobTitle: string | null;
   website: string | null;
   birthday: string | null;
+  significantDates?: unknown;
   address: string | null;
   postalAddresses: unknown;
   notes: string | null;
@@ -77,6 +80,7 @@ export const buildLocalConflictSnapshot = (contact: ContactConflictSnapshotInput
   jobTitle: contact.jobTitle,
   website: contact.website,
   birthday: contact.birthday,
+  significantDates: parseContactDateEntries(contact.significantDates),
   address: contact.address,
   postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
   notes: contact.notes,

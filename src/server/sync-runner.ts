@@ -59,6 +59,7 @@ type SyncContactRow = {
   website: string | null;
   websiteEntries?: unknown;
   birthday: string | null;
+  significantDates?: unknown;
   address: string | null;
   postalAddresses: unknown;
   addressEntries?: unknown;
@@ -90,6 +91,33 @@ const safeValueEntries = (value: unknown) =>
             label: typeof (entry as { label?: unknown }).label === "string" ? (entry as { label: string }).label : "",
             value: (entry as { value: string }).value,
             isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+          },
+        ];
+      })
+    : [];
+
+const safeDateEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { date?: unknown }).date !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label:
+              typeof (entry as { label?: unknown }).label === "string"
+                ? (entry as { label: string }).label
+                : "Anniversary",
+            date: (entry as { date: string }).date,
+            isPrimary:
+              typeof (entry as { isPrimary?: unknown }).isPrimary === "boolean"
+                ? (entry as { isPrimary: boolean }).isPrimary
+                : false,
           },
         ];
       })
@@ -166,6 +194,7 @@ const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
   website: c.website,
   websiteEntries: safeValueEntries(c.websiteEntries),
   birthday: c.birthday,
+  significantDates: safeDateEntries(c.significantDates),
   address: c.address,
   postalAddresses: Array.isArray(c.postalAddresses)
     ? (c.postalAddresses as PortableContactInput["postalAddresses"])
@@ -197,6 +226,7 @@ const cardDavPushContactSelect = {
   website: true,
   websiteEntries: true,
   birthday: true,
+  significantDates: true,
   address: true,
   postalAddresses: true,
   addressEntries: true,
@@ -241,6 +271,9 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     website: typeof snapshot.website === "string" ? snapshot.website : null,
     websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
     birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
+    significantDates: Array.isArray(snapshot.significantDates)
+      ? snapshot.significantDates
+      : undefined,
     address: typeof snapshot.address === "string" ? snapshot.address : null,
     postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
     addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
@@ -1256,6 +1289,8 @@ export const runQueuedSyncJobs = async ({
               website: card.website,
               websiteEntries: card.websiteEntries.length > 0 ? card.websiteEntries : undefined,
               birthday: card.birthday,
+              significantDates:
+                card.significantDates.length > 0 ? card.significantDates : undefined,
               address: card.address,
               postalAddresses:
                 card.postalAddresses.length > 0 ? card.postalAddresses : undefined,

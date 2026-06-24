@@ -1,5 +1,6 @@
 import {
   contactsToVCard,
+  parseContactDateEntries,
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -37,6 +38,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
           jobTitle: true,
           website: true,
           birthday: true,
+          significantDates: true,
           address: true,
           postalAddresses: true,
           notes: true,
@@ -98,6 +100,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
       jobTitle: c.jobTitle,
       website: c.website,
       birthday: c.birthday,
+      significantDates: parseContactDateEntries(c.significantDates),
       address: c.address,
       postalAddresses: parseContactPostalAddresses(c.postalAddresses),
       notes: c.notes,

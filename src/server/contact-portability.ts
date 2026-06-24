@@ -45,6 +45,12 @@ export type ContactAddressEntryInput = {
   poBox?: string;
 };
 
+export type ContactDateEntryInput = {
+  label: string;
+  date: string;
+  isPrimary?: boolean;
+};
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
@@ -66,6 +72,25 @@ export const parseContactPostalAddresses = (value: unknown): ContactPostalAddres
         const formatted = typeof rawFormatted === "string" ? rawFormatted : null;
 
         return formatted?.trim().length ? [{ label, formatted }] : [];
+      })
+    : [];
+
+export const parseContactDateEntries = (value: unknown): ContactDateEntryInput[] =>
+  Array.isArray(value)
+    ? value.flatMap((item) => {
+        if (!isRecord(item)) {
+          return [];
+        }
+
+        const rawLabel = item.label;
+        const rawDate = item.date;
+        const rawPrimary = item.isPrimary;
+        const label = typeof rawLabel === "string" ? rawLabel : "Other";
+        const date = typeof rawDate === "string" ? rawDate.trim() : "";
+
+        return date.length > 0
+          ? [{ label, date, isPrimary: typeof rawPrimary === "boolean" ? rawPrimary : undefined }]
+          : [];
       })
     : [];
 
@@ -92,6 +117,7 @@ export type PortableContactInput = {
   website?: string | null;
   websiteEntries?: ContactValueEntryInput[] | null;
   birthday?: string | null;
+  significantDates?: ContactDateEntryInput[] | null;
   address?: string | null;
   postalAddresses?: ContactPostalAddressInput[] | null;
   addressEntries?: ContactAddressEntryInput[] | null;
@@ -546,6 +572,9 @@ const normalizeBirthdayForVCard = (value: string | null | undefined) => {
 
   return trimmed;
 };
+
+const normalizeDateEntryForVCard = (value: string | null | undefined) =>
+  normalizeBirthdayForVCard(value);
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -1469,6 +1498,17 @@ export const contactsToVCard = (
       const birthdayValue = normalizeBirthdayForVCard(contact.birthday);
       if (birthdayValue) {
         lines.push(`BDAY:${escapeVCard(birthdayValue)}`);
+      }
+
+      const significantDates = (contact.significantDates ?? []).filter((entry) => {
+        const label = entry.label?.trim();
+        return Boolean(label) && Boolean(normalizeDateEntryForVCard(entry.date));
+      });
+      for (const entry of significantDates) {
+        const normalizedDate = normalizeDateEntryForVCard(entry.date);
+        const groupPrefix = `item${customGroupIndex++}.`;
+        lines.push(`${groupPrefix}X-ABDATE:${escapeVCard(normalizedDate!)}`);
+        lines.push(`${groupPrefix}X-ABLABEL:${escapeVCard(entry.label.trim())}`);
       }
 
       const addressEntries = (contact.addressEntries ?? []).filter(
