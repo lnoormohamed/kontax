@@ -773,6 +773,8 @@ model SyncContactLink {
     remoteHref     String?
     remoteUid      String?
     remoteETag     String?
+    capabilityProfileId String?
+    supportedFieldShadow Json?
     lastSyncedAt   DateTime?
     tombstonedAt   DateTime?
     remoteDeletedAt DateTime?

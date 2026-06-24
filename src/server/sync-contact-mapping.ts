@@ -1,6 +1,7 @@
 // Canonical mapped-contact shape shared by every sync connector's field mapper
 // (Google P27-02, Microsoft P27-05). Maps to the same Contact write fields the
 // CardDAV importer sets, so contacts look identical regardless of source.
+import type { PortableContactInput } from "~/server/contact-portability";
 
 export type ValueEntry = { label: string; value: string; isPrimary: boolean };
 
@@ -72,4 +73,36 @@ export const mappedContactToWriteData = (m: MappedContact) => ({
   notes: m.notes,
   relatedPeople: m.relatedPeople.length > 0 ? m.relatedPeople : undefined,
   customFields: m.customFields.length > 0 ? m.customFields : undefined,
+});
+
+export const mappedContactToPortableContact = (
+  m: MappedContact,
+): PortableContactInput => ({
+  fullName: m.fullName,
+  firstName: m.firstName,
+  middleName: m.middleName,
+  lastName: m.lastName,
+  namePrefix: m.namePrefix,
+  nameSuffix: m.nameSuffix,
+  nickname: m.nickname,
+  email: m.emailAddresses[0] ?? null,
+  emailAddresses: m.emailAddresses,
+  emailEntries: m.emailEntries,
+  phone: m.phoneNumbers[0] ?? null,
+  phoneNumbers: m.phoneNumbers,
+  phoneEntries: m.phoneEntries,
+  company: m.company,
+  department: m.department,
+  jobTitle: m.jobTitle,
+  website: m.website,
+  websiteEntries: m.websiteEntries,
+  birthday: m.birthday,
+  address: m.address,
+  postalAddresses: m.postalAddresses,
+  addressEntries: m.addressEntries,
+  notes: m.notes,
+  customFields:
+    m.customFields.length > 0
+      ? Object.fromEntries(m.customFields.map((field) => [field.label, field.value]))
+      : null,
 });

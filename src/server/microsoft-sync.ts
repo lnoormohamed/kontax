@@ -17,7 +17,10 @@ import {
 import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { parseContactStringArray } from "~/server/contact-portability";
+import {
+  parseContactPostalAddresses,
+  parseContactStringArray,
+} from "~/server/contact-portability";
 import {
   type GraphContact,
   type GraphContactSource,
@@ -39,6 +42,10 @@ import {
   recordAutoResolved,
   type RemoteContactItem,
 } from "~/server/sync-import-engine";
+import {
+  buildProviderSupportedContactShadow,
+  resolveSyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 import {
   decryptMicrosoftSyncCredential,
   encryptMicrosoftSyncCredential,
@@ -163,8 +170,13 @@ const toEngineAccount = (account: MicrosoftImportAccount): ImportEngineAccount =
   userId: account.userId,
   label: account.label,
   conflictPolicy: account.conflictPolicy,
+  capabilityProfile: resolveSyncProviderCapabilityProfile({ provider: "MICROSOFT" }),
   sourceType: "SYNC_MICROSOFT",
   providerName: "Outlook",
+});
+
+const MICROSOFT_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
+  provider: "MICROSOFT",
 });
 
 // ── token acquisition (refresh via MSAL token cache) ─────────────────────────
@@ -410,9 +422,15 @@ export const pushMicrosoftContact = async (
 
   const patched = await graphPatchContact(accessToken, link.remoteUid, link.remoteETag ?? "*", body);
   if ("etag" in patched) {
+    const localShadow = buildMicrosoftPushShadow(contact);
     await db.syncContactLink.update({
       where: { id: link.id },
-      data: { remoteETag: patched.etag, lastSyncedAt: new Date() },
+      data: {
+        remoteETag: patched.etag,
+        capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
+        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        lastSyncedAt: new Date(),
+      },
     });
     return { ok: true };
   }
@@ -453,9 +471,15 @@ export const pushMicrosoftContact = async (
     if (!("etag" in retry)) {
       throw normaliseMicrosoftError({ statusCode: retry.status, message: retry.message });
     }
+    const localShadow = buildMicrosoftPushShadow(contact);
     await db.syncContactLink.update({
       where: { id: link.id },
-      data: { remoteETag: retry.etag, lastSyncedAt: now },
+      data: {
+        remoteETag: retry.etag,
+        capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
+        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        lastSyncedAt: now,
+      },
     });
     await recordAutoResolved(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag, "KEEP_LOCAL", now);
     return { ok: false, conflict: true, strategy: "KEEP_LOCAL" };
@@ -546,6 +570,36 @@ const buildMicrosoftPushContact = (c: PushContactRow): MicrosoftPushContact => (
   notes: c.notes,
 });
 
+const buildMicrosoftPushShadow = (contact: MicrosoftPushContact) =>
+  buildProviderSupportedContactShadow(
+    {
+      fullName: contact.fullName ?? "",
+      firstName: contact.firstName,
+      middleName: contact.middleName,
+      lastName: contact.lastName,
+      namePrefix: contact.namePrefix,
+      nameSuffix: contact.nameSuffix,
+      nickname: contact.nickname ?? null,
+      email: contact.email ?? null,
+      emailAddresses:
+        contact.emailEntries?.map((entry) => entry.value) ?? contact.emailAddresses ?? [],
+      emailEntries: contact.emailEntries ?? [],
+      phone: contact.phone ?? null,
+      phoneNumbers: contact.phoneEntries?.map((entry) => entry.value) ?? [],
+      phoneEntries: contact.phoneEntries ?? [],
+      company: contact.company ?? null,
+      department: contact.department ?? null,
+      jobTitle: contact.jobTitle ?? null,
+      website: contact.website ?? null,
+      websiteEntries: contact.websiteEntries ?? [],
+      birthday: contact.birthday ?? null,
+      address: contact.address ?? null,
+      postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+      notes: contact.notes ?? null,
+    },
+    MICROSOFT_CAPABILITY_PROFILE,
+  );
+
 // Create a brand-new Outlook contact, then link it.
 const createMicrosoftContactRemote = async (
   account: MicrosoftImportAccount,
@@ -573,6 +627,10 @@ const createMicrosoftContactRemote = async (
       remoteHref: created.id,
       remoteUid: created.id,
       remoteETag: created["@odata.etag"] ?? null,
+      capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
+      supportedFieldShadow: buildMicrosoftPushShadow(
+        buildMicrosoftPushContact(contact),
+      ) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
     },
   });

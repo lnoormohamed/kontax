@@ -767,22 +767,24 @@ model SyncSettingsElevation {
 }
 
 model SyncContactLink {
-  id               String         @id @default(cuid())
-  syncAccountId    String
-  contactId        String
-  remoteHref       String?
-  remoteUid        String?
-  remoteETag       String?
-  lastSyncedAt     DateTime?
-  tombstonedAt     DateTime?
-  remoteDeletedAt  DateTime?
-  lastErrorCode    String?
-  lastErrorMessage String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  syncAccount      SyncAccount    @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
-  contact          Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  syncConflicts    SyncConflict[]
+  id                   String         @id @default(cuid())
+  syncAccountId        String
+  contactId            String
+  remoteHref           String?
+  remoteUid            String?
+  remoteETag           String?
+  capabilityProfileId  String?
+  supportedFieldShadow Json?
+  lastSyncedAt         DateTime?
+  tombstonedAt         DateTime?
+  remoteDeletedAt      DateTime?
+  lastErrorCode        String?
+  lastErrorMessage     String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  syncAccount          SyncAccount    @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+  contact              Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  syncConflicts        SyncConflict[]
 
   @@unique([syncAccountId, contactId])
   @@unique([syncAccountId, remoteHref])

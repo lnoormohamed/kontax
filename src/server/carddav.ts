@@ -1,5 +1,10 @@
 import type { PortableContactInput } from "~/server/contact-portability";
 import { contactsToVCard } from "~/server/contact-portability";
+import {
+  getCardDavVCardFlavor,
+  projectPortableContactForProvider,
+  resolveSyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 
 type CardDavCredentials = {
   username: string;
@@ -775,21 +780,21 @@ export const fetchCardDavAddressBookCards = async ({
 
 const ensureTrailingSlash = (value: string) => (value.endsWith("/") ? value : `${value}/`);
 
-const getCardDavFlavor = (url: string): "generic" | "fastmail" => {
-  try {
-    const hostname = new URL(url).hostname.toLowerCase();
-    return hostname.includes("fastmail.com") ? "fastmail" : "generic";
-  } catch {
-    return "generic";
-  }
-};
-
 const buildCardDavContactBody = (
   contact: PortableContactInput,
   uid: string,
-  flavor: "generic" | "fastmail",
-) =>
-  contactsToVCard([contact], { flavor }).replace(/\r\nEND:VCARD$/, `\r\nUID:${uid}\r\nEND:VCARD`);
+  addressBookUrl: string,
+) => {
+  const profile = resolveSyncProviderCapabilityProfile({
+    provider: "CARDDAV",
+    addressBookUrl,
+  });
+  const projected = projectPortableContactForProvider(contact, profile);
+  return contactsToVCard([projected], { flavor: getCardDavVCardFlavor(profile) }).replace(
+    /\r\nEND:VCARD$/,
+    `\r\nUID:${uid}\r\nEND:VCARD`,
+  );
+};
 
 export const pushCardDavContact = async ({
   addressBookUrl,
@@ -811,7 +816,7 @@ export const pushCardDavContact = async ({
   // update the contact's UID, which then breaks future REPORT lookups (the new UID won't
   // match our contactByUid map, triggering spurious bootstrap attempts).
   const uidForBody = remoteUid;
-  const body = buildCardDavContactBody(contact, uidForBody, getCardDavFlavor(href));
+  const body = buildCardDavContactBody(contact, uidForBody, collectionUrl);
 
   let response: Response;
   // Explicitly convert to UTF-8 Buffer so the underlying HTTP stack cannot

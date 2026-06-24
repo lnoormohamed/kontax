@@ -10,7 +10,10 @@ import { auth as googleAuth, people, type people_v1 } from "@googleapis/people";
 import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { parseContactStringArray } from "~/server/contact-portability";
+import {
+  parseContactPostalAddresses,
+  parseContactStringArray,
+} from "~/server/contact-portability";
 import {
   type GoogleContactSource,
   mapContactToGooglePerson,
@@ -31,6 +34,10 @@ import {
   recordAutoResolved,
   type RemoteContactItem,
 } from "~/server/sync-import-engine";
+import {
+  buildProviderSupportedContactShadow,
+  resolveSyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 import {
   decryptGoogleSyncCredential,
   encryptGoogleSyncCredential,
@@ -122,8 +129,13 @@ const toEngineAccount = (account: GoogleImportAccount): ImportEngineAccount => (
   userId: account.userId,
   label: account.label,
   conflictPolicy: account.conflictPolicy,
+  capabilityProfile: resolveSyncProviderCapabilityProfile({ provider: "GOOGLE" }),
   sourceType: "SYNC_GOOGLE",
   providerName: "Google",
+});
+
+const GOOGLE_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
+  provider: "GOOGLE",
 });
 
 const normaliseGoogleError = (error: unknown): GoogleSyncError => {
@@ -367,9 +379,15 @@ export const pushGoogleContact = async (
       updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
       requestBody: body,
     });
+    const localShadow = buildGooglePushShadow(contact);
     await db.syncContactLink.update({
       where: { id: link.id },
-      data: { remoteETag: res.data.etag ?? null, lastSyncedAt: new Date() },
+      data: {
+        remoteETag: res.data.etag ?? null,
+        capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
+        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        lastSyncedAt: new Date(),
+      },
     });
     return { ok: true };
   } catch (error) {
@@ -424,9 +442,15 @@ export const pushGoogleContact = async (
       updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
       requestBody: retryBody,
     });
+    const localShadow = buildGooglePushShadow(contact);
     await db.syncContactLink.update({
       where: { id: link.id },
-      data: { remoteETag: res.data.etag ?? null, lastSyncedAt: now },
+      data: {
+        remoteETag: res.data.etag ?? null,
+        capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
+        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        lastSyncedAt: now,
+      },
     });
     await recordAutoResolved(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag, "KEEP_LOCAL", now);
     return { ok: false, conflict: true, strategy: "KEEP_LOCAL" };
@@ -518,6 +542,34 @@ const buildGooglePushContact = (c: PushContactRow): GooglePushContact => ({
   notes: c.notes,
 });
 
+const buildGooglePushShadow = (contact: GooglePushContact) =>
+  buildProviderSupportedContactShadow(
+    {
+      fullName: contact.fullName,
+      firstName: contact.firstName,
+      middleName: contact.middleName,
+      lastName: contact.lastName,
+      namePrefix: contact.namePrefix,
+      nameSuffix: contact.nameSuffix,
+      nickname: contact.nickname,
+      email: contact.email,
+      emailAddresses: contact.emailAddresses,
+      emailEntries: contact.emailEntries,
+      phone: contact.phone,
+      phoneNumbers: contact.phoneNumbers,
+      phoneEntries: contact.phoneEntries,
+      company: contact.company,
+      department: contact.department,
+      jobTitle: contact.jobTitle,
+      website: contact.website,
+      birthday: contact.birthday,
+      address: contact.address,
+      postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+      notes: contact.notes,
+    },
+    GOOGLE_CAPABILITY_PROFILE,
+  );
+
 // Create a brand-new Google contact for a local contact that has no link yet,
 // then record the link so subsequent syncs treat it as updates, not creates.
 const createGoogleContactRemote = async (
@@ -543,6 +595,10 @@ const createGoogleContactRemote = async (
       remoteHref: created.resourceName,
       remoteUid: created.resourceName,
       remoteETag: created.etag ?? null,
+      capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
+      supportedFieldShadow: buildGooglePushShadow(
+        buildGooglePushContact(contact),
+      ) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
     },
   });

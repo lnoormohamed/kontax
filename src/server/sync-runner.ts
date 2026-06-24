@@ -1,5 +1,6 @@
 import type { Prisma } from "../../generated/prisma";
 import {
+  type CardDavContactCard,
   CardDavPreflightError,
   deleteCardDavContact,
   fetchCardDavAddressBookCards,
@@ -23,6 +24,13 @@ import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
+import {
+  buildProviderSupportedContactShadow,
+  providerSupportsSignificantDates,
+  providerSupportedShadowsEqual,
+  resolveSyncProviderCapabilityProfile,
+  type SyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 import {
   DEFAULT_SYNC_FREQUENCY_MINUTES,
   getEffectiveSyncAccountSettings,
@@ -203,6 +211,33 @@ const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
   notes: c.notes,
 });
 
+const cardDavCardToPortable = (card: CardDavContactCard): PortableContactInput => ({
+  fullName: card.fullName,
+  firstName: card.firstName,
+  middleName: card.middleName,
+  lastName: card.lastName,
+  namePrefix: card.namePrefix,
+  nameSuffix: card.nameSuffix,
+  nickname: card.nickname,
+  email: card.emailAddresses[0] ?? null,
+  emailAddresses: card.emailAddresses,
+  emailEntries: card.emailEntries,
+  phone: card.phoneNumbers[0] ?? null,
+  phoneNumbers: card.phoneNumbers,
+  phoneEntries: card.phoneEntries,
+  company: card.company,
+  department: card.department,
+  jobTitle: card.jobTitle,
+  website: card.website,
+  websiteEntries: card.websiteEntries,
+  birthday: card.birthday,
+  significantDates: card.significantDates,
+  address: card.address,
+  postalAddresses: card.postalAddresses,
+  addressEntries: card.addressEntries,
+  notes: card.notes,
+});
+
 const cardDavPushContactSelect = {
   id: true,
   syncUid: true,
@@ -233,7 +268,10 @@ const cardDavPushContactSelect = {
   notes: true,
 } satisfies Prisma.ContactSelect;
 
-const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
+const buildContactWriteDataFromRemoteSnapshot = (
+  snapshot: unknown,
+  profile: SyncProviderCapabilityProfile,
+) => {
   if (!isRecord(snapshot)) {
     throw new Error("Remote sync snapshot is missing or invalid.");
   }
@@ -251,7 +289,7 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
     : [];
 
-  return {
+  const writeData = {
     fullName,
     firstName: typeof snapshot.firstName === "string" ? snapshot.firstName : null,
     middleName: typeof snapshot.middleName === "string" ? snapshot.middleName : null,
@@ -271,14 +309,22 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     website: typeof snapshot.website === "string" ? snapshot.website : null,
     websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
     birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
-    significantDates: Array.isArray(snapshot.significantDates)
-      ? snapshot.significantDates
-      : undefined,
     address: typeof snapshot.address === "string" ? snapshot.address : null,
     postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
     addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
     notes: typeof snapshot.notes === "string" ? snapshot.notes : null,
   };
+
+  if (providerSupportsSignificantDates(profile)) {
+    return {
+      ...writeData,
+      significantDates: Array.isArray(snapshot.significantDates)
+        ? snapshot.significantDates
+        : undefined,
+    };
+  }
+
+  return writeData;
 };
 
 const getFailureStatus = (
@@ -865,6 +911,12 @@ export const runQueuedSyncJobs = async ({
 
     try {
       const now = new Date();
+      const capabilityProfile = resolveSyncProviderCapabilityProfile({
+        provider: job.syncAccount.provider,
+        baseUrl: job.syncAccount.baseUrl,
+        addressBookUrl: job.syncAccount.addressBookUrl,
+        label: job.syncAccount.label,
+      });
       const remoteEntries = await fetchCardDavAddressBookIndex({
         addressBookUrl: job.syncAccount.addressBookUrl,
         credentials: {
@@ -906,6 +958,8 @@ export const runQueuedSyncJobs = async ({
           remoteUid: true,
           remoteHref: true,
           remoteETag: true,
+          capabilityProfileId: true,
+          supportedFieldShadow: true,
           lastSyncedAt: true,
           contactId: true,
           contact: {
@@ -992,6 +1046,14 @@ export const runQueuedSyncJobs = async ({
         linkId: string;
         remoteHref: string;
       }> = [];
+      const metadataRefreshCandidates: Array<{
+        linkId: string;
+        remoteHref: string;
+        remoteUid: string;
+        remoteETag: string | null;
+        supportedFieldShadow: ReturnType<typeof buildProviderSupportedContactShadow>;
+        lastSyncedAt: Date;
+      }> = [];
       // P23-05: audit trail for conflicts auto-resolved by SERVER_WINS / DEVICE_WINS.
       const autoResolvedEntries: Array<{
         linkId: string;
@@ -1030,6 +1092,22 @@ export const runQueuedSyncJobs = async ({
         const localChanged =
           link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
         const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
+        const localSupportedShadow = buildProviderSupportedContactShadow(
+          contactToPortable(link.contact),
+          capabilityProfile,
+        );
+        const remoteSupportedShadow = remoteCard
+          ? buildProviderSupportedContactShadow(
+              cardDavCardToPortable(remoteCard),
+              capabilityProfile,
+            )
+          : null;
+        const supportedFieldsDiffer =
+          remoteSupportedShadow == null
+            ? true
+            : !providerSupportedShadowsEqual(localSupportedShadow, remoteSupportedShadow);
+        const localSupportedChanged = localChanged && supportedFieldsDiffer;
+        const remoteSupportedChanged = remoteChanged && supportedFieldsDiffer;
 
         if (!remoteEntry) {
           if (!link.contact.archivedAt) {
@@ -1053,7 +1131,16 @@ export const runQueuedSyncJobs = async ({
           continue;
         }
 
-        if (localChanged && remoteChanged && remoteCard) {
+        if (localChanged && link.contact.archivedAt) {
+          if (canWrite && link.remoteHref) {
+            localDeleteCandidates.push({ linkId: link.id, remoteHref: link.remoteHref });
+          } else {
+            deferredLocalChangesCount += 1;
+          }
+          continue;
+        }
+
+        if (localSupportedChanged && remoteSupportedChanged && remoteCard) {
           // P23-01: resolve a local↔remote mutation by the connection's policy.
           if (settings.conflictPolicy === "SERVER_WINS") {
             // Remote wins: apply the remote snapshot over the local contact.
@@ -1106,30 +1193,38 @@ export const runQueuedSyncJobs = async ({
           continue;
         }
 
-        if (localChanged) {
+        if (localSupportedChanged) {
           if (canWrite && link.remoteHref) {
-            if (link.contact.archivedAt) {
-              localDeleteCandidates.push({ linkId: link.id, remoteHref: link.remoteHref });
-            } else {
-              localPushCandidates.push({
-                linkId: link.id,
-                remoteHref: link.remoteHref,
-                remoteUid: remoteUid ?? link.remoteHref,
-                contact: link.contact,
-              });
-            }
+            localPushCandidates.push({
+              linkId: link.id,
+              remoteHref: link.remoteHref,
+              remoteUid: remoteUid ?? link.remoteHref,
+              contact: link.contact,
+            });
           } else {
             deferredLocalChangesCount += 1;
           }
           continue;
         }
 
-        if (remoteChanged && remoteCard) {
+        if (remoteSupportedChanged && remoteCard) {
           remoteApplyCandidates.push({
             linkId: link.id,
             contactId: link.contact.id,
             remoteETag: remoteEntry.etag ?? null,
             remoteSnapshot: remoteCard,
+          });
+          continue;
+        }
+
+        if (remoteSupportedShadow) {
+          metadataRefreshCandidates.push({
+            linkId: link.id,
+            remoteHref: remoteEntry.href,
+            remoteUid: remoteEntry.uid,
+            remoteETag: remoteEntry.etag ?? null,
+            supportedFieldShadow: remoteSupportedShadow,
+            lastSyncedAt: localChanged ? link.contact.updatedAt : now,
           });
         }
       }
@@ -1141,9 +1236,10 @@ export const runQueuedSyncJobs = async ({
         remoteUid: string;
         remoteHref: string;
         remoteETag: string | null;
+        supportedFieldShadow: ReturnType<typeof buildProviderSupportedContactShadow>;
         lastSyncedAt: Date;
       }> = [];
-      const deletedLinkIds: string[] = [];
+      const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = [];
 
       for (const candidate of localPushCandidates) {
         try {
@@ -1180,6 +1276,10 @@ export const runQueuedSyncJobs = async ({
             remoteUid: contact.syncUid,
             remoteHref: result.href,
             remoteETag: result.etag,
+            supportedFieldShadow: buildProviderSupportedContactShadow(
+              contactToPortable(contact),
+              capabilityProfile,
+            ),
             lastSyncedAt: contact.updatedAt,
           });
         } catch (err) {
@@ -1197,7 +1297,7 @@ export const runQueuedSyncJobs = async ({
               password: decryptedCredentials.password,
             },
           });
-          deletedLinkIds.push(candidate.linkId);
+          deletedLinkIds.push({ linkId: candidate.linkId, lastSyncedAt: now });
         } catch (err) {
           console.error(`[sync] CardDAV delete failed for link ${candidate.linkId}:`, err);
           deferredLocalChangesCount += 1;
@@ -1221,12 +1321,28 @@ export const runQueuedSyncJobs = async ({
               remoteHref: entry.href,
               remoteUid: entry.uid,
               remoteETag: entry.etag,
+              capabilityProfileId: capabilityProfile.id,
+              supportedFieldShadow:
+                remoteCardByUid.has(entry.uid)
+                  ? (buildProviderSupportedContactShadow(
+                      cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                      capabilityProfile,
+                    ) as Prisma.InputJsonValue)
+                  : undefined,
               lastSyncedAt: now,
             },
             update: {
               remoteHref: entry.href,
               remoteUid: entry.uid,
               remoteETag: entry.etag,
+              capabilityProfileId: capabilityProfile.id,
+              supportedFieldShadow:
+                remoteCardByUid.has(entry.uid)
+                  ? (buildProviderSupportedContactShadow(
+                      cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                      capabilityProfile,
+                    ) as Prisma.InputJsonValue)
+                  : undefined,
               remoteDeletedAt: null,
               tombstonedAt: null,
               lastErrorCode: null,
@@ -1250,12 +1366,16 @@ export const runQueuedSyncJobs = async ({
               remoteHref: created.remoteHref,
               remoteUid: created.remoteUid,
               remoteETag: created.remoteETag,
+              capabilityProfileId: capabilityProfile.id,
+              supportedFieldShadow: created.supportedFieldShadow as Prisma.InputJsonValue,
               lastSyncedAt: created.lastSyncedAt,
             },
             update: {
               remoteHref: created.remoteHref,
               remoteUid: created.remoteUid,
               remoteETag: created.remoteETag,
+              capabilityProfileId: capabilityProfile.id,
+              supportedFieldShadow: created.supportedFieldShadow as Prisma.InputJsonValue,
               remoteDeletedAt: null,
               tombstonedAt: null,
               lastErrorCode: null,
@@ -1289,7 +1409,7 @@ export const runQueuedSyncJobs = async ({
               website: card.website,
               websiteEntries: card.websiteEntries.length > 0 ? card.websiteEntries : undefined,
               birthday: card.birthday,
-              significantDates:
+              significantDates: providerSupportsSignificantDates(capabilityProfile) &&
                 card.significantDates.length > 0 ? card.significantDates : undefined,
               address: card.address,
               postalAddresses:
@@ -1327,6 +1447,11 @@ export const runQueuedSyncJobs = async ({
               remoteHref: remoteEntry?.href ?? card.href,
               remoteUid: card.uid,
               remoteETag: remoteEntry?.etag ?? card.etag,
+              capabilityProfileId: capabilityProfile.id,
+              supportedFieldShadow: buildProviderSupportedContactShadow(
+                cardDavCardToPortable(card),
+                capabilityProfile,
+              ) as Prisma.InputJsonValue,
               // Use the contact's actual updatedAt (set by Prisma during create) so that
               // subsequent syncs don't falsely detect all bootstrapped contacts as localChanged.
               lastSyncedAt: createdContact.updatedAt,
@@ -1371,7 +1496,10 @@ export const runQueuedSyncJobs = async ({
               id: remoteApply.contactId,
             },
             data: {
-              ...buildContactWriteDataFromRemoteSnapshot(remoteApply.remoteSnapshot),
+              ...buildContactWriteDataFromRemoteSnapshot(
+                remoteApply.remoteSnapshot,
+                capabilityProfile,
+              ),
               lastMutatedBy: "SYNC_CARDDAV",
               lastMutatedByDetail: job.syncAccount.label,
               syncVersion: {
@@ -1385,11 +1513,16 @@ export const runQueuedSyncJobs = async ({
             where: {
               id: remoteApply.linkId,
             },
-            data: {
-              remoteETag: remoteApply.remoteETag,
-              remoteDeletedAt: null,
-              tombstonedAt: null,
-              lastErrorCode: null,
+              data: {
+                remoteETag: remoteApply.remoteETag,
+                capabilityProfileId: capabilityProfile.id,
+                supportedFieldShadow: buildProviderSupportedContactShadow(
+                  cardDavCardToPortable(remoteApply.remoteSnapshot as CardDavContactCard),
+                  capabilityProfile,
+                ) as Prisma.InputJsonValue,
+                remoteDeletedAt: null,
+                tombstonedAt: null,
+                lastErrorCode: null,
               lastErrorMessage: null,
               // Use the contact's actual updatedAt so lastSyncedAt >= updatedAt,
               // preventing falsely detecting this pull as a local change next sync.
@@ -1438,11 +1571,21 @@ export const runQueuedSyncJobs = async ({
 
         // Update sync links for contacts successfully pushed to the remote.
         for (const pushed of pushedLinks) {
+          const pushedLink = localPushCandidates.find((candidate) => candidate.linkId === pushed.linkId);
           await tx.syncContactLink.update({
             where: { id: pushed.linkId },
             data: {
               remoteHref: pushed.newHref,
               remoteETag: pushed.newETag,
+              capabilityProfileId: capabilityProfile.id,
+              ...(pushedLink
+                ? {
+                    supportedFieldShadow: buildProviderSupportedContactShadow(
+                      contactToPortable(pushedLink.contact),
+                      capabilityProfile,
+                    ) as Prisma.InputJsonValue,
+                  }
+                : {}),
               lastSyncedAt: now,
               lastErrorCode: null,
               lastErrorMessage: null,
@@ -1450,11 +1593,29 @@ export const runQueuedSyncJobs = async ({
           });
         }
 
-        // Tombstone sync links for contacts deleted on the remote.
-        for (const linkId of deletedLinkIds) {
+        for (const refresh of metadataRefreshCandidates) {
           await tx.syncContactLink.update({
-            where: { id: linkId },
-            data: { tombstonedAt: now, lastSyncedAt: now },
+            where: { id: refresh.linkId },
+            data: {
+              remoteHref: refresh.remoteHref,
+              remoteUid: refresh.remoteUid,
+              remoteETag: refresh.remoteETag,
+              capabilityProfileId: capabilityProfile.id,
+              supportedFieldShadow: refresh.supportedFieldShadow as Prisma.InputJsonValue,
+              remoteDeletedAt: null,
+              tombstonedAt: null,
+              lastErrorCode: null,
+              lastErrorMessage: null,
+              lastSyncedAt: refresh.lastSyncedAt,
+            },
+          });
+        }
+
+        // Tombstone sync links for contacts deleted on the remote.
+        for (const deleted of deletedLinkIds) {
+          await tx.syncContactLink.update({
+            where: { id: deleted.linkId },
+            data: { tombstonedAt: now, lastSyncedAt: deleted.lastSyncedAt },
           });
         }
 

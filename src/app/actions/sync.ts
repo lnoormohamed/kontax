@@ -33,6 +33,12 @@ import {
   issueSyncSettingsElevation,
   requireSyncSettingsElevation,
 } from "~/server/sync-elevation";
+import {
+  buildProviderSupportedContactShadow,
+  providerSupportsSignificantDates,
+  resolveSyncProviderCapabilityProfile,
+  type SyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 
 const syncDirectionSchema = z.enum(["TWO_WAY", "IMPORT_ONLY", "EXPORT_ONLY"]);
 const conflictPolicySchema = z.enum(["SERVER_WINS", "DEVICE_WINS", "MANUAL"]);
@@ -225,39 +231,131 @@ const isConnectionValidationFailure = (errorCode: string) =>
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
+const parseValueEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { value?: unknown }).value !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label:
+              typeof (entry as { label?: unknown }).label === "string"
+                ? (entry as { label: string }).label
+                : "Other",
+            value: (entry as { value: string }).value,
+            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+          },
+        ];
+      })
+    : [];
+
+const parseAddressEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { formatted?: unknown }).formatted !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label:
+              typeof (entry as { label?: unknown }).label === "string"
+                ? (entry as { label: string }).label
+                : "Other",
+            formatted: (entry as { formatted: string }).formatted,
+            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+            ...(typeof (entry as { countryOrRegion?: unknown }).countryOrRegion === "string"
+              ? { countryOrRegion: (entry as { countryOrRegion: string }).countryOrRegion }
+              : {}),
+            ...(typeof (entry as { streetLine1?: unknown }).streetLine1 === "string"
+              ? { streetLine1: (entry as { streetLine1: string }).streetLine1 }
+              : {}),
+            ...(typeof (entry as { streetLine2?: unknown }).streetLine2 === "string"
+              ? { streetLine2: (entry as { streetLine2: string }).streetLine2 }
+              : {}),
+            ...(typeof (entry as { cityOrTown?: unknown }).cityOrTown === "string"
+              ? { cityOrTown: (entry as { cityOrTown: string }).cityOrTown }
+              : {}),
+            ...(typeof (entry as { stateOrProvince?: unknown }).stateOrProvince === "string"
+              ? { stateOrProvince: (entry as { stateOrProvince: string }).stateOrProvince }
+              : {}),
+            ...(typeof (entry as { postcode?: unknown }).postcode === "string"
+              ? { postcode: (entry as { postcode: string }).postcode }
+              : {}),
+            ...(typeof (entry as { poBox?: unknown }).poBox === "string"
+              ? { poBox: (entry as { poBox: string }).poBox }
+              : {}),
+          },
+        ];
+      })
+    : [];
+
 const toPortableSyncContact = (contact: {
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  namePrefix?: string | null;
+  nameSuffix?: string | null;
   fullName: string;
   nickname: string | null;
   email: string | null;
   emailAddresses: unknown;
+  emailEntries?: unknown;
   phone: string | null;
   phoneNumbers: unknown;
+  phoneEntries?: unknown;
   company: string | null;
+  department?: string | null;
   jobTitle: string | null;
   website: string | null;
+  websiteEntries?: unknown;
   birthday: string | null;
   significantDates?: unknown;
   address: string | null;
   postalAddresses: unknown;
+  addressEntries?: unknown;
   notes: string | null;
 }) => ({
   fullName: contact.fullName,
+  firstName: contact.firstName,
+  middleName: contact.middleName,
+  lastName: contact.lastName,
+  namePrefix: contact.namePrefix,
+  nameSuffix: contact.nameSuffix,
   nickname: contact.nickname,
   email: contact.email,
   emailAddresses: parseContactStringArray(contact.emailAddresses),
+  emailEntries: parseValueEntries(contact.emailEntries),
   phone: contact.phone,
   phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+  phoneEntries: parseValueEntries(contact.phoneEntries),
   company: contact.company,
+  department: contact.department,
   jobTitle: contact.jobTitle,
   website: contact.website,
+  websiteEntries: parseValueEntries(contact.websiteEntries),
   birthday: contact.birthday,
   significantDates: parseContactDateEntries(contact.significantDates),
   address: contact.address,
   postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+  addressEntries: parseAddressEntries(contact.addressEntries),
   notes: contact.notes,
 });
 
-const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
+const buildContactWriteDataFromRemoteSnapshot = (
+  snapshot: unknown,
+  profile: SyncProviderCapabilityProfile,
+) => {
   if (!isRecord(snapshot)) {
     throw new Error("Remote sync snapshot is missing or invalid.");
   }
@@ -275,7 +373,7 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
     : [];
 
-  return {
+  const writeData = {
     fullName,
     firstName: typeof snapshot.firstName === "string" ? snapshot.firstName : null,
     middleName: typeof snapshot.middleName === "string" ? snapshot.middleName : null,
@@ -290,18 +388,27 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
     phoneEntries: Array.isArray(snapshot.phoneEntries) ? snapshot.phoneEntries : undefined,
     company: typeof snapshot.company === "string" ? snapshot.company : null,
+    department: typeof snapshot.department === "string" ? snapshot.department : null,
     jobTitle: typeof snapshot.jobTitle === "string" ? snapshot.jobTitle : null,
     website: typeof snapshot.website === "string" ? snapshot.website : null,
     websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
     birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
-    significantDates: Array.isArray(snapshot.significantDates)
-      ? snapshot.significantDates
-      : undefined,
     address: typeof snapshot.address === "string" ? snapshot.address : null,
     postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
     addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
     notes: typeof snapshot.notes === "string" ? snapshot.notes : null,
   };
+
+  if (providerSupportsSignificantDates(profile)) {
+    return {
+      ...writeData,
+      significantDates: Array.isArray(snapshot.significantDates)
+        ? snapshot.significantDates
+        : undefined,
+    };
+  }
+
+  return writeData;
 };
 
 const getSnapshotStringValue = (snapshot: unknown, key: string) => {
@@ -468,6 +575,9 @@ const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unkno
     company:
       getSnapshotStringValue(localSnapshot, "company") ??
       getSnapshotStringValue(remoteSnapshot, "company"),
+    department:
+      getSnapshotStringValue(localSnapshot, "department") ??
+      getSnapshotStringValue(remoteSnapshot, "department"),
     jobTitle:
       getSnapshotStringValue(localSnapshot, "jobTitle") ??
       getSnapshotStringValue(remoteSnapshot, "jobTitle"),
@@ -1487,6 +1597,9 @@ export const resolveSyncConflict = async (formData: FormData) => {
       syncAccount: {
         select: {
           id: true,
+          provider: true,
+          baseUrl: true,
+          label: true,
           addressBookUrl: true,
           credentialReference: true,
         },
@@ -1511,15 +1624,20 @@ export const resolveSyncConflict = async (formData: FormData) => {
           nickname: true,
           email: true,
           emailAddresses: true,
+          emailEntries: true,
           phone: true,
           phoneNumbers: true,
+          phoneEntries: true,
           company: true,
+          department: true,
           jobTitle: true,
           website: true,
+          websiteEntries: true,
           birthday: true,
           significantDates: true,
           address: true,
           postalAddresses: true,
+          addressEntries: true,
           notes: true,
         },
       },
@@ -1538,6 +1656,12 @@ export const resolveSyncConflict = async (formData: FormData) => {
   }
   const syncAccount = conflict.syncAccount;
   const conflictSyncAccountId = conflict.syncAccountId;
+  const capabilityProfile = resolveSyncProviderCapabilityProfile({
+    provider: syncAccount.provider,
+    baseUrl: syncAccount.baseUrl,
+    addressBookUrl: syncAccount.addressBookUrl,
+    label: syncAccount.label,
+  });
 
   const resolvedAt = new Date();
 
@@ -1564,12 +1688,18 @@ export const resolveSyncConflict = async (formData: FormData) => {
     });
 
     if (conflict.syncContactLinkId) {
+      const localShadow = buildProviderSupportedContactShadow(
+        toPortableSyncContact(conflict.contact),
+        capabilityProfile,
+      );
       await db.syncContactLink.update({
         where: { id: conflict.syncContactLinkId },
         data: {
           remoteHref: pushed.href,
           remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
           remoteETag: pushed.etag,
+          capabilityProfileId: capabilityProfile.id,
+          supportedFieldShadow: localShadow as Prisma.InputJsonValue,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1590,7 +1720,10 @@ export const resolveSyncConflict = async (formData: FormData) => {
     await db.contact.update({
       where: { id: conflict.contactId },
       data: {
-        ...buildContactWriteDataFromRemoteSnapshot(conflict.remoteSnapshot),
+        ...buildContactWriteDataFromRemoteSnapshot(
+          conflict.remoteSnapshot,
+          capabilityProfile,
+        ),
         syncVersion: {
           increment: 1,
         },
@@ -1602,6 +1735,14 @@ export const resolveSyncConflict = async (formData: FormData) => {
         where: { id: conflict.syncContactLinkId },
         data: {
           remoteETag: conflict.remoteETag,
+          capabilityProfileId: capabilityProfile.id,
+          supportedFieldShadow: buildProviderSupportedContactShadow(
+            buildContactWriteDataFromRemoteSnapshot(
+              conflict.remoteSnapshot,
+              capabilityProfile,
+            ),
+            capabilityProfile,
+          ) as Prisma.InputJsonValue,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1648,7 +1789,10 @@ export const resolveSyncConflict = async (formData: FormData) => {
       await db.contact.update({
         where: { id: conflict.contactId },
         data: {
-          ...buildContactWriteDataFromRemoteSnapshot(conflict.remoteSnapshot),
+          ...buildContactWriteDataFromRemoteSnapshot(
+            conflict.remoteSnapshot,
+            capabilityProfile,
+          ),
           syncVersion: {
             increment: 1,
           },
@@ -1661,6 +1805,14 @@ export const resolveSyncConflict = async (formData: FormData) => {
         where: { id: conflict.syncContactLinkId },
         data: {
           remoteETag: conflict.remoteETag,
+          capabilityProfileId: capabilityProfile.id,
+          supportedFieldShadow: buildProviderSupportedContactShadow(
+            buildContactWriteDataFromRemoteSnapshot(
+              conflict.remoteSnapshot,
+              capabilityProfile,
+            ),
+            capabilityProfile,
+          ) as Prisma.InputJsonValue,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1734,6 +1886,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
         phoneNumbers: mergedWriteData.phoneNumbers,
         phoneEntries: mergedWriteData.phoneEntries as Prisma.InputJsonValue | undefined,
         company: mergedWriteData.company,
+        department: mergedWriteData.department,
         jobTitle: mergedWriteData.jobTitle,
         website: mergedWriteData.website,
         websiteEntries: mergedWriteData.websiteEntries as Prisma.InputJsonValue | undefined,
@@ -1765,6 +1918,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
         phone: mergedWriteData.phone ?? null,
         phoneNumbers: mergedWriteData.phoneNumbers ?? [],
         company: mergedWriteData.company ?? null,
+        department: mergedWriteData.department ?? null,
         jobTitle: mergedWriteData.jobTitle ?? null,
         website: mergedWriteData.website ?? null,
         birthday: mergedWriteData.birthday ?? null,
@@ -1776,12 +1930,43 @@ export const resolveSyncConflict = async (formData: FormData) => {
     });
 
     if (conflict.syncContactLinkId) {
+      const mergedShadow = buildProviderSupportedContactShadow(
+        {
+          fullName: mergedWriteData.fullName,
+          firstName: mergedWriteData.firstName ?? null,
+          middleName: mergedWriteData.middleName ?? null,
+          lastName: mergedWriteData.lastName ?? null,
+          namePrefix: mergedWriteData.namePrefix ?? null,
+          nameSuffix: mergedWriteData.nameSuffix ?? null,
+          nickname: mergedWriteData.nickname ?? null,
+          email: mergedWriteData.email ?? null,
+          emailAddresses: mergedWriteData.emailAddresses ?? [],
+          emailEntries: parseValueEntries(mergedWriteData.emailEntries ?? []),
+          phone: mergedWriteData.phone ?? null,
+          phoneNumbers: mergedWriteData.phoneNumbers ?? [],
+          phoneEntries: parseValueEntries(mergedWriteData.phoneEntries ?? []),
+          company: mergedWriteData.company ?? null,
+          department: mergedWriteData.department ?? null,
+          jobTitle: mergedWriteData.jobTitle ?? null,
+          website: mergedWriteData.website ?? null,
+          websiteEntries: parseValueEntries(mergedWriteData.websiteEntries ?? []),
+          birthday: mergedWriteData.birthday ?? null,
+          significantDates: parseContactDateEntries(mergedWriteData.significantDates ?? []),
+          address: mergedWriteData.address ?? null,
+          postalAddresses: parseContactPostalAddresses(mergedWriteData.postalAddresses ?? []),
+          addressEntries: parseAddressEntries(mergedWriteData.addressEntries ?? []),
+          notes: mergedWriteData.notes ?? null,
+        },
+        capabilityProfile,
+      );
       await db.syncContactLink.update({
         where: { id: conflict.syncContactLinkId },
         data: {
           remoteHref: pushed.href,
           remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
           remoteETag: pushed.etag,
+          capabilityProfileId: capabilityProfile.id,
+          supportedFieldShadow: mergedShadow as Prisma.InputJsonValue,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -2002,6 +2187,9 @@ export const updateSyncAccountSettings = async (
     where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
+      provider: true,
+      baseUrl: true,
+      label: true,
       status: true,
       syncDirection: true,
       addressBookUrl: true,
@@ -2048,6 +2236,12 @@ export const updateSyncAccountSettings = async (
   const prevPolicy = account.settings?.conflictPolicy ?? "SERVER_WINS";
   const leavingManual =
     conflictPolicy != null && conflictPolicy !== "MANUAL" && prevPolicy === "MANUAL";
+  const capabilityProfile = resolveSyncProviderCapabilityProfile({
+    provider: account.provider,
+    baseUrl: account.baseUrl,
+    addressBookUrl: account.addressBookUrl,
+    label: account.label,
+  });
 
   // Only include fields the caller actually sent (all are optional patches). The
   // same object seeds both the create and update branches of the upsert, so it
@@ -2134,14 +2328,28 @@ export const updateSyncAccountSettings = async (
           await db.contact.update({
             where: { id: conflict.contactId },
             data: {
-              ...buildContactWriteDataFromRemoteSnapshot(conflict.remoteSnapshot),
+              ...buildContactWriteDataFromRemoteSnapshot(
+                conflict.remoteSnapshot,
+                capabilityProfile,
+              ),
               syncVersion: { increment: 1 },
             },
           });
           if (conflict.syncContactLinkId) {
             await db.syncContactLink.update({
               where: { id: conflict.syncContactLinkId },
-              data: { remoteETag: conflict.remoteETag, lastSyncedAt: resolvedAt },
+              data: {
+                remoteETag: conflict.remoteETag,
+                capabilityProfileId: capabilityProfile.id,
+                supportedFieldShadow: buildProviderSupportedContactShadow(
+                  buildContactWriteDataFromRemoteSnapshot(
+                    conflict.remoteSnapshot,
+                    capabilityProfile,
+                  ),
+                  capabilityProfile,
+                ) as Prisma.InputJsonValue,
+                lastSyncedAt: resolvedAt,
+              },
             });
           }
         } catch {

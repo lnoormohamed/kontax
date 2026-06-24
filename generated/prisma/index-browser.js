@@ -439,6 +439,8 @@ exports.Prisma.SyncContactLinkScalarFieldEnum = {
   remoteHref: 'remoteHref',
   remoteUid: 'remoteUid',
   remoteETag: 'remoteETag',
+  capabilityProfileId: 'capabilityProfileId',
+  supportedFieldShadow: 'supportedFieldShadow',
   lastSyncedAt: 'lastSyncedAt',
   tombstonedAt: 'tombstonedAt',
   remoteDeletedAt: 'remoteDeletedAt',

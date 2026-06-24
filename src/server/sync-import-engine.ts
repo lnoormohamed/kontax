@@ -7,29 +7,140 @@
 import type { ConflictPolicy, Prisma, SourceType } from "../../generated/prisma";
 
 import { emitEvent } from "~/lib/activity";
+import {
+  parseContactPostalAddresses,
+  parseContactStringArray,
+} from "~/server/contact-portability";
 import { db } from "~/server/db";
 import {
   buildLocalConflictSnapshot,
   type ContactConflictSnapshotInput,
   contactConflictSelect,
 } from "~/server/sync-conflict-snapshot";
-import { type MappedContact, mappedContactToWriteData } from "~/server/sync-contact-mapping";
+import {
+  type MappedContact,
+  mappedContactToPortableContact,
+  mappedContactToWriteData,
+} from "~/server/sync-contact-mapping";
 import { MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
+import {
+  buildProviderSupportedContactShadow,
+  providerSupportedShadowsEqual,
+  type SyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 
 export type ImportEngineAccount = {
   id: string;
   userId: string;
   label: string;
   conflictPolicy: ConflictPolicy;
+  capabilityProfile: SyncProviderCapabilityProfile;
   // Source/mutation provenance stamped on imported contacts.
   sourceType: Extract<SourceType, "SYNC_GOOGLE" | "SYNC_MICROSOFT">;
   // Human provider name used in conflict resolution notes ("Google", "Outlook").
   providerName: string;
 };
 
-// One normalised remote record. `mapped` is null to skip (unmappable);
-// `deleted` flags a tombstone; `remoteSnapshot` is the raw remote object stored
-// on conflict rows.
+const parseValueEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { value?: unknown }).value !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label:
+              typeof (entry as { label?: unknown }).label === "string"
+                ? (entry as { label: string }).label
+                : "Other",
+            value: (entry as { value: string }).value,
+            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+          },
+        ];
+      })
+    : [];
+
+const parseAddressEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { formatted?: unknown }).formatted !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label:
+              typeof (entry as { label?: unknown }).label === "string"
+                ? (entry as { label: string }).label
+                : "Other",
+            formatted: (entry as { formatted: string }).formatted,
+            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+            ...(typeof (entry as { countryOrRegion?: unknown }).countryOrRegion === "string"
+              ? { countryOrRegion: (entry as { countryOrRegion: string }).countryOrRegion }
+              : {}),
+            ...(typeof (entry as { streetLine1?: unknown }).streetLine1 === "string"
+              ? { streetLine1: (entry as { streetLine1: string }).streetLine1 }
+              : {}),
+            ...(typeof (entry as { streetLine2?: unknown }).streetLine2 === "string"
+              ? { streetLine2: (entry as { streetLine2: string }).streetLine2 }
+              : {}),
+            ...(typeof (entry as { cityOrTown?: unknown }).cityOrTown === "string"
+              ? { cityOrTown: (entry as { cityOrTown: string }).cityOrTown }
+              : {}),
+            ...(typeof (entry as { stateOrProvince?: unknown }).stateOrProvince === "string"
+              ? { stateOrProvince: (entry as { stateOrProvince: string }).stateOrProvince }
+              : {}),
+            ...(typeof (entry as { postcode?: unknown }).postcode === "string"
+              ? { postcode: (entry as { postcode: string }).postcode }
+              : {}),
+            ...(typeof (entry as { poBox?: unknown }).poBox === "string"
+              ? { poBox: (entry as { poBox: string }).poBox }
+              : {}),
+          },
+        ];
+      })
+    : [];
+
+const linkedContactToPortable = (
+  contact: NonNullable<LinkedContact["contact"]>,
+) => ({
+  fullName: contact.fullName,
+  firstName: contact.firstName,
+  middleName: contact.middleName,
+  lastName: contact.lastName,
+  namePrefix: contact.namePrefix,
+  nameSuffix: contact.nameSuffix,
+  nickname: contact.nickname,
+  email: contact.email,
+  emailAddresses: parseContactStringArray(contact.emailAddresses),
+  emailEntries: parseValueEntries(contact.emailEntries),
+  phone: contact.phone,
+  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+  phoneEntries: parseValueEntries(contact.phoneEntries),
+  company: contact.company,
+  department: contact.department,
+  jobTitle: contact.jobTitle,
+  website: contact.website,
+  websiteEntries: parseValueEntries(contact.websiteEntries),
+  birthday: contact.birthday,
+  address: contact.address,
+  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+  addressEntries: parseAddressEntries(contact.addressEntries),
+  notes: contact.notes,
+});
+
+// One normalised remote record. `mapped` is null to skip (unmappable); `deleted`
+// flags a tombstone; `remoteSnapshot` is the raw remote object stored on
+// conflict rows.
 export type RemoteContactItem = {
   remoteUid: string;
   etag: string | null;
@@ -59,21 +170,28 @@ export const addImportBatch = (a: ImportBatchSummary, b: ImportBatchSummary): Im
   conflicts: a.conflicts + b.conflicts,
 });
 
-export type LinkedContact = {
-  id: string;
-  contactId: string;
-  remoteETag: string | null;
-  lastSyncedAt: Date | null;
-  contact: Prisma.ContactGetPayload<{ select: typeof contactConflictSelect }> | null;
-};
-
 export const linkedContactSelect = {
   id: true,
   contactId: true,
   remoteETag: true,
+  capabilityProfileId: true,
+  supportedFieldShadow: true,
   lastSyncedAt: true,
-  contact: { select: contactConflictSelect },
+  contact: {
+    select: {
+      ...contactConflictSelect,
+      emailEntries: true,
+      phoneEntries: true,
+      department: true,
+      websiteEntries: true,
+      addressEntries: true,
+    },
+  },
 } as const;
+
+export type LinkedContact = Prisma.SyncContactLinkGetPayload<{
+  select: typeof linkedContactSelect;
+}>;
 
 // Did the local contact change since we last synced this link?
 export const isLocalChanged = (
@@ -93,6 +211,10 @@ export const applyRemoteToContact = async (
   now: Date,
 ) => {
   const data = mappedContactToWriteData(mapped);
+  const supportedFieldShadow = buildProviderSupportedContactShadow(
+    mappedContactToPortableContact(mapped),
+    account.capabilityProfile,
+  );
   await db.$transaction(async (tx) => {
     await tx.contact.update({
       where: { id: contactId },
@@ -108,6 +230,8 @@ export const applyRemoteToContact = async (
       data: {
         remoteHref: remoteUid,
         remoteETag: etag,
+        capabilityProfileId: account.capabilityProfile.id,
+        supportedFieldShadow: supportedFieldShadow as Prisma.InputJsonValue,
         remoteDeletedAt: null,
         tombstonedAt: null,
         lastErrorCode: null,
@@ -313,6 +437,10 @@ const createContact = async (
   now: Date,
 ) => {
   const data = mappedContactToWriteData(mapped);
+  const supportedFieldShadow = buildProviderSupportedContactShadow(
+    mappedContactToPortableContact(mapped),
+    account.capabilityProfile,
+  );
   await db.$transaction(async (tx) => {
     const created = await tx.contact.create({
       data: {
@@ -332,6 +460,8 @@ const createContact = async (
         remoteHref: item.remoteUid,
         remoteUid: item.remoteUid,
         remoteETag: item.etag,
+        capabilityProfileId: account.capabilityProfile.id,
+        supportedFieldShadow: supportedFieldShadow as Prisma.InputJsonValue,
         lastSyncedAt: now,
       },
     });
@@ -385,8 +515,22 @@ export const importRemoteContactBatch = async (
 
     const remoteChanged = item.etag !== link.remoteETag;
     const localChanged = isLocalChanged(link.lastSyncedAt, link.contact.updatedAt);
+    const localSupportedShadow = buildProviderSupportedContactShadow(
+      linkedContactToPortable(link.contact),
+      account.capabilityProfile,
+    );
+    const remoteSupportedShadow = buildProviderSupportedContactShadow(
+      mappedContactToPortableContact(item.mapped),
+      account.capabilityProfile,
+    );
+    const supportedFieldsDiffer = !providerSupportedShadowsEqual(
+      localSupportedShadow,
+      remoteSupportedShadow,
+    );
+    const localSupportedChanged = localChanged && supportedFieldsDiffer;
+    const remoteSupportedChanged = remoteChanged && supportedFieldsDiffer;
 
-    if (remoteChanged && localChanged) {
+    if (remoteSupportedChanged && localSupportedChanged) {
       if (account.conflictPolicy === "SERVER_WINS") {
         await applyRemoteToContact(
           account,
@@ -409,7 +553,7 @@ export const importRemoteContactBatch = async (
       continue;
     }
 
-    if (remoteChanged) {
+    if (remoteSupportedChanged) {
       await applyRemoteToContact(
         account,
         link.id,
@@ -426,7 +570,12 @@ export const importRemoteContactBatch = async (
     // No remote change — anchor the link's sync marker to this pull.
     await db.syncContactLink.update({
       where: { id: link.id },
-      data: { remoteETag: item.etag, lastSyncedAt: now },
+      data: {
+        remoteETag: item.etag,
+        capabilityProfileId: account.capabilityProfile.id,
+        supportedFieldShadow: remoteSupportedShadow as Prisma.InputJsonValue,
+        lastSyncedAt: now,
+      },
     });
   }
 
