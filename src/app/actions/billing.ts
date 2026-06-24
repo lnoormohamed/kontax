@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import { auth } from "~/server/auth";
+import { countLiveSyncAccountSlots } from "~/server/billing";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
 import { ensureStripeCustomer, ensureTeamStripeCustomer } from "~/server/stripe-customers";
@@ -155,7 +156,7 @@ export async function getDowngradeSummary(): Promise<
   const userId = session.user.id;
 
   const [syncConnections, liveContacts, totalContacts, familyGroup] = await Promise.all([
-    db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
+    countLiveSyncAccountSlots(userId),
     db.contactShare.count({
       where: { recipientUserId: userId, shareType: "LIVE_SYNC", status: "ACTIVE" },
     }),

@@ -83,6 +83,16 @@ const syncSettingsChanged = z.object({
   changes: z.array(fieldDiffSchema),
 });
 
+const syncConnectionLifecycle = z.object({
+  syncAccountId: z.string(),
+  connectionId: z.string().min(1),
+  provider: z.string().optional(),
+  label: z.string().optional(),
+  replacesSyncAccountId: z.string().optional(),
+  replacedBySyncAccountId: z.string().optional(),
+  retirementReason: z.string().optional(),
+});
+
 export const EVENT_PAYLOAD_SCHEMAS = {
   CONTACT_CREATED: empty,
   CONTACT_UPDATED: contactUpdated,
@@ -98,6 +108,11 @@ export const EVENT_PAYLOAD_SCHEMAS = {
   SYNC_PUSHED: syncMutation,
   SYNC_CONFLICT_DETECTED: syncConflictDetected,
   SYNC_CONFLICT_RESOLVED: syncConflictResolved,
+  SYNC_CONNECTION_CONNECTED: syncConnectionLifecycle,
+  SYNC_CONNECTION_RECONNECTED: syncConnectionLifecycle,
+  SYNC_CONNECTION_DISCONNECTED: syncConnectionLifecycle,
+  SYNC_CONNECTION_RETIRED: syncConnectionLifecycle,
+  SYNC_CONNECTION_REPLACED: syncConnectionLifecycle,
   SYNC_SETTINGS_CHANGED: syncSettingsChanged,
   ACCOUNT_UPDATED: z.object({ field: z.string() }).strict(),
 } satisfies Record<EventType, z.ZodTypeAny>;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "~/server/auth";
+import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { CardDavPreflightError, discoverCardDavAddressBooks } from "~/server/carddav";
 import { db } from "~/server/db";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
@@ -22,7 +23,11 @@ export async function GET(
   const forceRefresh = new URL(request.url).searchParams.get("refresh") === "1";
 
   const account = await db.syncAccount.findFirst({
-    where: { id: accountId, userId: session.user.id },
+    where: {
+      id: accountId,
+      userId: session.user.id,
+      status: { in: [...SYNC_ACCOUNT_ACTIVE_STATUSES] },
+    },
     select: {
       baseUrl: true,
       principalUrl: true,

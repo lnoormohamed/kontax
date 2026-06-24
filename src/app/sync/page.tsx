@@ -14,6 +14,7 @@ import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getUserTeamMembership } from "~/server/team-access";
+import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
 import {
   getConsecutiveFailureStreak,
   getSyncAccountOperationalHealth,
@@ -33,12 +34,14 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
   google_state: "Google connection expired — please try connecting again.",
   google_token: "Couldn't complete the Google connection. Please try again.",
   google_duplicate: "That Google account looks already connected.",
+  google_cap: "You've reached the sync-account limit for your plan.",
   google_unconfigured: "Google sync isn't configured on this server.",
   microsoft_denied: "Outlook connection cancelled — access wasn't granted.",
   microsoft_invalid: "Outlook connection failed — the response was invalid. Please try again.",
   microsoft_state: "Outlook connection expired — please try connecting again.",
   microsoft_token: "Couldn't complete the Outlook connection. Please try again.",
   microsoft_duplicate: "That Outlook account looks already connected.",
+  microsoft_cap: "You've reached the sync-account limit for your plan.",
   microsoft_unconfigured: "Outlook sync isn't configured on this server.",
 };
 
@@ -156,7 +159,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, rawAccounts] =
+  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, rawAccounts, rawPastAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
       getUserFamilyMembership(userId),
@@ -177,8 +180,9 @@ export default async function SyncPage({ searchParams }: PageProps) {
         select: { id: true, name: true, color: true },
       }),
       db.syncAccount.findMany({
-        // P36-DB03: hide soft-disconnected connections from the active rail.
-        where: { userId, status: { not: "DISCONNECTED" } },
+        // Historical rows are preserved for reconnect/support flows but stay off
+        // the active rail.
+        where: { userId, status: { notIn: [...SYNC_ACCOUNT_HISTORICAL_STATUSES] } },
         orderBy: [{ updatedAt: "desc" }],
         include: {
           syncJobs: {
@@ -227,12 +231,74 @@ export default async function SyncPage({ searchParams }: PageProps) {
               maxAttemptsBeforePause: true,
             },
           },
+          replacesSyncAccount: {
+            select: { id: true, label: true, status: true },
+          },
+          replacedBySyncAccount: {
+            select: { id: true, label: true, status: true },
+          },
+        },
+      }),
+      db.syncAccount.findMany({
+        where: { userId, status: "RETIRED" },
+        orderBy: [{ retiredAt: "desc" }, { updatedAt: "desc" }],
+        include: {
+          syncJobs: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            select: {
+              id: true,
+              status: true,
+              syncDirection: true,
+              errorCode: true,
+              errorSummary: true,
+              createdCount: true,
+              updatedCount: true,
+              deletedCount: true,
+              pushedCreatedCount: true,
+              pushedUpdatedCount: true,
+              pushedDeletedCount: true,
+              duplicatesDetectedCount: true,
+              createdAt: true,
+              completedAt: true,
+              startedAt: true,
+            },
+          },
+          syncConflicts: {
+            where: { status: "OPEN" },
+            orderBy: { detectedAt: "desc" },
+            take: 10,
+            include: {
+              contact: { select: { id: true, fullName: true } },
+            },
+          },
+          settings: {
+            select: {
+              syncDirection: true,
+              conflictPolicy: true,
+              syncFrequencyMinutes: true,
+              bookAllowlist: true,
+              importLabelId: true,
+              maxDeletionsThreshold: true,
+              notifyOnFailure: true,
+              syncWindowStart: true,
+              syncWindowEnd: true,
+              excludedFields: true,
+              exportLabelFilter: true,
+              maxAttemptsBeforePause: true,
+            },
+          },
+          replacesSyncAccount: {
+            select: { id: true, label: true, status: true },
+          },
+          replacedBySyncAccount: {
+            select: { id: true, label: true, status: true },
+          },
         },
       }),
     ]);
 
-  // Serialise to plain data for client component
-  const accounts: SyncAccountData[] = rawAccounts.map((acct) => {
+  const serialiseSyncAccount = (acct: (typeof rawAccounts)[number]): SyncAccountData => {
     const recentJobs = acct.syncJobs.map((j) => ({
       status: j.status,
       errorCode: j.errorCode,
@@ -278,6 +344,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
       id: acct.id,
       label: acct.label,
       baseUrl: acct.baseUrl,
+      connectionId: acct.connectionId,
       provider: acct.provider,
       // OAuth: the connected provider account email (stored at connect time).
       connectedEmail: isOAuth ? acct.remoteAccountId : null,
@@ -308,6 +375,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
       maxAttemptsBeforePause: acct.settings?.maxAttemptsBeforePause ?? null,
       // P36-DB02: setup is pending until completeSyncSetup stamps setupCompletedAt.
       needsSetup: acct.setupCompletedAt == null,
+      createdAt: acct.createdAt.toISOString(),
+      disconnectedAt: acct.disconnectedAt?.toISOString() ?? null,
+      retiredAt: acct.retiredAt?.toISOString() ?? null,
+      replacesSyncAccountId: acct.replacesSyncAccountId,
+      replacesSyncAccountLabel: acct.replacesSyncAccount?.label ?? null,
+      replacedBySyncAccountId: acct.replacedBySyncAccountId,
+      replacedBySyncAccountLabel: acct.replacedBySyncAccount?.label ?? null,
       status: acct.status,
       health,
       lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
@@ -327,7 +401,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
       jobs,
       conflicts,
     };
-  });
+  };
+
+  // Serialise to plain data for client component
+  const accounts: SyncAccountData[] = rawAccounts.map(serialiseSyncAccount);
+  const pastAccounts: SyncAccountData[] = rawPastAccounts.map(serialiseSyncAccount);
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
@@ -420,6 +498,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
           <SyncPageClient
             key={addParam ? "add" : initialAccountId ? `account-${initialAccountId}` : "summary"}
             accounts={accounts}
+            pastAccounts={pastAccounts}
             labels={labels}
             initialAccountId={initialAccountId}
             initialAdd={addParam}

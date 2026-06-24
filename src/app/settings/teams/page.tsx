@@ -27,6 +27,7 @@ import {
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
+import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
 import { getTeamBillingSummary, getTeamGraceState } from "~/server/team-access";
 
 const fmtDate = (value: Date | null) =>
@@ -268,7 +269,11 @@ export default async function TeamSettingsPage() {
   };
 
   const [mySyncAccounts, teamSyncLinks] = await Promise.all([
-    db.syncAccount.findMany({ where: { userId }, orderBy: { createdAt: "asc" }, select: { id: true, label: true } }),
+    db.syncAccount.findMany({
+      where: { userId, status: { notIn: [...SYNC_ACCOUNT_HISTORICAL_STATUSES] } },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, label: true },
+    }),
     db.teamSyncAccount.findMany({
       where: { groupId: ownedTeam.id },
       include: {

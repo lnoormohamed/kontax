@@ -11,7 +11,14 @@ import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } fro
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
+import {
+  createSyncConnectionId,
+  emitSyncConnectionLifecycleEvent,
+  reconnectExistingSyncAccount,
+  replaceSyncAccountWithNewConnection,
+} from "~/server/sync-lineage";
 import {
   decryptSyncCredentialPayload,
   encryptSyncCredentialPayload,
@@ -81,6 +88,12 @@ const getRequiredUserId = async () => {
   return userId;
 };
 
+const currentSyncAccountWhere = (userId: string, syncAccountId: string) => ({
+  id: syncAccountId,
+  userId,
+  status: { in: [...SYNC_ACCOUNT_ACTIVE_STATUSES] },
+});
+
 const getOptionalString = (formData: FormData, key: string) => {
   const value = formData.get(key);
 
@@ -114,6 +127,20 @@ const parseCreateSyncAccountInput = (formData: FormData) => {
   }
 
   return parsed.data;
+};
+
+const parseChoiceResolution = (formData: FormData) => {
+  const resolution = formData.get("matchResolution");
+  const matchedSyncAccountId = formData.get("matchedSyncAccountId");
+
+  return {
+    resolution:
+      resolution === "reconnect" || resolution === "replace" ? resolution : null,
+    matchedSyncAccountId:
+      typeof matchedSyncAccountId === "string" && matchedSyncAccountId.trim().length > 0
+        ? matchedSyncAccountId.trim()
+        : null,
+  };
 };
 
 const parseAttachSyncCredentialInput = (formData: FormData) => {
@@ -459,7 +486,7 @@ const recordFailedPreflight = async ({
 }: {
   accountId: string;
   syncDirection: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
-  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
+  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED" | "RETIRED";
   errorCode: string;
   errorSummary: string;
 }) => {
@@ -467,8 +494,10 @@ const recordFailedPreflight = async ({
   const nextStatus =
     isCredentialValidationFailure(errorCode)
       ? "NEEDS_REAUTH"
-      : accountStatus === "PAUSED"
-        ? "PAUSED"
+      : accountStatus === "PAUSED" ||
+          accountStatus === "DISCONNECTED" ||
+          accountStatus === "RETIRED"
+        ? accountStatus
         : "ERROR";
 
   await db.$transaction([
@@ -510,6 +539,7 @@ export const createSyncAccount = async (
   try {
     const userId = await getRequiredUserId();
     input = parseCreateSyncAccountInput(formData);
+    const choice = parseChoiceResolution(formData);
 
     await assertCanCreateSyncAccount(userId);
     await assertCanUseCardDavSync(userId);
@@ -550,38 +580,135 @@ export const createSyncAccount = async (
     }
 
     const now = new Date();
-    // P36-DB03: re-adding a previously soft-disconnected CardDAV connection
-    // (same userId+baseUrl+label) reactivates that row — restoring its settings,
-    // contact links, and history — instead of hitting the unique constraint.
+    // P34H-01: when this add-account attempt matches a previously disconnected
+    // CardDAV connection, surface that match to the UI instead of silently
+    // reconnecting it.
     const disconnected = await db.syncAccount.findFirst({
       where: { userId, baseUrl: input.baseUrl, label: input.label, status: "DISCONNECTED" },
-      select: { id: true },
+      select: {
+        id: true,
+        connectionId: true,
+        label: true,
+        provider: true,
+        disconnectedAt: true,
+        lastSucceededAt: true,
+      },
     });
     if (disconnected) {
-      await db.syncAccount.update({
-        where: { id: disconnected.id },
-        data: {
-          status: "ACTIVE",
-          disconnectedAt: null,
-          principalUrl: discovery.principalUrl,
-          addressBookUrl: discovery.addressBookUrl,
-          addressBookDisplayName: discovery.addressBookDisplayName,
-          remoteAccountId: discovery.remoteAccountId,
-          remoteCTag: discovery.remoteCTag,
-          syncDirection: input.syncDirection,
-          credentialReference: encrypted.credentialReference,
-          credentialUpdatedAt: now,
-          credentialLastValidatedAt: now,
-          credentialRevokedAt: null,
-          encryptionKeyRef: encrypted.encryptionKeyRef,
-          connectionValidatedAt: now,
-          lastErrorAt: null,
-          lastErrorCode: null,
-          lastErrorMessage: null,
-        },
+      const connectionId = disconnected.connectionId ?? createSyncConnectionId();
+      if (!disconnected.connectionId) {
+        await db.syncAccount.update({
+          where: { id: disconnected.id },
+          data: { connectionId },
+        });
+      }
+
+      const match: SyncReconnectMatch = {
+        syncAccountId: disconnected.id,
+        connectionId,
+        label: disconnected.label,
+        provider: disconnected.provider,
+        disconnectedAt: disconnected.disconnectedAt?.toISOString() ?? null,
+        lastSucceededAt: disconnected.lastSucceededAt?.toISOString() ?? null,
+      };
+
+      if (!choice.resolution || choice.matchedSyncAccountId !== disconnected.id) {
+        return {
+          ok: false,
+          error: null,
+          requiresChoice: true,
+          match,
+        };
+      }
+
+      if (choice.resolution === "reconnect") {
+        await reconnectExistingSyncAccount({
+          client: db,
+          userId,
+          syncAccountId: disconnected.id,
+          actor: "USER",
+          data: {
+            principalUrl: discovery.principalUrl,
+            addressBookUrl: discovery.addressBookUrl,
+            addressBookDisplayName: discovery.addressBookDisplayName,
+            remoteAccountId: discovery.remoteAccountId,
+            remoteCTag: discovery.remoteCTag,
+            syncDirection: input.syncDirection,
+            credentialReference: encrypted.credentialReference,
+            credentialUpdatedAt: now,
+            credentialLastValidatedAt: now,
+            encryptionKeyRef: encrypted.encryptionKeyRef,
+            connectionValidatedAt: now,
+          },
+        });
+        revalidateSyncViews();
+        return {
+          ok: true,
+          error: null,
+          accountId: disconnected.id,
+          requiresChoice: false,
+          match: null,
+        };
+      }
+
+      const replacementAccountId = await db.$transaction(async (tx) => {
+        const { replacement } = await replaceSyncAccountWithNewConnection({
+          client: tx,
+          userId,
+          syncAccountId: disconnected.id,
+          actor: "USER",
+          newAccountData: {
+            label: input.label,
+            baseUrl: input.baseUrl,
+            principalUrl: discovery.principalUrl,
+            addressBookUrl: discovery.addressBookUrl,
+            addressBookDisplayName: discovery.addressBookDisplayName,
+            remoteAccountId: discovery.remoteAccountId,
+            remoteCTag: discovery.remoteCTag,
+            lastSyncCursor: discovery.remoteCTag,
+            syncDirection: input.syncDirection,
+            credentialReference: encrypted.credentialReference,
+            credentialVersion: 1,
+            credentialUpdatedAt: now,
+            credentialLastValidatedAt: now,
+            credentialRevokedAt: null,
+            encryptionKeyRef: encrypted.encryptionKeyRef,
+            connectionValidatedAt: now,
+            status: "ACTIVE",
+            lastSucceededAt: now,
+            lastErrorAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+          },
+        });
+
+        await tx.syncJob.create({
+          data: {
+            syncAccountId: replacement.id,
+            status: "SUCCEEDED",
+            trigger: "MANUAL",
+            syncDirection: input.syncDirection,
+            attemptCount: 1,
+            maxAttempts: 5,
+            cursorAfter: discovery.remoteCTag,
+            startedAt: now,
+            completedAt: now,
+            idempotencyKey: createIdempotencyKey([replacement.id, "manual", "replace"]),
+            errorSummary: `Replacement connection validated against ${discovery.addressBookDisplayName ?? "the CardDAV address book"}.`,
+          },
+        });
+
+        return replacement.id;
       });
+
       revalidateSyncViews();
-      return { ok: true, error: null, accountId: disconnected.id };
+      return {
+        ok: true,
+        error: null,
+        accountId: replacementAccountId,
+        requiresChoice: false,
+        match: null,
+      };
     }
     let accountId: string;
     try {
@@ -589,6 +716,7 @@ export const createSyncAccount = async (
         const syncAccount = await tx.syncAccount.create({
           data: {
             userId,
+            connectionId: createSyncConnectionId(),
             label: input.label,
             baseUrl: input.baseUrl,
             principalUrl: discovery.principalUrl,
@@ -629,6 +757,18 @@ export const createSyncAccount = async (
           },
         });
 
+        await emitSyncConnectionLifecycleEvent(tx, {
+          userId,
+          eventType: "SYNC_CONNECTION_CONNECTED",
+          actor: "USER",
+          seed: {
+            syncAccountId: syncAccount.id,
+            connectionId: syncAccount.connectionId!,
+            provider: syncAccount.provider,
+            label: syncAccount.label,
+          },
+        });
+
         return syncAccount.id;
       });
     } catch (error) {
@@ -661,10 +801,7 @@ export const activateSyncAccount = async (formData: FormData) => {
   await assertCanUseCardDavSync(userId);
 
   await db.syncAccount.updateMany({
-    where: {
-      id: syncAccountId,
-      userId,
-    },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     data: {
       status: "ACTIVE",
       lastErrorAt: null,
@@ -679,10 +816,25 @@ export const activateSyncAccount = async (formData: FormData) => {
   revalidateSyncViews();
 };
 
+export type SyncReconnectMatch = {
+  syncAccountId: string;
+  connectionId: string;
+  label: string;
+  provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
+  disconnectedAt: string | null;
+  lastSucceededAt: string | null;
+};
+
 // Result type for the add/edit CardDAV forms. These use useActionState + client
 // navigation instead of a server redirect(), which behind the reverse proxy
 // re-runs middleware via a cookieless sub-request and logs the user out.
-export type SyncFormState = { ok: boolean; error: string | null; accountId?: string };
+export type SyncFormState = {
+  ok: boolean;
+  error: string | null;
+  accountId?: string;
+  requiresChoice?: boolean;
+  match?: SyncReconnectMatch | null;
+};
 
 export const attachSyncCredentials = async (
   _prev: SyncFormState,
@@ -704,7 +856,7 @@ export const attachSyncCredentials = async (
     }
 
     const syncAccount = await db.syncAccount.findFirst({
-      where: { id: input.syncAccountId, userId },
+      where: currentSyncAccountWhere(userId, input.syncAccountId),
       select: { id: true, status: true },
     });
     if (!syncAccount) {
@@ -753,10 +905,7 @@ export const revokeSyncCredentials = async (formData: FormData) => {
   await assertCanUseCardDavSync(userId);
 
   await db.syncAccount.updateMany({
-    where: {
-      id: syncAccountId,
-      userId,
-    },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     data: {
       credentialReference: null,
       credentialVersion: {
@@ -786,10 +935,7 @@ export const prepareSyncRelink = async (formData: FormData) => {
   await assertCanUseCardDavSync(userId);
 
   const account = await db.syncAccount.findFirst({
-    where: {
-      id: syncAccountId,
-      userId,
-    },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
       credentialReference: true,
@@ -848,10 +994,7 @@ export const pauseSyncAccount = async (formData: FormData) => {
   const syncAccountId = parseSyncAccountId(formData);
 
   await db.syncAccount.updateMany({
-    where: {
-      id: syncAccountId,
-      userId,
-    },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     data: {
       status: "PAUSED",
     },
@@ -870,10 +1013,7 @@ export const revalidateSyncAccount = async (formData: FormData) => {
   await assertCanUseCardDavSync(userId);
 
   const account = await db.syncAccount.findFirst({
-    where: {
-      id: syncAccountId,
-      userId,
-    },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
       status: true,
@@ -1013,10 +1153,7 @@ export const queueSyncJob = async (formData: FormData) => {
   const syncAccountId = parseSyncAccountId(formData);
 
   const account = await db.syncAccount.findFirst({
-    where: {
-      id: syncAccountId,
-      userId,
-    },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
       provider: true,
@@ -1684,8 +1821,8 @@ export const disconnectSyncAccount = async (formData: FormData) => {
   // P27-07: revoke OAuth authorisation before deleting the account (best-effort —
   // a revoke failure must not block disconnect).
   const account = await db.syncAccount.findFirst({
-    where: { id: syncAccountId, userId },
-    select: { id: true, provider: true, credentialReference: true },
+    where: currentSyncAccountWhere(userId, syncAccountId),
+    select: { id: true, provider: true, credentialReference: true, connectionId: true, label: true },
   });
   // Dynamic import keeps the googleapis/MSAL dependency graph server-only — a
   // static import would drag it into this "use server" file's client reference
@@ -1703,13 +1840,13 @@ export const disconnectSyncAccount = async (formData: FormData) => {
   // (matched by email / baseUrl+label) restores it cleanly without duplicating
   // contacts. Cancel any pending jobs so the runner doesn't pick them up.
   const now = new Date();
-  await db.$transaction([
-    // Drop not-yet-run jobs so the runner can't pick them up after disconnect.
-    db.syncJob.deleteMany({
+  await db.$transaction(async (tx) => {
+    await tx.syncJob.deleteMany({
       where: { syncAccountId, status: { in: ["QUEUED", "RUNNING"] } },
-    }),
-    db.syncAccount.updateMany({
-      where: { id: syncAccountId, userId },
+    });
+
+    const updated = await tx.syncAccount.updateMany({
+      where: currentSyncAccountWhere(userId, syncAccountId),
       data: {
         status: "DISCONNECTED",
         disconnectedAt: now,
@@ -1718,8 +1855,22 @@ export const disconnectSyncAccount = async (formData: FormData) => {
         lastErrorCode: null,
         lastErrorMessage: null,
       },
-    }),
-  ]);
+    });
+
+    if (updated.count > 0 && account?.connectionId) {
+      await emitSyncConnectionLifecycleEvent(tx, {
+        userId,
+        eventType: "SYNC_CONNECTION_DISCONNECTED",
+        actor: "USER",
+        seed: {
+          syncAccountId: account.id,
+          connectionId: account.connectionId,
+          provider: account.provider,
+          label: account.label,
+        },
+      });
+    }
+  });
 
   // No redirect() — see queueSyncJob: a server-action redirect re-runs middleware
   // via a cookieless internal sub-request and bounces the user to /login. The
@@ -1830,7 +1981,7 @@ export const updateSyncAccountSettings = async (
   // decide whether a direction change should trigger a catch-up re-sync, plus the
   // previous setting values for the P23-06 audit diff.
   const account = await db.syncAccount.findFirst({
-    where: { id: syncAccountId, userId },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
       status: true,
@@ -2089,7 +2240,7 @@ export const completeSyncSetup = async (
   }
 
   const account = await db.syncAccount.findFirst({
-    where: { id: syncAccountId, userId },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
       status: true,
@@ -2214,7 +2365,7 @@ export const updateBookAllowlist = async (
   if (!elevation.ok) return elevation;
 
   const account = await db.syncAccount.findFirst({
-    where: { id: syncAccountId, userId },
+    where: currentSyncAccountWhere(userId, syncAccountId),
     select: { id: true, settings: { select: { bookAllowlist: true } } },
   });
   if (!account) {

@@ -4,7 +4,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { auth } from "~/server/auth";
+import { assertCanCreateSyncAccount, assertHasAvailableSyncAccountSlot } from "~/server/billing";
 import { db } from "~/server/db";
+import { SYNC_ACCOUNT_MUTABLE_STATUSES } from "~/lib/sync-account-status";
+import {
+  createSyncConnectionId,
+  emitSyncConnectionLifecycleEvent,
+  reconnectExistingSyncAccount,
+} from "~/server/sync-lineage";
 import { env } from "~/env";
 import {
   MICROSOFT_SCOPES,
@@ -87,52 +94,86 @@ export async function GET(req: NextRequest) {
   // dropped by Prisma and would return an arbitrary Microsoft account.
   const existing = microsoftEmail
     ? await db.syncAccount.findFirst({
-        where: { userId: state.userId, provider: "MICROSOFT", remoteAccountId: microsoftEmail },
+        where: {
+          userId: state.userId,
+          provider: "MICROSOFT",
+          remoteAccountId: microsoftEmail,
+          status: { in: [...SYNC_ACCOUNT_MUTABLE_STATUSES] },
+        },
         select: { id: true },
       })
     : null;
 
+  try {
+    if (existing) {
+      await assertHasAvailableSyncAccountSlot(state.userId, {
+        excludingSyncAccountIds: [existing.id],
+      });
+    } else {
+      await assertCanCreateSyncAccount(state.userId);
+    }
+  } catch {
+    return redirectTo(req, "/sync?error=microsoft_cap");
+  }
+
   const now = new Date();
   let accountId: string;
   try {
-    accountId = existing
-      ? (await db.syncAccount.update({
-          where: { id: existing.id },
+    accountId = await db.$transaction(async (tx) => {
+      if (existing) {
+        const reconnected = await reconnectExistingSyncAccount({
+          client: tx,
+          userId: state.userId,
+          syncAccountId: existing.id,
+          actor: "USER",
           data: {
             label,
-            status: "ACTIVE",
-            // P36-DB03: re-adding a soft-disconnected account reactivates it.
-            disconnectedAt: null,
-            credentialReference: enc.credentialReference,
-            encryptionKeyRef: enc.encryptionKeyRef,
-            credentialUpdatedAt: now,
-            credentialLastValidatedAt: now,
-            credentialRevokedAt: null,
-            lastSyncCursor: null,
-            lastErrorAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-          },
-          select: { id: true },
-        })).id
-      : (await db.syncAccount.create({
-          data: {
-            userId: state.userId,
-            provider: "MICROSOFT",
-            status: "ACTIVE",
-            syncDirection: "TWO_WAY",
-            label,
-            baseUrl: GRAPH_BASE_URL,
             remoteAccountId: microsoftEmail || null,
             credentialReference: enc.credentialReference,
             encryptionKeyRef: enc.encryptionKeyRef,
-            credentialVersion: 1,
             credentialUpdatedAt: now,
             credentialLastValidatedAt: now,
             connectionValidatedAt: now,
+            lastSyncCursor: null,
           },
-          select: { id: true },
-        })).id;
+        });
+        return reconnected.id;
+      }
+
+      const created = await tx.syncAccount.create({
+        data: {
+          userId: state.userId,
+          connectionId: createSyncConnectionId(),
+          provider: "MICROSOFT",
+          status: "ACTIVE",
+          syncDirection: "TWO_WAY",
+          label,
+          baseUrl: GRAPH_BASE_URL,
+          remoteAccountId: microsoftEmail || null,
+          credentialReference: enc.credentialReference,
+          encryptionKeyRef: enc.encryptionKeyRef,
+          credentialVersion: 1,
+          credentialUpdatedAt: now,
+          credentialLastValidatedAt: now,
+          connectionValidatedAt: now,
+        },
+        select: { id: true, connectionId: true, provider: true, label: true },
+      });
+
+      await emitSyncConnectionLifecycleEvent(tx, {
+        userId: state.userId,
+        eventType: "SYNC_CONNECTION_CONNECTED",
+        actor: "USER",
+        seed: {
+          syncAccountId: created.id,
+          connectionId: created.connectionId!,
+          provider: created.provider,
+          label: created.label,
+        },
+      });
+
+      return created.id;
+    });
   } catch {
     return redirectTo(req, "/sync?error=microsoft_duplicate");
   }

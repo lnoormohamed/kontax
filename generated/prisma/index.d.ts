@@ -441,7 +441,8 @@ export const SyncAccountStatus: {
   PAUSED: 'PAUSED',
   NEEDS_REAUTH: 'NEEDS_REAUTH',
   ERROR: 'ERROR',
-  DISCONNECTED: 'DISCONNECTED'
+  DISCONNECTED: 'DISCONNECTED',
+  RETIRED: 'RETIRED'
 };
 
 export type SyncAccountStatus = (typeof SyncAccountStatus)[keyof typeof SyncAccountStatus]
@@ -546,6 +547,11 @@ export const EventType: {
   SYNC_PUSHED: 'SYNC_PUSHED',
   SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
   SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED',
+  SYNC_CONNECTION_CONNECTED: 'SYNC_CONNECTION_CONNECTED',
+  SYNC_CONNECTION_RECONNECTED: 'SYNC_CONNECTION_RECONNECTED',
+  SYNC_CONNECTION_DISCONNECTED: 'SYNC_CONNECTION_DISCONNECTED',
+  SYNC_CONNECTION_RETIRED: 'SYNC_CONNECTION_RETIRED',
+  SYNC_CONNECTION_REPLACED: 'SYNC_CONNECTION_REPLACED',
   SYNC_SETTINGS_CHANGED: 'SYNC_SETTINGS_CHANGED',
   ACCOUNT_UPDATED: 'ACCOUNT_UPDATED'
 };
@@ -22778,6 +22784,9 @@ export namespace Prisma {
   export type SyncAccountMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    connectionId: string | null
+    replacesSyncAccountId: string | null
+    replacedBySyncAccountId: string | null
     provider: $Enums.SyncProvider | null
     status: $Enums.SyncAccountStatus | null
     syncDirection: $Enums.SyncDirection | null
@@ -22804,6 +22813,8 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    retiredAt: Date | null
+    retiredReason: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -22811,6 +22822,9 @@ export namespace Prisma {
   export type SyncAccountMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    connectionId: string | null
+    replacesSyncAccountId: string | null
+    replacedBySyncAccountId: string | null
     provider: $Enums.SyncProvider | null
     status: $Enums.SyncAccountStatus | null
     syncDirection: $Enums.SyncDirection | null
@@ -22837,6 +22851,8 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    retiredAt: Date | null
+    retiredReason: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -22844,6 +22860,9 @@ export namespace Prisma {
   export type SyncAccountCountAggregateOutputType = {
     id: number
     userId: number
+    connectionId: number
+    replacesSyncAccountId: number
+    replacedBySyncAccountId: number
     provider: number
     status: number
     syncDirection: number
@@ -22871,6 +22890,8 @@ export namespace Prisma {
     booksDiscoveredAt: number
     setupCompletedAt: number
     disconnectedAt: number
+    retiredAt: number
+    retiredReason: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -22888,6 +22909,9 @@ export namespace Prisma {
   export type SyncAccountMinAggregateInputType = {
     id?: true
     userId?: true
+    connectionId?: true
+    replacesSyncAccountId?: true
+    replacedBySyncAccountId?: true
     provider?: true
     status?: true
     syncDirection?: true
@@ -22914,6 +22938,8 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    retiredAt?: true
+    retiredReason?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22921,6 +22947,9 @@ export namespace Prisma {
   export type SyncAccountMaxAggregateInputType = {
     id?: true
     userId?: true
+    connectionId?: true
+    replacesSyncAccountId?: true
+    replacedBySyncAccountId?: true
     provider?: true
     status?: true
     syncDirection?: true
@@ -22947,6 +22976,8 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    retiredAt?: true
+    retiredReason?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22954,6 +22985,9 @@ export namespace Prisma {
   export type SyncAccountCountAggregateInputType = {
     id?: true
     userId?: true
+    connectionId?: true
+    replacesSyncAccountId?: true
+    replacedBySyncAccountId?: true
     provider?: true
     status?: true
     syncDirection?: true
@@ -22981,6 +23015,8 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    retiredAt?: true
+    retiredReason?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -23075,6 +23111,9 @@ export namespace Prisma {
   export type SyncAccountGroupByOutputType = {
     id: string
     userId: string
+    connectionId: string | null
+    replacesSyncAccountId: string | null
+    replacedBySyncAccountId: string | null
     provider: $Enums.SyncProvider
     status: $Enums.SyncAccountStatus
     syncDirection: $Enums.SyncDirection
@@ -23102,6 +23141,8 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    retiredAt: Date | null
+    retiredReason: string | null
     createdAt: Date
     updatedAt: Date
     _count: SyncAccountCountAggregateOutputType | null
@@ -23128,6 +23169,9 @@ export namespace Prisma {
   export type SyncAccountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    connectionId?: boolean
+    replacesSyncAccountId?: boolean
+    replacedBySyncAccountId?: boolean
     provider?: boolean
     status?: boolean
     syncDirection?: boolean
@@ -23155,9 +23199,15 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    retiredAt?: boolean
+    retiredReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
+    replacementChild?: boolean | SyncAccount$replacementChildArgs<ExtArgs>
+    replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
+    replacedAccount?: boolean | SyncAccount$replacedAccountArgs<ExtArgs>
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
     syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
     syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
@@ -23169,6 +23219,9 @@ export namespace Prisma {
   export type SyncAccountSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    connectionId?: boolean
+    replacesSyncAccountId?: boolean
+    replacedBySyncAccountId?: boolean
     provider?: boolean
     status?: boolean
     syncDirection?: boolean
@@ -23196,14 +23249,21 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    retiredAt?: boolean
+    retiredReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
+    replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccount"]>
 
   export type SyncAccountSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    connectionId?: boolean
+    replacesSyncAccountId?: boolean
+    replacedBySyncAccountId?: boolean
     provider?: boolean
     status?: boolean
     syncDirection?: boolean
@@ -23231,14 +23291,21 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    retiredAt?: boolean
+    retiredReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
+    replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccount"]>
 
   export type SyncAccountSelectScalar = {
     id?: boolean
     userId?: boolean
+    connectionId?: boolean
+    replacesSyncAccountId?: boolean
+    replacedBySyncAccountId?: boolean
     provider?: boolean
     status?: boolean
     syncDirection?: boolean
@@ -23266,13 +23333,19 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    retiredAt?: boolean
+    retiredReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "disconnectedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "connectionId" | "replacesSyncAccountId" | "replacedBySyncAccountId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "disconnectedAt" | "retiredAt" | "retiredReason" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
   export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
+    replacementChild?: boolean | SyncAccount$replacementChildArgs<ExtArgs>
+    replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
+    replacedAccount?: boolean | SyncAccount$replacedAccountArgs<ExtArgs>
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
     syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
     syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
@@ -23282,15 +23355,23 @@ export namespace Prisma {
   }
   export type SyncAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
+    replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }
   export type SyncAccountIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
+    replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }
 
   export type $SyncAccountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SyncAccount"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      replacesSyncAccount: Prisma.$SyncAccountPayload<ExtArgs> | null
+      replacementChild: Prisma.$SyncAccountPayload<ExtArgs> | null
+      replacedBySyncAccount: Prisma.$SyncAccountPayload<ExtArgs> | null
+      replacedAccount: Prisma.$SyncAccountPayload<ExtArgs> | null
       syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
       syncJobs: Prisma.$SyncJobPayload<ExtArgs>[]
       syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
@@ -23300,6 +23381,9 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
+      connectionId: string | null
+      replacesSyncAccountId: string | null
+      replacedBySyncAccountId: string | null
       provider: $Enums.SyncProvider
       status: $Enums.SyncAccountStatus
       syncDirection: $Enums.SyncDirection
@@ -23327,6 +23411,8 @@ export namespace Prisma {
       booksDiscoveredAt: Date | null
       setupCompletedAt: Date | null
       disconnectedAt: Date | null
+      retiredAt: Date | null
+      retiredReason: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["syncAccount"]>
@@ -23724,6 +23810,10 @@ export namespace Prisma {
   export interface Prisma__SyncAccountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    replacesSyncAccount<T extends SyncAccount$replacesSyncAccountArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacesSyncAccountArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    replacementChild<T extends SyncAccount$replacementChildArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacementChildArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    replacedBySyncAccount<T extends SyncAccount$replacedBySyncAccountArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacedBySyncAccountArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    replacedAccount<T extends SyncAccount$replacedAccountArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacedAccountArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     syncLinks<T extends SyncAccount$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncJobs<T extends SyncAccount$syncJobsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncConflicts<T extends SyncAccount$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -23760,6 +23850,9 @@ export namespace Prisma {
   interface SyncAccountFieldRefs {
     readonly id: FieldRef<"SyncAccount", 'String'>
     readonly userId: FieldRef<"SyncAccount", 'String'>
+    readonly connectionId: FieldRef<"SyncAccount", 'String'>
+    readonly replacesSyncAccountId: FieldRef<"SyncAccount", 'String'>
+    readonly replacedBySyncAccountId: FieldRef<"SyncAccount", 'String'>
     readonly provider: FieldRef<"SyncAccount", 'SyncProvider'>
     readonly status: FieldRef<"SyncAccount", 'SyncAccountStatus'>
     readonly syncDirection: FieldRef<"SyncAccount", 'SyncDirection'>
@@ -23787,6 +23880,8 @@ export namespace Prisma {
     readonly booksDiscoveredAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly setupCompletedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly disconnectedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly retiredAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly retiredReason: FieldRef<"SyncAccount", 'String'>
     readonly createdAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly updatedAt: FieldRef<"SyncAccount", 'DateTime'>
   }
@@ -24182,6 +24277,82 @@ export namespace Prisma {
      * Limit how many SyncAccounts to delete.
      */
     limit?: number
+  }
+
+  /**
+   * SyncAccount.replacesSyncAccount
+   */
+  export type SyncAccount$replacesSyncAccountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
+  }
+
+  /**
+   * SyncAccount.replacementChild
+   */
+  export type SyncAccount$replacementChildArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
+  }
+
+  /**
+   * SyncAccount.replacedBySyncAccount
+   */
+  export type SyncAccount$replacedBySyncAccountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
+  }
+
+  /**
+   * SyncAccount.replacedAccount
+   */
+  export type SyncAccount$replacedAccountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
   }
 
   /**
@@ -61483,6 +61654,9 @@ export namespace Prisma {
   export const SyncAccountScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    connectionId: 'connectionId',
+    replacesSyncAccountId: 'replacesSyncAccountId',
+    replacedBySyncAccountId: 'replacedBySyncAccountId',
     provider: 'provider',
     status: 'status',
     syncDirection: 'syncDirection',
@@ -61510,6 +61684,8 @@ export namespace Prisma {
     booksDiscoveredAt: 'booksDiscoveredAt',
     setupCompletedAt: 'setupCompletedAt',
     disconnectedAt: 'disconnectedAt',
+    retiredAt: 'retiredAt',
+    retiredReason: 'retiredReason',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -64306,6 +64482,9 @@ export namespace Prisma {
     NOT?: SyncAccountWhereInput | SyncAccountWhereInput[]
     id?: StringFilter<"SyncAccount"> | string
     userId?: StringFilter<"SyncAccount"> | string
+    connectionId?: StringNullableFilter<"SyncAccount"> | string | null
+    replacesSyncAccountId?: StringNullableFilter<"SyncAccount"> | string | null
+    replacedBySyncAccountId?: StringNullableFilter<"SyncAccount"> | string | null
     provider?: EnumSyncProviderFilter<"SyncAccount"> | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFilter<"SyncAccount"> | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFilter<"SyncAccount"> | $Enums.SyncDirection
@@ -64333,9 +64512,15 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    replacesSyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
+    replacementChild?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
+    replacedBySyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
+    replacedAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
     syncLinks?: SyncContactLinkListRelationFilter
     syncJobs?: SyncJobListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
@@ -64346,6 +64531,9 @@ export namespace Prisma {
   export type SyncAccountOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
+    connectionId?: SortOrderInput | SortOrder
+    replacesSyncAccountId?: SortOrderInput | SortOrder
+    replacedBySyncAccountId?: SortOrderInput | SortOrder
     provider?: SortOrder
     status?: SortOrder
     syncDirection?: SortOrder
@@ -64373,9 +64561,15 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrderInput | SortOrder
     setupCompletedAt?: SortOrderInput | SortOrder
     disconnectedAt?: SortOrderInput | SortOrder
+    retiredAt?: SortOrderInput | SortOrder
+    retiredReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    replacesSyncAccount?: SyncAccountOrderByWithRelationInput
+    replacementChild?: SyncAccountOrderByWithRelationInput
+    replacedBySyncAccount?: SyncAccountOrderByWithRelationInput
+    replacedAccount?: SyncAccountOrderByWithRelationInput
     syncLinks?: SyncContactLinkOrderByRelationAggregateInput
     syncJobs?: SyncJobOrderByRelationAggregateInput
     syncConflicts?: SyncConflictOrderByRelationAggregateInput
@@ -64385,6 +64579,9 @@ export namespace Prisma {
 
   export type SyncAccountWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    connectionId?: string
+    replacesSyncAccountId?: string
+    replacedBySyncAccountId?: string
     userId_baseUrl_label?: SyncAccountUserIdBaseUrlLabelCompoundUniqueInput
     AND?: SyncAccountWhereInput | SyncAccountWhereInput[]
     OR?: SyncAccountWhereInput[]
@@ -64417,19 +64614,28 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    replacesSyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
+    replacementChild?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
+    replacedBySyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
+    replacedAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
     syncLinks?: SyncContactLinkListRelationFilter
     syncJobs?: SyncJobListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     teamLink?: XOR<TeamSyncAccountNullableScalarRelationFilter, TeamSyncAccountWhereInput> | null
     settings?: XOR<SyncAccountSettingsNullableScalarRelationFilter, SyncAccountSettingsWhereInput> | null
-  }, "id" | "userId_baseUrl_label">
+  }, "id" | "connectionId" | "replacesSyncAccountId" | "replacedBySyncAccountId" | "userId_baseUrl_label">
 
   export type SyncAccountOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
+    connectionId?: SortOrderInput | SortOrder
+    replacesSyncAccountId?: SortOrderInput | SortOrder
+    replacedBySyncAccountId?: SortOrderInput | SortOrder
     provider?: SortOrder
     status?: SortOrder
     syncDirection?: SortOrder
@@ -64457,6 +64663,8 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrderInput | SortOrder
     setupCompletedAt?: SortOrderInput | SortOrder
     disconnectedAt?: SortOrderInput | SortOrder
+    retiredAt?: SortOrderInput | SortOrder
+    retiredReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SyncAccountCountOrderByAggregateInput
@@ -64472,6 +64680,9 @@ export namespace Prisma {
     NOT?: SyncAccountScalarWhereWithAggregatesInput | SyncAccountScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"SyncAccount"> | string
     userId?: StringWithAggregatesFilter<"SyncAccount"> | string
+    connectionId?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    replacesSyncAccountId?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    replacedBySyncAccountId?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     provider?: EnumSyncProviderWithAggregatesFilter<"SyncAccount"> | $Enums.SyncProvider
     status?: EnumSyncAccountStatusWithAggregatesFilter<"SyncAccount"> | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionWithAggregatesFilter<"SyncAccount"> | $Enums.SyncDirection
@@ -64499,6 +64710,8 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    retiredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    retiredReason?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
   }
@@ -69083,6 +69296,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -69110,9 +69324,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
@@ -69123,6 +69343,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedCreateInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -69150,8 +69373,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -69161,6 +69388,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -69188,9 +69416,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
@@ -69201,6 +69435,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -69228,8 +69465,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -69240,6 +69481,9 @@ export namespace Prisma {
   export type SyncAccountCreateManyInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -69267,12 +69511,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type SyncAccountUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -69300,6 +69547,8 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -69307,6 +69556,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -69334,6 +69586,8 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -74040,6 +74294,11 @@ export namespace Prisma {
     not?: NestedEnumSyncDirectionFilter<$PrismaModel> | $Enums.SyncDirection
   }
 
+  export type SyncAccountNullableScalarRelationFilter = {
+    is?: SyncAccountWhereInput | null
+    isNot?: SyncAccountWhereInput | null
+  }
+
   export type SyncJobListRelationFilter = {
     every?: SyncJobWhereInput
     some?: SyncJobWhereInput
@@ -74069,6 +74328,9 @@ export namespace Prisma {
   export type SyncAccountCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    connectionId?: SortOrder
+    replacesSyncAccountId?: SortOrder
+    replacedBySyncAccountId?: SortOrder
     provider?: SortOrder
     status?: SortOrder
     syncDirection?: SortOrder
@@ -74096,6 +74358,8 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    retiredAt?: SortOrder
+    retiredReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74107,6 +74371,9 @@ export namespace Prisma {
   export type SyncAccountMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    connectionId?: SortOrder
+    replacesSyncAccountId?: SortOrder
+    replacedBySyncAccountId?: SortOrder
     provider?: SortOrder
     status?: SortOrder
     syncDirection?: SortOrder
@@ -74133,6 +74400,8 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    retiredAt?: SortOrder
+    retiredReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74140,6 +74409,9 @@ export namespace Prisma {
   export type SyncAccountMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    connectionId?: SortOrder
+    replacesSyncAccountId?: SortOrder
+    replacedBySyncAccountId?: SortOrder
     provider?: SortOrder
     status?: SortOrder
     syncDirection?: SortOrder
@@ -74166,6 +74438,8 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    retiredAt?: SortOrder
+    retiredReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74587,11 +74861,6 @@ export namespace Prisma {
     in?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
     notIn?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
     not?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel> | $Enums.SyncResolutionStrategy | null
-  }
-
-  export type SyncAccountNullableScalarRelationFilter = {
-    is?: SyncAccountWhereInput | null
-    isNot?: SyncAccountWhereInput | null
   }
 
   export type SyncContactLinkNullableScalarRelationFilter = {
@@ -78628,6 +78897,30 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type SyncAccountCreateNestedOneWithoutReplacementChildInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacementChildInput, SyncAccountUncheckedCreateWithoutReplacementChildInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacementChildInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacesSyncAccountInput, SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacesSyncAccountInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type SyncAccountCreateNestedOneWithoutReplacedAccountInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacedAccountInput, SyncAccountUncheckedCreateWithoutReplacedAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacedAccountInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacedBySyncAccountInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
   export type SyncContactLinkCreateNestedManyWithoutSyncAccountInput = {
     create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
     connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
@@ -78659,6 +78952,18 @@ export namespace Prisma {
     create?: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
     connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutSyncAccountInput
     connect?: SyncAccountSettingsWhereUniqueInput
+  }
+
+  export type SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacesSyncAccountInput, SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacesSyncAccountInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacedBySyncAccountInput
+    connect?: SyncAccountWhereUniqueInput
   }
 
   export type SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput = {
@@ -78712,6 +79017,46 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSyncAccountsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSyncAccountsInput, UserUpdateWithoutSyncAccountsInput>, UserUncheckedUpdateWithoutSyncAccountsInput>
+  }
+
+  export type SyncAccountUpdateOneWithoutReplacementChildNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacementChildInput, SyncAccountUncheckedCreateWithoutReplacementChildInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacementChildInput
+    upsert?: SyncAccountUpsertWithoutReplacementChildInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutReplacementChildInput, SyncAccountUpdateWithoutReplacementChildInput>, SyncAccountUncheckedUpdateWithoutReplacementChildInput>
+  }
+
+  export type SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacesSyncAccountInput, SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacesSyncAccountInput
+    upsert?: SyncAccountUpsertWithoutReplacesSyncAccountInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutReplacesSyncAccountInput, SyncAccountUpdateWithoutReplacesSyncAccountInput>, SyncAccountUncheckedUpdateWithoutReplacesSyncAccountInput>
+  }
+
+  export type SyncAccountUpdateOneWithoutReplacedAccountNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacedAccountInput, SyncAccountUncheckedCreateWithoutReplacedAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacedAccountInput
+    upsert?: SyncAccountUpsertWithoutReplacedAccountInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutReplacedAccountInput, SyncAccountUpdateWithoutReplacedAccountInput>, SyncAccountUncheckedUpdateWithoutReplacedAccountInput>
+  }
+
+  export type SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacedBySyncAccountInput
+    upsert?: SyncAccountUpsertWithoutReplacedBySyncAccountInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutReplacedBySyncAccountInput, SyncAccountUpdateWithoutReplacedBySyncAccountInput>, SyncAccountUncheckedUpdateWithoutReplacedBySyncAccountInput>
   }
 
   export type SyncContactLinkUpdateManyWithoutSyncAccountNestedInput = {
@@ -78774,6 +79119,26 @@ export namespace Prisma {
     delete?: SyncAccountSettingsWhereInput | boolean
     connect?: SyncAccountSettingsWhereUniqueInput
     update?: XOR<XOR<SyncAccountSettingsUpdateToOneWithWhereWithoutSyncAccountInput, SyncAccountSettingsUpdateWithoutSyncAccountInput>, SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacesSyncAccountInput, SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacesSyncAccountInput
+    upsert?: SyncAccountUpsertWithoutReplacesSyncAccountInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutReplacesSyncAccountInput, SyncAccountUpdateWithoutReplacesSyncAccountInput>, SyncAccountUncheckedUpdateWithoutReplacesSyncAccountInput>
+  }
+
+  export type SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacedBySyncAccountInput
+    upsert?: SyncAccountUpsertWithoutReplacedBySyncAccountInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutReplacedBySyncAccountInput, SyncAccountUpdateWithoutReplacedBySyncAccountInput>, SyncAccountUncheckedUpdateWithoutReplacedBySyncAccountInput>
   }
 
   export type SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput = {
@@ -81342,6 +81707,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateWithoutUserInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -81369,8 +81735,14 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
@@ -81380,6 +81752,9 @@ export namespace Prisma {
 
   export type SyncAccountUncheckedCreateWithoutUserInput = {
     id?: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -81407,8 +81782,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -82662,6 +83041,9 @@ export namespace Prisma {
     NOT?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
     id?: StringFilter<"SyncAccount"> | string
     userId?: StringFilter<"SyncAccount"> | string
+    connectionId?: StringNullableFilter<"SyncAccount"> | string | null
+    replacesSyncAccountId?: StringNullableFilter<"SyncAccount"> | string | null
+    replacedBySyncAccountId?: StringNullableFilter<"SyncAccount"> | string | null
     provider?: EnumSyncProviderFilter<"SyncAccount"> | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFilter<"SyncAccount"> | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFilter<"SyncAccount"> | $Enums.SyncDirection
@@ -82689,6 +83071,8 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
   }
@@ -89880,6 +90264,386 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
   }
 
+  export type SyncAccountCreateWithoutReplacementChildInput = {
+    id?: string
+    connectionId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutReplacementChildInput = {
+    id?: string
+    userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutReplacementChildInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutReplacementChildInput, SyncAccountUncheckedCreateWithoutReplacementChildInput>
+  }
+
+  export type SyncAccountCreateWithoutReplacesSyncAccountInput = {
+    id?: string
+    connectionId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput = {
+    id?: string
+    userId: string
+    connectionId?: string | null
+    replacedBySyncAccountId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutReplacesSyncAccountInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutReplacesSyncAccountInput, SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput>
+  }
+
+  export type SyncAccountCreateWithoutReplacedAccountInput = {
+    id?: string
+    connectionId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutReplacedAccountInput = {
+    id?: string
+    userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutReplacedAccountInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutReplacedAccountInput, SyncAccountUncheckedCreateWithoutReplacedAccountInput>
+  }
+
+  export type SyncAccountCreateWithoutReplacedBySyncAccountInput = {
+    id?: string
+    connectionId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput = {
+    id?: string
+    userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutReplacedBySyncAccountInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput>
+  }
+
   export type SyncContactLinkCreateWithoutSyncAccountInput = {
     id?: string
     remoteHref?: string | null
@@ -90253,6 +91017,410 @@ export namespace Prisma {
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type SyncAccountUpsertWithoutReplacementChildInput = {
+    update: XOR<SyncAccountUpdateWithoutReplacementChildInput, SyncAccountUncheckedUpdateWithoutReplacementChildInput>
+    create: XOR<SyncAccountCreateWithoutReplacementChildInput, SyncAccountUncheckedCreateWithoutReplacementChildInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutReplacementChildInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutReplacementChildInput, SyncAccountUncheckedUpdateWithoutReplacementChildInput>
+  }
+
+  export type SyncAccountUpdateWithoutReplacementChildInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutReplacementChildInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUpsertWithoutReplacesSyncAccountInput = {
+    update: XOR<SyncAccountUpdateWithoutReplacesSyncAccountInput, SyncAccountUncheckedUpdateWithoutReplacesSyncAccountInput>
+    create: XOR<SyncAccountCreateWithoutReplacesSyncAccountInput, SyncAccountUncheckedCreateWithoutReplacesSyncAccountInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutReplacesSyncAccountInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutReplacesSyncAccountInput, SyncAccountUncheckedUpdateWithoutReplacesSyncAccountInput>
+  }
+
+  export type SyncAccountUpdateWithoutReplacesSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutReplacesSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUpsertWithoutReplacedAccountInput = {
+    update: XOR<SyncAccountUpdateWithoutReplacedAccountInput, SyncAccountUncheckedUpdateWithoutReplacedAccountInput>
+    create: XOR<SyncAccountCreateWithoutReplacedAccountInput, SyncAccountUncheckedCreateWithoutReplacedAccountInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutReplacedAccountInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutReplacedAccountInput, SyncAccountUncheckedUpdateWithoutReplacedAccountInput>
+  }
+
+  export type SyncAccountUpdateWithoutReplacedAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutReplacedAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUpsertWithoutReplacedBySyncAccountInput = {
+    update: XOR<SyncAccountUpdateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedUpdateWithoutReplacedBySyncAccountInput>
+    create: XOR<SyncAccountCreateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedCreateWithoutReplacedBySyncAccountInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutReplacedBySyncAccountInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutReplacedBySyncAccountInput, SyncAccountUncheckedUpdateWithoutReplacedBySyncAccountInput>
+  }
+
+  export type SyncAccountUpdateWithoutReplacedBySyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutReplacedBySyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
     where: SyncContactLinkWhereUniqueInput
     update: XOR<SyncContactLinkUpdateWithoutSyncAccountInput, SyncContactLinkUncheckedUpdateWithoutSyncAccountInput>
@@ -90413,6 +91581,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateWithoutSettingsInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -90440,9 +91609,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
@@ -90452,6 +91627,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedCreateWithoutSettingsInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -90479,8 +91657,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -90530,6 +91712,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateWithoutSettingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -90557,9 +91740,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
@@ -90569,6 +91758,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateWithoutSettingsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -90596,8 +91788,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -90637,6 +91833,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateWithoutSyncLinksInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -90664,9 +91861,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
@@ -90676,6 +91879,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedCreateWithoutSyncLinksInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -90703,8 +91909,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
@@ -90914,6 +92124,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateWithoutSyncLinksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -90941,9 +92152,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
@@ -90953,6 +92170,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateWithoutSyncLinksInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -90980,8 +92200,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
@@ -91143,6 +92367,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateWithoutSyncJobsInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -91170,9 +92395,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
@@ -91182,6 +92413,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedCreateWithoutSyncJobsInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -91209,8 +92443,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
@@ -91235,6 +92473,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateWithoutSyncJobsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -91262,9 +92501,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
@@ -91274,6 +92519,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateWithoutSyncJobsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -91301,8 +92549,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
@@ -91311,6 +92563,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateWithoutSyncConflictsInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -91338,9 +92591,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
@@ -91350,6 +92609,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedCreateWithoutSyncConflictsInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -91377,8 +92639,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
@@ -91598,6 +92864,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateWithoutSyncConflictsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -91625,9 +92892,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
@@ -91637,6 +92910,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateWithoutSyncConflictsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -91664,8 +92940,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
@@ -96284,6 +97564,7 @@ export namespace Prisma {
 
   export type SyncAccountCreateWithoutTeamLinkInput = {
     id?: string
+    connectionId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -96311,9 +97592,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildInput
+    replacementChild?: SyncAccountCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountInput
+    replacedAccount?: SyncAccountCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
@@ -96323,6 +97610,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedCreateWithoutTeamLinkInput = {
     id?: string
     userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -96350,8 +97640,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    replacementChild?: SyncAccountUncheckedCreateNestedOneWithoutReplacesSyncAccountInput
+    replacedAccount?: SyncAccountUncheckedCreateNestedOneWithoutReplacedBySyncAccountInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -96456,6 +97750,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateWithoutTeamLinkInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -96483,9 +97778,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
@@ -96495,6 +97796,9 @@ export namespace Prisma {
   export type SyncAccountUncheckedUpdateWithoutTeamLinkInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -96522,8 +97826,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -101324,6 +102632,9 @@ export namespace Prisma {
 
   export type SyncAccountCreateManyUserInput = {
     id?: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
     provider?: $Enums.SyncProvider
     status?: $Enums.SyncAccountStatus
     syncDirection?: $Enums.SyncDirection
@@ -101351,6 +102662,8 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -102101,6 +103414,7 @@ export namespace Prisma {
 
   export type SyncAccountUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -102128,8 +103442,14 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildNestedInput
+    replacementChild?: SyncAccountUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountNestedInput
+    replacedAccount?: SyncAccountUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
@@ -102139,6 +103459,9 @@ export namespace Prisma {
 
   export type SyncAccountUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -102166,8 +103489,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChild?: SyncAccountUncheckedUpdateOneWithoutReplacesSyncAccountNestedInput
+    replacedAccount?: SyncAccountUncheckedUpdateOneWithoutReplacedBySyncAccountNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -102177,6 +103504,9 @@ export namespace Prisma {
 
   export type SyncAccountUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
     status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
@@ -102204,6 +103534,8 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

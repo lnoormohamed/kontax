@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
+import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
@@ -649,7 +650,7 @@ export const linkTeamSyncAccount = async (formData: FormData) => {
   }
   const [account, book] = await Promise.all([
     db.syncAccount.findFirst({
-      where: { id: syncAccountId, userId },
+      where: { id: syncAccountId, userId, status: { in: [...SYNC_ACCOUNT_ACTIVE_STATUSES] } },
       select: { id: true, provider: true },
     }),
     db.groupAddressBook.findFirst({

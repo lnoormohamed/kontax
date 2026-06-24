@@ -40,6 +40,11 @@ const EVENT_META: Record<string, EventMeta> = {
   SYNC_PUSHED: { icon: "sync", color: "#2c7a52" },
   SYNC_CONFLICT_DETECTED: { icon: "warning", color: "#a8741f" },
   SYNC_CONFLICT_RESOLVED: { icon: "check", color: "#17352e" },
+  SYNC_CONNECTION_CONNECTED: { icon: "plus", color: "#2c7a52" },
+  SYNC_CONNECTION_RECONNECTED: { icon: "sync", color: "#2c7a52" },
+  SYNC_CONNECTION_DISCONNECTED: { icon: "warning", color: "#a8741f" },
+  SYNC_CONNECTION_RETIRED: { icon: "archive", color: "#5c655e" },
+  SYNC_CONNECTION_REPLACED: { icon: "sync", color: "#4158f4" },
 };
 const eventMeta = (t: string): EventMeta =>
   EVENT_META[t] ?? { icon: "pencil", color: "#4158f4" };

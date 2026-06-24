@@ -4,7 +4,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { auth } from "~/server/auth";
+import { assertCanCreateSyncAccount, assertHasAvailableSyncAccountSlot } from "~/server/billing";
 import { db } from "~/server/db";
+import { SYNC_ACCOUNT_MUTABLE_STATUSES } from "~/lib/sync-account-status";
+import {
+  createSyncConnectionId,
+  emitSyncConnectionLifecycleEvent,
+  reconnectExistingSyncAccount,
+} from "~/server/sync-lineage";
 import { env } from "~/env";
 import { people } from "@googleapis/people";
 
@@ -112,6 +119,7 @@ export async function GET(req: NextRequest) {
     where: {
       userId: state.userId,
       provider: "GOOGLE",
+      status: { in: [...SYNC_ACCOUNT_MUTABLE_STATUSES] },
       ...(googleEmail
         ? { remoteAccountId: googleEmail }
         : { OR: [{ remoteAccountId: null }, { remoteAccountId: "" }] }),
@@ -119,6 +127,18 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "asc" },
     select: { id: true, credentialReference: true },
   });
+
+  try {
+    if (existing) {
+      await assertHasAvailableSyncAccountSlot(state.userId, {
+        excludingSyncAccountIds: [existing.id],
+      });
+    } else {
+      await assertCanCreateSyncAccount(state.userId);
+    }
+  } catch {
+    return redirectTo(req, "/sync?error=google_cap");
+  }
 
   // Google only returns a refresh token on a fresh consent. Never overwrite a
   // good stored refresh token with undefined on reconnect.
@@ -144,46 +164,62 @@ export async function GET(req: NextRequest) {
   const now = new Date();
   let accountId: string;
   try {
-    accountId = existing
-      ? (await db.syncAccount.update({
-          where: { id: existing.id },
+    accountId = await db.$transaction(async (tx) => {
+      if (existing) {
+        const reconnected = await reconnectExistingSyncAccount({
+          client: tx,
+          userId: state.userId,
+          syncAccountId: existing.id,
+          actor: "USER",
           data: {
             label,
-            status: "ACTIVE",
-            // P36-DB03: re-adding a soft-disconnected account reactivates it.
-            disconnectedAt: null,
             remoteAccountId: googleEmail || null,
             credentialReference: enc.credentialReference,
             encryptionKeyRef: enc.encryptionKeyRef,
-            credentialUpdatedAt: now,
-            credentialLastValidatedAt: now,
-            credentialRevokedAt: null,
-            // Re-consent: clear the cursor so the next run does a full re-import.
-            lastSyncCursor: null,
-            lastErrorAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-          },
-          select: { id: true },
-        })).id
-      : (await db.syncAccount.create({
-          data: {
-            userId: state.userId,
-            provider: "GOOGLE",
-            status: "ACTIVE",
-            syncDirection: "TWO_WAY",
-            label,
-            baseUrl: GOOGLE_BASE_URL,
-            remoteAccountId: googleEmail || null,
-            credentialReference: enc.credentialReference,
-            encryptionKeyRef: enc.encryptionKeyRef,
-            credentialVersion: 1,
             credentialUpdatedAt: now,
             credentialLastValidatedAt: now,
             connectionValidatedAt: now,
+            // Re-consent: clear the cursor so the next run does a full re-import.
+            lastSyncCursor: null,
           },
-          select: { id: true },
-        })).id;
+        });
+        return reconnected.id;
+      }
+
+      const created = await tx.syncAccount.create({
+        data: {
+          userId: state.userId,
+          connectionId: createSyncConnectionId(),
+          provider: "GOOGLE",
+          status: "ACTIVE",
+          syncDirection: "TWO_WAY",
+          label,
+          baseUrl: GOOGLE_BASE_URL,
+          remoteAccountId: googleEmail || null,
+          credentialReference: enc.credentialReference,
+          encryptionKeyRef: enc.encryptionKeyRef,
+          credentialVersion: 1,
+          credentialUpdatedAt: now,
+          credentialLastValidatedAt: now,
+          connectionValidatedAt: now,
+        },
+        select: { id: true, connectionId: true, provider: true, label: true },
+      });
+
+      await emitSyncConnectionLifecycleEvent(tx, {
+        userId: state.userId,
+        eventType: "SYNC_CONNECTION_CONNECTED",
+        actor: "USER",
+        seed: {
+          syncAccountId: created.id,
+          connectionId: created.connectionId!,
+          provider: created.provider,
+          label: created.label,
+        },
+      });
+
+      return created.id;
+    });
   } catch {
     // Most likely the @@unique([userId, baseUrl, label]) constraint when a second
     // Google account connects without a resolvable email (both get the same label).

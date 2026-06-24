@@ -9,6 +9,7 @@ import {
 import type { PortableContactInput } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
 import { createNotification } from "~/server/notifications";
 import {
   AUTO_PAUSE_FAILURE_STREAK,
@@ -242,7 +243,7 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
 };
 
 const getFailureStatus = (
-  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED",
+  accountStatus: SyncAccountLifecycleStatus,
   errorCode: string,
 ) => {
   if (
@@ -255,7 +256,15 @@ const getFailureStatus = (
     return "NEEDS_REAUTH";
   }
 
-  return accountStatus === "PAUSED" ? "PAUSED" : "ERROR";
+  if (
+    accountStatus === "PAUSED" ||
+    accountStatus === "DISCONNECTED" ||
+    accountStatus === "RETIRED"
+  ) {
+    return accountStatus;
+  }
+
+  return "ERROR";
 };
 
 const markJobFailed = async ({
@@ -273,7 +282,7 @@ const markJobFailed = async ({
   _syncDirection: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
   attemptCount: number;
   maxAttempts: number;
-  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
+  accountStatus: SyncAccountLifecycleStatus;
   errorCode: string;
   errorSummary: string;
 }) => {
@@ -637,7 +646,18 @@ export const runQueuedSyncJobs = async ({
 
     summary.processed += 1;
 
-    if (job.syncAccount.status === "PAUSED") {
+    if (
+      job.syncAccount.status === "PAUSED" ||
+      job.syncAccount.status === "DISCONNECTED" ||
+      job.syncAccount.status === "RETIRED"
+    ) {
+      const statusLabel = job.syncAccount.status.toLowerCase().replace("_", " ");
+      const errorCode =
+        job.syncAccount.status === "PAUSED"
+          ? "SYNC_ACCOUNT_PAUSED"
+          : job.syncAccount.status === "DISCONNECTED"
+            ? "SYNC_ACCOUNT_DISCONNECTED"
+            : "SYNC_ACCOUNT_RETIRED";
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
@@ -645,8 +665,8 @@ export const runQueuedSyncJobs = async ({
         attemptCount: job.attemptCount,
         maxAttempts: job.maxAttempts,
         accountStatus: job.syncAccount.status,
-        errorCode: "SYNC_ACCOUNT_PAUSED",
-        errorSummary: "The queued sync job was skipped because the sync account is paused.",
+        errorCode,
+        errorSummary: `The queued sync job was skipped because the sync account is ${statusLabel}.`,
       });
       summary.failed += 1;
       continue;

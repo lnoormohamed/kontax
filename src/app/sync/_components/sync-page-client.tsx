@@ -54,6 +54,7 @@ export type SyncAccountData = {
   id: string;
   label: string;
   baseUrl: string;
+  connectionId: string | null;
   // P27-07: provider + OAuth metadata (Google/Microsoft show email, not a URL).
   provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
   connectedEmail: string | null;
@@ -79,8 +80,21 @@ export type SyncAccountData = {
   // P36-DB02: true when the connection was just created and the user hasn't
   // confirmed sync settings yet — the first sync is held and setup is shown.
   needsSetup: boolean;
-  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
-  health: "healthy" | "watch" | "needs_attention" | "paused_for_safety" | "needs_reauth";
+  createdAt: string;
+  disconnectedAt: string | null;
+  retiredAt: string | null;
+  replacesSyncAccountId: string | null;
+  replacesSyncAccountLabel: string | null;
+  replacedBySyncAccountId: string | null;
+  replacedBySyncAccountLabel: string | null;
+  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED" | "RETIRED";
+  health:
+    | "healthy"
+    | "watch"
+    | "needs_attention"
+    | "paused_for_safety"
+    | "needs_reauth"
+    | "retired";
   lastSyncedAtRelative: string | null;
   lastErrorMessage: string | null;
   consecutiveFailures: number;
@@ -105,6 +119,7 @@ type VisualHealth =
   | "warning"
   | "error"
   | "auth"
+  | "retired"
   | "paused"
   | "safety"
   | "never"
@@ -113,6 +128,7 @@ type VisualHealth =
 const getVisualHealth = (a: SyncAccountData, syncingId: string | null): VisualHealth => {
   if (a.id === syncingId) return "syncing";
   if (a.status === "NEEDS_REAUTH") return "auth";
+  if (a.health === "retired") return "retired";
   if (a.health === "paused_for_safety") return "safety";
   if (a.status === "PAUSED") return "paused";
   if (a.health === "needs_attention") return "error";
@@ -126,6 +142,7 @@ const HEALTH_DOT: Record<VisualHealth, string> = {
   warning: T.amber,
   error: T.red,
   auth: T.amber,
+  retired: T.mute,
   paused: T.mute,
   safety: T.amber,
   never: T.mute,
@@ -137,6 +154,7 @@ const HEALTH_LIST_COLOR: Record<VisualHealth, string> = {
   warning: T.mute,
   error: T.red,
   auth: T.red,
+  retired: T.mute,
   paused: T.mute,
   safety: T.mute,
   never: T.mute,
@@ -148,6 +166,7 @@ const HEALTH_LIST_TEXT: Record<VisualHealth, (a: SyncAccountData) => string> = {
   warning: () => "Needs attention",
   error: () => "Sync error",
   auth: () => "Auth error",
+  retired: () => "Retired",
   paused: () => "Paused",
   safety: () => "Paused",
   never: () => "Never synced",
@@ -159,6 +178,7 @@ const HEALTH_SUMMARY_COLOR: Record<VisualHealth, string> = {
   warning: T.amber,
   error: T.red,
   auth: T.red,
+  retired: T.mute,
   paused: T.mute,
   safety: T.amber,
   never: T.mute,
@@ -170,6 +190,7 @@ const HEALTH_LABEL: Record<VisualHealth, string> = {
   warning: `Consecutive failures`,
   error: "Last sync failed",
   auth: "Authentication failed",
+  retired: "Retired",
   paused: "Paused",
   safety: "Paused for safety",
   never: "Never synced",
@@ -185,6 +206,7 @@ const HEALTH_DETAIL: Record<VisualHealth, (a: SyncAccountData) => string> = {
     a.provider === "CARDDAV"
       ? "Re-authentication required — your app password was rejected."
       : `Re-authentication required — your ${a.provider === "GOOGLE" ? "Google" : "Microsoft"} authorisation has expired or been revoked.`,
+  retired: () => "This connection is no longer active.",
   paused: () => "Sync is paused. Click Resume to continue syncing.",
   safety: (a) =>
     a.conflictQueueFull
@@ -1251,6 +1273,7 @@ function AccountHeader({
 }) {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const isPaused = account.status === "PAUSED";
+  const isRetired = account.status === "RETIRED";
   const dir = DIR_BADGE[account.direction];
   const isOAuth = account.provider !== "CARDDAV";
   const providerName = account.provider === "GOOGLE" ? "Google" : "Outlook";
@@ -1407,6 +1430,18 @@ function AccountHeader({
       <div style={{ fontSize: 13, color: T.ink2, marginTop: 8, maxWidth: 520 }}>
         {HEALTH_DETAIL[vHealth](account)}
       </div>
+      {isRetired && (
+        <div style={{ fontSize: 13, color: T.ink2, marginTop: 6, maxWidth: 520, lineHeight: 1.5 }}>
+          {account.replacedBySyncAccountLabel
+            ? `Replaced by ${account.replacedBySyncAccountLabel}${formatAccountEventTime(account.retiredAt) ? ` on ${formatAccountEventTime(account.retiredAt)}` : ""}.`
+            : "This connection was intentionally replaced and kept for history."}
+        </div>
+      )}
+      {!isRetired && account.replacesSyncAccountLabel && (
+        <div style={{ fontSize: 13, color: T.ink2, marginTop: 6, maxWidth: 520, lineHeight: 1.5 }}>
+          Replaced previous connection: {account.replacesSyncAccountLabel}.
+        </div>
+      )}
       {vHealth !== "never" && vHealth !== "syncing" && account.lastSyncedAtRelative && (
         <div style={{ fontSize: 13, color: T.ink2, marginTop: 2 }}>
           Last synced:{" "}
@@ -1445,6 +1480,7 @@ function AccountHeader({
       )}
 
       {/* action buttons */}
+      {!isRetired ? (
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
         {/* sync now */}
         <form action={queueSyncJob}>
@@ -1489,6 +1525,7 @@ function AccountHeader({
           Disconnect
         </ActionBtn>
       </div>
+      ) : null}
     </div>
   );
 }
@@ -1710,6 +1747,42 @@ const OAUTH_TILES: Array<{ provider: string; kind: PlatKind; label: string; sub:
   },
 ];
 
+type MatchResolution = "reconnect" | "replace";
+
+const formatReconnectMatchTime = (iso: string | null) => {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+};
+
+const reconnectMatchIconKind = (
+  provider: SyncAccountData["provider"],
+  label: string,
+  baseUrl: string,
+): PlatKind => {
+  if (provider === "GOOGLE") return "gcontacts";
+  if (provider === "MICROSOFT") return "outlook";
+  return getPlatformKind(label, baseUrl);
+};
+
+const formatAccountEventTime = (iso: string | null) => {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
+
 function AddAccountForm({
   onCancel,
   accounts,
@@ -1725,11 +1798,15 @@ function AddAccountForm({
   const [baseUrl, setBaseUrl] = useState(QUICK_PRESETS[0]!.url);
   const [labelValue, setLabelValue] = useState(QUICK_PRESETS[0]!.label);
   const [reveal, setReveal] = useState(false);
+  const [matchResolution, setMatchResolution] = useState<MatchResolution>("reconnect");
   const router = useRouter();
   const [state, formAction] = useActionState(createSyncAccount, {
     ok: false,
     error: null,
+    requiresChoice: false,
+    match: null,
   });
+  const choiceMatch = state.requiresChoice ? state.match ?? null : null;
 
   // On success, navigate to the new connection (a client navigation that carries
   // cookies — no server redirect, so no reverse-proxy logout).
@@ -1738,6 +1815,12 @@ function AddAccountForm({
       router.push(`/sync?account=${state.accountId}`);
     }
   }, [state.ok, state.accountId, router]);
+
+  useEffect(() => {
+    if (choiceMatch) {
+      setMatchResolution("reconnect");
+    }
+  }, [choiceMatch?.syncAccountId]);
 
   const pickPreset = (q: QuickPreset) => {
     setSel(q);
@@ -1909,6 +1992,134 @@ function AddAccountForm({
             {state.error}
           </div>
         )}
+        {choiceMatch && (
+          <div
+            style={{
+              marginBottom: 16,
+              maxWidth: 460,
+              padding: "14px 16px",
+              borderRadius: 12,
+              border: "1px solid #d7ddf8",
+              background: "#f5f7ff",
+            }}
+          >
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <span
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  background: "#fff",
+                  border: "1px solid #e3e7fb",
+                  display: "grid",
+                  placeItems: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <PlatIcon
+                  kind={reconnectMatchIconKind(choiceMatch.provider, choiceMatch.label, baseUrl)}
+                  size={22}
+                />
+              </span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>
+                  Kontax found a previous connection
+                </div>
+                <div style={{ fontSize: 12.5, color: T.ink2, marginTop: 3, lineHeight: 1.5 }}>
+                  This label and server URL match a disconnected connection. Choose whether to continue that connection or start fresh.
+                </div>
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    background: "#fff",
+                    border: "1px solid #e3e7fb",
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>
+                    {choiceMatch.label}
+                  </div>
+                  <div style={{ fontSize: 12, color: T.mute, marginTop: 2 }}>
+                    {choiceMatch.lastSucceededAt
+                      ? `Last synced ${formatReconnectMatchTime(choiceMatch.lastSucceededAt)}`
+                      : choiceMatch.disconnectedAt
+                        ? `Disconnected ${formatReconnectMatchTime(choiceMatch.disconnectedAt)}`
+                        : "Previously connected"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+              <label
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "flex-start",
+                  padding: "11px 12px",
+                  borderRadius: 10,
+                  border:
+                    matchResolution === "reconnect"
+                      ? `1.5px solid ${T.blue}`
+                      : "1px solid #d7ddf8",
+                  background:
+                    matchResolution === "reconnect" ? "#edf0fe" : "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="radio"
+                  name="chooserResolution"
+                  checked={matchResolution === "reconnect"}
+                  onChange={() => setMatchResolution("reconnect")}
+                  style={{ marginTop: 2 }}
+                />
+                <span>
+                  <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: T.ink }}>
+                    Reconnect existing connection
+                  </span>
+                  <span style={{ display: "block", marginTop: 2, fontSize: 12.5, color: T.ink2, lineHeight: 1.45 }}>
+                    Restore this connection with its previous settings and history.
+                  </span>
+                </span>
+              </label>
+
+              <label
+                style={{
+                  display: "flex",
+                  gap: 10,
+                  alignItems: "flex-start",
+                  padding: "11px 12px",
+                  borderRadius: 10,
+                  border:
+                    matchResolution === "replace"
+                      ? `1.5px solid ${T.blue}`
+                      : "1px solid #d7ddf8",
+                  background:
+                    matchResolution === "replace" ? "#edf0fe" : "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="radio"
+                  name="chooserResolution"
+                  checked={matchResolution === "replace"}
+                  onChange={() => setMatchResolution("replace")}
+                  style={{ marginTop: 2 }}
+                />
+                <span>
+                  <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: T.ink }}>
+                    Create new connection and retire old one
+                  </span>
+                  <span style={{ display: "block", marginTop: 2, fontSize: 12.5, color: T.ink2, lineHeight: 1.45 }}>
+                    Start fresh and keep the old connection as retired history.
+                  </span>
+                </span>
+              </label>
+            </div>
+          </div>
+        )}
         <div style={{ display: "grid", gap: 14, maxWidth: 460 }}>
           <label style={{ display: "block" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>Label</span>
@@ -2008,10 +2219,20 @@ function AddAccountForm({
             </div>
           </div>
           <input type="hidden" name="syncDirection" value="TWO_WAY" />
+          {choiceMatch && (
+            <>
+              <input type="hidden" name="matchedSyncAccountId" value={choiceMatch.syncAccountId} />
+              <input type="hidden" name="matchResolution" value={matchResolution} />
+            </>
+          )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 22 }}>
           <ActionBtn variant="primary" type="submit">
-            Connect
+            {choiceMatch
+              ? matchResolution === "reconnect"
+                ? "Reconnect existing connection"
+                : "Create new connection"
+              : "Connect"}
           </ActionBtn>
           <button
             type="button"
@@ -2318,6 +2539,7 @@ function DisconnectModal({
 // ── Main client component ─────────────────────────────────────────────────────
 export type SyncPageClientProps = {
   accounts: SyncAccountData[];
+  pastAccounts: SyncAccountData[];
   // P36: the user's labels, for the auto-label and export-filter pickers.
   labels: LabelOption[];
   initialAccountId: string | null;
@@ -2330,12 +2552,13 @@ export type SyncPageClientProps = {
   upgradeableAtCap: boolean;
 };
 
-export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+  const allAccounts = [...accounts, ...pastAccounts];
   // P36-DB02: a freshly-connected account awaiting setup wins the initial selection
   // so its first-run setup panel opens immediately.
   const pendingSetup = accounts.find((a) => a.needsSetup) ?? null;
   const [selectedId, setSelectedId] = useState<string | null>(
-    initialAccountId ?? (initialAdd ? null : pendingSetup?.id) ?? accounts[0]?.id ?? null,
+    initialAccountId ?? (initialAdd ? null : pendingSetup?.id) ?? accounts[0]?.id ?? pastAccounts[0]?.id ?? null,
   );
   const [view, setView] = useState<"detail" | "add">(initialAdd ? "add" : "detail");
   const [editing, setEditing] = useState(false);
@@ -2378,10 +2601,10 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
     return () => clearTimeout(t);
   }, [toast]);
 
-  const selectedAccount = accounts.find((a) => a.id === selectedId) ?? accounts[0] ?? null;
+  const selectedAccount = allAccounts.find((a) => a.id === selectedId) ?? accounts[0] ?? pastAccounts[0] ?? null;
 
   const selectAccount = (id: string) => {
-    const target = accounts.find((a) => a.id === id);
+    const target = allAccounts.find((a) => a.id === id);
     setSelectedId(id);
     setView("detail");
     setEditing(false);
@@ -2431,7 +2654,7 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
           upgradeableAtCap={upgradeableAtCap}
         />
       );
-    if (accounts.length === 0) return <EmptyState onAdd={openAdd} />;
+    if (accounts.length === 0 && pastAccounts.length === 0) return <EmptyState onAdd={openAdd} />;
     if (!selectedAccount) return <EmptyState onAdd={openAdd} />;
     if (editing)
       return (
@@ -2762,6 +2985,93 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
         </div>
           );
         })()}
+
+        {pastAccounts.length > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: T.mute,
+                padding: "0 16px 6px",
+              }}
+            >
+              Past connections
+            </div>
+            <div style={{ display: "grid", gap: 2 }}>
+              {pastAccounts.map((a) => {
+                const vH = getVisualHealth(a, syncingId);
+                const sel = view === "detail" && selectedId === a.id;
+                const retiredDate = formatAccountEventTime(a.retiredAt);
+                return (
+                  <div key={a.id} className="sy-row-wrap" data-sel={sel ? "1" : "0"} style={{ position: "relative" }}>
+                    <button
+                      type="button"
+                      onClick={() => selectAccount(a.id)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        width: "100%",
+                        minHeight: 56,
+                        padding: "10px 12px",
+                        border: "none",
+                        borderLeft: `3px solid ${sel ? T.green : "transparent"}`,
+                        borderRadius: sel ? "0 10px 10px 0" : 10,
+                        background: sel ? T.sgreenWash : "transparent",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        transition: "background .13s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!sel) e.currentTarget.style.background = T.wash;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!sel) e.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      <span style={{ flexShrink: 0, opacity: 0.7 }}>
+                        <PlatIcon kind={getAccountIconKind(a)} size={24} />
+                      </span>
+                      <span style={{ minWidth: 0, flex: 1 }}>
+                        <span
+                          style={{
+                            display: "block",
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: T.ink,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {a.label}
+                        </span>
+                        <span
+                          style={{
+                            display: "block",
+                            fontSize: 12,
+                            color: HEALTH_LIST_COLOR[vH],
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {a.replacedBySyncAccountLabel
+                            ? `Replaced by ${a.replacedBySyncAccountLabel}${retiredDate ? ` · ${retiredDate}` : ""}`
+                            : HEALTH_LIST_TEXT[vH](a)}
+                        </span>
+                      </span>
+                      <Dot color={HEALTH_DOT[vH]} pulse={false} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* add account */}
         <button

@@ -118,6 +118,11 @@ const countDiffs = (payload: unknown): number =>
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
+const getPayloadString = (payload: unknown, key: string): string | null =>
+  isRecord(payload) && typeof payload[key] === "string" && payload[key].trim().length > 0
+    ? payload[key].trim()
+    : null;
+
 /** One-line human summary for an activity event. */
 export function formatEventSummary(
   eventType: EventType,
@@ -167,6 +172,26 @@ export function formatEventSummary(
           ? payload.resolutionStrategy
           : null;
       return strat ? `Sync conflict resolved (${strat})` : "Sync conflict resolved";
+    }
+    case "SYNC_CONNECTION_CONNECTED": {
+      const label = getPayloadString(payload, "label");
+      return label ? `${label} connected` : "Sync account connected";
+    }
+    case "SYNC_CONNECTION_RECONNECTED": {
+      const label = getPayloadString(payload, "label");
+      return label ? `${label} reconnected` : "Sync account reconnected";
+    }
+    case "SYNC_CONNECTION_DISCONNECTED": {
+      const label = getPayloadString(payload, "label");
+      return label ? `${label} disconnected` : "Sync account disconnected";
+    }
+    case "SYNC_CONNECTION_RETIRED": {
+      const label = getPayloadString(payload, "label");
+      return label ? `${label} connection retired` : "Sync account retired";
+    }
+    case "SYNC_CONNECTION_REPLACED": {
+      const label = getPayloadString(payload, "label");
+      return label ? `New ${label} connection created` : "New sync connection created";
     }
     default:
       return "Updated";

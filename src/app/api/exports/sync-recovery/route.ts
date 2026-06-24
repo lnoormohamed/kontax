@@ -1,5 +1,6 @@
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { getSyncLineageInvariantIssues } from "~/server/sync-lineage";
 import {
   AUTO_PAUSE_FAILURE_STREAK,
   getConsecutiveFailureStreak,
@@ -40,6 +41,22 @@ export async function GET(request: Request) {
           syncJobs: true,
           syncConflicts: true,
           syncLinks: true,
+        },
+      },
+      replacesSyncAccount: {
+        select: {
+          id: true,
+          connectionId: true,
+          status: true,
+          replacedBySyncAccountId: true,
+        },
+      },
+      replacedBySyncAccount: {
+        select: {
+          id: true,
+          connectionId: true,
+          status: true,
+          replacesSyncAccountId: true,
         },
       },
       syncJobs: {
@@ -195,6 +212,7 @@ export async function GET(request: Request) {
       },
       syncAccount: {
         id: syncAccount.id,
+        connectionId: syncAccount.connectionId,
         label: syncAccount.label,
         provider: syncAccount.provider,
         status: syncAccount.status,
@@ -207,7 +225,12 @@ export async function GET(request: Request) {
         credentialVersion: syncAccount.credentialVersion,
         credentialUpdatedAt: syncAccount.credentialUpdatedAt,
         credentialRevokedAt: syncAccount.credentialRevokedAt,
+        disconnectedAt: syncAccount.disconnectedAt,
+        retiredAt: syncAccount.retiredAt,
+        retiredReason: syncAccount.retiredReason,
         encryptionKeyRef: syncAccount.encryptionKeyRef,
+        replacesSyncAccountId: syncAccount.replacesSyncAccountId,
+        replacedBySyncAccountId: syncAccount.replacedBySyncAccountId,
         lastSyncCursor: syncAccount.lastSyncCursor,
         lastSyncedAt: syncAccount.lastSyncedAt,
         lastSucceededAt: syncAccount.lastSucceededAt,
@@ -215,6 +238,11 @@ export async function GET(request: Request) {
         lastErrorCode: syncAccount.lastErrorCode,
         lastErrorMessage: syncAccount.lastErrorMessage,
         counts: syncAccount._count,
+      },
+      lineage: {
+        invariantIssues: getSyncLineageInvariantIssues(syncAccount),
+        replacesSyncAccount: syncAccount.replacesSyncAccount,
+        replacedBySyncAccount: syncAccount.replacedBySyncAccount,
       },
       recentJobs: syncAccount.syncJobs.map((job) => ({
         ...job,

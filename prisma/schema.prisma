@@ -147,14 +147,21 @@ enum SyncDirection {
 }
 
 enum SyncAccountStatus {
+    // Healthy and runnable.
     ACTIVE
+    // Temporarily stopped by the user or by an auto-pause safety rule.
     PAUSED
+    // Credentials/token broken; user action is required before the next run.
     NEEDS_REAUTH
+    // Operational failure that does not inherently invalidate credentials.
     ERROR
     // P36-DB03: soft-disconnected. Credentials revoked, hidden from the active
     // rail and skipped by the runner, but settings + contact links are retained so
     // re-adding the same remote (matched by email / baseUrl+label) restores it.
     DISCONNECTED
+    // P34G-02: intentionally replaced by a newer connection. Historical-only:
+    // preserved for audit/support and never eligible for normal reconnect flows.
+    RETIRED
 }
 
 // P23-01: per-connection conflict resolution policy.
@@ -633,6 +640,12 @@ model MergeDismissal {
 model SyncAccount {
     id                  String            @id @default(cuid())
     userId              String
+    // P34G-01: stable logical connection identity. Nullable for deploy-safe
+    // `db push`; all new writes set it immediately and a backfill script fills
+    // legacy rows before any code relies on it being present.
+    connectionId        String?           @unique
+    replacesSyncAccountId String?         @unique
+    replacedBySyncAccountId String?       @unique
     provider            SyncProvider      @default(CARDDAV)
     status              SyncAccountStatus @default(PAUSED)
     syncDirection       SyncDirection     @default(TWO_WAY)
@@ -667,9 +680,15 @@ model SyncAccount {
     setupCompletedAt    DateTime?
     // P36-DB03: when the user soft-disconnected this connection (status DISCONNECTED).
     disconnectedAt      DateTime?
+    retiredAt           DateTime?
+    retiredReason       String?
     createdAt           DateTime          @default(now())
     updatedAt           DateTime          @updatedAt
     user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    replacesSyncAccount SyncAccount?      @relation("SyncAccountReplaces", fields: [replacesSyncAccountId], references: [id], onDelete: SetNull)
+    replacementChild    SyncAccount?      @relation("SyncAccountReplaces")
+    replacedBySyncAccount SyncAccount?    @relation("SyncAccountReplacedBy", fields: [replacedBySyncAccountId], references: [id], onDelete: SetNull)
+    replacedAccount     SyncAccount?      @relation("SyncAccountReplacedBy")
     syncLinks           SyncContactLink[]
     syncJobs            SyncJob[]
     syncConflicts       SyncConflict[]
@@ -677,6 +696,8 @@ model SyncAccount {
     settings            SyncAccountSettings?
 
     @@index([userId, status, updatedAt])
+    @@index([replacesSyncAccountId])
+    @@index([replacedBySyncAccountId])
     @@unique([userId, baseUrl, label])
 }
 
@@ -847,6 +868,11 @@ enum EventType {
     SYNC_PUSHED
     SYNC_CONFLICT_DETECTED
     SYNC_CONFLICT_RESOLVED
+    SYNC_CONNECTION_CONNECTED
+    SYNC_CONNECTION_RECONNECTED
+    SYNC_CONNECTION_DISCONNECTED
+    SYNC_CONNECTION_RETIRED
+    SYNC_CONNECTION_REPLACED
     // P23-06: a sync connection's settings (direction, conflict policy, frequency,
     // book allowlist) were changed — security-relevant, audited.
     SYNC_SETTINGS_CHANGED

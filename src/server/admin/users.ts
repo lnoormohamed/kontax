@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "~/server/db";
-import { getUserBillingContext } from "~/server/billing";
+import { countLiveSyncAccountSlots, getUserBillingContext } from "~/server/billing";
 
 const PLAN_LABEL: Record<string, string> = {
   FREE: "Free",
@@ -101,6 +101,11 @@ const EVENT_META: Record<string, { icon: string; label: string }> = {
   SYNC_PUSHED: { icon: "sync", label: "CardDAV sync pushed changes" },
   SYNC_CONFLICT_DETECTED: { icon: "sync", label: "Sync conflict detected" },
   SYNC_CONFLICT_RESOLVED: { icon: "sync", label: "Sync conflict resolved" },
+  SYNC_CONNECTION_CONNECTED: { icon: "sync", label: "Sync connection connected" },
+  SYNC_CONNECTION_RECONNECTED: { icon: "sync", label: "Sync connection reconnected" },
+  SYNC_CONNECTION_DISCONNECTED: { icon: "sync", label: "Sync connection disconnected" },
+  SYNC_CONNECTION_RETIRED: { icon: "archive", label: "Sync connection retired" },
+  SYNC_CONNECTION_REPLACED: { icon: "sync", label: "Sync connection replaced" },
   ACCOUNT_UPDATED: { icon: "account", label: "Account updated" },
 };
 
@@ -144,7 +149,7 @@ export async function loadUserDetail(userId: string) {
     await Promise.all([
       getUserBillingContext(userId),
       db.contact.count({ where: { userId } }),
-      db.syncAccount.count({ where: { userId } }),
+      countLiveSyncAccountSlots(userId),
       db.appPassword.count({ where: { userId, revokedAt: null } }),
       db.importJob.aggregate({
         where: { userId, status: "COMPLETED", createdAt: { gte: monthStart } },

@@ -1,6 +1,7 @@
-import { type SubscriptionPlan } from "../../generated/prisma";
+import { type Prisma, type SubscriptionPlan } from "../../generated/prisma";
 
 import { db } from "~/server/db";
+import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
 
 export type BillingLifecycleState = "ACTIVE" | "TRIALING" | "GRACE" | "CANCELED" | "LOCKED";
 
@@ -284,7 +285,7 @@ export const getUserPlanSummary = async (userId: string) => {
         },
         _sum: { importedCount: true },
       }),
-      db.syncAccount.count({ where: { userId } }),
+      countLiveSyncAccountSlots(userId),
       db.appPassword.count({ where: { userId } }),
     ]);
 
@@ -352,14 +353,34 @@ export const assertCanUseCardDavSync = async (userId: string) => {
   return summary;
 };
 
-export const assertCanCreateSyncAccount = async (userId: string) => {
-  const summary = await assertCanUseCardDavSync(userId);
-  const syncAccountsUsed = await db.syncAccount.count({
-    // P36-DB03: soft-disconnected connections stay in the database so they can
-    // be restored with settings/history intact, but they should not consume one
-    // of the plan's active sync-account slots.
-    where: { userId, status: { not: "DISCONNECTED" } },
+const liveSyncAccountWhere = (
+  userId: string,
+  excludingSyncAccountIds: string[] = [],
+): Prisma.SyncAccountWhereInput => ({
+  userId,
+  status: { notIn: [...SYNC_ACCOUNT_HISTORICAL_STATUSES] },
+  ...(excludingSyncAccountIds.length > 0 ? { id: { notIn: excludingSyncAccountIds } } : {}),
+});
+
+export const countLiveSyncAccountSlots = (
+  userId: string,
+  excludingSyncAccountIds: string[] = [],
+) =>
+  db.syncAccount.count({
+    // Historical rows stay in the database for restore/audit purposes, but they
+    // do not represent a current live connection or consume a sync slot.
+    where: liveSyncAccountWhere(userId, excludingSyncAccountIds),
   });
+
+export const assertHasAvailableSyncAccountSlot = async (
+  userId: string,
+  options?: { excludingSyncAccountIds?: string[] },
+) => {
+  const summary = await assertCanUseCardDavSync(userId);
+  const syncAccountsUsed = await countLiveSyncAccountSlots(
+    userId,
+    options?.excludingSyncAccountIds ?? [],
+  );
 
   if (syncAccountsUsed + 1 > summary.entitlements.syncAccountsLimit) {
     throw new Error(
@@ -373,6 +394,9 @@ export const assertCanCreateSyncAccount = async (userId: string) => {
     syncAccountsRemaining: Math.max(summary.entitlements.syncAccountsLimit - syncAccountsUsed, 0),
   };
 };
+
+export const assertCanCreateSyncAccount = async (userId: string) =>
+  assertHasAvailableSyncAccountSlot(userId);
 
 // --- Activity log & sharing gates (P11-03) -----------------------------------
 

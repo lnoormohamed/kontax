@@ -368,6 +368,9 @@ exports.Prisma.MergeDismissalScalarFieldEnum = {
 exports.Prisma.SyncAccountScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  connectionId: 'connectionId',
+  replacesSyncAccountId: 'replacesSyncAccountId',
+  replacedBySyncAccountId: 'replacedBySyncAccountId',
   provider: 'provider',
   status: 'status',
   syncDirection: 'syncDirection',
@@ -395,6 +398,8 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   booksDiscoveredAt: 'booksDiscoveredAt',
   setupCompletedAt: 'setupCompletedAt',
   disconnectedAt: 'disconnectedAt',
+  retiredAt: 'retiredAt',
+  retiredReason: 'retiredReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -957,7 +962,8 @@ exports.SyncAccountStatus = exports.$Enums.SyncAccountStatus = {
   PAUSED: 'PAUSED',
   NEEDS_REAUTH: 'NEEDS_REAUTH',
   ERROR: 'ERROR',
-  DISCONNECTED: 'DISCONNECTED'
+  DISCONNECTED: 'DISCONNECTED',
+  RETIRED: 'RETIRED'
 };
 
 exports.SyncDirection = exports.$Enums.SyncDirection = {
@@ -1034,6 +1040,11 @@ exports.EventType = exports.$Enums.EventType = {
   SYNC_PUSHED: 'SYNC_PUSHED',
   SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
   SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED',
+  SYNC_CONNECTION_CONNECTED: 'SYNC_CONNECTION_CONNECTED',
+  SYNC_CONNECTION_RECONNECTED: 'SYNC_CONNECTION_RECONNECTED',
+  SYNC_CONNECTION_DISCONNECTED: 'SYNC_CONNECTION_DISCONNECTED',
+  SYNC_CONNECTION_RETIRED: 'SYNC_CONNECTION_RETIRED',
+  SYNC_CONNECTION_REPLACED: 'SYNC_CONNECTION_REPLACED',
   SYNC_SETTINGS_CHANGED: 'SYNC_SETTINGS_CHANGED',
   ACCOUNT_UPDATED: 'ACCOUNT_UPDATED'
 };
