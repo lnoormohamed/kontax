@@ -1,0 +1,6 @@
+{
+  "provider": "CARDDAV",
+  "label": "Fastmail Personal",
+  "baseUrl": "https://carddav.example.net/addressbooks/user/default",
+  "addressBookUrl": "https://carddav.example.net/addressbooks/user/default/contacts/"
+}

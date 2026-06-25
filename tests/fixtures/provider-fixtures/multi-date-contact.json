@@ -1,0 +1,51 @@
+{
+  "fullName": "Fixture Person",
+  "firstName": "Fixture",
+  "lastName": "Person",
+  "nickname": "Fix",
+  "email": "fixture.person@kontax-seed.test",
+  "emailEntries": [
+    { "label": "Work", "value": "fixture.person@kontax-seed.test", "isPrimary": true },
+    { "label": "Press", "value": "press.fixture@kontax-seed.test" }
+  ],
+  "phone": "+44 7700 900101",
+  "phoneEntries": [
+    { "label": "Mobile", "value": "+44 7700 900101", "isPrimary": true },
+    { "label": "Bookings desk", "value": "+44 20 7946 7101" }
+  ],
+  "company": "Northline Advisory",
+  "department": "International demos",
+  "jobTitle": "Operations Manager",
+  "website": "https://kontax-seed.test/en/101",
+  "websiteEntries": [
+    { "label": "Portfolio", "value": "https://kontax-seed.test/en/101", "isPrimary": true },
+    { "label": "Press", "value": "https://press.northline.example.com/eleanor-hart" },
+    { "label": "Calendar", "value": "https://calendar.northline.example.com/eleanor" }
+  ],
+  "birthday": "1990-04-18",
+  "significantDates": [
+    { "label": "Anniversary", "date": "2019-03-10", "isPrimary": true },
+    { "label": "Lunar birthday", "date": "1990-05-12" }
+  ],
+  "address": "10 St Bride Street, London, EC4A 4AD, United Kingdom",
+  "addressEntries": [
+    {
+      "label": "HQ",
+      "formatted": "10 St Bride Street, London, EC4A 4AD, United Kingdom",
+      "isPrimary": true,
+      "streetLine1": "10 St Bride Street",
+      "cityOrTown": "London",
+      "postcode": "EC4A 4AD",
+      "countryOrRegion": "United Kingdom"
+    },
+    {
+      "label": "Studio",
+      "formatted": "8 Floral Street, London, WC2E 9DG, United Kingdom",
+      "streetLine1": "8 Floral Street",
+      "cityOrTown": "London",
+      "postcode": "WC2E 9DG",
+      "countryOrRegion": "United Kingdom"
+    }
+  ],
+  "notes": "Fixture contact used for provider regression coverage."
+}

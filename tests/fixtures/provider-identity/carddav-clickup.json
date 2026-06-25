@@ -1,0 +1,6 @@
+{
+  "provider": "CARDDAV",
+  "label": "Work CRM",
+  "baseUrl": "https://dav.clickup.com/addressbooks/users/demo",
+  "addressBookUrl": "https://dav.clickup.com/addressbooks/users/demo/default/"
+}

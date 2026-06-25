@@ -72,6 +72,9 @@ export default async function AdminSyncConnectionDetailPage({
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div className="ad-overview-email">{d.label}</div>
                     <div className="ad-overview-name">{d.providerLabel} · {d.user.email}</div>
+                    {d.providerSecondaryText ? (
+                      <div className="ad-overview-name">{d.providerSecondaryText}</div>
+                    ) : null}
                     <div className="ad-overview-tags">
                       <span className="ad-home-status" style={{ background: tone.pill, color: tone.fg }}>
                         <span className="ad-home-status__dot" style={{ background: tone.dot }} />
@@ -89,6 +92,18 @@ export default async function AdminSyncConnectionDetailPage({
                   <KV k="Last succeeded" v={d.lastSucceededAt} />
                   <KV k="Open conflicts" v={String(d.counts.syncConflicts)} />
                   <KV k="Synced links" v={String(d.counts.syncLinks)} />
+                </div>
+              </section>
+
+              <section className="ad-card">
+                <div className="ad-card-head">
+                  <h3 className="ad-card-title">Provider identity</h3>
+                </div>
+                <div className="ad-kv-grid">
+                  <KV k="Detected provider" v={d.providerDisplayName ?? "Generic CardDAV"} />
+                  <KV k="Canonical host" v={d.providerHost ?? "—"} />
+                  <KV k="Verification state" v={d.providerVerificationState} />
+                  <KV k="Detection source" v={d.providerDetectionSource ?? "—"} />
                 </div>
               </section>
 

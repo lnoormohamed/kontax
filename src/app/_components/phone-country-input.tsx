@@ -13,9 +13,12 @@ import { createPortal } from "react-dom";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   PHONE_COUNTRY_RULES_LIST,
-  findPhoneCountryRuleByCallingCode,
   getPhoneCountryRule,
 } from "~/lib/phone-country-rules";
+import {
+  parsePhoneCountryInputValue,
+  replacePhoneCallingCode,
+} from "~/lib/phone-country-input-utils";
 import { normalizePhoneCandidate } from "~/lib/phone-normalization";
 
 type PhoneCountryInputProps = {
@@ -29,69 +32,17 @@ type PhoneCountryInputProps = {
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
 };
 
-type ParsedPhoneState = {
-  iso2: string | null;
-  value: string;
-};
-
 const COUNTRY_OPTIONS = [...PHONE_COUNTRY_RULES_LIST].sort((left, right) =>
   left.displayName.localeCompare(right.displayName),
 );
 
 const flagEmojiForIso2 = (iso2: string | null) => {
-  if (!iso2 || iso2.length !== 2) return "🌐";
+  if (iso2?.length !== 2) return "🌐";
   return iso2
     .toUpperCase()
     .split("")
     .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
     .join("");
-};
-
-const parsePhoneValue = (value: string): ParsedPhoneState => {
-  const raw = value.trim();
-  if (!raw) {
-    return { iso2: null, value: "" };
-  }
-
-  const candidate = normalizePhoneCandidate(raw);
-  const iso2 = candidate.countryCode ?? null;
-  const normalizedValue = candidate.displayInternational ?? candidate.value ?? raw;
-
-  if (raw.startsWith("+")) {
-    const match = raw.match(/^\+(\d{1,4})/);
-    const rule = match?.[1] ? findPhoneCountryRuleByCallingCode(match[1])?.rule ?? null : null;
-    return {
-      iso2: iso2 ?? rule?.iso2 ?? null,
-      value: normalizedValue,
-    };
-  }
-
-  return {
-    iso2,
-    value: normalizedValue,
-  };
-};
-
-const replaceCallingCode = (currentValue: string, nextCallingCode: string) => {
-  const parsedCurrent = parsePhoneValue(currentValue);
-  const normalizedCurrent = normalizePhoneCandidate(parsedCurrent.value);
-  const existingRule = parsedCurrent.iso2 ? getPhoneCountryRule(parsedCurrent.iso2) : null;
-
-  let localNumber = "";
-  if (normalizedCurrent.displayNational) {
-    localNumber = normalizedCurrent.displayNational;
-  } else if (existingRule) {
-    const prefix = `+${existingRule.callingCode}`;
-    localNumber = parsedCurrent.value.startsWith(prefix)
-      ? parsedCurrent.value.slice(prefix.length).trim()
-      : parsedCurrent.value.trim();
-  } else if (parsedCurrent.value.startsWith("+")) {
-    localNumber = parsedCurrent.value.replace(/^\+\d{1,4}\s*/, "").trim();
-  } else {
-    localNumber = parsedCurrent.value.trim();
-  }
-
-  return localNumber ? `+${nextCallingCode} ${localNumber}` : `+${nextCallingCode}`;
 };
 
 export function PhoneCountryInput({
@@ -104,7 +55,9 @@ export function PhoneCountryInput({
   numberInputClassName,
   onKeyDown,
 }: PhoneCountryInputProps) {
-  const [{ iso2, value: draftValue }, setState] = useState<ParsedPhoneState>(() => parsePhoneValue(value));
+  const [{ iso2, value: draftValue }, setState] = useState(() =>
+    parsePhoneCountryInputValue(value),
+  );
   const [open, setOpen] = useState(false);
   const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -121,7 +74,7 @@ export function PhoneCountryInput({
     if (value === lastEmittedValueRef.current) {
       return;
     }
-    setState(parsePhoneValue(value));
+    setState(parsePhoneCountryInputValue(value));
   }, [value]);
 
   useEffect(() => {
@@ -160,7 +113,7 @@ export function PhoneCountryInput({
   const emit = (nextRawValue: string, normalize = false) => {
     const normalized = normalize ? normalizePhoneCandidate(nextRawValue) : null;
     const finalValue = normalized?.displayInternational ?? normalized?.value ?? nextRawValue;
-    const nextState = parsePhoneValue(finalValue);
+    const nextState = parsePhoneCountryInputValue(finalValue);
     setState(nextState);
     lastEmittedValueRef.current = finalValue;
     onChange(finalValue);
@@ -170,7 +123,7 @@ export function PhoneCountryInput({
     const rule = getPhoneCountryRule(nextIso2);
     if (!rule) return;
     setOpen(false);
-    emit(replaceCallingCode(draftValue, rule.callingCode), false);
+    emit(replacePhoneCallingCode(draftValue, rule.callingCode), false);
     requestAnimationFrame(() => {
       inputRef.current?.focus();
       inputRef.current?.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);

@@ -3,7 +3,8 @@ import type {
   ContactDateEntryInput,
   ContactValueEntryInput,
   PortableContactInput,
-} from "~/server/contact-portability";
+} from "./contact-portability";
+import { resolveCardDavProviderIdentity } from "./sync-provider-identity";
 
 export type SyncProviderCapabilityProfileId =
   | "carddav-generic"
@@ -141,23 +142,6 @@ const FASTMAIL_CARDDAV_PROFILE: SyncProviderCapabilityProfile = {
   },
 };
 
-const getHostnames = (value: string | null | undefined): string[] => {
-  if (!value) {
-    return [];
-  }
-
-  try {
-    return [new URL(value).hostname.toLowerCase()];
-  } catch {
-    return [];
-  }
-};
-
-const includesAny = (value: string | null | undefined, needles: string[]) => {
-  const normalized = value?.trim().toLowerCase();
-  return Boolean(normalized && needles.some((needle) => normalized.includes(needle)));
-};
-
 const normalizeCardDavCapabilityProfileId = (
   id: string | null | undefined,
 ): CardDavCapabilityProfileOverrideId | null => {
@@ -204,18 +188,22 @@ const resolveCardDavProfile = ({
     return GENERIC_CARDDAV_PROFILE;
   }
 
-  const hosts = [...getHostnames(baseUrl), ...getHostnames(addressBookUrl)];
+  const identity = resolveCardDavProviderIdentity({
+    label,
+    baseUrl,
+    addressBookUrl,
+  });
 
   if (
-    hosts.some((host) => host.includes("icloud.com")) ||
-    includesAny(label, ["icloud"])
+    identity.providerVerificationState === "VERIFIED" &&
+    identity.providerBrandKey === "icloud"
   ) {
     return ICLOUD_CARDDAV_PROFILE;
   }
 
   if (
-    hosts.some((host) => host.includes("fastmail.com")) ||
-    includesAny(label, ["fastmail"])
+    identity.providerVerificationState === "VERIFIED" &&
+    identity.providerBrandKey === "fastmail"
   ) {
     return FASTMAIL_CARDDAV_PROFILE;
   }

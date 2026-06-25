@@ -263,6 +263,9 @@ export default async function AdminUserDetailPage({
                               {account.genericSafe ? " · generic-safe" : ""}
                               {account.connectionId ? ` · ${account.connectionId}` : ""}
                             </div>
+                            {account.providerSecondaryText ? (
+                              <div className="ad-support-list__body">{account.providerSecondaryText}</div>
+                            ) : null}
                           </div>
                           <div className="ad-support-list__meta">
                             <span

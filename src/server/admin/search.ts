@@ -35,6 +35,8 @@ export async function searchAdminEntities(query: string) {
           { label: { contains: q, mode: "insensitive" } },
           { connectionId: { contains: q, mode: "insensitive" } },
           { remoteAccountId: { contains: q, mode: "insensitive" } },
+          { baseUrl: { contains: q, mode: "insensitive" } },
+          { addressBookUrl: { contains: q, mode: "insensitive" } },
           { user: { email: { contains: q, mode: "insensitive" } } },
         ],
       },

@@ -26,6 +26,10 @@ import {
   resolveSyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
 import {
+  formatProviderIdentitySecondaryText,
+  resolveSyncProviderIdentity,
+} from "~/server/sync-provider-identity";
+import {
   SyncPageClient,
   type SyncAccountData,
   type SyncJobRow,
@@ -314,6 +318,12 @@ export default async function SyncPage({ searchParams }: PageProps) {
       label: acct.label,
       capabilityProfileOverride: acct.settings?.capabilityProfileOverride ?? null,
     });
+    const providerIdentity = resolveSyncProviderIdentity({
+      provider: acct.provider,
+      baseUrl: acct.baseUrl,
+      addressBookUrl: acct.addressBookUrl,
+      label: acct.label,
+    });
     const capabilityNotice = getProviderCapabilityNotice(capabilityProfile);
     const recentJobs = acct.syncJobs.map((j) => ({
       status: j.status,
@@ -362,6 +372,12 @@ export default async function SyncPage({ searchParams }: PageProps) {
       baseUrl: acct.baseUrl,
       connectionId: acct.connectionId,
       provider: acct.provider,
+      providerDisplayName: providerIdentity.providerDisplayName,
+      providerHost: providerIdentity.providerHost,
+      providerVerificationState: providerIdentity.providerVerificationState,
+      providerBrandKey: providerIdentity.providerBrandKey,
+      providerDetectionSource: providerIdentity.detectionSource,
+      providerSecondaryText: formatProviderIdentitySecondaryText(providerIdentity),
       // OAuth: the connected provider account email (stored at connect time).
       connectedEmail: isOAuth ? acct.remoteAccountId : null,
       scope: isOAuth ? "Contacts (read & write)" : null,

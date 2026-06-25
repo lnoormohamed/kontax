@@ -35,5 +35,7 @@ COPY --from=builder /app/src ./src
 
 EXPOSE 3000
 
-# Sync schema to the production DB on every startup (additive-only; safe for new tables/columns).
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npm start"]
+# Startup policy is environment-aware:
+# - non-prod can keep `KONTAX_SCHEMA_MODE=push`
+# - production should use `KONTAX_DEPLOY_ENV=production` (defaults to validate)
+CMD ["node", "scripts/start-production.mjs"]

@@ -40,6 +40,7 @@ import {
   resolveSyncProviderCapabilityProfile,
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
+import { resolveSyncProviderIdentity } from "~/server/sync-provider-identity";
 
 const syncDirectionSchema = z.enum(["TWO_WAY", "IMPORT_ONLY", "EXPORT_ONLY"]);
 const conflictPolicySchema = z.enum(["SERVER_WINS", "DEVICE_WINS", "MANUAL"]);
@@ -734,6 +735,12 @@ export const createSyncAccount = async (
         connectionId,
         label: disconnected.label,
         provider: disconnected.provider,
+        providerBrandKey: resolveSyncProviderIdentity({
+          provider: disconnected.provider,
+          label: disconnected.label,
+          baseUrl: input.baseUrl,
+          addressBookUrl: discovery.addressBookUrl,
+        }).providerBrandKey,
         disconnectedAt: disconnected.disconnectedAt?.toISOString() ?? null,
         lastSucceededAt: disconnected.lastSucceededAt?.toISOString() ?? null,
       };
@@ -947,6 +954,7 @@ export type SyncReconnectMatch = {
   connectionId: string;
   label: string;
   provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
+  providerBrandKey: string | null;
   disconnectedAt: string | null;
   lastSucceededAt: string | null;
 };

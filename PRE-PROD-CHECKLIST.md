@@ -71,6 +71,13 @@ the code is shipped and working; these are deployment-environment steps. Clean u
   not. Add it (scan unlinked local contacts → PUT → create link) with live iCloud/Fastmail
   testing if full parity is wanted.
 
+- [ ] **Relax the first-time CardDAV fan-out gate for sync-originated contacts.** Right now
+  first-time CardDAV outbound create only picks up contacts marked `lastMutatedBy = MANUAL`,
+  which is conservative but means an iCloud-originated contact will not automatically fan out
+  to a second CardDAV account like Fastmail unless it gets a fresh manual edit first. If we
+  want multi-CardDAV setups to behave more naturally, loosen that eligibility rule for
+  first-time per-account creates and verify the behavior with live iCloud/Fastmail coverage.
+
 ### Notes / context
 - A local dev `CRON_SECRET` was added to the gitignored `.env` for testing — prod needs
   its own value.

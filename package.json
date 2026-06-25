@@ -6,6 +6,7 @@
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
+    "db:check:drift": "node scripts/check-schema-drift.mjs",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
@@ -18,6 +19,9 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
+    "test:repo": "node --experimental-strip-types --loader ./scripts/node-test-loader.mjs --test tests/node/*.test.ts",
+    "test:sync-fixtures": "node --experimental-strip-types --loader ./scripts/node-test-loader.mjs --test tests/node/sync-provider-capabilities.test.ts tests/node/sync-provider-identity.test.ts",
+    "test:e2e": "playwright test",
     "migrate:books": "node scripts/migrate-default-address-books.mjs",
     "backfill:sync-lineage": "node scripts/backfill-sync-account-lineage.mjs",
     "migrate:teams-billing": "node scripts/migrate-teams-billing-to-org.mjs",
@@ -36,6 +40,7 @@
     "seed:demo": "node scripts/seed-demo-showcase.mjs",
     "seed:demo:multilingual": "node scripts/seed-multilingual-demo-contacts.mjs",
     "start": "node server.mjs",
+    "start:production": "node scripts/start-production.mjs",
     "typecheck": "tsc --noEmit",
     "seed:phase37:asia-latam": "node scripts/seed-phase37-asia-latam.mjs"
   },

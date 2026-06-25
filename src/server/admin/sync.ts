@@ -18,6 +18,10 @@ import {
   isGenericSafeCardDavProfile,
   resolveSyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
+import {
+  formatProviderIdentitySecondaryText,
+  resolveSyncProviderIdentity,
+} from "~/server/sync-provider-identity";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const RECENT_WINDOW = new Date(Date.now() - DAY_MS);
@@ -121,6 +125,8 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
             { user: { email: { contains: q, mode: "insensitive" } } },
             { user: { name: { contains: q, mode: "insensitive" } } },
             { connectionId: { contains: q, mode: "insensitive" } },
+            { baseUrl: { contains: q, mode: "insensitive" } },
+            { addressBookUrl: { contains: q, mode: "insensitive" } },
           ],
         }
       : {}),
@@ -218,6 +224,12 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
         label: account.label,
         capabilityProfileOverride: account.settings?.capabilityProfileOverride ?? null,
       });
+      const providerIdentity = resolveSyncProviderIdentity({
+        provider: account.provider,
+        baseUrl: account.baseUrl,
+        addressBookUrl: account.addressBookUrl,
+        label: account.label,
+      });
       const profileId = capabilityProfile.id;
       if (profileFilter !== "all" && profileFilter !== profileId) {
         return null;
@@ -238,6 +250,12 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
         profileLabel: getSyncProviderCapabilityProfileLabel(capabilityProfile),
         genericSafe: isGenericSafeCardDavProfile(capabilityProfile),
         supportBucket: getSyncErrorSupportBucket(account.lastErrorCode),
+        providerDisplayName: providerIdentity.providerDisplayName,
+        providerHost: providerIdentity.providerHost,
+        providerVerificationState: providerIdentity.providerVerificationState,
+        providerBrandKey: providerIdentity.providerBrandKey,
+        providerDetectionSource: providerIdentity.detectionSource,
+        providerSecondaryText: formatProviderIdentitySecondaryText(providerIdentity),
       };
     })
     .filter((value): value is NonNullable<typeof value> => value != null);
@@ -315,6 +333,7 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
           : row.status === "PAUSED"
             ? "This connection is paused and may need manual review."
             : "Recent sync behavior needs support attention."),
+      providerSecondaryText: row.providerSecondaryText,
     }));
 
   const connectionRows = enriched.slice(0, 50).map((row) => ({
@@ -334,6 +353,11 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
     lastError: row.lastErrorAt ? fmtRelative(row.lastErrorAt) : null,
     supportBucket: row.supportBucket,
     connectionId: row.connectionId,
+    providerDisplayName: row.providerDisplayName,
+    providerHost: row.providerHost,
+    providerVerificationState: row.providerVerificationState,
+    providerDetectionSource: row.providerDetectionSource,
+    providerSecondaryText: row.providerSecondaryText,
   }));
 
   return {
@@ -446,6 +470,12 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
     label: account.label,
     capabilityProfileOverride: account.settings?.capabilityProfileOverride ?? null,
   });
+  const providerIdentity = resolveSyncProviderIdentity({
+    provider: account.provider,
+    baseUrl: account.baseUrl,
+    addressBookUrl: account.addressBookUrl,
+    label: account.label,
+  });
   const capabilityNotice = getProviderCapabilityNotice(capabilityProfile);
   const recentJobs = account.syncJobs.map((job) => ({
     status: job.status,
@@ -497,6 +527,12 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
       account.settings?.capabilityProfileOverride ?? null,
     ),
     capabilityGenericSafe: isGenericSafeCardDavProfile(capabilityProfile),
+    providerDisplayName: providerIdentity.providerDisplayName,
+    providerHost: providerIdentity.providerHost,
+    providerVerificationState: providerIdentity.providerVerificationState,
+    providerBrandKey: providerIdentity.providerBrandKey,
+    providerDetectionSource: providerIdentity.detectionSource,
+    providerSecondaryText: formatProviderIdentitySecondaryText(providerIdentity),
     capabilityNotice,
     setupCompletedAt: account.setupCompletedAt ? fmtRelative(account.setupCompletedAt) : "Pending setup",
     credentialStatus:

@@ -57,6 +57,12 @@ export type SyncAccountData = {
   connectionId: string | null;
   // P27-07: provider + OAuth metadata (Google/Microsoft show email, not a URL).
   provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
+  providerDisplayName: string | null;
+  providerHost: string | null;
+  providerVerificationState: "VERIFIED" | "DETECTED_UNVERIFIED" | "GENERIC";
+  providerBrandKey: string | null;
+  providerDetectionSource: string | null;
+  providerSecondaryText: string | null;
   connectedEmail: string | null;
   scope: string | null;
   tokenStatus: "valid" | "expired" | null;
@@ -225,26 +231,35 @@ const HEALTH_DETAIL: Record<VisualHealth, (a: SyncAccountData) => string> = {
   syncing: () => "Sync in progress…",
 };
 
+const getAccountRailSubtitle = (
+  account: SyncAccountData,
+  health: VisualHealth,
+) => {
+  if (account.provider !== "CARDDAV") {
+    return account.connectedEmail ?? HEALTH_LIST_TEXT[health](account);
+  }
+
+  const identityText =
+    account.providerSecondaryText ?? account.providerHost ?? account.baseUrl;
+  const healthText = HEALTH_LIST_TEXT[health](account);
+
+  return identityText === healthText ? identityText : `${identityText} · ${healthText}`;
+};
+
 // ── Platform icon (SVG only) ─────────────────────────────────────────────────
 type PlatKind = "icloud" | "nextcloud" | "fastmail" | "generic" | "gcontacts" | "outlook";
-
-const getPlatformKind = (label: string, url: string): PlatKind => {
-  const s = `${label} ${url}`.toLowerCase();
-  if (s.includes("icloud")) return "icloud";
-  if (s.includes("nextcloud")) return "nextcloud";
-  if (s.includes("fastmail")) return "fastmail";
-  return "generic";
-};
 
 // P27-07: provider-aware icon — OAuth providers get their brand mark.
 const getAccountIconKind = (account: {
   provider: SyncAccountData["provider"];
-  label: string;
-  baseUrl: string;
+  providerBrandKey: SyncAccountData["providerBrandKey"];
 }): PlatKind => {
   if (account.provider === "GOOGLE") return "gcontacts";
   if (account.provider === "MICROSOFT") return "outlook";
-  return getPlatformKind(account.label, account.baseUrl);
+  if (account.providerBrandKey === "icloud") return "icloud";
+  if (account.providerBrandKey === "nextcloud") return "nextcloud";
+  if (account.providerBrandKey === "fastmail") return "fastmail";
+  return "generic";
 };
 
 function PlatIcon({ kind, size = 24 }: { kind: PlatKind; size?: number }) {
@@ -1333,7 +1348,6 @@ function AccountHeader({
   const dir = DIR_BADGE[account.direction];
   const isOAuth = account.provider !== "CARDDAV";
   const providerName = account.provider === "GOOGLE" ? "Google" : "Outlook";
-  const authParty = account.provider === "GOOGLE" ? "Google" : "Microsoft";
   const connectPath =
     account.provider === "GOOGLE" ? "/api/sync/google/connect" : "/api/sync/microsoft/connect";
   const needsReauth = isOAuth && account.status === "NEEDS_REAUTH";
@@ -1381,62 +1395,77 @@ function AccountHeader({
               {account.connectedEmail ?? providerName}
             </div>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 3 }}>
-              <span
+            <div style={{ marginTop: 3, display: "grid", gap: 4 }}>
+              <div
                 style={{
                   fontSize: 13,
                   color: T.mute,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  maxWidth: 360,
+                  maxWidth: 520,
                 }}
               >
-                {account.baseUrl}
-              </span>
-              <button
-                type="button"
-                onClick={handleCopyUrl}
-                title="Copy URL"
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  cursor: "pointer",
-                  padding: 2,
-                  color: copiedUrl ? T.sgreen : T.mute,
-                  display: "inline-flex",
-                  flexShrink: 0,
-                }}
-              >
-                {copiedUrl ? (
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke={T.sgreen}
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 12.5l4 4 10-10" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="9" y="9" width="11" height="11" rx="2" />
-                    <path d="M5 15V5a2 2 0 012-2h10" />
-                  </svg>
-                )}
-              </button>
+                {account.providerSecondaryText ?? account.providerHost ?? account.baseUrl}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: T.mute,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    maxWidth: 420,
+                    fontFamily: '"Geist Mono", ui-monospace, monospace',
+                  }}
+                >
+                  {account.baseUrl}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyUrl}
+                  title="Copy URL"
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                    padding: 2,
+                    color: copiedUrl ? T.sgreen : T.mute,
+                    display: "inline-flex",
+                    flexShrink: 0,
+                  }}
+                >
+                  {copiedUrl ? (
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={T.sgreen}
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12.5l4 4 10-10" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="9" y="9" width="11" height="11" rx="2" />
+                      <path d="M5 15V5a2 2 0 012-2h10" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -1773,7 +1802,7 @@ function FormField({
 
 // ── Add account form ──────────────────────────────────────────────────────────
 type QuickPreset = {
-  kind: ReturnType<typeof getPlatformKind>;
+  kind: PlatKind;
   label: string;
   url: string;
 };
@@ -1820,12 +1849,14 @@ const formatReconnectMatchTime = (iso: string | null) => {
 
 const reconnectMatchIconKind = (
   provider: SyncAccountData["provider"],
-  label: string,
-  baseUrl: string,
+  providerBrandKey: SyncAccountData["providerBrandKey"],
 ): PlatKind => {
   if (provider === "GOOGLE") return "gcontacts";
   if (provider === "MICROSOFT") return "outlook";
-  return getPlatformKind(label, baseUrl);
+  if (providerBrandKey === "icloud") return "icloud";
+  if (providerBrandKey === "nextcloud") return "nextcloud";
+  if (providerBrandKey === "fastmail") return "fastmail";
+  return "generic";
 };
 
 const formatAccountEventTime = (iso: string | null) => {
@@ -2073,7 +2104,10 @@ function AddAccountForm({
                 }}
               >
                 <PlatIcon
-                  kind={reconnectMatchIconKind(choiceMatch.provider, choiceMatch.label, baseUrl)}
+                  kind={reconnectMatchIconKind(
+                    choiceMatch.provider,
+                    choiceMatch.providerBrandKey,
+                  )}
                   size={22}
                 />
               </span>
@@ -2958,10 +2992,6 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
             const sel = view === "detail" && selectedId === a.id;
             // OAuth accounts always show the connected email so the user can
             // identify which account is which regardless of health state.
-            const subtitle =
-              a.provider !== "CARDDAV" && a.connectedEmail
-                ? a.connectedEmail
-                : HEALTH_LIST_TEXT[vH](a);
             return (
               <div key={a.id} className="sy-row-wrap" data-sel={sel ? "1" : "0"} style={{ position: "relative" }}>
                 <button
@@ -3016,7 +3046,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {HEALTH_LIST_TEXT[vH](a)}
+                      {getAccountRailSubtitle(a, vH)}
                     </span>
                   </span>
                   <Dot color={HEALTH_DOT[vH]} pulse={vH === "syncing"} />

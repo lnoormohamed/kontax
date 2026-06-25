@@ -13,6 +13,10 @@ import {
   isGenericSafeCardDavProfile,
   resolveSyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
+import {
+  formatProviderIdentitySecondaryText,
+  resolveSyncProviderIdentity,
+} from "~/server/sync-provider-identity";
 
 const PLAN_LABEL: Record<string, string> = {
   FREE: "Free",
@@ -306,6 +310,12 @@ export async function loadUserDetail(userId: string) {
       label: account.label,
       capabilityProfileOverride: account.settings?.capabilityProfileOverride ?? null,
     });
+    const providerIdentity = resolveSyncProviderIdentity({
+      provider: account.provider,
+      baseUrl: account.baseUrl,
+      addressBookUrl: account.addressBookUrl,
+      label: account.label,
+    });
     const health = getSyncAccountOperationalHealth({
       status: account.status,
       lastErrorCode: account.lastErrorCode,
@@ -324,6 +334,10 @@ export async function loadUserDetail(userId: string) {
       health,
       profileLabel: getSyncProviderCapabilityProfileLabel(capabilityProfile),
       genericSafe: isGenericSafeCardDavProfile(capabilityProfile),
+      providerDisplayName: providerIdentity.providerDisplayName,
+      providerHost: providerIdentity.providerHost,
+      providerVerificationState: providerIdentity.providerVerificationState,
+      providerSecondaryText: formatProviderIdentitySecondaryText(providerIdentity),
       openConflicts: account._count.syncConflicts,
       syncLinks: account._count.syncLinks,
       lastSuccess: account.lastSucceededAt ? relativeTime(account.lastSucceededAt) : "Never",

@@ -187,6 +187,9 @@ export default async function AdminSyncPage({
                           <div className="ad-support-list__sub">
                             {item.provider} · {item.userEmail} · {item.profileLabel}
                           </div>
+                          {item.providerSecondaryText ? (
+                            <div className="ad-support-list__body">{item.providerSecondaryText}</div>
+                          ) : null}
                           <div className="ad-support-list__body">{item.body}</div>
                         </div>
                         <div className="ad-support-list__meta">
@@ -276,6 +279,9 @@ export default async function AdminSyncPage({
                         {row.provider} · {row.userEmail} · {row.profileLabel}
                         {row.connectionId ? ` · ${row.connectionId}` : ""}
                       </div>
+                      {row.providerSecondaryText ? (
+                        <div className="ad-support-list__body">{row.providerSecondaryText}</div>
+                      ) : null}
                       <div className="ad-support-list__body">
                         {row.openConflicts} open conflict{row.openConflicts === 1 ? "" : "s"} · {row.syncLinks} synced link{row.syncLinks === 1 ? "" : "s"} · last success {row.lastSuccess}
                         {row.lastError ? ` · last error ${row.lastError}` : ""}

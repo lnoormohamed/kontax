@@ -6,8 +6,8 @@ import {
   type KontaxField,
   type ConfidenceTier,
   type Suggestion,
-} from "~/server/import/column-classifier";
-import { computeHeaderHash } from "~/server/import/header-hash";
+} from "./import/column-classifier";
+import { computeHeaderHash } from "./import/header-hash";
 
 export type ColumnMapping = {
   header: string;

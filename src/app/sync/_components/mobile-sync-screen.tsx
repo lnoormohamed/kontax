@@ -18,20 +18,33 @@ import type { SyncAccountData } from "./sync-page-client";
 type StatusVisual = { sub: string; dot: string; tone: string };
 
 function statusVisual(a: SyncAccountData): StatusVisual {
+  const cardDavPrefix =
+    a.provider === "CARDDAV"
+      ? `${a.providerSecondaryText ?? a.providerHost ?? a.baseUrl} · `
+      : "";
+
   switch (a.status) {
     case "ACTIVE":
       return {
-        sub: a.lastSyncedAtRelative ? `Synced ${a.lastSyncedAtRelative.toLowerCase()}` : "Connected",
+        sub:
+          cardDavPrefix +
+          (a.lastSyncedAtRelative
+            ? `Synced ${a.lastSyncedAtRelative.toLowerCase()}`
+            : "Connected"),
         dot: "#2f9e5e",
         tone: "#8b938c",
       };
     case "PAUSED":
-      return { sub: "Paused", dot: "#bf8526", tone: "#bf8526" };
+      return { sub: `${cardDavPrefix}Paused`, dot: "#bf8526", tone: "#bf8526" };
     case "NEEDS_REAUTH":
-      return { sub: "Reconnect needed", dot: "#b5472f", tone: "#b5472f" };
+      return { sub: `${cardDavPrefix}Reconnect needed`, dot: "#b5472f", tone: "#b5472f" };
     case "ERROR":
     default:
-      return { sub: a.lastErrorMessage ?? "Sync error", dot: "#b5472f", tone: "#b5472f" };
+      return {
+        sub: cardDavPrefix + (a.lastErrorMessage ?? "Sync error"),
+        dot: "#b5472f",
+        tone: "#b5472f",
+      };
   }
 }
 
