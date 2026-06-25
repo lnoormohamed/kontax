@@ -42,6 +42,7 @@ const auth = cache(async () => {
       role: "USER" as const,
     },
     impersonatedBy: imp.adminId,
+    impersonationExpiresAt: imp.exp,
   };
 });
 

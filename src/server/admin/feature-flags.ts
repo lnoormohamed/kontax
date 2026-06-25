@@ -3,6 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { db } from "~/server/db";
+import { loadFeatureFlagAuditHistory } from "~/server/admin/audit";
 import type { FeatureFlagMode } from "../../../generated/prisma";
 
 export type AdminFlagRow = {
@@ -10,10 +11,22 @@ export type AdminFlagRow = {
   key: string;
   name: string;
   description: string;
+  owner: string | null;
+  purpose: string | null;
+  environmentScope: string[];
+  riskLevel: string;
+  killSwitch: boolean;
   mode: FeatureFlagMode;
   rolloutPct: number;
+  allowedUserIds: string[];
   userCount: number;
   updatedLabel: string;
+  history: Array<{
+    id: string;
+    when: string;
+    actor: string;
+    details: Record<string, unknown>;
+  }>;
 };
 
 const fmt = (d: Date) =>
@@ -21,15 +34,29 @@ const fmt = (d: Date) =>
 
 export async function listFlags(): Promise<AdminFlagRow[]> {
   const flags = await db.featureFlag.findMany({ orderBy: { name: "asc" } });
-  return flags.map((f) => ({
+  const histories = await Promise.all(flags.map((flag) => loadFeatureFlagAuditHistory(flag.key, 4)));
+
+  return flags.map((f, index) => ({
     id: f.id,
     key: f.key,
     name: f.name,
     description: f.description,
+    owner: f.owner,
+    purpose: f.purpose,
+    environmentScope: f.environmentScope,
+    riskLevel: f.riskLevel,
+    killSwitch: f.killSwitch,
     mode: f.mode,
     rolloutPct: f.rolloutPct,
+    allowedUserIds: f.allowedUserIds,
     userCount: f.allowedUserIds.length,
     updatedLabel: `${fmt(f.updatedAt)}${f.updatedByName ? ` · ${f.updatedByName}` : ""}`,
+    history: histories[index]!.map((row) => ({
+      id: row.id,
+      when: fmt(row.createdAt),
+      actor: row.adminName,
+      details: row.details,
+    })),
   }));
 }
 
@@ -44,9 +71,13 @@ export async function listFlags(): Promise<AdminFlagRow[]> {
 export async function isFeatureEnabled(key: string, userId: string): Promise<boolean> {
   const flag = await db.featureFlag.findUnique({
     where: { key },
-    select: { mode: true, rolloutPct: true, allowedUserIds: true },
+    select: { mode: true, rolloutPct: true, allowedUserIds: true, killSwitch: true, environmentScope: true },
   });
   if (!flag) return false;
+  if (flag.killSwitch) return false;
+  if (flag.environmentScope.length > 0 && !flag.environmentScope.includes(process.env.NODE_ENV ?? "development")) {
+    return false;
+  }
   switch (flag.mode) {
     case "OFF":
       return false;

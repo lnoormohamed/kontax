@@ -1,9 +1,31 @@
 "use client";
 
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 
 import { endImpersonation } from "~/app/actions/admin";
+
+function formatRemaining(exp: number) {
+  const remainingMs = Math.max(0, exp - Date.now());
+  const mins = Math.floor(remainingMs / 60000);
+  const secs = Math.floor((remainingMs % 60000) / 1000);
+  return `${mins}:${secs.toString().padStart(2, "0")} left`;
+}
+
+export function ImpersonationBannerClient({
+  expiresAt,
+}: {
+  expiresAt: number;
+}) {
+  const [label, setLabel] = useState(() => formatRemaining(expiresAt));
+
+  useEffect(() => {
+    const timer = setInterval(() => setLabel(formatRemaining(expiresAt)), 1000);
+    return () => clearInterval(timer);
+  }, [expiresAt]);
+
+  return <span style={{ color: "rgba(255,255,255,0.75)" }}>{label}</span>;
+}
 
 export function EndImpersonationButton() {
   const router = useRouter();

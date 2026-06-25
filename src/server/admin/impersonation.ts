@@ -59,10 +59,10 @@ export async function clearImpersonation(): Promise<void> {
   store.delete(COOKIE);
 }
 
-export async function readImpersonation(): Promise<{ adminId: string; targetId: string } | null> {
+export async function readImpersonation(): Promise<{ adminId: string; targetId: string; exp: number } | null> {
   const store = await cookies();
   const token = store.get(COOKIE)?.value;
   if (!token) return null;
   const payload = decode(token);
-  return payload ? { adminId: payload.adminId, targetId: payload.targetId } : null;
+  return payload ? { adminId: payload.adminId, targetId: payload.targetId, exp: payload.exp } : null;
 }

@@ -15,10 +15,22 @@ type Flag = {
   key: string;
   name: string;
   description: string;
+  owner: string | null;
+  purpose: string | null;
+  environmentScope: string[];
+  riskLevel: string;
+  killSwitch: boolean;
   mode: Mode;
   rolloutPct: number;
+  allowedUserIds: string[];
   userCount: number;
   updatedLabel: string;
+  history: Array<{
+    id: string;
+    when: string;
+    actor: string;
+    details: Record<string, unknown>;
+  }>;
 };
 
 const MODE_META: Record<Mode, { color: string; label: (f: Flag) => string }> = {
@@ -37,7 +49,6 @@ const MODE_OPTS: { id: Mode; label: string; desc: string }[] = [
 
 export function FlagsTable({ flags }: { flags: Flag[] }) {
   const [editing, setEditing] = useState<Flag | null>(null);
-  // Remember the last enabled mode per flag so the binary toggle can restore it.
   const [prevMode, setPrevMode] = useState<Record<string, Mode>>(() =>
     Object.fromEntries(flags.map((f) => [f.key, f.mode === "OFF" ? "ALL" : f.mode])),
   );
@@ -78,17 +89,22 @@ export function FlagsTable({ flags }: { flags: Flag[] }) {
         ) : (
           flags.map((f) => {
             const meta = MODE_META[f.mode];
-            const on = f.mode !== "OFF";
+            const on = f.mode !== "OFF" && !f.killSwitch;
             return (
               <div key={f.key} className="ad-tr ad-tr--flags">
                 <span className="ad-flag-name" data-th="Flag">
                   <span className="ad-flag-title">{f.name}</span>
                   <span className="ad-flag-key tnum">{f.key}</span>
+                  <span className="ad-mode-opt-desc">
+                    {f.owner ? `${f.owner} · ` : ""}
+                    {f.riskLevel}
+                    {f.killSwitch ? " · kill switch" : ""}
+                  </span>
                 </span>
                 <span data-th="Rollout">
                   <span className="ad-flag-mode" style={{ color: meta.color }}>
                     <span className="ad-mode-dot" style={{ background: meta.color }} />
-                    {meta.label(f)}
+                    {f.killSwitch ? "Forced off" : meta.label(f)}
                   </span>
                 </span>
                 <span data-th="Status">
@@ -144,7 +160,18 @@ function FlagSlideOver({
   onClose: () => void;
   onSaved: (name: string) => void;
 }) {
-  const [draft, setDraft] = useState({ description: flag.description, mode: flag.mode, rolloutPct: flag.rolloutPct });
+  const [draft, setDraft] = useState({
+    description: flag.description,
+    owner: flag.owner ?? "",
+    purpose: flag.purpose ?? "",
+    environmentScope: flag.environmentScope.join(", "),
+    riskLevel: flag.riskLevel || "standard",
+    killSwitch: flag.killSwitch,
+    mode: flag.mode,
+    rolloutPct: flag.rolloutPct,
+    allowedUserIds: flag.allowedUserIds.join("\n"),
+    changeSummary: "",
+  });
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const trap = useFocusTrap<HTMLElement>(true);
@@ -155,12 +182,19 @@ function FlagSlideOver({
     const res = await saveFeatureFlag({
       key: flag.key,
       description: draft.description,
+      owner: draft.owner,
+      purpose: draft.purpose,
+      environmentScope: draft.environmentScope.split(",").map((value) => value.trim()).filter(Boolean),
+      riskLevel: draft.riskLevel,
+      killSwitch: draft.killSwitch,
       mode: draft.mode,
       rolloutPct: draft.rolloutPct,
+      allowedUserIds: draft.allowedUserIds.split("\n").map((value) => value.trim()).filter(Boolean),
+      changeSummary: draft.changeSummary,
     });
     if ("error" in res) {
       setSaving(false);
-      setErr("Couldn’t save changes. Please try again.");
+      setErr(res.error === "REASON_REQUIRED" ? "A change summary is required." : "Couldn’t save changes. Please try again.");
       return;
     }
     onSaved(flag.name);
@@ -189,6 +223,51 @@ function FlagSlideOver({
             value={draft.description}
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
           />
+
+          <div className="ad-kv-grid" style={{ marginTop: 18 }}>
+            <div>
+              <label className="ad-field-label">Owner</label>
+              <input
+                className="ad-text-input"
+                value={draft.owner}
+                onChange={(e) => setDraft({ ...draft, owner: e.target.value })}
+                placeholder="Team or person"
+              />
+            </div>
+            <div>
+              <label className="ad-field-label">Risk level</label>
+              <div className="ad-select-wrap ad-select-wrap--block">
+                <select
+                  className="ad-select"
+                  value={draft.riskLevel}
+                  onChange={(e) => setDraft({ ...draft, riskLevel: e.target.value })}
+                >
+                  <option value="standard">Standard</option>
+                  <option value="high">High risk</option>
+                  <option value="critical">Critical</option>
+                </select>
+                <AdIcon name="chevd" size={14} c={AD.mute} />
+              </div>
+            </div>
+          </div>
+
+          <label className="ad-field-label" style={{ marginTop: 18 }}>Purpose</label>
+          <textarea
+            className="ad-textarea"
+            rows={2}
+            value={draft.purpose}
+            onChange={(e) => setDraft({ ...draft, purpose: e.target.value })}
+            placeholder="What this rollout is for"
+          />
+
+          <label className="ad-field-label" style={{ marginTop: 18 }}>Environment scope</label>
+          <input
+            className="ad-text-input"
+            value={draft.environmentScope}
+            onChange={(e) => setDraft({ ...draft, environmentScope: e.target.value })}
+            placeholder="production, preview"
+          />
+          <div className="ad-field-hint">Comma-separated environments. Leave blank to evaluate in every environment.</div>
 
           <label className="ad-field-label" style={{ marginTop: 18 }}>
             Rollout mode
@@ -237,11 +316,68 @@ function FlagSlideOver({
                 <label className="ad-field-label" style={{ margin: 0 }}>
                   Allow-list size
                 </label>
-                <span className="ad-rollout-val tnum">{flag.userCount} users</span>
+                <span className="ad-rollout-val tnum">
+                  {draft.allowedUserIds.split("\n").map((value) => value.trim()).filter(Boolean).length} users
+                </span>
               </div>
-              <div className="ad-field-hint">Manage the explicit allow-list in the rollout console.</div>
+              <textarea
+                className="ad-textarea"
+                rows={5}
+                value={draft.allowedUserIds}
+                onChange={(e) => setDraft({ ...draft, allowedUserIds: e.target.value })}
+                placeholder="One user id per line"
+              />
+              <div className="ad-field-hint">Manage the explicit allow-list here, one user id per line.</div>
             </div>
           )}
+
+          <div className="ad-rollout-field" style={{ marginTop: 18 }}>
+            <label className="ad-field-row" style={{ marginBottom: 0 }}>
+              <span className="ad-field-label" style={{ margin: 0 }}>Kill switch</span>
+              <button
+                type="button"
+                className="ad-toggle"
+                data-on={draft.killSwitch ? "1" : "0"}
+                onClick={() => setDraft({ ...draft, killSwitch: !draft.killSwitch })}
+                style={{ background: draft.killSwitch ? AD.red : "#d4d4d8" }}
+              >
+                <i />
+              </button>
+            </label>
+            <div className="ad-field-hint">When enabled, this flag resolves off regardless of rollout mode.</div>
+          </div>
+
+          <label className="ad-field-label" style={{ marginTop: 18 }}>Change summary</label>
+          <textarea
+            className="ad-textarea"
+            rows={2}
+            value={draft.changeSummary}
+            onChange={(e) => setDraft({ ...draft, changeSummary: e.target.value })}
+            placeholder="Why this flag is changing right now"
+          />
+
+          <div className="ad-support-callout">
+            <div className="ad-support-callout__title">Recent changes</div>
+            {flag.history.length === 0 ? (
+              <div className="ad-support-callout__body">No recent audit history for this flag yet.</div>
+            ) : (
+              <div className="ad-support-list">
+                {flag.history.map((entry) => (
+                  <div key={entry.id} className="ad-support-list__row">
+                    <div className="ad-support-list__main">
+                      <div className="ad-support-list__title">{entry.actor}</div>
+                      <div className="ad-support-list__sub">{entry.when}</div>
+                      <div className="ad-support-list__body">
+                        {typeof entry.details.changeSummary === "string"
+                          ? entry.details.changeSummary
+                          : JSON.stringify(entry.details)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {err && (
             <div className="ad-modal-error" style={{ marginTop: 16 }}>

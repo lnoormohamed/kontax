@@ -6,6 +6,7 @@ import {
   getLifecycleAccessPolicy,
   getUserBillingContext,
 } from "~/server/billing";
+import { listUserSupportTimeline } from "~/server/admin/support-notes";
 import { getSyncAccountOperationalHealth, getSyncErrorSupportBucket } from "~/server/sync-health";
 import {
   getSyncProviderCapabilityProfileLabel,
@@ -195,6 +196,7 @@ export async function loadUserDetail(userId: string) {
     lastSession,
     syncAccountsRaw,
     adminActionsRaw,
+    supportNotesRaw,
   ] =
     await Promise.all([
       getUserBillingContext(userId),
@@ -288,6 +290,7 @@ export async function loadUserDetail(userId: string) {
           admin: { select: { name: true, email: true } },
         },
       }),
+      listUserSupportTimeline(userId, 12),
     ]);
 
   const ent = billing.entitlements;
@@ -352,10 +355,46 @@ export async function loadUserDetail(userId: string) {
       id: event.id,
       label,
       when: relativeTime(event.createdAt),
+      createdAt: event.createdAt,
       actor,
       reason,
     };
   });
+
+  const supportTimeline = [
+    ...supportNotes.map((note) => ({
+      id: note.id,
+      type: "audit" as const,
+      label: note.label,
+      body: note.reason,
+      when: note.when,
+      actor: note.actor,
+      createdAt: note.createdAt,
+    })),
+    ...supportNotesRaw.map((note) => ({
+      id: note.id,
+      type: "note" as const,
+      label: "Internal support note",
+      body: note.body,
+      when: note.when,
+      actor: note.author,
+      createdAt: note.createdAt,
+    })),
+  ]
+    .sort((left, right) => {
+      const leftDate = "createdAt" in left && left.createdAt instanceof Date ? left.createdAt.getTime() : 0;
+      const rightDate = "createdAt" in right && right.createdAt instanceof Date ? right.createdAt.getTime() : 0;
+      return rightDate - leftDate;
+    })
+    .slice(0, 16)
+    .map((item) => ({
+      id: item.id,
+      type: item.type,
+      label: item.label,
+      body: item.body ?? null,
+      when: item.when,
+      actor: item.actor,
+    }));
 
   const usage = [
     {
@@ -443,6 +482,7 @@ export async function loadUserDetail(userId: string) {
       accounts: syncAccounts,
       notes: supportNotes,
     },
+    supportTimeline,
     group: group?.group
       ? {
           isTeam: group.group.type === "TEAM",

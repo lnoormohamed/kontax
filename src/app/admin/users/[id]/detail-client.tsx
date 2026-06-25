@@ -104,6 +104,14 @@ const ERROR_LABELS: Record<string, string> = {
   INVALID_PLAN: "Pick a valid plan.",
 };
 
+const REASON_OPTIONS: Record<DialogKind, string[]> = {
+  override: ["billing exception", "support recovery", "manual correction"],
+  suspend: ["abuse review", "security review", "billing enforcement"],
+  unsuspend: ["issue resolved", "manual recovery", "support follow-up"],
+  delete: ["user request", "fraud cleanup", "admin cleanup"],
+  impersonate: ["billing investigation", "sync investigation", "support reproduction"],
+};
+
 export function UserActions({
   userId,
   user,
@@ -225,6 +233,8 @@ function ConfirmDialog({
   const cfg = DIALOGS[kind];
   const [phase, setPhase] = useState<"idle" | "loading" | "success">("idle");
   const [reason, setReason] = useState("");
+  const [reasonCategory, setReasonCategory] = useState(REASON_OPTIONS[kind][0] ?? "general");
+  const [confirmValue, setConfirmValue] = useState("");
   const [plan, setPlan] = useState(user.plan);
   const [err, setErr] = useState<string | null>(null);
   const trap = useFocusTrap<HTMLDivElement>(true);
@@ -238,18 +248,20 @@ function ConfirmDialog({
   }, [onClose, phase]);
 
   const needsReason = kind !== "unsuspend" && !reason.trim();
+  const needsTypedConfirm = kind === "suspend" || kind === "delete" || kind === "impersonate";
+  const typedConfirmValid = !needsTypedConfirm || confirmValue.trim().toLowerCase() === user.email.toLowerCase();
 
   const submit = async () => {
-    if (needsReason || phase === "loading") return;
+    if (needsReason || !typedConfirmValid || phase === "loading") return;
     setErr(null);
     setPhase("loading");
 
     let res: { success: true } | { error: string };
-    if (kind === "override") res = await overridePlan({ userId, plan, reason });
-    else if (kind === "suspend") res = await suspendAccount({ userId, reason });
-    else if (kind === "unsuspend") res = await unsuspendAccount({ userId, reason: reason.trim() || undefined });
-    else if (kind === "delete") res = await adminDeleteAccount({ userId, reason });
-    else res = await startImpersonation({ userId, reason });
+    if (kind === "override") res = await overridePlan({ userId, plan, reason, reasonCategory });
+    else if (kind === "suspend") res = await suspendAccount({ userId, reason, reasonCategory });
+    else if (kind === "unsuspend") res = await unsuspendAccount({ userId, reason: reason.trim() || undefined, reasonCategory });
+    else if (kind === "delete") res = await adminDeleteAccount({ userId, reason, reasonCategory });
+    else res = await startImpersonation({ userId, reason, reasonCategory });
 
     if ("error" in res) {
       setPhase("idle");
@@ -327,6 +339,20 @@ function ConfirmDialog({
         )}
 
         <div className="ad-modal-field">
+          <label className="ad-field-label">Reason category</label>
+          <div className="ad-select-wrap ad-select-wrap--block">
+            <select className="ad-select" value={reasonCategory} onChange={(e) => setReasonCategory(e.target.value)}>
+              {REASON_OPTIONS[kind].map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <AdIcon name="chevd" size={14} c={AD.mute} />
+          </div>
+        </div>
+
+        <div className="ad-modal-field">
           <label className="ad-field-label">
             Reason {kind === "unsuspend" ? null : <span className="ad-req">*</span>}
           </label>
@@ -343,6 +369,27 @@ function ConfirmDialog({
           />
         </div>
 
+        {needsTypedConfirm && (
+          <div className="ad-modal-field">
+            <label className="ad-field-label">
+              Confirm by typing the user email <span className="ad-req">*</span>
+            </label>
+            <input
+              className="ad-text-input"
+              value={confirmValue}
+              onChange={(e) => setConfirmValue(e.target.value)}
+              placeholder={user.email}
+            />
+            <div className="ad-field-hint">
+              {kind === "suspend"
+                ? "This signs the user out immediately."
+                : kind === "delete"
+                  ? "This starts the 30-day deletion countdown."
+                  : "Impersonation is read-only and expires after 30 minutes."}
+            </div>
+          </div>
+        )}
+
         {err && (
           <div className="ad-modal-error">
             <AdIcon name="warn" size={15} c={AD.red} />
@@ -358,7 +405,7 @@ function ConfirmDialog({
             className={`ad-btn ${toneClass}`}
             onClick={submit}
             data-phase={phase}
-            disabled={phase === "loading" || needsReason}
+            disabled={phase === "loading" || needsReason || !typedConfirmValid}
           >
             {phase === "loading" && <AdIcon name="spinner" size={15} c="#fff" w={2} spin />}
             {phase === "success" && <AdIcon name="check" size={15} c="#fff" w={2.6} />}

@@ -569,11 +569,27 @@ exports.Prisma.AdminAuditEventScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.AdminSupportNoteScalarFieldEnum = {
+  id: 'id',
+  adminUserId: 'adminUserId',
+  subjectType: 'subjectType',
+  subjectId: 'subjectId',
+  targetUserId: 'targetUserId',
+  body: 'body',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.FeatureFlagScalarFieldEnum = {
   id: 'id',
   key: 'key',
   name: 'name',
   description: 'description',
+  owner: 'owner',
+  purpose: 'purpose',
+  environmentScope: 'environmentScope',
+  riskLevel: 'riskLevel',
+  killSwitch: 'killSwitch',
   mode: 'mode',
   rolloutPct: 'rolloutPct',
   allowedUserIds: 'allowedUserIds',
@@ -1154,6 +1170,7 @@ exports.Prisma.ModelName = {
   TotpRecoveryCode: 'TotpRecoveryCode',
   ActivityEvent: 'ActivityEvent',
   AdminAuditEvent: 'AdminAuditEvent',
+  AdminSupportNote: 'AdminSupportNote',
   FeatureFlag: 'FeatureFlag',
   Group: 'Group',
   GroupMember: 'GroupMember',

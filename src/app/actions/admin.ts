@@ -28,6 +28,7 @@ export async function overridePlan(input: {
   userId: string;
   plan: string;
   reason: string;
+  reasonCategory?: string;
 }): Promise<Result> {
   let admin;
   try {
@@ -81,7 +82,7 @@ export async function overridePlan(input: {
     action: ADMIN_ACTIONS.USER_PLAN_OVERRIDE,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { to: plan, reason },
+    details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() || null },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
@@ -90,7 +91,7 @@ export async function overridePlan(input: {
 
 // ─── P21-05: Suspend / unsuspend / schedule deletion ──────────────────────────
 
-export async function suspendAccount(input: { userId: string; reason: string }): Promise<Result> {
+export async function suspendAccount(input: { userId: string; reason: string; reasonCategory?: string }): Promise<Result> {
   let admin;
   try {
     admin = await assertAdmin();
@@ -119,14 +120,14 @@ export async function suspendAccount(input: { userId: string; reason: string }):
     action: ADMIN_ACTIONS.USER_SUSPENDED,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { reason },
+    details: { reason, reasonCategory: input.reasonCategory?.trim() || null },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
   return { success: true };
 }
 
-export async function unsuspendAccount(input: { userId: string; reason?: string }): Promise<Result> {
+export async function unsuspendAccount(input: { userId: string; reason?: string; reasonCategory?: string }): Promise<Result> {
   let admin;
   try {
     admin = await assertAdmin();
@@ -148,14 +149,17 @@ export async function unsuspendAccount(input: { userId: string; reason?: string 
     action: ADMIN_ACTIONS.USER_UNSUSPENDED,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { reason: input.reason?.trim() ? input.reason.trim() : null },
+    details: {
+      reason: input.reason?.trim() ? input.reason.trim() : null,
+      reasonCategory: input.reasonCategory?.trim() || null,
+    },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
   return { success: true };
 }
 
-export async function adminDeleteAccount(input: { userId: string; reason: string }): Promise<Result> {
+export async function adminDeleteAccount(input: { userId: string; reason: string; reasonCategory?: string }): Promise<Result> {
   let admin;
   try {
     admin = await assertAdmin();
@@ -183,10 +187,49 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
     action: ADMIN_ACTIONS.USER_DELETION_SCHEDULED,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { reason, purgeAt: scheduledDeleteAt.toISOString() },
+    details: {
+      reason,
+      purgeAt: scheduledDeleteAt.toISOString(),
+      reasonCategory: input.reasonCategory?.trim() || null,
+    },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
+  return { success: true };
+}
+
+export async function addAdminSupportNote(input: {
+  subjectType: string;
+  subjectId: string;
+  targetUserId?: string | null;
+  body: string;
+}): Promise<Result> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const body = input.body.trim();
+  if (!body) return { error: "REASON_REQUIRED" };
+
+  await db.adminSupportNote.create({
+    data: {
+      adminUserId: admin.adminId,
+      subjectType: input.subjectType.trim().toUpperCase(),
+      subjectId: input.subjectId,
+      targetUserId: input.targetUserId ?? null,
+      body: body.slice(0, 4000),
+    },
+  });
+
+  revalidatePath("/admin");
+  if (input.targetUserId) revalidatePath(`/admin/users/${input.targetUserId}`);
+  if (input.subjectType.trim().toUpperCase() === "SYNC_ACCOUNT") {
+    revalidatePath(`/admin/sync/${input.subjectId}`);
+  }
   return { success: true };
 }
 
@@ -260,7 +303,7 @@ export async function updateSyncCapabilityOverride(input: {
 
 // ─── P21-07: Impersonation ────────────────────────────────────────────────────
 
-export async function startImpersonation(input: { userId: string; reason: string }): Promise<Result> {
+export async function startImpersonation(input: { userId: string; reason: string; reasonCategory?: string }): Promise<Result> {
   let admin;
   try {
     admin = await assertAdmin();
@@ -283,7 +326,12 @@ export async function startImpersonation(input: { userId: string; reason: string
     action: ADMIN_ACTIONS.IMPERSONATION_START,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { reason, readOnly: true },
+    details: {
+      reason,
+      readOnly: true,
+      reasonCategory: input.reasonCategory?.trim() || null,
+      expiresInMinutes: 30,
+    },
   });
 
   return { success: true };

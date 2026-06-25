@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { assertAdmin } from "~/server/admin/guard";
-import { loadAdminAudit } from "~/server/admin/audit";
+import { buildAdminAuditHref, loadAdminAudit } from "~/server/admin/audit";
 import { AdminHeader } from "../_components/admin-header";
 import { AdIcon } from "../_components/admin-icons";
 import { AuditFilters, AuditRow } from "./audit-client";
@@ -38,20 +38,20 @@ export default async function AdminAuditPage({
 
   const sp = await searchParams;
   const action = typeof sp.action === "string" ? sp.action : "all";
+  const actor = typeof sp.actor === "string" ? sp.actor : "all";
   const target = typeof sp.target === "string" ? sp.target : "";
+  const entity = typeof sp.entity === "string" ? sp.entity : "";
+  const severity = typeof sp.severity === "string" ? sp.severity : "all";
+  const q = typeof sp.q === "string" ? sp.q : "";
   const range = typeof sp.range === "string" ? sp.range : "all";
   const page = typeof sp.page === "string" ? Math.max(0, parseInt(sp.page, 10) || 0) : 0;
 
-  const data = await loadAdminAudit({ action, target, range, page });
+  const data = await loadAdminAudit({ action, actor, target, entity, severity: severity as "all" | "high" | "standard", q, range, page });
 
   const buildHref = (p: number) => {
-    const q = new URLSearchParams();
-    if (action !== "all") q.set("action", action);
-    if (target) q.set("target", target);
-    if (range !== "all") q.set("range", range);
-    if (p > 0) q.set("page", String(p));
-    const s = q.toString();
-    return `/admin/audit${s ? `?${s}` : ""}`;
+    const href = buildAdminAuditHref({ action, actor, target, entity, severity, q, range });
+    if (p <= 0) return href;
+    return `${href}${href.includes("?") ? "&" : "?"}page=${p}`;
   };
 
   const start = data.page * data.pageSize;
@@ -67,8 +67,21 @@ export default async function AdminAuditPage({
         <div className="ad-page">
           <AuditFilters
             actionTypes={data.actionTypes}
-            current={{ action, target, range }}
+            actors={data.actors}
+            current={{ action, actor, target, entity, severity, q, range }}
           />
+
+          <div className="ad-result-meta" style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+            <span>
+              {data.total} audit event{data.total === 1 ? "" : "s"} matched
+            </span>
+            <Link
+              href={`/admin/audit/export${buildAdminAuditHref({ action, actor, target, entity, severity, q, range }).replace("/admin/audit", "")}`}
+              className="ad-btn ad-btn--secondary ad-btn--sm"
+            >
+              Export CSV
+            </Link>
+          </div>
 
           <div className="ad-table-wrap ad-table-wrap--dense">
             <div className="ad-tr ad-thead ad-tr--audit">
@@ -76,6 +89,7 @@ export default async function AdminAuditPage({
               <span>Admin</span>
               <span>Action</span>
               <span>Target user</span>
+              <span>Severity</span>
               <span>Details</span>
             </div>
 
@@ -99,6 +113,7 @@ export default async function AdminAuditPage({
                     adminName: r.adminName,
                     action: r.action,
                     targetEmail: r.targetEmail,
+                    severity: r.severity,
                     details: r.details,
                   }}
                 />

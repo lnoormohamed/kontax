@@ -12,10 +12,12 @@ export function AdminHeader({
   title,
   crumbs,
   adminName,
+  showSearch = true,
 }: {
   title: string;
   crumbs?: AdminCrumb[];
   adminName: string;
+  showSearch?: boolean;
 }) {
   return (
     <header className="ad-header">
@@ -41,6 +43,16 @@ export function AdminHeader({
         )}
       </div>
       <div className="ad-header-right">
+        {showSearch ? (
+          <form action="/admin/search" className="ad-header-search">
+            <input
+              className="ad-header-search__input"
+              type="search"
+              name="q"
+              placeholder="Search users, sync ids, flags…"
+            />
+          </form>
+        ) : null}
         <span className="ad-header-role">Platform admin</span>
         <span className="ad-header-name">{adminName}</span>
         <Avatar name={adminName} size={32} />

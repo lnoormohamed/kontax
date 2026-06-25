@@ -134,6 +134,11 @@ export type ActivityEvent = $Result.DefaultSelection<Prisma.$ActivityEventPayloa
  */
 export type AdminAuditEvent = $Result.DefaultSelection<Prisma.$AdminAuditEventPayload>
 /**
+ * Model AdminSupportNote
+ * 
+ */
+export type AdminSupportNote = $Result.DefaultSelection<Prisma.$AdminSupportNotePayload>
+/**
  * Model FeatureFlag
  * 
  */
@@ -1143,6 +1148,16 @@ export class PrismaClient<
   get adminAuditEvent(): Prisma.AdminAuditEventDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.adminSupportNote`: Exposes CRUD operations for the **AdminSupportNote** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AdminSupportNotes
+    * const adminSupportNotes = await prisma.adminSupportNote.findMany()
+    * ```
+    */
+  get adminSupportNote(): Prisma.AdminSupportNoteDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.featureFlag`: Exposes CRUD operations for the **FeatureFlag** model.
     * Example usage:
     * ```ts
@@ -1816,6 +1831,7 @@ export namespace Prisma {
     TotpRecoveryCode: 'TotpRecoveryCode',
     ActivityEvent: 'ActivityEvent',
     AdminAuditEvent: 'AdminAuditEvent',
+    AdminSupportNote: 'AdminSupportNote',
     FeatureFlag: 'FeatureFlag',
     Group: 'Group',
     GroupMember: 'GroupMember',
@@ -1855,7 +1871,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3635,6 +3651,80 @@ export namespace Prisma {
           }
         }
       }
+      AdminSupportNote: {
+        payload: Prisma.$AdminSupportNotePayload<ExtArgs>
+        fields: Prisma.AdminSupportNoteFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AdminSupportNoteFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AdminSupportNoteFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>
+          }
+          findFirst: {
+            args: Prisma.AdminSupportNoteFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AdminSupportNoteFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>
+          }
+          findMany: {
+            args: Prisma.AdminSupportNoteFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>[]
+          }
+          create: {
+            args: Prisma.AdminSupportNoteCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>
+          }
+          createMany: {
+            args: Prisma.AdminSupportNoteCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AdminSupportNoteCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>[]
+          }
+          delete: {
+            args: Prisma.AdminSupportNoteDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>
+          }
+          update: {
+            args: Prisma.AdminSupportNoteUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>
+          }
+          deleteMany: {
+            args: Prisma.AdminSupportNoteDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AdminSupportNoteUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AdminSupportNoteUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>[]
+          }
+          upsert: {
+            args: Prisma.AdminSupportNoteUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportNotePayload>
+          }
+          aggregate: {
+            args: Prisma.AdminSupportNoteAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAdminSupportNote>
+          }
+          groupBy: {
+            args: Prisma.AdminSupportNoteGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AdminSupportNoteGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AdminSupportNoteCountArgs<ExtArgs>
+            result: $Utils.Optional<AdminSupportNoteCountAggregateOutputType> | number
+          }
+        }
+      }
       FeatureFlag: {
         payload: Prisma.$FeatureFlagPayload<ExtArgs>
         fields: Prisma.FeatureFlagFieldRefs
@@ -5309,6 +5399,7 @@ export namespace Prisma {
     totpRecoveryCode?: TotpRecoveryCodeOmit
     activityEvent?: ActivityEventOmit
     adminAuditEvent?: AdminAuditEventOmit
+    adminSupportNote?: AdminSupportNoteOmit
     featureFlag?: FeatureFlagOmit
     group?: GroupOmit
     groupMember?: GroupMemberOmit
@@ -5441,6 +5532,7 @@ export namespace Prisma {
     apiTokens: number
     labels: number
     failedLoginAttempts: number
+    supportNotesAuthored: number
     cardViewLog: number
   }
 
@@ -5476,6 +5568,7 @@ export namespace Prisma {
     apiTokens?: boolean | UserCountOutputTypeCountApiTokensArgs
     labels?: boolean | UserCountOutputTypeCountLabelsArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
+    supportNotesAuthored?: boolean | UserCountOutputTypeCountSupportNotesAuthoredArgs
     cardViewLog?: boolean | UserCountOutputTypeCountCardViewLogArgs
   }
 
@@ -5705,6 +5798,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountFailedLoginAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FailedLoginAttemptWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSupportNotesAuthoredArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminSupportNoteWhereInput
   }
 
   /**
@@ -6721,6 +6821,7 @@ export namespace Prisma {
     labels?: boolean | User$labelsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
+    supportNotesAuthored?: boolean | User$supportNotesAuthoredArgs<ExtArgs>
     cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -6857,6 +6958,7 @@ export namespace Prisma {
     labels?: boolean | User$labelsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
+    supportNotesAuthored?: boolean | User$supportNotesAuthoredArgs<ExtArgs>
     cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -6900,6 +7002,7 @@ export namespace Prisma {
       labels: Prisma.$LabelPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
       onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
+      supportNotesAuthored: Prisma.$AdminSupportNotePayload<ExtArgs>[]
       cardViewLog: Prisma.$PublicCardViewPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -7360,6 +7463,7 @@ export namespace Prisma {
     labels<T extends User$labelsArgs<ExtArgs> = {}>(args?: Subset<T, User$labelsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    supportNotesAuthored<T extends User$supportNotesAuthoredArgs<ExtArgs> = {}>(args?: Subset<T, User$supportNotesAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     cardViewLog<T extends User$cardViewLogArgs<ExtArgs> = {}>(args?: Subset<T, User$cardViewLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -8605,6 +8709,30 @@ export namespace Prisma {
      */
     include?: UserOnboardingStateInclude<ExtArgs> | null
     where?: UserOnboardingStateWhereInput
+  }
+
+  /**
+   * User.supportNotesAuthored
+   */
+  export type User$supportNotesAuthoredArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    where?: AdminSupportNoteWhereInput
+    orderBy?: AdminSupportNoteOrderByWithRelationInput | AdminSupportNoteOrderByWithRelationInput[]
+    cursor?: AdminSupportNoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminSupportNoteScalarFieldEnum | AdminSupportNoteScalarFieldEnum[]
   }
 
   /**
@@ -37407,6 +37535,1103 @@ export namespace Prisma {
 
 
   /**
+   * Model AdminSupportNote
+   */
+
+  export type AggregateAdminSupportNote = {
+    _count: AdminSupportNoteCountAggregateOutputType | null
+    _min: AdminSupportNoteMinAggregateOutputType | null
+    _max: AdminSupportNoteMaxAggregateOutputType | null
+  }
+
+  export type AdminSupportNoteMinAggregateOutputType = {
+    id: string | null
+    adminUserId: string | null
+    subjectType: string | null
+    subjectId: string | null
+    targetUserId: string | null
+    body: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AdminSupportNoteMaxAggregateOutputType = {
+    id: string | null
+    adminUserId: string | null
+    subjectType: string | null
+    subjectId: string | null
+    targetUserId: string | null
+    body: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AdminSupportNoteCountAggregateOutputType = {
+    id: number
+    adminUserId: number
+    subjectType: number
+    subjectId: number
+    targetUserId: number
+    body: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AdminSupportNoteMinAggregateInputType = {
+    id?: true
+    adminUserId?: true
+    subjectType?: true
+    subjectId?: true
+    targetUserId?: true
+    body?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AdminSupportNoteMaxAggregateInputType = {
+    id?: true
+    adminUserId?: true
+    subjectType?: true
+    subjectId?: true
+    targetUserId?: true
+    body?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AdminSupportNoteCountAggregateInputType = {
+    id?: true
+    adminUserId?: true
+    subjectType?: true
+    subjectId?: true
+    targetUserId?: true
+    body?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AdminSupportNoteAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminSupportNote to aggregate.
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportNotes to fetch.
+     */
+    orderBy?: AdminSupportNoteOrderByWithRelationInput | AdminSupportNoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AdminSupportNoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportNotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportNotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AdminSupportNotes
+    **/
+    _count?: true | AdminSupportNoteCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AdminSupportNoteMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AdminSupportNoteMaxAggregateInputType
+  }
+
+  export type GetAdminSupportNoteAggregateType<T extends AdminSupportNoteAggregateArgs> = {
+        [P in keyof T & keyof AggregateAdminSupportNote]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAdminSupportNote[P]>
+      : GetScalarType<T[P], AggregateAdminSupportNote[P]>
+  }
+
+
+
+
+  export type AdminSupportNoteGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminSupportNoteWhereInput
+    orderBy?: AdminSupportNoteOrderByWithAggregationInput | AdminSupportNoteOrderByWithAggregationInput[]
+    by: AdminSupportNoteScalarFieldEnum[] | AdminSupportNoteScalarFieldEnum
+    having?: AdminSupportNoteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AdminSupportNoteCountAggregateInputType | true
+    _min?: AdminSupportNoteMinAggregateInputType
+    _max?: AdminSupportNoteMaxAggregateInputType
+  }
+
+  export type AdminSupportNoteGroupByOutputType = {
+    id: string
+    adminUserId: string
+    subjectType: string
+    subjectId: string
+    targetUserId: string | null
+    body: string
+    createdAt: Date
+    updatedAt: Date
+    _count: AdminSupportNoteCountAggregateOutputType | null
+    _min: AdminSupportNoteMinAggregateOutputType | null
+    _max: AdminSupportNoteMaxAggregateOutputType | null
+  }
+
+  type GetAdminSupportNoteGroupByPayload<T extends AdminSupportNoteGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AdminSupportNoteGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AdminSupportNoteGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AdminSupportNoteGroupByOutputType[P]>
+            : GetScalarType<T[P], AdminSupportNoteGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AdminSupportNoteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    adminUserId?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    author?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminSupportNote"]>
+
+  export type AdminSupportNoteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    adminUserId?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    author?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminSupportNote"]>
+
+  export type AdminSupportNoteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    adminUserId?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    author?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminSupportNote"]>
+
+  export type AdminSupportNoteSelectScalar = {
+    id?: boolean
+    adminUserId?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    body?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AdminSupportNoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "adminUserId" | "subjectType" | "subjectId" | "targetUserId" | "body" | "createdAt" | "updatedAt", ExtArgs["result"]["adminSupportNote"]>
+  export type AdminSupportNoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    author?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AdminSupportNoteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    author?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AdminSupportNoteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    author?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $AdminSupportNotePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AdminSupportNote"
+    objects: {
+      author: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      adminUserId: string
+      subjectType: string
+      subjectId: string
+      targetUserId: string | null
+      body: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["adminSupportNote"]>
+    composites: {}
+  }
+
+  type AdminSupportNoteGetPayload<S extends boolean | null | undefined | AdminSupportNoteDefaultArgs> = $Result.GetResult<Prisma.$AdminSupportNotePayload, S>
+
+  type AdminSupportNoteCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AdminSupportNoteFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AdminSupportNoteCountAggregateInputType | true
+    }
+
+  export interface AdminSupportNoteDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AdminSupportNote'], meta: { name: 'AdminSupportNote' } }
+    /**
+     * Find zero or one AdminSupportNote that matches the filter.
+     * @param {AdminSupportNoteFindUniqueArgs} args - Arguments to find a AdminSupportNote
+     * @example
+     * // Get one AdminSupportNote
+     * const adminSupportNote = await prisma.adminSupportNote.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AdminSupportNoteFindUniqueArgs>(args: SelectSubset<T, AdminSupportNoteFindUniqueArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AdminSupportNote that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AdminSupportNoteFindUniqueOrThrowArgs} args - Arguments to find a AdminSupportNote
+     * @example
+     * // Get one AdminSupportNote
+     * const adminSupportNote = await prisma.adminSupportNote.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AdminSupportNoteFindUniqueOrThrowArgs>(args: SelectSubset<T, AdminSupportNoteFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminSupportNote that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteFindFirstArgs} args - Arguments to find a AdminSupportNote
+     * @example
+     * // Get one AdminSupportNote
+     * const adminSupportNote = await prisma.adminSupportNote.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AdminSupportNoteFindFirstArgs>(args?: SelectSubset<T, AdminSupportNoteFindFirstArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminSupportNote that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteFindFirstOrThrowArgs} args - Arguments to find a AdminSupportNote
+     * @example
+     * // Get one AdminSupportNote
+     * const adminSupportNote = await prisma.adminSupportNote.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AdminSupportNoteFindFirstOrThrowArgs>(args?: SelectSubset<T, AdminSupportNoteFindFirstOrThrowArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AdminSupportNotes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AdminSupportNotes
+     * const adminSupportNotes = await prisma.adminSupportNote.findMany()
+     * 
+     * // Get first 10 AdminSupportNotes
+     * const adminSupportNotes = await prisma.adminSupportNote.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const adminSupportNoteWithIdOnly = await prisma.adminSupportNote.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AdminSupportNoteFindManyArgs>(args?: SelectSubset<T, AdminSupportNoteFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AdminSupportNote.
+     * @param {AdminSupportNoteCreateArgs} args - Arguments to create a AdminSupportNote.
+     * @example
+     * // Create one AdminSupportNote
+     * const AdminSupportNote = await prisma.adminSupportNote.create({
+     *   data: {
+     *     // ... data to create a AdminSupportNote
+     *   }
+     * })
+     * 
+     */
+    create<T extends AdminSupportNoteCreateArgs>(args: SelectSubset<T, AdminSupportNoteCreateArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AdminSupportNotes.
+     * @param {AdminSupportNoteCreateManyArgs} args - Arguments to create many AdminSupportNotes.
+     * @example
+     * // Create many AdminSupportNotes
+     * const adminSupportNote = await prisma.adminSupportNote.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AdminSupportNoteCreateManyArgs>(args?: SelectSubset<T, AdminSupportNoteCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AdminSupportNotes and returns the data saved in the database.
+     * @param {AdminSupportNoteCreateManyAndReturnArgs} args - Arguments to create many AdminSupportNotes.
+     * @example
+     * // Create many AdminSupportNotes
+     * const adminSupportNote = await prisma.adminSupportNote.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AdminSupportNotes and only return the `id`
+     * const adminSupportNoteWithIdOnly = await prisma.adminSupportNote.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AdminSupportNoteCreateManyAndReturnArgs>(args?: SelectSubset<T, AdminSupportNoteCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AdminSupportNote.
+     * @param {AdminSupportNoteDeleteArgs} args - Arguments to delete one AdminSupportNote.
+     * @example
+     * // Delete one AdminSupportNote
+     * const AdminSupportNote = await prisma.adminSupportNote.delete({
+     *   where: {
+     *     // ... filter to delete one AdminSupportNote
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AdminSupportNoteDeleteArgs>(args: SelectSubset<T, AdminSupportNoteDeleteArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AdminSupportNote.
+     * @param {AdminSupportNoteUpdateArgs} args - Arguments to update one AdminSupportNote.
+     * @example
+     * // Update one AdminSupportNote
+     * const adminSupportNote = await prisma.adminSupportNote.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AdminSupportNoteUpdateArgs>(args: SelectSubset<T, AdminSupportNoteUpdateArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AdminSupportNotes.
+     * @param {AdminSupportNoteDeleteManyArgs} args - Arguments to filter AdminSupportNotes to delete.
+     * @example
+     * // Delete a few AdminSupportNotes
+     * const { count } = await prisma.adminSupportNote.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AdminSupportNoteDeleteManyArgs>(args?: SelectSubset<T, AdminSupportNoteDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminSupportNotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AdminSupportNotes
+     * const adminSupportNote = await prisma.adminSupportNote.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AdminSupportNoteUpdateManyArgs>(args: SelectSubset<T, AdminSupportNoteUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminSupportNotes and returns the data updated in the database.
+     * @param {AdminSupportNoteUpdateManyAndReturnArgs} args - Arguments to update many AdminSupportNotes.
+     * @example
+     * // Update many AdminSupportNotes
+     * const adminSupportNote = await prisma.adminSupportNote.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AdminSupportNotes and only return the `id`
+     * const adminSupportNoteWithIdOnly = await prisma.adminSupportNote.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AdminSupportNoteUpdateManyAndReturnArgs>(args: SelectSubset<T, AdminSupportNoteUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AdminSupportNote.
+     * @param {AdminSupportNoteUpsertArgs} args - Arguments to update or create a AdminSupportNote.
+     * @example
+     * // Update or create a AdminSupportNote
+     * const adminSupportNote = await prisma.adminSupportNote.upsert({
+     *   create: {
+     *     // ... data to create a AdminSupportNote
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AdminSupportNote we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AdminSupportNoteUpsertArgs>(args: SelectSubset<T, AdminSupportNoteUpsertArgs<ExtArgs>>): Prisma__AdminSupportNoteClient<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AdminSupportNotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteCountArgs} args - Arguments to filter AdminSupportNotes to count.
+     * @example
+     * // Count the number of AdminSupportNotes
+     * const count = await prisma.adminSupportNote.count({
+     *   where: {
+     *     // ... the filter for the AdminSupportNotes we want to count
+     *   }
+     * })
+    **/
+    count<T extends AdminSupportNoteCountArgs>(
+      args?: Subset<T, AdminSupportNoteCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AdminSupportNoteCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AdminSupportNote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AdminSupportNoteAggregateArgs>(args: Subset<T, AdminSupportNoteAggregateArgs>): Prisma.PrismaPromise<GetAdminSupportNoteAggregateType<T>>
+
+    /**
+     * Group by AdminSupportNote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportNoteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminSupportNoteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminSupportNoteGroupByArgs['orderBy'] }
+        : { orderBy?: AdminSupportNoteGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminSupportNoteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminSupportNoteGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AdminSupportNote model
+   */
+  readonly fields: AdminSupportNoteFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AdminSupportNote.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AdminSupportNoteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    author<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AdminSupportNote model
+   */
+  interface AdminSupportNoteFieldRefs {
+    readonly id: FieldRef<"AdminSupportNote", 'String'>
+    readonly adminUserId: FieldRef<"AdminSupportNote", 'String'>
+    readonly subjectType: FieldRef<"AdminSupportNote", 'String'>
+    readonly subjectId: FieldRef<"AdminSupportNote", 'String'>
+    readonly targetUserId: FieldRef<"AdminSupportNote", 'String'>
+    readonly body: FieldRef<"AdminSupportNote", 'String'>
+    readonly createdAt: FieldRef<"AdminSupportNote", 'DateTime'>
+    readonly updatedAt: FieldRef<"AdminSupportNote", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AdminSupportNote findUnique
+   */
+  export type AdminSupportNoteFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportNote to fetch.
+     */
+    where: AdminSupportNoteWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportNote findUniqueOrThrow
+   */
+  export type AdminSupportNoteFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportNote to fetch.
+     */
+    where: AdminSupportNoteWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportNote findFirst
+   */
+  export type AdminSupportNoteFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportNote to fetch.
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportNotes to fetch.
+     */
+    orderBy?: AdminSupportNoteOrderByWithRelationInput | AdminSupportNoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminSupportNotes.
+     */
+    cursor?: AdminSupportNoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportNotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportNotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminSupportNotes.
+     */
+    distinct?: AdminSupportNoteScalarFieldEnum | AdminSupportNoteScalarFieldEnum[]
+  }
+
+  /**
+   * AdminSupportNote findFirstOrThrow
+   */
+  export type AdminSupportNoteFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportNote to fetch.
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportNotes to fetch.
+     */
+    orderBy?: AdminSupportNoteOrderByWithRelationInput | AdminSupportNoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminSupportNotes.
+     */
+    cursor?: AdminSupportNoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportNotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportNotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminSupportNotes.
+     */
+    distinct?: AdminSupportNoteScalarFieldEnum | AdminSupportNoteScalarFieldEnum[]
+  }
+
+  /**
+   * AdminSupportNote findMany
+   */
+  export type AdminSupportNoteFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportNotes to fetch.
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportNotes to fetch.
+     */
+    orderBy?: AdminSupportNoteOrderByWithRelationInput | AdminSupportNoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AdminSupportNotes.
+     */
+    cursor?: AdminSupportNoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportNotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportNotes.
+     */
+    skip?: number
+    distinct?: AdminSupportNoteScalarFieldEnum | AdminSupportNoteScalarFieldEnum[]
+  }
+
+  /**
+   * AdminSupportNote create
+   */
+  export type AdminSupportNoteCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AdminSupportNote.
+     */
+    data: XOR<AdminSupportNoteCreateInput, AdminSupportNoteUncheckedCreateInput>
+  }
+
+  /**
+   * AdminSupportNote createMany
+   */
+  export type AdminSupportNoteCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AdminSupportNotes.
+     */
+    data: AdminSupportNoteCreateManyInput | AdminSupportNoteCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminSupportNote createManyAndReturn
+   */
+  export type AdminSupportNoteCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * The data used to create many AdminSupportNotes.
+     */
+    data: AdminSupportNoteCreateManyInput | AdminSupportNoteCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminSupportNote update
+   */
+  export type AdminSupportNoteUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AdminSupportNote.
+     */
+    data: XOR<AdminSupportNoteUpdateInput, AdminSupportNoteUncheckedUpdateInput>
+    /**
+     * Choose, which AdminSupportNote to update.
+     */
+    where: AdminSupportNoteWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportNote updateMany
+   */
+  export type AdminSupportNoteUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AdminSupportNotes.
+     */
+    data: XOR<AdminSupportNoteUpdateManyMutationInput, AdminSupportNoteUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminSupportNotes to update
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * Limit how many AdminSupportNotes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminSupportNote updateManyAndReturn
+   */
+  export type AdminSupportNoteUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * The data used to update AdminSupportNotes.
+     */
+    data: XOR<AdminSupportNoteUpdateManyMutationInput, AdminSupportNoteUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminSupportNotes to update
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * Limit how many AdminSupportNotes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminSupportNote upsert
+   */
+  export type AdminSupportNoteUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AdminSupportNote to update in case it exists.
+     */
+    where: AdminSupportNoteWhereUniqueInput
+    /**
+     * In case the AdminSupportNote found by the `where` argument doesn't exist, create a new AdminSupportNote with this data.
+     */
+    create: XOR<AdminSupportNoteCreateInput, AdminSupportNoteUncheckedCreateInput>
+    /**
+     * In case the AdminSupportNote was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AdminSupportNoteUpdateInput, AdminSupportNoteUncheckedUpdateInput>
+  }
+
+  /**
+   * AdminSupportNote delete
+   */
+  export type AdminSupportNoteDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+    /**
+     * Filter which AdminSupportNote to delete.
+     */
+    where: AdminSupportNoteWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportNote deleteMany
+   */
+  export type AdminSupportNoteDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminSupportNotes to delete
+     */
+    where?: AdminSupportNoteWhereInput
+    /**
+     * Limit how many AdminSupportNotes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminSupportNote without action
+   */
+  export type AdminSupportNoteDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportNote
+     */
+    select?: AdminSupportNoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportNote
+     */
+    omit?: AdminSupportNoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportNoteInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model FeatureFlag
    */
 
@@ -37431,6 +38656,10 @@ export namespace Prisma {
     key: string | null
     name: string | null
     description: string | null
+    owner: string | null
+    purpose: string | null
+    riskLevel: string | null
+    killSwitch: boolean | null
     mode: $Enums.FeatureFlagMode | null
     rolloutPct: number | null
     updatedById: string | null
@@ -37444,6 +38673,10 @@ export namespace Prisma {
     key: string | null
     name: string | null
     description: string | null
+    owner: string | null
+    purpose: string | null
+    riskLevel: string | null
+    killSwitch: boolean | null
     mode: $Enums.FeatureFlagMode | null
     rolloutPct: number | null
     updatedById: string | null
@@ -37457,6 +38690,11 @@ export namespace Prisma {
     key: number
     name: number
     description: number
+    owner: number
+    purpose: number
+    environmentScope: number
+    riskLevel: number
+    killSwitch: number
     mode: number
     rolloutPct: number
     allowedUserIds: number
@@ -37481,6 +38719,10 @@ export namespace Prisma {
     key?: true
     name?: true
     description?: true
+    owner?: true
+    purpose?: true
+    riskLevel?: true
+    killSwitch?: true
     mode?: true
     rolloutPct?: true
     updatedById?: true
@@ -37494,6 +38736,10 @@ export namespace Prisma {
     key?: true
     name?: true
     description?: true
+    owner?: true
+    purpose?: true
+    riskLevel?: true
+    killSwitch?: true
     mode?: true
     rolloutPct?: true
     updatedById?: true
@@ -37507,6 +38753,11 @@ export namespace Prisma {
     key?: true
     name?: true
     description?: true
+    owner?: true
+    purpose?: true
+    environmentScope?: true
+    riskLevel?: true
+    killSwitch?: true
     mode?: true
     rolloutPct?: true
     allowedUserIds?: true
@@ -37608,6 +38859,11 @@ export namespace Prisma {
     key: string
     name: string
     description: string
+    owner: string | null
+    purpose: string | null
+    environmentScope: string[]
+    riskLevel: string
+    killSwitch: boolean
     mode: $Enums.FeatureFlagMode
     rolloutPct: number
     allowedUserIds: string[]
@@ -37641,6 +38897,11 @@ export namespace Prisma {
     key?: boolean
     name?: boolean
     description?: boolean
+    owner?: boolean
+    purpose?: boolean
+    environmentScope?: boolean
+    riskLevel?: boolean
+    killSwitch?: boolean
     mode?: boolean
     rolloutPct?: boolean
     allowedUserIds?: boolean
@@ -37655,6 +38916,11 @@ export namespace Prisma {
     key?: boolean
     name?: boolean
     description?: boolean
+    owner?: boolean
+    purpose?: boolean
+    environmentScope?: boolean
+    riskLevel?: boolean
+    killSwitch?: boolean
     mode?: boolean
     rolloutPct?: boolean
     allowedUserIds?: boolean
@@ -37669,6 +38935,11 @@ export namespace Prisma {
     key?: boolean
     name?: boolean
     description?: boolean
+    owner?: boolean
+    purpose?: boolean
+    environmentScope?: boolean
+    riskLevel?: boolean
+    killSwitch?: boolean
     mode?: boolean
     rolloutPct?: boolean
     allowedUserIds?: boolean
@@ -37683,6 +38954,11 @@ export namespace Prisma {
     key?: boolean
     name?: boolean
     description?: boolean
+    owner?: boolean
+    purpose?: boolean
+    environmentScope?: boolean
+    riskLevel?: boolean
+    killSwitch?: boolean
     mode?: boolean
     rolloutPct?: boolean
     allowedUserIds?: boolean
@@ -37692,7 +38968,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FeatureFlagOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "name" | "description" | "mode" | "rolloutPct" | "allowedUserIds" | "updatedById" | "updatedByName" | "createdAt" | "updatedAt", ExtArgs["result"]["featureFlag"]>
+  export type FeatureFlagOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "name" | "description" | "owner" | "purpose" | "environmentScope" | "riskLevel" | "killSwitch" | "mode" | "rolloutPct" | "allowedUserIds" | "updatedById" | "updatedByName" | "createdAt" | "updatedAt", ExtArgs["result"]["featureFlag"]>
 
   export type $FeatureFlagPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FeatureFlag"
@@ -37702,6 +38978,11 @@ export namespace Prisma {
       key: string
       name: string
       description: string
+      owner: string | null
+      purpose: string | null
+      environmentScope: string[]
+      riskLevel: string
+      killSwitch: boolean
       mode: $Enums.FeatureFlagMode
       rolloutPct: number
       allowedUserIds: string[]
@@ -38136,6 +39417,11 @@ export namespace Prisma {
     readonly key: FieldRef<"FeatureFlag", 'String'>
     readonly name: FieldRef<"FeatureFlag", 'String'>
     readonly description: FieldRef<"FeatureFlag", 'String'>
+    readonly owner: FieldRef<"FeatureFlag", 'String'>
+    readonly purpose: FieldRef<"FeatureFlag", 'String'>
+    readonly environmentScope: FieldRef<"FeatureFlag", 'String[]'>
+    readonly riskLevel: FieldRef<"FeatureFlag", 'String'>
+    readonly killSwitch: FieldRef<"FeatureFlag", 'Boolean'>
     readonly mode: FieldRef<"FeatureFlag", 'FeatureFlagMode'>
     readonly rolloutPct: FieldRef<"FeatureFlag", 'Int'>
     readonly allowedUserIds: FieldRef<"FeatureFlag", 'String[]'>
@@ -61954,11 +63240,30 @@ export namespace Prisma {
   export type AdminAuditEventScalarFieldEnum = (typeof AdminAuditEventScalarFieldEnum)[keyof typeof AdminAuditEventScalarFieldEnum]
 
 
+  export const AdminSupportNoteScalarFieldEnum: {
+    id: 'id',
+    adminUserId: 'adminUserId',
+    subjectType: 'subjectType',
+    subjectId: 'subjectId',
+    targetUserId: 'targetUserId',
+    body: 'body',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AdminSupportNoteScalarFieldEnum = (typeof AdminSupportNoteScalarFieldEnum)[keyof typeof AdminSupportNoteScalarFieldEnum]
+
+
   export const FeatureFlagScalarFieldEnum: {
     id: 'id',
     key: 'key',
     name: 'name',
     description: 'description',
+    owner: 'owner',
+    purpose: 'purpose',
+    environmentScope: 'environmentScope',
+    riskLevel: 'riskLevel',
+    killSwitch: 'killSwitch',
     mode: 'mode',
     rolloutPct: 'rolloutPct',
     allowedUserIds: 'allowedUserIds',
@@ -63006,6 +64311,7 @@ export namespace Prisma {
     labels?: LabelListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
+    supportNotesAuthored?: AdminSupportNoteListRelationFilter
     cardViewLog?: PublicCardViewListRelationFilter
   }
 
@@ -63073,6 +64379,7 @@ export namespace Prisma {
     labels?: LabelOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
     onboardingState?: UserOnboardingStateOrderByWithRelationInput
+    supportNotesAuthored?: AdminSupportNoteOrderByRelationAggregateInput
     cardViewLog?: PublicCardViewOrderByRelationAggregateInput
   }
 
@@ -63143,6 +64450,7 @@ export namespace Prisma {
     labels?: LabelListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
+    supportNotesAuthored?: AdminSupportNoteListRelationFilter
     cardViewLog?: PublicCardViewListRelationFilter
   }, "id" | "email" | "username">
 
@@ -65801,6 +67109,76 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"AdminAuditEvent"> | Date | string
   }
 
+  export type AdminSupportNoteWhereInput = {
+    AND?: AdminSupportNoteWhereInput | AdminSupportNoteWhereInput[]
+    OR?: AdminSupportNoteWhereInput[]
+    NOT?: AdminSupportNoteWhereInput | AdminSupportNoteWhereInput[]
+    id?: StringFilter<"AdminSupportNote"> | string
+    adminUserId?: StringFilter<"AdminSupportNote"> | string
+    subjectType?: StringFilter<"AdminSupportNote"> | string
+    subjectId?: StringFilter<"AdminSupportNote"> | string
+    targetUserId?: StringNullableFilter<"AdminSupportNote"> | string | null
+    body?: StringFilter<"AdminSupportNote"> | string
+    createdAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type AdminSupportNoteOrderByWithRelationInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    author?: UserOrderByWithRelationInput
+  }
+
+  export type AdminSupportNoteWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AdminSupportNoteWhereInput | AdminSupportNoteWhereInput[]
+    OR?: AdminSupportNoteWhereInput[]
+    NOT?: AdminSupportNoteWhereInput | AdminSupportNoteWhereInput[]
+    adminUserId?: StringFilter<"AdminSupportNote"> | string
+    subjectType?: StringFilter<"AdminSupportNote"> | string
+    subjectId?: StringFilter<"AdminSupportNote"> | string
+    targetUserId?: StringNullableFilter<"AdminSupportNote"> | string | null
+    body?: StringFilter<"AdminSupportNote"> | string
+    createdAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type AdminSupportNoteOrderByWithAggregationInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AdminSupportNoteCountOrderByAggregateInput
+    _max?: AdminSupportNoteMaxOrderByAggregateInput
+    _min?: AdminSupportNoteMinOrderByAggregateInput
+  }
+
+  export type AdminSupportNoteScalarWhereWithAggregatesInput = {
+    AND?: AdminSupportNoteScalarWhereWithAggregatesInput | AdminSupportNoteScalarWhereWithAggregatesInput[]
+    OR?: AdminSupportNoteScalarWhereWithAggregatesInput[]
+    NOT?: AdminSupportNoteScalarWhereWithAggregatesInput | AdminSupportNoteScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AdminSupportNote"> | string
+    adminUserId?: StringWithAggregatesFilter<"AdminSupportNote"> | string
+    subjectType?: StringWithAggregatesFilter<"AdminSupportNote"> | string
+    subjectId?: StringWithAggregatesFilter<"AdminSupportNote"> | string
+    targetUserId?: StringNullableWithAggregatesFilter<"AdminSupportNote"> | string | null
+    body?: StringWithAggregatesFilter<"AdminSupportNote"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"AdminSupportNote"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AdminSupportNote"> | Date | string
+  }
+
   export type FeatureFlagWhereInput = {
     AND?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
     OR?: FeatureFlagWhereInput[]
@@ -65809,6 +67187,11 @@ export namespace Prisma {
     key?: StringFilter<"FeatureFlag"> | string
     name?: StringFilter<"FeatureFlag"> | string
     description?: StringFilter<"FeatureFlag"> | string
+    owner?: StringNullableFilter<"FeatureFlag"> | string | null
+    purpose?: StringNullableFilter<"FeatureFlag"> | string | null
+    environmentScope?: StringNullableListFilter<"FeatureFlag">
+    riskLevel?: StringFilter<"FeatureFlag"> | string
+    killSwitch?: BoolFilter<"FeatureFlag"> | boolean
     mode?: EnumFeatureFlagModeFilter<"FeatureFlag"> | $Enums.FeatureFlagMode
     rolloutPct?: IntFilter<"FeatureFlag"> | number
     allowedUserIds?: StringNullableListFilter<"FeatureFlag">
@@ -65823,6 +67206,11 @@ export namespace Prisma {
     key?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    owner?: SortOrderInput | SortOrder
+    purpose?: SortOrderInput | SortOrder
+    environmentScope?: SortOrder
+    riskLevel?: SortOrder
+    killSwitch?: SortOrder
     mode?: SortOrder
     rolloutPct?: SortOrder
     allowedUserIds?: SortOrder
@@ -65840,6 +67228,11 @@ export namespace Prisma {
     NOT?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
     name?: StringFilter<"FeatureFlag"> | string
     description?: StringFilter<"FeatureFlag"> | string
+    owner?: StringNullableFilter<"FeatureFlag"> | string | null
+    purpose?: StringNullableFilter<"FeatureFlag"> | string | null
+    environmentScope?: StringNullableListFilter<"FeatureFlag">
+    riskLevel?: StringFilter<"FeatureFlag"> | string
+    killSwitch?: BoolFilter<"FeatureFlag"> | boolean
     mode?: EnumFeatureFlagModeFilter<"FeatureFlag"> | $Enums.FeatureFlagMode
     rolloutPct?: IntFilter<"FeatureFlag"> | number
     allowedUserIds?: StringNullableListFilter<"FeatureFlag">
@@ -65854,6 +67247,11 @@ export namespace Prisma {
     key?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    owner?: SortOrderInput | SortOrder
+    purpose?: SortOrderInput | SortOrder
+    environmentScope?: SortOrder
+    riskLevel?: SortOrder
+    killSwitch?: SortOrder
     mode?: SortOrder
     rolloutPct?: SortOrder
     allowedUserIds?: SortOrder
@@ -65876,6 +67274,11 @@ export namespace Prisma {
     key?: StringWithAggregatesFilter<"FeatureFlag"> | string
     name?: StringWithAggregatesFilter<"FeatureFlag"> | string
     description?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    owner?: StringNullableWithAggregatesFilter<"FeatureFlag"> | string | null
+    purpose?: StringNullableWithAggregatesFilter<"FeatureFlag"> | string | null
+    environmentScope?: StringNullableListFilter<"FeatureFlag">
+    riskLevel?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    killSwitch?: BoolWithAggregatesFilter<"FeatureFlag"> | boolean
     mode?: EnumFeatureFlagModeWithAggregatesFilter<"FeatureFlag"> | $Enums.FeatureFlagMode
     rolloutPct?: IntWithAggregatesFilter<"FeatureFlag"> | number
     allowedUserIds?: StringNullableListFilter<"FeatureFlag">
@@ -67545,6 +68948,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -67612,6 +69016,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -67679,6 +69084,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -67746,6 +69152,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -70816,11 +72223,92 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AdminSupportNoteCreateInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    author: UserCreateNestedOneWithoutSupportNotesAuthoredInput
+  }
+
+  export type AdminSupportNoteUncheckedCreateInput = {
+    id?: string
+    adminUserId: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportNoteUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    author?: UserUpdateOneRequiredWithoutSupportNotesAuthoredNestedInput
+  }
+
+  export type AdminSupportNoteUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    adminUserId?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportNoteCreateManyInput = {
+    id?: string
+    adminUserId: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportNoteUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportNoteUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    adminUserId?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type FeatureFlagCreateInput = {
     id?: string
     key: string
     name: string
     description?: string
+    owner?: string | null
+    purpose?: string | null
+    environmentScope?: FeatureFlagCreateenvironmentScopeInput | string[]
+    riskLevel?: string
+    killSwitch?: boolean
     mode?: $Enums.FeatureFlagMode
     rolloutPct?: number
     allowedUserIds?: FeatureFlagCreateallowedUserIdsInput | string[]
@@ -70835,6 +72323,11 @@ export namespace Prisma {
     key: string
     name: string
     description?: string
+    owner?: string | null
+    purpose?: string | null
+    environmentScope?: FeatureFlagCreateenvironmentScopeInput | string[]
+    riskLevel?: string
+    killSwitch?: boolean
     mode?: $Enums.FeatureFlagMode
     rolloutPct?: number
     allowedUserIds?: FeatureFlagCreateallowedUserIdsInput | string[]
@@ -70849,6 +72342,11 @@ export namespace Prisma {
     key?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    purpose?: NullableStringFieldUpdateOperationsInput | string | null
+    environmentScope?: FeatureFlagUpdateenvironmentScopeInput | string[]
+    riskLevel?: StringFieldUpdateOperationsInput | string
+    killSwitch?: BoolFieldUpdateOperationsInput | boolean
     mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
     rolloutPct?: IntFieldUpdateOperationsInput | number
     allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
@@ -70863,6 +72361,11 @@ export namespace Prisma {
     key?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    purpose?: NullableStringFieldUpdateOperationsInput | string | null
+    environmentScope?: FeatureFlagUpdateenvironmentScopeInput | string[]
+    riskLevel?: StringFieldUpdateOperationsInput | string
+    killSwitch?: BoolFieldUpdateOperationsInput | boolean
     mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
     rolloutPct?: IntFieldUpdateOperationsInput | number
     allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
@@ -70877,6 +72380,11 @@ export namespace Prisma {
     key: string
     name: string
     description?: string
+    owner?: string | null
+    purpose?: string | null
+    environmentScope?: FeatureFlagCreateenvironmentScopeInput | string[]
+    riskLevel?: string
+    killSwitch?: boolean
     mode?: $Enums.FeatureFlagMode
     rolloutPct?: number
     allowedUserIds?: FeatureFlagCreateallowedUserIdsInput | string[]
@@ -70891,6 +72399,11 @@ export namespace Prisma {
     key?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    purpose?: NullableStringFieldUpdateOperationsInput | string | null
+    environmentScope?: FeatureFlagUpdateenvironmentScopeInput | string[]
+    riskLevel?: StringFieldUpdateOperationsInput | string
+    killSwitch?: BoolFieldUpdateOperationsInput | boolean
     mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
     rolloutPct?: IntFieldUpdateOperationsInput | number
     allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
@@ -70905,6 +72418,11 @@ export namespace Prisma {
     key?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    owner?: NullableStringFieldUpdateOperationsInput | string | null
+    purpose?: NullableStringFieldUpdateOperationsInput | string | null
+    environmentScope?: FeatureFlagUpdateenvironmentScopeInput | string[]
+    riskLevel?: StringFieldUpdateOperationsInput | string
+    killSwitch?: BoolFieldUpdateOperationsInput | boolean
     mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
     rolloutPct?: IntFieldUpdateOperationsInput | number
     allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
@@ -72933,6 +74451,12 @@ export namespace Prisma {
     isNot?: UserOnboardingStateWhereInput | null
   }
 
+  export type AdminSupportNoteListRelationFilter = {
+    every?: AdminSupportNoteWhereInput
+    some?: AdminSupportNoteWhereInput
+    none?: AdminSupportNoteWhereInput
+  }
+
   export type PublicCardViewListRelationFilter = {
     every?: PublicCardViewWhereInput
     some?: PublicCardViewWhereInput
@@ -73061,6 +74585,10 @@ export namespace Prisma {
   }
 
   export type FailedLoginAttemptOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AdminSupportNoteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -75334,6 +76862,39 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type AdminSupportNoteCountOrderByAggregateInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminSupportNoteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminSupportNoteMinOrderByAggregateInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrder
+    body?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type EnumFeatureFlagModeFilter<$PrismaModel = never> = {
     equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
     in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
@@ -75346,6 +76907,11 @@ export namespace Prisma {
     key?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    owner?: SortOrder
+    purpose?: SortOrder
+    environmentScope?: SortOrder
+    riskLevel?: SortOrder
+    killSwitch?: SortOrder
     mode?: SortOrder
     rolloutPct?: SortOrder
     allowedUserIds?: SortOrder
@@ -75364,6 +76930,10 @@ export namespace Prisma {
     key?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    owner?: SortOrder
+    purpose?: SortOrder
+    riskLevel?: SortOrder
+    killSwitch?: SortOrder
     mode?: SortOrder
     rolloutPct?: SortOrder
     updatedById?: SortOrder
@@ -75377,6 +76947,10 @@ export namespace Prisma {
     key?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    owner?: SortOrder
+    purpose?: SortOrder
+    riskLevel?: SortOrder
+    killSwitch?: SortOrder
     mode?: SortOrder
     rolloutPct?: SortOrder
     updatedById?: SortOrder
@@ -76663,6 +78237,13 @@ export namespace Prisma {
     connect?: UserOnboardingStateWhereUniqueInput
   }
 
+  export type AdminSupportNoteCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<AdminSupportNoteCreateWithoutAuthorInput, AdminSupportNoteUncheckedCreateWithoutAuthorInput> | AdminSupportNoteCreateWithoutAuthorInput[] | AdminSupportNoteUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: AdminSupportNoteCreateOrConnectWithoutAuthorInput | AdminSupportNoteCreateOrConnectWithoutAuthorInput[]
+    createMany?: AdminSupportNoteCreateManyAuthorInputEnvelope
+    connect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+  }
+
   export type PublicCardViewCreateNestedManyWithoutUserInput = {
     create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
     connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
@@ -76903,6 +78484,13 @@ export namespace Prisma {
     create?: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserOnboardingStateCreateOrConnectWithoutUserInput
     connect?: UserOnboardingStateWhereUniqueInput
+  }
+
+  export type AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<AdminSupportNoteCreateWithoutAuthorInput, AdminSupportNoteUncheckedCreateWithoutAuthorInput> | AdminSupportNoteCreateWithoutAuthorInput[] | AdminSupportNoteUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: AdminSupportNoteCreateOrConnectWithoutAuthorInput | AdminSupportNoteCreateOrConnectWithoutAuthorInput[]
+    createMany?: AdminSupportNoteCreateManyAuthorInputEnvelope
+    connect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
   }
 
   export type PublicCardViewUncheckedCreateNestedManyWithoutUserInput = {
@@ -77416,6 +79004,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserOnboardingStateUpdateToOneWithWhereWithoutUserInput, UserOnboardingStateUpdateWithoutUserInput>, UserOnboardingStateUncheckedUpdateWithoutUserInput>
   }
 
+  export type AdminSupportNoteUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<AdminSupportNoteCreateWithoutAuthorInput, AdminSupportNoteUncheckedCreateWithoutAuthorInput> | AdminSupportNoteCreateWithoutAuthorInput[] | AdminSupportNoteUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: AdminSupportNoteCreateOrConnectWithoutAuthorInput | AdminSupportNoteCreateOrConnectWithoutAuthorInput[]
+    upsert?: AdminSupportNoteUpsertWithWhereUniqueWithoutAuthorInput | AdminSupportNoteUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: AdminSupportNoteCreateManyAuthorInputEnvelope
+    set?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    disconnect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    delete?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    connect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    update?: AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput | AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput | AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: AdminSupportNoteScalarWhereInput | AdminSupportNoteScalarWhereInput[]
+  }
+
   export type PublicCardViewUpdateManyWithoutUserNestedInput = {
     create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
     connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
@@ -77892,6 +79494,20 @@ export namespace Prisma {
     delete?: UserOnboardingStateWhereInput | boolean
     connect?: UserOnboardingStateWhereUniqueInput
     update?: XOR<XOR<UserOnboardingStateUpdateToOneWithWhereWithoutUserInput, UserOnboardingStateUpdateWithoutUserInput>, UserOnboardingStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<AdminSupportNoteCreateWithoutAuthorInput, AdminSupportNoteUncheckedCreateWithoutAuthorInput> | AdminSupportNoteCreateWithoutAuthorInput[] | AdminSupportNoteUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: AdminSupportNoteCreateOrConnectWithoutAuthorInput | AdminSupportNoteCreateOrConnectWithoutAuthorInput[]
+    upsert?: AdminSupportNoteUpsertWithWhereUniqueWithoutAuthorInput | AdminSupportNoteUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: AdminSupportNoteCreateManyAuthorInputEnvelope
+    set?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    disconnect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    delete?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    connect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+    update?: AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput | AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput | AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: AdminSupportNoteScalarWhereInput | AdminSupportNoteScalarWhereInput[]
   }
 
   export type PublicCardViewUncheckedUpdateManyWithoutUserNestedInput = {
@@ -79677,8 +81293,31 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAdminAuditEventsInput, UserUpdateWithoutAdminAuditEventsInput>, UserUncheckedUpdateWithoutAdminAuditEventsInput>
   }
 
+  export type UserCreateNestedOneWithoutSupportNotesAuthoredInput = {
+    create?: XOR<UserCreateWithoutSupportNotesAuthoredInput, UserUncheckedCreateWithoutSupportNotesAuthoredInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportNotesAuthoredInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSupportNotesAuthoredNestedInput = {
+    create?: XOR<UserCreateWithoutSupportNotesAuthoredInput, UserUncheckedCreateWithoutSupportNotesAuthoredInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportNotesAuthoredInput
+    upsert?: UserUpsertWithoutSupportNotesAuthoredInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSupportNotesAuthoredInput, UserUpdateWithoutSupportNotesAuthoredInput>, UserUncheckedUpdateWithoutSupportNotesAuthoredInput>
+  }
+
+  export type FeatureFlagCreateenvironmentScopeInput = {
+    set: string[]
+  }
+
   export type FeatureFlagCreateallowedUserIdsInput = {
     set: string[]
+  }
+
+  export type FeatureFlagUpdateenvironmentScopeInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type EnumFeatureFlagModeFieldUpdateOperationsInput = {
@@ -82847,6 +84486,36 @@ export namespace Prisma {
     create: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
   }
 
+  export type AdminSupportNoteCreateWithoutAuthorInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportNoteUncheckedCreateWithoutAuthorInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportNoteCreateOrConnectWithoutAuthorInput = {
+    where: AdminSupportNoteWhereUniqueInput
+    create: XOR<AdminSupportNoteCreateWithoutAuthorInput, AdminSupportNoteUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type AdminSupportNoteCreateManyAuthorInputEnvelope = {
+    data: AdminSupportNoteCreateManyAuthorInput | AdminSupportNoteCreateManyAuthorInput[]
+    skipDuplicates?: boolean
+  }
+
   export type PublicCardViewCreateWithoutUserInput = {
     id?: string
     viewedAt?: Date | string
@@ -84033,6 +85702,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AdminSupportNoteUpsertWithWhereUniqueWithoutAuthorInput = {
+    where: AdminSupportNoteWhereUniqueInput
+    update: XOR<AdminSupportNoteUpdateWithoutAuthorInput, AdminSupportNoteUncheckedUpdateWithoutAuthorInput>
+    create: XOR<AdminSupportNoteCreateWithoutAuthorInput, AdminSupportNoteUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput = {
+    where: AdminSupportNoteWhereUniqueInput
+    data: XOR<AdminSupportNoteUpdateWithoutAuthorInput, AdminSupportNoteUncheckedUpdateWithoutAuthorInput>
+  }
+
+  export type AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput = {
+    where: AdminSupportNoteScalarWhereInput
+    data: XOR<AdminSupportNoteUpdateManyMutationInput, AdminSupportNoteUncheckedUpdateManyWithoutAuthorInput>
+  }
+
+  export type AdminSupportNoteScalarWhereInput = {
+    AND?: AdminSupportNoteScalarWhereInput | AdminSupportNoteScalarWhereInput[]
+    OR?: AdminSupportNoteScalarWhereInput[]
+    NOT?: AdminSupportNoteScalarWhereInput | AdminSupportNoteScalarWhereInput[]
+    id?: StringFilter<"AdminSupportNote"> | string
+    adminUserId?: StringFilter<"AdminSupportNote"> | string
+    subjectType?: StringFilter<"AdminSupportNote"> | string
+    subjectId?: StringFilter<"AdminSupportNote"> | string
+    targetUserId?: StringNullableFilter<"AdminSupportNote"> | string | null
+    body?: StringFilter<"AdminSupportNote"> | string
+    createdAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
+  }
+
   export type PublicCardViewUpsertWithWhereUniqueWithoutUserInput = {
     where: PublicCardViewWhereUniqueInput
     update: XOR<PublicCardViewUpdateWithoutUserInput, PublicCardViewUncheckedUpdateWithoutUserInput>
@@ -84123,6 +85822,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
   }
 
   export type UserUncheckedCreateWithoutCardViewLogInput = {
@@ -84189,6 +85889,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
   }
 
   export type UserCreateOrConnectWithoutCardViewLogInput = {
@@ -84271,6 +85972,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCardViewLogInput = {
@@ -84337,6 +86039,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
   export type UserCreateWithoutOnboardingStateInput = {
@@ -84402,6 +86105,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -84468,6 +86172,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -84550,6 +86255,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -84616,6 +86322,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -84682,6 +86389,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -84748,6 +86456,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -84884,6 +86593,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -84950,6 +86660,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -85058,6 +86769,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -85124,6 +86836,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -85993,6 +87706,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -86059,6 +87773,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -86589,6 +88304,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -86655,6 +88371,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -86862,6 +88579,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -86928,6 +88646,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -87059,6 +88778,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -87125,6 +88845,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -87325,6 +89046,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -87391,6 +89113,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -87555,6 +89278,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -87621,6 +89345,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -87839,6 +89564,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -87905,6 +89631,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -87987,6 +89714,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -88053,6 +89781,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -88135,6 +89864,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -88201,6 +89931,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -88267,6 +89998,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -88333,6 +90065,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -88715,6 +90448,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -88781,6 +90515,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -89180,6 +90915,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -89246,6 +90982,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -89377,6 +91114,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -89443,6 +91181,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -89509,6 +91248,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -89575,6 +91315,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -89919,6 +91660,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -89985,6 +91727,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -90325,6 +92068,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -90391,6 +92135,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -91099,6 +92844,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -91165,6 +92911,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -93219,6 +94966,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -93285,6 +95033,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -93367,6 +95116,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -93433,6 +95183,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -93499,6 +95250,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -93565,6 +95317,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -93647,6 +95400,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -93713,6 +95467,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -93779,6 +95534,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -93845,6 +95601,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -93927,6 +95684,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -93993,6 +95751,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -94059,6 +95818,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -94125,6 +95885,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -94207,6 +95968,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -94273,6 +96035,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -94339,6 +96102,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -94405,6 +96169,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -94618,6 +96383,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -94684,6 +96450,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -94887,6 +96654,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -94953,6 +96721,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -95035,6 +96804,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -95089,6 +96859,291 @@ export namespace Prisma {
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
     savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutSupportNotesAuthoredInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSupportNotesAuthoredInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSupportNotesAuthoredInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSupportNotesAuthoredInput, UserUncheckedCreateWithoutSupportNotesAuthoredInput>
+  }
+
+  export type UserUpsertWithoutSupportNotesAuthoredInput = {
+    update: XOR<UserUpdateWithoutSupportNotesAuthoredInput, UserUncheckedUpdateWithoutSupportNotesAuthoredInput>
+    create: XOR<UserCreateWithoutSupportNotesAuthoredInput, UserUncheckedCreateWithoutSupportNotesAuthoredInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSupportNotesAuthoredInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSupportNotesAuthoredInput, UserUncheckedUpdateWithoutSupportNotesAuthoredInput>
+  }
+
+  export type UserUpdateWithoutSupportNotesAuthoredInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSupportNotesAuthoredInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
@@ -95167,6 +97222,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -95233,6 +97289,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -95607,6 +97664,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -95673,6 +97731,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -95989,6 +98048,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -96055,6 +98115,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -96186,6 +98247,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -96252,6 +98314,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -96494,6 +98557,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -96560,6 +98624,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -96778,6 +98843,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -96844,6 +98910,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -96926,6 +98993,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -96992,6 +99060,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -97074,6 +99143,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -97140,6 +99210,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -97206,6 +99277,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -97272,6 +99344,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -97404,6 +99477,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -97470,6 +99544,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -98268,6 +100343,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -98334,6 +100410,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -98536,6 +100613,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -98602,6 +100680,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -98815,6 +100894,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -98881,6 +100961,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -99095,6 +101176,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -99161,6 +101243,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -99364,6 +101447,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -99430,6 +101514,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -99541,6 +101626,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -99607,6 +101693,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -99708,6 +101795,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -99774,6 +101862,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -99892,6 +101981,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -99958,6 +102048,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -100040,6 +102131,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -100106,6 +102198,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -100188,6 +102281,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -100254,6 +102348,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -100320,6 +102415,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -100386,6 +102482,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -100468,6 +102565,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -100534,6 +102632,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -100600,6 +102699,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -100666,6 +102766,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -100879,6 +102980,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -100945,6 +103047,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101148,6 +103251,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -101214,6 +103318,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -101296,6 +103401,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -101362,6 +103468,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101428,6 +103535,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -101494,6 +103602,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -101576,6 +103685,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -101642,6 +103752,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101708,6 +103819,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -101774,6 +103886,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -101856,6 +103969,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -101922,6 +104036,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101988,6 +104103,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -102054,6 +104170,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -102136,6 +104253,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -102202,6 +104320,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -102268,6 +104387,7 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -102334,6 +104454,7 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -102416,6 +104537,7 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -102482,6 +104604,7 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -102951,6 +105074,16 @@ export namespace Prisma {
     id?: string
     ipAddress?: string | null
     createdAt?: Date | string
+  }
+
+  export type AdminSupportNoteCreateManyAuthorInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PublicCardViewCreateManyUserInput = {
@@ -104423,6 +106556,36 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportNoteUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportNoteUncheckedUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportNoteUncheckedUpdateManyWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PublicCardViewUpdateWithoutUserInput = {

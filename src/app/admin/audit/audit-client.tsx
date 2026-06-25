@@ -15,6 +15,7 @@ const ACTION_META: Record<string, { label: string; tone: string }> = {
   "impersonation.end": { label: "Impersonation end", tone: "gray" },
   "flag.update": { label: "Flag update", tone: "gray" },
   "user.view": { label: "User viewed", tone: "gray" },
+  "sync.capability.override": { label: "Sync capability override", tone: "amber" },
 };
 
 const TONE_BADGE: Record<string, { bg: string; fg: string }> = {
@@ -34,14 +35,18 @@ function detailsSummary(details: Record<string, unknown>): string {
 
 export function AuditFilters({
   actionTypes,
+  actors,
   current,
 }: {
   actionTypes: string[];
-  current: { action: string; target: string; range: string };
+  actors: { id: string; label: string }[];
+  current: { action: string; actor: string; target: string; entity: string; severity: string; q: string; range: string };
 }) {
   const router = useRouter();
   const params = useSearchParams();
   const [target, setTarget] = useState(current.target);
+  const [entity, setEntity] = useState(current.entity);
+  const [q, setQ] = useState(current.q);
 
   const push = (patch: Record<string, string>) => {
     const next = new URLSearchParams(params?.toString() ?? "");
@@ -68,6 +73,37 @@ export function AuditFilters({
               {ACTION_META[a]?.label ?? a}
             </option>
           ))}
+        </select>
+        <AdIcon name="chevd" size={14} c={AD.mute} />
+      </div>
+
+      <div className="ad-select-wrap">
+        <AdIcon name="users" size={15} c={AD.mute} />
+        <select
+          className="ad-select"
+          value={current.actor}
+          onChange={(e) => push({ actor: e.target.value })}
+        >
+          <option value="all">All admins</option>
+          {actors.map((actor) => (
+            <option key={actor.id} value={actor.id}>
+              {actor.label}
+            </option>
+          ))}
+        </select>
+        <AdIcon name="chevd" size={14} c={AD.mute} />
+      </div>
+
+      <div className="ad-select-wrap">
+        <AdIcon name="warn" size={15} c={AD.mute} />
+        <select
+          className="ad-select"
+          value={current.severity}
+          onChange={(e) => push({ severity: e.target.value })}
+        >
+          <option value="all">All severity</option>
+          <option value="high">High risk only</option>
+          <option value="standard">Standard only</option>
         </select>
         <AdIcon name="chevd" size={14} c={AD.mute} />
       </div>
@@ -113,6 +149,36 @@ export function AuditFilters({
           </button>
         )}
       </form>
+
+      <form
+        className="ad-filter-search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          push({ entity });
+        }}
+      >
+        <AdIcon name="sync" size={15} c={AD.mute} />
+        <input
+          placeholder="Pivot by entity id, connection id, or flag key…"
+          value={entity}
+          onChange={(e) => setEntity(e.target.value)}
+        />
+      </form>
+
+      <form
+        className="ad-filter-search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          push({ q });
+        }}
+      >
+        <AdIcon name="search" size={15} c={AD.mute} />
+        <input
+          placeholder="Search details, action, actor, or IP…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </form>
     </div>
   );
 }
@@ -126,6 +192,7 @@ export function AuditRow({
     adminName: string;
     action: string;
     targetEmail: string | null;
+    severity: "high" | "standard";
     details: Record<string, unknown>;
   };
 }) {
@@ -150,6 +217,14 @@ export function AuditRow({
         </span>
         <span className="ad-cell ad-cell-target" data-th="Target">
           {row.targetEmail ?? "—"}
+        </span>
+        <span data-th="Severity">
+          <span
+            className="ad-action-badge"
+            style={row.severity === "high" ? { background: "#fef2f2", color: "#b91c1c" } : { background: "#f4f4f5", color: "#52525b" }}
+          >
+            {row.severity}
+          </span>
         </span>
         <span className="ad-cell ad-audit-summary" data-th="Details">
           <AdIcon name={open ? "chevu" : "chev"} size={14} c={AD.faint} />

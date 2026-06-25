@@ -1,5 +1,5 @@
 import { auth } from "~/server/auth";
-import { EndImpersonationButton } from "./impersonation-banner-client";
+import { EndImpersonationButton, ImpersonationBannerClient } from "./impersonation-banner-client";
 
 // P21-07: pinned full-width banner shown above the normal app while an admin is
 // impersonating a user. Rendered in the root layout so it appears everywhere.
@@ -33,7 +33,10 @@ export async function ImpersonationBanner() {
         </svg>
         <span>
           Viewing as <strong style={{ fontWeight: 600 }}>{email}</strong>{" "}
-          <span style={{ color: "rgba(255,255,255,0.65)" }}>(read-only)</span>
+          <span style={{ color: "rgba(255,255,255,0.65)" }}>(read-only)</span>{" "}
+          {typeof (session as { impersonationExpiresAt?: number }).impersonationExpiresAt === "number" ? (
+            <ImpersonationBannerClient expiresAt={(session as { impersonationExpiresAt: number }).impersonationExpiresAt} />
+          ) : null}
         </span>
       </span>
       <EndImpersonationButton />

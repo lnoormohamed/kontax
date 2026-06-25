@@ -3,7 +3,9 @@ import { notFound, redirect } from "next/navigation";
 
 import { AdminHeader } from "../../_components/admin-header";
 import { AD } from "../../_components/admin-icons";
+import { SupportNoteComposer } from "../../_components/support-note-composer";
 import { adminAttentionMeta } from "~/server/admin/attention";
+import { buildAdminAuditHref } from "~/server/admin/audit";
 import { assertAdmin } from "~/server/admin/guard";
 import { loadAdminSyncConnectionDetail } from "~/server/admin/sync";
 import { SyncConnectionActions } from "./detail-client";
@@ -121,6 +123,17 @@ export default async function AdminSyncConnectionDetailPage({
                   <KV k="Conflict policy" v={d.conflictPolicy} />
                   <KV k="Failure streak" v={String(d.failureStreak)} />
                   <KV k="Remote account" v={d.remoteAccountId ?? "—"} />
+                </div>
+                <div style={{ marginTop: 14 }}>
+                  <Link
+                    href={buildAdminAuditHref({
+                      target: d.user.email,
+                      entity: d.id,
+                    })}
+                    className="ad-inline-link"
+                  >
+                    Open related audit trail
+                  </Link>
                 </div>
                 <div className="ad-support-list" style={{ marginTop: 14 }}>
                   <div className="ad-support-list__row">
@@ -252,6 +265,33 @@ export default async function AdminSyncConnectionDetailPage({
                           <div className="ad-support-list__body">
                             Resolution {conflict.resolutionStrategy ?? "pending"}
                           </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+
+              <section className="ad-card">
+                <div className="ad-card-head">
+                  <h3 className="ad-card-title">Internal support notes</h3>
+                </div>
+                <SupportNoteComposer
+                  subjectType="SYNC_ACCOUNT"
+                  subjectId={d.id}
+                  targetUserId={d.user.id}
+                  placeholder="Capture provider verification notes, investigation context, or replacement/reconnect decisions."
+                />
+                <div className="ad-support-list" style={{ marginTop: 14 }}>
+                  {d.supportNotes.length === 0 ? (
+                    <div className="ad-support-note">No support notes for this connection yet.</div>
+                  ) : (
+                    d.supportNotes.map((note) => (
+                      <div key={note.id} className="ad-support-list__row">
+                        <div className="ad-support-list__main">
+                          <div className="ad-support-list__title">{note.author}</div>
+                          <div className="ad-support-list__sub">{note.when}</div>
+                          <div className="ad-support-list__body">{note.body}</div>
                         </div>
                       </div>
                     ))

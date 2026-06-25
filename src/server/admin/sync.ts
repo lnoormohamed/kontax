@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma, SyncProvider } from "../../../generated/prisma";
 
 import { db } from "~/server/db";
+import { listAdminSupportNotes } from "~/server/admin/support-notes";
 import { getSyncLineageInvariantIssues } from "~/server/sync-lineage";
 import {
   getConsecutiveFailureStreak,
@@ -380,58 +381,61 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
 }
 
 export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
-  const account = await db.syncAccount.findUnique({
-    where: { id: syncAccountId },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          lifecycleState: true,
+  const [account, supportNotes] = await Promise.all([
+    db.syncAccount.findUnique({
+      where: { id: syncAccountId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            lifecycleState: true,
+          },
+        },
+        settings: true,
+        replacesSyncAccount: {
+          select: {
+            id: true,
+            label: true,
+            connectionId: true,
+            status: true,
+            retiredAt: true,
+            replacedBySyncAccountId: true,
+          },
+        },
+        replacedBySyncAccount: {
+          select: {
+            id: true,
+            label: true,
+            connectionId: true,
+            status: true,
+            createdAt: true,
+            replacesSyncAccountId: true,
+          },
+        },
+        syncJobs: {
+          orderBy: { createdAt: "desc" },
+          take: 12,
+        },
+        syncConflicts: {
+          orderBy: { detectedAt: "desc" },
+          take: 12,
+          include: {
+            contact: { select: { id: true, fullName: true } },
+          },
+        },
+        _count: {
+          select: {
+            syncJobs: true,
+            syncConflicts: { where: { status: "OPEN" } },
+            syncLinks: true,
+          },
         },
       },
-      settings: true,
-      replacesSyncAccount: {
-        select: {
-          id: true,
-          label: true,
-          connectionId: true,
-          status: true,
-          retiredAt: true,
-          replacedBySyncAccountId: true,
-        },
-      },
-      replacedBySyncAccount: {
-        select: {
-          id: true,
-          label: true,
-          connectionId: true,
-          status: true,
-          createdAt: true,
-          replacesSyncAccountId: true,
-        },
-      },
-      syncJobs: {
-        orderBy: { createdAt: "desc" },
-        take: 12,
-      },
-      syncConflicts: {
-        orderBy: { detectedAt: "desc" },
-        take: 12,
-        include: {
-          contact: { select: { id: true, fullName: true } },
-        },
-      },
-      _count: {
-        select: {
-          syncJobs: true,
-          syncConflicts: { where: { status: "OPEN" } },
-          syncLinks: true,
-        },
-      },
-    },
-  });
+    }),
+    listAdminSupportNotes({ subjectType: "SYNC_ACCOUNT", subjectId: syncAccountId, limit: 12 }),
+  ]);
 
   if (!account) return null;
 
@@ -576,5 +580,6 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
       detectedAt: fmtRelative(conflict.detectedAt),
       resolutionStrategy: conflict.resolutionStrategy,
     })),
+    supportNotes,
   };
 }

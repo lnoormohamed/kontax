@@ -54,8 +54,15 @@ export async function toggleFeatureFlag(input: { key: string; enable: boolean; r
 export async function saveFeatureFlag(input: {
   key: string;
   description: string;
+  owner: string;
+  purpose: string;
+  environmentScope: string[];
+  riskLevel: string;
+  killSwitch: boolean;
   mode: string;
   rolloutPct: number;
+  allowedUserIds: string[];
+  changeSummary: string;
 }): Promise<Result> {
   let admin;
   try {
@@ -67,18 +74,28 @@ export async function saveFeatureFlag(input: {
 
   const mode = input.mode.toUpperCase() as FeatureFlagMode;
   if (!MODES.includes(mode)) return { error: "INVALID_MODE" };
+  const changeSummary = input.changeSummary.trim();
+  if (!changeSummary) return { error: "REASON_REQUIRED" };
 
   const flag = await db.featureFlag.findUnique({ where: { key: input.key } });
   if (!flag) return { error: "FLAG_NOT_FOUND" };
 
   const rolloutPct = Math.max(0, Math.min(100, Math.round(input.rolloutPct)));
+  const allowedUserIds = [...new Set(input.allowedUserIds.map((value) => value.trim()).filter(Boolean))].slice(0, 250);
+  const environmentScope = [...new Set(input.environmentScope.map((value) => value.trim()).filter(Boolean))].slice(0, 8);
 
   await db.featureFlag.update({
     where: { key: input.key },
     data: {
       description: input.description.slice(0, 280),
+      owner: input.owner.trim() || null,
+      purpose: input.purpose.trim() || null,
+      environmentScope,
+      riskLevel: input.riskLevel.trim().toLowerCase() || "standard",
+      killSwitch: input.killSwitch,
       mode,
       rolloutPct,
+      allowedUserIds,
       updatedById: admin.adminId,
       updatedByName: admin.name,
     },
@@ -87,7 +104,19 @@ export async function saveFeatureFlag(input: {
   await emitAdminEvent({
     adminId: admin.adminId,
     action: ADMIN_ACTIONS.FEATURE_FLAG_CHANGED,
-    details: { flag: input.key, from: flag.mode, to: mode, rolloutPct },
+    details: {
+      flag: input.key,
+      from: flag.mode,
+      to: mode,
+      rolloutPct,
+      owner: input.owner.trim() || null,
+      purpose: input.purpose.trim() || null,
+      environmentScope,
+      riskLevel: input.riskLevel.trim().toLowerCase() || "standard",
+      killSwitch: input.killSwitch,
+      allowedUserCount: allowedUserIds.length,
+      changeSummary,
+    },
   });
 
   revalidatePath("/admin/feature-flags");
