@@ -409,6 +409,7 @@ exports.Prisma.SyncAccountSettingsScalarFieldEnum = {
   syncAccountId: 'syncAccountId',
   syncDirection: 'syncDirection',
   conflictPolicy: 'conflictPolicy',
+  capabilityProfileOverride: 'capabilityProfileOverride',
   bookAllowlist: 'bookAllowlist',
   syncFrequencyMinutes: 'syncFrequencyMinutes',
   requireReauthToEdit: 'requireReauthToEdit',

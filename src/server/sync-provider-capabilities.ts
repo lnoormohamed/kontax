@@ -7,10 +7,22 @@ import type {
 
 export type SyncProviderCapabilityProfileId =
   | "carddav-generic"
+  | "carddav-generic-safe"
   | "carddav-icloud"
   | "carddav-fastmail"
   | "google"
   | "microsoft";
+
+export type CardDavCapabilityProfileOverrideId =
+  | "carddav-generic-safe"
+  | "carddav-icloud"
+  | "carddav-fastmail";
+
+export const CARD_DAV_CAPABILITY_OVERRIDE_IDS = [
+  "carddav-generic-safe",
+  "carddav-icloud",
+  "carddav-fastmail",
+] as const satisfies readonly CardDavCapabilityProfileOverrideId[];
 
 export type SyncProviderCapabilityProfile = {
   id: SyncProviderCapabilityProfileId;
@@ -78,6 +90,7 @@ type SyncProviderCapabilityInput = {
   baseUrl?: string | null;
   addressBookUrl?: string | null;
   label?: string | null;
+  capabilityProfileOverride?: string | null;
 };
 
 const GOOGLE_PROFILE: SyncProviderCapabilityProfile = {
@@ -99,12 +112,12 @@ const MICROSOFT_PROFILE: SyncProviderCapabilityProfile = {
 };
 
 const GENERIC_CARDDAV_PROFILE: SyncProviderCapabilityProfile = {
-  id: "carddav-generic",
+  id: "carddav-generic-safe",
   provider: "CARDDAV",
   variant: "generic",
   fields: {
     birthday: "full",
-    significantDates: "full",
+    significantDates: "none",
   },
 };
 
@@ -145,11 +158,52 @@ const includesAny = (value: string | null | undefined, needles: string[]) => {
   return Boolean(normalized && needles.some((needle) => normalized.includes(needle)));
 };
 
+const normalizeCardDavCapabilityProfileId = (
+  id: string | null | undefined,
+): CardDavCapabilityProfileOverrideId | null => {
+  if (!id) {
+    return null;
+  }
+
+  switch (id) {
+    case "carddav-generic":
+    case "carddav-generic-safe":
+      return "carddav-generic-safe";
+    case "carddav-icloud":
+    case "carddav-fastmail":
+      return id;
+    default:
+      return null;
+  }
+};
+
+export const coerceCardDavCapabilityProfileOverrideId = (
+  id: string | null | undefined,
+): CardDavCapabilityProfileOverrideId | null =>
+  normalizeCardDavCapabilityProfileId(id);
+
 const resolveCardDavProfile = ({
   baseUrl,
   addressBookUrl,
   label,
-}: Pick<SyncProviderCapabilityInput, "baseUrl" | "addressBookUrl" | "label">): SyncProviderCapabilityProfile => {
+  capabilityProfileOverride,
+}: Pick<
+  SyncProviderCapabilityInput,
+  "baseUrl" | "addressBookUrl" | "label" | "capabilityProfileOverride"
+>): SyncProviderCapabilityProfile => {
+  const overrideId = normalizeCardDavCapabilityProfileId(capabilityProfileOverride);
+  if (overrideId === "carddav-icloud") {
+    return ICLOUD_CARDDAV_PROFILE;
+  }
+
+  if (overrideId === "carddav-fastmail") {
+    return FASTMAIL_CARDDAV_PROFILE;
+  }
+
+  if (overrideId === "carddav-generic-safe") {
+    return GENERIC_CARDDAV_PROFILE;
+  }
+
   const hosts = [...getHostnames(baseUrl), ...getHostnames(addressBookUrl)];
 
   if (
@@ -183,6 +237,32 @@ export const resolveSyncProviderCapabilityProfile = (
   return resolveCardDavProfile(input);
 };
 
+export const getSyncProviderCapabilityProfileLabel = (
+  profile: SyncProviderCapabilityProfile,
+) => {
+  switch (normalizeCardDavCapabilityProfileId(profile.id)) {
+    case "carddav-generic-safe":
+      return "Generic safe";
+    case "carddav-icloud":
+      return "Verified iCloud";
+    case "carddav-fastmail":
+      return "Verified Fastmail";
+    default:
+      switch (profile.id) {
+        case "google":
+          return "Google Contacts";
+        case "microsoft":
+          return "Outlook";
+        default:
+          return "Provider default";
+      }
+  }
+};
+
+export const isGenericSafeCardDavProfile = (
+  profile: SyncProviderCapabilityProfile,
+) => normalizeCardDavCapabilityProfileId(profile.id) === "carddav-generic-safe";
+
 export const providerSupportsSignificantDates = (
   profile: SyncProviderCapabilityProfile,
 ) => profile.fields.significantDates === "full";
@@ -191,6 +271,9 @@ export const getSyncProviderCapabilityProfileDisplayName = (
   profile: SyncProviderCapabilityProfile,
 ) => {
   switch (profile.id) {
+    case "carddav-generic":
+    case "carddav-generic-safe":
+      return "this CardDAV provider";
     case "carddav-icloud":
       return "iCloud";
     case "carddav-fastmail":
@@ -284,6 +367,14 @@ export const getProviderCapabilityNotice = (
 
   if (unsupportedFieldFamilies.length === 0) {
     return null;
+  }
+
+  if (isGenericSafeCardDavProfile(profile)) {
+    return {
+      title: "Safe compatibility mode is on",
+      body: "Kontax has not verified every field for this CardDAV provider yet. Significant dates stay in Kontax until this connection is explicitly verified or overridden.",
+      unsupportedFieldFamilies,
+    };
   }
 
   const providerName = getSyncProviderCapabilityProfileDisplayName(profile);

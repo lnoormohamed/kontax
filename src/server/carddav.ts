@@ -1,6 +1,7 @@
 import type { PortableContactInput } from "~/server/contact-portability";
 import { contactsToVCard } from "~/server/contact-portability";
 import {
+  type SyncProviderCapabilityProfile,
   getCardDavVCardFlavor,
   projectPortableContactForProvider,
   resolveSyncProviderCapabilityProfile,
@@ -784,11 +785,14 @@ const buildCardDavContactBody = (
   contact: PortableContactInput,
   uid: string,
   addressBookUrl: string,
+  capabilityProfile?: SyncProviderCapabilityProfile,
 ) => {
-  const profile = resolveSyncProviderCapabilityProfile({
-    provider: "CARDDAV",
-    addressBookUrl,
-  });
+  const profile =
+    capabilityProfile ??
+    resolveSyncProviderCapabilityProfile({
+      provider: "CARDDAV",
+      addressBookUrl,
+    });
   const projected = projectPortableContactForProvider(contact, profile);
   return contactsToVCard([projected], { flavor: getCardDavVCardFlavor(profile) }).replace(
     /\r\nEND:VCARD$/,
@@ -801,12 +805,14 @@ export const pushCardDavContact = async ({
   credentials,
   remoteUid,
   contact,
+  capabilityProfile,
   hrefOverride,
 }: {
   addressBookUrl: string;
   credentials: CardDavCredentials;
   remoteUid: string;
   contact: PortableContactInput;
+  capabilityProfile?: SyncProviderCapabilityProfile;
   hrefOverride?: string;
 }): Promise<CardDavPushResult> => {
   const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
@@ -816,7 +822,12 @@ export const pushCardDavContact = async ({
   // update the contact's UID, which then breaks future REPORT lookups (the new UID won't
   // match our contactByUid map, triggering spurious bootstrap attempts).
   const uidForBody = remoteUid;
-  const body = buildCardDavContactBody(contact, uidForBody, collectionUrl);
+  const body = buildCardDavContactBody(
+    contact,
+    uidForBody,
+    collectionUrl,
+    capabilityProfile,
+  );
 
   let response: Response;
   // Explicitly convert to UTF-8 Buffer so the underlying HTTP stack cannot

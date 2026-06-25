@@ -20,6 +20,8 @@ import {
   getSyncAccountOperationalHealth,
 } from "~/server/sync-health";
 import {
+  coerceCardDavCapabilityProfileOverrideId,
+  getSyncProviderCapabilityProfileLabel,
   getProviderCapabilityNotice,
   resolveSyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
@@ -223,6 +225,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
             select: {
               syncDirection: true,
               conflictPolicy: true,
+              capabilityProfileOverride: true,
               syncFrequencyMinutes: true,
               bookAllowlist: true,
               importLabelId: true,
@@ -280,6 +283,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
             select: {
               syncDirection: true,
               conflictPolicy: true,
+              capabilityProfileOverride: true,
               syncFrequencyMinutes: true,
               bookAllowlist: true,
               importLabelId: true,
@@ -308,6 +312,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
       baseUrl: acct.baseUrl,
       addressBookUrl: acct.addressBookUrl,
       label: acct.label,
+      capabilityProfileOverride: acct.settings?.capabilityProfileOverride ?? null,
     });
     const capabilityNotice = getProviderCapabilityNotice(capabilityProfile);
     const recentJobs = acct.syncJobs.map((j) => ({
@@ -373,6 +378,12 @@ export default async function SyncPage({ searchParams }: PageProps) {
       // SyncAccount column when no settings row exists yet.
       direction: acct.settings?.syncDirection ?? acct.syncDirection,
       conflictPolicy: acct.settings?.conflictPolicy ?? "SERVER_WINS",
+      capabilityProfileOverride: coerceCardDavCapabilityProfileOverrideId(
+        acct.settings?.capabilityProfileOverride ?? null,
+      ),
+      capabilityProfileLabel: getSyncProviderCapabilityProfileLabel(
+        capabilityProfile,
+      ),
       syncFrequencyMinutes: acct.settings?.syncFrequencyMinutes ?? null,
       bookAllowlist: acct.settings?.bookAllowlist ?? [],
       // P36 advanced settings (fall back to column defaults when no row exists).

@@ -16,6 +16,7 @@ const WARN_FG = "#7a5a1a";
 // ── settings vocabulary (P36-DB01 design copy) ───────────────────────────────
 type SyncDirection = SyncAccountData["direction"];
 type ConflictPolicy = SyncAccountData["conflictPolicy"];
+type CapabilityOverride = SyncAccountData["capabilityProfileOverride"];
 
 const DIR_OPTS: { v: SyncDirection; name: string; desc: string }[] = [
   { v: "TWO_WAY", name: "Two-way", desc: "Push and pull changes" },
@@ -37,6 +38,15 @@ const FREQ_OPTS: { v: string; label: string; pro?: boolean }[] = [
   { v: "360", label: "Every 6 hours" },
   { v: "1440", label: "Every 24 hours" },
   { v: "manual", label: "Manual only" },
+];
+const CAPABILITY_OPTS: Array<{
+  value: "" | NonNullable<CapabilityOverride>;
+  label: string;
+}> = [
+  { value: "", label: "Auto-detect from provider" },
+  { value: "carddav-generic-safe", label: "Generic safe compatibility mode" },
+  { value: "carddav-icloud", label: "Verified iCloud profile" },
+  { value: "carddav-fastmail", label: "Verified Fastmail profile" },
 ];
 const PLAN_FREQ_LABEL = "every 60 minutes"; // platform default (DEFAULT_SYNC_FREQUENCY_MINUTES)
 const RETRY_OPTS: { value: string; label: string }[] = [
@@ -526,6 +536,7 @@ function BookAllowlist({
 type SettingsDraft = {
   direction: SyncDirection;
   policy: ConflictPolicy;
+  capabilityProfileOverride: "" | NonNullable<CapabilityOverride>;
   freq: string;
   importLabelId: string; // "" = no label
   deletionGuard: boolean; // whether the deletion threshold is enabled
@@ -542,6 +553,7 @@ type SettingsDraft = {
 const seedDraft = (account: SyncAccountData): SettingsDraft => ({
   direction: account.direction,
   policy: account.conflictPolicy,
+  capabilityProfileOverride: account.capabilityProfileOverride ?? "",
   freq: freqToSelect(account.syncFrequencyMinutes),
   importLabelId: account.importLabelId ?? "",
   deletionGuard: account.maxDeletionsThreshold != null,
@@ -591,6 +603,7 @@ export function ConnectionSettings({
     account.id,
     account.direction,
     account.conflictPolicy,
+    account.capabilityProfileOverride,
     account.syncFrequencyMinutes,
     account.importLabelId,
     account.maxDeletionsThreshold,
@@ -614,6 +627,7 @@ export function ConnectionSettings({
   const dirty =
     draft.direction !== baseline.direction ||
     draft.policy !== baseline.policy ||
+    draft.capabilityProfileOverride !== baseline.capabilityProfileOverride ||
     draft.freq !== baseline.freq ||
     draft.importLabelId !== baseline.importLabelId ||
     draft.deletionGuard !== baseline.deletionGuard ||
@@ -653,6 +667,8 @@ export function ConnectionSettings({
     syncAccountId: account.id,
     syncDirection: draft.direction,
     conflictPolicy: draft.policy,
+    capabilityProfileOverride:
+      draft.capabilityProfileOverride === "" ? null : draft.capabilityProfileOverride,
     syncFrequencyMinutes: selectToFreq(draft.freq),
     importLabelId: draft.importLabelId === "" ? null : draft.importLabelId,
     maxDeletionsThreshold: maxDeletionsValue(),
@@ -699,6 +715,12 @@ export function ConnectionSettings({
       syncAccountId: account.id,
       ...(draft.direction !== baseline.direction ? { syncDirection: draft.direction } : {}),
       ...(draft.policy !== baseline.policy ? { conflictPolicy: draft.policy } : {}),
+      ...(draft.capabilityProfileOverride !== baseline.capabilityProfileOverride
+        ? {
+            capabilityProfileOverride:
+              draft.capabilityProfileOverride === "" ? null : draft.capabilityProfileOverride,
+          }
+        : {}),
       ...(draft.freq !== baseline.freq ? { syncFrequencyMinutes: selectToFreq(draft.freq) } : {}),
       ...(draft.importLabelId !== baseline.importLabelId
         ? { importLabelId: draft.importLabelId === "" ? null : draft.importLabelId }
@@ -827,6 +849,28 @@ export function ConnectionSettings({
               </div>
             </div>
           </div>
+        ) : null}
+
+        {isCardDAV ? (
+          <OptSection label="Provider compatibility">
+            <div style={{ display: "grid", gap: 10 }}>
+              <OptSelect
+                value={draft.capabilityProfileOverride}
+                onChange={(v) =>
+                  patch({
+                    capabilityProfileOverride:
+                      v as SettingsDraft["capabilityProfileOverride"],
+                  })
+                }
+                options={CAPABILITY_OPTS}
+              />
+              <div style={{ fontSize: 12.5, lineHeight: 1.5, color: T.ink2 }}>
+                {draft.capabilityProfileOverride === ""
+                  ? `Auto-detect is active. This connection currently resolves as ${account.capabilityProfileLabel}.`
+                  : "This override pins the connection to a verified compatibility profile until you switch back to auto-detect."}
+              </div>
+            </div>
+          </OptSection>
         ) : null}
 
         {/* §1 Direction */}

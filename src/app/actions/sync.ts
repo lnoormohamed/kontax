@@ -34,6 +34,7 @@ import {
   requireSyncSettingsElevation,
 } from "~/server/sync-elevation";
 import {
+  CARD_DAV_CAPABILITY_OVERRIDE_IDS,
   buildProviderSupportedContactShadow,
   providerSupportsSignificantDates,
   resolveSyncProviderCapabilityProfile,
@@ -49,6 +50,7 @@ const syncResolutionStrategySchema = z.enum([
   "ARCHIVE_LOCAL",
   "MANUAL_MERGE",
 ]);
+const cardDavCapabilityOverrideSchema = z.enum(CARD_DAV_CAPABILITY_OVERRIDE_IDS);
 
 const createSyncAccountSchema = z.object({
   label: z.string().trim().min(1, "Label is required.").max(120),
@@ -1602,6 +1604,11 @@ export const resolveSyncConflict = async (formData: FormData) => {
           label: true,
           addressBookUrl: true,
           credentialReference: true,
+          settings: {
+            select: {
+              capabilityProfileOverride: true,
+            },
+          },
         },
       },
       syncContactLink: {
@@ -1661,6 +1668,8 @@ export const resolveSyncConflict = async (formData: FormData) => {
     baseUrl: syncAccount.baseUrl,
     addressBookUrl: syncAccount.addressBookUrl,
     label: syncAccount.label,
+    capabilityProfileOverride:
+      syncAccount.settings?.capabilityProfileOverride ?? null,
   });
 
   const resolvedAt = new Date();
@@ -2123,6 +2132,7 @@ const updateSyncAccountSettingsSchema = z.object({
   syncAccountId: z.string().min(1, "Sync account id is required."),
   syncDirection: syncDirectionSchema.optional(),
   conflictPolicy: conflictPolicySchema.optional(),
+  capabilityProfileOverride: cardDavCapabilityOverrideSchema.nullable().optional(),
   syncFrequencyMinutes: z.number().int().min(0).max(100_000).nullable().optional(),
   // P36 — advanced settings.
   importLabelId: z.string().min(1).nullable().optional(),
@@ -2157,6 +2167,7 @@ export const updateSyncAccountSettings = async (
     syncAccountId,
     syncDirection,
     conflictPolicy,
+    capabilityProfileOverride,
     syncFrequencyMinutes,
     importLabelId,
     maxDeletionsThreshold,
@@ -2200,6 +2211,7 @@ export const updateSyncAccountSettings = async (
       settings: {
         select: {
           conflictPolicy: true,
+          capabilityProfileOverride: true,
           syncFrequencyMinutes: true,
           importLabelId: true,
           maxDeletionsThreshold: true,
@@ -2228,6 +2240,10 @@ export const updateSyncAccountSettings = async (
     }
   }
 
+  if (capabilityProfileOverride !== undefined && account.provider !== "CARDDAV") {
+    return { ok: false, error: "Only CardDAV connections can override provider capabilities." };
+  }
+
   // P23-04: a change to a pulling direction (TWO_WAY / IMPORT_ONLY) may need to
   // catch up on remote contacts skipped while the connection was EXPORT_ONLY.
   const directionChanged = syncDirection != null && syncDirection !== account.syncDirection;
@@ -2241,6 +2257,8 @@ export const updateSyncAccountSettings = async (
     baseUrl: account.baseUrl,
     addressBookUrl: account.addressBookUrl,
     label: account.label,
+    capabilityProfileOverride:
+      capabilityProfileOverride ?? account.settings?.capabilityProfileOverride ?? null,
   });
 
   // Only include fields the caller actually sent (all are optional patches). The
@@ -2249,6 +2267,7 @@ export const updateSyncAccountSettings = async (
   const settingsPatch = {
     ...(syncDirection ? { syncDirection } : {}),
     ...(conflictPolicy ? { conflictPolicy } : {}),
+    ...(capabilityProfileOverride !== undefined ? { capabilityProfileOverride } : {}),
     ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
     ...(importLabelId !== undefined ? { importLabelId } : {}),
     ...(maxDeletionsThreshold !== undefined ? { maxDeletionsThreshold } : {}),
@@ -2403,6 +2422,11 @@ export const updateSyncAccountSettings = async (
       changes.push({ field, before: before ?? [], after });
     }
   };
+  diffScalar(
+    "capabilityProfileOverride",
+    prev?.capabilityProfileOverride,
+    capabilityProfileOverride,
+  );
   diffScalar("importLabelId", prev?.importLabelId, importLabelId);
   diffScalar("maxDeletionsThreshold", prev?.maxDeletionsThreshold, maxDeletionsThreshold);
   diffScalar("notifyOnFailure", prev?.notifyOnFailure, notifyOnFailure);
@@ -2447,6 +2471,7 @@ export const completeSyncSetup = async (
     syncAccountId,
     syncDirection,
     conflictPolicy,
+    capabilityProfileOverride,
     syncFrequencyMinutes,
     importLabelId,
     maxDeletionsThreshold,
@@ -2469,6 +2494,7 @@ export const completeSyncSetup = async (
     where: currentSyncAccountWhere(userId, syncAccountId),
     select: {
       id: true,
+      provider: true,
       status: true,
       setupCompletedAt: true,
       syncDirection: true,
@@ -2495,9 +2521,14 @@ export const completeSyncSetup = async (
     }
   }
 
+  if (capabilityProfileOverride !== undefined && account.provider !== "CARDDAV") {
+    return { ok: false, error: "Only CardDAV connections can override provider capabilities." };
+  }
+
   const settingsPatch = {
     ...(syncDirection ? { syncDirection } : {}),
     ...(conflictPolicy ? { conflictPolicy } : {}),
+    ...(capabilityProfileOverride !== undefined ? { capabilityProfileOverride } : {}),
     ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
     ...(importLabelId !== undefined ? { importLabelId } : {}),
     ...(maxDeletionsThreshold !== undefined ? { maxDeletionsThreshold } : {}),

@@ -64,6 +64,12 @@ export type SyncAccountData = {
   lastErrorCode: string | null;
   direction: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
   conflictPolicy: "SERVER_WINS" | "DEVICE_WINS" | "MANUAL";
+  capabilityProfileOverride:
+    | "carddav-generic-safe"
+    | "carddav-icloud"
+    | "carddav-fastmail"
+    | null;
+  capabilityProfileLabel: string;
   // P23-01 convention: null = platform default (60 min), 0 = manual only.
   syncFrequencyMinutes: number | null;
   bookAllowlist: string[];
@@ -2209,6 +2215,11 @@ function AddAccountForm({
                 boxSizing: "border-box",
               }}
             />
+            {sel.kind === "generic" ? (
+              <div style={{ marginTop: 8, fontSize: 12.5, lineHeight: 1.5, color: T.ink2 }}>
+                Unknown CardDAV providers start in safe compatibility mode. Kontax will sync core fields first and keep unsupported fields in Kontax until the connection is verified.
+              </div>
+            ) : null}
           </label>
           <FormField
             label="Username"

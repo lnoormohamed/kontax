@@ -579,6 +579,11 @@ export const runQueuedSyncJobs = async ({
           lastSyncCursor: true,
           credentialReference: true,
           credentialRevokedAt: true,
+          settings: {
+            select: {
+              capabilityProfileOverride: true,
+            },
+          },
           // P14-06: when linked to a team book, sync operates on that book's
           // contacts (owned by the group owner) instead of personal contacts.
           teamLink: {
@@ -928,6 +933,8 @@ export const runQueuedSyncJobs = async ({
         baseUrl: job.syncAccount.baseUrl,
         addressBookUrl: job.syncAccount.addressBookUrl,
         label: job.syncAccount.label,
+        capabilityProfileOverride:
+          job.syncAccount.settings?.capabilityProfileOverride ?? null,
       });
       const remoteEntries = await fetchCardDavAddressBookIndex({
         addressBookUrl: job.syncAccount.addressBookUrl,
@@ -1278,6 +1285,7 @@ export const runQueuedSyncJobs = async ({
             },
             remoteUid: candidate.remoteUid,
             contact: contactToPortable(candidate.contact),
+            capabilityProfile,
             hrefOverride: candidate.remoteHref || undefined,
           });
           pushedLinks.push({ linkId: candidate.linkId, newETag: result.etag, newHref: result.href });
@@ -1297,6 +1305,7 @@ export const runQueuedSyncJobs = async ({
             },
             remoteUid: contact.syncUid,
             contact: contactToPortable(contact),
+            capabilityProfile,
           });
           createdLinks.push({
             contactId: contact.id,

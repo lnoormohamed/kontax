@@ -24545,6 +24545,7 @@ export namespace Prisma {
     syncAccountId: string | null
     syncDirection: $Enums.SyncDirection | null
     conflictPolicy: $Enums.ConflictPolicy | null
+    capabilityProfileOverride: string | null
     syncFrequencyMinutes: number | null
     requireReauthToEdit: boolean | null
     importLabelId: string | null
@@ -24562,6 +24563,7 @@ export namespace Prisma {
     syncAccountId: string | null
     syncDirection: $Enums.SyncDirection | null
     conflictPolicy: $Enums.ConflictPolicy | null
+    capabilityProfileOverride: string | null
     syncFrequencyMinutes: number | null
     requireReauthToEdit: boolean | null
     importLabelId: string | null
@@ -24579,6 +24581,7 @@ export namespace Prisma {
     syncAccountId: number
     syncDirection: number
     conflictPolicy: number
+    capabilityProfileOverride: number
     bookAllowlist: number
     syncFrequencyMinutes: number
     requireReauthToEdit: number
@@ -24617,6 +24620,7 @@ export namespace Prisma {
     syncAccountId?: true
     syncDirection?: true
     conflictPolicy?: true
+    capabilityProfileOverride?: true
     syncFrequencyMinutes?: true
     requireReauthToEdit?: true
     importLabelId?: true
@@ -24634,6 +24638,7 @@ export namespace Prisma {
     syncAccountId?: true
     syncDirection?: true
     conflictPolicy?: true
+    capabilityProfileOverride?: true
     syncFrequencyMinutes?: true
     requireReauthToEdit?: true
     importLabelId?: true
@@ -24651,6 +24656,7 @@ export namespace Prisma {
     syncAccountId?: true
     syncDirection?: true
     conflictPolicy?: true
+    capabilityProfileOverride?: true
     bookAllowlist?: true
     syncFrequencyMinutes?: true
     requireReauthToEdit?: true
@@ -24758,6 +24764,7 @@ export namespace Prisma {
     syncAccountId: string
     syncDirection: $Enums.SyncDirection
     conflictPolicy: $Enums.ConflictPolicy
+    capabilityProfileOverride: string | null
     bookAllowlist: string[]
     syncFrequencyMinutes: number | null
     requireReauthToEdit: boolean
@@ -24797,6 +24804,7 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncDirection?: boolean
     conflictPolicy?: boolean
+    capabilityProfileOverride?: boolean
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
@@ -24819,6 +24827,7 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncDirection?: boolean
     conflictPolicy?: boolean
+    capabilityProfileOverride?: boolean
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
@@ -24841,6 +24850,7 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncDirection?: boolean
     conflictPolicy?: boolean
+    capabilityProfileOverride?: boolean
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
@@ -24863,6 +24873,7 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncDirection?: boolean
     conflictPolicy?: boolean
+    capabilityProfileOverride?: boolean
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
@@ -24878,7 +24889,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
+  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
   export type SyncAccountSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
     importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
@@ -24903,6 +24914,7 @@ export namespace Prisma {
       syncAccountId: string
       syncDirection: $Enums.SyncDirection
       conflictPolicy: $Enums.ConflictPolicy
+      capabilityProfileOverride: string | null
       bookAllowlist: string[]
       syncFrequencyMinutes: number | null
       requireReauthToEdit: boolean
@@ -25345,6 +25357,7 @@ export namespace Prisma {
     readonly syncAccountId: FieldRef<"SyncAccountSettings", 'String'>
     readonly syncDirection: FieldRef<"SyncAccountSettings", 'SyncDirection'>
     readonly conflictPolicy: FieldRef<"SyncAccountSettings", 'ConflictPolicy'>
+    readonly capabilityProfileOverride: FieldRef<"SyncAccountSettings", 'String'>
     readonly bookAllowlist: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly syncFrequencyMinutes: FieldRef<"SyncAccountSettings", 'Int'>
     readonly requireReauthToEdit: FieldRef<"SyncAccountSettings", 'Boolean'>
@@ -61748,6 +61761,7 @@ export namespace Prisma {
     syncAccountId: 'syncAccountId',
     syncDirection: 'syncDirection',
     conflictPolicy: 'conflictPolicy',
+    capabilityProfileOverride: 'capabilityProfileOverride',
     bookAllowlist: 'bookAllowlist',
     syncFrequencyMinutes: 'syncFrequencyMinutes',
     requireReauthToEdit: 'requireReauthToEdit',
@@ -64776,6 +64790,7 @@ export namespace Prisma {
     syncAccountId?: StringFilter<"SyncAccountSettings"> | string
     syncDirection?: EnumSyncDirectionFilter<"SyncAccountSettings"> | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    capabilityProfileOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
@@ -64798,6 +64813,7 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncDirection?: SortOrder
     conflictPolicy?: SortOrder
+    capabilityProfileOverride?: SortOrderInput | SortOrder
     bookAllowlist?: SortOrder
     syncFrequencyMinutes?: SortOrderInput | SortOrder
     requireReauthToEdit?: SortOrder
@@ -64823,6 +64839,7 @@ export namespace Prisma {
     NOT?: SyncAccountSettingsWhereInput | SyncAccountSettingsWhereInput[]
     syncDirection?: EnumSyncDirectionFilter<"SyncAccountSettings"> | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    capabilityProfileOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
@@ -64845,6 +64862,7 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncDirection?: SortOrder
     conflictPolicy?: SortOrder
+    capabilityProfileOverride?: SortOrderInput | SortOrder
     bookAllowlist?: SortOrder
     syncFrequencyMinutes?: SortOrderInput | SortOrder
     requireReauthToEdit?: SortOrder
@@ -64873,6 +64891,7 @@ export namespace Prisma {
     syncAccountId?: StringWithAggregatesFilter<"SyncAccountSettings"> | string
     syncDirection?: EnumSyncDirectionWithAggregatesFilter<"SyncAccountSettings"> | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyWithAggregatesFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    capabilityProfileOverride?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolWithAggregatesFilter<"SyncAccountSettings"> | boolean
@@ -69658,6 +69677,7 @@ export namespace Prisma {
     id?: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -69679,6 +69699,7 @@ export namespace Prisma {
     syncAccountId: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -69698,6 +69719,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -69719,6 +69741,7 @@ export namespace Prisma {
     syncAccountId?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -69739,6 +69762,7 @@ export namespace Prisma {
     syncAccountId: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -69758,6 +69782,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -69777,6 +69802,7 @@ export namespace Prisma {
     syncAccountId?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -74584,6 +74610,7 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncDirection?: SortOrder
     conflictPolicy?: SortOrder
+    capabilityProfileOverride?: SortOrder
     bookAllowlist?: SortOrder
     syncFrequencyMinutes?: SortOrder
     requireReauthToEdit?: SortOrder
@@ -74612,6 +74639,7 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncDirection?: SortOrder
     conflictPolicy?: SortOrder
+    capabilityProfileOverride?: SortOrder
     syncFrequencyMinutes?: SortOrder
     requireReauthToEdit?: SortOrder
     importLabelId?: SortOrder
@@ -74629,6 +74657,7 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncDirection?: SortOrder
     conflictPolicy?: SortOrder
+    capabilityProfileOverride?: SortOrder
     syncFrequencyMinutes?: SortOrder
     requireReauthToEdit?: SortOrder
     importLabelId?: SortOrder
@@ -90955,6 +90984,7 @@ export namespace Prisma {
     id?: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -90974,6 +91004,7 @@ export namespace Prisma {
     id?: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -91495,6 +91526,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -91514,6 +91546,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -97251,6 +97284,7 @@ export namespace Prisma {
     id?: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -97271,6 +97305,7 @@ export namespace Prisma {
     syncAccountId: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -97462,6 +97497,7 @@ export namespace Prisma {
     syncAccountId?: StringFilter<"SyncAccountSettings"> | string
     syncDirection?: EnumSyncDirectionFilter<"SyncAccountSettings"> | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    capabilityProfileOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
@@ -107134,6 +107170,7 @@ export namespace Prisma {
     syncAccountId: string
     syncDirection?: $Enums.SyncDirection
     conflictPolicy?: $Enums.ConflictPolicy
+    capabilityProfileOverride?: string | null
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
@@ -107152,6 +107189,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -107172,6 +107210,7 @@ export namespace Prisma {
     syncAccountId?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
@@ -107191,6 +107230,7 @@ export namespace Prisma {
     syncAccountId?: StringFieldUpdateOperationsInput | string
     syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
     conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    capabilityProfileOverride?: NullableStringFieldUpdateOperationsInput | string | null
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
