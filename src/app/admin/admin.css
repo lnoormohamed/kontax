@@ -352,6 +352,61 @@
 .ad-action-note strong { color: #1d2823; font-weight: 600; }
 .ad-action-flag { display: inline-flex; align-items: center; gap: 4px; color: #4158f4; font-weight: 600; margin-left: 6px; }
 
+/* ───────────────── sync ops + support console ───────────────── */
+.ad-inline-link { font-size: 12.5px; font-weight: 600; color: #4158f4; }
+.ad-inline-link:hover { text-decoration: underline; }
+.ad-sync-mini-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.ad-sync-mini {
+  background: #fff;
+  border: 1px solid #d8ddd6;
+  border-radius: 13px;
+  padding: 16px;
+}
+.ad-sync-mini__label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8b938c; }
+.ad-sync-mini__value { margin-top: 8px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #1d2823; }
+.ad-sync-provider-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.ad-sync-provider-card { padding: 18px; }
+.ad-sync-provider-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ad-sync-provider-card__title { font-size: 14px; font-weight: 600; color: #1d2823; }
+.ad-sync-provider-card__sub { margin-top: 5px; font-size: 12.5px; color: #5c655e; }
+.ad-sync-provider-card__stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 12.5px; color: #5c655e; }
+.ad-support-stack { display: grid; gap: 18px; }
+.ad-support-stack__title { margin-bottom: 10px; font-size: 13px; font-weight: 700; color: #1d2823; }
+.ad-support-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px dashed #d8ddd6;
+  border-radius: 11px;
+  background: #fafbf9;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #5c655e;
+}
+.ad-support-callout {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #e5e7e2;
+  border-radius: 12px;
+  background: #fafbf9;
+}
+.ad-support-callout__title { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #8b938c; }
+.ad-support-callout__body { margin-top: 8px; font-size: 13px; line-height: 1.55; color: #1d2823; }
+.ad-support-list { display: flex; flex-direction: column; }
+.ad-support-list__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+}
+.ad-support-list__row + .ad-support-list__row { border-top: 1px solid #f0f1ee; }
+.ad-support-list__main, .ad-support-list__meta { min-width: 0; }
+.ad-support-list__title { font-size: 13.5px; font-weight: 600; color: #1d2823; }
+.ad-support-list__sub { margin-top: 4px; font-size: 12.5px; color: #5c655e; }
+.ad-support-list__body { margin-top: 6px; font-size: 12.5px; line-height: 1.55; color: #5c655e; }
+.ad-support-list__meta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex: 0 0 auto; }
+.ad-support-list__tail { font-size: 12px; color: #8b938c; text-align: right; }
+
 /* ───────────────── metrics ───────────────── */
 .ad-health { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid; border-radius: 13px; margin-bottom: 20px; position: relative; }
 .ad-health-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
@@ -480,6 +535,8 @@
   .ad-detail-grid { grid-template-columns: 1fr; }
   .ad-detail-actions { position: static; }
   .ad-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ad-sync-mini-grid,
+  .ad-sync-provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 /* Mobile horizontal nav strip — hidden on desktop */
 .ad-mob-nav {
@@ -535,6 +592,8 @@
   .ad-home-two-col,
   .ad-home-stat-grid,
   .ad-home-action-grid,
+  .ad-sync-mini-grid,
+  .ad-sync-provider-grid,
   .ad-home-queue__head,
   .ad-home-queue__item { grid-template-columns: 1fr; }
   .ad-home-hero,
@@ -544,10 +603,12 @@
   .ad-thead { display: none; }
   .ad-home-list__head,
   .ad-home-queue__head,
-  .ad-home-queue__item { flex-direction: column; align-items: flex-start; }
+  .ad-home-queue__item,
+  .ad-support-list__row { flex-direction: column; align-items: flex-start; }
   .ad-home-list__meta,
   .ad-home-queue__meta,
-  .ad-home-queue__item-meta { align-items: flex-start; }
+  .ad-home-queue__item-meta,
+  .ad-support-list__meta { align-items: flex-start; }
   .ad-home-recent__head { display: none; }
   .ad-home-recent__row {
     grid-template-columns: 1fr;

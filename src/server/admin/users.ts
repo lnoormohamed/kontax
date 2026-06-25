@@ -1,7 +1,17 @@
 import "server-only";
 
 import { db } from "~/server/db";
-import { countLiveSyncAccountSlots, getUserBillingContext } from "~/server/billing";
+import {
+  countLiveSyncAccountSlots,
+  getLifecycleAccessPolicy,
+  getUserBillingContext,
+} from "~/server/billing";
+import { getSyncAccountOperationalHealth, getSyncErrorSupportBucket } from "~/server/sync-health";
+import {
+  getSyncProviderCapabilityProfileLabel,
+  isGenericSafeCardDavProfile,
+  resolveSyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 
 const PLAN_LABEL: Record<string, string> = {
   FREE: "Free",
@@ -28,6 +38,34 @@ export type AdminUserRow = {
 
 const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(d);
+
+const providerLabel = (provider: string) => {
+  switch (provider) {
+    case "GOOGLE":
+      return "Google";
+    case "MICROSOFT":
+      return "Microsoft";
+    default:
+      return "CardDAV";
+  }
+};
+
+const syncStatusLabel = (status: string) => {
+  switch (status) {
+    case "NEEDS_REAUTH":
+      return "Needs re-auth";
+    case "ERROR":
+      return "Error";
+    case "PAUSED":
+      return "Paused";
+    case "DISCONNECTED":
+      return "Disconnected";
+    case "RETIRED":
+      return "Retired";
+    default:
+      return "Active";
+  }
+};
 
 const SEARCH_LIMIT = 50;
 
@@ -145,7 +183,19 @@ export async function loadUserDetail(userId: string) {
 
   const monthStart = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1));
 
-  const [billing, contactsUsed, syncUsed, appPwdUsed, importsAgg, group, activityRaw, sessionsRaw, lastSession] =
+  const [
+    billing,
+    contactsUsed,
+    syncUsed,
+    appPwdUsed,
+    importsAgg,
+    group,
+    activityRaw,
+    sessionsRaw,
+    lastSession,
+    syncAccountsRaw,
+    adminActionsRaw,
+  ] =
     await Promise.all([
       getUserBillingContext(userId),
       db.contact.count({ where: { userId } }),
@@ -186,11 +236,126 @@ export async function loadUserDetail(userId: string) {
         orderBy: { lastActiveAt: "desc" },
         select: { lastActiveAt: true },
       }),
+      db.syncAccount.findMany({
+        where: { userId },
+        orderBy: [{ updatedAt: "desc" }],
+        select: {
+          id: true,
+          connectionId: true,
+          label: true,
+          provider: true,
+          status: true,
+          baseUrl: true,
+          addressBookUrl: true,
+          lastErrorCode: true,
+          lastErrorAt: true,
+          lastSucceededAt: true,
+          updatedAt: true,
+          settings: { select: { capabilityProfileOverride: true } },
+          syncJobs: {
+            orderBy: { createdAt: "desc" },
+            take: 5,
+            select: { status: true, errorCode: true },
+          },
+          _count: {
+            select: {
+              syncConflicts: { where: { status: "OPEN" } },
+              syncLinks: true,
+            },
+          },
+        },
+      }),
+      db.adminAuditEvent.findMany({
+        where: {
+          targetUserId: userId,
+          action: {
+            in: [
+              "plan.override",
+              "account.suspend",
+              "account.unlock",
+              "account.delete.schedule",
+              "sync.capability.override",
+            ],
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        select: {
+          id: true,
+          action: true,
+          createdAt: true,
+          details: true,
+          admin: { select: { name: true, email: true } },
+        },
+      }),
     ]);
 
   const ent = billing.entitlements;
   const sub = user.subscriptions[0];
   const dayMs = 24 * 60 * 60 * 1000;
+  const lifecyclePolicy = getLifecycleAccessPolicy(user.lifecycleState);
+
+  const syncAccounts = syncAccountsRaw.map((account) => {
+    const capabilityProfile = resolveSyncProviderCapabilityProfile({
+      provider: account.provider,
+      baseUrl: account.baseUrl,
+      addressBookUrl: account.addressBookUrl,
+      label: account.label,
+      capabilityProfileOverride: account.settings?.capabilityProfileOverride ?? null,
+    });
+    const health = getSyncAccountOperationalHealth({
+      status: account.status,
+      lastErrorCode: account.lastErrorCode,
+      recentJobs: account.syncJobs.map((job) => ({
+        status: job.status,
+        errorCode: job.errorCode,
+      })),
+    });
+    return {
+      id: account.id,
+      href: `/admin/sync/${account.id}`,
+      connectionId: account.connectionId,
+      label: account.label,
+      provider: providerLabel(account.provider),
+      status: syncStatusLabel(account.status),
+      health,
+      profileLabel: getSyncProviderCapabilityProfileLabel(capabilityProfile),
+      genericSafe: isGenericSafeCardDavProfile(capabilityProfile),
+      openConflicts: account._count.syncConflicts,
+      syncLinks: account._count.syncLinks,
+      lastSuccess: account.lastSucceededAt ? relativeTime(account.lastSucceededAt) : "Never",
+      lastError: account.lastErrorAt ? relativeTime(account.lastErrorAt) : null,
+      supportBucket: getSyncErrorSupportBucket(account.lastErrorCode),
+      capabilityOverride: account.settings?.capabilityProfileOverride ?? null,
+    };
+  });
+
+  const supportNotes = adminActionsRaw.map((event) => {
+    const actor = event.admin?.name?.trim() ?? event.admin?.email ?? "Admin";
+    const details = (event.details ?? {}) as Record<string, unknown>;
+    const nextOverride =
+      typeof details.nextOverride === "string" ? details.nextOverride : null;
+    const reason = typeof details.reason === "string" ? details.reason : null;
+    const label =
+      event.action === "plan.override"
+        ? "Plan override updated"
+        : event.action === "account.suspend"
+          ? "Account suspended"
+          : event.action === "account.unlock"
+            ? "Account unlocked"
+            : event.action === "account.delete.schedule"
+              ? "Deletion scheduled"
+              : event.action === "sync.capability.override"
+                ? `Sync capability override set${nextOverride ? ` to ${nextOverride}` : " to auto-detect"}`
+                : event.action;
+    return {
+      id: event.id,
+      label,
+      when: relativeTime(event.createdAt),
+      actor,
+      reason,
+    };
+  });
 
   const usage = [
     {
@@ -246,6 +411,38 @@ export async function loadUserDetail(userId: string) {
       cancelAtPeriodEnd: sub?.cancelAtPeriodEnd ?? false,
     },
     usage,
+    billingDiagnostics: {
+      lifecycleState: user.lifecycleState,
+      lifecycleLabel: lifecyclePolicy.label,
+      lifecycleDescription: lifecyclePolicy.description,
+      canWrite: lifecyclePolicy.canWrite,
+      canAuthenticateExpected: lifecyclePolicy.canAuthenticateExpected,
+      basePlan: sub ? (PLAN_LABEL[sub.plan] ?? "Free") : "Free",
+      effectivePlan: PLAN_LABEL[billing.plan] ?? "Free",
+      subscriptionStatus: sub?.status ?? "FREE",
+      trialEndsAt: sub?.trialEndsAt ? fmtDate(sub.trialEndsAt) : null,
+      periodEndsAt: sub?.currentPeriodEnd ? fmtDate(sub.currentPeriodEnd) : null,
+      overrideReason: user.planOverrideReason?.trim() || null,
+      overrideAt: user.planOverriddenAt ? fmtDate(user.planOverriddenAt) : null,
+      scheduledDeleteAt: user.scheduledDeleteAt ? fmtDate(user.scheduledDeleteAt) : null,
+      syncAllowanceUsed: syncUsed,
+      syncAllowanceLimit: ent.syncAccountsLimit,
+      syncAllowanceRemaining: Math.max(0, ent.syncAccountsLimit - syncUsed),
+    },
+    syncSupport: {
+      summary: {
+        total: syncAccounts.length,
+        active: syncAccounts.filter((account) => account.status === "Active").length,
+        needsReauth: syncAccounts.filter((account) => account.status === "Needs re-auth").length,
+        errors: syncAccounts.filter((account) => account.status === "Error").length,
+        paused: syncAccounts.filter((account) => account.status === "Paused").length,
+        retired: syncAccounts.filter((account) => account.status === "Retired").length,
+        genericSafe: syncAccounts.filter((account) => account.genericSafe).length,
+        openConflicts: syncAccounts.reduce((sum, account) => sum + account.openConflicts, 0),
+      },
+      accounts: syncAccounts,
+      notes: supportNotes,
+    },
     group: group?.group
       ? {
           isTeam: group.group.type === "TEAM",

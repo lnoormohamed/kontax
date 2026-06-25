@@ -8,6 +8,7 @@ import { setImpersonation, clearImpersonation, readImpersonation } from "~/serve
 import { db } from "~/server/db";
 import { sendAccountSuspendedEmail } from "~/server/billing-emails";
 import { broadcastProductUpdate as broadcastProductUpdateToUsers } from "~/server/notifications";
+import { coerceCardDavCapabilityProfileOverrideId } from "~/server/sync-provider-capabilities";
 import type { SubscriptionPlan } from "../../../generated/prisma";
 
 type Result = { success: true } | { error: string };
@@ -186,6 +187,74 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
   });
 
   revalidatePath(`/admin/users/${target.id}`);
+  return { success: true };
+}
+
+export async function updateSyncCapabilityOverride(input: {
+  syncAccountId: string;
+  capabilityProfileOverride: string | null;
+  reason: string;
+}): Promise<Result> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const reason = input.reason.trim();
+  if (!reason) return { error: "REASON_REQUIRED" };
+
+  const normalizedOverride = coerceCardDavCapabilityProfileOverrideId(input.capabilityProfileOverride);
+  if (input.capabilityProfileOverride && !normalizedOverride) {
+    return { error: "INVALID_PROFILE" };
+  }
+
+  const target = await db.syncAccount.findUnique({
+    where: { id: input.syncAccountId },
+    select: {
+      id: true,
+      userId: true,
+      label: true,
+      provider: true,
+      connectionId: true,
+      user: { select: { email: true } },
+      settings: { select: { capabilityProfileOverride: true } },
+    },
+  });
+  if (!target) return { error: "SYNC_ACCOUNT_NOT_FOUND" };
+  if (target.provider !== "CARDDAV") return { error: "UNSUPPORTED_PROVIDER" };
+
+  await db.syncAccountSettings.upsert({
+    where: { syncAccountId: target.id },
+    update: { capabilityProfileOverride: normalizedOverride },
+    create: {
+      syncAccountId: target.id,
+      capabilityProfileOverride: normalizedOverride,
+    },
+  });
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.SYNC_CAPABILITY_OVERRIDE_UPDATED,
+    targetUserId: target.userId,
+    targetEmail: target.user.email,
+    details: {
+      syncAccountId: target.id,
+      label: target.label,
+      provider: target.provider,
+      connectionId: target.connectionId,
+      previousOverride: target.settings?.capabilityProfileOverride ?? null,
+      nextOverride: normalizedOverride,
+      reason,
+    },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/sync");
+  revalidatePath(`/admin/sync/${target.id}`);
+  revalidatePath(`/admin/users/${target.userId}`);
   return { success: true };
 }
 

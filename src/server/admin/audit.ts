@@ -13,6 +13,7 @@ export const ADMIN_ACTIONS = {
   USER_SUSPENDED: "account.suspend",
   USER_UNSUSPENDED: "account.unlock",
   USER_DELETION_SCHEDULED: "account.delete.schedule",
+  SYNC_CAPABILITY_OVERRIDE_UPDATED: "sync.capability.override",
   IMPERSONATION_START: "impersonation.start",
   IMPERSONATION_END: "impersonation.end",
   FEATURE_FLAG_CHANGED: "flag.update",

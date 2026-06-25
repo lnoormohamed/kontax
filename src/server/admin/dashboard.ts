@@ -221,7 +221,7 @@ export async function loadAdminOverview() {
       label: "Connections need re-auth",
       count: syncNeedsReauth,
       tone: syncNeedsReauth > 0 ? "action" : "healthy",
-      href: "/admin/metrics",
+      href: "/admin/sync",
       body:
         syncNeedsReauth > 0
           ? "At least one connected provider cannot refresh until credentials are fixed."
@@ -232,7 +232,7 @@ export async function loadAdminOverview() {
       label: "Sync accounts in error or paused",
       count: syncErrors + syncPaused,
       tone: syncErrors > 0 ? "warning" : syncPaused > 0 ? "watch" : "healthy",
-      href: "/admin/metrics",
+      href: "/admin/sync",
       body:
         syncErrors + syncPaused > 0
           ? "Review provider health and recent job failures before issues spread."
@@ -305,7 +305,7 @@ export async function loadAdminOverview() {
     {
       id: "sync-action",
       label: "Sync connections needing action",
-      href: "/admin/metrics",
+      href: "/admin/sync",
       count: syncQueueCount,
       tone:
         syncQueueItemsRaw.length > 0
@@ -428,7 +428,7 @@ export async function loadAdminOverview() {
         label: "Active sync accounts",
         value: syncActive.toLocaleString(),
         sub: `${(syncNeedsReauth + syncErrors + syncPaused).toLocaleString()} need review`,
-        href: "/admin/metrics",
+        href: "/admin/sync",
       },
       {
         id: "audit",
@@ -459,7 +459,7 @@ export async function loadAdminOverview() {
         id: "metrics",
         label: "Check platform health",
         body: "Review usage, growth, and error rates across the platform.",
-        href: "/admin/metrics",
+        href: "/admin/sync",
         icon: "metrics",
       },
       {

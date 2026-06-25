@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 
 import { assertAdmin } from "~/server/admin/guard";
+import { adminAttentionMeta } from "~/server/admin/attention";
 import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { loadUserDetail } from "~/server/admin/users";
 import { AdminHeader } from "../../_components/admin-header";
@@ -38,6 +40,15 @@ function Progress({ pct, tone }: { pct: number | null; tone: string }) {
     <span className="ad-prog">
       <span className="ad-prog-fill" style={{ width: `${Math.round(pct * 100)}%`, background: tone }} />
     </span>
+  );
+}
+
+function SupportMiniStat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="ad-sync-mini">
+      <div className="ad-sync-mini__label">{label}</div>
+      <div className="ad-sync-mini__value tnum">{value}</div>
+    </div>
   );
 }
 
@@ -145,6 +156,50 @@ export default async function AdminUserDetailPage({
 
               <section className="ad-card">
                 <div className="ad-card-head">
+                  <h3 className="ad-card-title">Billing & lifecycle</h3>
+                </div>
+                <div className="ad-kv-grid">
+                  <KV k="Effective plan" v={d.billingDiagnostics.effectivePlan} />
+                  <KV k="Base plan" v={d.billingDiagnostics.basePlan} />
+                  <KV k="Lifecycle" v={d.billingDiagnostics.lifecycleLabel} />
+                  <KV
+                    k="Writes allowed"
+                    v={d.billingDiagnostics.canWrite ? "Yes" : "Read only"}
+                    vColor={d.billingDiagnostics.canWrite ? AD.green : AD.amber}
+                  />
+                  <KV
+                    k="Authentication expected"
+                    v={d.billingDiagnostics.canAuthenticateExpected ? "Yes" : "Blocked"}
+                    vColor={d.billingDiagnostics.canAuthenticateExpected ? AD.green : AD.red}
+                  />
+                  <KV
+                    k="Sync slots"
+                    v={`${d.billingDiagnostics.syncAllowanceUsed} / ${d.billingDiagnostics.syncAllowanceLimit}`}
+                  />
+                  {d.billingDiagnostics.periodEndsAt ? (
+                    <KV k="Current period ends" v={d.billingDiagnostics.periodEndsAt} />
+                  ) : null}
+                  {d.billingDiagnostics.trialEndsAt ? (
+                    <KV k="Trial ends" v={d.billingDiagnostics.trialEndsAt} />
+                  ) : null}
+                  {d.billingDiagnostics.overrideAt ? (
+                    <KV k="Override applied" v={d.billingDiagnostics.overrideAt} />
+                  ) : null}
+                  {d.billingDiagnostics.scheduledDeleteAt ? (
+                    <KV k="Deletion scheduled" v={d.billingDiagnostics.scheduledDeleteAt} vColor={AD.red} />
+                  ) : null}
+                </div>
+                <div className="ad-support-note">{d.billingDiagnostics.lifecycleDescription}</div>
+                {d.billingDiagnostics.overrideReason ? (
+                  <div className="ad-support-callout">
+                    <div className="ad-support-callout__title">Override reason</div>
+                    <div className="ad-support-callout__body">{d.billingDiagnostics.overrideReason}</div>
+                  </div>
+                ) : null}
+              </section>
+
+              <section className="ad-card">
+                <div className="ad-card-head">
                   <h3 className="ad-card-title">Usage</h3>
                 </div>
                 <div className="ad-usage">
@@ -160,6 +215,87 @@ export default async function AdminUserDetailPage({
                   ))}
                 </div>
               </section>
+
+              <section className="ad-card">
+                <div className="ad-card-head">
+                  <h3 className="ad-card-title">Sync support console</h3>
+                  <Link href="/admin/sync" className="ad-inline-link">
+                    Open sync ops
+                  </Link>
+                </div>
+                <div className="ad-sync-mini-grid">
+                  <SupportMiniStat label="Connections" value={d.syncSupport.summary.total} />
+                  <SupportMiniStat label="Needs re-auth" value={d.syncSupport.summary.needsReauth} />
+                  <SupportMiniStat label="Errors" value={d.syncSupport.summary.errors} />
+                  <SupportMiniStat label="Paused" value={d.syncSupport.summary.paused} />
+                  <SupportMiniStat label="Generic safe" value={d.syncSupport.summary.genericSafe} />
+                  <SupportMiniStat label="Open conflicts" value={d.syncSupport.summary.openConflicts} />
+                </div>
+                {d.syncSupport.accounts.length === 0 ? (
+                  <div className="ad-support-note">This user has no connected sync accounts.</div>
+                ) : (
+                  <div className="ad-support-list">
+                    {d.syncSupport.accounts.map((account) => {
+                      const tone = adminAttentionMeta(
+                        account.health === "needs_reauth"
+                          ? "action"
+                          : account.health === "needs_attention" || account.health === "paused_for_safety"
+                            ? "warning"
+                            : account.health === "watch"
+                              ? "watch"
+                              : "healthy",
+                      );
+                      return (
+                        <Link key={account.id} href={account.href} className="ad-support-list__row">
+                          <div className="ad-support-list__main">
+                            <div className="ad-support-list__title">{account.label}</div>
+                            <div className="ad-support-list__sub">
+                              {account.provider} · {account.profileLabel}
+                              {account.genericSafe ? " · generic-safe" : ""}
+                              {account.connectionId ? ` · ${account.connectionId}` : ""}
+                            </div>
+                          </div>
+                          <div className="ad-support-list__meta">
+                            <span
+                              className="ad-home-status"
+                              style={{ background: tone.pill, color: tone.fg }}
+                            >
+                              <span className="ad-home-status__dot" style={{ background: tone.dot }} />
+                              {account.status}
+                            </span>
+                            <div className="ad-support-list__tail">
+                              {account.lastError ? `Error ${account.lastError}` : `Success ${account.lastSuccess}`}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+
+              {d.syncSupport.notes.length > 0 && (
+                <section className="ad-card">
+                  <div className="ad-card-head">
+                    <h3 className="ad-card-title">Support notes</h3>
+                  </div>
+                  <div className="ad-support-list">
+                    {d.syncSupport.notes.map((note) => (
+                      <div key={note.id} className="ad-support-list__row">
+                        <div className="ad-support-list__main">
+                          <div className="ad-support-list__title">{note.label}</div>
+                          <div className="ad-support-list__sub">
+                            {note.actor} · {note.when}
+                          </div>
+                          {note.reason ? (
+                            <div className="ad-support-list__body">{note.reason}</div>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {d.group && (
                 <section className="ad-card">
