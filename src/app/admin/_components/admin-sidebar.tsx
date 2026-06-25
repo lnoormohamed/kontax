@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AD, AdIcon } from "./admin-icons";
 
 const NAV = [
+  { id: "overview", label: "Overview", icon: "home", href: "/admin" },
   { id: "users", label: "Users", icon: "users", href: "/admin/users" },
   { id: "metrics", label: "Metrics", icon: "metrics", href: "/admin/metrics" },
   { id: "flags", label: "Feature Flags", icon: "flag", href: "/admin/feature-flags" },
@@ -14,16 +15,17 @@ const NAV = [
 ] as const;
 
 function activeId(pathname: string): string {
+  if (pathname === "/admin") return "overview";
   if (pathname.startsWith("/admin/metrics")) return "metrics";
   if (pathname.startsWith("/admin/feature-flags")) return "flags";
   if (pathname.startsWith("/admin/broadcast")) return "broadcast";
   if (pathname.startsWith("/admin/audit")) return "audit";
-  // /admin/users, /admin/users/[id], and /admin all map to Users.
+  // /admin/users and /admin/users/[id] map to Users.
   return "users";
 }
 
 export function AdminSidebar() {
-  const pathname = usePathname() ?? "/admin/users";
+  const pathname = usePathname() ?? "/admin";
   const active = activeId(pathname);
 
   return (

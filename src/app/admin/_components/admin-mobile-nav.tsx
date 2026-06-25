@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV = [
+  { id: "overview", label: "Overview", href: "/admin" },
   { id: "users", label: "Users", href: "/admin/users" },
   { id: "metrics", label: "Metrics", href: "/admin/metrics" },
   { id: "flags", label: "Flags", href: "/admin/feature-flags" },
@@ -12,6 +13,7 @@ const NAV = [
 ] as const;
 
 function activeId(pathname: string): string {
+  if (pathname === "/admin") return "overview";
   if (pathname.startsWith("/admin/metrics")) return "metrics";
   if (pathname.startsWith("/admin/feature-flags")) return "flags";
   if (pathname.startsWith("/admin/broadcast")) return "broadcast";
@@ -20,7 +22,7 @@ function activeId(pathname: string): string {
 }
 
 export function AdminMobileNav() {
-  const pathname = usePathname() ?? "/admin/users";
+  const pathname = usePathname() ?? "/admin";
   const active = activeId(pathname);
 
   return (
