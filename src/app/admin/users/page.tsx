@@ -118,7 +118,11 @@ export default async function AdminUsersPage({
 
   return (
     <>
-      <AdminHeader title="Users" adminName={admin.name} />
+      <AdminHeader
+        title="Users"
+        adminName={admin.name}
+        crumbs={[{ label: "Operations" }]}
+      />
       <div className="adm-content">
         <div className="ad-page">
           <UserSearch initial={q} />

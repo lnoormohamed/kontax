@@ -19,7 +19,11 @@ export default async function AdminFeatureFlagsPage() {
 
   return (
     <>
-      <AdminHeader title="Feature flags" adminName={admin.name} />
+      <AdminHeader
+        title="Feature flags"
+        adminName={admin.name}
+        crumbs={[{ label: "Governance" }]}
+      />
       <div className="adm-content">
         <div className="ad-page">
           <FlagsTable flags={flags} />

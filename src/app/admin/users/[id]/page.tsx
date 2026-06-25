@@ -72,7 +72,14 @@ export default async function AdminUserDetailPage({
 
   return (
     <>
-      <AdminHeader title={d.email} crumb={{ label: "Users", href: "/admin/users" }} adminName={admin.name} />
+      <AdminHeader
+        title={d.email}
+        crumbs={[
+          { label: "Operations" },
+          { label: "Users", href: "/admin/users" },
+        ]}
+        adminName={admin.name}
+      />
       <div className="adm-content">
         <div className="ad-page">
           {(d.suspended || d.deletionScheduled) && (

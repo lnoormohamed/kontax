@@ -3,26 +3,37 @@ import Link from "next/link";
 import { AD, AdIcon } from "./admin-icons";
 import { Avatar } from "./avatar";
 
-// Fixed 52px header (DB04 §1). `crumb` renders the "Users › {title}" breadcrumb
-// used by the user-detail page; otherwise a plain page title.
+type AdminCrumb = {
+  label: string;
+  href?: string;
+};
+
 export function AdminHeader({
   title,
-  crumb,
+  crumbs,
   adminName,
 }: {
   title: string;
-  crumb?: { label: string; href: string };
+  crumbs?: AdminCrumb[];
   adminName: string;
 }) {
   return (
     <header className="ad-header">
       <div className="ad-header-title">
-        {crumb ? (
+        {crumbs?.length ? (
           <>
-            <Link className="ad-crumb" href={crumb.href}>
-              {crumb.label}
-            </Link>
-            <AdIcon name="chev" size={15} c={AD.faint} />
+            {crumbs.map((crumb, index) => (
+              <span key={`${crumb.label}-${index}`} className="ad-crumb-wrap">
+                {crumb.href ? (
+                  <Link className="ad-crumb" href={crumb.href}>
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span className="ad-crumb ad-crumb--static">{crumb.label}</span>
+                )}
+                <AdIcon name="chev" size={15} c={AD.faint} />
+              </span>
+            ))}
             <span className="ad-crumb-cur">{title}</span>
           </>
         ) : (

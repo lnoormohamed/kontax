@@ -1,25 +1,56 @@
 import { redirect } from "next/navigation";
 
 import { assertAdmin } from "~/server/admin/guard";
+import {
+  adminAttentionForErrorRate,
+  adminAttentionMeta,
+} from "~/server/admin/attention";
 import { loadPlatformMetrics } from "~/server/admin/metrics";
 import { AdminHeader } from "../_components/admin-header";
 import { AD, AdIcon } from "../_components/admin-icons";
 
 export const dynamic = "force-dynamic";
 
-// Severity thresholds (DB04 §4): amber 5–15%, red >15%.
 function sev(rate: number) {
-  if (rate > 15) return { tone: AD.red, bg: "#fef2f2", fg: "#b91c1c", label: "Critical" };
-  if (rate >= 5) return { tone: AD.amber, bg: "#fffbeb", fg: "#b45309", label: "Warning" };
-  return { tone: "#16a34a", bg: "#f0fdf4", fg: "#15803d", label: "Healthy" };
+  const state = adminAttentionForErrorRate(rate);
+  const meta = adminAttentionMeta(state);
+  return { tone: meta.dot, bg: meta.pill, fg: meta.fg, label: meta.label };
 }
 
 function healthBanner(worst: number) {
-  if (worst > 15)
-    return { bg: "#fef2f2", bd: "#fecaca", fg: "#b91c1c", dot: "#ef4444", icon: "warn", title: "Service degraded", sub: `A service is failing at ${worst}% — above the 15% critical threshold.` };
-  if (worst >= 5)
-    return { bg: "#fffbeb", bd: "#fde68a", fg: "#b45309", dot: "#f59e0b", icon: "warn", title: "Elevated error rate", sub: `A service is failing at ${worst}% — above the 5% warning threshold.` };
-  return { bg: "#f0fdf4", bd: "#bbf7d0", fg: "#15803d", dot: "#22c55e", icon: "check", title: "All systems operational", sub: "Error rates are within normal range across all services." };
+  const state = adminAttentionForErrorRate(worst);
+  const meta = adminAttentionMeta(state);
+  if (state === "critical") {
+    return {
+      bg: meta.pill,
+      bd: "#fecaca",
+      fg: meta.fg,
+      dot: meta.dot,
+      icon: "warn",
+      title: "Service degraded",
+      sub: `A service is failing at ${worst}% — above the 15% critical threshold.`,
+    };
+  }
+  if (state === "warning") {
+    return {
+      bg: meta.pill,
+      bd: "#fde68a",
+      fg: meta.fg,
+      dot: meta.dot,
+      icon: "warn",
+      title: "Elevated error rate",
+      sub: `A service is failing at ${worst}% — above the 5% warning threshold.`,
+    };
+  }
+  return {
+    bg: meta.pill,
+    bd: "#bbf7d0",
+    fg: meta.fg,
+    dot: meta.dot,
+    icon: "check",
+    title: "All systems operational",
+    sub: "Error rates are within normal range across all services.",
+  };
 }
 
 export default async function AdminMetricsPage() {
@@ -36,7 +67,11 @@ export default async function AdminMetricsPage() {
 
   return (
     <>
-      <AdminHeader title="Platform metrics" adminName={admin.name} />
+      <AdminHeader
+        title="Sync ops"
+        adminName={admin.name}
+        crumbs={[{ label: "Operations" }]}
+      />
       <div className="adm-content">
         <div className="ad-page">
           <div className="ad-health" style={{ background: h.bg, borderColor: h.bd, color: h.fg }}>

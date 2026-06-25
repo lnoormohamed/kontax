@@ -58,7 +58,11 @@ export default async function AdminAuditPage({
 
   return (
     <>
-      <AdminHeader title="Audit log" adminName={admin.name} />
+      <AdminHeader
+        title="Audit log"
+        adminName={admin.name}
+        crumbs={[{ label: "Governance" }]}
+      />
       <div className="adm-content">
         <div className="ad-page">
           <AuditFilters

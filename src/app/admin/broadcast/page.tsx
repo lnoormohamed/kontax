@@ -16,7 +16,11 @@ export default async function AdminBroadcastPage() {
 
   return (
     <>
-      <AdminHeader adminName={admin.name} title="Broadcast" />
+      <AdminHeader
+        adminName={admin.name}
+        title="Broadcast"
+        crumbs={[{ label: "Communications" }]}
+      />
       <div className="adm-content">
         <div className="ad-page">
           <BroadcastForm />

@@ -1,5 +1,12 @@
 import "server-only";
 
+import type { Prisma } from "../../../generated/prisma";
+import { ADMIN_ACTIONS } from "~/server/admin/audit";
+import {
+  type AdminAttentionState,
+  adminAttentionForSyncStatus,
+  adminWorstAttention,
+} from "~/server/admin/attention";
 import { db } from "~/server/db";
 import { loadPlatformMetrics } from "~/server/admin/metrics";
 
@@ -28,8 +35,50 @@ const formatActionLabel = (action: string) =>
 
 export type AdminOverviewData = Awaited<ReturnType<typeof loadAdminOverview>>;
 
+type OverviewAttentionItem = {
+  id: string;
+  label: string;
+  count: number;
+  tone: AdminAttentionState;
+  href: string;
+  body: string;
+};
+
+type WorkQueueItem = {
+  id: string;
+  href: string;
+  label: string;
+  sub: string;
+  meta: string;
+  tone: AdminAttentionState;
+};
+
+type WorkQueue = {
+  id: string;
+  label: string;
+  href: string;
+  count: number;
+  tone: AdminAttentionState;
+  body: string;
+  items: WorkQueueItem[];
+};
+
 export async function loadAdminOverview() {
   const since = dayAgo();
+  const weekAgo = new Date(Date.now() - 7 * DAY_MS);
+  const userReviewWhere: Prisma.UserWhereInput = {
+    OR: [
+      { lifecycleState: { in: ["LOCKED", "CANCELED", "GRACE"] } },
+      { scheduledDeleteAt: { not: null } },
+    ],
+  };
+  const lifecycleExceptionWhere: Prisma.UserWhereInput = {
+    OR: [
+      { lifecycleState: "GRACE" },
+      { planOverriddenAt: { not: null } },
+      { scheduledDeleteAt: { not: null } },
+    ],
+  };
 
   const [
     metrics,
@@ -40,6 +89,14 @@ export async function loadAdminOverview() {
     syncGrouped,
     audit24h,
     recentActionsRaw,
+    userReviewCount,
+    userReviewItemsRaw,
+    syncQueueCount,
+    syncQueueItemsRaw,
+    lifecycleExceptionCount,
+    lifecycleExceptionItemsRaw,
+    destructiveActionCount,
+    destructiveActionItemsRaw,
   ] = await Promise.all([
     loadPlatformMetrics(),
     db.user.count({
@@ -66,6 +123,86 @@ export async function loadAdminOverview() {
         admin: { select: { name: true, email: true } },
       },
     }),
+    db.user.count({ where: userReviewWhere }),
+    db.user.findMany({
+      where: userReviewWhere,
+      orderBy: [{ scheduledDeleteAt: "desc" }, { updatedAt: "desc" }],
+      take: 4,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        lifecycleState: true,
+        scheduledDeleteAt: true,
+        updatedAt: true,
+      },
+    }),
+    db.syncAccount.count({
+      where: { status: { in: ["NEEDS_REAUTH", "ERROR", "PAUSED"] } },
+    }),
+    db.syncAccount.findMany({
+      where: { status: { in: ["NEEDS_REAUTH", "ERROR", "PAUSED"] } },
+      orderBy: [{ updatedAt: "desc" }],
+      take: 4,
+      select: {
+        id: true,
+        label: true,
+        provider: true,
+        status: true,
+        updatedAt: true,
+        userId: true,
+        user: { select: { email: true, name: true } },
+      },
+    }),
+    db.user.count({ where: lifecycleExceptionWhere }),
+    db.user.findMany({
+      where: lifecycleExceptionWhere,
+      orderBy: [{ planOverriddenAt: "desc" }, { updatedAt: "desc" }],
+      take: 4,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        lifecycleState: true,
+        scheduledDeleteAt: true,
+        planOverriddenAt: true,
+        updatedAt: true,
+      },
+    }),
+    db.adminAuditEvent.count({
+      where: {
+        createdAt: { gte: weekAgo },
+        action: {
+          in: [
+            ADMIN_ACTIONS.USER_SUSPENDED,
+            ADMIN_ACTIONS.USER_DELETION_SCHEDULED,
+            ADMIN_ACTIONS.IMPERSONATION_START,
+          ],
+        },
+      },
+    }),
+    db.adminAuditEvent.findMany({
+      where: {
+        createdAt: { gte: weekAgo },
+        action: {
+          in: [
+            ADMIN_ACTIONS.USER_SUSPENDED,
+            ADMIN_ACTIONS.USER_DELETION_SCHEDULED,
+            ADMIN_ACTIONS.IMPERSONATION_START,
+          ],
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      select: {
+        id: true,
+        action: true,
+        createdAt: true,
+        targetUserId: true,
+        targetEmail: true,
+        admin: { select: { name: true, email: true } },
+      },
+    }),
   ]);
 
   const syncByStatus = Object.fromEntries(
@@ -78,12 +215,12 @@ export async function loadAdminOverview() {
   const syncRetired = syncByStatus.RETIRED ?? 0;
   const syncActive = syncByStatus.ACTIVE ?? 0;
 
-  const attention = [
+  const attention: OverviewAttentionItem[] = [
     {
       id: "sync-auth",
       label: "Connections need re-auth",
       count: syncNeedsReauth,
-      tone: syncNeedsReauth > 0 ? "critical" : "healthy",
+      tone: syncNeedsReauth > 0 ? "action" : "healthy",
       href: "/admin/metrics",
       body:
         syncNeedsReauth > 0
@@ -126,11 +263,145 @@ export async function loadAdminOverview() {
     },
   ];
 
+  const workQueues: WorkQueue[] = [
+    {
+      id: "user-review",
+      label: "Users needing review",
+      href: "/admin/users",
+      count: userReviewCount,
+      tone:
+        userReviewItemsRaw.length > 0
+          ? adminWorstAttention(
+              ...userReviewItemsRaw.map((row) =>
+                row.scheduledDeleteAt || row.lifecycleState === "LOCKED" || row.lifecycleState === "CANCELED"
+                  ? "warning"
+                  : "watch",
+              ),
+            )
+          : "healthy",
+      body:
+        userReviewCount > 0
+          ? "Accounts in grace, suspension, or scheduled deletion that may need human follow-up."
+          : "No user lifecycle issues are currently waiting for review.",
+      items: userReviewItemsRaw.map((row) => ({
+        id: row.id,
+        href: `/admin/users/${row.id}`,
+        label: row.email,
+        sub:
+          row.scheduledDeleteAt != null
+            ? `Deletion scheduled · ${fmtRelative(row.scheduledDeleteAt)}`
+            : row.lifecycleState === "GRACE"
+              ? "Grace period active"
+              : row.lifecycleState === "LOCKED"
+                ? "Account suspended"
+                : "Access restricted",
+        meta: row.name?.trim() || "No profile name",
+        tone:
+          row.scheduledDeleteAt != null || row.lifecycleState === "LOCKED" || row.lifecycleState === "CANCELED"
+            ? "warning"
+            : "watch",
+      })),
+    },
+    {
+      id: "sync-action",
+      label: "Sync connections needing action",
+      href: "/admin/metrics",
+      count: syncQueueCount,
+      tone:
+        syncQueueItemsRaw.length > 0
+          ? adminWorstAttention(
+              ...syncQueueItemsRaw.map((row) => adminAttentionForSyncStatus(row.status)),
+            )
+          : "healthy",
+      body:
+        syncQueueCount > 0
+          ? "Paused, errored, or re-auth-blocked connections waiting for support attention."
+          : "All sync connections are currently healthy or intentionally retired.",
+      items: syncQueueItemsRaw.map((row) => ({
+        id: row.id,
+        href: `/admin/users/${row.userId}`,
+        label: row.label,
+        sub: `${row.provider} · ${row.user.email}`,
+        meta: fmtRelative(row.updatedAt),
+        tone: adminAttentionForSyncStatus(row.status),
+      })),
+    },
+    {
+      id: "destructive-actions",
+      label: "Recent destructive actions",
+      href: "/admin/audit",
+      count: destructiveActionCount,
+      tone: destructiveActionCount > 0 ? "watch" : "healthy",
+      body:
+        destructiveActionCount > 0
+          ? "Suspensions, deletion schedules, and impersonation starts from the last 7 days."
+          : "No destructive admin actions have been recorded in the last 7 days.",
+      items: destructiveActionItemsRaw.map((row) => ({
+        id: row.id,
+        href: row.targetUserId ? `/admin/users/${row.targetUserId}` : "/admin/audit",
+        label: formatActionLabel(row.action),
+        sub: row.targetEmail ?? "No user target",
+        meta: `${row.admin?.name?.trim() ?? row.admin?.email ?? "system"} · ${fmtRelative(row.createdAt)}`,
+        tone:
+          row.action === ADMIN_ACTIONS.USER_DELETION_SCHEDULED
+            ? "warning"
+            : row.action === ADMIN_ACTIONS.USER_SUSPENDED
+              ? "warning"
+              : "watch",
+      })),
+    },
+    {
+      id: "billing-lifecycle",
+      label: "Billing and lifecycle exceptions",
+      href: "/admin/users",
+      count: lifecycleExceptionCount,
+      tone:
+        lifecycleExceptionItemsRaw.length > 0
+          ? adminWorstAttention(
+              ...lifecycleExceptionItemsRaw.map((row) =>
+                row.scheduledDeleteAt != null
+                  ? "warning"
+                  : row.lifecycleState === "GRACE"
+                    ? "watch"
+                    : row.planOverriddenAt != null
+                      ? "watch"
+                      : "healthy",
+              ),
+            )
+          : "healthy",
+      body:
+        lifecycleExceptionCount > 0
+          ? "Overrides, grace states, and pending deletion windows that support should keep an eye on."
+          : "No billing or lifecycle exceptions are active right now.",
+      items: lifecycleExceptionItemsRaw.map((row) => ({
+        id: row.id,
+        href: `/admin/users/${row.id}`,
+        label: row.email,
+        sub:
+          row.planOverriddenAt != null
+            ? "Admin plan override active"
+            : row.scheduledDeleteAt != null
+              ? "Deletion scheduled"
+              : "Grace period active",
+        meta: row.name?.trim() || fmtRelative(row.updatedAt),
+        tone:
+          row.scheduledDeleteAt != null
+            ? "warning"
+            : row.planOverriddenAt != null || row.lifecycleState === "GRACE"
+              ? "watch"
+              : "healthy",
+      })),
+    },
+  ];
+
   const criticalCount = attention
-    .filter((item) => item.tone === "critical")
+    .filter((item) => item.tone === "critical" || item.tone === "action")
     .reduce((sum, item) => sum + item.count, 0);
   const needsAttentionCount = attention
-    .filter((item) => item.tone === "critical" || item.tone === "warning")
+    .filter((item) => item.tone === "action" || item.tone === "critical" || item.tone === "warning")
+    .reduce((sum, item) => sum + item.count, 0);
+  const actionRequiredCount = attention
+    .filter((item) => item.tone === "action")
     .reduce((sum, item) => sum + item.count, 0);
 
   const recentActions = recentActionsRaw.map((row) => ({
@@ -175,6 +446,7 @@ export async function loadAdminOverview() {
       },
     ],
     attention,
+    workQueues,
     quickActions: [
       {
         id: "users",
@@ -214,6 +486,7 @@ export async function loadAdminOverview() {
     ],
     recentActions,
     summary: {
+      actionRequiredCount,
       criticalCount,
       needsAttentionCount,
       lockedUsers,

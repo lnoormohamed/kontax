@@ -4,29 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AD, AdIcon } from "./admin-icons";
-
-const NAV = [
-  { id: "overview", label: "Overview", icon: "home", href: "/admin" },
-  { id: "users", label: "Users", icon: "users", href: "/admin/users" },
-  { id: "metrics", label: "Metrics", icon: "metrics", href: "/admin/metrics" },
-  { id: "flags", label: "Feature Flags", icon: "flag", href: "/admin/feature-flags" },
-  { id: "broadcast", label: "Broadcast", icon: "share", href: "/admin/broadcast" },
-  { id: "audit", label: "Audit Log", icon: "audit", href: "/admin/audit" },
-] as const;
-
-function activeId(pathname: string): string {
-  if (pathname === "/admin") return "overview";
-  if (pathname.startsWith("/admin/metrics")) return "metrics";
-  if (pathname.startsWith("/admin/feature-flags")) return "flags";
-  if (pathname.startsWith("/admin/broadcast")) return "broadcast";
-  if (pathname.startsWith("/admin/audit")) return "audit";
-  // /admin/users and /admin/users/[id] map to Users.
-  return "users";
-}
+import { activeAdminNavId, ADMIN_NAV_GROUPS } from "./admin-nav";
 
 export function AdminSidebar() {
   const pathname = usePathname() ?? "/admin";
-  const active = activeId(pathname);
+  const active = activeAdminNavId(pathname);
 
   return (
     <aside className="ad-side">
@@ -36,17 +18,29 @@ export function AdminSidebar() {
         <span className="ad-admin-badge">Admin</span>
       </div>
       <nav className="ad-side-nav">
-        {NAV.map((n) => (
-          <Link
-            key={n.id}
-            href={n.href}
-            className="ad-nav"
-            data-active={active === n.id ? "1" : "0"}
-          >
-            <span className="ad-nav-bar" />
-            <AdIcon name={n.icon} size={18} c={active === n.id ? AD.ink : AD.ink2} w={active === n.id ? 1.9 : 1.7} />
-            <span>{n.label}</span>
-          </Link>
+        {ADMIN_NAV_GROUPS.map((group) => (
+          <div key={group.id} className="ad-side-section">
+            <div className="ad-side-section__label">{group.label}</div>
+            <div className="ad-side-section__items">
+              {group.items.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="ad-nav"
+                  data-active={active === item.id ? "1" : "0"}
+                >
+                  <span className="ad-nav-bar" />
+                  <AdIcon
+                    name={item.icon}
+                    size={18}
+                    c={active === item.id ? AD.ink : AD.ink2}
+                    w={active === item.id ? 1.9 : 1.7}
+                  />
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
       <div className="ad-side-foot">
