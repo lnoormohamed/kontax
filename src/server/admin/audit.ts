@@ -17,7 +17,10 @@ export const ADMIN_ACTIONS = {
   IMPERSONATION_START: "impersonation.start",
   IMPERSONATION_END: "impersonation.end",
   FEATURE_FLAG_CHANGED: "flag.update",
+  SUPPORT_CASE_CREATED: "support.case.create",
+  SUPPORT_CASE_UPDATED: "support.case.update",
   PRODUCT_BROADCAST: "product.broadcast",
+  PRODUCT_BROADCAST_RETRACTED: "product.broadcast.retract",
 } as const;
 
 export type AdminActionKey = (typeof ADMIN_ACTIONS)[keyof typeof ADMIN_ACTIONS];
@@ -33,6 +36,8 @@ const HIGH_SEVERITY_ACTIONS = new Set<string>([
   ADMIN_ACTIONS.IMPERSONATION_START,
   ADMIN_ACTIONS.SYNC_CAPABILITY_OVERRIDE_UPDATED,
   ADMIN_ACTIONS.FEATURE_FLAG_CHANGED,
+  ADMIN_ACTIONS.SUPPORT_CASE_UPDATED,
+  ADMIN_ACTIONS.PRODUCT_BROADCAST_RETRACTED,
 ]);
 
 async function clientIp(): Promise<string | null> {

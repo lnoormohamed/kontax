@@ -7,9 +7,24 @@ import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
 import { db } from "~/server/db";
 import { sendAccountSuspendedEmail } from "~/server/billing-emails";
-import { broadcastProductUpdate as broadcastProductUpdateToUsers } from "~/server/notifications";
 import { coerceCardDavCapabilityProfileOverrideId } from "~/server/sync-provider-capabilities";
-import type { SubscriptionPlan } from "../../../generated/prisma";
+import {
+  listAdminBroadcasts,
+  processScheduledAdminBroadcasts,
+  resolveBroadcastAudience,
+  retractAdminBroadcast,
+  saveAdminBroadcastDraft,
+  sendAdminBroadcast,
+  type BroadcastAudienceFilters,
+} from "~/server/admin/broadcasts";
+import type {
+  AccountLifecycleState,
+  AdminBroadcastStatus,
+  AdminSupportCaseSeverity,
+  AdminSupportCaseStatus,
+  SubscriptionPlan,
+  SyncProvider,
+} from "../../../generated/prisma";
 
 type Result = { success: true } | { error: string };
 
@@ -233,6 +248,161 @@ export async function addAdminSupportNote(input: {
   return { success: true };
 }
 
+export async function createAdminSupportCase(input: {
+  subjectType: string;
+  subjectId: string;
+  targetUserId?: string | null;
+  title: string;
+  summary?: string;
+  severity?: string;
+  status?: string;
+  nextFollowUpAt?: string | null;
+  assignToSelf?: boolean;
+}): Promise<Result & { supportCaseId?: string }> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const title = input.title.trim();
+  if (!title) return { error: "REASON_REQUIRED" };
+
+  const severity = ((input.severity?.trim().toUpperCase() as AdminSupportCaseSeverity | undefined) ?? "NORMAL");
+  const status = ((input.status?.trim().toUpperCase() as AdminSupportCaseStatus | undefined) ?? "OPEN");
+  const nextFollowUpAt = input.nextFollowUpAt ? new Date(input.nextFollowUpAt) : null;
+
+  const supportCase = await db.adminSupportCase.create({
+    data: {
+      subjectType: input.subjectType.trim().toUpperCase(),
+      subjectId: input.subjectId,
+      targetUserId: input.targetUserId ?? null,
+      creatorAdminUserId: admin.adminId,
+      assigneeAdminUserId: input.assignToSelf ? admin.adminId : null,
+      title,
+      summary: input.summary?.trim() ? input.summary.trim().slice(0, 4000) : null,
+      severity,
+      status,
+      nextFollowUpAt: nextFollowUpAt && !Number.isNaN(nextFollowUpAt.getTime()) ? nextFollowUpAt : null,
+      resolvedAt: status === "RESOLVED" ? new Date() : null,
+      archivedAt: status === "ARCHIVED" ? new Date() : null,
+    },
+    select: { id: true },
+  });
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.SUPPORT_CASE_CREATED,
+    targetUserId: input.targetUserId ?? null,
+    details: {
+      supportCaseId: supportCase.id,
+      subjectType: input.subjectType.trim().toUpperCase(),
+      subjectId: input.subjectId,
+      title,
+      severity,
+      status,
+    },
+  });
+
+  revalidatePath("/admin");
+  if (input.targetUserId) revalidatePath(`/admin/users/${input.targetUserId}`);
+  if (input.subjectType.trim().toUpperCase() === "SYNC_ACCOUNT") {
+    revalidatePath(`/admin/sync/${input.subjectId}`);
+  }
+
+  return { success: true, supportCaseId: supportCase.id };
+}
+
+export async function updateAdminSupportCase(input: {
+  supportCaseId: string;
+  summary?: string;
+  severity?: string;
+  status?: string;
+  nextFollowUpAt?: string | null;
+  assignToSelf?: boolean;
+  clearAssignment?: boolean;
+}): Promise<Result> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const existing = await db.adminSupportCase.findUnique({
+    where: { id: input.supportCaseId },
+    select: {
+      id: true,
+      subjectType: true,
+      subjectId: true,
+      targetUserId: true,
+      summary: true,
+      severity: true,
+      status: true,
+    },
+  });
+  if (!existing) return { error: "USER_NOT_FOUND" };
+
+  const severity = input.severity
+    ? (input.severity.trim().toUpperCase() as AdminSupportCaseSeverity)
+    : existing.severity;
+  const status = input.status
+    ? (input.status.trim().toUpperCase() as AdminSupportCaseStatus)
+    : existing.status;
+  const nextFollowUpAt = input.nextFollowUpAt ? new Date(input.nextFollowUpAt) : null;
+
+  await db.adminSupportCase.update({
+    where: { id: existing.id },
+    data: {
+      summary:
+        typeof input.summary === "string"
+          ? input.summary.trim()
+            ? input.summary.trim().slice(0, 4000)
+            : null
+          : undefined,
+      severity,
+      status,
+      nextFollowUpAt:
+        input.nextFollowUpAt === undefined
+          ? undefined
+          : nextFollowUpAt && !Number.isNaN(nextFollowUpAt.getTime())
+            ? nextFollowUpAt
+            : null,
+      assigneeAdminUserId: input.assignToSelf
+        ? admin.adminId
+        : input.clearAssignment
+          ? null
+          : undefined,
+      resolvedAt: status === "RESOLVED" ? new Date() : status === "ARCHIVED" ? null : undefined,
+      archivedAt: status === "ARCHIVED" ? new Date() : status === "RESOLVED" ? null : undefined,
+    },
+  });
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.SUPPORT_CASE_UPDATED,
+    targetUserId: existing.targetUserId ?? null,
+    details: {
+      supportCaseId: existing.id,
+      subjectType: existing.subjectType,
+      subjectId: existing.subjectId,
+      severity,
+      status,
+      assignedToSelf: !!input.assignToSelf,
+      clearedAssignment: !!input.clearAssignment,
+    },
+  });
+
+  revalidatePath("/admin");
+  if (existing.targetUserId) revalidatePath(`/admin/users/${existing.targetUserId}`);
+  if (existing.subjectType === "SYNC_ACCOUNT") revalidatePath(`/admin/sync/${existing.subjectId}`);
+
+  return { success: true };
+}
+
 export async function updateSyncCapabilityOverride(input: {
   syncAccountId: string;
   capabilityProfileOverride: string | null;
@@ -359,14 +529,51 @@ export async function endImpersonation(): Promise<Result> {
   return { success: true };
 }
 
-// P22-DB05: broadcast a PRODUCT_UPDATES notification to every active user.
-// Honours each user's in-app product-update preference (handled in
-// broadcastProductUpdate → createNotification).
-export async function broadcastProductUpdate(input: {
+function normalizeAudienceFilters(input: {
+  plans?: string[];
+  lifecycleStates?: string[];
+  providers?: string[];
+  featureFlagKeys?: string[];
+}): Partial<BroadcastAudienceFilters> {
+  return {
+    plans: (input.plans ?? []).map((value) => value.trim().toUpperCase() as SubscriptionPlan),
+    lifecycleStates: (input.lifecycleStates ?? []).map(
+      (value) => value.trim().toUpperCase() as AccountLifecycleState,
+    ),
+    providers: (input.providers ?? []).map((value) => value.trim().toUpperCase() as SyncProvider),
+    featureFlagKeys: (input.featureFlagKeys ?? []).map((value) => value.trim()).filter(Boolean),
+  };
+}
+
+export async function previewProductBroadcastAudience(input: {
+  plans?: string[];
+  lifecycleStates?: string[];
+  providers?: string[];
+  featureFlagKeys?: string[];
+}): Promise<Result & { recipients?: number; sample?: string[] }> {
+  try {
+    await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const audience = await resolveBroadcastAudience(normalizeAudienceFilters(input));
+  return { success: true, recipients: audience.count, sample: audience.sample };
+}
+
+export async function saveProductBroadcast(input: {
+  broadcastId?: string | null;
   title: string;
   body: string;
   actionUrl?: string;
-}): Promise<Result & { recipients?: number }> {
+  plans?: string[];
+  lifecycleStates?: string[];
+  providers?: string[];
+  featureFlagKeys?: string[];
+  status: "DRAFT" | "SCHEDULED" | "SEND_NOW";
+  scheduledFor?: string | null;
+}): Promise<Result & { recipients?: number; broadcastId?: string }> {
   let admin;
   try {
     admin = await assertAdmin();
@@ -382,13 +589,135 @@ export async function broadcastProductUpdate(input: {
   if (!title) return { error: "TITLE_REQUIRED" };
   if (!body) return { error: "BODY_REQUIRED" };
 
-  const recipients = await broadcastProductUpdateToUsers({ title, body, actionUrl });
+  const status: Extract<AdminBroadcastStatus, "DRAFT" | "SCHEDULED"> =
+    input.status === "SCHEDULED" ? "SCHEDULED" : "DRAFT";
+  const scheduledFor = input.scheduledFor?.trim() ? new Date(input.scheduledFor) : null;
+  const saved = await saveAdminBroadcastDraft({
+    adminId: admin.adminId,
+    broadcastId: input.broadcastId ?? null,
+    title,
+    body,
+    actionUrl,
+    filters: normalizeAudienceFilters(input),
+    status,
+    scheduledFor: scheduledFor && !Number.isNaN(scheduledFor.getTime()) ? scheduledFor : null,
+  });
+
+  let recipients = saved.previewRecipientCount;
+  if (input.status === "SEND_NOW") {
+    const sent = await sendAdminBroadcast({ adminId: admin.adminId, broadcastId: saved.id });
+    recipients = sent?.deliveredRecipientCount ?? recipients;
+  }
 
   await emitAdminEvent({
     adminId: admin.adminId,
     action: ADMIN_ACTIONS.PRODUCT_BROADCAST,
-    details: { title, recipients },
+    details: {
+      broadcastId: saved.id,
+      title,
+      status: input.status,
+      recipients,
+      scheduledFor: scheduledFor?.toISOString() ?? null,
+    },
   });
 
-  return { success: true, recipients };
+  revalidatePath("/admin");
+  revalidatePath("/admin/broadcast");
+  return { success: true, recipients, broadcastId: saved.id };
+}
+
+export async function retractProductBroadcast(input: {
+  broadcastId: string;
+}): Promise<Result> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const retracted = await retractAdminBroadcast({
+    adminId: admin.adminId,
+    broadcastId: input.broadcastId,
+  });
+  if (!retracted) return { error: "USER_NOT_FOUND" };
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.PRODUCT_BROADCAST_RETRACTED,
+    details: { broadcastId: input.broadcastId, title: retracted.title },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/broadcast");
+  return { success: true };
+}
+
+export async function sendSavedProductBroadcast(input: {
+  broadcastId: string;
+}): Promise<Result & { recipients?: number }> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const sent = await sendAdminBroadcast({ adminId: admin.adminId, broadcastId: input.broadcastId });
+  if (!sent) return { error: "USER_NOT_FOUND" };
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.PRODUCT_BROADCAST,
+    details: { broadcastId: sent.id, title: sent.title, status: "SEND_NOW", recipients: sent.deliveredRecipientCount },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/broadcast");
+  return { success: true, recipients: sent.deliveredRecipientCount };
+}
+
+// Backwards-compatible wrapper while the richer admin broadcast surface is
+// being wired in. Existing callers can still "send now" to the default active
+// audience without learning the new draft/schedule model first.
+export async function broadcastProductUpdate(input: {
+  title: string;
+  body: string;
+  actionUrl?: string;
+}): Promise<Result & { recipients?: number; broadcastId?: string }> {
+  return saveProductBroadcast({
+    title: input.title,
+    body: input.body,
+    actionUrl: input.actionUrl,
+    status: "SEND_NOW",
+  });
+}
+
+export async function loadAdminBroadcastPanel() {
+  try {
+    await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return null;
+    throw e;
+  }
+
+  await processScheduledAdminBroadcasts();
+
+  const [broadcasts, flags] = await Promise.all([
+    listAdminBroadcasts(),
+    db.featureFlag.findMany({
+      orderBy: { key: "asc" },
+      select: { key: true, name: true },
+    }),
+  ]);
+
+  return {
+    broadcasts,
+    flags: flags.map((flag) => ({
+      key: flag.key,
+      label: flag.name?.trim() || flag.key,
+    })),
+  };
 }

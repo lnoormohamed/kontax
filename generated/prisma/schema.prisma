@@ -22,6 +22,27 @@ enum UserRole {
   ADMIN
 }
 
+enum AdminSupportCaseStatus {
+  OPEN
+  WAITING_ON_CUSTOMER
+  WAITING_ON_PROVIDER
+  RESOLVED
+  ARCHIVED
+}
+
+enum AdminSupportCaseSeverity {
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum AdminBroadcastStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  RETRACTED
+}
+
 // P20-10: SES delivery status. BOUNCED/COMPLAINED addresses are suppressed from
 // further sends to protect sender reputation.
 enum EmailStatus {
@@ -309,6 +330,12 @@ model User {
   // P26-04: first-run onboarding checklist state
   onboardingState                  UserOnboardingState?
   supportNotesAuthored             AdminSupportNote[]                @relation("AdminSupportNoteAuthor")
+  supportCasesCreated              AdminSupportCase[]                @relation("AdminSupportCaseCreator")
+  supportCasesAssigned             AdminSupportCase[]                @relation("AdminSupportCaseAssignee")
+  supportCasesTargeted             AdminSupportCase[]                @relation("AdminSupportCaseTargetUser")
+  broadcastsCreated                AdminBroadcast[]                  @relation("AdminBroadcastCreator")
+  broadcastsSent                   AdminBroadcast[]                  @relation("AdminBroadcastSender")
+  broadcastsRetracted              AdminBroadcast[]                  @relation("AdminBroadcastRetractor")
   // P30-01: public card username (powers /u/{username})
   username                         String?                           @unique
   usernameClaimedAt                DateTime?
@@ -1030,6 +1057,32 @@ model AdminSupportNote {
   @@index([adminUserId, createdAt(sort: Desc)])
 }
 
+model AdminSupportCase {
+  id                  String                   @id @default(cuid())
+  subjectType         String
+  subjectId           String
+  targetUserId        String?
+  creatorAdminUserId  String
+  assigneeAdminUserId String?
+  title               String
+  summary             String?
+  status              AdminSupportCaseStatus   @default(OPEN)
+  severity            AdminSupportCaseSeverity @default(NORMAL)
+  nextFollowUpAt      DateTime?
+  resolvedAt          DateTime?
+  archivedAt          DateTime?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  creator    User  @relation("AdminSupportCaseCreator", fields: [creatorAdminUserId], references: [id], onDelete: Cascade)
+  assignee   User? @relation("AdminSupportCaseAssignee", fields: [assigneeAdminUserId], references: [id], onDelete: SetNull)
+  targetUser User? @relation("AdminSupportCaseTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
+
+  @@index([subjectType, subjectId, status, updatedAt(sort: Desc)])
+  @@index([targetUserId, status, updatedAt(sort: Desc)])
+  @@index([assigneeAdminUserId, status, updatedAt(sort: Desc)])
+}
+
 // P21-08: feature-flag gating with per-user allow-list and percentage rollout.
 enum FeatureFlagMode {
   OFF
@@ -1344,25 +1397,56 @@ enum DigestCadence {
 // In-app notification feed row. One per user-facing event; the bell badge counts
 // unread (read=false), the dropdown lists non-dismissed rows newest-first.
 model Notification {
-  id              String               @id @default(cuid())
-  userId          String
-  category        NotificationCategory
-  title           String
-  body            String
-  read            Boolean              @default(false)
-  readAt          DateTime?
-  dismissedAt     DateTime?
+  id               String               @id @default(cuid())
+  userId           String
+  category         NotificationCategory
+  title            String
+  body             String
+  read             Boolean              @default(false)
+  readAt           DateTime?
+  dismissedAt      DateTime?
   // SHARING uses this to deep-link (e.g. "/shares"); null otherwise.
-  actionUrl       String?
+  actionUrl        String?
   // SECURITY rows deep-link 1:1 to their anomaly (Resolution 3).
-  securityAlertId String?
-  createdAt       DateTime             @default(now())
+  securityAlertId  String?
+  adminBroadcastId String?
+  createdAt        DateTime             @default(now())
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  securityAlert SecurityAlert? @relation(fields: [securityAlertId], references: [id], onDelete: SetNull)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  securityAlert  SecurityAlert?  @relation(fields: [securityAlertId], references: [id], onDelete: SetNull)
+  adminBroadcast AdminBroadcast? @relation(fields: [adminBroadcastId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, read])
+  @@index([adminBroadcastId])
+}
+
+model AdminBroadcast {
+  id                      String               @id @default(cuid())
+  createdByAdminUserId    String
+  sentByAdminUserId       String?
+  retractedByAdminUserId  String?
+  title                   String
+  body                    String
+  actionUrl               String?
+  status                  AdminBroadcastStatus @default(DRAFT)
+  scheduledFor            DateTime?
+  sentAt                  DateTime?
+  retractedAt             DateTime?
+  audienceFilters         Json                 @default("{}")
+  audienceSummary         Json                 @default("{}")
+  previewRecipientCount   Int                  @default(0)
+  deliveredRecipientCount Int                  @default(0)
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+
+  creator       User           @relation("AdminBroadcastCreator", fields: [createdByAdminUserId], references: [id], onDelete: Cascade)
+  sender        User?          @relation("AdminBroadcastSender", fields: [sentByAdminUserId], references: [id], onDelete: SetNull)
+  retractor     User?          @relation("AdminBroadcastRetractor", fields: [retractedByAdminUserId], references: [id], onDelete: SetNull)
+  notifications Notification[]
+
+  @@index([status, scheduledFor, createdAt(sort: Desc)])
+  @@index([createdByAdminUserId, createdAt(sort: Desc)])
 }
 
 // Persisted anomaly record behind a SECURITY notification. kind drives the drawer

@@ -103,12 +103,13 @@ export async function createNotification(params: {
   body: string;
   actionUrl?: string | null;
   securityAlertId?: string | null;
-}): Promise<void> {
+  adminBroadcastId?: string | null;
+}): Promise<boolean> {
   try {
     const pref = PREF_COLUMNS[params.category];
     if (pref) {
       const settings = await getNotificationSettings(params.userId);
-      if (!settings[pref.inApp]) return;
+      if (!settings[pref.inApp]) return false;
     }
     await db.notification.create({
       data: {
@@ -118,10 +119,13 @@ export async function createNotification(params: {
         body: params.body,
         actionUrl: params.actionUrl ?? null,
         securityAlertId: params.securityAlertId ?? null,
+        adminBroadcastId: params.adminBroadcastId ?? null,
       },
     });
+    return true;
   } catch (err) {
     console.error("createNotification failed", err);
+    return false;
   }
 }
 

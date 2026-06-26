@@ -7,6 +7,7 @@ import {
   getUserBillingContext,
 } from "~/server/billing";
 import { listUserSupportTimeline } from "~/server/admin/support-notes";
+import { listSupportCasesForSubject } from "~/server/admin/support-cases";
 import { getSyncAccountOperationalHealth, getSyncErrorSupportBucket } from "~/server/sync-health";
 import {
   getSyncProviderCapabilityProfileLabel,
@@ -201,6 +202,7 @@ export async function loadUserDetail(userId: string) {
     syncAccountsRaw,
     adminActionsRaw,
     supportNotesRaw,
+    supportCases,
   ] =
     await Promise.all([
       getUserBillingContext(userId),
@@ -295,6 +297,7 @@ export async function loadUserDetail(userId: string) {
         },
       }),
       listUserSupportTimeline(userId, 12),
+      listSupportCasesForSubject("USER", userId),
     ]);
 
   const ent = billing.entitlements;
@@ -496,6 +499,7 @@ export async function loadUserDetail(userId: string) {
       accounts: syncAccounts,
       notes: supportNotes,
     },
+    supportCases,
     supportTimeline,
     group: group?.group
       ? {

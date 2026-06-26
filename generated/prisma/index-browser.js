@@ -580,6 +580,24 @@ exports.Prisma.AdminSupportNoteScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.AdminSupportCaseScalarFieldEnum = {
+  id: 'id',
+  subjectType: 'subjectType',
+  subjectId: 'subjectId',
+  targetUserId: 'targetUserId',
+  creatorAdminUserId: 'creatorAdminUserId',
+  assigneeAdminUserId: 'assigneeAdminUserId',
+  title: 'title',
+  summary: 'summary',
+  status: 'status',
+  severity: 'severity',
+  nextFollowUpAt: 'nextFollowUpAt',
+  resolvedAt: 'resolvedAt',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.FeatureFlagScalarFieldEnum = {
   id: 'id',
   key: 'key',
@@ -740,7 +758,28 @@ exports.Prisma.NotificationScalarFieldEnum = {
   dismissedAt: 'dismissedAt',
   actionUrl: 'actionUrl',
   securityAlertId: 'securityAlertId',
+  adminBroadcastId: 'adminBroadcastId',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.AdminBroadcastScalarFieldEnum = {
+  id: 'id',
+  createdByAdminUserId: 'createdByAdminUserId',
+  sentByAdminUserId: 'sentByAdminUserId',
+  retractedByAdminUserId: 'retractedByAdminUserId',
+  title: 'title',
+  body: 'body',
+  actionUrl: 'actionUrl',
+  status: 'status',
+  scheduledFor: 'scheduledFor',
+  sentAt: 'sentAt',
+  retractedAt: 'retractedAt',
+  audienceFilters: 'audienceFilters',
+  audienceSummary: 'audienceSummary',
+  previewRecipientCount: 'previewRecipientCount',
+  deliveredRecipientCount: 'deliveredRecipientCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SecurityAlertScalarFieldEnum = {
@@ -1079,6 +1118,20 @@ exports.Actor = exports.$Enums.Actor = {
   API: 'API'
 };
 
+exports.AdminSupportCaseStatus = exports.$Enums.AdminSupportCaseStatus = {
+  OPEN: 'OPEN',
+  WAITING_ON_CUSTOMER: 'WAITING_ON_CUSTOMER',
+  WAITING_ON_PROVIDER: 'WAITING_ON_PROVIDER',
+  RESOLVED: 'RESOLVED',
+  ARCHIVED: 'ARCHIVED'
+};
+
+exports.AdminSupportCaseSeverity = exports.$Enums.AdminSupportCaseSeverity = {
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
 exports.FeatureFlagMode = exports.$Enums.FeatureFlagMode = {
   OFF: 'OFF',
   SPECIFIC_USERS: 'SPECIFIC_USERS',
@@ -1126,6 +1179,13 @@ exports.NotificationCategory = exports.$Enums.NotificationCategory = {
   PRODUCT_UPDATES: 'PRODUCT_UPDATES'
 };
 
+exports.AdminBroadcastStatus = exports.$Enums.AdminBroadcastStatus = {
+  DRAFT: 'DRAFT',
+  SCHEDULED: 'SCHEDULED',
+  SENT: 'SENT',
+  RETRACTED: 'RETRACTED'
+};
+
 exports.DigestCadence = exports.$Enums.DigestCadence = {
   NONE: 'NONE',
   DAILY: 'DAILY',
@@ -1171,6 +1231,7 @@ exports.Prisma.ModelName = {
   ActivityEvent: 'ActivityEvent',
   AdminAuditEvent: 'AdminAuditEvent',
   AdminSupportNote: 'AdminSupportNote',
+  AdminSupportCase: 'AdminSupportCase',
   FeatureFlag: 'FeatureFlag',
   Group: 'Group',
   GroupMember: 'GroupMember',
@@ -1183,6 +1244,7 @@ exports.Prisma.ModelName = {
   ContactShare: 'ContactShare',
   StripeWebhookEvent: 'StripeWebhookEvent',
   Notification: 'Notification',
+  AdminBroadcast: 'AdminBroadcast',
   SecurityAlert: 'SecurityAlert',
   NotificationSettings: 'NotificationSettings',
   FailedLoginAttempt: 'FailedLoginAttempt',

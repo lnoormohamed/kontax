@@ -139,6 +139,11 @@ export type AdminAuditEvent = $Result.DefaultSelection<Prisma.$AdminAuditEventPa
  */
 export type AdminSupportNote = $Result.DefaultSelection<Prisma.$AdminSupportNotePayload>
 /**
+ * Model AdminSupportCase
+ * 
+ */
+export type AdminSupportCase = $Result.DefaultSelection<Prisma.$AdminSupportCasePayload>
+/**
  * Model FeatureFlag
  * 
  */
@@ -198,6 +203,11 @@ export type StripeWebhookEvent = $Result.DefaultSelection<Prisma.$StripeWebhookE
  * 
  */
 export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
+/**
+ * Model AdminBroadcast
+ * 
+ */
+export type AdminBroadcast = $Result.DefaultSelection<Prisma.$AdminBroadcastPayload>
 /**
  * Model SecurityAlert
  * 
@@ -265,6 +275,36 @@ export const UserRole: {
 };
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const AdminSupportCaseStatus: {
+  OPEN: 'OPEN',
+  WAITING_ON_CUSTOMER: 'WAITING_ON_CUSTOMER',
+  WAITING_ON_PROVIDER: 'WAITING_ON_PROVIDER',
+  RESOLVED: 'RESOLVED',
+  ARCHIVED: 'ARCHIVED'
+};
+
+export type AdminSupportCaseStatus = (typeof AdminSupportCaseStatus)[keyof typeof AdminSupportCaseStatus]
+
+
+export const AdminSupportCaseSeverity: {
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
+export type AdminSupportCaseSeverity = (typeof AdminSupportCaseSeverity)[keyof typeof AdminSupportCaseSeverity]
+
+
+export const AdminBroadcastStatus: {
+  DRAFT: 'DRAFT',
+  SCHEDULED: 'SCHEDULED',
+  SENT: 'SENT',
+  RETRACTED: 'RETRACTED'
+};
+
+export type AdminBroadcastStatus = (typeof AdminBroadcastStatus)[keyof typeof AdminBroadcastStatus]
 
 
 export const EmailStatus: {
@@ -644,6 +684,18 @@ export const AccountLifecycleState: typeof $Enums.AccountLifecycleState
 export type UserRole = $Enums.UserRole
 
 export const UserRole: typeof $Enums.UserRole
+
+export type AdminSupportCaseStatus = $Enums.AdminSupportCaseStatus
+
+export const AdminSupportCaseStatus: typeof $Enums.AdminSupportCaseStatus
+
+export type AdminSupportCaseSeverity = $Enums.AdminSupportCaseSeverity
+
+export const AdminSupportCaseSeverity: typeof $Enums.AdminSupportCaseSeverity
+
+export type AdminBroadcastStatus = $Enums.AdminBroadcastStatus
+
+export const AdminBroadcastStatus: typeof $Enums.AdminBroadcastStatus
 
 export type EmailStatus = $Enums.EmailStatus
 
@@ -1158,6 +1210,16 @@ export class PrismaClient<
   get adminSupportNote(): Prisma.AdminSupportNoteDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.adminSupportCase`: Exposes CRUD operations for the **AdminSupportCase** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AdminSupportCases
+    * const adminSupportCases = await prisma.adminSupportCase.findMany()
+    * ```
+    */
+  get adminSupportCase(): Prisma.AdminSupportCaseDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.featureFlag`: Exposes CRUD operations for the **FeatureFlag** model.
     * Example usage:
     * ```ts
@@ -1276,6 +1338,16 @@ export class PrismaClient<
     * ```
     */
   get notification(): Prisma.NotificationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.adminBroadcast`: Exposes CRUD operations for the **AdminBroadcast** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AdminBroadcasts
+    * const adminBroadcasts = await prisma.adminBroadcast.findMany()
+    * ```
+    */
+  get adminBroadcast(): Prisma.AdminBroadcastDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.securityAlert`: Exposes CRUD operations for the **SecurityAlert** model.
@@ -1832,6 +1904,7 @@ export namespace Prisma {
     ActivityEvent: 'ActivityEvent',
     AdminAuditEvent: 'AdminAuditEvent',
     AdminSupportNote: 'AdminSupportNote',
+    AdminSupportCase: 'AdminSupportCase',
     FeatureFlag: 'FeatureFlag',
     Group: 'Group',
     GroupMember: 'GroupMember',
@@ -1844,6 +1917,7 @@ export namespace Prisma {
     ContactShare: 'ContactShare',
     StripeWebhookEvent: 'StripeWebhookEvent',
     Notification: 'Notification',
+    AdminBroadcast: 'AdminBroadcast',
     SecurityAlert: 'SecurityAlert',
     NotificationSettings: 'NotificationSettings',
     FailedLoginAttempt: 'FailedLoginAttempt',
@@ -1871,7 +1945,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3725,6 +3799,80 @@ export namespace Prisma {
           }
         }
       }
+      AdminSupportCase: {
+        payload: Prisma.$AdminSupportCasePayload<ExtArgs>
+        fields: Prisma.AdminSupportCaseFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AdminSupportCaseFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AdminSupportCaseFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>
+          }
+          findFirst: {
+            args: Prisma.AdminSupportCaseFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AdminSupportCaseFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>
+          }
+          findMany: {
+            args: Prisma.AdminSupportCaseFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>[]
+          }
+          create: {
+            args: Prisma.AdminSupportCaseCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>
+          }
+          createMany: {
+            args: Prisma.AdminSupportCaseCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AdminSupportCaseCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>[]
+          }
+          delete: {
+            args: Prisma.AdminSupportCaseDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>
+          }
+          update: {
+            args: Prisma.AdminSupportCaseUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>
+          }
+          deleteMany: {
+            args: Prisma.AdminSupportCaseDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AdminSupportCaseUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AdminSupportCaseUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>[]
+          }
+          upsert: {
+            args: Prisma.AdminSupportCaseUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminSupportCasePayload>
+          }
+          aggregate: {
+            args: Prisma.AdminSupportCaseAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAdminSupportCase>
+          }
+          groupBy: {
+            args: Prisma.AdminSupportCaseGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AdminSupportCaseGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AdminSupportCaseCountArgs<ExtArgs>
+            result: $Utils.Optional<AdminSupportCaseCountAggregateOutputType> | number
+          }
+        }
+      }
       FeatureFlag: {
         payload: Prisma.$FeatureFlagPayload<ExtArgs>
         fields: Prisma.FeatureFlagFieldRefs
@@ -4613,6 +4761,80 @@ export namespace Prisma {
           }
         }
       }
+      AdminBroadcast: {
+        payload: Prisma.$AdminBroadcastPayload<ExtArgs>
+        fields: Prisma.AdminBroadcastFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AdminBroadcastFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AdminBroadcastFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>
+          }
+          findFirst: {
+            args: Prisma.AdminBroadcastFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AdminBroadcastFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>
+          }
+          findMany: {
+            args: Prisma.AdminBroadcastFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>[]
+          }
+          create: {
+            args: Prisma.AdminBroadcastCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>
+          }
+          createMany: {
+            args: Prisma.AdminBroadcastCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AdminBroadcastCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>[]
+          }
+          delete: {
+            args: Prisma.AdminBroadcastDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>
+          }
+          update: {
+            args: Prisma.AdminBroadcastUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>
+          }
+          deleteMany: {
+            args: Prisma.AdminBroadcastDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AdminBroadcastUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AdminBroadcastUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>[]
+          }
+          upsert: {
+            args: Prisma.AdminBroadcastUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminBroadcastPayload>
+          }
+          aggregate: {
+            args: Prisma.AdminBroadcastAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAdminBroadcast>
+          }
+          groupBy: {
+            args: Prisma.AdminBroadcastGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AdminBroadcastGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AdminBroadcastCountArgs<ExtArgs>
+            result: $Utils.Optional<AdminBroadcastCountAggregateOutputType> | number
+          }
+        }
+      }
       SecurityAlert: {
         payload: Prisma.$SecurityAlertPayload<ExtArgs>
         fields: Prisma.SecurityAlertFieldRefs
@@ -5400,6 +5622,7 @@ export namespace Prisma {
     activityEvent?: ActivityEventOmit
     adminAuditEvent?: AdminAuditEventOmit
     adminSupportNote?: AdminSupportNoteOmit
+    adminSupportCase?: AdminSupportCaseOmit
     featureFlag?: FeatureFlagOmit
     group?: GroupOmit
     groupMember?: GroupMemberOmit
@@ -5412,6 +5635,7 @@ export namespace Prisma {
     contactShare?: ContactShareOmit
     stripeWebhookEvent?: StripeWebhookEventOmit
     notification?: NotificationOmit
+    adminBroadcast?: AdminBroadcastOmit
     securityAlert?: SecurityAlertOmit
     notificationSettings?: NotificationSettingsOmit
     failedLoginAttempt?: FailedLoginAttemptOmit
@@ -5533,6 +5757,12 @@ export namespace Prisma {
     labels: number
     failedLoginAttempts: number
     supportNotesAuthored: number
+    supportCasesCreated: number
+    supportCasesAssigned: number
+    supportCasesTargeted: number
+    broadcastsCreated: number
+    broadcastsSent: number
+    broadcastsRetracted: number
     cardViewLog: number
   }
 
@@ -5569,6 +5799,12 @@ export namespace Prisma {
     labels?: boolean | UserCountOutputTypeCountLabelsArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
     supportNotesAuthored?: boolean | UserCountOutputTypeCountSupportNotesAuthoredArgs
+    supportCasesCreated?: boolean | UserCountOutputTypeCountSupportCasesCreatedArgs
+    supportCasesAssigned?: boolean | UserCountOutputTypeCountSupportCasesAssignedArgs
+    supportCasesTargeted?: boolean | UserCountOutputTypeCountSupportCasesTargetedArgs
+    broadcastsCreated?: boolean | UserCountOutputTypeCountBroadcastsCreatedArgs
+    broadcastsSent?: boolean | UserCountOutputTypeCountBroadcastsSentArgs
+    broadcastsRetracted?: boolean | UserCountOutputTypeCountBroadcastsRetractedArgs
     cardViewLog?: boolean | UserCountOutputTypeCountCardViewLogArgs
   }
 
@@ -5805,6 +6041,48 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSupportNotesAuthoredArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AdminSupportNoteWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSupportCasesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminSupportCaseWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSupportCasesAssignedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminSupportCaseWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSupportCasesTargetedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminSupportCaseWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBroadcastsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminBroadcastWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBroadcastsSentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminBroadcastWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBroadcastsRetractedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminBroadcastWhereInput
   }
 
   /**
@@ -6359,6 +6637,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type AdminBroadcastCountOutputType
+   */
+
+  export type AdminBroadcastCountOutputType = {
+    notifications: number
+  }
+
+  export type AdminBroadcastCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    notifications?: boolean | AdminBroadcastCountOutputTypeCountNotificationsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AdminBroadcastCountOutputType without action
+   */
+  export type AdminBroadcastCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcastCountOutputType
+     */
+    select?: AdminBroadcastCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AdminBroadcastCountOutputType without action
+   */
+  export type AdminBroadcastCountOutputTypeCountNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationWhereInput
+  }
+
+
+  /**
    * Count Type SecurityAlertCountOutputType
    */
 
@@ -6822,6 +7131,12 @@ export namespace Prisma {
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     supportNotesAuthored?: boolean | User$supportNotesAuthoredArgs<ExtArgs>
+    supportCasesCreated?: boolean | User$supportCasesCreatedArgs<ExtArgs>
+    supportCasesAssigned?: boolean | User$supportCasesAssignedArgs<ExtArgs>
+    supportCasesTargeted?: boolean | User$supportCasesTargetedArgs<ExtArgs>
+    broadcastsCreated?: boolean | User$broadcastsCreatedArgs<ExtArgs>
+    broadcastsSent?: boolean | User$broadcastsSentArgs<ExtArgs>
+    broadcastsRetracted?: boolean | User$broadcastsRetractedArgs<ExtArgs>
     cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -6959,6 +7274,12 @@ export namespace Prisma {
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     supportNotesAuthored?: boolean | User$supportNotesAuthoredArgs<ExtArgs>
+    supportCasesCreated?: boolean | User$supportCasesCreatedArgs<ExtArgs>
+    supportCasesAssigned?: boolean | User$supportCasesAssignedArgs<ExtArgs>
+    supportCasesTargeted?: boolean | User$supportCasesTargetedArgs<ExtArgs>
+    broadcastsCreated?: boolean | User$broadcastsCreatedArgs<ExtArgs>
+    broadcastsSent?: boolean | User$broadcastsSentArgs<ExtArgs>
+    broadcastsRetracted?: boolean | User$broadcastsRetractedArgs<ExtArgs>
     cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -7003,6 +7324,12 @@ export namespace Prisma {
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
       onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
       supportNotesAuthored: Prisma.$AdminSupportNotePayload<ExtArgs>[]
+      supportCasesCreated: Prisma.$AdminSupportCasePayload<ExtArgs>[]
+      supportCasesAssigned: Prisma.$AdminSupportCasePayload<ExtArgs>[]
+      supportCasesTargeted: Prisma.$AdminSupportCasePayload<ExtArgs>[]
+      broadcastsCreated: Prisma.$AdminBroadcastPayload<ExtArgs>[]
+      broadcastsSent: Prisma.$AdminBroadcastPayload<ExtArgs>[]
+      broadcastsRetracted: Prisma.$AdminBroadcastPayload<ExtArgs>[]
       cardViewLog: Prisma.$PublicCardViewPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -7464,6 +7791,12 @@ export namespace Prisma {
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     supportNotesAuthored<T extends User$supportNotesAuthoredArgs<ExtArgs> = {}>(args?: Subset<T, User$supportNotesAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    supportCasesCreated<T extends User$supportCasesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$supportCasesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    supportCasesAssigned<T extends User$supportCasesAssignedArgs<ExtArgs> = {}>(args?: Subset<T, User$supportCasesAssignedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    supportCasesTargeted<T extends User$supportCasesTargetedArgs<ExtArgs> = {}>(args?: Subset<T, User$supportCasesTargetedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    broadcastsCreated<T extends User$broadcastsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$broadcastsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    broadcastsSent<T extends User$broadcastsSentArgs<ExtArgs> = {}>(args?: Subset<T, User$broadcastsSentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    broadcastsRetracted<T extends User$broadcastsRetractedArgs<ExtArgs> = {}>(args?: Subset<T, User$broadcastsRetractedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     cardViewLog<T extends User$cardViewLogArgs<ExtArgs> = {}>(args?: Subset<T, User$cardViewLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -8733,6 +9066,150 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AdminSupportNoteScalarFieldEnum | AdminSupportNoteScalarFieldEnum[]
+  }
+
+  /**
+   * User.supportCasesCreated
+   */
+  export type User$supportCasesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    where?: AdminSupportCaseWhereInput
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    cursor?: AdminSupportCaseWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminSupportCaseScalarFieldEnum | AdminSupportCaseScalarFieldEnum[]
+  }
+
+  /**
+   * User.supportCasesAssigned
+   */
+  export type User$supportCasesAssignedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    where?: AdminSupportCaseWhereInput
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    cursor?: AdminSupportCaseWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminSupportCaseScalarFieldEnum | AdminSupportCaseScalarFieldEnum[]
+  }
+
+  /**
+   * User.supportCasesTargeted
+   */
+  export type User$supportCasesTargetedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    where?: AdminSupportCaseWhereInput
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    cursor?: AdminSupportCaseWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminSupportCaseScalarFieldEnum | AdminSupportCaseScalarFieldEnum[]
+  }
+
+  /**
+   * User.broadcastsCreated
+   */
+  export type User$broadcastsCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    where?: AdminBroadcastWhereInput
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    cursor?: AdminBroadcastWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminBroadcastScalarFieldEnum | AdminBroadcastScalarFieldEnum[]
+  }
+
+  /**
+   * User.broadcastsSent
+   */
+  export type User$broadcastsSentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    where?: AdminBroadcastWhereInput
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    cursor?: AdminBroadcastWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminBroadcastScalarFieldEnum | AdminBroadcastScalarFieldEnum[]
+  }
+
+  /**
+   * User.broadcastsRetracted
+   */
+  export type User$broadcastsRetractedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    where?: AdminBroadcastWhereInput
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    cursor?: AdminBroadcastWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminBroadcastScalarFieldEnum | AdminBroadcastScalarFieldEnum[]
   }
 
   /**
@@ -38632,6 +39109,1248 @@ export namespace Prisma {
 
 
   /**
+   * Model AdminSupportCase
+   */
+
+  export type AggregateAdminSupportCase = {
+    _count: AdminSupportCaseCountAggregateOutputType | null
+    _min: AdminSupportCaseMinAggregateOutputType | null
+    _max: AdminSupportCaseMaxAggregateOutputType | null
+  }
+
+  export type AdminSupportCaseMinAggregateOutputType = {
+    id: string | null
+    subjectType: string | null
+    subjectId: string | null
+    targetUserId: string | null
+    creatorAdminUserId: string | null
+    assigneeAdminUserId: string | null
+    title: string | null
+    summary: string | null
+    status: $Enums.AdminSupportCaseStatus | null
+    severity: $Enums.AdminSupportCaseSeverity | null
+    nextFollowUpAt: Date | null
+    resolvedAt: Date | null
+    archivedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AdminSupportCaseMaxAggregateOutputType = {
+    id: string | null
+    subjectType: string | null
+    subjectId: string | null
+    targetUserId: string | null
+    creatorAdminUserId: string | null
+    assigneeAdminUserId: string | null
+    title: string | null
+    summary: string | null
+    status: $Enums.AdminSupportCaseStatus | null
+    severity: $Enums.AdminSupportCaseSeverity | null
+    nextFollowUpAt: Date | null
+    resolvedAt: Date | null
+    archivedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AdminSupportCaseCountAggregateOutputType = {
+    id: number
+    subjectType: number
+    subjectId: number
+    targetUserId: number
+    creatorAdminUserId: number
+    assigneeAdminUserId: number
+    title: number
+    summary: number
+    status: number
+    severity: number
+    nextFollowUpAt: number
+    resolvedAt: number
+    archivedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AdminSupportCaseMinAggregateInputType = {
+    id?: true
+    subjectType?: true
+    subjectId?: true
+    targetUserId?: true
+    creatorAdminUserId?: true
+    assigneeAdminUserId?: true
+    title?: true
+    summary?: true
+    status?: true
+    severity?: true
+    nextFollowUpAt?: true
+    resolvedAt?: true
+    archivedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AdminSupportCaseMaxAggregateInputType = {
+    id?: true
+    subjectType?: true
+    subjectId?: true
+    targetUserId?: true
+    creatorAdminUserId?: true
+    assigneeAdminUserId?: true
+    title?: true
+    summary?: true
+    status?: true
+    severity?: true
+    nextFollowUpAt?: true
+    resolvedAt?: true
+    archivedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AdminSupportCaseCountAggregateInputType = {
+    id?: true
+    subjectType?: true
+    subjectId?: true
+    targetUserId?: true
+    creatorAdminUserId?: true
+    assigneeAdminUserId?: true
+    title?: true
+    summary?: true
+    status?: true
+    severity?: true
+    nextFollowUpAt?: true
+    resolvedAt?: true
+    archivedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AdminSupportCaseAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminSupportCase to aggregate.
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportCases to fetch.
+     */
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AdminSupportCaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportCases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportCases.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AdminSupportCases
+    **/
+    _count?: true | AdminSupportCaseCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AdminSupportCaseMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AdminSupportCaseMaxAggregateInputType
+  }
+
+  export type GetAdminSupportCaseAggregateType<T extends AdminSupportCaseAggregateArgs> = {
+        [P in keyof T & keyof AggregateAdminSupportCase]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAdminSupportCase[P]>
+      : GetScalarType<T[P], AggregateAdminSupportCase[P]>
+  }
+
+
+
+
+  export type AdminSupportCaseGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminSupportCaseWhereInput
+    orderBy?: AdminSupportCaseOrderByWithAggregationInput | AdminSupportCaseOrderByWithAggregationInput[]
+    by: AdminSupportCaseScalarFieldEnum[] | AdminSupportCaseScalarFieldEnum
+    having?: AdminSupportCaseScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AdminSupportCaseCountAggregateInputType | true
+    _min?: AdminSupportCaseMinAggregateInputType
+    _max?: AdminSupportCaseMaxAggregateInputType
+  }
+
+  export type AdminSupportCaseGroupByOutputType = {
+    id: string
+    subjectType: string
+    subjectId: string
+    targetUserId: string | null
+    creatorAdminUserId: string
+    assigneeAdminUserId: string | null
+    title: string
+    summary: string | null
+    status: $Enums.AdminSupportCaseStatus
+    severity: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt: Date | null
+    resolvedAt: Date | null
+    archivedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: AdminSupportCaseCountAggregateOutputType | null
+    _min: AdminSupportCaseMinAggregateOutputType | null
+    _max: AdminSupportCaseMaxAggregateOutputType | null
+  }
+
+  type GetAdminSupportCaseGroupByPayload<T extends AdminSupportCaseGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AdminSupportCaseGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AdminSupportCaseGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AdminSupportCaseGroupByOutputType[P]>
+            : GetScalarType<T[P], AdminSupportCaseGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AdminSupportCaseSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    creatorAdminUserId?: boolean
+    assigneeAdminUserId?: boolean
+    title?: boolean
+    summary?: boolean
+    status?: boolean
+    severity?: boolean
+    nextFollowUpAt?: boolean
+    resolvedAt?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    assignee?: boolean | AdminSupportCase$assigneeArgs<ExtArgs>
+    targetUser?: boolean | AdminSupportCase$targetUserArgs<ExtArgs>
+  }, ExtArgs["result"]["adminSupportCase"]>
+
+  export type AdminSupportCaseSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    creatorAdminUserId?: boolean
+    assigneeAdminUserId?: boolean
+    title?: boolean
+    summary?: boolean
+    status?: boolean
+    severity?: boolean
+    nextFollowUpAt?: boolean
+    resolvedAt?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    assignee?: boolean | AdminSupportCase$assigneeArgs<ExtArgs>
+    targetUser?: boolean | AdminSupportCase$targetUserArgs<ExtArgs>
+  }, ExtArgs["result"]["adminSupportCase"]>
+
+  export type AdminSupportCaseSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    creatorAdminUserId?: boolean
+    assigneeAdminUserId?: boolean
+    title?: boolean
+    summary?: boolean
+    status?: boolean
+    severity?: boolean
+    nextFollowUpAt?: boolean
+    resolvedAt?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    assignee?: boolean | AdminSupportCase$assigneeArgs<ExtArgs>
+    targetUser?: boolean | AdminSupportCase$targetUserArgs<ExtArgs>
+  }, ExtArgs["result"]["adminSupportCase"]>
+
+  export type AdminSupportCaseSelectScalar = {
+    id?: boolean
+    subjectType?: boolean
+    subjectId?: boolean
+    targetUserId?: boolean
+    creatorAdminUserId?: boolean
+    assigneeAdminUserId?: boolean
+    title?: boolean
+    summary?: boolean
+    status?: boolean
+    severity?: boolean
+    nextFollowUpAt?: boolean
+    resolvedAt?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AdminSupportCaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "subjectType" | "subjectId" | "targetUserId" | "creatorAdminUserId" | "assigneeAdminUserId" | "title" | "summary" | "status" | "severity" | "nextFollowUpAt" | "resolvedAt" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["adminSupportCase"]>
+  export type AdminSupportCaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    assignee?: boolean | AdminSupportCase$assigneeArgs<ExtArgs>
+    targetUser?: boolean | AdminSupportCase$targetUserArgs<ExtArgs>
+  }
+  export type AdminSupportCaseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    assignee?: boolean | AdminSupportCase$assigneeArgs<ExtArgs>
+    targetUser?: boolean | AdminSupportCase$targetUserArgs<ExtArgs>
+  }
+  export type AdminSupportCaseIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    assignee?: boolean | AdminSupportCase$assigneeArgs<ExtArgs>
+    targetUser?: boolean | AdminSupportCase$targetUserArgs<ExtArgs>
+  }
+
+  export type $AdminSupportCasePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AdminSupportCase"
+    objects: {
+      creator: Prisma.$UserPayload<ExtArgs>
+      assignee: Prisma.$UserPayload<ExtArgs> | null
+      targetUser: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      subjectType: string
+      subjectId: string
+      targetUserId: string | null
+      creatorAdminUserId: string
+      assigneeAdminUserId: string | null
+      title: string
+      summary: string | null
+      status: $Enums.AdminSupportCaseStatus
+      severity: $Enums.AdminSupportCaseSeverity
+      nextFollowUpAt: Date | null
+      resolvedAt: Date | null
+      archivedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["adminSupportCase"]>
+    composites: {}
+  }
+
+  type AdminSupportCaseGetPayload<S extends boolean | null | undefined | AdminSupportCaseDefaultArgs> = $Result.GetResult<Prisma.$AdminSupportCasePayload, S>
+
+  type AdminSupportCaseCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AdminSupportCaseFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AdminSupportCaseCountAggregateInputType | true
+    }
+
+  export interface AdminSupportCaseDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AdminSupportCase'], meta: { name: 'AdminSupportCase' } }
+    /**
+     * Find zero or one AdminSupportCase that matches the filter.
+     * @param {AdminSupportCaseFindUniqueArgs} args - Arguments to find a AdminSupportCase
+     * @example
+     * // Get one AdminSupportCase
+     * const adminSupportCase = await prisma.adminSupportCase.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AdminSupportCaseFindUniqueArgs>(args: SelectSubset<T, AdminSupportCaseFindUniqueArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AdminSupportCase that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AdminSupportCaseFindUniqueOrThrowArgs} args - Arguments to find a AdminSupportCase
+     * @example
+     * // Get one AdminSupportCase
+     * const adminSupportCase = await prisma.adminSupportCase.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AdminSupportCaseFindUniqueOrThrowArgs>(args: SelectSubset<T, AdminSupportCaseFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminSupportCase that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseFindFirstArgs} args - Arguments to find a AdminSupportCase
+     * @example
+     * // Get one AdminSupportCase
+     * const adminSupportCase = await prisma.adminSupportCase.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AdminSupportCaseFindFirstArgs>(args?: SelectSubset<T, AdminSupportCaseFindFirstArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminSupportCase that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseFindFirstOrThrowArgs} args - Arguments to find a AdminSupportCase
+     * @example
+     * // Get one AdminSupportCase
+     * const adminSupportCase = await prisma.adminSupportCase.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AdminSupportCaseFindFirstOrThrowArgs>(args?: SelectSubset<T, AdminSupportCaseFindFirstOrThrowArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AdminSupportCases that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AdminSupportCases
+     * const adminSupportCases = await prisma.adminSupportCase.findMany()
+     * 
+     * // Get first 10 AdminSupportCases
+     * const adminSupportCases = await prisma.adminSupportCase.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const adminSupportCaseWithIdOnly = await prisma.adminSupportCase.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AdminSupportCaseFindManyArgs>(args?: SelectSubset<T, AdminSupportCaseFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AdminSupportCase.
+     * @param {AdminSupportCaseCreateArgs} args - Arguments to create a AdminSupportCase.
+     * @example
+     * // Create one AdminSupportCase
+     * const AdminSupportCase = await prisma.adminSupportCase.create({
+     *   data: {
+     *     // ... data to create a AdminSupportCase
+     *   }
+     * })
+     * 
+     */
+    create<T extends AdminSupportCaseCreateArgs>(args: SelectSubset<T, AdminSupportCaseCreateArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AdminSupportCases.
+     * @param {AdminSupportCaseCreateManyArgs} args - Arguments to create many AdminSupportCases.
+     * @example
+     * // Create many AdminSupportCases
+     * const adminSupportCase = await prisma.adminSupportCase.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AdminSupportCaseCreateManyArgs>(args?: SelectSubset<T, AdminSupportCaseCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AdminSupportCases and returns the data saved in the database.
+     * @param {AdminSupportCaseCreateManyAndReturnArgs} args - Arguments to create many AdminSupportCases.
+     * @example
+     * // Create many AdminSupportCases
+     * const adminSupportCase = await prisma.adminSupportCase.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AdminSupportCases and only return the `id`
+     * const adminSupportCaseWithIdOnly = await prisma.adminSupportCase.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AdminSupportCaseCreateManyAndReturnArgs>(args?: SelectSubset<T, AdminSupportCaseCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AdminSupportCase.
+     * @param {AdminSupportCaseDeleteArgs} args - Arguments to delete one AdminSupportCase.
+     * @example
+     * // Delete one AdminSupportCase
+     * const AdminSupportCase = await prisma.adminSupportCase.delete({
+     *   where: {
+     *     // ... filter to delete one AdminSupportCase
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AdminSupportCaseDeleteArgs>(args: SelectSubset<T, AdminSupportCaseDeleteArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AdminSupportCase.
+     * @param {AdminSupportCaseUpdateArgs} args - Arguments to update one AdminSupportCase.
+     * @example
+     * // Update one AdminSupportCase
+     * const adminSupportCase = await prisma.adminSupportCase.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AdminSupportCaseUpdateArgs>(args: SelectSubset<T, AdminSupportCaseUpdateArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AdminSupportCases.
+     * @param {AdminSupportCaseDeleteManyArgs} args - Arguments to filter AdminSupportCases to delete.
+     * @example
+     * // Delete a few AdminSupportCases
+     * const { count } = await prisma.adminSupportCase.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AdminSupportCaseDeleteManyArgs>(args?: SelectSubset<T, AdminSupportCaseDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminSupportCases.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AdminSupportCases
+     * const adminSupportCase = await prisma.adminSupportCase.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AdminSupportCaseUpdateManyArgs>(args: SelectSubset<T, AdminSupportCaseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminSupportCases and returns the data updated in the database.
+     * @param {AdminSupportCaseUpdateManyAndReturnArgs} args - Arguments to update many AdminSupportCases.
+     * @example
+     * // Update many AdminSupportCases
+     * const adminSupportCase = await prisma.adminSupportCase.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AdminSupportCases and only return the `id`
+     * const adminSupportCaseWithIdOnly = await prisma.adminSupportCase.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AdminSupportCaseUpdateManyAndReturnArgs>(args: SelectSubset<T, AdminSupportCaseUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AdminSupportCase.
+     * @param {AdminSupportCaseUpsertArgs} args - Arguments to update or create a AdminSupportCase.
+     * @example
+     * // Update or create a AdminSupportCase
+     * const adminSupportCase = await prisma.adminSupportCase.upsert({
+     *   create: {
+     *     // ... data to create a AdminSupportCase
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AdminSupportCase we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AdminSupportCaseUpsertArgs>(args: SelectSubset<T, AdminSupportCaseUpsertArgs<ExtArgs>>): Prisma__AdminSupportCaseClient<$Result.GetResult<Prisma.$AdminSupportCasePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AdminSupportCases.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseCountArgs} args - Arguments to filter AdminSupportCases to count.
+     * @example
+     * // Count the number of AdminSupportCases
+     * const count = await prisma.adminSupportCase.count({
+     *   where: {
+     *     // ... the filter for the AdminSupportCases we want to count
+     *   }
+     * })
+    **/
+    count<T extends AdminSupportCaseCountArgs>(
+      args?: Subset<T, AdminSupportCaseCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AdminSupportCaseCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AdminSupportCase.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AdminSupportCaseAggregateArgs>(args: Subset<T, AdminSupportCaseAggregateArgs>): Prisma.PrismaPromise<GetAdminSupportCaseAggregateType<T>>
+
+    /**
+     * Group by AdminSupportCase.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminSupportCaseGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminSupportCaseGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminSupportCaseGroupByArgs['orderBy'] }
+        : { orderBy?: AdminSupportCaseGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminSupportCaseGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminSupportCaseGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AdminSupportCase model
+   */
+  readonly fields: AdminSupportCaseFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AdminSupportCase.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AdminSupportCaseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    creator<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    assignee<T extends AdminSupportCase$assigneeArgs<ExtArgs> = {}>(args?: Subset<T, AdminSupportCase$assigneeArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    targetUser<T extends AdminSupportCase$targetUserArgs<ExtArgs> = {}>(args?: Subset<T, AdminSupportCase$targetUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AdminSupportCase model
+   */
+  interface AdminSupportCaseFieldRefs {
+    readonly id: FieldRef<"AdminSupportCase", 'String'>
+    readonly subjectType: FieldRef<"AdminSupportCase", 'String'>
+    readonly subjectId: FieldRef<"AdminSupportCase", 'String'>
+    readonly targetUserId: FieldRef<"AdminSupportCase", 'String'>
+    readonly creatorAdminUserId: FieldRef<"AdminSupportCase", 'String'>
+    readonly assigneeAdminUserId: FieldRef<"AdminSupportCase", 'String'>
+    readonly title: FieldRef<"AdminSupportCase", 'String'>
+    readonly summary: FieldRef<"AdminSupportCase", 'String'>
+    readonly status: FieldRef<"AdminSupportCase", 'AdminSupportCaseStatus'>
+    readonly severity: FieldRef<"AdminSupportCase", 'AdminSupportCaseSeverity'>
+    readonly nextFollowUpAt: FieldRef<"AdminSupportCase", 'DateTime'>
+    readonly resolvedAt: FieldRef<"AdminSupportCase", 'DateTime'>
+    readonly archivedAt: FieldRef<"AdminSupportCase", 'DateTime'>
+    readonly createdAt: FieldRef<"AdminSupportCase", 'DateTime'>
+    readonly updatedAt: FieldRef<"AdminSupportCase", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AdminSupportCase findUnique
+   */
+  export type AdminSupportCaseFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportCase to fetch.
+     */
+    where: AdminSupportCaseWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportCase findUniqueOrThrow
+   */
+  export type AdminSupportCaseFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportCase to fetch.
+     */
+    where: AdminSupportCaseWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportCase findFirst
+   */
+  export type AdminSupportCaseFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportCase to fetch.
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportCases to fetch.
+     */
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminSupportCases.
+     */
+    cursor?: AdminSupportCaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportCases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportCases.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminSupportCases.
+     */
+    distinct?: AdminSupportCaseScalarFieldEnum | AdminSupportCaseScalarFieldEnum[]
+  }
+
+  /**
+   * AdminSupportCase findFirstOrThrow
+   */
+  export type AdminSupportCaseFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportCase to fetch.
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportCases to fetch.
+     */
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminSupportCases.
+     */
+    cursor?: AdminSupportCaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportCases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportCases.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminSupportCases.
+     */
+    distinct?: AdminSupportCaseScalarFieldEnum | AdminSupportCaseScalarFieldEnum[]
+  }
+
+  /**
+   * AdminSupportCase findMany
+   */
+  export type AdminSupportCaseFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminSupportCases to fetch.
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminSupportCases to fetch.
+     */
+    orderBy?: AdminSupportCaseOrderByWithRelationInput | AdminSupportCaseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AdminSupportCases.
+     */
+    cursor?: AdminSupportCaseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminSupportCases from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminSupportCases.
+     */
+    skip?: number
+    distinct?: AdminSupportCaseScalarFieldEnum | AdminSupportCaseScalarFieldEnum[]
+  }
+
+  /**
+   * AdminSupportCase create
+   */
+  export type AdminSupportCaseCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AdminSupportCase.
+     */
+    data: XOR<AdminSupportCaseCreateInput, AdminSupportCaseUncheckedCreateInput>
+  }
+
+  /**
+   * AdminSupportCase createMany
+   */
+  export type AdminSupportCaseCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AdminSupportCases.
+     */
+    data: AdminSupportCaseCreateManyInput | AdminSupportCaseCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminSupportCase createManyAndReturn
+   */
+  export type AdminSupportCaseCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * The data used to create many AdminSupportCases.
+     */
+    data: AdminSupportCaseCreateManyInput | AdminSupportCaseCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminSupportCase update
+   */
+  export type AdminSupportCaseUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AdminSupportCase.
+     */
+    data: XOR<AdminSupportCaseUpdateInput, AdminSupportCaseUncheckedUpdateInput>
+    /**
+     * Choose, which AdminSupportCase to update.
+     */
+    where: AdminSupportCaseWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportCase updateMany
+   */
+  export type AdminSupportCaseUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AdminSupportCases.
+     */
+    data: XOR<AdminSupportCaseUpdateManyMutationInput, AdminSupportCaseUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminSupportCases to update
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * Limit how many AdminSupportCases to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminSupportCase updateManyAndReturn
+   */
+  export type AdminSupportCaseUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * The data used to update AdminSupportCases.
+     */
+    data: XOR<AdminSupportCaseUpdateManyMutationInput, AdminSupportCaseUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminSupportCases to update
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * Limit how many AdminSupportCases to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminSupportCase upsert
+   */
+  export type AdminSupportCaseUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AdminSupportCase to update in case it exists.
+     */
+    where: AdminSupportCaseWhereUniqueInput
+    /**
+     * In case the AdminSupportCase found by the `where` argument doesn't exist, create a new AdminSupportCase with this data.
+     */
+    create: XOR<AdminSupportCaseCreateInput, AdminSupportCaseUncheckedCreateInput>
+    /**
+     * In case the AdminSupportCase was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AdminSupportCaseUpdateInput, AdminSupportCaseUncheckedUpdateInput>
+  }
+
+  /**
+   * AdminSupportCase delete
+   */
+  export type AdminSupportCaseDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+    /**
+     * Filter which AdminSupportCase to delete.
+     */
+    where: AdminSupportCaseWhereUniqueInput
+  }
+
+  /**
+   * AdminSupportCase deleteMany
+   */
+  export type AdminSupportCaseDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminSupportCases to delete
+     */
+    where?: AdminSupportCaseWhereInput
+    /**
+     * Limit how many AdminSupportCases to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminSupportCase.assignee
+   */
+  export type AdminSupportCase$assigneeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * AdminSupportCase.targetUser
+   */
+  export type AdminSupportCase$targetUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * AdminSupportCase without action
+   */
+  export type AdminSupportCaseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminSupportCase
+     */
+    select?: AdminSupportCaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminSupportCase
+     */
+    omit?: AdminSupportCaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminSupportCaseInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model FeatureFlag
    */
 
@@ -51529,6 +53248,7 @@ export namespace Prisma {
     dismissedAt: Date | null
     actionUrl: string | null
     securityAlertId: string | null
+    adminBroadcastId: string | null
     createdAt: Date | null
   }
 
@@ -51543,6 +53263,7 @@ export namespace Prisma {
     dismissedAt: Date | null
     actionUrl: string | null
     securityAlertId: string | null
+    adminBroadcastId: string | null
     createdAt: Date | null
   }
 
@@ -51557,6 +53278,7 @@ export namespace Prisma {
     dismissedAt: number
     actionUrl: number
     securityAlertId: number
+    adminBroadcastId: number
     createdAt: number
     _all: number
   }
@@ -51573,6 +53295,7 @@ export namespace Prisma {
     dismissedAt?: true
     actionUrl?: true
     securityAlertId?: true
+    adminBroadcastId?: true
     createdAt?: true
   }
 
@@ -51587,6 +53310,7 @@ export namespace Prisma {
     dismissedAt?: true
     actionUrl?: true
     securityAlertId?: true
+    adminBroadcastId?: true
     createdAt?: true
   }
 
@@ -51601,6 +53325,7 @@ export namespace Prisma {
     dismissedAt?: true
     actionUrl?: true
     securityAlertId?: true
+    adminBroadcastId?: true
     createdAt?: true
     _all?: true
   }
@@ -51688,6 +53413,7 @@ export namespace Prisma {
     dismissedAt: Date | null
     actionUrl: string | null
     securityAlertId: string | null
+    adminBroadcastId: string | null
     createdAt: Date
     _count: NotificationCountAggregateOutputType | null
     _min: NotificationMinAggregateOutputType | null
@@ -51719,9 +53445,11 @@ export namespace Prisma {
     dismissedAt?: boolean
     actionUrl?: boolean
     securityAlertId?: boolean
+    adminBroadcastId?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
+    adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -51735,9 +53463,11 @@ export namespace Prisma {
     dismissedAt?: boolean
     actionUrl?: boolean
     securityAlertId?: boolean
+    adminBroadcastId?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
+    adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -51751,9 +53481,11 @@ export namespace Prisma {
     dismissedAt?: boolean
     actionUrl?: boolean
     securityAlertId?: boolean
+    adminBroadcastId?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
+    adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectScalar = {
@@ -51767,21 +53499,25 @@ export namespace Prisma {
     dismissedAt?: boolean
     actionUrl?: boolean
     securityAlertId?: boolean
+    adminBroadcastId?: boolean
     createdAt?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "title" | "body" | "read" | "readAt" | "dismissedAt" | "actionUrl" | "securityAlertId" | "createdAt", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "title" | "body" | "read" | "readAt" | "dismissedAt" | "actionUrl" | "securityAlertId" | "adminBroadcastId" | "createdAt", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
+    adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
   }
   export type NotificationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
+    adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
   }
   export type NotificationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
+    adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
   }
 
   export type $NotificationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -51789,6 +53525,7 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       securityAlert: Prisma.$SecurityAlertPayload<ExtArgs> | null
+      adminBroadcast: Prisma.$AdminBroadcastPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -51801,6 +53538,7 @@ export namespace Prisma {
       dismissedAt: Date | null
       actionUrl: string | null
       securityAlertId: string | null
+      adminBroadcastId: string | null
       createdAt: Date
     }, ExtArgs["result"]["notification"]>
     composites: {}
@@ -52198,6 +53936,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     securityAlert<T extends Notification$securityAlertArgs<ExtArgs> = {}>(args?: Subset<T, Notification$securityAlertArgs<ExtArgs>>): Prisma__SecurityAlertClient<$Result.GetResult<Prisma.$SecurityAlertPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    adminBroadcast<T extends Notification$adminBroadcastArgs<ExtArgs> = {}>(args?: Subset<T, Notification$adminBroadcastArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -52237,6 +53976,7 @@ export namespace Prisma {
     readonly dismissedAt: FieldRef<"Notification", 'DateTime'>
     readonly actionUrl: FieldRef<"Notification", 'String'>
     readonly securityAlertId: FieldRef<"Notification", 'String'>
+    readonly adminBroadcastId: FieldRef<"Notification", 'String'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
   }
     
@@ -52653,6 +54393,25 @@ export namespace Prisma {
   }
 
   /**
+   * Notification.adminBroadcast
+   */
+  export type Notification$adminBroadcastArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    where?: AdminBroadcastWhereInput
+  }
+
+  /**
    * Notification without action
    */
   export type NotificationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -52668,6 +54427,1334 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: NotificationInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AdminBroadcast
+   */
+
+  export type AggregateAdminBroadcast = {
+    _count: AdminBroadcastCountAggregateOutputType | null
+    _avg: AdminBroadcastAvgAggregateOutputType | null
+    _sum: AdminBroadcastSumAggregateOutputType | null
+    _min: AdminBroadcastMinAggregateOutputType | null
+    _max: AdminBroadcastMaxAggregateOutputType | null
+  }
+
+  export type AdminBroadcastAvgAggregateOutputType = {
+    previewRecipientCount: number | null
+    deliveredRecipientCount: number | null
+  }
+
+  export type AdminBroadcastSumAggregateOutputType = {
+    previewRecipientCount: number | null
+    deliveredRecipientCount: number | null
+  }
+
+  export type AdminBroadcastMinAggregateOutputType = {
+    id: string | null
+    createdByAdminUserId: string | null
+    sentByAdminUserId: string | null
+    retractedByAdminUserId: string | null
+    title: string | null
+    body: string | null
+    actionUrl: string | null
+    status: $Enums.AdminBroadcastStatus | null
+    scheduledFor: Date | null
+    sentAt: Date | null
+    retractedAt: Date | null
+    previewRecipientCount: number | null
+    deliveredRecipientCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AdminBroadcastMaxAggregateOutputType = {
+    id: string | null
+    createdByAdminUserId: string | null
+    sentByAdminUserId: string | null
+    retractedByAdminUserId: string | null
+    title: string | null
+    body: string | null
+    actionUrl: string | null
+    status: $Enums.AdminBroadcastStatus | null
+    scheduledFor: Date | null
+    sentAt: Date | null
+    retractedAt: Date | null
+    previewRecipientCount: number | null
+    deliveredRecipientCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AdminBroadcastCountAggregateOutputType = {
+    id: number
+    createdByAdminUserId: number
+    sentByAdminUserId: number
+    retractedByAdminUserId: number
+    title: number
+    body: number
+    actionUrl: number
+    status: number
+    scheduledFor: number
+    sentAt: number
+    retractedAt: number
+    audienceFilters: number
+    audienceSummary: number
+    previewRecipientCount: number
+    deliveredRecipientCount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AdminBroadcastAvgAggregateInputType = {
+    previewRecipientCount?: true
+    deliveredRecipientCount?: true
+  }
+
+  export type AdminBroadcastSumAggregateInputType = {
+    previewRecipientCount?: true
+    deliveredRecipientCount?: true
+  }
+
+  export type AdminBroadcastMinAggregateInputType = {
+    id?: true
+    createdByAdminUserId?: true
+    sentByAdminUserId?: true
+    retractedByAdminUserId?: true
+    title?: true
+    body?: true
+    actionUrl?: true
+    status?: true
+    scheduledFor?: true
+    sentAt?: true
+    retractedAt?: true
+    previewRecipientCount?: true
+    deliveredRecipientCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AdminBroadcastMaxAggregateInputType = {
+    id?: true
+    createdByAdminUserId?: true
+    sentByAdminUserId?: true
+    retractedByAdminUserId?: true
+    title?: true
+    body?: true
+    actionUrl?: true
+    status?: true
+    scheduledFor?: true
+    sentAt?: true
+    retractedAt?: true
+    previewRecipientCount?: true
+    deliveredRecipientCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AdminBroadcastCountAggregateInputType = {
+    id?: true
+    createdByAdminUserId?: true
+    sentByAdminUserId?: true
+    retractedByAdminUserId?: true
+    title?: true
+    body?: true
+    actionUrl?: true
+    status?: true
+    scheduledFor?: true
+    sentAt?: true
+    retractedAt?: true
+    audienceFilters?: true
+    audienceSummary?: true
+    previewRecipientCount?: true
+    deliveredRecipientCount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AdminBroadcastAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminBroadcast to aggregate.
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminBroadcasts to fetch.
+     */
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AdminBroadcastWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminBroadcasts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminBroadcasts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AdminBroadcasts
+    **/
+    _count?: true | AdminBroadcastCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AdminBroadcastAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AdminBroadcastSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AdminBroadcastMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AdminBroadcastMaxAggregateInputType
+  }
+
+  export type GetAdminBroadcastAggregateType<T extends AdminBroadcastAggregateArgs> = {
+        [P in keyof T & keyof AggregateAdminBroadcast]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAdminBroadcast[P]>
+      : GetScalarType<T[P], AggregateAdminBroadcast[P]>
+  }
+
+
+
+
+  export type AdminBroadcastGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminBroadcastWhereInput
+    orderBy?: AdminBroadcastOrderByWithAggregationInput | AdminBroadcastOrderByWithAggregationInput[]
+    by: AdminBroadcastScalarFieldEnum[] | AdminBroadcastScalarFieldEnum
+    having?: AdminBroadcastScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AdminBroadcastCountAggregateInputType | true
+    _avg?: AdminBroadcastAvgAggregateInputType
+    _sum?: AdminBroadcastSumAggregateInputType
+    _min?: AdminBroadcastMinAggregateInputType
+    _max?: AdminBroadcastMaxAggregateInputType
+  }
+
+  export type AdminBroadcastGroupByOutputType = {
+    id: string
+    createdByAdminUserId: string
+    sentByAdminUserId: string | null
+    retractedByAdminUserId: string | null
+    title: string
+    body: string
+    actionUrl: string | null
+    status: $Enums.AdminBroadcastStatus
+    scheduledFor: Date | null
+    sentAt: Date | null
+    retractedAt: Date | null
+    audienceFilters: JsonValue
+    audienceSummary: JsonValue
+    previewRecipientCount: number
+    deliveredRecipientCount: number
+    createdAt: Date
+    updatedAt: Date
+    _count: AdminBroadcastCountAggregateOutputType | null
+    _avg: AdminBroadcastAvgAggregateOutputType | null
+    _sum: AdminBroadcastSumAggregateOutputType | null
+    _min: AdminBroadcastMinAggregateOutputType | null
+    _max: AdminBroadcastMaxAggregateOutputType | null
+  }
+
+  type GetAdminBroadcastGroupByPayload<T extends AdminBroadcastGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AdminBroadcastGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AdminBroadcastGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AdminBroadcastGroupByOutputType[P]>
+            : GetScalarType<T[P], AdminBroadcastGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AdminBroadcastSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdByAdminUserId?: boolean
+    sentByAdminUserId?: boolean
+    retractedByAdminUserId?: boolean
+    title?: boolean
+    body?: boolean
+    actionUrl?: boolean
+    status?: boolean
+    scheduledFor?: boolean
+    sentAt?: boolean
+    retractedAt?: boolean
+    audienceFilters?: boolean
+    audienceSummary?: boolean
+    previewRecipientCount?: boolean
+    deliveredRecipientCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    sender?: boolean | AdminBroadcast$senderArgs<ExtArgs>
+    retractor?: boolean | AdminBroadcast$retractorArgs<ExtArgs>
+    notifications?: boolean | AdminBroadcast$notificationsArgs<ExtArgs>
+    _count?: boolean | AdminBroadcastCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminBroadcast"]>
+
+  export type AdminBroadcastSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdByAdminUserId?: boolean
+    sentByAdminUserId?: boolean
+    retractedByAdminUserId?: boolean
+    title?: boolean
+    body?: boolean
+    actionUrl?: boolean
+    status?: boolean
+    scheduledFor?: boolean
+    sentAt?: boolean
+    retractedAt?: boolean
+    audienceFilters?: boolean
+    audienceSummary?: boolean
+    previewRecipientCount?: boolean
+    deliveredRecipientCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    sender?: boolean | AdminBroadcast$senderArgs<ExtArgs>
+    retractor?: boolean | AdminBroadcast$retractorArgs<ExtArgs>
+  }, ExtArgs["result"]["adminBroadcast"]>
+
+  export type AdminBroadcastSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdByAdminUserId?: boolean
+    sentByAdminUserId?: boolean
+    retractedByAdminUserId?: boolean
+    title?: boolean
+    body?: boolean
+    actionUrl?: boolean
+    status?: boolean
+    scheduledFor?: boolean
+    sentAt?: boolean
+    retractedAt?: boolean
+    audienceFilters?: boolean
+    audienceSummary?: boolean
+    previewRecipientCount?: boolean
+    deliveredRecipientCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    sender?: boolean | AdminBroadcast$senderArgs<ExtArgs>
+    retractor?: boolean | AdminBroadcast$retractorArgs<ExtArgs>
+  }, ExtArgs["result"]["adminBroadcast"]>
+
+  export type AdminBroadcastSelectScalar = {
+    id?: boolean
+    createdByAdminUserId?: boolean
+    sentByAdminUserId?: boolean
+    retractedByAdminUserId?: boolean
+    title?: boolean
+    body?: boolean
+    actionUrl?: boolean
+    status?: boolean
+    scheduledFor?: boolean
+    sentAt?: boolean
+    retractedAt?: boolean
+    audienceFilters?: boolean
+    audienceSummary?: boolean
+    previewRecipientCount?: boolean
+    deliveredRecipientCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AdminBroadcastOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdByAdminUserId" | "sentByAdminUserId" | "retractedByAdminUserId" | "title" | "body" | "actionUrl" | "status" | "scheduledFor" | "sentAt" | "retractedAt" | "audienceFilters" | "audienceSummary" | "previewRecipientCount" | "deliveredRecipientCount" | "createdAt" | "updatedAt", ExtArgs["result"]["adminBroadcast"]>
+  export type AdminBroadcastInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    sender?: boolean | AdminBroadcast$senderArgs<ExtArgs>
+    retractor?: boolean | AdminBroadcast$retractorArgs<ExtArgs>
+    notifications?: boolean | AdminBroadcast$notificationsArgs<ExtArgs>
+    _count?: boolean | AdminBroadcastCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type AdminBroadcastIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    sender?: boolean | AdminBroadcast$senderArgs<ExtArgs>
+    retractor?: boolean | AdminBroadcast$retractorArgs<ExtArgs>
+  }
+  export type AdminBroadcastIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    sender?: boolean | AdminBroadcast$senderArgs<ExtArgs>
+    retractor?: boolean | AdminBroadcast$retractorArgs<ExtArgs>
+  }
+
+  export type $AdminBroadcastPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AdminBroadcast"
+    objects: {
+      creator: Prisma.$UserPayload<ExtArgs>
+      sender: Prisma.$UserPayload<ExtArgs> | null
+      retractor: Prisma.$UserPayload<ExtArgs> | null
+      notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdByAdminUserId: string
+      sentByAdminUserId: string | null
+      retractedByAdminUserId: string | null
+      title: string
+      body: string
+      actionUrl: string | null
+      status: $Enums.AdminBroadcastStatus
+      scheduledFor: Date | null
+      sentAt: Date | null
+      retractedAt: Date | null
+      audienceFilters: Prisma.JsonValue
+      audienceSummary: Prisma.JsonValue
+      previewRecipientCount: number
+      deliveredRecipientCount: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["adminBroadcast"]>
+    composites: {}
+  }
+
+  type AdminBroadcastGetPayload<S extends boolean | null | undefined | AdminBroadcastDefaultArgs> = $Result.GetResult<Prisma.$AdminBroadcastPayload, S>
+
+  type AdminBroadcastCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AdminBroadcastFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AdminBroadcastCountAggregateInputType | true
+    }
+
+  export interface AdminBroadcastDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AdminBroadcast'], meta: { name: 'AdminBroadcast' } }
+    /**
+     * Find zero or one AdminBroadcast that matches the filter.
+     * @param {AdminBroadcastFindUniqueArgs} args - Arguments to find a AdminBroadcast
+     * @example
+     * // Get one AdminBroadcast
+     * const adminBroadcast = await prisma.adminBroadcast.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AdminBroadcastFindUniqueArgs>(args: SelectSubset<T, AdminBroadcastFindUniqueArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AdminBroadcast that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AdminBroadcastFindUniqueOrThrowArgs} args - Arguments to find a AdminBroadcast
+     * @example
+     * // Get one AdminBroadcast
+     * const adminBroadcast = await prisma.adminBroadcast.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AdminBroadcastFindUniqueOrThrowArgs>(args: SelectSubset<T, AdminBroadcastFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminBroadcast that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastFindFirstArgs} args - Arguments to find a AdminBroadcast
+     * @example
+     * // Get one AdminBroadcast
+     * const adminBroadcast = await prisma.adminBroadcast.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AdminBroadcastFindFirstArgs>(args?: SelectSubset<T, AdminBroadcastFindFirstArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminBroadcast that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastFindFirstOrThrowArgs} args - Arguments to find a AdminBroadcast
+     * @example
+     * // Get one AdminBroadcast
+     * const adminBroadcast = await prisma.adminBroadcast.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AdminBroadcastFindFirstOrThrowArgs>(args?: SelectSubset<T, AdminBroadcastFindFirstOrThrowArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AdminBroadcasts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AdminBroadcasts
+     * const adminBroadcasts = await prisma.adminBroadcast.findMany()
+     * 
+     * // Get first 10 AdminBroadcasts
+     * const adminBroadcasts = await prisma.adminBroadcast.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const adminBroadcastWithIdOnly = await prisma.adminBroadcast.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AdminBroadcastFindManyArgs>(args?: SelectSubset<T, AdminBroadcastFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AdminBroadcast.
+     * @param {AdminBroadcastCreateArgs} args - Arguments to create a AdminBroadcast.
+     * @example
+     * // Create one AdminBroadcast
+     * const AdminBroadcast = await prisma.adminBroadcast.create({
+     *   data: {
+     *     // ... data to create a AdminBroadcast
+     *   }
+     * })
+     * 
+     */
+    create<T extends AdminBroadcastCreateArgs>(args: SelectSubset<T, AdminBroadcastCreateArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AdminBroadcasts.
+     * @param {AdminBroadcastCreateManyArgs} args - Arguments to create many AdminBroadcasts.
+     * @example
+     * // Create many AdminBroadcasts
+     * const adminBroadcast = await prisma.adminBroadcast.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AdminBroadcastCreateManyArgs>(args?: SelectSubset<T, AdminBroadcastCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AdminBroadcasts and returns the data saved in the database.
+     * @param {AdminBroadcastCreateManyAndReturnArgs} args - Arguments to create many AdminBroadcasts.
+     * @example
+     * // Create many AdminBroadcasts
+     * const adminBroadcast = await prisma.adminBroadcast.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AdminBroadcasts and only return the `id`
+     * const adminBroadcastWithIdOnly = await prisma.adminBroadcast.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AdminBroadcastCreateManyAndReturnArgs>(args?: SelectSubset<T, AdminBroadcastCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AdminBroadcast.
+     * @param {AdminBroadcastDeleteArgs} args - Arguments to delete one AdminBroadcast.
+     * @example
+     * // Delete one AdminBroadcast
+     * const AdminBroadcast = await prisma.adminBroadcast.delete({
+     *   where: {
+     *     // ... filter to delete one AdminBroadcast
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AdminBroadcastDeleteArgs>(args: SelectSubset<T, AdminBroadcastDeleteArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AdminBroadcast.
+     * @param {AdminBroadcastUpdateArgs} args - Arguments to update one AdminBroadcast.
+     * @example
+     * // Update one AdminBroadcast
+     * const adminBroadcast = await prisma.adminBroadcast.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AdminBroadcastUpdateArgs>(args: SelectSubset<T, AdminBroadcastUpdateArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AdminBroadcasts.
+     * @param {AdminBroadcastDeleteManyArgs} args - Arguments to filter AdminBroadcasts to delete.
+     * @example
+     * // Delete a few AdminBroadcasts
+     * const { count } = await prisma.adminBroadcast.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AdminBroadcastDeleteManyArgs>(args?: SelectSubset<T, AdminBroadcastDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminBroadcasts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AdminBroadcasts
+     * const adminBroadcast = await prisma.adminBroadcast.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AdminBroadcastUpdateManyArgs>(args: SelectSubset<T, AdminBroadcastUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminBroadcasts and returns the data updated in the database.
+     * @param {AdminBroadcastUpdateManyAndReturnArgs} args - Arguments to update many AdminBroadcasts.
+     * @example
+     * // Update many AdminBroadcasts
+     * const adminBroadcast = await prisma.adminBroadcast.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AdminBroadcasts and only return the `id`
+     * const adminBroadcastWithIdOnly = await prisma.adminBroadcast.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AdminBroadcastUpdateManyAndReturnArgs>(args: SelectSubset<T, AdminBroadcastUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AdminBroadcast.
+     * @param {AdminBroadcastUpsertArgs} args - Arguments to update or create a AdminBroadcast.
+     * @example
+     * // Update or create a AdminBroadcast
+     * const adminBroadcast = await prisma.adminBroadcast.upsert({
+     *   create: {
+     *     // ... data to create a AdminBroadcast
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AdminBroadcast we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AdminBroadcastUpsertArgs>(args: SelectSubset<T, AdminBroadcastUpsertArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AdminBroadcasts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastCountArgs} args - Arguments to filter AdminBroadcasts to count.
+     * @example
+     * // Count the number of AdminBroadcasts
+     * const count = await prisma.adminBroadcast.count({
+     *   where: {
+     *     // ... the filter for the AdminBroadcasts we want to count
+     *   }
+     * })
+    **/
+    count<T extends AdminBroadcastCountArgs>(
+      args?: Subset<T, AdminBroadcastCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AdminBroadcastCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AdminBroadcast.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AdminBroadcastAggregateArgs>(args: Subset<T, AdminBroadcastAggregateArgs>): Prisma.PrismaPromise<GetAdminBroadcastAggregateType<T>>
+
+    /**
+     * Group by AdminBroadcast.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminBroadcastGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminBroadcastGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminBroadcastGroupByArgs['orderBy'] }
+        : { orderBy?: AdminBroadcastGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminBroadcastGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminBroadcastGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AdminBroadcast model
+   */
+  readonly fields: AdminBroadcastFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AdminBroadcast.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AdminBroadcastClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    creator<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    sender<T extends AdminBroadcast$senderArgs<ExtArgs> = {}>(args?: Subset<T, AdminBroadcast$senderArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    retractor<T extends AdminBroadcast$retractorArgs<ExtArgs> = {}>(args?: Subset<T, AdminBroadcast$retractorArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    notifications<T extends AdminBroadcast$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, AdminBroadcast$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AdminBroadcast model
+   */
+  interface AdminBroadcastFieldRefs {
+    readonly id: FieldRef<"AdminBroadcast", 'String'>
+    readonly createdByAdminUserId: FieldRef<"AdminBroadcast", 'String'>
+    readonly sentByAdminUserId: FieldRef<"AdminBroadcast", 'String'>
+    readonly retractedByAdminUserId: FieldRef<"AdminBroadcast", 'String'>
+    readonly title: FieldRef<"AdminBroadcast", 'String'>
+    readonly body: FieldRef<"AdminBroadcast", 'String'>
+    readonly actionUrl: FieldRef<"AdminBroadcast", 'String'>
+    readonly status: FieldRef<"AdminBroadcast", 'AdminBroadcastStatus'>
+    readonly scheduledFor: FieldRef<"AdminBroadcast", 'DateTime'>
+    readonly sentAt: FieldRef<"AdminBroadcast", 'DateTime'>
+    readonly retractedAt: FieldRef<"AdminBroadcast", 'DateTime'>
+    readonly audienceFilters: FieldRef<"AdminBroadcast", 'Json'>
+    readonly audienceSummary: FieldRef<"AdminBroadcast", 'Json'>
+    readonly previewRecipientCount: FieldRef<"AdminBroadcast", 'Int'>
+    readonly deliveredRecipientCount: FieldRef<"AdminBroadcast", 'Int'>
+    readonly createdAt: FieldRef<"AdminBroadcast", 'DateTime'>
+    readonly updatedAt: FieldRef<"AdminBroadcast", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AdminBroadcast findUnique
+   */
+  export type AdminBroadcastFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminBroadcast to fetch.
+     */
+    where: AdminBroadcastWhereUniqueInput
+  }
+
+  /**
+   * AdminBroadcast findUniqueOrThrow
+   */
+  export type AdminBroadcastFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminBroadcast to fetch.
+     */
+    where: AdminBroadcastWhereUniqueInput
+  }
+
+  /**
+   * AdminBroadcast findFirst
+   */
+  export type AdminBroadcastFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminBroadcast to fetch.
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminBroadcasts to fetch.
+     */
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminBroadcasts.
+     */
+    cursor?: AdminBroadcastWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminBroadcasts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminBroadcasts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminBroadcasts.
+     */
+    distinct?: AdminBroadcastScalarFieldEnum | AdminBroadcastScalarFieldEnum[]
+  }
+
+  /**
+   * AdminBroadcast findFirstOrThrow
+   */
+  export type AdminBroadcastFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminBroadcast to fetch.
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminBroadcasts to fetch.
+     */
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminBroadcasts.
+     */
+    cursor?: AdminBroadcastWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminBroadcasts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminBroadcasts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminBroadcasts.
+     */
+    distinct?: AdminBroadcastScalarFieldEnum | AdminBroadcastScalarFieldEnum[]
+  }
+
+  /**
+   * AdminBroadcast findMany
+   */
+  export type AdminBroadcastFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminBroadcasts to fetch.
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminBroadcasts to fetch.
+     */
+    orderBy?: AdminBroadcastOrderByWithRelationInput | AdminBroadcastOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AdminBroadcasts.
+     */
+    cursor?: AdminBroadcastWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminBroadcasts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminBroadcasts.
+     */
+    skip?: number
+    distinct?: AdminBroadcastScalarFieldEnum | AdminBroadcastScalarFieldEnum[]
+  }
+
+  /**
+   * AdminBroadcast create
+   */
+  export type AdminBroadcastCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AdminBroadcast.
+     */
+    data: XOR<AdminBroadcastCreateInput, AdminBroadcastUncheckedCreateInput>
+  }
+
+  /**
+   * AdminBroadcast createMany
+   */
+  export type AdminBroadcastCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AdminBroadcasts.
+     */
+    data: AdminBroadcastCreateManyInput | AdminBroadcastCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminBroadcast createManyAndReturn
+   */
+  export type AdminBroadcastCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * The data used to create many AdminBroadcasts.
+     */
+    data: AdminBroadcastCreateManyInput | AdminBroadcastCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminBroadcast update
+   */
+  export type AdminBroadcastUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AdminBroadcast.
+     */
+    data: XOR<AdminBroadcastUpdateInput, AdminBroadcastUncheckedUpdateInput>
+    /**
+     * Choose, which AdminBroadcast to update.
+     */
+    where: AdminBroadcastWhereUniqueInput
+  }
+
+  /**
+   * AdminBroadcast updateMany
+   */
+  export type AdminBroadcastUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AdminBroadcasts.
+     */
+    data: XOR<AdminBroadcastUpdateManyMutationInput, AdminBroadcastUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminBroadcasts to update
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * Limit how many AdminBroadcasts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminBroadcast updateManyAndReturn
+   */
+  export type AdminBroadcastUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * The data used to update AdminBroadcasts.
+     */
+    data: XOR<AdminBroadcastUpdateManyMutationInput, AdminBroadcastUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminBroadcasts to update
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * Limit how many AdminBroadcasts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminBroadcast upsert
+   */
+  export type AdminBroadcastUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AdminBroadcast to update in case it exists.
+     */
+    where: AdminBroadcastWhereUniqueInput
+    /**
+     * In case the AdminBroadcast found by the `where` argument doesn't exist, create a new AdminBroadcast with this data.
+     */
+    create: XOR<AdminBroadcastCreateInput, AdminBroadcastUncheckedCreateInput>
+    /**
+     * In case the AdminBroadcast was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AdminBroadcastUpdateInput, AdminBroadcastUncheckedUpdateInput>
+  }
+
+  /**
+   * AdminBroadcast delete
+   */
+  export type AdminBroadcastDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
+    /**
+     * Filter which AdminBroadcast to delete.
+     */
+    where: AdminBroadcastWhereUniqueInput
+  }
+
+  /**
+   * AdminBroadcast deleteMany
+   */
+  export type AdminBroadcastDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminBroadcasts to delete
+     */
+    where?: AdminBroadcastWhereInput
+    /**
+     * Limit how many AdminBroadcasts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminBroadcast.sender
+   */
+  export type AdminBroadcast$senderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * AdminBroadcast.retractor
+   */
+  export type AdminBroadcast$retractorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * AdminBroadcast.notifications
+   */
+  export type AdminBroadcast$notificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    where?: NotificationWhereInput
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    cursor?: NotificationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * AdminBroadcast without action
+   */
+  export type AdminBroadcastDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminBroadcast
+     */
+    select?: AdminBroadcastSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminBroadcast
+     */
+    omit?: AdminBroadcastOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminBroadcastInclude<ExtArgs> | null
   }
 
 
@@ -63254,6 +66341,27 @@ export namespace Prisma {
   export type AdminSupportNoteScalarFieldEnum = (typeof AdminSupportNoteScalarFieldEnum)[keyof typeof AdminSupportNoteScalarFieldEnum]
 
 
+  export const AdminSupportCaseScalarFieldEnum: {
+    id: 'id',
+    subjectType: 'subjectType',
+    subjectId: 'subjectId',
+    targetUserId: 'targetUserId',
+    creatorAdminUserId: 'creatorAdminUserId',
+    assigneeAdminUserId: 'assigneeAdminUserId',
+    title: 'title',
+    summary: 'summary',
+    status: 'status',
+    severity: 'severity',
+    nextFollowUpAt: 'nextFollowUpAt',
+    resolvedAt: 'resolvedAt',
+    archivedAt: 'archivedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AdminSupportCaseScalarFieldEnum = (typeof AdminSupportCaseScalarFieldEnum)[keyof typeof AdminSupportCaseScalarFieldEnum]
+
+
   export const FeatureFlagScalarFieldEnum: {
     id: 'id',
     key: 'key',
@@ -63447,10 +66555,34 @@ export namespace Prisma {
     dismissedAt: 'dismissedAt',
     actionUrl: 'actionUrl',
     securityAlertId: 'securityAlertId',
+    adminBroadcastId: 'adminBroadcastId',
     createdAt: 'createdAt'
   };
 
   export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+  export const AdminBroadcastScalarFieldEnum: {
+    id: 'id',
+    createdByAdminUserId: 'createdByAdminUserId',
+    sentByAdminUserId: 'sentByAdminUserId',
+    retractedByAdminUserId: 'retractedByAdminUserId',
+    title: 'title',
+    body: 'body',
+    actionUrl: 'actionUrl',
+    status: 'status',
+    scheduledFor: 'scheduledFor',
+    sentAt: 'sentAt',
+    retractedAt: 'retractedAt',
+    audienceFilters: 'audienceFilters',
+    audienceSummary: 'audienceSummary',
+    previewRecipientCount: 'previewRecipientCount',
+    deliveredRecipientCount: 'deliveredRecipientCount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AdminBroadcastScalarFieldEnum = (typeof AdminBroadcastScalarFieldEnum)[keyof typeof AdminBroadcastScalarFieldEnum]
 
 
   export const SecurityAlertScalarFieldEnum: {
@@ -64088,6 +67220,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'AdminSupportCaseStatus'
+   */
+  export type EnumAdminSupportCaseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminSupportCaseStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdminSupportCaseStatus[]'
+   */
+  export type ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminSupportCaseStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdminSupportCaseSeverity'
+   */
+  export type EnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminSupportCaseSeverity'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdminSupportCaseSeverity[]'
+   */
+  export type ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminSupportCaseSeverity[]'>
+    
+
+
+  /**
    * Reference to a field of type 'FeatureFlagMode'
    */
   export type EnumFeatureFlagModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FeatureFlagMode'>
@@ -64182,6 +67342,20 @@ export namespace Prisma {
    * Reference to a field of type 'NotificationCategory[]'
    */
   export type ListEnumNotificationCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdminBroadcastStatus'
+   */
+  export type EnumAdminBroadcastStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminBroadcastStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdminBroadcastStatus[]'
+   */
+  export type ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdminBroadcastStatus[]'>
     
 
 
@@ -64312,6 +67486,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
     supportNotesAuthored?: AdminSupportNoteListRelationFilter
+    supportCasesCreated?: AdminSupportCaseListRelationFilter
+    supportCasesAssigned?: AdminSupportCaseListRelationFilter
+    supportCasesTargeted?: AdminSupportCaseListRelationFilter
+    broadcastsCreated?: AdminBroadcastListRelationFilter
+    broadcastsSent?: AdminBroadcastListRelationFilter
+    broadcastsRetracted?: AdminBroadcastListRelationFilter
     cardViewLog?: PublicCardViewListRelationFilter
   }
 
@@ -64380,6 +67560,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
     onboardingState?: UserOnboardingStateOrderByWithRelationInput
     supportNotesAuthored?: AdminSupportNoteOrderByRelationAggregateInput
+    supportCasesCreated?: AdminSupportCaseOrderByRelationAggregateInput
+    supportCasesAssigned?: AdminSupportCaseOrderByRelationAggregateInput
+    supportCasesTargeted?: AdminSupportCaseOrderByRelationAggregateInput
+    broadcastsCreated?: AdminBroadcastOrderByRelationAggregateInput
+    broadcastsSent?: AdminBroadcastOrderByRelationAggregateInput
+    broadcastsRetracted?: AdminBroadcastOrderByRelationAggregateInput
     cardViewLog?: PublicCardViewOrderByRelationAggregateInput
   }
 
@@ -64451,6 +67637,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
     supportNotesAuthored?: AdminSupportNoteListRelationFilter
+    supportCasesCreated?: AdminSupportCaseListRelationFilter
+    supportCasesAssigned?: AdminSupportCaseListRelationFilter
+    supportCasesTargeted?: AdminSupportCaseListRelationFilter
+    broadcastsCreated?: AdminBroadcastListRelationFilter
+    broadcastsSent?: AdminBroadcastListRelationFilter
+    broadcastsRetracted?: AdminBroadcastListRelationFilter
     cardViewLog?: PublicCardViewListRelationFilter
   }, "id" | "email" | "username">
 
@@ -67179,6 +70371,117 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"AdminSupportNote"> | Date | string
   }
 
+  export type AdminSupportCaseWhereInput = {
+    AND?: AdminSupportCaseWhereInput | AdminSupportCaseWhereInput[]
+    OR?: AdminSupportCaseWhereInput[]
+    NOT?: AdminSupportCaseWhereInput | AdminSupportCaseWhereInput[]
+    id?: StringFilter<"AdminSupportCase"> | string
+    subjectType?: StringFilter<"AdminSupportCase"> | string
+    subjectId?: StringFilter<"AdminSupportCase"> | string
+    targetUserId?: StringNullableFilter<"AdminSupportCase"> | string | null
+    creatorAdminUserId?: StringFilter<"AdminSupportCase"> | string
+    assigneeAdminUserId?: StringNullableFilter<"AdminSupportCase"> | string | null
+    title?: StringFilter<"AdminSupportCase"> | string
+    summary?: StringNullableFilter<"AdminSupportCase"> | string | null
+    status?: EnumAdminSupportCaseStatusFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    resolvedAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    archivedAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    createdAt?: DateTimeFilter<"AdminSupportCase"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminSupportCase"> | Date | string
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    assignee?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    targetUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type AdminSupportCaseOrderByWithRelationInput = {
+    id?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    creatorAdminUserId?: SortOrder
+    assigneeAdminUserId?: SortOrderInput | SortOrder
+    title?: SortOrder
+    summary?: SortOrderInput | SortOrder
+    status?: SortOrder
+    severity?: SortOrder
+    nextFollowUpAt?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    creator?: UserOrderByWithRelationInput
+    assignee?: UserOrderByWithRelationInput
+    targetUser?: UserOrderByWithRelationInput
+  }
+
+  export type AdminSupportCaseWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AdminSupportCaseWhereInput | AdminSupportCaseWhereInput[]
+    OR?: AdminSupportCaseWhereInput[]
+    NOT?: AdminSupportCaseWhereInput | AdminSupportCaseWhereInput[]
+    subjectType?: StringFilter<"AdminSupportCase"> | string
+    subjectId?: StringFilter<"AdminSupportCase"> | string
+    targetUserId?: StringNullableFilter<"AdminSupportCase"> | string | null
+    creatorAdminUserId?: StringFilter<"AdminSupportCase"> | string
+    assigneeAdminUserId?: StringNullableFilter<"AdminSupportCase"> | string | null
+    title?: StringFilter<"AdminSupportCase"> | string
+    summary?: StringNullableFilter<"AdminSupportCase"> | string | null
+    status?: EnumAdminSupportCaseStatusFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    resolvedAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    archivedAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    createdAt?: DateTimeFilter<"AdminSupportCase"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminSupportCase"> | Date | string
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    assignee?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    targetUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type AdminSupportCaseOrderByWithAggregationInput = {
+    id?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    creatorAdminUserId?: SortOrder
+    assigneeAdminUserId?: SortOrderInput | SortOrder
+    title?: SortOrder
+    summary?: SortOrderInput | SortOrder
+    status?: SortOrder
+    severity?: SortOrder
+    nextFollowUpAt?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AdminSupportCaseCountOrderByAggregateInput
+    _max?: AdminSupportCaseMaxOrderByAggregateInput
+    _min?: AdminSupportCaseMinOrderByAggregateInput
+  }
+
+  export type AdminSupportCaseScalarWhereWithAggregatesInput = {
+    AND?: AdminSupportCaseScalarWhereWithAggregatesInput | AdminSupportCaseScalarWhereWithAggregatesInput[]
+    OR?: AdminSupportCaseScalarWhereWithAggregatesInput[]
+    NOT?: AdminSupportCaseScalarWhereWithAggregatesInput | AdminSupportCaseScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AdminSupportCase"> | string
+    subjectType?: StringWithAggregatesFilter<"AdminSupportCase"> | string
+    subjectId?: StringWithAggregatesFilter<"AdminSupportCase"> | string
+    targetUserId?: StringNullableWithAggregatesFilter<"AdminSupportCase"> | string | null
+    creatorAdminUserId?: StringWithAggregatesFilter<"AdminSupportCase"> | string
+    assigneeAdminUserId?: StringNullableWithAggregatesFilter<"AdminSupportCase"> | string | null
+    title?: StringWithAggregatesFilter<"AdminSupportCase"> | string
+    summary?: StringNullableWithAggregatesFilter<"AdminSupportCase"> | string | null
+    status?: EnumAdminSupportCaseStatusWithAggregatesFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityWithAggregatesFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: DateTimeNullableWithAggregatesFilter<"AdminSupportCase"> | Date | string | null
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"AdminSupportCase"> | Date | string | null
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"AdminSupportCase"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AdminSupportCase"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AdminSupportCase"> | Date | string
+  }
+
   export type FeatureFlagWhereInput = {
     AND?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
     OR?: FeatureFlagWhereInput[]
@@ -68163,9 +71466,11 @@ export namespace Prisma {
     dismissedAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
+    adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     securityAlert?: XOR<SecurityAlertNullableScalarRelationFilter, SecurityAlertWhereInput> | null
+    adminBroadcast?: XOR<AdminBroadcastNullableScalarRelationFilter, AdminBroadcastWhereInput> | null
   }
 
   export type NotificationOrderByWithRelationInput = {
@@ -68179,9 +71484,11 @@ export namespace Prisma {
     dismissedAt?: SortOrderInput | SortOrder
     actionUrl?: SortOrderInput | SortOrder
     securityAlertId?: SortOrderInput | SortOrder
+    adminBroadcastId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
     securityAlert?: SecurityAlertOrderByWithRelationInput
+    adminBroadcast?: AdminBroadcastOrderByWithRelationInput
   }
 
   export type NotificationWhereUniqueInput = Prisma.AtLeast<{
@@ -68198,9 +71505,11 @@ export namespace Prisma {
     dismissedAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
+    adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     securityAlert?: XOR<SecurityAlertNullableScalarRelationFilter, SecurityAlertWhereInput> | null
+    adminBroadcast?: XOR<AdminBroadcastNullableScalarRelationFilter, AdminBroadcastWhereInput> | null
   }, "id">
 
   export type NotificationOrderByWithAggregationInput = {
@@ -68214,6 +71523,7 @@ export namespace Prisma {
     dismissedAt?: SortOrderInput | SortOrder
     actionUrl?: SortOrderInput | SortOrder
     securityAlertId?: SortOrderInput | SortOrder
+    adminBroadcastId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: NotificationCountOrderByAggregateInput
     _max?: NotificationMaxOrderByAggregateInput
@@ -68234,7 +71544,134 @@ export namespace Prisma {
     dismissedAt?: DateTimeNullableWithAggregatesFilter<"Notification"> | Date | string | null
     actionUrl?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     securityAlertId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
+    adminBroadcastId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
+  }
+
+  export type AdminBroadcastWhereInput = {
+    AND?: AdminBroadcastWhereInput | AdminBroadcastWhereInput[]
+    OR?: AdminBroadcastWhereInput[]
+    NOT?: AdminBroadcastWhereInput | AdminBroadcastWhereInput[]
+    id?: StringFilter<"AdminBroadcast"> | string
+    createdByAdminUserId?: StringFilter<"AdminBroadcast"> | string
+    sentByAdminUserId?: StringNullableFilter<"AdminBroadcast"> | string | null
+    retractedByAdminUserId?: StringNullableFilter<"AdminBroadcast"> | string | null
+    title?: StringFilter<"AdminBroadcast"> | string
+    body?: StringFilter<"AdminBroadcast"> | string
+    actionUrl?: StringNullableFilter<"AdminBroadcast"> | string | null
+    status?: EnumAdminBroadcastStatusFilter<"AdminBroadcast"> | $Enums.AdminBroadcastStatus
+    scheduledFor?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    sentAt?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    retractedAt?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    audienceFilters?: JsonFilter<"AdminBroadcast">
+    audienceSummary?: JsonFilter<"AdminBroadcast">
+    previewRecipientCount?: IntFilter<"AdminBroadcast"> | number
+    deliveredRecipientCount?: IntFilter<"AdminBroadcast"> | number
+    createdAt?: DateTimeFilter<"AdminBroadcast"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminBroadcast"> | Date | string
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    sender?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    retractor?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    notifications?: NotificationListRelationFilter
+  }
+
+  export type AdminBroadcastOrderByWithRelationInput = {
+    id?: SortOrder
+    createdByAdminUserId?: SortOrder
+    sentByAdminUserId?: SortOrderInput | SortOrder
+    retractedByAdminUserId?: SortOrderInput | SortOrder
+    title?: SortOrder
+    body?: SortOrder
+    actionUrl?: SortOrderInput | SortOrder
+    status?: SortOrder
+    scheduledFor?: SortOrderInput | SortOrder
+    sentAt?: SortOrderInput | SortOrder
+    retractedAt?: SortOrderInput | SortOrder
+    audienceFilters?: SortOrder
+    audienceSummary?: SortOrder
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    creator?: UserOrderByWithRelationInput
+    sender?: UserOrderByWithRelationInput
+    retractor?: UserOrderByWithRelationInput
+    notifications?: NotificationOrderByRelationAggregateInput
+  }
+
+  export type AdminBroadcastWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AdminBroadcastWhereInput | AdminBroadcastWhereInput[]
+    OR?: AdminBroadcastWhereInput[]
+    NOT?: AdminBroadcastWhereInput | AdminBroadcastWhereInput[]
+    createdByAdminUserId?: StringFilter<"AdminBroadcast"> | string
+    sentByAdminUserId?: StringNullableFilter<"AdminBroadcast"> | string | null
+    retractedByAdminUserId?: StringNullableFilter<"AdminBroadcast"> | string | null
+    title?: StringFilter<"AdminBroadcast"> | string
+    body?: StringFilter<"AdminBroadcast"> | string
+    actionUrl?: StringNullableFilter<"AdminBroadcast"> | string | null
+    status?: EnumAdminBroadcastStatusFilter<"AdminBroadcast"> | $Enums.AdminBroadcastStatus
+    scheduledFor?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    sentAt?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    retractedAt?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    audienceFilters?: JsonFilter<"AdminBroadcast">
+    audienceSummary?: JsonFilter<"AdminBroadcast">
+    previewRecipientCount?: IntFilter<"AdminBroadcast"> | number
+    deliveredRecipientCount?: IntFilter<"AdminBroadcast"> | number
+    createdAt?: DateTimeFilter<"AdminBroadcast"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminBroadcast"> | Date | string
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    sender?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    retractor?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    notifications?: NotificationListRelationFilter
+  }, "id">
+
+  export type AdminBroadcastOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdByAdminUserId?: SortOrder
+    sentByAdminUserId?: SortOrderInput | SortOrder
+    retractedByAdminUserId?: SortOrderInput | SortOrder
+    title?: SortOrder
+    body?: SortOrder
+    actionUrl?: SortOrderInput | SortOrder
+    status?: SortOrder
+    scheduledFor?: SortOrderInput | SortOrder
+    sentAt?: SortOrderInput | SortOrder
+    retractedAt?: SortOrderInput | SortOrder
+    audienceFilters?: SortOrder
+    audienceSummary?: SortOrder
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AdminBroadcastCountOrderByAggregateInput
+    _avg?: AdminBroadcastAvgOrderByAggregateInput
+    _max?: AdminBroadcastMaxOrderByAggregateInput
+    _min?: AdminBroadcastMinOrderByAggregateInput
+    _sum?: AdminBroadcastSumOrderByAggregateInput
+  }
+
+  export type AdminBroadcastScalarWhereWithAggregatesInput = {
+    AND?: AdminBroadcastScalarWhereWithAggregatesInput | AdminBroadcastScalarWhereWithAggregatesInput[]
+    OR?: AdminBroadcastScalarWhereWithAggregatesInput[]
+    NOT?: AdminBroadcastScalarWhereWithAggregatesInput | AdminBroadcastScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AdminBroadcast"> | string
+    createdByAdminUserId?: StringWithAggregatesFilter<"AdminBroadcast"> | string
+    sentByAdminUserId?: StringNullableWithAggregatesFilter<"AdminBroadcast"> | string | null
+    retractedByAdminUserId?: StringNullableWithAggregatesFilter<"AdminBroadcast"> | string | null
+    title?: StringWithAggregatesFilter<"AdminBroadcast"> | string
+    body?: StringWithAggregatesFilter<"AdminBroadcast"> | string
+    actionUrl?: StringNullableWithAggregatesFilter<"AdminBroadcast"> | string | null
+    status?: EnumAdminBroadcastStatusWithAggregatesFilter<"AdminBroadcast"> | $Enums.AdminBroadcastStatus
+    scheduledFor?: DateTimeNullableWithAggregatesFilter<"AdminBroadcast"> | Date | string | null
+    sentAt?: DateTimeNullableWithAggregatesFilter<"AdminBroadcast"> | Date | string | null
+    retractedAt?: DateTimeNullableWithAggregatesFilter<"AdminBroadcast"> | Date | string | null
+    audienceFilters?: JsonWithAggregatesFilter<"AdminBroadcast">
+    audienceSummary?: JsonWithAggregatesFilter<"AdminBroadcast">
+    previewRecipientCount?: IntWithAggregatesFilter<"AdminBroadcast"> | number
+    deliveredRecipientCount?: IntWithAggregatesFilter<"AdminBroadcast"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"AdminBroadcast"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AdminBroadcast"> | Date | string
   }
 
   export type SecurityAlertWhereInput = {
@@ -68949,6 +72386,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -69017,6 +72460,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -69085,6 +72534,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -69153,6 +72608,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72299,6 +75760,129 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AdminSupportCaseCreateInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutSupportCasesCreatedInput
+    assignee?: UserCreateNestedOneWithoutSupportCasesAssignedInput
+    targetUser?: UserCreateNestedOneWithoutSupportCasesTargetedInput
+  }
+
+  export type AdminSupportCaseUncheckedCreateInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    creatorAdminUserId: string
+    assigneeAdminUserId?: string | null
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutSupportCasesCreatedNestedInput
+    assignee?: UserUpdateOneWithoutSupportCasesAssignedNestedInput
+    targetUser?: UserUpdateOneWithoutSupportCasesTargetedNestedInput
+  }
+
+  export type AdminSupportCaseUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    creatorAdminUserId?: StringFieldUpdateOperationsInput | string
+    assigneeAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseCreateManyInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    creatorAdminUserId: string
+    assigneeAdminUserId?: string | null
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    creatorAdminUserId?: StringFieldUpdateOperationsInput | string
+    assigneeAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type FeatureFlagCreateInput = {
     id?: string
     key: string
@@ -73373,6 +76957,7 @@ export namespace Prisma {
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutNotificationsInput
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+    adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateInput = {
@@ -73386,6 +76971,7 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    adminBroadcastId?: string | null
     createdAt?: Date | string
   }
 
@@ -73401,6 +76987,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+    adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateInput = {
@@ -73414,6 +77001,7 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -73428,6 +77016,7 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    adminBroadcastId?: string | null
     createdAt?: Date | string
   }
 
@@ -73454,7 +77043,149 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminBroadcastCreateInput = {
+    id?: string
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutBroadcastsCreatedInput
+    sender?: UserCreateNestedOneWithoutBroadcastsSentInput
+    retractor?: UserCreateNestedOneWithoutBroadcastsRetractedInput
+    notifications?: NotificationCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastUncheckedCreateInput = {
+    id?: string
+    createdByAdminUserId: string
+    sentByAdminUserId?: string | null
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutBroadcastsCreatedNestedInput
+    sender?: UserUpdateOneWithoutBroadcastsSentNestedInput
+    retractor?: UserUpdateOneWithoutBroadcastsRetractedNestedInput
+    notifications?: NotificationUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastCreateManyInput = {
+    id?: string
+    createdByAdminUserId: string
+    sentByAdminUserId?: string | null
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminBroadcastUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SecurityAlertCreateInput = {
@@ -74457,6 +78188,18 @@ export namespace Prisma {
     none?: AdminSupportNoteWhereInput
   }
 
+  export type AdminSupportCaseListRelationFilter = {
+    every?: AdminSupportCaseWhereInput
+    some?: AdminSupportCaseWhereInput
+    none?: AdminSupportCaseWhereInput
+  }
+
+  export type AdminBroadcastListRelationFilter = {
+    every?: AdminBroadcastWhereInput
+    some?: AdminBroadcastWhereInput
+    none?: AdminBroadcastWhereInput
+  }
+
   export type PublicCardViewListRelationFilter = {
     every?: PublicCardViewWhereInput
     some?: PublicCardViewWhereInput
@@ -74589,6 +78332,14 @@ export namespace Prisma {
   }
 
   export type AdminSupportNoteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AdminSupportCaseOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AdminBroadcastOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -76895,6 +80646,94 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type EnumAdminSupportCaseStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseStatus | EnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseStatusFilter<$PrismaModel> | $Enums.AdminSupportCaseStatus
+  }
+
+  export type EnumAdminSupportCaseSeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseSeverity | EnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel> | $Enums.AdminSupportCaseSeverity
+  }
+
+  export type AdminSupportCaseCountOrderByAggregateInput = {
+    id?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrder
+    creatorAdminUserId?: SortOrder
+    assigneeAdminUserId?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    status?: SortOrder
+    severity?: SortOrder
+    nextFollowUpAt?: SortOrder
+    resolvedAt?: SortOrder
+    archivedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminSupportCaseMaxOrderByAggregateInput = {
+    id?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrder
+    creatorAdminUserId?: SortOrder
+    assigneeAdminUserId?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    status?: SortOrder
+    severity?: SortOrder
+    nextFollowUpAt?: SortOrder
+    resolvedAt?: SortOrder
+    archivedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminSupportCaseMinOrderByAggregateInput = {
+    id?: SortOrder
+    subjectType?: SortOrder
+    subjectId?: SortOrder
+    targetUserId?: SortOrder
+    creatorAdminUserId?: SortOrder
+    assigneeAdminUserId?: SortOrder
+    title?: SortOrder
+    summary?: SortOrder
+    status?: SortOrder
+    severity?: SortOrder
+    nextFollowUpAt?: SortOrder
+    resolvedAt?: SortOrder
+    archivedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumAdminSupportCaseStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseStatus | EnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseStatusWithAggregatesFilter<$PrismaModel> | $Enums.AdminSupportCaseStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminSupportCaseStatusFilter<$PrismaModel>
+    _max?: NestedEnumAdminSupportCaseStatusFilter<$PrismaModel>
+  }
+
+  export type EnumAdminSupportCaseSeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseSeverity | EnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseSeverityWithAggregatesFilter<$PrismaModel> | $Enums.AdminSupportCaseSeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel>
+    _max?: NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel>
+  }
+
   export type EnumFeatureFlagModeFilter<$PrismaModel = never> = {
     equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
     in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
@@ -77560,6 +81399,11 @@ export namespace Prisma {
     isNot?: SecurityAlertWhereInput | null
   }
 
+  export type AdminBroadcastNullableScalarRelationFilter = {
+    is?: AdminBroadcastWhereInput | null
+    isNot?: AdminBroadcastWhereInput | null
+  }
+
   export type NotificationCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -77571,6 +81415,7 @@ export namespace Prisma {
     dismissedAt?: SortOrder
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
+    adminBroadcastId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -77585,6 +81430,7 @@ export namespace Prisma {
     dismissedAt?: SortOrder
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
+    adminBroadcastId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -77599,6 +81445,7 @@ export namespace Prisma {
     dismissedAt?: SortOrder
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
+    adminBroadcastId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -77610,6 +81457,89 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumNotificationCategoryFilter<$PrismaModel>
     _max?: NestedEnumNotificationCategoryFilter<$PrismaModel>
+  }
+
+  export type EnumAdminBroadcastStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminBroadcastStatus | EnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminBroadcastStatusFilter<$PrismaModel> | $Enums.AdminBroadcastStatus
+  }
+
+  export type AdminBroadcastCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdByAdminUserId?: SortOrder
+    sentByAdminUserId?: SortOrder
+    retractedByAdminUserId?: SortOrder
+    title?: SortOrder
+    body?: SortOrder
+    actionUrl?: SortOrder
+    status?: SortOrder
+    scheduledFor?: SortOrder
+    sentAt?: SortOrder
+    retractedAt?: SortOrder
+    audienceFilters?: SortOrder
+    audienceSummary?: SortOrder
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminBroadcastAvgOrderByAggregateInput = {
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+  }
+
+  export type AdminBroadcastMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdByAdminUserId?: SortOrder
+    sentByAdminUserId?: SortOrder
+    retractedByAdminUserId?: SortOrder
+    title?: SortOrder
+    body?: SortOrder
+    actionUrl?: SortOrder
+    status?: SortOrder
+    scheduledFor?: SortOrder
+    sentAt?: SortOrder
+    retractedAt?: SortOrder
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminBroadcastMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdByAdminUserId?: SortOrder
+    sentByAdminUserId?: SortOrder
+    retractedByAdminUserId?: SortOrder
+    title?: SortOrder
+    body?: SortOrder
+    actionUrl?: SortOrder
+    status?: SortOrder
+    scheduledFor?: SortOrder
+    sentAt?: SortOrder
+    retractedAt?: SortOrder
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AdminBroadcastSumOrderByAggregateInput = {
+    previewRecipientCount?: SortOrder
+    deliveredRecipientCount?: SortOrder
+  }
+
+  export type EnumAdminBroadcastStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminBroadcastStatus | EnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminBroadcastStatusWithAggregatesFilter<$PrismaModel> | $Enums.AdminBroadcastStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminBroadcastStatusFilter<$PrismaModel>
+    _max?: NestedEnumAdminBroadcastStatusFilter<$PrismaModel>
   }
 
   export type SecurityAlertCountOrderByAggregateInput = {
@@ -78244,6 +82174,48 @@ export namespace Prisma {
     connect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
   }
 
+  export type AdminSupportCaseCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutCreatorInput, AdminSupportCaseUncheckedCreateWithoutCreatorInput> | AdminSupportCaseCreateWithoutCreatorInput[] | AdminSupportCaseUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutCreatorInput | AdminSupportCaseCreateOrConnectWithoutCreatorInput[]
+    createMany?: AdminSupportCaseCreateManyCreatorInputEnvelope
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+  }
+
+  export type AdminSupportCaseCreateNestedManyWithoutAssigneeInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutAssigneeInput, AdminSupportCaseUncheckedCreateWithoutAssigneeInput> | AdminSupportCaseCreateWithoutAssigneeInput[] | AdminSupportCaseUncheckedCreateWithoutAssigneeInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutAssigneeInput | AdminSupportCaseCreateOrConnectWithoutAssigneeInput[]
+    createMany?: AdminSupportCaseCreateManyAssigneeInputEnvelope
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+  }
+
+  export type AdminSupportCaseCreateNestedManyWithoutTargetUserInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutTargetUserInput, AdminSupportCaseUncheckedCreateWithoutTargetUserInput> | AdminSupportCaseCreateWithoutTargetUserInput[] | AdminSupportCaseUncheckedCreateWithoutTargetUserInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutTargetUserInput | AdminSupportCaseCreateOrConnectWithoutTargetUserInput[]
+    createMany?: AdminSupportCaseCreateManyTargetUserInputEnvelope
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+  }
+
+  export type AdminBroadcastCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<AdminBroadcastCreateWithoutCreatorInput, AdminBroadcastUncheckedCreateWithoutCreatorInput> | AdminBroadcastCreateWithoutCreatorInput[] | AdminBroadcastUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutCreatorInput | AdminBroadcastCreateOrConnectWithoutCreatorInput[]
+    createMany?: AdminBroadcastCreateManyCreatorInputEnvelope
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+  }
+
+  export type AdminBroadcastCreateNestedManyWithoutSenderInput = {
+    create?: XOR<AdminBroadcastCreateWithoutSenderInput, AdminBroadcastUncheckedCreateWithoutSenderInput> | AdminBroadcastCreateWithoutSenderInput[] | AdminBroadcastUncheckedCreateWithoutSenderInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutSenderInput | AdminBroadcastCreateOrConnectWithoutSenderInput[]
+    createMany?: AdminBroadcastCreateManySenderInputEnvelope
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+  }
+
+  export type AdminBroadcastCreateNestedManyWithoutRetractorInput = {
+    create?: XOR<AdminBroadcastCreateWithoutRetractorInput, AdminBroadcastUncheckedCreateWithoutRetractorInput> | AdminBroadcastCreateWithoutRetractorInput[] | AdminBroadcastUncheckedCreateWithoutRetractorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutRetractorInput | AdminBroadcastCreateOrConnectWithoutRetractorInput[]
+    createMany?: AdminBroadcastCreateManyRetractorInputEnvelope
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+  }
+
   export type PublicCardViewCreateNestedManyWithoutUserInput = {
     create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
     connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
@@ -78491,6 +82463,48 @@ export namespace Prisma {
     connectOrCreate?: AdminSupportNoteCreateOrConnectWithoutAuthorInput | AdminSupportNoteCreateOrConnectWithoutAuthorInput[]
     createMany?: AdminSupportNoteCreateManyAuthorInputEnvelope
     connect?: AdminSupportNoteWhereUniqueInput | AdminSupportNoteWhereUniqueInput[]
+  }
+
+  export type AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutCreatorInput, AdminSupportCaseUncheckedCreateWithoutCreatorInput> | AdminSupportCaseCreateWithoutCreatorInput[] | AdminSupportCaseUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutCreatorInput | AdminSupportCaseCreateOrConnectWithoutCreatorInput[]
+    createMany?: AdminSupportCaseCreateManyCreatorInputEnvelope
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+  }
+
+  export type AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutAssigneeInput, AdminSupportCaseUncheckedCreateWithoutAssigneeInput> | AdminSupportCaseCreateWithoutAssigneeInput[] | AdminSupportCaseUncheckedCreateWithoutAssigneeInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutAssigneeInput | AdminSupportCaseCreateOrConnectWithoutAssigneeInput[]
+    createMany?: AdminSupportCaseCreateManyAssigneeInputEnvelope
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+  }
+
+  export type AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutTargetUserInput, AdminSupportCaseUncheckedCreateWithoutTargetUserInput> | AdminSupportCaseCreateWithoutTargetUserInput[] | AdminSupportCaseUncheckedCreateWithoutTargetUserInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutTargetUserInput | AdminSupportCaseCreateOrConnectWithoutTargetUserInput[]
+    createMany?: AdminSupportCaseCreateManyTargetUserInputEnvelope
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+  }
+
+  export type AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<AdminBroadcastCreateWithoutCreatorInput, AdminBroadcastUncheckedCreateWithoutCreatorInput> | AdminBroadcastCreateWithoutCreatorInput[] | AdminBroadcastUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutCreatorInput | AdminBroadcastCreateOrConnectWithoutCreatorInput[]
+    createMany?: AdminBroadcastCreateManyCreatorInputEnvelope
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+  }
+
+  export type AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput = {
+    create?: XOR<AdminBroadcastCreateWithoutSenderInput, AdminBroadcastUncheckedCreateWithoutSenderInput> | AdminBroadcastCreateWithoutSenderInput[] | AdminBroadcastUncheckedCreateWithoutSenderInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutSenderInput | AdminBroadcastCreateOrConnectWithoutSenderInput[]
+    createMany?: AdminBroadcastCreateManySenderInputEnvelope
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+  }
+
+  export type AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput = {
+    create?: XOR<AdminBroadcastCreateWithoutRetractorInput, AdminBroadcastUncheckedCreateWithoutRetractorInput> | AdminBroadcastCreateWithoutRetractorInput[] | AdminBroadcastUncheckedCreateWithoutRetractorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutRetractorInput | AdminBroadcastCreateOrConnectWithoutRetractorInput[]
+    createMany?: AdminBroadcastCreateManyRetractorInputEnvelope
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
   }
 
   export type PublicCardViewUncheckedCreateNestedManyWithoutUserInput = {
@@ -79018,6 +83032,90 @@ export namespace Prisma {
     deleteMany?: AdminSupportNoteScalarWhereInput | AdminSupportNoteScalarWhereInput[]
   }
 
+  export type AdminSupportCaseUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutCreatorInput, AdminSupportCaseUncheckedCreateWithoutCreatorInput> | AdminSupportCaseCreateWithoutCreatorInput[] | AdminSupportCaseUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutCreatorInput | AdminSupportCaseCreateOrConnectWithoutCreatorInput[]
+    upsert?: AdminSupportCaseUpsertWithWhereUniqueWithoutCreatorInput | AdminSupportCaseUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: AdminSupportCaseCreateManyCreatorInputEnvelope
+    set?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    disconnect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    delete?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    update?: AdminSupportCaseUpdateWithWhereUniqueWithoutCreatorInput | AdminSupportCaseUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: AdminSupportCaseUpdateManyWithWhereWithoutCreatorInput | AdminSupportCaseUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+  }
+
+  export type AdminSupportCaseUpdateManyWithoutAssigneeNestedInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutAssigneeInput, AdminSupportCaseUncheckedCreateWithoutAssigneeInput> | AdminSupportCaseCreateWithoutAssigneeInput[] | AdminSupportCaseUncheckedCreateWithoutAssigneeInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutAssigneeInput | AdminSupportCaseCreateOrConnectWithoutAssigneeInput[]
+    upsert?: AdminSupportCaseUpsertWithWhereUniqueWithoutAssigneeInput | AdminSupportCaseUpsertWithWhereUniqueWithoutAssigneeInput[]
+    createMany?: AdminSupportCaseCreateManyAssigneeInputEnvelope
+    set?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    disconnect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    delete?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    update?: AdminSupportCaseUpdateWithWhereUniqueWithoutAssigneeInput | AdminSupportCaseUpdateWithWhereUniqueWithoutAssigneeInput[]
+    updateMany?: AdminSupportCaseUpdateManyWithWhereWithoutAssigneeInput | AdminSupportCaseUpdateManyWithWhereWithoutAssigneeInput[]
+    deleteMany?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+  }
+
+  export type AdminSupportCaseUpdateManyWithoutTargetUserNestedInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutTargetUserInput, AdminSupportCaseUncheckedCreateWithoutTargetUserInput> | AdminSupportCaseCreateWithoutTargetUserInput[] | AdminSupportCaseUncheckedCreateWithoutTargetUserInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutTargetUserInput | AdminSupportCaseCreateOrConnectWithoutTargetUserInput[]
+    upsert?: AdminSupportCaseUpsertWithWhereUniqueWithoutTargetUserInput | AdminSupportCaseUpsertWithWhereUniqueWithoutTargetUserInput[]
+    createMany?: AdminSupportCaseCreateManyTargetUserInputEnvelope
+    set?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    disconnect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    delete?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    update?: AdminSupportCaseUpdateWithWhereUniqueWithoutTargetUserInput | AdminSupportCaseUpdateWithWhereUniqueWithoutTargetUserInput[]
+    updateMany?: AdminSupportCaseUpdateManyWithWhereWithoutTargetUserInput | AdminSupportCaseUpdateManyWithWhereWithoutTargetUserInput[]
+    deleteMany?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+  }
+
+  export type AdminBroadcastUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutCreatorInput, AdminBroadcastUncheckedCreateWithoutCreatorInput> | AdminBroadcastCreateWithoutCreatorInput[] | AdminBroadcastUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutCreatorInput | AdminBroadcastCreateOrConnectWithoutCreatorInput[]
+    upsert?: AdminBroadcastUpsertWithWhereUniqueWithoutCreatorInput | AdminBroadcastUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: AdminBroadcastCreateManyCreatorInputEnvelope
+    set?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    disconnect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    delete?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    update?: AdminBroadcastUpdateWithWhereUniqueWithoutCreatorInput | AdminBroadcastUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: AdminBroadcastUpdateManyWithWhereWithoutCreatorInput | AdminBroadcastUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+  }
+
+  export type AdminBroadcastUpdateManyWithoutSenderNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutSenderInput, AdminBroadcastUncheckedCreateWithoutSenderInput> | AdminBroadcastCreateWithoutSenderInput[] | AdminBroadcastUncheckedCreateWithoutSenderInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutSenderInput | AdminBroadcastCreateOrConnectWithoutSenderInput[]
+    upsert?: AdminBroadcastUpsertWithWhereUniqueWithoutSenderInput | AdminBroadcastUpsertWithWhereUniqueWithoutSenderInput[]
+    createMany?: AdminBroadcastCreateManySenderInputEnvelope
+    set?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    disconnect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    delete?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    update?: AdminBroadcastUpdateWithWhereUniqueWithoutSenderInput | AdminBroadcastUpdateWithWhereUniqueWithoutSenderInput[]
+    updateMany?: AdminBroadcastUpdateManyWithWhereWithoutSenderInput | AdminBroadcastUpdateManyWithWhereWithoutSenderInput[]
+    deleteMany?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+  }
+
+  export type AdminBroadcastUpdateManyWithoutRetractorNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutRetractorInput, AdminBroadcastUncheckedCreateWithoutRetractorInput> | AdminBroadcastCreateWithoutRetractorInput[] | AdminBroadcastUncheckedCreateWithoutRetractorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutRetractorInput | AdminBroadcastCreateOrConnectWithoutRetractorInput[]
+    upsert?: AdminBroadcastUpsertWithWhereUniqueWithoutRetractorInput | AdminBroadcastUpsertWithWhereUniqueWithoutRetractorInput[]
+    createMany?: AdminBroadcastCreateManyRetractorInputEnvelope
+    set?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    disconnect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    delete?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    update?: AdminBroadcastUpdateWithWhereUniqueWithoutRetractorInput | AdminBroadcastUpdateWithWhereUniqueWithoutRetractorInput[]
+    updateMany?: AdminBroadcastUpdateManyWithWhereWithoutRetractorInput | AdminBroadcastUpdateManyWithWhereWithoutRetractorInput[]
+    deleteMany?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+  }
+
   export type PublicCardViewUpdateManyWithoutUserNestedInput = {
     create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
     connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
@@ -79508,6 +83606,90 @@ export namespace Prisma {
     update?: AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput | AdminSupportNoteUpdateWithWhereUniqueWithoutAuthorInput[]
     updateMany?: AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput | AdminSupportNoteUpdateManyWithWhereWithoutAuthorInput[]
     deleteMany?: AdminSupportNoteScalarWhereInput | AdminSupportNoteScalarWhereInput[]
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutCreatorInput, AdminSupportCaseUncheckedCreateWithoutCreatorInput> | AdminSupportCaseCreateWithoutCreatorInput[] | AdminSupportCaseUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutCreatorInput | AdminSupportCaseCreateOrConnectWithoutCreatorInput[]
+    upsert?: AdminSupportCaseUpsertWithWhereUniqueWithoutCreatorInput | AdminSupportCaseUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: AdminSupportCaseCreateManyCreatorInputEnvelope
+    set?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    disconnect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    delete?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    update?: AdminSupportCaseUpdateWithWhereUniqueWithoutCreatorInput | AdminSupportCaseUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: AdminSupportCaseUpdateManyWithWhereWithoutCreatorInput | AdminSupportCaseUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutAssigneeInput, AdminSupportCaseUncheckedCreateWithoutAssigneeInput> | AdminSupportCaseCreateWithoutAssigneeInput[] | AdminSupportCaseUncheckedCreateWithoutAssigneeInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutAssigneeInput | AdminSupportCaseCreateOrConnectWithoutAssigneeInput[]
+    upsert?: AdminSupportCaseUpsertWithWhereUniqueWithoutAssigneeInput | AdminSupportCaseUpsertWithWhereUniqueWithoutAssigneeInput[]
+    createMany?: AdminSupportCaseCreateManyAssigneeInputEnvelope
+    set?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    disconnect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    delete?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    update?: AdminSupportCaseUpdateWithWhereUniqueWithoutAssigneeInput | AdminSupportCaseUpdateWithWhereUniqueWithoutAssigneeInput[]
+    updateMany?: AdminSupportCaseUpdateManyWithWhereWithoutAssigneeInput | AdminSupportCaseUpdateManyWithWhereWithoutAssigneeInput[]
+    deleteMany?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput = {
+    create?: XOR<AdminSupportCaseCreateWithoutTargetUserInput, AdminSupportCaseUncheckedCreateWithoutTargetUserInput> | AdminSupportCaseCreateWithoutTargetUserInput[] | AdminSupportCaseUncheckedCreateWithoutTargetUserInput[]
+    connectOrCreate?: AdminSupportCaseCreateOrConnectWithoutTargetUserInput | AdminSupportCaseCreateOrConnectWithoutTargetUserInput[]
+    upsert?: AdminSupportCaseUpsertWithWhereUniqueWithoutTargetUserInput | AdminSupportCaseUpsertWithWhereUniqueWithoutTargetUserInput[]
+    createMany?: AdminSupportCaseCreateManyTargetUserInputEnvelope
+    set?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    disconnect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    delete?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    connect?: AdminSupportCaseWhereUniqueInput | AdminSupportCaseWhereUniqueInput[]
+    update?: AdminSupportCaseUpdateWithWhereUniqueWithoutTargetUserInput | AdminSupportCaseUpdateWithWhereUniqueWithoutTargetUserInput[]
+    updateMany?: AdminSupportCaseUpdateManyWithWhereWithoutTargetUserInput | AdminSupportCaseUpdateManyWithWhereWithoutTargetUserInput[]
+    deleteMany?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutCreatorInput, AdminBroadcastUncheckedCreateWithoutCreatorInput> | AdminBroadcastCreateWithoutCreatorInput[] | AdminBroadcastUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutCreatorInput | AdminBroadcastCreateOrConnectWithoutCreatorInput[]
+    upsert?: AdminBroadcastUpsertWithWhereUniqueWithoutCreatorInput | AdminBroadcastUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: AdminBroadcastCreateManyCreatorInputEnvelope
+    set?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    disconnect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    delete?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    update?: AdminBroadcastUpdateWithWhereUniqueWithoutCreatorInput | AdminBroadcastUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: AdminBroadcastUpdateManyWithWhereWithoutCreatorInput | AdminBroadcastUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutSenderInput, AdminBroadcastUncheckedCreateWithoutSenderInput> | AdminBroadcastCreateWithoutSenderInput[] | AdminBroadcastUncheckedCreateWithoutSenderInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutSenderInput | AdminBroadcastCreateOrConnectWithoutSenderInput[]
+    upsert?: AdminBroadcastUpsertWithWhereUniqueWithoutSenderInput | AdminBroadcastUpsertWithWhereUniqueWithoutSenderInput[]
+    createMany?: AdminBroadcastCreateManySenderInputEnvelope
+    set?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    disconnect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    delete?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    update?: AdminBroadcastUpdateWithWhereUniqueWithoutSenderInput | AdminBroadcastUpdateWithWhereUniqueWithoutSenderInput[]
+    updateMany?: AdminBroadcastUpdateManyWithWhereWithoutSenderInput | AdminBroadcastUpdateManyWithWhereWithoutSenderInput[]
+    deleteMany?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutRetractorInput, AdminBroadcastUncheckedCreateWithoutRetractorInput> | AdminBroadcastCreateWithoutRetractorInput[] | AdminBroadcastUncheckedCreateWithoutRetractorInput[]
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutRetractorInput | AdminBroadcastCreateOrConnectWithoutRetractorInput[]
+    upsert?: AdminBroadcastUpsertWithWhereUniqueWithoutRetractorInput | AdminBroadcastUpsertWithWhereUniqueWithoutRetractorInput[]
+    createMany?: AdminBroadcastCreateManyRetractorInputEnvelope
+    set?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    disconnect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    delete?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    connect?: AdminBroadcastWhereUniqueInput | AdminBroadcastWhereUniqueInput[]
+    update?: AdminBroadcastUpdateWithWhereUniqueWithoutRetractorInput | AdminBroadcastUpdateWithWhereUniqueWithoutRetractorInput[]
+    updateMany?: AdminBroadcastUpdateManyWithWhereWithoutRetractorInput | AdminBroadcastUpdateManyWithWhereWithoutRetractorInput[]
+    deleteMany?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
   }
 
   export type PublicCardViewUncheckedUpdateManyWithoutUserNestedInput = {
@@ -81307,6 +85489,60 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSupportNotesAuthoredInput, UserUpdateWithoutSupportNotesAuthoredInput>, UserUncheckedUpdateWithoutSupportNotesAuthoredInput>
   }
 
+  export type UserCreateNestedOneWithoutSupportCasesCreatedInput = {
+    create?: XOR<UserCreateWithoutSupportCasesCreatedInput, UserUncheckedCreateWithoutSupportCasesCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportCasesCreatedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSupportCasesAssignedInput = {
+    create?: XOR<UserCreateWithoutSupportCasesAssignedInput, UserUncheckedCreateWithoutSupportCasesAssignedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportCasesAssignedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSupportCasesTargetedInput = {
+    create?: XOR<UserCreateWithoutSupportCasesTargetedInput, UserUncheckedCreateWithoutSupportCasesTargetedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportCasesTargetedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumAdminSupportCaseStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AdminSupportCaseStatus
+  }
+
+  export type EnumAdminSupportCaseSeverityFieldUpdateOperationsInput = {
+    set?: $Enums.AdminSupportCaseSeverity
+  }
+
+  export type UserUpdateOneRequiredWithoutSupportCasesCreatedNestedInput = {
+    create?: XOR<UserCreateWithoutSupportCasesCreatedInput, UserUncheckedCreateWithoutSupportCasesCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportCasesCreatedInput
+    upsert?: UserUpsertWithoutSupportCasesCreatedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSupportCasesCreatedInput, UserUpdateWithoutSupportCasesCreatedInput>, UserUncheckedUpdateWithoutSupportCasesCreatedInput>
+  }
+
+  export type UserUpdateOneWithoutSupportCasesAssignedNestedInput = {
+    create?: XOR<UserCreateWithoutSupportCasesAssignedInput, UserUncheckedCreateWithoutSupportCasesAssignedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportCasesAssignedInput
+    upsert?: UserUpsertWithoutSupportCasesAssignedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSupportCasesAssignedInput, UserUpdateWithoutSupportCasesAssignedInput>, UserUncheckedUpdateWithoutSupportCasesAssignedInput>
+  }
+
+  export type UserUpdateOneWithoutSupportCasesTargetedNestedInput = {
+    create?: XOR<UserCreateWithoutSupportCasesTargetedInput, UserUncheckedCreateWithoutSupportCasesTargetedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSupportCasesTargetedInput
+    upsert?: UserUpsertWithoutSupportCasesTargetedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSupportCasesTargetedInput, UserUpdateWithoutSupportCasesTargetedInput>, UserUncheckedUpdateWithoutSupportCasesTargetedInput>
+  }
+
   export type FeatureFlagCreateenvironmentScopeInput = {
     set: string[]
   }
@@ -81986,6 +86222,12 @@ export namespace Prisma {
     connect?: SecurityAlertWhereUniqueInput
   }
 
+  export type AdminBroadcastCreateNestedOneWithoutNotificationsInput = {
+    create?: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutNotificationsInput
+    connect?: AdminBroadcastWhereUniqueInput
+  }
+
   export type EnumNotificationCategoryFieldUpdateOperationsInput = {
     set?: $Enums.NotificationCategory
   }
@@ -82006,6 +86248,108 @@ export namespace Prisma {
     delete?: SecurityAlertWhereInput | boolean
     connect?: SecurityAlertWhereUniqueInput
     update?: XOR<XOR<SecurityAlertUpdateToOneWithWhereWithoutNotificationsInput, SecurityAlertUpdateWithoutNotificationsInput>, SecurityAlertUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type AdminBroadcastUpdateOneWithoutNotificationsNestedInput = {
+    create?: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: AdminBroadcastCreateOrConnectWithoutNotificationsInput
+    upsert?: AdminBroadcastUpsertWithoutNotificationsInput
+    disconnect?: AdminBroadcastWhereInput | boolean
+    delete?: AdminBroadcastWhereInput | boolean
+    connect?: AdminBroadcastWhereUniqueInput
+    update?: XOR<XOR<AdminBroadcastUpdateToOneWithWhereWithoutNotificationsInput, AdminBroadcastUpdateWithoutNotificationsInput>, AdminBroadcastUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type UserCreateNestedOneWithoutBroadcastsCreatedInput = {
+    create?: XOR<UserCreateWithoutBroadcastsCreatedInput, UserUncheckedCreateWithoutBroadcastsCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBroadcastsCreatedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutBroadcastsSentInput = {
+    create?: XOR<UserCreateWithoutBroadcastsSentInput, UserUncheckedCreateWithoutBroadcastsSentInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBroadcastsSentInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutBroadcastsRetractedInput = {
+    create?: XOR<UserCreateWithoutBroadcastsRetractedInput, UserUncheckedCreateWithoutBroadcastsRetractedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBroadcastsRetractedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type NotificationCreateNestedManyWithoutAdminBroadcastInput = {
+    create?: XOR<NotificationCreateWithoutAdminBroadcastInput, NotificationUncheckedCreateWithoutAdminBroadcastInput> | NotificationCreateWithoutAdminBroadcastInput[] | NotificationUncheckedCreateWithoutAdminBroadcastInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutAdminBroadcastInput | NotificationCreateOrConnectWithoutAdminBroadcastInput[]
+    createMany?: NotificationCreateManyAdminBroadcastInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type NotificationUncheckedCreateNestedManyWithoutAdminBroadcastInput = {
+    create?: XOR<NotificationCreateWithoutAdminBroadcastInput, NotificationUncheckedCreateWithoutAdminBroadcastInput> | NotificationCreateWithoutAdminBroadcastInput[] | NotificationUncheckedCreateWithoutAdminBroadcastInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutAdminBroadcastInput | NotificationCreateOrConnectWithoutAdminBroadcastInput[]
+    createMany?: NotificationCreateManyAdminBroadcastInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type EnumAdminBroadcastStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AdminBroadcastStatus
+  }
+
+  export type UserUpdateOneRequiredWithoutBroadcastsCreatedNestedInput = {
+    create?: XOR<UserCreateWithoutBroadcastsCreatedInput, UserUncheckedCreateWithoutBroadcastsCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBroadcastsCreatedInput
+    upsert?: UserUpsertWithoutBroadcastsCreatedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBroadcastsCreatedInput, UserUpdateWithoutBroadcastsCreatedInput>, UserUncheckedUpdateWithoutBroadcastsCreatedInput>
+  }
+
+  export type UserUpdateOneWithoutBroadcastsSentNestedInput = {
+    create?: XOR<UserCreateWithoutBroadcastsSentInput, UserUncheckedCreateWithoutBroadcastsSentInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBroadcastsSentInput
+    upsert?: UserUpsertWithoutBroadcastsSentInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBroadcastsSentInput, UserUpdateWithoutBroadcastsSentInput>, UserUncheckedUpdateWithoutBroadcastsSentInput>
+  }
+
+  export type UserUpdateOneWithoutBroadcastsRetractedNestedInput = {
+    create?: XOR<UserCreateWithoutBroadcastsRetractedInput, UserUncheckedCreateWithoutBroadcastsRetractedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBroadcastsRetractedInput
+    upsert?: UserUpsertWithoutBroadcastsRetractedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBroadcastsRetractedInput, UserUpdateWithoutBroadcastsRetractedInput>, UserUncheckedUpdateWithoutBroadcastsRetractedInput>
+  }
+
+  export type NotificationUpdateManyWithoutAdminBroadcastNestedInput = {
+    create?: XOR<NotificationCreateWithoutAdminBroadcastInput, NotificationUncheckedCreateWithoutAdminBroadcastInput> | NotificationCreateWithoutAdminBroadcastInput[] | NotificationUncheckedCreateWithoutAdminBroadcastInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutAdminBroadcastInput | NotificationCreateOrConnectWithoutAdminBroadcastInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutAdminBroadcastInput | NotificationUpsertWithWhereUniqueWithoutAdminBroadcastInput[]
+    createMany?: NotificationCreateManyAdminBroadcastInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutAdminBroadcastInput | NotificationUpdateWithWhereUniqueWithoutAdminBroadcastInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutAdminBroadcastInput | NotificationUpdateManyWithWhereWithoutAdminBroadcastInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutAdminBroadcastNestedInput = {
+    create?: XOR<NotificationCreateWithoutAdminBroadcastInput, NotificationUncheckedCreateWithoutAdminBroadcastInput> | NotificationCreateWithoutAdminBroadcastInput[] | NotificationUncheckedCreateWithoutAdminBroadcastInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutAdminBroadcastInput | NotificationCreateOrConnectWithoutAdminBroadcastInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutAdminBroadcastInput | NotificationUpsertWithWhereUniqueWithoutAdminBroadcastInput[]
+    createMany?: NotificationCreateManyAdminBroadcastInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutAdminBroadcastInput | NotificationUpdateWithWhereUniqueWithoutAdminBroadcastInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutAdminBroadcastInput | NotificationUpdateManyWithWhereWithoutAdminBroadcastInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSecurityAlertsInput = {
@@ -82925,6 +87269,40 @@ export namespace Prisma {
     _max?: NestedEnumActorFilter<$PrismaModel>
   }
 
+  export type NestedEnumAdminSupportCaseStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseStatus | EnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseStatusFilter<$PrismaModel> | $Enums.AdminSupportCaseStatus
+  }
+
+  export type NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseSeverity | EnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel> | $Enums.AdminSupportCaseSeverity
+  }
+
+  export type NestedEnumAdminSupportCaseStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseStatus | EnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseStatus[] | ListEnumAdminSupportCaseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseStatusWithAggregatesFilter<$PrismaModel> | $Enums.AdminSupportCaseStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminSupportCaseStatusFilter<$PrismaModel>
+    _max?: NestedEnumAdminSupportCaseStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAdminSupportCaseSeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminSupportCaseSeverity | EnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminSupportCaseSeverity[] | ListEnumAdminSupportCaseSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminSupportCaseSeverityWithAggregatesFilter<$PrismaModel> | $Enums.AdminSupportCaseSeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel>
+    _max?: NestedEnumAdminSupportCaseSeverityFilter<$PrismaModel>
+  }
+
   export type NestedEnumFeatureFlagModeFilter<$PrismaModel = never> = {
     equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
     in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
@@ -83042,6 +87420,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumNotificationCategoryFilter<$PrismaModel>
     _max?: NestedEnumNotificationCategoryFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAdminBroadcastStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminBroadcastStatus | EnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminBroadcastStatusFilter<$PrismaModel> | $Enums.AdminBroadcastStatus
+  }
+
+  export type NestedEnumAdminBroadcastStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminBroadcastStatus | EnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminBroadcastStatus[] | ListEnumAdminBroadcastStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminBroadcastStatusWithAggregatesFilter<$PrismaModel> | $Enums.AdminBroadcastStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminBroadcastStatusFilter<$PrismaModel>
+    _max?: NestedEnumAdminBroadcastStatusFilter<$PrismaModel>
   }
 
   export type NestedEnumDigestCadenceFilter<$PrismaModel = never> = {
@@ -84137,6 +88532,7 @@ export namespace Prisma {
     actionUrl?: string | null
     createdAt?: Date | string
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+    adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutUserInput = {
@@ -84149,6 +88545,7 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    adminBroadcastId?: string | null
     createdAt?: Date | string
   }
 
@@ -84513,6 +88910,288 @@ export namespace Prisma {
 
   export type AdminSupportNoteCreateManyAuthorInputEnvelope = {
     data: AdminSupportNoteCreateManyAuthorInput | AdminSupportNoteCreateManyAuthorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AdminSupportCaseCreateWithoutCreatorInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignee?: UserCreateNestedOneWithoutSupportCasesAssignedInput
+    targetUser?: UserCreateNestedOneWithoutSupportCasesTargetedInput
+  }
+
+  export type AdminSupportCaseUncheckedCreateWithoutCreatorInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    assigneeAdminUserId?: string | null
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseCreateOrConnectWithoutCreatorInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    create: XOR<AdminSupportCaseCreateWithoutCreatorInput, AdminSupportCaseUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type AdminSupportCaseCreateManyCreatorInputEnvelope = {
+    data: AdminSupportCaseCreateManyCreatorInput | AdminSupportCaseCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AdminSupportCaseCreateWithoutAssigneeInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutSupportCasesCreatedInput
+    targetUser?: UserCreateNestedOneWithoutSupportCasesTargetedInput
+  }
+
+  export type AdminSupportCaseUncheckedCreateWithoutAssigneeInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    creatorAdminUserId: string
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseCreateOrConnectWithoutAssigneeInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    create: XOR<AdminSupportCaseCreateWithoutAssigneeInput, AdminSupportCaseUncheckedCreateWithoutAssigneeInput>
+  }
+
+  export type AdminSupportCaseCreateManyAssigneeInputEnvelope = {
+    data: AdminSupportCaseCreateManyAssigneeInput | AdminSupportCaseCreateManyAssigneeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AdminSupportCaseCreateWithoutTargetUserInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutSupportCasesCreatedInput
+    assignee?: UserCreateNestedOneWithoutSupportCasesAssignedInput
+  }
+
+  export type AdminSupportCaseUncheckedCreateWithoutTargetUserInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    creatorAdminUserId: string
+    assigneeAdminUserId?: string | null
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseCreateOrConnectWithoutTargetUserInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    create: XOR<AdminSupportCaseCreateWithoutTargetUserInput, AdminSupportCaseUncheckedCreateWithoutTargetUserInput>
+  }
+
+  export type AdminSupportCaseCreateManyTargetUserInputEnvelope = {
+    data: AdminSupportCaseCreateManyTargetUserInput | AdminSupportCaseCreateManyTargetUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AdminBroadcastCreateWithoutCreatorInput = {
+    id?: string
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sender?: UserCreateNestedOneWithoutBroadcastsSentInput
+    retractor?: UserCreateNestedOneWithoutBroadcastsRetractedInput
+    notifications?: NotificationCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastUncheckedCreateWithoutCreatorInput = {
+    id?: string
+    sentByAdminUserId?: string | null
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastCreateOrConnectWithoutCreatorInput = {
+    where: AdminBroadcastWhereUniqueInput
+    create: XOR<AdminBroadcastCreateWithoutCreatorInput, AdminBroadcastUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type AdminBroadcastCreateManyCreatorInputEnvelope = {
+    data: AdminBroadcastCreateManyCreatorInput | AdminBroadcastCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AdminBroadcastCreateWithoutSenderInput = {
+    id?: string
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutBroadcastsCreatedInput
+    retractor?: UserCreateNestedOneWithoutBroadcastsRetractedInput
+    notifications?: NotificationCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastUncheckedCreateWithoutSenderInput = {
+    id?: string
+    createdByAdminUserId: string
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastCreateOrConnectWithoutSenderInput = {
+    where: AdminBroadcastWhereUniqueInput
+    create: XOR<AdminBroadcastCreateWithoutSenderInput, AdminBroadcastUncheckedCreateWithoutSenderInput>
+  }
+
+  export type AdminBroadcastCreateManySenderInputEnvelope = {
+    data: AdminBroadcastCreateManySenderInput | AdminBroadcastCreateManySenderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AdminBroadcastCreateWithoutRetractorInput = {
+    id?: string
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutBroadcastsCreatedInput
+    sender?: UserCreateNestedOneWithoutBroadcastsSentInput
+    notifications?: NotificationCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastUncheckedCreateWithoutRetractorInput = {
+    id?: string
+    createdByAdminUserId: string
+    sentByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutAdminBroadcastInput
+  }
+
+  export type AdminBroadcastCreateOrConnectWithoutRetractorInput = {
+    where: AdminBroadcastWhereUniqueInput
+    create: XOR<AdminBroadcastCreateWithoutRetractorInput, AdminBroadcastUncheckedCreateWithoutRetractorInput>
+  }
+
+  export type AdminBroadcastCreateManyRetractorInputEnvelope = {
+    data: AdminBroadcastCreateManyRetractorInput | AdminBroadcastCreateManyRetractorInput[]
     skipDuplicates?: boolean
   }
 
@@ -85364,6 +90043,7 @@ export namespace Prisma {
     dismissedAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
+    adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
   }
 
@@ -85732,6 +90412,146 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AdminSupportNote"> | Date | string
   }
 
+  export type AdminSupportCaseUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    update: XOR<AdminSupportCaseUpdateWithoutCreatorInput, AdminSupportCaseUncheckedUpdateWithoutCreatorInput>
+    create: XOR<AdminSupportCaseCreateWithoutCreatorInput, AdminSupportCaseUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type AdminSupportCaseUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    data: XOR<AdminSupportCaseUpdateWithoutCreatorInput, AdminSupportCaseUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type AdminSupportCaseUpdateManyWithWhereWithoutCreatorInput = {
+    where: AdminSupportCaseScalarWhereInput
+    data: XOR<AdminSupportCaseUpdateManyMutationInput, AdminSupportCaseUncheckedUpdateManyWithoutCreatorInput>
+  }
+
+  export type AdminSupportCaseScalarWhereInput = {
+    AND?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+    OR?: AdminSupportCaseScalarWhereInput[]
+    NOT?: AdminSupportCaseScalarWhereInput | AdminSupportCaseScalarWhereInput[]
+    id?: StringFilter<"AdminSupportCase"> | string
+    subjectType?: StringFilter<"AdminSupportCase"> | string
+    subjectId?: StringFilter<"AdminSupportCase"> | string
+    targetUserId?: StringNullableFilter<"AdminSupportCase"> | string | null
+    creatorAdminUserId?: StringFilter<"AdminSupportCase"> | string
+    assigneeAdminUserId?: StringNullableFilter<"AdminSupportCase"> | string | null
+    title?: StringFilter<"AdminSupportCase"> | string
+    summary?: StringNullableFilter<"AdminSupportCase"> | string | null
+    status?: EnumAdminSupportCaseStatusFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFilter<"AdminSupportCase"> | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    resolvedAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    archivedAt?: DateTimeNullableFilter<"AdminSupportCase"> | Date | string | null
+    createdAt?: DateTimeFilter<"AdminSupportCase"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminSupportCase"> | Date | string
+  }
+
+  export type AdminSupportCaseUpsertWithWhereUniqueWithoutAssigneeInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    update: XOR<AdminSupportCaseUpdateWithoutAssigneeInput, AdminSupportCaseUncheckedUpdateWithoutAssigneeInput>
+    create: XOR<AdminSupportCaseCreateWithoutAssigneeInput, AdminSupportCaseUncheckedCreateWithoutAssigneeInput>
+  }
+
+  export type AdminSupportCaseUpdateWithWhereUniqueWithoutAssigneeInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    data: XOR<AdminSupportCaseUpdateWithoutAssigneeInput, AdminSupportCaseUncheckedUpdateWithoutAssigneeInput>
+  }
+
+  export type AdminSupportCaseUpdateManyWithWhereWithoutAssigneeInput = {
+    where: AdminSupportCaseScalarWhereInput
+    data: XOR<AdminSupportCaseUpdateManyMutationInput, AdminSupportCaseUncheckedUpdateManyWithoutAssigneeInput>
+  }
+
+  export type AdminSupportCaseUpsertWithWhereUniqueWithoutTargetUserInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    update: XOR<AdminSupportCaseUpdateWithoutTargetUserInput, AdminSupportCaseUncheckedUpdateWithoutTargetUserInput>
+    create: XOR<AdminSupportCaseCreateWithoutTargetUserInput, AdminSupportCaseUncheckedCreateWithoutTargetUserInput>
+  }
+
+  export type AdminSupportCaseUpdateWithWhereUniqueWithoutTargetUserInput = {
+    where: AdminSupportCaseWhereUniqueInput
+    data: XOR<AdminSupportCaseUpdateWithoutTargetUserInput, AdminSupportCaseUncheckedUpdateWithoutTargetUserInput>
+  }
+
+  export type AdminSupportCaseUpdateManyWithWhereWithoutTargetUserInput = {
+    where: AdminSupportCaseScalarWhereInput
+    data: XOR<AdminSupportCaseUpdateManyMutationInput, AdminSupportCaseUncheckedUpdateManyWithoutTargetUserInput>
+  }
+
+  export type AdminBroadcastUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: AdminBroadcastWhereUniqueInput
+    update: XOR<AdminBroadcastUpdateWithoutCreatorInput, AdminBroadcastUncheckedUpdateWithoutCreatorInput>
+    create: XOR<AdminBroadcastCreateWithoutCreatorInput, AdminBroadcastUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type AdminBroadcastUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: AdminBroadcastWhereUniqueInput
+    data: XOR<AdminBroadcastUpdateWithoutCreatorInput, AdminBroadcastUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type AdminBroadcastUpdateManyWithWhereWithoutCreatorInput = {
+    where: AdminBroadcastScalarWhereInput
+    data: XOR<AdminBroadcastUpdateManyMutationInput, AdminBroadcastUncheckedUpdateManyWithoutCreatorInput>
+  }
+
+  export type AdminBroadcastScalarWhereInput = {
+    AND?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+    OR?: AdminBroadcastScalarWhereInput[]
+    NOT?: AdminBroadcastScalarWhereInput | AdminBroadcastScalarWhereInput[]
+    id?: StringFilter<"AdminBroadcast"> | string
+    createdByAdminUserId?: StringFilter<"AdminBroadcast"> | string
+    sentByAdminUserId?: StringNullableFilter<"AdminBroadcast"> | string | null
+    retractedByAdminUserId?: StringNullableFilter<"AdminBroadcast"> | string | null
+    title?: StringFilter<"AdminBroadcast"> | string
+    body?: StringFilter<"AdminBroadcast"> | string
+    actionUrl?: StringNullableFilter<"AdminBroadcast"> | string | null
+    status?: EnumAdminBroadcastStatusFilter<"AdminBroadcast"> | $Enums.AdminBroadcastStatus
+    scheduledFor?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    sentAt?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    retractedAt?: DateTimeNullableFilter<"AdminBroadcast"> | Date | string | null
+    audienceFilters?: JsonFilter<"AdminBroadcast">
+    audienceSummary?: JsonFilter<"AdminBroadcast">
+    previewRecipientCount?: IntFilter<"AdminBroadcast"> | number
+    deliveredRecipientCount?: IntFilter<"AdminBroadcast"> | number
+    createdAt?: DateTimeFilter<"AdminBroadcast"> | Date | string
+    updatedAt?: DateTimeFilter<"AdminBroadcast"> | Date | string
+  }
+
+  export type AdminBroadcastUpsertWithWhereUniqueWithoutSenderInput = {
+    where: AdminBroadcastWhereUniqueInput
+    update: XOR<AdminBroadcastUpdateWithoutSenderInput, AdminBroadcastUncheckedUpdateWithoutSenderInput>
+    create: XOR<AdminBroadcastCreateWithoutSenderInput, AdminBroadcastUncheckedCreateWithoutSenderInput>
+  }
+
+  export type AdminBroadcastUpdateWithWhereUniqueWithoutSenderInput = {
+    where: AdminBroadcastWhereUniqueInput
+    data: XOR<AdminBroadcastUpdateWithoutSenderInput, AdminBroadcastUncheckedUpdateWithoutSenderInput>
+  }
+
+  export type AdminBroadcastUpdateManyWithWhereWithoutSenderInput = {
+    where: AdminBroadcastScalarWhereInput
+    data: XOR<AdminBroadcastUpdateManyMutationInput, AdminBroadcastUncheckedUpdateManyWithoutSenderInput>
+  }
+
+  export type AdminBroadcastUpsertWithWhereUniqueWithoutRetractorInput = {
+    where: AdminBroadcastWhereUniqueInput
+    update: XOR<AdminBroadcastUpdateWithoutRetractorInput, AdminBroadcastUncheckedUpdateWithoutRetractorInput>
+    create: XOR<AdminBroadcastCreateWithoutRetractorInput, AdminBroadcastUncheckedCreateWithoutRetractorInput>
+  }
+
+  export type AdminBroadcastUpdateWithWhereUniqueWithoutRetractorInput = {
+    where: AdminBroadcastWhereUniqueInput
+    data: XOR<AdminBroadcastUpdateWithoutRetractorInput, AdminBroadcastUncheckedUpdateWithoutRetractorInput>
+  }
+
+  export type AdminBroadcastUpdateManyWithWhereWithoutRetractorInput = {
+    where: AdminBroadcastScalarWhereInput
+    data: XOR<AdminBroadcastUpdateManyMutationInput, AdminBroadcastUncheckedUpdateManyWithoutRetractorInput>
+  }
+
   export type PublicCardViewUpsertWithWhereUniqueWithoutUserInput = {
     where: PublicCardViewWhereUniqueInput
     update: XOR<PublicCardViewUpdateWithoutUserInput, PublicCardViewUncheckedUpdateWithoutUserInput>
@@ -85823,6 +90643,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
   }
 
   export type UserUncheckedCreateWithoutCardViewLogInput = {
@@ -85890,6 +90716,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
   }
 
   export type UserCreateOrConnectWithoutCardViewLogInput = {
@@ -85973,6 +90805,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCardViewLogInput = {
@@ -86040,6 +90878,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
   }
 
   export type UserCreateWithoutOnboardingStateInput = {
@@ -86106,6 +90950,12 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -86173,6 +91023,12 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -86256,6 +91112,12 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -86323,6 +91185,12 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -86390,6 +91258,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -86457,6 +91331,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -86594,6 +91474,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -86661,6 +91547,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -86770,6 +91662,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -86837,6 +91735,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -87707,6 +92611,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -87774,6 +92684,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -88305,6 +93221,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -88372,6 +93294,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -88580,6 +93508,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -88647,6 +93581,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -88779,6 +93719,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -88846,6 +93792,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -89047,6 +93999,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -89114,6 +94072,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -89279,6 +94243,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -89346,6 +94316,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -89565,6 +94541,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -89632,6 +94614,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -89715,6 +94703,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -89782,6 +94776,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -89865,6 +94865,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -89932,6 +94938,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -89999,6 +95011,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -90066,6 +95084,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -90449,6 +95473,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -90516,6 +95546,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -90916,6 +95952,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -90983,6 +96025,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -91115,6 +96163,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -91182,6 +96236,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -91249,6 +96309,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -91316,6 +96382,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -91661,6 +96733,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -91728,6 +96806,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -92069,6 +97153,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -92136,6 +97226,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -92845,6 +97941,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -92912,6 +98014,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -94967,6 +100075,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -95034,6 +100148,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -95117,6 +100237,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -95184,6 +100310,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -95251,6 +100383,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -95318,6 +100456,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -95401,6 +100545,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -95468,6 +100618,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -95535,6 +100691,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -95602,6 +100764,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -95685,6 +100853,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -95752,6 +100926,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -95819,6 +100999,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -95886,6 +101072,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -95969,6 +101161,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -96036,6 +101234,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -96103,6 +101307,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -96170,6 +101380,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -96384,6 +101600,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -96451,6 +101673,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -96655,6 +101883,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -96722,6 +101956,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -96805,6 +102045,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -96872,6 +102118,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -96939,6 +102191,12 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -97006,6 +102264,12 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -97089,6 +102353,12 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -97156,6 +102426,936 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutSupportCasesCreatedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSupportCasesCreatedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSupportCasesCreatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSupportCasesCreatedInput, UserUncheckedCreateWithoutSupportCasesCreatedInput>
+  }
+
+  export type UserCreateWithoutSupportCasesAssignedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSupportCasesAssignedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSupportCasesAssignedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSupportCasesAssignedInput, UserUncheckedCreateWithoutSupportCasesAssignedInput>
+  }
+
+  export type UserCreateWithoutSupportCasesTargetedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSupportCasesTargetedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSupportCasesTargetedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSupportCasesTargetedInput, UserUncheckedCreateWithoutSupportCasesTargetedInput>
+  }
+
+  export type UserUpsertWithoutSupportCasesCreatedInput = {
+    update: XOR<UserUpdateWithoutSupportCasesCreatedInput, UserUncheckedUpdateWithoutSupportCasesCreatedInput>
+    create: XOR<UserCreateWithoutSupportCasesCreatedInput, UserUncheckedCreateWithoutSupportCasesCreatedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSupportCasesCreatedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSupportCasesCreatedInput, UserUncheckedUpdateWithoutSupportCasesCreatedInput>
+  }
+
+  export type UserUpdateWithoutSupportCasesCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSupportCasesCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUpsertWithoutSupportCasesAssignedInput = {
+    update: XOR<UserUpdateWithoutSupportCasesAssignedInput, UserUncheckedUpdateWithoutSupportCasesAssignedInput>
+    create: XOR<UserCreateWithoutSupportCasesAssignedInput, UserUncheckedCreateWithoutSupportCasesAssignedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSupportCasesAssignedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSupportCasesAssignedInput, UserUncheckedUpdateWithoutSupportCasesAssignedInput>
+  }
+
+  export type UserUpdateWithoutSupportCasesAssignedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSupportCasesAssignedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUpsertWithoutSupportCasesTargetedInput = {
+    update: XOR<UserUpdateWithoutSupportCasesTargetedInput, UserUncheckedUpdateWithoutSupportCasesTargetedInput>
+    create: XOR<UserCreateWithoutSupportCasesTargetedInput, UserUncheckedCreateWithoutSupportCasesTargetedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSupportCasesTargetedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSupportCasesTargetedInput, UserUncheckedUpdateWithoutSupportCasesTargetedInput>
+  }
+
+  export type UserUpdateWithoutSupportCasesTargetedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSupportCasesTargetedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -97223,6 +103423,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -97290,6 +103496,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -97665,6 +103877,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -97732,6 +103950,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -98049,6 +104273,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -98116,6 +104346,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -98248,6 +104484,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -98315,6 +104557,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -98558,6 +104806,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -98625,6 +104879,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -98844,6 +105104,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -98911,6 +105177,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -98994,6 +105266,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -99061,6 +105339,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -99144,6 +105428,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -99211,6 +105501,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -99278,6 +105574,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -99345,6 +105647,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -99478,6 +105786,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -99545,6 +105859,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -100344,6 +106664,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -100411,6 +106737,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -100614,6 +106946,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -100681,6 +107019,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -100895,6 +107239,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -100962,6 +107312,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101177,6 +107533,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -101244,6 +107606,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101448,6 +107816,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -101515,6 +107889,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -101550,6 +107930,51 @@ export namespace Prisma {
   export type SecurityAlertCreateOrConnectWithoutNotificationsInput = {
     where: SecurityAlertWhereUniqueInput
     create: XOR<SecurityAlertCreateWithoutNotificationsInput, SecurityAlertUncheckedCreateWithoutNotificationsInput>
+  }
+
+  export type AdminBroadcastCreateWithoutNotificationsInput = {
+    id?: string
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutBroadcastsCreatedInput
+    sender?: UserCreateNestedOneWithoutBroadcastsSentInput
+    retractor?: UserCreateNestedOneWithoutBroadcastsRetractedInput
+  }
+
+  export type AdminBroadcastUncheckedCreateWithoutNotificationsInput = {
+    id?: string
+    createdByAdminUserId: string
+    sentByAdminUserId?: string | null
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminBroadcastCreateOrConnectWithoutNotificationsInput = {
+    where: AdminBroadcastWhereUniqueInput
+    create: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
   }
 
   export type UserUpsertWithoutNotificationsInput = {
@@ -101627,6 +108052,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -101694,6 +108125,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -101730,6 +108167,1035 @@ export namespace Prisma {
     resolution?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminBroadcastUpsertWithoutNotificationsInput = {
+    update: XOR<AdminBroadcastUpdateWithoutNotificationsInput, AdminBroadcastUncheckedUpdateWithoutNotificationsInput>
+    create: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
+    where?: AdminBroadcastWhereInput
+  }
+
+  export type AdminBroadcastUpdateToOneWithWhereWithoutNotificationsInput = {
+    where?: AdminBroadcastWhereInput
+    data: XOR<AdminBroadcastUpdateWithoutNotificationsInput, AdminBroadcastUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type AdminBroadcastUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutBroadcastsCreatedNestedInput
+    sender?: UserUpdateOneWithoutBroadcastsSentNestedInput
+    retractor?: UserUpdateOneWithoutBroadcastsRetractedNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserCreateWithoutBroadcastsCreatedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutBroadcastsCreatedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutBroadcastsCreatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBroadcastsCreatedInput, UserUncheckedCreateWithoutBroadcastsCreatedInput>
+  }
+
+  export type UserCreateWithoutBroadcastsSentInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutBroadcastsSentInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutBroadcastsSentInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBroadcastsSentInput, UserUncheckedCreateWithoutBroadcastsSentInput>
+  }
+
+  export type UserCreateWithoutBroadcastsRetractedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutBroadcastsRetractedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutBroadcastsRetractedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBroadcastsRetractedInput, UserUncheckedCreateWithoutBroadcastsRetractedInput>
+  }
+
+  export type NotificationCreateWithoutAdminBroadcastInput = {
+    id?: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutNotificationsInput
+    securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+  }
+
+  export type NotificationUncheckedCreateWithoutAdminBroadcastInput = {
+    id?: string
+    userId: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    securityAlertId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type NotificationCreateOrConnectWithoutAdminBroadcastInput = {
+    where: NotificationWhereUniqueInput
+    create: XOR<NotificationCreateWithoutAdminBroadcastInput, NotificationUncheckedCreateWithoutAdminBroadcastInput>
+  }
+
+  export type NotificationCreateManyAdminBroadcastInputEnvelope = {
+    data: NotificationCreateManyAdminBroadcastInput | NotificationCreateManyAdminBroadcastInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutBroadcastsCreatedInput = {
+    update: XOR<UserUpdateWithoutBroadcastsCreatedInput, UserUncheckedUpdateWithoutBroadcastsCreatedInput>
+    create: XOR<UserCreateWithoutBroadcastsCreatedInput, UserUncheckedCreateWithoutBroadcastsCreatedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBroadcastsCreatedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBroadcastsCreatedInput, UserUncheckedUpdateWithoutBroadcastsCreatedInput>
+  }
+
+  export type UserUpdateWithoutBroadcastsCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBroadcastsCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUpsertWithoutBroadcastsSentInput = {
+    update: XOR<UserUpdateWithoutBroadcastsSentInput, UserUncheckedUpdateWithoutBroadcastsSentInput>
+    create: XOR<UserCreateWithoutBroadcastsSentInput, UserUncheckedCreateWithoutBroadcastsSentInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBroadcastsSentInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBroadcastsSentInput, UserUncheckedUpdateWithoutBroadcastsSentInput>
+  }
+
+  export type UserUpdateWithoutBroadcastsSentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBroadcastsSentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUpsertWithoutBroadcastsRetractedInput = {
+    update: XOR<UserUpdateWithoutBroadcastsRetractedInput, UserUncheckedUpdateWithoutBroadcastsRetractedInput>
+    create: XOR<UserCreateWithoutBroadcastsRetractedInput, UserUncheckedCreateWithoutBroadcastsRetractedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBroadcastsRetractedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBroadcastsRetractedInput, UserUncheckedUpdateWithoutBroadcastsRetractedInput>
+  }
+
+  export type UserUpdateWithoutBroadcastsRetractedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBroadcastsRetractedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type NotificationUpsertWithWhereUniqueWithoutAdminBroadcastInput = {
+    where: NotificationWhereUniqueInput
+    update: XOR<NotificationUpdateWithoutAdminBroadcastInput, NotificationUncheckedUpdateWithoutAdminBroadcastInput>
+    create: XOR<NotificationCreateWithoutAdminBroadcastInput, NotificationUncheckedCreateWithoutAdminBroadcastInput>
+  }
+
+  export type NotificationUpdateWithWhereUniqueWithoutAdminBroadcastInput = {
+    where: NotificationWhereUniqueInput
+    data: XOR<NotificationUpdateWithoutAdminBroadcastInput, NotificationUncheckedUpdateWithoutAdminBroadcastInput>
+  }
+
+  export type NotificationUpdateManyWithWhereWithoutAdminBroadcastInput = {
+    where: NotificationScalarWhereInput
+    data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutAdminBroadcastInput>
   }
 
   export type UserCreateWithoutSecurityAlertsInput = {
@@ -101796,6 +109262,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -101863,6 +109335,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -101882,6 +109360,7 @@ export namespace Prisma {
     actionUrl?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutNotificationsInput
+    adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutSecurityAlertInput = {
@@ -101894,6 +109373,7 @@ export namespace Prisma {
     readAt?: Date | string | null
     dismissedAt?: Date | string | null
     actionUrl?: string | null
+    adminBroadcastId?: string | null
     createdAt?: Date | string
   }
 
@@ -101982,6 +109462,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -102049,6 +109535,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -102132,6 +109624,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -102199,6 +109697,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -102282,6 +109786,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -102349,6 +109859,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -102416,6 +109932,12 @@ export namespace Prisma {
     labels?: LabelCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -102483,6 +110005,12 @@ export namespace Prisma {
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -102566,6 +110094,12 @@ export namespace Prisma {
     labels?: LabelUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -102633,6 +110167,12 @@ export namespace Prisma {
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -102700,6 +110240,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -102767,6 +110313,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -102981,6 +110533,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -103048,6 +110606,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -103252,6 +110816,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -103319,6 +110889,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -103402,6 +110978,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -103469,6 +111051,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -103536,6 +111124,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -103603,6 +111197,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -103686,6 +111286,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -103753,6 +111359,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -103820,6 +111432,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -103887,6 +111505,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -103970,6 +111594,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -104037,6 +111667,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -104104,6 +111740,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -104171,6 +111813,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -104254,6 +111902,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -104321,6 +111975,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -104388,6 +112048,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
@@ -104455,6 +112121,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -104538,6 +112210,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
@@ -104605,6 +112283,12 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -104986,6 +112670,7 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    adminBroadcastId?: string | null
     createdAt?: Date | string
   }
 
@@ -105082,6 +112767,114 @@ export namespace Prisma {
     subjectId: string
     targetUserId?: string | null
     body: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseCreateManyCreatorInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    assigneeAdminUserId?: string | null
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseCreateManyAssigneeInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    targetUserId?: string | null
+    creatorAdminUserId: string
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminSupportCaseCreateManyTargetUserInput = {
+    id?: string
+    subjectType: string
+    subjectId: string
+    creatorAdminUserId: string
+    assigneeAdminUserId?: string | null
+    title: string
+    summary?: string | null
+    status?: $Enums.AdminSupportCaseStatus
+    severity?: $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminBroadcastCreateManyCreatorInput = {
+    id?: string
+    sentByAdminUserId?: string | null
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminBroadcastCreateManySenderInput = {
+    id?: string
+    createdByAdminUserId: string
+    retractedByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AdminBroadcastCreateManyRetractorInput = {
+    id?: string
+    createdByAdminUserId: string
+    sentByAdminUserId?: string | null
+    title: string
+    body: string
+    actionUrl?: string | null
+    status?: $Enums.AdminBroadcastStatus
+    scheduledFor?: Date | string | null
+    sentAt?: Date | string | null
+    retractedAt?: Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: number
+    deliveredRecipientCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -106265,6 +114058,7 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+    adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutUserInput = {
@@ -106277,6 +114071,7 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -106290,6 +114085,7 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -106584,6 +114380,336 @@ export namespace Prisma {
     subjectId?: StringFieldUpdateOperationsInput | string
     targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignee?: UserUpdateOneWithoutSupportCasesAssignedNestedInput
+    targetUser?: UserUpdateOneWithoutSupportCasesTargetedNestedInput
+  }
+
+  export type AdminSupportCaseUncheckedUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUpdateWithoutAssigneeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutSupportCasesCreatedNestedInput
+    targetUser?: UserUpdateOneWithoutSupportCasesTargetedNestedInput
+  }
+
+  export type AdminSupportCaseUncheckedUpdateWithoutAssigneeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    creatorAdminUserId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyWithoutAssigneeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    creatorAdminUserId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUpdateWithoutTargetUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutSupportCasesCreatedNestedInput
+    assignee?: UserUpdateOneWithoutSupportCasesAssignedNestedInput
+  }
+
+  export type AdminSupportCaseUncheckedUpdateWithoutTargetUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    creatorAdminUserId?: StringFieldUpdateOperationsInput | string
+    assigneeAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminSupportCaseUncheckedUpdateManyWithoutTargetUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    subjectType?: StringFieldUpdateOperationsInput | string
+    subjectId?: StringFieldUpdateOperationsInput | string
+    creatorAdminUserId?: StringFieldUpdateOperationsInput | string
+    assigneeAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminSupportCaseStatusFieldUpdateOperationsInput | $Enums.AdminSupportCaseStatus
+    severity?: EnumAdminSupportCaseSeverityFieldUpdateOperationsInput | $Enums.AdminSupportCaseSeverity
+    nextFollowUpAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminBroadcastUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sender?: UserUpdateOneWithoutBroadcastsSentNestedInput
+    retractor?: UserUpdateOneWithoutBroadcastsRetractedNestedInput
+    notifications?: NotificationUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyWithoutCreatorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminBroadcastUpdateWithoutSenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutBroadcastsCreatedNestedInput
+    retractor?: UserUpdateOneWithoutBroadcastsRetractedNestedInput
+    notifications?: NotificationUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateWithoutSenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyWithoutSenderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    retractedByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminBroadcastUpdateWithoutRetractorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutBroadcastsCreatedNestedInput
+    sender?: UserUpdateOneWithoutBroadcastsSentNestedInput
+    notifications?: NotificationUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateWithoutRetractorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutAdminBroadcastNestedInput
+  }
+
+  export type AdminBroadcastUncheckedUpdateManyWithoutRetractorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdByAdminUserId?: StringFieldUpdateOperationsInput | string
+    sentByAdminUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumAdminBroadcastStatusFieldUpdateOperationsInput | $Enums.AdminBroadcastStatus
+    scheduledFor?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retractedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    audienceFilters?: JsonNullValueInput | InputJsonValue
+    audienceSummary?: JsonNullValueInput | InputJsonValue
+    previewRecipientCount?: IntFieldUpdateOperationsInput | number
+    deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -109408,6 +117534,62 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type NotificationCreateManyAdminBroadcastInput = {
+    id?: string
+    userId: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    securityAlertId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type NotificationUpdateWithoutAdminBroadcastInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
+    securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+  }
+
+  export type NotificationUncheckedUpdateWithoutAdminBroadcastInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutAdminBroadcastInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type NotificationCreateManySecurityAlertInput = {
     id?: string
     userId: string
@@ -109418,6 +117600,7 @@ export namespace Prisma {
     readAt?: Date | string | null
     dismissedAt?: Date | string | null
     actionUrl?: string | null
+    adminBroadcastId?: string | null
     createdAt?: Date | string
   }
 
@@ -109432,6 +117615,7 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
+    adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutSecurityAlertInput = {
@@ -109444,6 +117628,7 @@ export namespace Prisma {
     readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -109457,6 +117642,7 @@ export namespace Prisma {
     readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

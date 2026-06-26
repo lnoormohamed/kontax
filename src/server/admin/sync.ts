@@ -4,6 +4,7 @@ import type { Prisma, SyncProvider } from "../../../generated/prisma";
 
 import { db } from "~/server/db";
 import { listAdminSupportNotes } from "~/server/admin/support-notes";
+import { listSupportCasesForSubject } from "~/server/admin/support-cases";
 import { getSyncLineageInvariantIssues } from "~/server/sync-lineage";
 import {
   getConsecutiveFailureStreak,
@@ -405,7 +406,7 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
 }
 
 export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
-  const [account, supportNotes] = await Promise.all([
+  const [account, supportNotes, supportCases] = await Promise.all([
     db.syncAccount.findUnique({
       where: { id: syncAccountId },
       include: {
@@ -459,6 +460,7 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
       },
     }),
     listAdminSupportNotes({ subjectType: "SYNC_ACCOUNT", subjectId: syncAccountId, limit: 12 }),
+    listSupportCasesForSubject("SYNC_ACCOUNT", syncAccountId),
   ]);
 
   if (!account) return null;
@@ -617,5 +619,6 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
       resolutionStrategy: conflict.resolutionStrategy,
     })),
     supportNotes,
+    supportCases,
   };
 }
