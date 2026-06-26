@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import {
   buildProviderCapabilityDiagnostics,
   buildProviderSupportedContactShadow,
+  describeProviderFieldFamilies,
   getCardDavVCardFlavor,
   projectPortableContactForProvider,
   providerSupportedShadowsEqual,
@@ -85,4 +86,26 @@ test("Fastmail exports custom website labels as online services", () => {
 
   assert.match(vcard, /X-CYRUS-ONLINESERVICE;X-SERVICE-TYPE=Press/);
   assert.match(vcard, /X-CYRUS-ONLINESERVICE;X-SERVICE-TYPE=Calendar/);
+});
+
+test("provider field-family diagnostics mark unsupported significant dates as local-only", () => {
+  const googleProfile = resolveSyncProviderCapabilityProfile({
+    provider: "GOOGLE",
+  });
+  const icloudProfile = resolveSyncProviderCapabilityProfile({
+    provider: "CARDDAV",
+    baseUrl: "https://contacts.icloud.com",
+  });
+
+  const googleDates = describeProviderFieldFamilies(googleProfile).find(
+    (field) => field.key === "significantDates",
+  );
+  const icloudDates = describeProviderFieldFamilies(icloudProfile).find(
+    (field) => field.key === "significantDates",
+  );
+
+  assert.equal(googleDates?.support, "local_only");
+  assert.match(googleDates?.detail ?? "", /stay in Kontax/i);
+  assert.equal(icloudDates?.support, "two_way");
+  assert.match(icloudDates?.detail ?? "", /sync with iCloud/i);
 });

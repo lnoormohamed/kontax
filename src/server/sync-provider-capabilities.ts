@@ -48,6 +48,25 @@ export type ProviderCapabilityNotice = {
   unsupportedFieldFamilies: ProviderCapabilityUnsupportedFieldFamily[];
 };
 
+export type ProviderFieldFamilyKey =
+  | "names"
+  | "phones"
+  | "emails"
+  | "addresses"
+  | "websites"
+  | "notes"
+  | "birthday"
+  | "significantDates";
+
+export type ProviderFieldFamilySupport = "two_way" | "local_only";
+
+export type ProviderFieldFamilyDescriptor = {
+  key: ProviderFieldFamilyKey;
+  label: string;
+  support: ProviderFieldFamilySupport;
+  detail: string;
+};
+
 export type ProviderSupportedContactShadow = {
   fullName: string;
   firstName: string | null;
@@ -373,6 +392,66 @@ export const getProviderCapabilityNotice = (
     body: `Some providers do not support every contact field. ${providerName} does not currently store ${familyLabel}, so those values stay in Kontax and in providers that support them.`,
     unsupportedFieldFamilies,
   };
+};
+
+export const describeProviderFieldFamilies = (
+  profile: SyncProviderCapabilityProfile,
+): ProviderFieldFamilyDescriptor[] => {
+  const providerName = getSyncProviderCapabilityProfileDisplayName(profile);
+  const significantDatesSupported = providerSupportsSignificantDates(profile);
+
+  return [
+    {
+      key: "names",
+      label: "Names",
+      support: "two_way",
+      detail: `Names sync between Kontax and ${providerName}.`,
+    },
+    {
+      key: "phones",
+      label: "Phones",
+      support: "two_way",
+      detail: `Phone numbers sync between Kontax and ${providerName}.`,
+    },
+    {
+      key: "emails",
+      label: "Emails",
+      support: "two_way",
+      detail: `Email addresses sync between Kontax and ${providerName}.`,
+    },
+    {
+      key: "addresses",
+      label: "Addresses",
+      support: "two_way",
+      detail: `Postal addresses sync between Kontax and ${providerName}.`,
+    },
+    {
+      key: "websites",
+      label: "Websites",
+      support: "two_way",
+      detail: `Websites sync between Kontax and ${providerName}.`,
+    },
+    {
+      key: "notes",
+      label: "Notes",
+      support: "two_way",
+      detail: `Notes sync between Kontax and ${providerName}.`,
+    },
+    {
+      key: "birthday",
+      label: "Birthday",
+      support: "two_way",
+      detail: `Birthday syncs between Kontax and ${providerName}.`,
+    },
+    {
+      key: "significantDates",
+      label: "Other significant dates",
+      support: significantDatesSupported ? "two_way" : "local_only",
+      detail: significantDatesSupported
+        ? `Anniversaries, lunar birthdays, and custom dates sync with ${providerName}.`
+        : `Anniversaries, lunar birthdays, and custom dates stay in Kontax because ${providerName} does not currently store them.`,
+    },
+  ];
 };
 
 export const projectPortableContactForProvider = (

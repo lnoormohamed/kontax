@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 
 import { HelpFaq } from "~/app/_components/help-faq";
 import { HELP_FAQ } from "~/app/_components/help-faq-data";
+import { HelpProviderGuides } from "~/app/_components/help-provider-guides";
 import { breadcrumbSchema, faqPageSchema, JsonLd } from "~/app/_components/json-ld";
 import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
@@ -37,17 +38,18 @@ export default async function HelpPage() {
             <h1 className="help-h1">Help &amp; FAQ</h1>
             <p className="help-lede">
               Answers to the questions new and long-time Kontax users ask most. Can&rsquo;t find it?
-              Reach us at <a className="inline" href="mailto:support@vexon.co">support@vexon.co</a>.
+              Reach us at <a className="inline" href="mailto:support@getkontax.com">support@getkontax.com</a>.
             </p>
           </div>
 
+          <HelpProviderGuides />
           <HelpFaq />
 
           <div className="help-foot">
             <span className="help-foot__k">K</span>
             <span>
               Still stuck? Email{" "}
-              <a className="inline" href="mailto:support@vexon.co">support@vexon.co</a>{" "}
+              <a className="inline" href="mailto:support@getkontax.com">support@getkontax.com</a>{" "}
               — we reply within a day.
             </span>
           </div>

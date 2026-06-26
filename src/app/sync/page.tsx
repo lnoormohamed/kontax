@@ -21,6 +21,7 @@ import {
 } from "~/server/sync-health";
 import {
   coerceCardDavCapabilityProfileOverrideId,
+  describeProviderFieldFamilies,
   getSyncProviderCapabilityProfileLabel,
   getProviderCapabilityNotice,
   resolveSyncProviderCapabilityProfile,
@@ -81,6 +82,27 @@ const formatRelative = (date: Date | null): string | null => {
     year: "numeric",
   }).format(date);
 };
+
+const getSyncHelpHref = (account: {
+  provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
+  providerBrandKey: string | null;
+}) => {
+  if (account.provider === "GOOGLE") return "/help#provider-google";
+  if (account.provider === "MICROSOFT") return "/help#provider-microsoft";
+  switch (account.providerBrandKey) {
+    case "icloud":
+      return "/help#provider-icloud";
+    case "fastmail":
+      return "/help#provider-fastmail";
+    case "nextcloud":
+      return "/help#provider-carddav";
+    default:
+      return "/help#provider-carddav";
+  }
+};
+
+const isSuccessfulJob = (status: string) =>
+  status === "SUCCEEDED" || status === "PARTIAL";
 
 // Extract a human-readable snapshot summary for conflict comparison rows.
 // The snapshots are stored as JSON blobs in the DB.
@@ -325,16 +347,63 @@ export default async function SyncPage({ searchParams }: PageProps) {
       label: acct.label,
     });
     const capabilityNotice = getProviderCapabilityNotice(capabilityProfile);
+    const fieldSupport = describeProviderFieldFamilies(capabilityProfile);
     const recentJobs = acct.syncJobs.map((j) => ({
       status: j.status,
       errorCode: j.errorCode,
     }));
-
+    const completedJobs = acct.syncJobs
+      .filter((job) => isSuccessfulJob(job.status))
+      .sort(
+        (left, right) =>
+          (right.completedAt ?? right.startedAt ?? right.createdAt).getTime() -
+          (left.completedAt ?? left.startedAt ?? left.createdAt).getTime(),
+      );
+    const lastSuccessfulJob = completedJobs[0] ?? null;
+    const lastInboundActivityJob =
+      completedJobs.find(
+        (job) => job.createdCount + job.updatedCount + job.deletedCount > 0,
+      ) ?? null;
+    const lastOutboundActivityJob =
+      completedJobs.find(
+        (job) =>
+          job.pushedCreatedCount + job.pushedUpdatedCount + job.pushedDeletedCount > 0,
+      ) ?? null;
     const health = getSyncAccountOperationalHealth({
       status: acct.status,
       lastErrorCode: acct.lastErrorCode,
       recentJobs,
     });
+
+    const diagnosticsWarnings: string[] = [];
+    if (acct.status === "NEEDS_REAUTH") {
+      diagnosticsWarnings.push(
+        "This connection needs you to sign in again before sync can continue.",
+      );
+    } else if (
+      acct.status === "PAUSED" &&
+      acct.lastErrorCode === "SYNC_CONFLICT_QUEUE_FULL"
+    ) {
+      diagnosticsWarnings.push(
+        "Kontax paused this connection because the manual conflict queue is full.",
+      );
+    } else if (health === "paused_for_safety") {
+      diagnosticsWarnings.push(
+        "Kontax paused this connection after repeated failures so it does not keep retrying unattended.",
+      );
+    } else if (acct.status === "ERROR" && acct.lastErrorMessage) {
+      diagnosticsWarnings.push(acct.lastErrorMessage);
+    } else if (acct.status === "PAUSED") {
+      diagnosticsWarnings.push(
+        "This connection is paused. Resume it when you're ready for sync to continue.",
+      );
+    }
+
+    if (capabilityProfile.fields.significantDates === "none") {
+      diagnosticsWarnings.push(
+        "Additional dates such as anniversaries and lunar birthdays stay in Kontax and in providers that support them.",
+      );
+    }
 
     const jobs: SyncJobRow[] = acct.syncJobs.map((j) => ({
       id: j.id,
@@ -378,6 +447,10 @@ export default async function SyncPage({ searchParams }: PageProps) {
       providerBrandKey: providerIdentity.providerBrandKey,
       providerDetectionSource: providerIdentity.detectionSource,
       providerSecondaryText: formatProviderIdentitySecondaryText(providerIdentity),
+      diagnosticsHelpHref: getSyncHelpHref({
+        provider: acct.provider,
+        providerBrandKey: providerIdentity.providerBrandKey,
+      }),
       // OAuth: the connected provider account email (stored at connect time).
       connectedEmail: isOAuth ? acct.remoteAccountId : null,
       scope: isOAuth ? "Contacts (read & write)" : null,
@@ -428,6 +501,29 @@ export default async function SyncPage({ searchParams }: PageProps) {
       capabilityNoteBody: capabilityNotice?.body ?? null,
       capabilityUnsupportedFieldFamilies:
         capabilityNotice?.unsupportedFieldFamilies ?? [],
+      diagnosticsFieldSupport: fieldSupport,
+      diagnosticsWarnings,
+      lastSuccessfulJobRelative: formatRelative(
+        lastSuccessfulJob
+          ? lastSuccessfulJob.completedAt ??
+              lastSuccessfulJob.startedAt ??
+              lastSuccessfulJob.createdAt
+          : null,
+      ),
+      lastInboundActivityRelative: formatRelative(
+        lastInboundActivityJob
+          ? lastInboundActivityJob.completedAt ??
+              lastInboundActivityJob.startedAt ??
+              lastInboundActivityJob.createdAt
+          : null,
+      ),
+      lastOutboundActivityRelative: formatRelative(
+        lastOutboundActivityJob
+          ? lastOutboundActivityJob.completedAt ??
+              lastOutboundActivityJob.startedAt ??
+              lastOutboundActivityJob.createdAt
+          : null,
+      ),
       consecutiveFailures: getConsecutiveFailureStreak(recentJobs),
       // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
       conflictQueueFull:

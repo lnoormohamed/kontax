@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 
 import {
   activateSyncAccount,
@@ -50,6 +57,21 @@ export type SyncConflictData = {
   comparisonRows: ConflictComparisonRow[];
 };
 
+export type SyncFieldSupportRow = {
+  key:
+    | "names"
+    | "phones"
+    | "emails"
+    | "addresses"
+    | "websites"
+    | "notes"
+    | "birthday"
+    | "significantDates";
+  label: string;
+  support: "two_way" | "local_only";
+  detail: string;
+};
+
 export type SyncAccountData = {
   id: string;
   label: string;
@@ -63,6 +85,7 @@ export type SyncAccountData = {
   providerBrandKey: string | null;
   providerDetectionSource: string | null;
   providerSecondaryText: string | null;
+  diagnosticsHelpHref: string;
   connectedEmail: string | null;
   scope: string | null;
   tokenStatus: "valid" | "expired" | null;
@@ -112,6 +135,11 @@ export type SyncAccountData = {
   capabilityNoteTitle: string | null;
   capabilityNoteBody: string | null;
   capabilityUnsupportedFieldFamilies: string[];
+  diagnosticsFieldSupport: SyncFieldSupportRow[];
+  diagnosticsWarnings: string[];
+  lastSuccessfulJobRelative: string | null;
+  lastInboundActivityRelative: string | null;
+  lastOutboundActivityRelative: string | null;
   consecutiveFailures: number;
   // P23-05: account auto-paused because the manual conflict queue is full.
   conflictQueueFull: boolean;
@@ -355,7 +383,7 @@ function ActionBtn({
   type = "button",
   onClick,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   variant?: "primary" | "ghost";
   danger?: boolean;
   disabled?: boolean;
@@ -423,7 +451,7 @@ function ConflictRow({
     strategy,
     variant = "ghost",
   }: {
-    children: React.ReactNode;
+    children: ReactNode;
     strategy: string;
     variant?: "primary" | "ghost";
   }) => (
@@ -1086,6 +1114,313 @@ function CapabilityNote({
   );
 }
 
+function DiagnosticsStat({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div
+      style={{
+        borderRadius: 10,
+        border: `1px solid ${T.line2}`,
+        background: "#fff",
+        padding: "12px 13px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: T.mute,
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ marginTop: 7, fontSize: 14, fontWeight: 600, color: T.ink }}>
+        {value}
+      </div>
+      <div style={{ marginTop: 4, fontSize: 12.5, lineHeight: 1.45, color: T.ink2 }}>
+        {detail}
+      </div>
+    </div>
+  );
+}
+
+function SyncDiagnosticsPanel({
+  account,
+}: {
+  account: SyncAccountData;
+}) {
+  const syncedBothWays = account.diagnosticsFieldSupport.filter(
+    (field) => field.support === "two_way",
+  );
+  const localOnly = account.diagnosticsFieldSupport.filter(
+    (field) => field.support === "local_only",
+  );
+
+  return (
+    <section
+      style={{
+        marginBottom: 24,
+        border: `1px solid ${T.line}`,
+        borderRadius: 14,
+        background: "#f8faf8",
+        padding: 16,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: T.mute,
+            }}
+          >
+            Sync diagnostics
+          </div>
+          <div style={{ marginTop: 6, fontSize: 14, lineHeight: 1.55, color: T.ink2, maxWidth: 620 }}>
+            See what this provider stores, what stays local to Kontax, and whether recent changes
+            were flowing in both directions.
+          </div>
+        </div>
+        <Link
+          href={account.diagnosticsHelpHref}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 7,
+            borderRadius: 9,
+            border: `1px solid ${T.line}`,
+            background: "#fff",
+            padding: "9px 12px",
+            fontSize: 13,
+            fontWeight: 600,
+            color: T.ink,
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Provider guide
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </Link>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+          gap: 10,
+          marginTop: 14,
+        }}
+      >
+        <DiagnosticsStat
+          label="Last healthy sync"
+          value={account.lastSuccessfulJobRelative ?? "No completed sync yet"}
+          detail="Most recent successful or partially successful sync run."
+        />
+        <DiagnosticsStat
+          label="Remote updates pulled"
+          value={
+            account.direction === "EXPORT_ONLY"
+              ? "Not enabled"
+              : account.lastInboundActivityRelative ?? "No recent remote changes"
+          }
+          detail="When Kontax last imported a real change from this provider."
+        />
+        <DiagnosticsStat
+          label="Kontax updates pushed"
+          value={
+            account.direction === "IMPORT_ONLY"
+              ? "Not enabled"
+              : account.lastOutboundActivityRelative ?? "No recent outbound changes"
+          }
+          detail="When Kontax last pushed a real change out to this provider."
+        />
+      </div>
+
+      {account.diagnosticsWarnings.length > 0 ? (
+        <div style={{ marginTop: 14, display: "grid", gap: 8 }}>
+          {account.diagnosticsWarnings.map((warning) => (
+            <div
+              key={warning}
+              style={{
+                display: "flex",
+                gap: 10,
+                alignItems: "flex-start",
+                borderRadius: 10,
+                background: "#fff",
+                border: `1px solid ${T.line2}`,
+                padding: "11px 12px",
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={T.ink2}
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ flexShrink: 0, marginTop: 1 }}
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 10v5" />
+                <path d="M12 7h.01" />
+              </svg>
+              <span style={{ fontSize: 12.5, lineHeight: 1.5, color: T.ink2 }}>{warning}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 14,
+          marginTop: 16,
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: T.mute,
+              marginBottom: 8,
+            }}
+          >
+            Syncs both ways
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {syncedBothWays.map((field) => (
+              <div
+                key={field.key}
+                style={{
+                  borderRadius: 10,
+                  background: "#fff",
+                  border: `1px solid ${T.line2}`,
+                  padding: "10px 12px",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>{field.label}</span>
+                  <span
+                    style={{
+                      borderRadius: 999,
+                      background: "#e7efe9",
+                      color: T.sgreen,
+                      padding: "3px 8px",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    Two-way
+                  </span>
+                </div>
+                <div style={{ marginTop: 5, fontSize: 12.5, lineHeight: 1.45, color: T.ink2 }}>
+                  {field.detail}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: T.mute,
+              marginBottom: 8,
+            }}
+          >
+            Stays in Kontax
+          </div>
+          {localOnly.length === 0 ? (
+            <div
+              style={{
+                borderRadius: 10,
+                border: `1px solid ${T.line2}`,
+                background: "#fff",
+                padding: "12px 13px",
+                fontSize: 12.5,
+                lineHeight: 1.5,
+                color: T.ink2,
+              }}
+            >
+              This provider stores every field family Kontax is currently sending here.
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: 8 }}>
+              {localOnly.map((field) => (
+                <div
+                  key={field.key}
+                  style={{
+                    borderRadius: 10,
+                    background: "#fff",
+                    border: `1px solid ${T.line2}`,
+                    padding: "10px 12px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                    <span style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>{field.label}</span>
+                    <span
+                      style={{
+                        borderRadius: 999,
+                        background: "#f2f4f0",
+                        color: T.ink2,
+                        padding: "3px 8px",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      Local only
+                    </span>
+                  </div>
+                  <div style={{ marginTop: 5, fontSize: 12.5, lineHeight: 1.45, color: T.ink2 }}>
+                    {field.detail}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Re-auth banner ────────────────────────────────────────────────────────────
 function ReauthBanner({ onFix }: { onFix: () => void }) {
   return (
@@ -1139,7 +1474,7 @@ function ReauthBanner({ onFix }: { onFix: () => void }) {
 }
 
 // ── P27-07: OAuth detail-panel metadata row ──────────────────────────────────
-function OAuthMetaRow({ label, children }: { label: string; children: React.ReactNode }) {
+function OAuthMetaRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div
       style={{
@@ -1769,7 +2104,7 @@ function FormField({
   defaultValue?: string;
   required?: boolean;
   mono?: boolean;
-  hint?: React.ReactNode;
+  hint?: ReactNode;
 }) {
   return (
     <label style={{ display: "block" }}>
@@ -2821,6 +3156,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
             });
           }}
         />
+        <SyncDiagnosticsPanel account={selectedAccount} />
         <HistoryTable
           jobs={selectedAccount.jobs}
           isSyncing={syncingId === selectedAccount.id}

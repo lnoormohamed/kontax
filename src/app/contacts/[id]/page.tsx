@@ -36,9 +36,14 @@ import { getContactFamilyContext, getUserFamilyMembership } from "~/server/famil
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
 import { getPublicOrigin } from "~/lib/public-origin";
-import { DEFAULT_PREFERENCES } from "~/lib/preferences";
+import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences";
+import { buildUpcomingContactDates } from "~/lib/contact-date-events";
 import { formatDate, formatStoredDate } from "~/lib/dates";
 import { getDisplayName } from "~/lib/display-name";
+import {
+  providerSupportsSignificantDates,
+  resolveSyncProviderCapabilityProfile,
+} from "~/server/sync-provider-capabilities";
 
 type ContactDetailPageProps = {
   params: Promise<{
@@ -124,6 +129,58 @@ const tintForName = (primary: string | null | undefined, fallback?: string | nul
   for (let i = 0; i < src.length; i++) hash = ((hash * 31 + src.charCodeAt(i)) >>> 0);
   return AVATAR_TINTS[hash % AVATAR_TINTS.length]!;
 };
+
+const formatUpcomingDateLead = (daysUntil: number) => {
+  if (daysUntil <= 0) return "Today";
+  if (daysUntil === 1) return "Tomorrow";
+  return `In ${daysUntil} days`;
+};
+
+function UpcomingDatesPanel({
+  events,
+  dateFormat,
+  compact = false,
+  providerHasDateLimit = false,
+}: {
+  events: Array<{ key: string; label: string; value: string; daysUntil: number }>;
+  dateFormat: NonNullable<UserPreferences["dateFormat"]>;
+  compact?: boolean;
+  providerHasDateLimit?: boolean;
+}) {
+  if (events.length === 0) return null;
+
+  return (
+    <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
+      <div className={compact ? "px-4 py-3" : "px-5 pt-3.5"}>
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+          Upcoming dates
+        </h3>
+      </div>
+      {!compact ? <div className="mt-3 h-px bg-[#e9ece7]" /> : null}
+      <div className={compact ? "grid gap-2 px-4 pb-3" : "grid gap-3 px-5 py-4"}>
+        {events.map((event) => (
+          <div className="flex items-start justify-between gap-3" key={event.key}>
+            <div className="min-w-0">
+              <div className="text-[13.5px] font-semibold text-[#1d2823]">{event.label}</div>
+              <div className="mt-0.5 text-[12.5px] text-[#5c655e]">
+                {formatStoredDate(event.value, dateFormat) ?? event.value}
+              </div>
+            </div>
+            <span className="shrink-0 rounded-full bg-[#f2f4f0] px-2.5 py-1 text-[11px] font-semibold text-[#5c655e]">
+              {formatUpcomingDateLead(event.daysUntil)}
+            </span>
+          </div>
+        ))}
+        {providerHasDateLimit ? (
+          <p className="rounded-[10px] bg-[#f8faf8] px-3 py-2 text-[12px] leading-[1.5] text-[#5c655e]">
+            Some linked providers only store birthdays. Extra dates stay in Kontax and still
+            power reminders and calendar feeds here.
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
 
 
 // Normalise the contact's Json entry columns into the shapes the inline editor
@@ -456,6 +513,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               addressBookDisplayName: true,
               status: true,
               lastSyncedAt: true,
+              provider: true,
+              baseUrl: true,
+              addressBookUrl: true,
+              settings: {
+                select: { capabilityProfileOverride: true },
+              },
             },
           },
           _count: { select: { syncConflicts: true } },
@@ -494,6 +557,30 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     dates: normaliseDates(contact.significantDates),
     related: normaliseRelated(contact.relatedPeople),
   };
+  const upcomingDateEvents = buildUpcomingContactDates(
+    {
+      birthday: contact.birthday,
+      significantDates: (contact.significantDates ?? []) as Array<{
+        label?: string | null;
+        date?: string | null;
+      }>,
+    },
+    { limit: 3 },
+  );
+  const linkedProviderHasDateLimit =
+    editorEntries.dates.length > 0 &&
+    syncLinks.some((link) => {
+      const profile = resolveSyncProviderCapabilityProfile({
+        provider: link.syncAccount.provider,
+        baseUrl: link.syncAccount.baseUrl,
+        addressBookUrl: link.syncAccount.addressBookUrl,
+        label:
+          link.syncAccount.label ?? link.syncAccount.addressBookDisplayName ?? null,
+        capabilityProfileOverride:
+          link.syncAccount.settings?.capabilityProfileOverride ?? null,
+      });
+      return !providerSupportsSignificantDates(profile);
+    });
 
   // P24B-DB19: prefill payload for the mobile edit sheet (full field coverage).
   const sheetInitial = {
@@ -598,6 +685,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 />
               ) : null}
               <ContactInlineEditor />
+              <UpcomingDatesPanel
+                compact
+                dateFormat={dateFormat}
+                events={upcomingDateEvents}
+                providerHasDateLimit={linkedProviderHasDateLimit}
+              />
               {reminderHasDate ? (
                 <ContactReminderOverride
                   contactId={contact.id}
@@ -783,6 +876,30 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <WorkspaceIcon name="gift" size={14} />
                 {formatStoredDate(contact.birthday, dateFormat) || "Not added yet"}
               </p>
+            ) : null}
+            {upcomingDateEvents.length > 0 ? (
+              <div className="mt-3 rounded-[14px] border border-[#e9ece7] bg-[#fbfcf9] px-3 py-3">
+                <div className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+                  Upcoming dates
+                </div>
+                <div className="mt-2 grid gap-2">
+                  {upcomingDateEvents.map((event) => (
+                    <div className="flex items-start justify-between gap-3" key={event.key}>
+                      <div className="min-w-0">
+                        <div className="text-[12.5px] font-semibold text-[#1d2823]">
+                          {event.label}
+                        </div>
+                        <div className="text-[12px] text-[#5c655e]">
+                          {formatStoredDate(event.value, dateFormat) ?? event.value}
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10.5px] font-semibold text-[#5c655e]">
+                        {formatUpcomingDateLead(event.daysUntil)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : null}
 
             <div className="mt-3.5 flex flex-wrap gap-2">
@@ -982,6 +1099,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               />
             ) : null}
             <ContactInlineEditor />
+            <UpcomingDatesPanel
+              dateFormat={dateFormat}
+              events={upcomingDateEvents}
+              providerHasDateLimit={linkedProviderHasDateLimit}
+            />
 
             {reminderHasDate ? (
               <ContactReminderOverride

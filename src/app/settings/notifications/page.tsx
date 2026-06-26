@@ -146,7 +146,7 @@ export default async function NotificationSettingsPage() {
                 emailName="remindersEmail"
                 inApp={prefs.remindersInApp}
                 inAppName="remindersInApp"
-                name="Birthday & anniversary reminders"
+                name="Birthday, anniversary & date reminders"
               />
               {/* P22-10: lead-time preference */}
               <div className="-mt-1 flex items-center gap-3 pb-4 pl-0.5">

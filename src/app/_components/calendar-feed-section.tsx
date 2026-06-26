@@ -49,9 +49,9 @@ export function CalendarFeedSection({
       </p>
       <section className="rounded-2xl border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.05)]">
         <p className="text-[13.5px] leading-6 text-[#5c655e]">
-          Subscribe to your contacts&apos; birthdays and anniversaries in Google Calendar, Apple
-          Calendar, or Outlook. The link contains a private token — anyone with it can see your
-          contacts&apos; dates, so keep it to yourself.
+          Subscribe to your contacts&apos; birthdays, anniversaries, lunar birthdays, and other
+          saved dates in Google Calendar, Apple Calendar, or Outlook. The link contains a private
+          token — anyone with it can see your contacts&apos; date feed, so keep it to yourself.
         </p>
 
         {token ? (

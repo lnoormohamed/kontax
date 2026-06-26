@@ -121,7 +121,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "Why are some contacts not syncing?",
-        a: "Check Sync → Account status for error messages. Common causes: an expired app password (generate a new one and update it in Kontax), a server URL that has changed, or a contact the remote server rejected. If the status shows a recent successful sync but a contact is missing, it may be in a separate address book on that server that is not yet mapped — open the account settings to add it.",
+        a: "Open the connection in Sync and read the diagnostics block. Kontax shows provider identity, recent healthy sync timing, recent inbound and outbound activity, and whether a field family is local-only for that provider. Common causes are an expired app password, a changed server URL, revoked OAuth access, or a provider that does not store a field family such as additional dates.",
       },
     ],
   },
@@ -141,7 +141,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "What contact fields does Google/Outlook sync support?",
-        a: "Name, phones, emails, addresses, company, job title, birthday, website, and notes are synced both ways. Kontax-specific fields — labels, books, emergency flag, and private notes — are stored locally and are not sent to Google or Outlook.",
+        a: "Name, phones, emails, addresses, company, job title, birthday, website, and notes are synced both ways. Kontax-specific structures such as labels, books, and product-only metadata stay local. Additional dates beyond birthday may also stay local if the provider does not preserve that field family.",
       },
       {
         q: "What is the difference between Google/Outlook sync and CardDAV sync?",
@@ -229,7 +229,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
     items: [
       {
         q: "How do birthday reminders work?",
-        a: "When a contact has a birthday saved, Kontax sends you a notification a set number of days in advance (7 days by default). You can change the lead time globally in Settings → Notifications, or override it per contact in the contact edit form. Reminders require push notifications to be enabled in your browser or on your installed PWA.",
+        a: "Kontax can remind you about birthdays and any additional saved dates such as anniversaries, lunar birthdays, or custom labeled dates. Notifications are sent a set number of days in advance (7 days by default). You can change the lead time globally in Settings → Notifications, or override it per contact in the contact detail page. Reminders require push notifications to be enabled in your browser or on your installed PWA.",
       },
       {
         q: "How do I enable push notifications?",
@@ -237,7 +237,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "How do I subscribe to a birthday calendar?",
-        a: "Go to Settings → Notifications → Birthday calendar and copy the iCal URL. Add it as a subscribed calendar in Apple Calendar, Google Calendar, Outlook, or any app that supports calendar subscriptions. The feed updates automatically as you add or edit contact birthdays.",
+        a: "Go to Settings → Notifications → Calendar feed and copy the iCal URL. Add it as a subscribed calendar in Apple Calendar, Google Calendar, Outlook, or any app that supports calendar subscriptions. The feed updates automatically as you add or edit birthdays, anniversaries, lunar birthdays, and other saved contact dates.",
       },
       {
         q: "What are security notifications and can I turn them off?",
