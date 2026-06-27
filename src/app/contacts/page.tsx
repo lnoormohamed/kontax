@@ -33,7 +33,7 @@ type ContactsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-type ContactsWorkspaceTab = "people" | "archived" | "duplicates" | "activity";
+type ContactsWorkspaceTab = "overview" | "people" | "archived" | "duplicates" | "activity";
 type ContactsWorkspaceFilter = "all" | "recent" | "incomplete" | "favorites" | "emergency";
 type ContactsWorkspaceSort = "updated" | "name";
 type ContactsWorkspaceView = "compact" | "cozy";
@@ -58,7 +58,7 @@ const getSelectedTab = async (
   searchParams?: ContactsPageProps["searchParams"],
 ): Promise<ContactsWorkspaceTab> => {
   const tab = await getSingleParam(searchParams, "tab");
-  if (tab === "archived" || tab === "duplicates" || tab === "activity") {
+  if (tab === "overview" || tab === "archived" || tab === "duplicates" || tab === "activity") {
     return tab;
   }
   return "people";
@@ -252,8 +252,10 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     : mergeSuggestionsRefreshedParam;
   const mergeSuggestionsRefreshed = mergeSuggestionsRefreshedValue === "1";
 
+  const showsOverview = selectedTab === "overview";
   const showsPeopleList = selectedTab === "people";
   const showsArchivedList = selectedTab === "archived";
+  const shouldLoadActiveContacts = showsOverview || showsPeopleList;
   const shouldLoadDuplicateDetails = selectedTab === "duplicates";
   const supportsContactSearch = showsPeopleList || showsArchivedList;
   const shouldLoadLabelSuggestions = showsPeopleList || showsArchivedList;
@@ -302,6 +304,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     website: true,
     birthday: true,
     address: true,
+    avatarUrl: true,
     isFavorite: true,
     isEmergency: true,
     notes: true,
@@ -457,7 +460,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     recentMerges,
     planSummary,
   ] = await Promise.all([
-      showsPeopleList && includePrivate
+      shouldLoadActiveContacts && includePrivate
         ? db.contact.findMany({
             // AND the fragments rather than spreading: personalBookWhere,
             // searchConditions, and the "incomplete" filter each carry a
@@ -472,14 +475,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      showsPeopleList && includeShared && familyTargetId
+      shouldLoadActiveContacts && includeShared && familyTargetId
         ? db.contact.findMany({
             where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      showsPeopleList && includeShared && teamTargetIds.length > 0
+      shouldLoadActiveContacts && includeShared && teamTargetIds.length > 0
         ? db.contact.findMany({
             where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
             orderBy: { updatedAt: "desc" as const },
@@ -574,7 +577,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     selectedSort === "name"
       ? [...archivedWithFlag].sort(compareWorkspaceContacts)
       : archivedWithFlag;
-  const filteredActiveContacts = selectedHealth
+  const filteredActiveContacts = selectedTab === "people" && selectedHealth
     ? sortedActiveContacts.filter((contact) => matchesContactHealth(contact, selectedHealth))
     : sortedActiveContacts;
   const healthCounts = countContactsByHealth(sortedActiveContacts);
@@ -603,7 +606,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       description: "No phone number or email on file.",
       count: healthCounts["missing-methods"],
       href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "missing-methods"]]).toString()}`,
-      active: selectedHealth === "missing-methods",
+      active: selectedTab === "people" && selectedHealth === "missing-methods",
     },
     {
       key: "missing-context" as const,
@@ -611,7 +614,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       description: "Missing company, role, and department context.",
       count: healthCounts["missing-context"],
       href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "missing-context"]]).toString()}`,
-      active: selectedHealth === "missing-context",
+      active: selectedTab === "people" && selectedHealth === "missing-context",
     },
     {
       key: "unlabeled" as const,
@@ -619,7 +622,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       description: "Still needs categories or tags for quick grouping.",
       count: healthCounts.unlabeled,
       href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "unlabeled"]]).toString()}`,
-      active: selectedHealth === "unlabeled",
+      active: selectedTab === "people" && selectedHealth === "unlabeled",
     },
     {
       key: "missing-dates" as const,
@@ -627,7 +630,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       description: "No birthday or other saved date entries.",
       count: healthCounts["missing-dates"],
       href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "missing-dates"]]).toString()}`,
-      active: selectedHealth === "missing-dates",
+      active: selectedTab === "people" && selectedHealth === "missing-dates",
     },
     {
       key: "sync-attention" as const,
@@ -635,12 +638,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       description: "Linked records with stale or failed sync state.",
       count: healthCounts["sync-attention"],
       href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "sync-attention"]]).toString()}`,
-      active: selectedHealth === "sync-attention",
+      active: selectedTab === "people" && selectedHealth === "sync-attention",
     },
   ];
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
   const userInitials = getInitials(userLabel);
+  const headerSearchTab = selectedTab === "overview" ? "people" : selectedTab;
+  const headerSearchFilter = selectedTab === "overview" ? "all" : selectedFilter;
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
@@ -650,21 +655,23 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         tab={selectedTab}
         labelRegistry={sidebarLabels.map((l) => ({ name: l.name, color: l.color }))}
         filterSlot={
-          <MobileFilterButton
-            labels={sidebarLabels}
-            savedFilters={savedFilters}
-            personalBooks={personalBooks}
-            activeLabel={labelParam || null}
-            activeBook={activeBook ?? activePersonalBookId}
-            currentFilter={selectedFilter}
-          />
+          selectedTab === "overview" ? null : (
+            <MobileFilterButton
+              labels={sidebarLabels}
+              savedFilters={savedFilters}
+              personalBooks={personalBooks}
+              activeLabel={labelParam || null}
+              activeBook={activeBook ?? activePersonalBookId}
+              currentFilter={selectedFilter}
+            />
+          )
         }
       />
 
       {/* desktop header */}
       <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block">
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
-          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts">
+          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts?tab=overview">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
               K
             </span>
@@ -672,16 +679,20 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           </Link>
 
           <SearchInput
-            extraParams={{
-              book: activeBook ?? activePersonalBookId,
-              health: selectedHealth,
-              label: labelParam || null,
-              scope: !activeBook && !activePersonalBookId && scope !== "all" ? scope : null,
-            }}
-            filter={selectedFilter}
+            extraParams={
+              selectedTab === "overview"
+                ? {}
+                : {
+                    book: activeBook ?? activePersonalBookId,
+                    health: selectedHealth,
+                    label: labelParam || null,
+                    scope: !activeBook && !activePersonalBookId && scope !== "all" ? scope : null,
+                  }
+            }
+            filter={headerSearchFilter}
             initialQuery={query}
             sort={selectedSort}
-            tab={selectedTab}
+            tab={headerSearchTab}
             view={selectedView}
           />
 

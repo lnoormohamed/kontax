@@ -560,7 +560,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
       {/* ── Desktop header — hidden on mobile ── */}
       <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block" style={{ zIndex: 20 }}>
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
-          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts">
+          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts?tab=overview">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
               K
             </span>

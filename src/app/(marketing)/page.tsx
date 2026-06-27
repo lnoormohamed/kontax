@@ -55,7 +55,7 @@ export default async function HomePage() {
                 </h1>
                 <p className="hp-hero__sub">Your contacts are waiting.</p>
                 <div className="hp-hero__ctas">
-                  <Link className="hp-btn--green" href="/contacts">
+                  <Link className="hp-btn--green" href="/contacts?tab=overview">
                     Open Kontax
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />

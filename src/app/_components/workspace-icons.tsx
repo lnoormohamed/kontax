@@ -2,6 +2,7 @@
 // Pure SVG — safe in server components. Paths mirror the approved design kit.
 
 const PATHS: Record<string, string[]> = {
+  home: ["M4 10.5L12 4l8 6.5", "M6.5 9.8V20h11V9.8", "M10 20v-5h4v5"],
   search: ["M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3"],
   people: [
     "M9 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7z",

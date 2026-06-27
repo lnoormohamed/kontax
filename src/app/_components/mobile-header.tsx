@@ -42,7 +42,7 @@ export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry }: Mob
       }}
     >
       <Link
-        href="/contacts"
+        href="/contacts?tab=overview"
         style={{
           display: "flex",
           alignItems: "center",

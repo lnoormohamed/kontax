@@ -69,7 +69,7 @@ type PlanSummary = {
   activityEnabled: boolean;
 };
 
-type WorkspaceTab = "people" | "archived" | "duplicates" | "activity";
+type WorkspaceTab = "overview" | "people" | "archived" | "duplicates" | "activity";
 type WorkspaceFilter = "all" | "recent" | "incomplete" | "favorites" | "emergency";
 type WorkspaceSort = "updated" | "name";
 type WorkspaceView = "compact" | "cozy";
@@ -231,6 +231,67 @@ export function ContactDashboard({
   const isEmergencyView = currentTab === "people" && currentFilter === "emergency";
   const peopleActive = currentTab === "people" && !isFavoritesView && !isEmergencyView;
   const groupByLetter = currentSort === "name" && !query;
+  const sharedBooksLabel =
+    sharedBooks.length === 0
+      ? "No shared spaces connected yet."
+      : `${sharedBooks.length} shared space${sharedBooks.length === 1 ? "" : "s"} linked into this workspace.`;
+  const planCapacityNote =
+    planSummary.contactsRemaining === null || planSummary.contactsLimit === null
+      ? `${planSummary.planLabel} plan with room to grow.`
+      : `${planSummary.contactsRemaining.toLocaleString()} of ${planSummary.contactsLimit.toLocaleString()} contacts remaining on ${planSummary.planLabel}.`;
+  const overviewStats = [
+    {
+      label: "Contacts",
+      value: counts.people,
+      detail: hasShared ? sharedBooksLabel : "Your main address book at a glance.",
+    },
+    {
+      label: "Favorites",
+      value: counts.favorites,
+      detail: "Starred people you reach for often.",
+    },
+    {
+      label: "Emergency",
+      value: counts.emergency,
+      detail: "Pinned for urgent access when you need it fast.",
+    },
+    {
+      label: "Duplicates",
+      value: counts.duplicates,
+      detail:
+        counts.duplicates > 0
+          ? `${highConfidenceCount.toLocaleString()} high-confidence suggestion${highConfidenceCount === 1 ? "" : "s"} ready to review.`
+          : "No open merge suggestions right now.",
+    },
+  ] as const;
+  const overviewActions = [
+    {
+      title: "All contacts",
+      href: buildHref("people", { filter: "all", health: null }),
+      body: "Return to the full list and keep sorting, filtering, or searching.",
+    },
+    {
+      title: "Duplicate review",
+      href: buildHref("duplicates", { filter: "all" }),
+      body:
+        counts.duplicates > 0
+          ? `${counts.duplicates.toLocaleString()} open suggestion${counts.duplicates === 1 ? "" : "s"} waiting for review.`
+          : "No duplicate queue right now, but you can reopen the workbench anytime.",
+    },
+    {
+      title: "Shared with me",
+      href: "/shares",
+      body:
+        incomingShares && incomingShares > 0
+          ? `${incomingShares.toLocaleString()} pending share${incomingShares === 1 ? "" : "s"} waiting for you.`
+          : "New incoming shares from family or team members will land here.",
+    },
+    {
+      title: "Sync and imports",
+      href: "/sync",
+      body: planCapacityNote,
+    },
+  ] as const;
 
   // GRACE is handled by the pinned BillingBanner (§2); the dashboard keeps the
   // read-only (locked/canceled) and near-limit notices, which are out of scope
@@ -320,7 +381,9 @@ export function ContactDashboard({
   );
 
   const countLabel =
-    currentTab === "people"
+    currentTab === "overview"
+      ? `${counts.people} contacts`
+      : currentTab === "people"
       ? currentHealth
         ? `${visiblePeopleCount} contacts`
         : `${counts.people} contacts`
@@ -350,7 +413,8 @@ export function ContactDashboard({
           </span>
         </Link>
 
-        {navItem(peopleActive, buildHref("people", { filter: "all" }), "people", "People", counts.people)}
+        {navItem(currentTab === "overview", buildHref("overview", { filter: "all", health: null }), "home", "Overview", null)}
+        {navItem(peopleActive, buildHref("people", { filter: "all", health: null }), "people", "People", counts.people)}
         {peopleActive ? (
           <div className="grid gap-0.5">
             {subFilter("all", "All contacts")}
@@ -450,7 +514,7 @@ export function ContactDashboard({
 
         {/* toolbar — desktop only; the mobile design has no sort/view/scope bar
             (search is the mobile filter, sort defaults to Name A–Z). */}
-        {currentTab === "activity" ? null : (
+        {currentTab === "activity" || currentTab === "overview" ? null : (
         <div className="hidden shrink-0 items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5 md:flex">
           {currentTab !== "duplicates" ? (
             <>
@@ -487,7 +551,7 @@ export function ContactDashboard({
         )}
 
         {/* P31B-05/08: label filter context bar — shown when filtering by a label */}
-        {currentLabel ? (
+        {currentLabel && currentTab !== "overview" ? (
           <>
             {(() => {
               const labelMeta = sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase());
@@ -517,55 +581,131 @@ export function ContactDashboard({
           </>
         ) : null}
 
-        {currentTab === "people" && currentFilter === "all" ? (
-          <div className="border-b border-[#e9ece7] bg-[#fbfcf9] px-4 py-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
-                  Contact health
-                </p>
-                <p className="mt-1 text-[14px] text-[#5c655e]">
-                  Turn the biggest contact-quality gaps into worklists you can actually clear.
-                  {currentHealthTitle ? ` Currently viewing: ${currentHealthTitle}.` : ""}
-                </p>
-              </div>
-              {currentHealth ? (
-                <Link
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f6f7f4]"
-                  href={buildHref("people", { health: null })}
-                >
-                  <WorkspaceIcon name="x" size={14} />
-                  Clear queue
-                </Link>
-              ) : null}
+        {currentTab === "people" && currentHealthTitle ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e9ece7] bg-[#fbfcf9] px-4 py-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+                Contact health queue
+              </p>
+              <p className="mt-1 text-[13.5px] text-[#5c655e]">
+                Currently showing <span className="font-semibold text-[#1d2823]">{currentHealthTitle}</span>.
+              </p>
             </div>
-            <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-6">
-              {healthCards.map((card) => (
-                <Link
-                  className={`rounded-2xl border px-4 py-3 transition ${
-                    card.active
-                      ? "border-[#4158f4] bg-[#edf0fe]"
-                      : "border-[#e9ece7] bg-white hover:border-[#d8ddd6] hover:bg-[#f6f7f4]"
-                  }`}
-                  href={card.active ? buildHref("people", { health: null }) : card.href}
-                  key={card.key}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-[13.5px] font-semibold text-[#1d2823]">{card.title}</p>
-                      <p className="mt-1 text-[12.5px] leading-5 text-[#5c655e]">{card.description}</p>
-                    </div>
-                    <span className="text-[20px] font-semibold text-[#1d2823]">
-                      {card.count.toLocaleString()}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <Link
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f6f7f4]"
+              href={buildHref("people", { health: null })}
+            >
+              <WorkspaceIcon name="x" size={14} />
+              Clear queue
+            </Link>
           </div>
         ) : null}
 
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
+          {currentTab === "overview" ? (
+            <div className="grid gap-6 px-4 py-4">
+              <section className="overflow-hidden rounded-[1.6rem] border border-[#d8ddd6] bg-[linear-gradient(135deg,#f7f8f3_0%,#eef5f0_55%,#f7f4ec_100%)] p-5">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="max-w-2xl">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7d877f]">
+                      Overview
+                    </p>
+                    <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-[#1d2823]">
+                      Your contact workspace
+                    </h1>
+                    <p className="mt-2 text-[14px] leading-6 text-[#4f5a53]">
+                      Start with the biggest data-quality queues, then jump back into the list when you&apos;re ready to work the details.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      className="inline-flex h-10 items-center rounded-full bg-[#17352e] px-4 text-[13.5px] font-semibold text-white transition hover:bg-[#21473d]"
+                      href={buildHref("people", { filter: "all", health: null })}
+                    >
+                      Open people
+                    </Link>
+                    <Link
+                      className="inline-flex h-10 items-center rounded-full border border-[#d8ddd6] bg-white px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                      href={counts.duplicates > 0 ? buildHref("duplicates", { filter: "all" }) : "/import-export"}
+                    >
+                      {counts.duplicates > 0 ? "Review duplicates" : "Import contacts"}
+                    </Link>
+                  </div>
+                </div>
+                <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  {overviewStats.map((card) => (
+                    <div className="rounded-[1.25rem] border border-white/70 bg-white/80 p-4 shadow-[0_12px_32px_rgba(23,53,46,0.04)] backdrop-blur" key={card.label}>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7d877f]">
+                        {card.label}
+                      </p>
+                      <p className="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-[#1d2823]">
+                        {card.value.toLocaleString()}
+                      </p>
+                      <p className="mt-1 text-[13px] leading-5 text-[#5c655e]">{card.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-[1.6rem] border border-[#d8ddd6] bg-white p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+                      Contact health
+                    </p>
+                    <p className="mt-1 text-[14px] text-[#5c655e]">
+                      Turn the biggest contact-quality gaps into worklists you can actually clear.
+                    </p>
+                  </div>
+                  <Link
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] px-3 py-2 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#edf0ea]"
+                    href={buildHref("people", { filter: "all", health: null })}
+                  >
+                    Open people list
+                    <WorkspaceIcon name="chevronRight" size={14} />
+                  </Link>
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+                  {healthCards.map((card) => (
+                    <Link
+                      className="rounded-[1.3rem] border border-[#e9ece7] bg-[#fbfcf9] px-4 py-4 transition hover:border-[#d8ddd6] hover:bg-white"
+                      href={card.href}
+                      key={card.key}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[13.5px] font-semibold text-[#1d2823]">{card.title}</p>
+                          <p className="mt-1 text-[12.5px] leading-5 text-[#5c655e]">{card.description}</p>
+                        </div>
+                        <span className="text-[20px] font-semibold text-[#1d2823]">
+                          {card.count.toLocaleString()}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+
+              <section className="grid gap-4 xl:grid-cols-2">
+                {overviewActions.map((action) => (
+                  <Link
+                    className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5 transition hover:border-[#bcc7bf] hover:bg-[#fbfcf9]"
+                    href={action.href}
+                    key={action.title}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[16px] font-semibold text-[#1d2823]">{action.title}</p>
+                        <p className="mt-2 max-w-xl text-[13.5px] leading-6 text-[#5c655e]">{action.body}</p>
+                      </div>
+                      <WorkspaceIcon className="mt-0.5 text-[#8b938c]" name="chevronRight" size={18} />
+                    </div>
+                  </Link>
+                ))}
+              </section>
+            </div>
+          ) : null}
+
           {showOnboarding ? (
             <div className="px-4 pt-3">
               <OnboardingChecklist

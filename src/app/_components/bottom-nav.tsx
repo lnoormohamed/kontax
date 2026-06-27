@@ -11,7 +11,7 @@ interface BottomNavProps {
 }
 
 const TABS = [
-  { key: "contacts", label: "Contacts", icon: "layoutList", href: "/contacts" },
+  { key: "contacts", label: "Contacts", icon: "layoutList", href: "/contacts?tab=overview" },
   { key: "activity", label: "Activity", icon: "activity", href: "/contacts?tab=activity" },
   { key: "sync", label: "Sync", icon: "sync", href: "/sync" },
   { key: "settings", label: "Settings", icon: "gear", href: "/settings" },
