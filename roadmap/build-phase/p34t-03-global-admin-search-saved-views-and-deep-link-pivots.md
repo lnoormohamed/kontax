@@ -75,4 +75,4 @@ pages.
 - [ ] External · users — none
 - [ ] External · developers — none
 - [x] Internal · engineering — search/pivot scope documented here
-- [x] Internal · support/admin — saved-view usage notes required
+- [x] Internal · support/admin — saved-view usage notes in `roadmap/runbooks/admin-search-saved-views-and-pivots.md`

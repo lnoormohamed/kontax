@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { assertAdmin } from "~/server/admin/guard";
+import { ADMIN_USER_VIEWS, normalizeAdminUserViewId } from "~/server/admin/saved-views";
 import { searchUsers } from "~/server/admin/users";
 import { AdminHeader } from "../_components/admin-header";
 import { AdIcon } from "../_components/admin-icons";
@@ -41,10 +42,10 @@ function TableSkeleton() {
   );
 }
 
-async function Results({ q }: { q: string }) {
+async function Results({ q, view }: { q: string; view: string }) {
   let rows;
   try {
-    rows = await searchUsers(q);
+    rows = await searchUsers({ query: q, view });
   } catch {
     return (
       <div className="ad-table-wrap">
@@ -64,6 +65,9 @@ async function Results({ q }: { q: string }) {
       <div className="ad-result-meta">
         {rows.length} user{rows.length === 1 ? "" : "s"}
         {q ? ` matching “${q}”` : ""}
+        {view !== "all"
+          ? `${q ? " in " : " in "}“${ADMIN_USER_VIEWS.find((item) => item.id === view)?.label ?? "this view"}”`
+          : ""}
       </div>
       <div className="ad-table-wrap">
         <div className="ad-tr ad-thead ad-tr--users">
@@ -115,6 +119,7 @@ export default async function AdminUsersPage({
 
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q : "";
+  const view = normalizeAdminUserViewId(typeof sp.view === "string" ? sp.view : undefined);
 
   return (
     <>
@@ -125,9 +130,22 @@ export default async function AdminUsersPage({
       />
       <div className="adm-content">
         <div className="ad-page">
-          <UserSearch initial={q} />
-          <Suspense key={q} fallback={<TableSkeleton />}>
-            <Results q={q} />
+          <div className="ad-section-label">Saved views</div>
+          <div className="ad-support-tabs">
+            {ADMIN_USER_VIEWS.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="ad-support-tab"
+                data-active={view === item.id ? "1" : "0"}
+              >
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+          <UserSearch initial={q} view={view} />
+          <Suspense key={`${view}:${q}`} fallback={<TableSkeleton />}>
+            <Results q={q} view={view} />
           </Suspense>
         </div>
       </div>

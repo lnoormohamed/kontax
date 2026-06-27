@@ -1,6 +1,9 @@
 import "server-only";
 
+import type { Prisma } from "../../../generated/prisma";
+
 import { db } from "~/server/db";
+import { normalizeAdminUserViewId, type AdminUserViewId } from "~/server/admin/saved-views";
 import {
   countLiveSyncAccountSlots,
   getLifecycleAccessPolicy,
@@ -75,19 +78,67 @@ const syncStatusLabel = (status: string) => {
 
 const SEARCH_LIMIT = 50;
 
-/** Search by email or name (DB04 §2). Empty query returns the most recent users. */
-export async function searchUsers(query: string): Promise<AdminUserRow[]> {
-  const q = query.trim();
+function userWhereForView(view: AdminUserViewId): Prisma.UserWhereInput {
+  switch (view) {
+    case "user-review":
+      return {
+        OR: [
+          { lifecycleState: { in: ["GRACE", "LOCKED", "CANCELED"] } },
+          { scheduledDeleteAt: { not: null } },
+        ],
+      };
+    case "locked-or-delete":
+      return {
+        OR: [
+          { lifecycleState: { in: ["LOCKED", "CANCELED"] } },
+          { scheduledDeleteAt: { not: null } },
+        ],
+      };
+    case "grace":
+      return { lifecycleState: "GRACE" };
+    case "billing-exceptions":
+      return {
+        OR: [
+          { lifecycleState: "GRACE" },
+          { planOverriddenAt: { not: null } },
+          { scheduledDeleteAt: { not: null } },
+        ],
+      };
+    case "plan-overrides":
+      return { planOverriddenAt: { not: null } };
+    default:
+      return {};
+  }
+}
+
+/** Search by email, name, or id. Empty query returns the most relevant view set. */
+export async function searchUsers(input: {
+  query: string;
+  view?: string;
+}): Promise<AdminUserRow[]> {
+  const q = input.query.trim();
+  const view = normalizeAdminUserViewId(input.view);
   const users = await db.user.findMany({
-    where: q
-      ? {
-          OR: [
-            { email: { contains: q, mode: "insensitive" } },
-            { name: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : {},
-    orderBy: { createdAt: "desc" },
+    where: {
+      AND: [
+        userWhereForView(view),
+        ...(q
+          ? [
+              {
+                OR: [
+                  { email: { contains: q, mode: "insensitive" as const } },
+                  { name: { contains: q, mode: "insensitive" as const } },
+                  { id: { contains: q, mode: "insensitive" as const } },
+                ],
+              },
+            ]
+          : []),
+      ],
+    },
+    orderBy:
+      view === "locked-or-delete" || view === "billing-exceptions" || view === "user-review"
+        ? [{ scheduledDeleteAt: "desc" }, { updatedAt: "desc" }]
+        : [{ createdAt: "desc" }],
     take: SEARCH_LIMIT,
     select: {
       id: true,

@@ -49,7 +49,7 @@ export function AdminHeader({
               className="ad-header-search__input"
               type="search"
               name="q"
-              placeholder="Search users, sync ids, flags…"
+              placeholder="Search users, cases, sync ids, flags…"
             />
           </form>
         ) : null}

@@ -250,6 +250,7 @@ export async function loadAdminSupportCaseWorkbench(input: {
   if (q) {
     whereAnd.push({
       OR: [
+        { id: containsInsensitive(q) },
         { title: containsInsensitive(q) },
         { summary: containsInsensitive(q) },
         { subjectId: containsInsensitive(q) },

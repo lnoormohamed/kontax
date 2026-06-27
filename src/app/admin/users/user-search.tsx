@@ -5,20 +5,24 @@ import { useEffect, useState } from "react";
 
 import { AD, AdIcon } from "../_components/admin-icons";
 
-// Debounced search that drives the server page via ?q=. The results table is
-// server-rendered from searchUsers(q).
-export function UserSearch({ initial }: { initial: string }) {
+// Debounced search that drives the server page via ?q= while preserving any
+// active saved view.
+export function UserSearch({ initial, view }: { initial: string; view: string }) {
   const router = useRouter();
   const [value, setValue] = useState(initial);
 
   useEffect(() => {
     const t = setTimeout(() => {
       const q = value.trim();
-      router.replace(q ? `/admin/users?q=${encodeURIComponent(q)}` : "/admin/users");
+      const params = new URLSearchParams();
+      if (view && view !== "all") params.set("view", view);
+      if (q) params.set("q", q);
+      const next = params.toString();
+      router.replace(next ? `/admin/users?${next}` : "/admin/users");
     }, 250);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [value, view]);
 
   return (
     <div className="ad-search-bar">

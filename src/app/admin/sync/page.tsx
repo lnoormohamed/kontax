@@ -5,6 +5,7 @@ import { AdminHeader } from "../_components/admin-header";
 import { AD, AdIcon } from "../_components/admin-icons";
 import { adminAttentionMeta } from "~/server/admin/attention";
 import { assertAdmin } from "~/server/admin/guard";
+import { ADMIN_SYNC_VIEWS, adminSyncViewDefaults, normalizeAdminSyncViewId } from "~/server/admin/saved-views";
 import { loadAdminSyncOverview } from "~/server/admin/sync";
 
 export const dynamic = "force-dynamic";
@@ -28,11 +29,13 @@ export default async function AdminSyncPage({
   }
 
   const sp = await searchParams;
+  const view = normalizeAdminSyncViewId(typeof sp.view === "string" ? sp.view : undefined);
+  const defaults = adminSyncViewDefaults(view);
   const data = await loadAdminSyncOverview({
-    provider: typeof sp.provider === "string" ? sp.provider : undefined,
-    status: typeof sp.status === "string" ? sp.status : undefined,
-    profile: typeof sp.profile === "string" ? sp.profile : undefined,
-    q: typeof sp.q === "string" ? sp.q : undefined,
+    provider: typeof sp.provider === "string" ? sp.provider : defaults.provider,
+    status: typeof sp.status === "string" ? sp.status : defaults.status,
+    profile: typeof sp.profile === "string" ? sp.profile : defaults.profile,
+    q: typeof sp.q === "string" ? sp.q : defaults.q,
   });
 
   const bannerTone = adminAttentionMeta(
@@ -72,7 +75,22 @@ export default async function AdminSyncPage({
             </div>
           </div>
 
+          <div className="ad-section-label">Saved views</div>
+          <div className="ad-support-tabs">
+            {ADMIN_SYNC_VIEWS.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="ad-support-tab"
+                data-active={view === item.id ? "1" : "0"}
+              >
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+
           <form className="ad-filterbar" method="get">
+            <input type="hidden" name="view" value={view} />
             <div className="ad-select-wrap">
               <select className="ad-select" name="provider" defaultValue={data.filters.provider}>
                 <option value="all">All providers</option>

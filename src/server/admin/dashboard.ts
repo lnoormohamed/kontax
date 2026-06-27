@@ -245,7 +245,7 @@ export async function loadAdminOverview() {
       label: "Connections need re-auth",
       count: syncNeedsReauth,
       tone: syncNeedsReauth > 0 ? "action" : "healthy",
-      href: "/admin/sync",
+      href: "/admin/sync?view=needs-reauth",
       body:
         syncNeedsReauth > 0
           ? "At least one connected provider cannot refresh until credentials are fixed."
@@ -256,7 +256,7 @@ export async function loadAdminOverview() {
       label: "Sync accounts in error or paused",
       count: syncErrors + syncPaused,
       tone: syncErrors > 0 ? "warning" : syncPaused > 0 ? "watch" : "healthy",
-      href: "/admin/sync",
+      href: "/admin/sync?view=action-required",
       body:
         syncErrors + syncPaused > 0
           ? "Review provider health and recent job failures before issues spread."
@@ -268,7 +268,7 @@ export async function loadAdminOverview() {
       count: lockedUsers + scheduledDeletions,
       tone:
         lockedUsers + scheduledDeletions > 0 ? "warning" : "healthy",
-      href: "/admin/users",
+      href: "/admin/users?view=locked-or-delete",
       body:
         lockedUsers + scheduledDeletions > 0
           ? "Support may need context on suspensions, deletion schedules, or recovery."
@@ -279,7 +279,7 @@ export async function loadAdminOverview() {
       label: "Users in grace",
       count: graceUsers,
       tone: graceUsers > 0 ? "watch" : "healthy",
-      href: "/admin/users",
+      href: "/admin/users?view=grace",
       body:
         graceUsers > 0
           ? "These users may need billing follow-up before their access degrades."
@@ -291,7 +291,7 @@ export async function loadAdminOverview() {
     {
       id: "user-review",
       label: "Users needing review",
-      href: "/admin/users",
+      href: "/admin/users?view=user-review",
       count: userReviewCount,
       tone:
         userReviewItemsRaw.length > 0
@@ -329,7 +329,7 @@ export async function loadAdminOverview() {
     {
       id: "sync-action",
       label: "Sync connections needing action",
-      href: "/admin/sync",
+      href: "/admin/sync?view=action-required",
       count: syncQueueCount,
       tone:
         syncQueueItemsRaw.length > 0
@@ -353,7 +353,7 @@ export async function loadAdminOverview() {
     {
       id: "support-cases",
       label: "Open support cases",
-      href: "/admin/support",
+      href: "/admin/support?queue=open",
       count: openSupportCaseCount,
       tone:
         openSupportCasesRaw.length > 0
@@ -380,7 +380,7 @@ export async function loadAdminOverview() {
     {
       id: "destructive-actions",
       label: "Recent destructive actions",
-      href: "/admin/audit",
+      href: "/admin/audit?view=destructive-actions",
       count: destructiveActionCount,
       tone: destructiveActionCount > 0 ? "watch" : "healthy",
       body:
@@ -404,7 +404,7 @@ export async function loadAdminOverview() {
     {
       id: "billing-lifecycle",
       label: "Billing and lifecycle exceptions",
-      href: "/admin/users",
+      href: "/admin/users?view=billing-exceptions",
       count: lifecycleExceptionCount,
       tone:
         lifecycleExceptionItemsRaw.length > 0
@@ -493,18 +493,18 @@ export async function loadAdminOverview() {
         label: "Plan overrides",
         value: planOverrides.toLocaleString(),
         sub: "Accounts on admin-managed billing state",
-        href: "/admin/users",
+        href: "/admin/users?view=plan-overrides",
       },
     ],
     attention,
     workQueues,
     quickActions: [
       {
-        id: "users",
-        label: "Search users",
-        body: "Open the support-facing user list and jump into one account fast.",
-        href: "/admin/users",
-        icon: "users",
+        id: "search",
+        label: "Open admin search",
+        body: "Search users, support cases, sync ids, flags, and broadcasts from one place.",
+        href: "/admin/search",
+        icon: "search",
       },
       {
         id: "metrics",

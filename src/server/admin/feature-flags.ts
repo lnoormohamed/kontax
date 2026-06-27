@@ -32,8 +32,22 @@ export type AdminFlagRow = {
 const fmt = (d: Date) =>
   new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(d);
 
-export async function listFlags(): Promise<AdminFlagRow[]> {
-  const flags = await db.featureFlag.findMany({ orderBy: { name: "asc" } });
+export async function listFlags(query = ""): Promise<AdminFlagRow[]> {
+  const q = query.trim();
+  const flags = await db.featureFlag.findMany({
+    where: q
+      ? {
+          OR: [
+            { key: { contains: q, mode: "insensitive" } },
+            { name: { contains: q, mode: "insensitive" } },
+            { owner: { contains: q, mode: "insensitive" } },
+            { description: { contains: q, mode: "insensitive" } },
+            { purpose: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : undefined,
+    orderBy: { name: "asc" },
+  });
   const histories = await Promise.all(flags.map((flag) => loadFeatureFlagAuditHistory(flag.key, 4)));
 
   return flags.map((f, index) => ({

@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 
 import { assertAdmin } from "~/server/admin/guard";
 import { buildAdminAuditHref, loadAdminAudit } from "~/server/admin/audit";
+import {
+  ADMIN_AUDIT_VIEWS,
+  adminAuditViewDefaults,
+  normalizeAdminAuditViewId,
+} from "~/server/admin/saved-views";
 import { AdminHeader } from "../_components/admin-header";
 import { AdIcon } from "../_components/admin-icons";
 import { AuditFilters, AuditRow } from "./audit-client";
@@ -37,13 +42,15 @@ export default async function AdminAuditPage({
   }
 
   const sp = await searchParams;
-  const action = typeof sp.action === "string" ? sp.action : "all";
-  const actor = typeof sp.actor === "string" ? sp.actor : "all";
-  const target = typeof sp.target === "string" ? sp.target : "";
-  const entity = typeof sp.entity === "string" ? sp.entity : "";
-  const severity = typeof sp.severity === "string" ? sp.severity : "all";
-  const q = typeof sp.q === "string" ? sp.q : "";
-  const range = typeof sp.range === "string" ? sp.range : "all";
+  const view = normalizeAdminAuditViewId(typeof sp.view === "string" ? sp.view : undefined);
+  const defaults = adminAuditViewDefaults(view);
+  const action = typeof sp.action === "string" ? sp.action : defaults.action;
+  const actor = typeof sp.actor === "string" ? sp.actor : defaults.actor;
+  const target = typeof sp.target === "string" ? sp.target : defaults.target;
+  const entity = typeof sp.entity === "string" ? sp.entity : defaults.entity;
+  const severity = typeof sp.severity === "string" ? sp.severity : defaults.severity;
+  const q = typeof sp.q === "string" ? sp.q : defaults.q;
+  const range = typeof sp.range === "string" ? sp.range : defaults.range;
   const page = typeof sp.page === "string" ? Math.max(0, parseInt(sp.page, 10) || 0) : 0;
 
   const data = await loadAdminAudit({ action, actor, target, entity, severity: severity as "all" | "high" | "standard", q, range, page });
@@ -65,6 +72,20 @@ export default async function AdminAuditPage({
       />
       <div className="adm-content">
         <div className="ad-page">
+          <div className="ad-section-label">Saved views</div>
+          <div className="ad-support-tabs">
+            {ADMIN_AUDIT_VIEWS.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="ad-support-tab"
+                data-active={view === item.id ? "1" : "0"}
+              >
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </div>
+
           <AuditFilters
             actionTypes={data.actionTypes}
             actors={data.actors}

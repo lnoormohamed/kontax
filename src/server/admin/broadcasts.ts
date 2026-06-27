@@ -254,8 +254,18 @@ export async function processScheduledAdminBroadcasts(systemAdminId?: string | n
   return { processed };
 }
 
-export async function listAdminBroadcasts(limit = 12) {
+export async function listAdminBroadcasts(limit = 12, query = "") {
+  const q = query.trim();
   const rows = await db.adminBroadcast.findMany({
+    where: q
+      ? {
+          OR: [
+            { id: { contains: q, mode: "insensitive" } },
+            { title: { contains: q, mode: "insensitive" } },
+            { body: { contains: q, mode: "insensitive" } },
+          ],
+        }
+      : undefined,
     orderBy: [{ createdAt: "desc" }],
     take: limit,
     select: {
