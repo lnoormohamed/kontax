@@ -29,6 +29,7 @@ import type {
 type Result = { success: true } | { error: string };
 
 const PLANS: SubscriptionPlan[] = ["FREE", "PRO", "FAMILY", "TEAMS"];
+const MIN_BROADCAST_SCHEDULE_LEAD_MS = 5 * 60 * 1000;
 
 async function loadTarget(userId: string) {
   return db.user.findUnique({
@@ -594,6 +595,17 @@ export async function saveProductBroadcast(input: {
   const status: Extract<AdminBroadcastStatus, "DRAFT" | "SCHEDULED"> =
     input.status === "SCHEDULED" ? "SCHEDULED" : "DRAFT";
   const scheduledFor = input.scheduledFor?.trim() ? new Date(input.scheduledFor) : null;
+  if (input.status === "SCHEDULED") {
+    if (!input.scheduledFor?.trim()) return { error: "SCHEDULE_REQUIRED" };
+    if (!scheduledFor || Number.isNaN(scheduledFor.getTime())) return { error: "SCHEDULE_INVALID" };
+
+    const now = Date.now();
+    if (scheduledFor.getTime() <= now) return { error: "SCHEDULE_IN_PAST" };
+    if (scheduledFor.getTime() - now < MIN_BROADCAST_SCHEDULE_LEAD_MS) {
+      return { error: "SCHEDULE_TOO_SOON" };
+    }
+  }
+
   const saved = await saveAdminBroadcastDraft({
     adminId: admin.adminId,
     broadcastId: input.broadcastId ?? null,

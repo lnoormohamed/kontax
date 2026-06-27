@@ -277,9 +277,11 @@ export async function listAdminBroadcasts(limit = 12, query = "") {
       scheduledFor: true,
       sentAt: true,
       retractedAt: true,
+      createdAt: true,
       previewRecipientCount: true,
       deliveredRecipientCount: true,
       audienceFilters: true,
+      audienceSummary: true,
       creator: { select: { name: true, email: true } },
     },
   });
@@ -290,6 +292,13 @@ export async function listAdminBroadcasts(limit = 12, query = "") {
     body: row.body,
     actionUrl: row.actionUrl,
     status: row.status,
+    createdAtLabel: new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "UTC",
+    }).format(row.createdAt),
     scheduledFor: row.scheduledFor,
     scheduledForLabel: row.scheduledFor
       ? new Intl.DateTimeFormat("en-US", {
@@ -321,6 +330,10 @@ export async function listAdminBroadcasts(limit = 12, query = "") {
     previewRecipientCount: row.previewRecipientCount,
     deliveredRecipientCount: row.deliveredRecipientCount,
     filters: row.audienceFilters as BroadcastAudienceFilters,
+    audienceSample:
+      ((row.audienceSummary as { sample?: string[] } | null)?.sample ?? []).filter(
+        (value): value is string => typeof value === "string" && value.trim().length > 0,
+      ),
     createdBy: row.creator.name?.trim() ?? row.creator.email,
   }));
 }
