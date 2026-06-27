@@ -7,6 +7,11 @@ import {
   createAdminSupportCase,
   updateAdminSupportCase,
 } from "~/app/actions/admin";
+import {
+  SUPPORT_CASE_SEVERITY_OPTIONS,
+  SUPPORT_CASE_STATUS_OPTIONS,
+  toSupportCaseDatetimeLocalValue,
+} from "./support-case-shared";
 import { useToast } from "./toast";
 
 type SupportCaseRow = {
@@ -24,28 +29,6 @@ type SupportCaseRow = {
   nextFollowUpLabel: string;
   resolvedAtLabel: string;
 };
-
-const STATUS_OPTIONS = [
-  { value: "OPEN", label: "Open" },
-  { value: "WAITING_ON_CUSTOMER", label: "Waiting on customer" },
-  { value: "WAITING_ON_PROVIDER", label: "Waiting on provider" },
-  { value: "RESOLVED", label: "Resolved" },
-  { value: "ARCHIVED", label: "Archived" },
-] as const;
-
-const SEVERITY_OPTIONS = [
-  { value: "NORMAL", label: "Normal" },
-  { value: "HIGH", label: "High" },
-  { value: "CRITICAL", label: "Critical" },
-] as const;
-
-function toDatetimeLocalValue(value: string) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}T${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}`;
-}
 
 export function SupportCasePanel({
   subjectType,
@@ -76,7 +59,7 @@ export function SupportCasePanel({
             summary: supportCase.summary ?? "",
             severity: supportCase.severity,
             status: supportCase.status,
-            nextFollowUpAt: toDatetimeLocalValue(supportCase.nextFollowUpIso),
+            nextFollowUpAt: toSupportCaseDatetimeLocalValue(supportCase.nextFollowUpIso),
           },
         ]),
       ),
@@ -177,7 +160,7 @@ export function SupportCasePanel({
           <label style={{ display: "grid", gap: 6 }}>
             <span className="ad-kv-k">Status</span>
             <select className="ad-text-input" value={status} onChange={(event) => setStatus(event.target.value)}>
-              {STATUS_OPTIONS.map((option) => (
+              {SUPPORT_CASE_STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -187,7 +170,7 @@ export function SupportCasePanel({
           <label style={{ display: "grid", gap: 6 }}>
             <span className="ad-kv-k">Severity</span>
             <select className="ad-text-input" value={severity} onChange={(event) => setSeverity(event.target.value)}>
-              {SEVERITY_OPTIONS.map((option) => (
+              {SUPPORT_CASE_SEVERITY_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -228,7 +211,7 @@ export function SupportCasePanel({
               summary: supportCase.summary ?? "",
               severity: supportCase.severity,
               status: supportCase.status,
-              nextFollowUpAt: toDatetimeLocalValue(supportCase.nextFollowUpIso),
+              nextFollowUpAt: toSupportCaseDatetimeLocalValue(supportCase.nextFollowUpIso),
             };
             return (
               <div key={supportCase.id} className="ad-support-list__row" style={{ display: "grid", gap: 12 }}>
@@ -268,7 +251,7 @@ export function SupportCasePanel({
                       }))
                     }
                   >
-                    {STATUS_OPTIONS.map((option) => (
+                    {SUPPORT_CASE_STATUS_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -284,7 +267,7 @@ export function SupportCasePanel({
                       }))
                     }
                   >
-                    {SEVERITY_OPTIONS.map((option) => (
+                    {SUPPORT_CASE_SEVERITY_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>

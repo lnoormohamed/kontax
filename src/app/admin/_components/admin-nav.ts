@@ -9,6 +9,7 @@ export const ADMIN_NAV_GROUPS = [
     label: "Operations",
     items: [
       { id: "users", label: "Users", icon: "users", href: "/admin/users" },
+      { id: "support", label: "Support", icon: "card", href: "/admin/support" },
       { id: "sync", label: "Sync ops", icon: "sync", href: "/admin/sync" },
     ],
   },
@@ -31,6 +32,7 @@ export const ADMIN_NAV_GROUPS = [
 
 export function activeAdminNavId(pathname: string): string {
   if (pathname === "/admin") return "overview";
+  if (pathname.startsWith("/admin/support")) return "support";
   if (pathname.startsWith("/admin/sync") || pathname.startsWith("/admin/metrics")) return "sync";
   if (pathname.startsWith("/admin/feature-flags")) return "flags";
   if (pathname.startsWith("/admin/broadcast")) return "broadcast";

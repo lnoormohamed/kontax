@@ -241,6 +241,7 @@ export async function addAdminSupportNote(input: {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/admin/support");
   if (input.targetUserId) revalidatePath(`/admin/users/${input.targetUserId}`);
   if (input.subjectType.trim().toUpperCase() === "SYNC_ACCOUNT") {
     revalidatePath(`/admin/sync/${input.subjectId}`);
@@ -397,6 +398,7 @@ export async function updateAdminSupportCase(input: {
   });
 
   revalidatePath("/admin");
+  revalidatePath("/admin/support");
   if (existing.targetUserId) revalidatePath(`/admin/users/${existing.targetUserId}`);
   if (existing.subjectType === "SYNC_ACCOUNT") revalidatePath(`/admin/sync/${existing.subjectId}`);
 

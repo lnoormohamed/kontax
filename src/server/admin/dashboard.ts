@@ -7,6 +7,10 @@ import {
   adminAttentionForSyncStatus,
   adminWorstAttention,
 } from "~/server/admin/attention";
+import {
+  countOpenSupportCases,
+  listOpenSupportCases,
+} from "~/server/admin/support-cases";
 import { db } from "~/server/db";
 import { loadPlatformMetrics } from "~/server/admin/metrics";
 
@@ -32,6 +36,22 @@ const formatActionLabel = (action: string) =>
     .split(".")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+
+const supportCaseHref = (subjectType: string, subjectId: string) => {
+  if (subjectType === "SYNC_ACCOUNT") return `/admin/sync/${subjectId}`;
+  return `/admin/users/${subjectId}`;
+};
+
+const supportCaseTone = (supportCase: {
+  severity: string;
+  status: string;
+}): AdminAttentionState => {
+  if (supportCase.severity === "CRITICAL") return "action";
+  if (supportCase.status === "WAITING_ON_CUSTOMER") return "watch";
+  if (supportCase.status === "WAITING_ON_PROVIDER") return "watch";
+  if (supportCase.severity === "HIGH") return "warning";
+  return "warning";
+};
 
 export type AdminOverviewData = Awaited<ReturnType<typeof loadAdminOverview>>;
 
@@ -97,6 +117,8 @@ export async function loadAdminOverview() {
     lifecycleExceptionItemsRaw,
     destructiveActionCount,
     destructiveActionItemsRaw,
+    openSupportCaseCount,
+    openSupportCasesRaw,
   ] = await Promise.all([
     loadPlatformMetrics(),
     db.user.count({
@@ -203,6 +225,8 @@ export async function loadAdminOverview() {
         admin: { select: { name: true, email: true } },
       },
     }),
+    countOpenSupportCases(),
+    listOpenSupportCases(4),
   ]);
 
   const syncByStatus = Object.fromEntries(
@@ -324,6 +348,33 @@ export async function loadAdminOverview() {
         sub: `${row.provider} · ${row.user.email}`,
         meta: fmtRelative(row.updatedAt),
         tone: adminAttentionForSyncStatus(row.status),
+      })),
+    },
+    {
+      id: "support-cases",
+      label: "Open support cases",
+      href: "/admin/support",
+      count: openSupportCaseCount,
+      tone:
+        openSupportCasesRaw.length > 0
+          ? adminWorstAttention(
+              ...openSupportCasesRaw.map((supportCase) => supportCaseTone(supportCase)),
+            )
+          : "healthy",
+      body:
+        openSupportCaseCount > 0
+          ? "Tracked support work with ownership, severity, and next follow-up dates."
+          : "No open support cases are waiting for triage right now.",
+      items: openSupportCasesRaw.map((supportCase) => ({
+        id: supportCase.id,
+        href: supportCaseHref(supportCase.subjectType, supportCase.subjectId),
+        label: supportCase.title,
+        sub: `${supportCase.statusLabel} · ${supportCase.severityLabel} · ${supportCase.target}`,
+        meta:
+          supportCase.nextFollowUpAt != null
+            ? `Owner ${supportCase.owner} · Follow-up ${supportCase.nextFollowUpLabel}`
+            : `Owner ${supportCase.owner} · Updated ${supportCase.updatedWhen}`,
+        tone: supportCaseTone(supportCase),
       })),
     },
     {
