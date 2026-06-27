@@ -105,6 +105,10 @@ export function PhoneCountryInput({
   }, [open]);
 
   const selectedRule = useMemo(() => (iso2 ? getPhoneCountryRule(iso2) : null), [iso2]);
+  const selectorLabel = selectedRule ? `+${selectedRule.callingCode}` : "Code";
+  const selectorAriaLabel = selectedRule
+    ? `Select country code, current ${selectedRule.displayName} plus ${selectedRule.callingCode}`
+    : "Select country code";
   const inputPlaceholder = useMemo(() => {
     const example = selectedRule?.examples?.mobile ?? selectedRule?.examples?.landline;
     return example ?? placeholder;
@@ -183,6 +187,7 @@ export function PhoneCountryInput({
       >
         <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-[0.7rem] border border-[#d8ddd6] bg-white focus-within:border-[#4158f4]">
           <button
+            aria-label={selectorAriaLabel}
             aria-expanded={open}
             aria-haspopup="listbox"
             className={
@@ -194,9 +199,11 @@ export function PhoneCountryInput({
               setOpen((current) => !current);
             }}
             ref={triggerRef}
+            title={selectorAriaLabel}
             type="button"
           >
             <span className="text-[18px] leading-none">{flagEmojiForIso2(iso2)}</span>
+            <span className="text-[12.5px] font-semibold text-[#5c655e]">{selectorLabel}</span>
             <WorkspaceIcon
               name={open ? "chevron-up" : "chevron-down"}
               size={14}
