@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "../../../generated/prisma";
 
 import { db } from "~/server/db";
+import { loadUserInvestigationTimeline } from "~/server/admin/investigation-timeline";
 import { normalizeAdminUserViewId, type AdminUserViewId } from "~/server/admin/saved-views";
 import {
   countLiveSyncAccountSlots,
@@ -252,7 +253,7 @@ export async function loadUserDetail(userId: string) {
     lastSession,
     syncAccountsRaw,
     adminActionsRaw,
-    supportNotesRaw,
+    investigationTimeline,
     supportCases,
   ] =
     await Promise.all([
@@ -347,7 +348,7 @@ export async function loadUserDetail(userId: string) {
           admin: { select: { name: true, email: true } },
         },
       }),
-      listUserSupportTimeline(userId, 12),
+      loadUserInvestigationTimeline(userId),
       listSupportCasesForSubject("USER", userId),
     ]);
 
@@ -428,41 +429,6 @@ export async function loadUserDetail(userId: string) {
       reason,
     };
   });
-
-  const supportTimeline = [
-    ...supportNotes.map((note) => ({
-      id: note.id,
-      type: "audit" as const,
-      label: note.label,
-      body: note.reason,
-      when: note.when,
-      actor: note.actor,
-      createdAt: note.createdAt,
-    })),
-    ...supportNotesRaw.map((note) => ({
-      id: note.id,
-      type: "note" as const,
-      label: "Internal support note",
-      body: note.body,
-      when: note.when,
-      actor: note.author,
-      createdAt: note.createdAt,
-    })),
-  ]
-    .sort((left, right) => {
-      const leftDate = "createdAt" in left && left.createdAt instanceof Date ? left.createdAt.getTime() : 0;
-      const rightDate = "createdAt" in right && right.createdAt instanceof Date ? right.createdAt.getTime() : 0;
-      return rightDate - leftDate;
-    })
-    .slice(0, 16)
-    .map((item) => ({
-      id: item.id,
-      type: item.type,
-      label: item.label,
-      body: item.body ?? null,
-      when: item.when,
-      actor: item.actor,
-    }));
 
   const usage = [
     {
@@ -551,7 +517,7 @@ export async function loadUserDetail(userId: string) {
       notes: supportNotes,
     },
     supportCases,
-    supportTimeline,
+    investigationTimeline,
     group: group?.group
       ? {
           isTeam: group.group.type === "TEAM",

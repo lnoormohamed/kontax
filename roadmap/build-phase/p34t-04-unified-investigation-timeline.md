@@ -65,4 +65,4 @@ cross-referencing.
 - [ ] External · users — none
 - [ ] External · developers — none
 - [x] Internal · engineering — investigation timeline scope documented here
-- [x] Internal · support/admin — timeline-reading guidance required
+- [x] Internal · support/admin — timeline-reading guidance in `roadmap/runbooks/admin-investigation-timeline.md`

@@ -7,7 +7,8 @@ import { ADMIN_ACTIONS, buildAdminAuditHref, emitAdminEvent } from "~/server/adm
 import { loadUserDetail } from "~/server/admin/users";
 import { AdminHeader } from "../../_components/admin-header";
 import { AD, AdIcon } from "../../_components/admin-icons";
-import { SupportNoteComposer } from "../../_components/support-note-composer";
+import { InvestigationTimeline } from "../../_components/investigation-timeline";
+import { SupportCasePanel } from "../../_components/support-case-panel";
 import { Avatar } from "../../_components/avatar";
 import { PlanPill, StatusPill } from "../../_components/pills";
 import { Collapsible, UserActions } from "./detail-client";
@@ -286,61 +287,21 @@ export default async function AdminUserDetailPage({
                 )}
               </section>
 
-              {d.syncSupport.notes.length > 0 && (
-                <section className="ad-card">
-                  <div className="ad-card-head">
-                    <h3 className="ad-card-title">Support notes</h3>
-                  </div>
-                  <div className="ad-support-list">
-                    {d.syncSupport.notes.map((note) => (
-                      <div key={note.id} className="ad-support-list__row">
-                        <div className="ad-support-list__main">
-                          <div className="ad-support-list__title">{note.label}</div>
-                          <div className="ad-support-list__sub">
-                            {note.actor} · {note.when}
-                          </div>
-                          {note.reason ? (
-                            <div className="ad-support-list__body">{note.reason}</div>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
+              <SupportCasePanel
+                subjectType="USER"
+                subjectId={d.id}
+                targetUserId={d.id}
+                cases={d.supportCases}
+              />
 
-              <section className="ad-card">
-                <div className="ad-card-head">
-                  <h3 className="ad-card-title">Internal support notes</h3>
-                </div>
-                <SupportNoteComposer
-                  subjectType="USER"
-                  subjectId={d.id}
-                  targetUserId={d.id}
-                  placeholder="Capture investigation context, billing exceptions, or handoff notes for the next admin."
-                />
-                <div className="ad-support-list" style={{ marginTop: 14 }}>
-                  {d.supportTimeline.length === 0 ? (
-                    <div className="ad-support-note">No support timeline entries yet.</div>
-                  ) : (
-                    d.supportTimeline.map((entry) => (
-                      <div key={entry.id} className="ad-support-list__row">
-                        <div className="ad-support-list__main">
-                          <div className="ad-support-list__title">
-                            {entry.type === "note" ? "Internal note" : entry.label}
-                          </div>
-                          <div className="ad-support-list__sub">
-                            {entry.actor} · {entry.when}
-                          </div>
-                          {entry.body ? (
-                            <div className="ad-support-list__body">{entry.body}</div>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section>
+              <InvestigationTimeline
+                entries={d.investigationTimeline}
+                subjectType="USER"
+                subjectId={d.id}
+                targetUserId={d.id}
+                placeholder="Capture investigation context, billing exceptions, or handoff notes for the next admin."
+                emptyMessage="No investigation timeline entries yet for this user."
+              />
 
               {d.group && (
                 <section className="ad-card">

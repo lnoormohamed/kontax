@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma, SyncProvider } from "../../../generated/prisma";
 
 import { db } from "~/server/db";
+import { loadSyncAccountInvestigationTimeline } from "~/server/admin/investigation-timeline";
 import { listAdminSupportNotes } from "~/server/admin/support-notes";
 import { listSupportCasesForSubject } from "~/server/admin/support-cases";
 import { getSyncLineageInvariantIssues } from "~/server/sync-lineage";
@@ -465,6 +466,28 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
 
   if (!account) return null;
 
+  const investigationTimeline = await loadSyncAccountInvestigationTimeline({
+    syncAccountId,
+    userId: account.user.id,
+    label: account.label,
+    disconnectedAt: account.disconnectedAt,
+    retiredAt: account.retiredAt,
+    replaces: account.replacesSyncAccount
+      ? {
+          id: account.replacesSyncAccount.id,
+          label: account.replacesSyncAccount.label,
+          retiredAt: account.replacesSyncAccount.retiredAt,
+        }
+      : null,
+    replacedBy: account.replacedBySyncAccount
+      ? {
+          id: account.replacedBySyncAccount.id,
+          label: account.replacedBySyncAccount.label,
+          createdAt: account.replacedBySyncAccount.createdAt,
+        }
+      : null,
+  });
+
   const capabilityProfile = resolveSyncProviderCapabilityProfile({
     provider: account.provider,
     baseUrl: account.baseUrl,
@@ -620,5 +643,6 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
     })),
     supportNotes,
     supportCases,
+    investigationTimeline,
   };
 }

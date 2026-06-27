@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 
 import { AdminHeader } from "../../_components/admin-header";
 import { AD } from "../../_components/admin-icons";
-import { SupportNoteComposer } from "../../_components/support-note-composer";
+import { InvestigationTimeline } from "../../_components/investigation-timeline";
+import { SupportCasePanel } from "../../_components/support-case-panel";
 import { adminAttentionMeta } from "~/server/admin/attention";
 import { buildAdminAuditHref } from "~/server/admin/audit";
 import { assertAdmin } from "~/server/admin/guard";
@@ -287,32 +288,21 @@ export default async function AdminSyncConnectionDetailPage({
                 </div>
               </section>
 
-              <section className="ad-card">
-                <div className="ad-card-head">
-                  <h3 className="ad-card-title">Internal support notes</h3>
-                </div>
-                <SupportNoteComposer
-                  subjectType="SYNC_ACCOUNT"
-                  subjectId={d.id}
-                  targetUserId={d.user.id}
-                  placeholder="Capture provider verification notes, investigation context, or replacement/reconnect decisions."
-                />
-                <div className="ad-support-list" style={{ marginTop: 14 }}>
-                  {d.supportNotes.length === 0 ? (
-                    <div className="ad-support-note">No support notes for this connection yet.</div>
-                  ) : (
-                    d.supportNotes.map((note) => (
-                      <div key={note.id} className="ad-support-list__row">
-                        <div className="ad-support-list__main">
-                          <div className="ad-support-list__title">{note.author}</div>
-                          <div className="ad-support-list__sub">{note.when}</div>
-                          <div className="ad-support-list__body">{note.body}</div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section>
+              <SupportCasePanel
+                subjectType="SYNC_ACCOUNT"
+                subjectId={d.id}
+                targetUserId={d.user.id}
+                cases={d.supportCases}
+              />
+
+              <InvestigationTimeline
+                entries={d.investigationTimeline}
+                subjectType="SYNC_ACCOUNT"
+                subjectId={d.id}
+                targetUserId={d.user.id}
+                placeholder="Capture provider verification notes, investigation context, or replacement/reconnect decisions."
+                emptyMessage="No investigation timeline entries yet for this connection."
+              />
             </div>
 
             <SyncConnectionActions
