@@ -697,7 +697,7 @@ export async function broadcastProductUpdate(input: {
   });
 }
 
-export async function loadAdminBroadcastPanel() {
+export async function loadAdminBroadcastPanel(query = "") {
   try {
     await assertAdmin();
   } catch (e) {
@@ -708,7 +708,7 @@ export async function loadAdminBroadcastPanel() {
   await processScheduledAdminBroadcasts();
 
   const [broadcasts, flags] = await Promise.all([
-    listAdminBroadcasts(),
+    listAdminBroadcasts(12, query),
     db.featureFlag.findMany({
       orderBy: { key: "asc" },
       select: { key: true, name: true },
