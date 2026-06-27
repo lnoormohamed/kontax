@@ -154,6 +154,11 @@ export type FeatureFlag = $Result.DefaultSelection<Prisma.$FeatureFlagPayload>
  */
 export type Group = $Result.DefaultSelection<Prisma.$GroupPayload>
 /**
+ * Model SharedBookPermissionAuditEvent
+ * 
+ */
+export type SharedBookPermissionAuditEvent = $Result.DefaultSelection<Prisma.$SharedBookPermissionAuditEventPayload>
+/**
  * Model GroupMember
  * 
  */
@@ -358,6 +363,14 @@ export const GroupInviteStatus: {
 };
 
 export type GroupInviteStatus = (typeof GroupInviteStatus)[keyof typeof GroupInviteStatus]
+
+
+export const SharedBookPermissionKind: {
+  FAMILY_CAN_EDIT: 'FAMILY_CAN_EDIT',
+  TEAM_BOOK_ACCESS: 'TEAM_BOOK_ACCESS'
+};
+
+export type SharedBookPermissionKind = (typeof SharedBookPermissionKind)[keyof typeof SharedBookPermissionKind]
 
 
 export const SubscriptionStatus: {
@@ -720,6 +733,10 @@ export const GroupRole: typeof $Enums.GroupRole
 export type GroupInviteStatus = $Enums.GroupInviteStatus
 
 export const GroupInviteStatus: typeof $Enums.GroupInviteStatus
+
+export type SharedBookPermissionKind = $Enums.SharedBookPermissionKind
+
+export const SharedBookPermissionKind: typeof $Enums.SharedBookPermissionKind
 
 export type SubscriptionStatus = $Enums.SubscriptionStatus
 
@@ -1238,6 +1255,16 @@ export class PrismaClient<
     * ```
     */
   get group(): Prisma.GroupDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.sharedBookPermissionAuditEvent`: Exposes CRUD operations for the **SharedBookPermissionAuditEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SharedBookPermissionAuditEvents
+    * const sharedBookPermissionAuditEvents = await prisma.sharedBookPermissionAuditEvent.findMany()
+    * ```
+    */
+  get sharedBookPermissionAuditEvent(): Prisma.SharedBookPermissionAuditEventDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.groupMember`: Exposes CRUD operations for the **GroupMember** model.
@@ -1907,6 +1934,7 @@ export namespace Prisma {
     AdminSupportCase: 'AdminSupportCase',
     FeatureFlag: 'FeatureFlag',
     Group: 'Group',
+    SharedBookPermissionAuditEvent: 'SharedBookPermissionAuditEvent',
     GroupMember: 'GroupMember',
     GroupAddressBook: 'GroupAddressBook',
     AddressBook: 'AddressBook',
@@ -1945,7 +1973,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4021,6 +4049,80 @@ export namespace Prisma {
           }
         }
       }
+      SharedBookPermissionAuditEvent: {
+        payload: Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>
+        fields: Prisma.SharedBookPermissionAuditEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SharedBookPermissionAuditEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SharedBookPermissionAuditEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>
+          }
+          findFirst: {
+            args: Prisma.SharedBookPermissionAuditEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SharedBookPermissionAuditEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>
+          }
+          findMany: {
+            args: Prisma.SharedBookPermissionAuditEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>[]
+          }
+          create: {
+            args: Prisma.SharedBookPermissionAuditEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>
+          }
+          createMany: {
+            args: Prisma.SharedBookPermissionAuditEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SharedBookPermissionAuditEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>[]
+          }
+          delete: {
+            args: Prisma.SharedBookPermissionAuditEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>
+          }
+          update: {
+            args: Prisma.SharedBookPermissionAuditEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.SharedBookPermissionAuditEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SharedBookPermissionAuditEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SharedBookPermissionAuditEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.SharedBookPermissionAuditEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SharedBookPermissionAuditEventPayload>
+          }
+          aggregate: {
+            args: Prisma.SharedBookPermissionAuditEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSharedBookPermissionAuditEvent>
+          }
+          groupBy: {
+            args: Prisma.SharedBookPermissionAuditEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SharedBookPermissionAuditEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SharedBookPermissionAuditEventCountArgs<ExtArgs>
+            result: $Utils.Optional<SharedBookPermissionAuditEventCountAggregateOutputType> | number
+          }
+        }
+      }
       GroupMember: {
         payload: Prisma.$GroupMemberPayload<ExtArgs>
         fields: Prisma.GroupMemberFieldRefs
@@ -5625,6 +5727,7 @@ export namespace Prisma {
     adminSupportCase?: AdminSupportCaseOmit
     featureFlag?: FeatureFlagOmit
     group?: GroupOmit
+    sharedBookPermissionAuditEvent?: SharedBookPermissionAuditEventOmit
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
     addressBook?: AddressBookOmit
@@ -6485,6 +6588,7 @@ export namespace Prisma {
     members: number
     addressBooks: number
     teamSyncAccounts: number
+    permissionAuditEvents: number
   }
 
   export type GroupCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6492,6 +6596,7 @@ export namespace Prisma {
     members?: boolean | GroupCountOutputTypeCountMembersArgs
     addressBooks?: boolean | GroupCountOutputTypeCountAddressBooksArgs
     teamSyncAccounts?: boolean | GroupCountOutputTypeCountTeamSyncAccountsArgs
+    permissionAuditEvents?: boolean | GroupCountOutputTypeCountPermissionAuditEventsArgs
   }
 
   // Custom InputTypes
@@ -6531,6 +6636,13 @@ export namespace Prisma {
    */
   export type GroupCountOutputTypeCountTeamSyncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TeamSyncAccountWhereInput
+  }
+
+  /**
+   * GroupCountOutputType without action
+   */
+  export type GroupCountOutputTypeCountPermissionAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SharedBookPermissionAuditEventWhereInput
   }
 
 
@@ -41779,6 +41891,7 @@ export namespace Prisma {
     members?: boolean | Group$membersArgs<ExtArgs>
     addressBooks?: boolean | Group$addressBooksArgs<ExtArgs>
     teamSyncAccounts?: boolean | Group$teamSyncAccountsArgs<ExtArgs>
+    permissionAuditEvents?: boolean | Group$permissionAuditEventsArgs<ExtArgs>
     _count?: boolean | GroupCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["group"]>
 
@@ -41840,6 +41953,7 @@ export namespace Prisma {
     members?: boolean | Group$membersArgs<ExtArgs>
     addressBooks?: boolean | Group$addressBooksArgs<ExtArgs>
     teamSyncAccounts?: boolean | Group$teamSyncAccountsArgs<ExtArgs>
+    permissionAuditEvents?: boolean | Group$permissionAuditEventsArgs<ExtArgs>
     _count?: boolean | GroupCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GroupIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -41861,6 +41975,7 @@ export namespace Prisma {
       members: Prisma.$GroupMemberPayload<ExtArgs>[]
       addressBooks: Prisma.$GroupAddressBookPayload<ExtArgs>[]
       teamSyncAccounts: Prisma.$TeamSyncAccountPayload<ExtArgs>[]
+      permissionAuditEvents: Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -42276,6 +42391,7 @@ export namespace Prisma {
     members<T extends Group$membersArgs<ExtArgs> = {}>(args?: Subset<T, Group$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     addressBooks<T extends Group$addressBooksArgs<ExtArgs> = {}>(args?: Subset<T, Group$addressBooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupAddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     teamSyncAccounts<T extends Group$teamSyncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, Group$teamSyncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    permissionAuditEvents<T extends Group$permissionAuditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Group$permissionAuditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -42847,6 +42963,30 @@ export namespace Prisma {
   }
 
   /**
+   * Group.permissionAuditEvents
+   */
+  export type Group$permissionAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    where?: SharedBookPermissionAuditEventWhereInput
+    orderBy?: SharedBookPermissionAuditEventOrderByWithRelationInput | SharedBookPermissionAuditEventOrderByWithRelationInput[]
+    cursor?: SharedBookPermissionAuditEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SharedBookPermissionAuditEventScalarFieldEnum | SharedBookPermissionAuditEventScalarFieldEnum[]
+  }
+
+  /**
    * Group without action
    */
   export type GroupDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -42862,6 +43002,1194 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: GroupInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SharedBookPermissionAuditEvent
+   */
+
+  export type AggregateSharedBookPermissionAuditEvent = {
+    _count: SharedBookPermissionAuditEventCountAggregateOutputType | null
+    _min: SharedBookPermissionAuditEventMinAggregateOutputType | null
+    _max: SharedBookPermissionAuditEventMaxAggregateOutputType | null
+  }
+
+  export type SharedBookPermissionAuditEventMinAggregateOutputType = {
+    id: string | null
+    groupId: string | null
+    groupType: $Enums.GroupType | null
+    groupName: string | null
+    groupAddressBookId: string | null
+    groupAddressBookName: string | null
+    actorUserId: string | null
+    actorName: string | null
+    targetMemberId: string | null
+    targetUserId: string | null
+    targetName: string | null
+    permissionKind: $Enums.SharedBookPermissionKind | null
+    beforeValue: string | null
+    afterValue: string | null
+    createdAt: Date | null
+  }
+
+  export type SharedBookPermissionAuditEventMaxAggregateOutputType = {
+    id: string | null
+    groupId: string | null
+    groupType: $Enums.GroupType | null
+    groupName: string | null
+    groupAddressBookId: string | null
+    groupAddressBookName: string | null
+    actorUserId: string | null
+    actorName: string | null
+    targetMemberId: string | null
+    targetUserId: string | null
+    targetName: string | null
+    permissionKind: $Enums.SharedBookPermissionKind | null
+    beforeValue: string | null
+    afterValue: string | null
+    createdAt: Date | null
+  }
+
+  export type SharedBookPermissionAuditEventCountAggregateOutputType = {
+    id: number
+    groupId: number
+    groupType: number
+    groupName: number
+    groupAddressBookId: number
+    groupAddressBookName: number
+    actorUserId: number
+    actorName: number
+    targetMemberId: number
+    targetUserId: number
+    targetName: number
+    permissionKind: number
+    beforeValue: number
+    afterValue: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SharedBookPermissionAuditEventMinAggregateInputType = {
+    id?: true
+    groupId?: true
+    groupType?: true
+    groupName?: true
+    groupAddressBookId?: true
+    groupAddressBookName?: true
+    actorUserId?: true
+    actorName?: true
+    targetMemberId?: true
+    targetUserId?: true
+    targetName?: true
+    permissionKind?: true
+    beforeValue?: true
+    afterValue?: true
+    createdAt?: true
+  }
+
+  export type SharedBookPermissionAuditEventMaxAggregateInputType = {
+    id?: true
+    groupId?: true
+    groupType?: true
+    groupName?: true
+    groupAddressBookId?: true
+    groupAddressBookName?: true
+    actorUserId?: true
+    actorName?: true
+    targetMemberId?: true
+    targetUserId?: true
+    targetName?: true
+    permissionKind?: true
+    beforeValue?: true
+    afterValue?: true
+    createdAt?: true
+  }
+
+  export type SharedBookPermissionAuditEventCountAggregateInputType = {
+    id?: true
+    groupId?: true
+    groupType?: true
+    groupName?: true
+    groupAddressBookId?: true
+    groupAddressBookName?: true
+    actorUserId?: true
+    actorName?: true
+    targetMemberId?: true
+    targetUserId?: true
+    targetName?: true
+    permissionKind?: true
+    beforeValue?: true
+    afterValue?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SharedBookPermissionAuditEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SharedBookPermissionAuditEvent to aggregate.
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedBookPermissionAuditEvents to fetch.
+     */
+    orderBy?: SharedBookPermissionAuditEventOrderByWithRelationInput | SharedBookPermissionAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SharedBookPermissionAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedBookPermissionAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedBookPermissionAuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SharedBookPermissionAuditEvents
+    **/
+    _count?: true | SharedBookPermissionAuditEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SharedBookPermissionAuditEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SharedBookPermissionAuditEventMaxAggregateInputType
+  }
+
+  export type GetSharedBookPermissionAuditEventAggregateType<T extends SharedBookPermissionAuditEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateSharedBookPermissionAuditEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSharedBookPermissionAuditEvent[P]>
+      : GetScalarType<T[P], AggregateSharedBookPermissionAuditEvent[P]>
+  }
+
+
+
+
+  export type SharedBookPermissionAuditEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SharedBookPermissionAuditEventWhereInput
+    orderBy?: SharedBookPermissionAuditEventOrderByWithAggregationInput | SharedBookPermissionAuditEventOrderByWithAggregationInput[]
+    by: SharedBookPermissionAuditEventScalarFieldEnum[] | SharedBookPermissionAuditEventScalarFieldEnum
+    having?: SharedBookPermissionAuditEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SharedBookPermissionAuditEventCountAggregateInputType | true
+    _min?: SharedBookPermissionAuditEventMinAggregateInputType
+    _max?: SharedBookPermissionAuditEventMaxAggregateInputType
+  }
+
+  export type SharedBookPermissionAuditEventGroupByOutputType = {
+    id: string
+    groupId: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId: string | null
+    groupAddressBookName: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue: string | null
+    afterValue: string
+    createdAt: Date
+    _count: SharedBookPermissionAuditEventCountAggregateOutputType | null
+    _min: SharedBookPermissionAuditEventMinAggregateOutputType | null
+    _max: SharedBookPermissionAuditEventMaxAggregateOutputType | null
+  }
+
+  type GetSharedBookPermissionAuditEventGroupByPayload<T extends SharedBookPermissionAuditEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SharedBookPermissionAuditEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SharedBookPermissionAuditEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SharedBookPermissionAuditEventGroupByOutputType[P]>
+            : GetScalarType<T[P], SharedBookPermissionAuditEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SharedBookPermissionAuditEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupId?: boolean
+    groupType?: boolean
+    groupName?: boolean
+    groupAddressBookId?: boolean
+    groupAddressBookName?: boolean
+    actorUserId?: boolean
+    actorName?: boolean
+    targetMemberId?: boolean
+    targetUserId?: boolean
+    targetName?: boolean
+    permissionKind?: boolean
+    beforeValue?: boolean
+    afterValue?: boolean
+    createdAt?: boolean
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sharedBookPermissionAuditEvent"]>
+
+  export type SharedBookPermissionAuditEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupId?: boolean
+    groupType?: boolean
+    groupName?: boolean
+    groupAddressBookId?: boolean
+    groupAddressBookName?: boolean
+    actorUserId?: boolean
+    actorName?: boolean
+    targetMemberId?: boolean
+    targetUserId?: boolean
+    targetName?: boolean
+    permissionKind?: boolean
+    beforeValue?: boolean
+    afterValue?: boolean
+    createdAt?: boolean
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sharedBookPermissionAuditEvent"]>
+
+  export type SharedBookPermissionAuditEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupId?: boolean
+    groupType?: boolean
+    groupName?: boolean
+    groupAddressBookId?: boolean
+    groupAddressBookName?: boolean
+    actorUserId?: boolean
+    actorName?: boolean
+    targetMemberId?: boolean
+    targetUserId?: boolean
+    targetName?: boolean
+    permissionKind?: boolean
+    beforeValue?: boolean
+    afterValue?: boolean
+    createdAt?: boolean
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["sharedBookPermissionAuditEvent"]>
+
+  export type SharedBookPermissionAuditEventSelectScalar = {
+    id?: boolean
+    groupId?: boolean
+    groupType?: boolean
+    groupName?: boolean
+    groupAddressBookId?: boolean
+    groupAddressBookName?: boolean
+    actorUserId?: boolean
+    actorName?: boolean
+    targetMemberId?: boolean
+    targetUserId?: boolean
+    targetName?: boolean
+    permissionKind?: boolean
+    beforeValue?: boolean
+    afterValue?: boolean
+    createdAt?: boolean
+  }
+
+  export type SharedBookPermissionAuditEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "groupType" | "groupName" | "groupAddressBookId" | "groupAddressBookName" | "actorUserId" | "actorName" | "targetMemberId" | "targetUserId" | "targetName" | "permissionKind" | "beforeValue" | "afterValue" | "createdAt", ExtArgs["result"]["sharedBookPermissionAuditEvent"]>
+  export type SharedBookPermissionAuditEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+  }
+  export type SharedBookPermissionAuditEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+  }
+  export type SharedBookPermissionAuditEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+  }
+
+  export type $SharedBookPermissionAuditEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SharedBookPermissionAuditEvent"
+    objects: {
+      group: Prisma.$GroupPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      groupId: string
+      groupType: $Enums.GroupType
+      groupName: string
+      groupAddressBookId: string | null
+      groupAddressBookName: string | null
+      actorUserId: string
+      actorName: string
+      targetMemberId: string
+      targetUserId: string | null
+      targetName: string
+      permissionKind: $Enums.SharedBookPermissionKind
+      beforeValue: string | null
+      afterValue: string
+      createdAt: Date
+    }, ExtArgs["result"]["sharedBookPermissionAuditEvent"]>
+    composites: {}
+  }
+
+  type SharedBookPermissionAuditEventGetPayload<S extends boolean | null | undefined | SharedBookPermissionAuditEventDefaultArgs> = $Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload, S>
+
+  type SharedBookPermissionAuditEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SharedBookPermissionAuditEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SharedBookPermissionAuditEventCountAggregateInputType | true
+    }
+
+  export interface SharedBookPermissionAuditEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SharedBookPermissionAuditEvent'], meta: { name: 'SharedBookPermissionAuditEvent' } }
+    /**
+     * Find zero or one SharedBookPermissionAuditEvent that matches the filter.
+     * @param {SharedBookPermissionAuditEventFindUniqueArgs} args - Arguments to find a SharedBookPermissionAuditEvent
+     * @example
+     * // Get one SharedBookPermissionAuditEvent
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SharedBookPermissionAuditEventFindUniqueArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventFindUniqueArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SharedBookPermissionAuditEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SharedBookPermissionAuditEventFindUniqueOrThrowArgs} args - Arguments to find a SharedBookPermissionAuditEvent
+     * @example
+     * // Get one SharedBookPermissionAuditEvent
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SharedBookPermissionAuditEventFindUniqueOrThrowArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SharedBookPermissionAuditEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventFindFirstArgs} args - Arguments to find a SharedBookPermissionAuditEvent
+     * @example
+     * // Get one SharedBookPermissionAuditEvent
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SharedBookPermissionAuditEventFindFirstArgs>(args?: SelectSubset<T, SharedBookPermissionAuditEventFindFirstArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SharedBookPermissionAuditEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventFindFirstOrThrowArgs} args - Arguments to find a SharedBookPermissionAuditEvent
+     * @example
+     * // Get one SharedBookPermissionAuditEvent
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SharedBookPermissionAuditEventFindFirstOrThrowArgs>(args?: SelectSubset<T, SharedBookPermissionAuditEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SharedBookPermissionAuditEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SharedBookPermissionAuditEvents
+     * const sharedBookPermissionAuditEvents = await prisma.sharedBookPermissionAuditEvent.findMany()
+     * 
+     * // Get first 10 SharedBookPermissionAuditEvents
+     * const sharedBookPermissionAuditEvents = await prisma.sharedBookPermissionAuditEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const sharedBookPermissionAuditEventWithIdOnly = await prisma.sharedBookPermissionAuditEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SharedBookPermissionAuditEventFindManyArgs>(args?: SelectSubset<T, SharedBookPermissionAuditEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SharedBookPermissionAuditEvent.
+     * @param {SharedBookPermissionAuditEventCreateArgs} args - Arguments to create a SharedBookPermissionAuditEvent.
+     * @example
+     * // Create one SharedBookPermissionAuditEvent
+     * const SharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.create({
+     *   data: {
+     *     // ... data to create a SharedBookPermissionAuditEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends SharedBookPermissionAuditEventCreateArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventCreateArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SharedBookPermissionAuditEvents.
+     * @param {SharedBookPermissionAuditEventCreateManyArgs} args - Arguments to create many SharedBookPermissionAuditEvents.
+     * @example
+     * // Create many SharedBookPermissionAuditEvents
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SharedBookPermissionAuditEventCreateManyArgs>(args?: SelectSubset<T, SharedBookPermissionAuditEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SharedBookPermissionAuditEvents and returns the data saved in the database.
+     * @param {SharedBookPermissionAuditEventCreateManyAndReturnArgs} args - Arguments to create many SharedBookPermissionAuditEvents.
+     * @example
+     * // Create many SharedBookPermissionAuditEvents
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SharedBookPermissionAuditEvents and only return the `id`
+     * const sharedBookPermissionAuditEventWithIdOnly = await prisma.sharedBookPermissionAuditEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SharedBookPermissionAuditEventCreateManyAndReturnArgs>(args?: SelectSubset<T, SharedBookPermissionAuditEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SharedBookPermissionAuditEvent.
+     * @param {SharedBookPermissionAuditEventDeleteArgs} args - Arguments to delete one SharedBookPermissionAuditEvent.
+     * @example
+     * // Delete one SharedBookPermissionAuditEvent
+     * const SharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.delete({
+     *   where: {
+     *     // ... filter to delete one SharedBookPermissionAuditEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SharedBookPermissionAuditEventDeleteArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventDeleteArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SharedBookPermissionAuditEvent.
+     * @param {SharedBookPermissionAuditEventUpdateArgs} args - Arguments to update one SharedBookPermissionAuditEvent.
+     * @example
+     * // Update one SharedBookPermissionAuditEvent
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SharedBookPermissionAuditEventUpdateArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventUpdateArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SharedBookPermissionAuditEvents.
+     * @param {SharedBookPermissionAuditEventDeleteManyArgs} args - Arguments to filter SharedBookPermissionAuditEvents to delete.
+     * @example
+     * // Delete a few SharedBookPermissionAuditEvents
+     * const { count } = await prisma.sharedBookPermissionAuditEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SharedBookPermissionAuditEventDeleteManyArgs>(args?: SelectSubset<T, SharedBookPermissionAuditEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SharedBookPermissionAuditEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SharedBookPermissionAuditEvents
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SharedBookPermissionAuditEventUpdateManyArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SharedBookPermissionAuditEvents and returns the data updated in the database.
+     * @param {SharedBookPermissionAuditEventUpdateManyAndReturnArgs} args - Arguments to update many SharedBookPermissionAuditEvents.
+     * @example
+     * // Update many SharedBookPermissionAuditEvents
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SharedBookPermissionAuditEvents and only return the `id`
+     * const sharedBookPermissionAuditEventWithIdOnly = await prisma.sharedBookPermissionAuditEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SharedBookPermissionAuditEventUpdateManyAndReturnArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SharedBookPermissionAuditEvent.
+     * @param {SharedBookPermissionAuditEventUpsertArgs} args - Arguments to update or create a SharedBookPermissionAuditEvent.
+     * @example
+     * // Update or create a SharedBookPermissionAuditEvent
+     * const sharedBookPermissionAuditEvent = await prisma.sharedBookPermissionAuditEvent.upsert({
+     *   create: {
+     *     // ... data to create a SharedBookPermissionAuditEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SharedBookPermissionAuditEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SharedBookPermissionAuditEventUpsertArgs>(args: SelectSubset<T, SharedBookPermissionAuditEventUpsertArgs<ExtArgs>>): Prisma__SharedBookPermissionAuditEventClient<$Result.GetResult<Prisma.$SharedBookPermissionAuditEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SharedBookPermissionAuditEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventCountArgs} args - Arguments to filter SharedBookPermissionAuditEvents to count.
+     * @example
+     * // Count the number of SharedBookPermissionAuditEvents
+     * const count = await prisma.sharedBookPermissionAuditEvent.count({
+     *   where: {
+     *     // ... the filter for the SharedBookPermissionAuditEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends SharedBookPermissionAuditEventCountArgs>(
+      args?: Subset<T, SharedBookPermissionAuditEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SharedBookPermissionAuditEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SharedBookPermissionAuditEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SharedBookPermissionAuditEventAggregateArgs>(args: Subset<T, SharedBookPermissionAuditEventAggregateArgs>): Prisma.PrismaPromise<GetSharedBookPermissionAuditEventAggregateType<T>>
+
+    /**
+     * Group by SharedBookPermissionAuditEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SharedBookPermissionAuditEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SharedBookPermissionAuditEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SharedBookPermissionAuditEventGroupByArgs['orderBy'] }
+        : { orderBy?: SharedBookPermissionAuditEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SharedBookPermissionAuditEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSharedBookPermissionAuditEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SharedBookPermissionAuditEvent model
+   */
+  readonly fields: SharedBookPermissionAuditEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SharedBookPermissionAuditEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SharedBookPermissionAuditEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    group<T extends GroupDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupDefaultArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SharedBookPermissionAuditEvent model
+   */
+  interface SharedBookPermissionAuditEventFieldRefs {
+    readonly id: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly groupId: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly groupType: FieldRef<"SharedBookPermissionAuditEvent", 'GroupType'>
+    readonly groupName: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly groupAddressBookId: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly groupAddressBookName: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly actorUserId: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly actorName: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly targetMemberId: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly targetUserId: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly targetName: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly permissionKind: FieldRef<"SharedBookPermissionAuditEvent", 'SharedBookPermissionKind'>
+    readonly beforeValue: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly afterValue: FieldRef<"SharedBookPermissionAuditEvent", 'String'>
+    readonly createdAt: FieldRef<"SharedBookPermissionAuditEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SharedBookPermissionAuditEvent findUnique
+   */
+  export type SharedBookPermissionAuditEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedBookPermissionAuditEvent to fetch.
+     */
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent findUniqueOrThrow
+   */
+  export type SharedBookPermissionAuditEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedBookPermissionAuditEvent to fetch.
+     */
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent findFirst
+   */
+  export type SharedBookPermissionAuditEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedBookPermissionAuditEvent to fetch.
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedBookPermissionAuditEvents to fetch.
+     */
+    orderBy?: SharedBookPermissionAuditEventOrderByWithRelationInput | SharedBookPermissionAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SharedBookPermissionAuditEvents.
+     */
+    cursor?: SharedBookPermissionAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedBookPermissionAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedBookPermissionAuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SharedBookPermissionAuditEvents.
+     */
+    distinct?: SharedBookPermissionAuditEventScalarFieldEnum | SharedBookPermissionAuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent findFirstOrThrow
+   */
+  export type SharedBookPermissionAuditEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedBookPermissionAuditEvent to fetch.
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedBookPermissionAuditEvents to fetch.
+     */
+    orderBy?: SharedBookPermissionAuditEventOrderByWithRelationInput | SharedBookPermissionAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SharedBookPermissionAuditEvents.
+     */
+    cursor?: SharedBookPermissionAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedBookPermissionAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedBookPermissionAuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SharedBookPermissionAuditEvents.
+     */
+    distinct?: SharedBookPermissionAuditEventScalarFieldEnum | SharedBookPermissionAuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent findMany
+   */
+  export type SharedBookPermissionAuditEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SharedBookPermissionAuditEvents to fetch.
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SharedBookPermissionAuditEvents to fetch.
+     */
+    orderBy?: SharedBookPermissionAuditEventOrderByWithRelationInput | SharedBookPermissionAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SharedBookPermissionAuditEvents.
+     */
+    cursor?: SharedBookPermissionAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SharedBookPermissionAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SharedBookPermissionAuditEvents.
+     */
+    skip?: number
+    distinct?: SharedBookPermissionAuditEventScalarFieldEnum | SharedBookPermissionAuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent create
+   */
+  export type SharedBookPermissionAuditEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SharedBookPermissionAuditEvent.
+     */
+    data: XOR<SharedBookPermissionAuditEventCreateInput, SharedBookPermissionAuditEventUncheckedCreateInput>
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent createMany
+   */
+  export type SharedBookPermissionAuditEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SharedBookPermissionAuditEvents.
+     */
+    data: SharedBookPermissionAuditEventCreateManyInput | SharedBookPermissionAuditEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent createManyAndReturn
+   */
+  export type SharedBookPermissionAuditEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many SharedBookPermissionAuditEvents.
+     */
+    data: SharedBookPermissionAuditEventCreateManyInput | SharedBookPermissionAuditEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent update
+   */
+  export type SharedBookPermissionAuditEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SharedBookPermissionAuditEvent.
+     */
+    data: XOR<SharedBookPermissionAuditEventUpdateInput, SharedBookPermissionAuditEventUncheckedUpdateInput>
+    /**
+     * Choose, which SharedBookPermissionAuditEvent to update.
+     */
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent updateMany
+   */
+  export type SharedBookPermissionAuditEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SharedBookPermissionAuditEvents.
+     */
+    data: XOR<SharedBookPermissionAuditEventUpdateManyMutationInput, SharedBookPermissionAuditEventUncheckedUpdateManyInput>
+    /**
+     * Filter which SharedBookPermissionAuditEvents to update
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * Limit how many SharedBookPermissionAuditEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent updateManyAndReturn
+   */
+  export type SharedBookPermissionAuditEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * The data used to update SharedBookPermissionAuditEvents.
+     */
+    data: XOR<SharedBookPermissionAuditEventUpdateManyMutationInput, SharedBookPermissionAuditEventUncheckedUpdateManyInput>
+    /**
+     * Filter which SharedBookPermissionAuditEvents to update
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * Limit how many SharedBookPermissionAuditEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent upsert
+   */
+  export type SharedBookPermissionAuditEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SharedBookPermissionAuditEvent to update in case it exists.
+     */
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+    /**
+     * In case the SharedBookPermissionAuditEvent found by the `where` argument doesn't exist, create a new SharedBookPermissionAuditEvent with this data.
+     */
+    create: XOR<SharedBookPermissionAuditEventCreateInput, SharedBookPermissionAuditEventUncheckedCreateInput>
+    /**
+     * In case the SharedBookPermissionAuditEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SharedBookPermissionAuditEventUpdateInput, SharedBookPermissionAuditEventUncheckedUpdateInput>
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent delete
+   */
+  export type SharedBookPermissionAuditEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter which SharedBookPermissionAuditEvent to delete.
+     */
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent deleteMany
+   */
+  export type SharedBookPermissionAuditEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SharedBookPermissionAuditEvents to delete
+     */
+    where?: SharedBookPermissionAuditEventWhereInput
+    /**
+     * Limit how many SharedBookPermissionAuditEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SharedBookPermissionAuditEvent without action
+   */
+  export type SharedBookPermissionAuditEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SharedBookPermissionAuditEvent
+     */
+    select?: SharedBookPermissionAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SharedBookPermissionAuditEvent
+     */
+    omit?: SharedBookPermissionAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SharedBookPermissionAuditEventInclude<ExtArgs> | null
   }
 
 
@@ -66402,6 +67730,27 @@ export namespace Prisma {
   export type GroupScalarFieldEnum = (typeof GroupScalarFieldEnum)[keyof typeof GroupScalarFieldEnum]
 
 
+  export const SharedBookPermissionAuditEventScalarFieldEnum: {
+    id: 'id',
+    groupId: 'groupId',
+    groupType: 'groupType',
+    groupName: 'groupName',
+    groupAddressBookId: 'groupAddressBookId',
+    groupAddressBookName: 'groupAddressBookName',
+    actorUserId: 'actorUserId',
+    actorName: 'actorName',
+    targetMemberId: 'targetMemberId',
+    targetUserId: 'targetUserId',
+    targetName: 'targetName',
+    permissionKind: 'permissionKind',
+    beforeValue: 'beforeValue',
+    afterValue: 'afterValue',
+    createdAt: 'createdAt'
+  };
+
+  export type SharedBookPermissionAuditEventScalarFieldEnum = (typeof SharedBookPermissionAuditEventScalarFieldEnum)[keyof typeof SharedBookPermissionAuditEventScalarFieldEnum]
+
+
   export const GroupMemberScalarFieldEnum: {
     id: 'id',
     groupId: 'groupId',
@@ -67272,6 +68621,20 @@ export namespace Prisma {
    * Reference to a field of type 'GroupType[]'
    */
   export type ListEnumGroupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GroupType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SharedBookPermissionKind'
+   */
+  export type EnumSharedBookPermissionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SharedBookPermissionKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'SharedBookPermissionKind[]'
+   */
+  export type ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SharedBookPermissionKind[]'>
     
 
 
@@ -70614,6 +71977,7 @@ export namespace Prisma {
     members?: GroupMemberListRelationFilter
     addressBooks?: GroupAddressBookListRelationFilter
     teamSyncAccounts?: TeamSyncAccountListRelationFilter
+    permissionAuditEvents?: SharedBookPermissionAuditEventListRelationFilter
   }
 
   export type GroupOrderByWithRelationInput = {
@@ -70636,6 +72000,7 @@ export namespace Prisma {
     members?: GroupMemberOrderByRelationAggregateInput
     addressBooks?: GroupAddressBookOrderByRelationAggregateInput
     teamSyncAccounts?: TeamSyncAccountOrderByRelationAggregateInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventOrderByRelationAggregateInput
   }
 
   export type GroupWhereUniqueInput = Prisma.AtLeast<{
@@ -70661,6 +72026,7 @@ export namespace Prisma {
     members?: GroupMemberListRelationFilter
     addressBooks?: GroupAddressBookListRelationFilter
     teamSyncAccounts?: TeamSyncAccountListRelationFilter
+    permissionAuditEvents?: SharedBookPermissionAuditEventListRelationFilter
   }, "id">
 
   export type GroupOrderByWithAggregationInput = {
@@ -70699,6 +72065,111 @@ export namespace Prisma {
     teamsEnabled?: BoolWithAggregatesFilter<"Group"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventWhereInput = {
+    AND?: SharedBookPermissionAuditEventWhereInput | SharedBookPermissionAuditEventWhereInput[]
+    OR?: SharedBookPermissionAuditEventWhereInput[]
+    NOT?: SharedBookPermissionAuditEventWhereInput | SharedBookPermissionAuditEventWhereInput[]
+    id?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupType?: EnumGroupTypeFilter<"SharedBookPermissionAuditEvent"> | $Enums.GroupType
+    groupName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupAddressBookId?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    groupAddressBookName?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    actorUserId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    actorName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    targetMemberId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    targetUserId?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    targetName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    permissionKind?: EnumSharedBookPermissionKindFilter<"SharedBookPermissionAuditEvent"> | $Enums.SharedBookPermissionKind
+    beforeValue?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    afterValue?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    createdAt?: DateTimeFilter<"SharedBookPermissionAuditEvent"> | Date | string
+    group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
+  }
+
+  export type SharedBookPermissionAuditEventOrderByWithRelationInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    groupType?: SortOrder
+    groupName?: SortOrder
+    groupAddressBookId?: SortOrderInput | SortOrder
+    groupAddressBookName?: SortOrderInput | SortOrder
+    actorUserId?: SortOrder
+    actorName?: SortOrder
+    targetMemberId?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    targetName?: SortOrder
+    permissionKind?: SortOrder
+    beforeValue?: SortOrderInput | SortOrder
+    afterValue?: SortOrder
+    createdAt?: SortOrder
+    group?: GroupOrderByWithRelationInput
+  }
+
+  export type SharedBookPermissionAuditEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SharedBookPermissionAuditEventWhereInput | SharedBookPermissionAuditEventWhereInput[]
+    OR?: SharedBookPermissionAuditEventWhereInput[]
+    NOT?: SharedBookPermissionAuditEventWhereInput | SharedBookPermissionAuditEventWhereInput[]
+    groupId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupType?: EnumGroupTypeFilter<"SharedBookPermissionAuditEvent"> | $Enums.GroupType
+    groupName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupAddressBookId?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    groupAddressBookName?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    actorUserId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    actorName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    targetMemberId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    targetUserId?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    targetName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    permissionKind?: EnumSharedBookPermissionKindFilter<"SharedBookPermissionAuditEvent"> | $Enums.SharedBookPermissionKind
+    beforeValue?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    afterValue?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    createdAt?: DateTimeFilter<"SharedBookPermissionAuditEvent"> | Date | string
+    group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
+  }, "id">
+
+  export type SharedBookPermissionAuditEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    groupType?: SortOrder
+    groupName?: SortOrder
+    groupAddressBookId?: SortOrderInput | SortOrder
+    groupAddressBookName?: SortOrderInput | SortOrder
+    actorUserId?: SortOrder
+    actorName?: SortOrder
+    targetMemberId?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    targetName?: SortOrder
+    permissionKind?: SortOrder
+    beforeValue?: SortOrderInput | SortOrder
+    afterValue?: SortOrder
+    createdAt?: SortOrder
+    _count?: SharedBookPermissionAuditEventCountOrderByAggregateInput
+    _max?: SharedBookPermissionAuditEventMaxOrderByAggregateInput
+    _min?: SharedBookPermissionAuditEventMinOrderByAggregateInput
+  }
+
+  export type SharedBookPermissionAuditEventScalarWhereWithAggregatesInput = {
+    AND?: SharedBookPermissionAuditEventScalarWhereWithAggregatesInput | SharedBookPermissionAuditEventScalarWhereWithAggregatesInput[]
+    OR?: SharedBookPermissionAuditEventScalarWhereWithAggregatesInput[]
+    NOT?: SharedBookPermissionAuditEventScalarWhereWithAggregatesInput | SharedBookPermissionAuditEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    groupId?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    groupType?: EnumGroupTypeWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | $Enums.GroupType
+    groupName?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    groupAddressBookId?: StringNullableWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string | null
+    groupAddressBookName?: StringNullableWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string | null
+    actorUserId?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    actorName?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    targetMemberId?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    targetUserId?: StringNullableWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string | null
+    targetName?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    permissionKind?: EnumSharedBookPermissionKindWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | $Enums.SharedBookPermissionKind
+    beforeValue?: StringNullableWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string | null
+    afterValue?: StringWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SharedBookPermissionAuditEvent"> | Date | string
   }
 
   export type GroupMemberWhereInput = {
@@ -76034,6 +77505,7 @@ export namespace Prisma {
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateInput = {
@@ -76054,6 +77526,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUpdateInput = {
@@ -76074,6 +77547,7 @@ export namespace Prisma {
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateInput = {
@@ -76094,6 +77568,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupCreateManyInput = {
@@ -76137,6 +77612,131 @@ export namespace Prisma {
     teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventCreateInput = {
+    id?: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId?: string | null
+    groupAddressBookName?: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId?: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue?: string | null
+    afterValue: string
+    createdAt?: Date | string
+    group: GroupCreateNestedOneWithoutPermissionAuditEventsInput
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedCreateInput = {
+    id?: string
+    groupId: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId?: string | null
+    groupAddressBookName?: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId?: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue?: string | null
+    afterValue: string
+    createdAt?: Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneRequiredWithoutPermissionAuditEventsNestedInput
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventCreateManyInput = {
+    id?: string
+    groupId: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId?: string | null
+    groupAddressBookName?: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId?: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue?: string | null
+    afterValue: string
+    createdAt?: Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GroupMemberCreateInput = {
@@ -80836,11 +82436,21 @@ export namespace Prisma {
     none?: TeamSyncAccountWhereInput
   }
 
+  export type SharedBookPermissionAuditEventListRelationFilter = {
+    every?: SharedBookPermissionAuditEventWhereInput
+    some?: SharedBookPermissionAuditEventWhereInput
+    none?: SharedBookPermissionAuditEventWhereInput
+  }
+
   export type GroupAddressBookOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type TeamSyncAccountOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SharedBookPermissionAuditEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -80909,6 +82519,82 @@ export namespace Prisma {
     _max?: NestedEnumGroupTypeFilter<$PrismaModel>
   }
 
+  export type EnumSharedBookPermissionKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.SharedBookPermissionKind | EnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSharedBookPermissionKindFilter<$PrismaModel> | $Enums.SharedBookPermissionKind
+  }
+
+  export type GroupScalarRelationFilter = {
+    is?: GroupWhereInput
+    isNot?: GroupWhereInput
+  }
+
+  export type SharedBookPermissionAuditEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    groupType?: SortOrder
+    groupName?: SortOrder
+    groupAddressBookId?: SortOrder
+    groupAddressBookName?: SortOrder
+    actorUserId?: SortOrder
+    actorName?: SortOrder
+    targetMemberId?: SortOrder
+    targetUserId?: SortOrder
+    targetName?: SortOrder
+    permissionKind?: SortOrder
+    beforeValue?: SortOrder
+    afterValue?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SharedBookPermissionAuditEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    groupType?: SortOrder
+    groupName?: SortOrder
+    groupAddressBookId?: SortOrder
+    groupAddressBookName?: SortOrder
+    actorUserId?: SortOrder
+    actorName?: SortOrder
+    targetMemberId?: SortOrder
+    targetUserId?: SortOrder
+    targetName?: SortOrder
+    permissionKind?: SortOrder
+    beforeValue?: SortOrder
+    afterValue?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SharedBookPermissionAuditEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    groupType?: SortOrder
+    groupName?: SortOrder
+    groupAddressBookId?: SortOrder
+    groupAddressBookName?: SortOrder
+    actorUserId?: SortOrder
+    actorName?: SortOrder
+    targetMemberId?: SortOrder
+    targetUserId?: SortOrder
+    targetName?: SortOrder
+    permissionKind?: SortOrder
+    beforeValue?: SortOrder
+    afterValue?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumSharedBookPermissionKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SharedBookPermissionKind | EnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSharedBookPermissionKindWithAggregatesFilter<$PrismaModel> | $Enums.SharedBookPermissionKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSharedBookPermissionKindFilter<$PrismaModel>
+    _max?: NestedEnumSharedBookPermissionKindFilter<$PrismaModel>
+  }
+
   export type EnumGroupRoleFilter<$PrismaModel = never> = {
     equals?: $Enums.GroupRole | EnumGroupRoleFieldRefInput<$PrismaModel>
     in?: $Enums.GroupRole[] | ListEnumGroupRoleFieldRefInput<$PrismaModel>
@@ -80921,11 +82607,6 @@ export namespace Prisma {
     in?: $Enums.GroupInviteStatus[] | ListEnumGroupInviteStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.GroupInviteStatus[] | ListEnumGroupInviteStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumGroupInviteStatusFilter<$PrismaModel> | $Enums.GroupInviteStatus
-  }
-
-  export type GroupScalarRelationFilter = {
-    is?: GroupWhereInput
-    isNot?: GroupWhereInput
   }
 
   export type GroupMemberGroupIdUserIdCompoundUniqueInput = {
@@ -85611,6 +87292,13 @@ export namespace Prisma {
     connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
   }
 
+  export type SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput = {
+    create?: XOR<SharedBookPermissionAuditEventCreateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput> | SharedBookPermissionAuditEventCreateWithoutGroupInput[] | SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput | SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput[]
+    createMany?: SharedBookPermissionAuditEventCreateManyGroupInputEnvelope
+    connect?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+  }
+
   export type SubscriptionUncheckedCreateNestedManyWithoutGroupInput = {
     create?: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput> | SubscriptionCreateWithoutGroupInput[] | SubscriptionUncheckedCreateWithoutGroupInput[]
     connectOrCreate?: SubscriptionCreateOrConnectWithoutGroupInput | SubscriptionCreateOrConnectWithoutGroupInput[]
@@ -85643,6 +87331,13 @@ export namespace Prisma {
     connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutGroupInput | TeamSyncAccountCreateOrConnectWithoutGroupInput[]
     createMany?: TeamSyncAccountCreateManyGroupInputEnvelope
     connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput = {
+    create?: XOR<SharedBookPermissionAuditEventCreateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput> | SharedBookPermissionAuditEventCreateWithoutGroupInput[] | SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput | SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput[]
+    createMany?: SharedBookPermissionAuditEventCreateManyGroupInputEnvelope
+    connect?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
   }
 
   export type EnumGroupTypeFieldUpdateOperationsInput = {
@@ -85733,6 +87428,20 @@ export namespace Prisma {
     deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
   }
 
+  export type SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput = {
+    create?: XOR<SharedBookPermissionAuditEventCreateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput> | SharedBookPermissionAuditEventCreateWithoutGroupInput[] | SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput | SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput[]
+    upsert?: SharedBookPermissionAuditEventUpsertWithWhereUniqueWithoutGroupInput | SharedBookPermissionAuditEventUpsertWithWhereUniqueWithoutGroupInput[]
+    createMany?: SharedBookPermissionAuditEventCreateManyGroupInputEnvelope
+    set?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    disconnect?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    delete?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    connect?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    update?: SharedBookPermissionAuditEventUpdateWithWhereUniqueWithoutGroupInput | SharedBookPermissionAuditEventUpdateWithWhereUniqueWithoutGroupInput[]
+    updateMany?: SharedBookPermissionAuditEventUpdateManyWithWhereWithoutGroupInput | SharedBookPermissionAuditEventUpdateManyWithWhereWithoutGroupInput[]
+    deleteMany?: SharedBookPermissionAuditEventScalarWhereInput | SharedBookPermissionAuditEventScalarWhereInput[]
+  }
+
   export type SubscriptionUncheckedUpdateManyWithoutGroupNestedInput = {
     create?: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput> | SubscriptionCreateWithoutGroupInput[] | SubscriptionUncheckedCreateWithoutGroupInput[]
     connectOrCreate?: SubscriptionCreateOrConnectWithoutGroupInput | SubscriptionCreateOrConnectWithoutGroupInput[]
@@ -85797,6 +87506,38 @@ export namespace Prisma {
     update?: TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput | TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput[]
     updateMany?: TeamSyncAccountUpdateManyWithWhereWithoutGroupInput | TeamSyncAccountUpdateManyWithWhereWithoutGroupInput[]
     deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput = {
+    create?: XOR<SharedBookPermissionAuditEventCreateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput> | SharedBookPermissionAuditEventCreateWithoutGroupInput[] | SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput | SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput[]
+    upsert?: SharedBookPermissionAuditEventUpsertWithWhereUniqueWithoutGroupInput | SharedBookPermissionAuditEventUpsertWithWhereUniqueWithoutGroupInput[]
+    createMany?: SharedBookPermissionAuditEventCreateManyGroupInputEnvelope
+    set?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    disconnect?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    delete?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    connect?: SharedBookPermissionAuditEventWhereUniqueInput | SharedBookPermissionAuditEventWhereUniqueInput[]
+    update?: SharedBookPermissionAuditEventUpdateWithWhereUniqueWithoutGroupInput | SharedBookPermissionAuditEventUpdateWithWhereUniqueWithoutGroupInput[]
+    updateMany?: SharedBookPermissionAuditEventUpdateManyWithWhereWithoutGroupInput | SharedBookPermissionAuditEventUpdateManyWithWhereWithoutGroupInput[]
+    deleteMany?: SharedBookPermissionAuditEventScalarWhereInput | SharedBookPermissionAuditEventScalarWhereInput[]
+  }
+
+  export type GroupCreateNestedOneWithoutPermissionAuditEventsInput = {
+    create?: XOR<GroupCreateWithoutPermissionAuditEventsInput, GroupUncheckedCreateWithoutPermissionAuditEventsInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutPermissionAuditEventsInput
+    connect?: GroupWhereUniqueInput
+  }
+
+  export type EnumSharedBookPermissionKindFieldUpdateOperationsInput = {
+    set?: $Enums.SharedBookPermissionKind
+  }
+
+  export type GroupUpdateOneRequiredWithoutPermissionAuditEventsNestedInput = {
+    create?: XOR<GroupCreateWithoutPermissionAuditEventsInput, GroupUncheckedCreateWithoutPermissionAuditEventsInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutPermissionAuditEventsInput
+    upsert?: GroupUpsertWithoutPermissionAuditEventsInput
+    connect?: GroupWhereUniqueInput
+    update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutPermissionAuditEventsInput, GroupUpdateWithoutPermissionAuditEventsInput>, GroupUncheckedUpdateWithoutPermissionAuditEventsInput>
   }
 
   export type GroupCreateNestedOneWithoutMembersInput = {
@@ -87337,6 +89078,23 @@ export namespace Prisma {
     _max?: NestedEnumGroupTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumSharedBookPermissionKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.SharedBookPermissionKind | EnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSharedBookPermissionKindFilter<$PrismaModel> | $Enums.SharedBookPermissionKind
+  }
+
+  export type NestedEnumSharedBookPermissionKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SharedBookPermissionKind | EnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    in?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SharedBookPermissionKind[] | ListEnumSharedBookPermissionKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumSharedBookPermissionKindWithAggregatesFilter<$PrismaModel> | $Enums.SharedBookPermissionKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSharedBookPermissionKindFilter<$PrismaModel>
+    _max?: NestedEnumSharedBookPermissionKindFilter<$PrismaModel>
+  }
+
   export type NestedEnumGroupRoleFilter<$PrismaModel = never> = {
     equals?: $Enums.GroupRole | EnumGroupRoleFieldRefInput<$PrismaModel>
     in?: $Enums.GroupRole[] | ListEnumGroupRoleFieldRefInput<$PrismaModel>
@@ -88124,6 +89882,7 @@ export namespace Prisma {
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutOwnerInput = {
@@ -88143,6 +89902,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutOwnerInput = {
@@ -93325,6 +95085,7 @@ export namespace Prisma {
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutBillingCustomerInput = {
@@ -93344,6 +95105,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutBillingCustomerInput = {
@@ -93618,6 +95380,7 @@ export namespace Prisma {
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutBillingCustomerInput = {
@@ -93637,6 +95400,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -93850,6 +95614,7 @@ export namespace Prisma {
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutSubscriptionInput = {
@@ -93869,6 +95634,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutSubscriptionInput = {
@@ -93898,6 +95664,7 @@ export namespace Prisma {
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutSubscriptionsInput = {
@@ -93917,6 +95684,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutSubscriptionsInput = {
@@ -94158,6 +95926,7 @@ export namespace Prisma {
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutSubscriptionsInput = {
@@ -94177,6 +95946,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type UserCreateWithoutImportJobsInput = {
@@ -103802,6 +105572,50 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SharedBookPermissionAuditEventCreateWithoutGroupInput = {
+    id?: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId?: string | null
+    groupAddressBookName?: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId?: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue?: string | null
+    afterValue: string
+    createdAt?: Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput = {
+    id?: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId?: string | null
+    groupAddressBookName?: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId?: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue?: string | null
+    afterValue: string
+    createdAt?: Date | string
+  }
+
+  export type SharedBookPermissionAuditEventCreateOrConnectWithoutGroupInput = {
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+    create: XOR<SharedBookPermissionAuditEventCreateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput>
+  }
+
+  export type SharedBookPermissionAuditEventCreateManyGroupInputEnvelope = {
+    data: SharedBookPermissionAuditEventCreateManyGroupInput | SharedBookPermissionAuditEventCreateManyGroupInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutOwnedGroupsInput = {
     update: XOR<UserUpdateWithoutOwnedGroupsInput, UserUncheckedUpdateWithoutOwnedGroupsInput>
     create: XOR<UserCreateWithoutOwnedGroupsInput, UserUncheckedCreateWithoutOwnedGroupsInput>
@@ -104166,6 +105980,139 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"TeamSyncAccount"> | Date | string
   }
 
+  export type SharedBookPermissionAuditEventUpsertWithWhereUniqueWithoutGroupInput = {
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+    update: XOR<SharedBookPermissionAuditEventUpdateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedUpdateWithoutGroupInput>
+    create: XOR<SharedBookPermissionAuditEventCreateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedCreateWithoutGroupInput>
+  }
+
+  export type SharedBookPermissionAuditEventUpdateWithWhereUniqueWithoutGroupInput = {
+    where: SharedBookPermissionAuditEventWhereUniqueInput
+    data: XOR<SharedBookPermissionAuditEventUpdateWithoutGroupInput, SharedBookPermissionAuditEventUncheckedUpdateWithoutGroupInput>
+  }
+
+  export type SharedBookPermissionAuditEventUpdateManyWithWhereWithoutGroupInput = {
+    where: SharedBookPermissionAuditEventScalarWhereInput
+    data: XOR<SharedBookPermissionAuditEventUpdateManyMutationInput, SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupInput>
+  }
+
+  export type SharedBookPermissionAuditEventScalarWhereInput = {
+    AND?: SharedBookPermissionAuditEventScalarWhereInput | SharedBookPermissionAuditEventScalarWhereInput[]
+    OR?: SharedBookPermissionAuditEventScalarWhereInput[]
+    NOT?: SharedBookPermissionAuditEventScalarWhereInput | SharedBookPermissionAuditEventScalarWhereInput[]
+    id?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupType?: EnumGroupTypeFilter<"SharedBookPermissionAuditEvent"> | $Enums.GroupType
+    groupName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    groupAddressBookId?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    groupAddressBookName?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    actorUserId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    actorName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    targetMemberId?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    targetUserId?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    targetName?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    permissionKind?: EnumSharedBookPermissionKindFilter<"SharedBookPermissionAuditEvent"> | $Enums.SharedBookPermissionKind
+    beforeValue?: StringNullableFilter<"SharedBookPermissionAuditEvent"> | string | null
+    afterValue?: StringFilter<"SharedBookPermissionAuditEvent"> | string
+    createdAt?: DateTimeFilter<"SharedBookPermissionAuditEvent"> | Date | string
+  }
+
+  export type GroupCreateWithoutPermissionAuditEventsInput = {
+    id?: string
+    type: $Enums.GroupType
+    name: string
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedGroupsInput
+    subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
+    members?: GroupMemberCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupUncheckedCreateWithoutPermissionAuditEventsInput = {
+    id?: string
+    ownerId: string
+    type: $Enums.GroupType
+    name: string
+    subscriptionId?: string | null
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
+    members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupCreateOrConnectWithoutPermissionAuditEventsInput = {
+    where: GroupWhereUniqueInput
+    create: XOR<GroupCreateWithoutPermissionAuditEventsInput, GroupUncheckedCreateWithoutPermissionAuditEventsInput>
+  }
+
+  export type GroupUpsertWithoutPermissionAuditEventsInput = {
+    update: XOR<GroupUpdateWithoutPermissionAuditEventsInput, GroupUncheckedUpdateWithoutPermissionAuditEventsInput>
+    create: XOR<GroupCreateWithoutPermissionAuditEventsInput, GroupUncheckedCreateWithoutPermissionAuditEventsInput>
+    where?: GroupWhereInput
+  }
+
+  export type GroupUpdateToOneWithWhereWithoutPermissionAuditEventsInput = {
+    where?: GroupWhereInput
+    data: XOR<GroupUpdateWithoutPermissionAuditEventsInput, GroupUncheckedUpdateWithoutPermissionAuditEventsInput>
+  }
+
+  export type GroupUpdateWithoutPermissionAuditEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
+    subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
+    members?: GroupMemberUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+  }
+
+  export type GroupUncheckedUpdateWithoutPermissionAuditEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
+    members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+  }
+
   export type GroupCreateWithoutMembersInput = {
     id?: string
     type: $Enums.GroupType
@@ -104183,6 +106130,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutMembersInput = {
@@ -104202,6 +106150,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutMembersInput = {
@@ -104388,6 +106337,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutMembersInput = {
@@ -104407,6 +106357,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type UserUpsertWithoutGroupMembershipsInput = {
@@ -104583,6 +106534,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutAddressBooksInput = {
@@ -104602,6 +106554,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutAddressBooksInput = {
@@ -104689,6 +106642,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutAddressBooksInput = {
@@ -104708,6 +106662,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput = {
@@ -105925,6 +107880,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutTeamSyncAccountsInput = {
@@ -105944,6 +107900,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutTeamSyncAccountsInput = {
@@ -106105,6 +108062,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutTeamSyncAccountsInput = {
@@ -106124,6 +108082,7 @@ export namespace Prisma {
     billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type SyncAccountUpsertWithoutTeamLinkInput = {
@@ -113614,6 +115573,7 @@ export namespace Prisma {
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutOwnerInput = {
@@ -113633,6 +115593,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateManyWithoutOwnerInput = {
@@ -115855,6 +117816,7 @@ export namespace Prisma {
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutSubscriptionInput = {
@@ -115874,6 +117836,7 @@ export namespace Prisma {
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+    permissionAuditEvents?: SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateManyWithoutSubscriptionInput = {
@@ -116943,6 +118906,23 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type SharedBookPermissionAuditEventCreateManyGroupInput = {
+    id?: string
+    groupType: $Enums.GroupType
+    groupName: string
+    groupAddressBookId?: string | null
+    groupAddressBookName?: string | null
+    actorUserId: string
+    actorName: string
+    targetMemberId: string
+    targetUserId?: string | null
+    targetName: string
+    permissionKind: $Enums.SharedBookPermissionKind
+    beforeValue?: string | null
+    afterValue: string
+    createdAt?: Date | string
+  }
+
   export type SubscriptionUpdateWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
@@ -117159,6 +119139,57 @@ export namespace Prisma {
     syncAccountId?: StringFieldUpdateOperationsInput | string
     addressBookId?: StringFieldUpdateOperationsInput | string
     addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SharedBookPermissionAuditEventUncheckedUpdateManyWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupType?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    groupName?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupAddressBookName?: NullableStringFieldUpdateOperationsInput | string | null
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    actorName?: StringFieldUpdateOperationsInput | string
+    targetMemberId?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetName?: StringFieldUpdateOperationsInput | string
+    permissionKind?: EnumSharedBookPermissionKindFieldUpdateOperationsInput | $Enums.SharedBookPermissionKind
+    beforeValue?: NullableStringFieldUpdateOperationsInput | string | null
+    afterValue?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

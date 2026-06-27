@@ -13,6 +13,7 @@ import { OnboardingChecklist } from "~/app/_components/onboarding-checklist";
 import { SmartListsBooks, type PersonalBook, type SmartList } from "~/app/_components/smart-lists-books";
 import { SortMenu } from "~/app/_components/sort-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import type { ContactHealthKey } from "~/server/contact-health";
 import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion, RecentMerge } from "~/server/contact-merge";
 import type { OnboardingChecklist as OnboardingChecklistData } from "~/server/onboarding";
@@ -30,6 +31,7 @@ type DashboardContact = {
   company: string | null;
   phoneticCompany: string | null;
   jobTitle: string | null;
+  department?: string | null;
   website: string | null;
   birthday: string | null;
   address: string | null;
@@ -40,6 +42,15 @@ type DashboardContact = {
   archivedAt: Date | null;
   updatedAt: Date;
   labels?: unknown; // P31B-06: JSON string[] from Prisma
+  significantDates?: unknown;
+  syncLinks?: Array<{
+    lastSyncedAt: Date | null;
+    lastErrorCode: string | null;
+    syncAccount: {
+      status: string;
+      lastSucceededAt: Date | null;
+    } | null;
+  }>;
 };
 
 type PlanSummary = {
@@ -62,6 +73,15 @@ type WorkspaceTab = "people" | "archived" | "duplicates" | "activity";
 type WorkspaceFilter = "all" | "recent" | "incomplete" | "favorites" | "emergency";
 type WorkspaceSort = "updated" | "name";
 type WorkspaceView = "compact" | "cozy";
+
+type HealthCard = {
+  key: ContactHealthKey | "duplicate-risk";
+  title: string;
+  description: string;
+  count: number;
+  href: string;
+  active: boolean;
+};
 
 type ContactDashboardProps = {
   activeContacts: DashboardContact[];
@@ -97,6 +117,9 @@ type ContactDashboardProps = {
   recentMerges: RecentMerge[];
   onboarding: OnboardingChecklistData;
   nameDisplayOrder?: "first-last" | "last-first";
+  currentHealth: ContactHealthKey | null;
+  healthCards: HealthCard[];
+  visiblePeopleCount: number;
 };
 
 const getInitials = (value: string) =>
@@ -136,6 +159,9 @@ export function ContactDashboard({
   incomingShares,
   onboarding,
   nameDisplayOrder,
+  currentHealth,
+  healthCards,
+  visiblePeopleCount,
 }: ContactDashboardProps) {
   // P26-04: show the first-run checklist only on the default people list —
   // not inside favorites/emergency views, a shared book, or a search.
@@ -167,11 +193,13 @@ export function ContactDashboard({
       view?: WorkspaceView;
       scope?: "all" | "private" | "shared";
       book?: string | null;
+      health?: ContactHealthKey | null;
     },
   ) => {
     const params = new URLSearchParams();
+    const nextFilter = overrides?.filter ?? currentFilter;
     params.set("tab", tab);
-    params.set("filter", overrides?.filter ?? currentFilter);
+    params.set("filter", nextFilter);
     params.set("sort", overrides?.sort ?? currentSort);
     params.set("view", overrides?.view ?? viewMode);
     // book and scope are mutually exclusive (a specific book overrides scope).
@@ -183,6 +211,15 @@ export function ContactDashboard({
       if (scope !== "all") {
         params.set("scope", scope);
       }
+    }
+    if (tab === "people") {
+      const health =
+        overrides && "health" in overrides
+          ? overrides.health
+          : nextFilter === "all"
+            ? currentHealth
+            : null;
+      if (health) params.set("health", health);
     }
     if (query) {
       params.set("q", query);
@@ -284,10 +321,14 @@ export function ContactDashboard({
 
   const countLabel =
     currentTab === "people"
-      ? `${counts.people} contacts`
+      ? currentHealth
+        ? `${visiblePeopleCount} contacts`
+        : `${counts.people} contacts`
       : currentTab === "archived"
         ? `${counts.archived} archived`
         : `${counts.duplicates} duplicates`;
+
+  const currentHealthTitle = healthCards.find((card) => card.key === currentHealth)?.title ?? null;
 
   return (
     <div className="flex min-h-0 flex-1">
@@ -476,6 +517,54 @@ export function ContactDashboard({
           </>
         ) : null}
 
+        {currentTab === "people" && currentFilter === "all" ? (
+          <div className="border-b border-[#e9ece7] bg-[#fbfcf9] px-4 py-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+                  Contact health
+                </p>
+                <p className="mt-1 text-[14px] text-[#5c655e]">
+                  Turn the biggest contact-quality gaps into worklists you can actually clear.
+                  {currentHealthTitle ? ` Currently viewing: ${currentHealthTitle}.` : ""}
+                </p>
+              </div>
+              {currentHealth ? (
+                <Link
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f6f7f4]"
+                  href={buildHref("people", { health: null })}
+                >
+                  <WorkspaceIcon name="x" size={14} />
+                  Clear queue
+                </Link>
+              ) : null}
+            </div>
+            <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-6">
+              {healthCards.map((card) => (
+                <Link
+                  className={`rounded-2xl border px-4 py-3 transition ${
+                    card.active
+                      ? "border-[#4158f4] bg-[#edf0fe]"
+                      : "border-[#e9ece7] bg-white hover:border-[#d8ddd6] hover:bg-[#f6f7f4]"
+                  }`}
+                  href={card.active ? buildHref("people", { health: null }) : card.href}
+                  key={card.key}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[13.5px] font-semibold text-[#1d2823]">{card.title}</p>
+                      <p className="mt-1 text-[12.5px] leading-5 text-[#5c655e]">{card.description}</p>
+                    </div>
+                    <span className="text-[20px] font-semibold text-[#1d2823]">
+                      {card.count.toLocaleString()}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
           {showOnboarding ? (
             <div className="px-4 pt-3">
@@ -527,6 +616,8 @@ export function ContactDashboard({
                       ? "No favorites yet. Star a contact to pin it here."
                       : isEmergencyView
                         ? "No emergency contacts yet. Mark a contact as emergency to pull it up fast."
+                        : currentHealthTitle
+                          ? `No contacts currently match ${currentHealthTitle.toLowerCase()}.`
                         : currentFilter === "incomplete"
                           ? "No contacts are missing details."
                           : "Your contacts list is empty. Add your first contact or import from Google, Apple, or Outlook."

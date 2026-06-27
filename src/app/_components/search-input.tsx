@@ -11,12 +11,14 @@ export function SearchInput({
   filter,
   sort,
   view,
+  extraParams,
 }: {
   initialQuery: string;
   tab: string;
   filter: string;
   sort: string;
   view: string;
+  extraParams?: Record<string, string | null | undefined>;
 }) {
   const router = useRouter();
   const [value, setValue] = useState(initialQuery);
@@ -33,6 +35,9 @@ export function SearchInput({
     params.set("filter", filter);
     params.set("sort", sort);
     params.set("view", view);
+    for (const [key, value] of Object.entries(extraParams ?? {})) {
+      if (value) params.set(key, value);
+    }
     if (next.trim()) {
       params.set("q", next);
     }

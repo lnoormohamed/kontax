@@ -80,6 +80,11 @@ enum GroupInviteStatus {
     REVOKED
 }
 
+enum SharedBookPermissionKind {
+    FAMILY_CAN_EDIT
+    TEAM_BOOK_ACCESS
+}
+
 enum SubscriptionStatus {
     INCOMPLETE
     TRIALING
@@ -1147,9 +1152,33 @@ model Group {
     members        GroupMember[]
     addressBooks   GroupAddressBook[]
     teamSyncAccounts TeamSyncAccount[]
+    permissionAuditEvents SharedBookPermissionAuditEvent[]
 
     @@index([ownerId])
     @@index([subscriptionId])
+}
+
+model SharedBookPermissionAuditEvent {
+    id                   String                   @id @default(cuid())
+    groupId              String
+    groupType            GroupType
+    groupName            String
+    groupAddressBookId   String?
+    groupAddressBookName String?
+    actorUserId          String
+    actorName            String
+    targetMemberId       String
+    targetUserId         String?
+    targetName           String
+    permissionKind       SharedBookPermissionKind
+    beforeValue          String?
+    afterValue           String
+    createdAt            DateTime                 @default(now())
+    group                Group                    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    @@index([groupId, createdAt(sort: Desc)])
+    @@index([groupType, createdAt(sort: Desc)])
+    @@index([targetMemberId, createdAt(sort: Desc)])
 }
 
 model GroupMember {

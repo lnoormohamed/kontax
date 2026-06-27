@@ -11,6 +11,7 @@ import { getUserBillingContext } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
 import { getStripeClient } from "~/server/stripe";
 import { canEditTeamBook, getTeamGraceState } from "~/server/team-access";
 
@@ -41,6 +42,14 @@ const str = (formData: FormData, key: string) => {
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const getAuditActorName = async (userId: string) => {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { name: true, email: true },
+  });
+  return user?.name?.trim() ?? user?.email ?? "A Kontax user";
+};
 
 // The team the user owns or administers (owner/admin), used for management gates.
 const getManageableTeam = async (userId: string) => {
@@ -247,6 +256,7 @@ const requireManagedMember = async (userId: string, memberId: string) => {
   }
   const member = await db.groupMember.findFirst({
     where: { id: memberId, groupId: manageable.team.id },
+    include: { user: { select: { name: true, email: true } } },
   });
   if (!member) {
     throw new Error("Member not found.");
@@ -513,8 +523,8 @@ export const setMemberBookPermission = async (formData: FormData) => {
   if (!["EDIT", "VIEW", "NONE"].includes(permission)) {
     throw new Error("Unknown permission.");
   }
-  const { member } = await requireManagedMember(userId, memberId);
-  await requireManagedBook(userId, bookId);
+  const { member, team } = await requireManagedMember(userId, memberId);
+  const { book } = await requireManagedBook(userId, bookId);
   if (member.role !== "MEMBER") {
     throw new Error("Owners and admins always have full access.");
   }
@@ -522,12 +532,37 @@ export const setMemberBookPermission = async (formData: FormData) => {
     member.addressBookPermissions && typeof member.addressBookPermissions === "object"
       ? (member.addressBookPermissions as Record<string, string>)
       : {};
+  if ((current[bookId] ?? "EDIT") === permission) {
+    revalidatePath("/settings/teams");
+    revalidatePath("/settings/books");
+    return;
+  }
   const next = { ...current, [bookId]: permission };
-  await db.groupMember.update({
-    where: { id: member.id },
-    data: { addressBookPermissions: next },
+  const actorName = await getAuditActorName(userId);
+  const targetName = member.user?.name?.trim() ?? member.user?.email ?? member.invitedEmail ?? "Member";
+  await db.$transaction(async (tx) => {
+    await tx.groupMember.update({
+      where: { id: member.id },
+      data: { addressBookPermissions: next },
+    });
+    await recordSharedBookPermissionAudit(tx, {
+      groupId: team.id,
+      groupType: "TEAM",
+      groupName: team.name,
+      groupAddressBookId: book.id,
+      groupAddressBookName: book.name,
+      actorUserId: userId,
+      actorName,
+      targetMemberId: member.id,
+      targetUserId: member.userId,
+      targetName,
+      permissionKind: "TEAM_BOOK_ACCESS",
+      beforeValue: current[bookId] ?? "EDIT",
+      afterValue: permission,
+    });
   });
   revalidatePath("/settings/teams");
+  revalidatePath("/settings/books");
 };
 
 // "Add to team book": copy a private contact into a team book (copy, not move).

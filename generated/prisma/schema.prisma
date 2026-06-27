@@ -80,6 +80,11 @@ enum GroupInviteStatus {
   REVOKED
 }
 
+enum SharedBookPermissionKind {
+  FAMILY_CAN_EDIT
+  TEAM_BOOK_ACCESS
+}
+
 enum SubscriptionStatus {
   INCOMPLETE
   TRIALING
@@ -1117,39 +1122,63 @@ model FeatureFlag {
 // Phases 13 (Family) and 14 (Teams) build the behaviour on top of these.
 
 model Group {
-  id                   String                @id @default(cuid())
-  ownerId              String
-  type                 GroupType
-  name                 String
-  subscriptionId       String?
-  memberSlotsLimit     Int?
+  id                    String                           @id @default(cuid())
+  ownerId               String
+  type                  GroupType
+  name                  String
+  subscriptionId        String?
+  memberSlotsLimit      Int?
   // P13-01: operational fields. Family v1 caps at 6 members (owner + 5).
-  maxMembers           Int                   @default(6)
-  defaultAddressBookId String?
+  maxMembers            Int                              @default(6)
+  defaultAddressBookId  String?
   // Set when owner downgrades from TEAMS; grace expires 14 days after billing period end.
   // null = active (or re-upgraded). Non-null + future = grace. Non-null + past = locked.
-  teamsGraceEndsAt     DateTime?
+  teamsGraceEndsAt      DateTime?
   // P34F-01: org-level entitlement. Once Teams billing is org-anchored, the
   // team's "is Teams active" can no longer be read off the owner's personal
   // entitlements — it lives here, maintained by upsertGroupSubscription.
   // Mirrors the existing teamsGraceEndsAt-on-Group pattern. Read by the team
   // active/grace paths (team-access, teams/page, welcome/[plan]) — see P34F §08.
-  teamsEnabled         Boolean               @default(false)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  owner                User                  @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  teamsEnabled          Boolean                          @default(false)
+  createdAt             DateTime                         @default(now())
+  updatedAt             DateTime                         @updatedAt
+  owner                 User                             @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   // The team's *current* subscription pointer (canonical "active sub").
-  subscription         Subscription?         @relation("GroupCurrentSubscription", fields: [subscriptionId], references: [id], onDelete: SetNull)
+  subscription          Subscription?                    @relation("GroupCurrentSubscription", fields: [subscriptionId], references: [id], onDelete: SetNull)
   // P34F-01: subscription rows *owned by* this org (org-anchored Teams billing).
-  subscriptions        Subscription[]        @relation("GroupOrgSubscriptions")
+  subscriptions         Subscription[]                   @relation("GroupOrgSubscriptions")
   // P34F-01: the org's Stripe customer (Teams). Null for non-billing groups.
-  billingCustomer      SubscriptionCustomer?
-  members              GroupMember[]
-  addressBooks         GroupAddressBook[]
-  teamSyncAccounts     TeamSyncAccount[]
+  billingCustomer       SubscriptionCustomer?
+  members               GroupMember[]
+  addressBooks          GroupAddressBook[]
+  teamSyncAccounts      TeamSyncAccount[]
+  permissionAuditEvents SharedBookPermissionAuditEvent[]
 
   @@index([ownerId])
   @@index([subscriptionId])
+}
+
+model SharedBookPermissionAuditEvent {
+  id                   String                   @id @default(cuid())
+  groupId              String
+  groupType            GroupType
+  groupName            String
+  groupAddressBookId   String?
+  groupAddressBookName String?
+  actorUserId          String
+  actorName            String
+  targetMemberId       String
+  targetUserId         String?
+  targetName           String
+  permissionKind       SharedBookPermissionKind
+  beforeValue          String?
+  afterValue           String
+  createdAt            DateTime                 @default(now())
+  group                Group                    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId, createdAt(sort: Desc)])
+  @@index([groupType, createdAt(sort: Desc)])
+  @@index([targetMemberId, createdAt(sort: Desc)])
 }
 
 model GroupMember {

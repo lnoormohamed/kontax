@@ -11,6 +11,7 @@ import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { snapshotFamilyBookForUser } from "~/server/family-snapshot";
+import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000; // 48h signed-token expiry
 
@@ -39,6 +40,14 @@ const str = (formData: FormData, key: string) => {
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const getAuditActorName = async (userId: string) => {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { name: true, email: true },
+  });
+  return user?.name?.trim() ?? user?.email ?? "A Kontax user";
+};
 
 // --- Create -----------------------------------------------------------------
 export const createFamilyGroup = async (formData: FormData) => {
@@ -221,7 +230,10 @@ export const declineFamilyInvite = async (formData: FormData) => {
 const requireOwnedMember = async (ownerId: string, memberId: string) => {
   const member = await db.groupMember.findFirst({
     where: { id: memberId, group: { ownerId, type: "FAMILY" } },
-    include: { group: { select: { ownerId: true } } },
+    include: {
+      group: { select: { ownerId: true, name: true, defaultAddressBookId: true } },
+      user: { select: { name: true, email: true } },
+    },
   });
   if (!member) {
     throw new Error("Member not found.");
@@ -386,8 +398,34 @@ export const setMemberCanEdit = async (formData: FormData) => {
   if (member.role === "OWNER") {
     throw new Error("The owner always has edit access.");
   }
-  await db.groupMember.update({ where: { id: member.id }, data: { canEdit } });
+  if (member.canEdit === canEdit) {
+    revalidatePath("/settings/family");
+    revalidatePath("/settings/books");
+    return;
+  }
+  const actorName = await getAuditActorName(userId);
+  const targetName = member.user?.name?.trim() ?? member.user?.email ?? member.invitedEmail ?? "Member";
+
+  await db.$transaction(async (tx) => {
+    await tx.groupMember.update({ where: { id: member.id }, data: { canEdit } });
+    await recordSharedBookPermissionAudit(tx, {
+      groupId: member.groupId,
+      groupType: "FAMILY",
+      groupName: member.group.name,
+      groupAddressBookId: member.group.defaultAddressBookId,
+      groupAddressBookName: member.group.name,
+      actorUserId: userId,
+      actorName,
+      targetMemberId: member.id,
+      targetUserId: member.userId,
+      targetName,
+      permissionKind: "FAMILY_CAN_EDIT",
+      beforeValue: member.canEdit ? "EDIT" : "VIEW",
+      afterValue: canEdit ? "EDIT" : "VIEW",
+    });
+  });
   revalidatePath("/settings/family");
+  revalidatePath("/settings/books");
 };
 
 export const resendFamilyInvite = async (formData: FormData) => {

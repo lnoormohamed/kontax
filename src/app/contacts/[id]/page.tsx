@@ -305,6 +305,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     },
     select: {
       id: true,
+      bookId: true,
       syncUid: true,
       fullName: true,
       firstName: true,
@@ -488,6 +489,29 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         },
       })
     : Promise.resolve([]));
+  const privateBook = await (detailTab === "sharing" && !familyContext && !teamContext
+    ? db.addressBook.findFirst({
+        where: contact.bookId
+          ? { id: contact.bookId, userId: session.user.id }
+          : { userId: session.user.id, isDefault: true },
+        select: { name: true, isDefault: true },
+      })
+    : Promise.resolve(null));
+  const sharingPlacement = familyContext
+    ? {
+        title: `Shared book: ${familyContext.groupName}`,
+        detail: "This contact lives in your family book, so everyone with access sees the same shared record.",
+      }
+    : teamContext
+      ? {
+          title: `Shared team book: ${teamBookLabel ?? teamContext.bookName}`,
+          detail: "This contact belongs to a team book. Share links come from this shared record, while team permissions still control who can edit it inside Kontax.",
+        }
+      : {
+          title: `Private book: ${privateBook?.name ?? "Default book"}`,
+          detail:
+            "This contact stays in your private library. Remote sync settings and shared-book access are managed separately, so you can organise books without changing how this share works.",
+        };
 
   const syncLinks = await (detailTab === "details"
     ? db.syncContactLink.findMany({
@@ -731,6 +755,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   lastErrorCode: s.lastErrorCode,
                 }))}
                 shareOrigin={shareOrigin}
+                placement={sharingPlacement}
                 staticShareEnabled={staticShareEnabled}
                 staticShares={staticShares.map((s) => ({
                   id: s.id,
@@ -1207,6 +1232,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               lastErrorCode: s.lastErrorCode,
             }))}
             shareOrigin={shareOrigin}
+            placement={sharingPlacement}
             staticShareEnabled={staticShareEnabled}
             staticShares={staticShares.map((s) => ({
               id: s.id,

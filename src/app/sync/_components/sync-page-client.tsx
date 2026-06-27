@@ -274,6 +274,11 @@ const getAccountRailSubtitle = (
   return identityText === healthText ? identityText : `${identityText} · ${healthText}`;
 };
 
+const getBookScopeSummary = (account: SyncAccountData) =>
+  account.bookAllowlist.length === 0
+    ? "All discovered remote address books"
+    : `${account.bookAllowlist.length} selected remote address book${account.bookAllowlist.length === 1 ? "" : "s"}`;
+
 // ── Platform icon (SVG only) ─────────────────────────────────────────────────
 type PlatKind = "icloud" | "nextcloud" | "fastmail" | "generic" | "gcontacts" | "outlook";
 
@@ -1868,6 +1873,31 @@ function AccountHeader({
           <span style={{ color: T.ink, fontWeight: 500 }}>{account.lastSyncedAtRelative}</span>
         </div>
       )}
+      <div
+        style={{
+          marginTop: 16,
+          maxWidth: 560,
+          border: `1px solid ${T.line2}`,
+          borderRadius: 12,
+          background: "#f8faf8",
+          padding: "12px 14px",
+        }}
+      >
+        {account.provider === "CARDDAV" ? (
+          <div style={{ fontSize: 13, lineHeight: 1.55, color: T.ink2 }}>
+            <span style={{ fontWeight: 600, color: T.ink }}>Remote book scope:</span>{" "}
+            {getBookScopeSummary(account)}. Change this from <span style={{ fontWeight: 600, color: T.ink }}>Settings → Address books</span> on this connection.
+          </div>
+        ) : null}
+        <div style={{ fontSize: 13, lineHeight: 1.55, color: T.ink2, marginTop: account.provider === "CARDDAV" ? 6 : 0 }}>
+          <span style={{ fontWeight: 600, color: T.ink }}>Kontax books:</span>{" "}
+          Organise your private and shared books separately in{" "}
+          <Link href="/settings/books" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>
+            Settings → Books
+          </Link>
+          .
+        </div>
+      </div>
 
       {/* P27-07: OAuth metadata */}
       {isOAuth && (
@@ -2305,6 +2335,26 @@ function AddAccountForm({
       <p style={{ margin: "0 0 22px", fontSize: 13.5, color: T.ink2, maxWidth: 480 }}>
         Connect a Google or Microsoft account in one tap, or link any CardDAV service manually.
       </p>
+      <div
+        style={{
+          maxWidth: 520,
+          marginBottom: 18,
+          border: `1px solid ${T.line2}`,
+          borderRadius: 12,
+          background: "#f8faf8",
+          padding: "12px 14px",
+          fontSize: 13,
+          lineHeight: 1.55,
+          color: T.ink2,
+        }}
+      >
+        After a CardDAV connection is saved, you can choose which remote address books it pulls from.
+        Your Kontax-side private and shared books stay managed separately in{" "}
+        <Link href="/settings/books" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>
+          Settings → Books
+        </Link>
+        .
+      </div>
 
       {/* P27-07 / P35: OAuth quick-connect — "Connect another…" when ≥1 of same provider */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>

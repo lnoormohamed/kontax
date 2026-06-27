@@ -58,6 +58,10 @@ type Props = {
   staticShares: ShareItem[];
   liveShares: ShareItem[];
   books: SharedBook[];
+  placement?: {
+    title: string;
+    detail: string;
+  } | null;
   mobile?: boolean;
 };
 
@@ -533,6 +537,7 @@ export function ContactSharing({
   staticShares,
   liveShares,
   books,
+  placement,
   mobile = false,
 }: Props) {
   const hasStatic = staticShares.some((s) => s.status === "ACTIVE");
@@ -550,6 +555,13 @@ export function ContactSharing({
         Share this contact
       </h3>
       <div className="mt-3 h-px bg-[#e9ece7]" />
+
+      {placement ? (
+        <div className="mx-3 mt-3 rounded-[12px] border border-[#e9ece7] bg-[#f8faf8] px-4 py-3">
+          <p className="text-[13.5px] font-semibold text-[#1d2823]">{placement.title}</p>
+          <p className="mt-1 text-[12.5px] leading-[1.5] text-[#5c655e]">{placement.detail}</p>
+        </div>
+      ) : null}
 
       {isCompletelyUnshared ? (
         <EmptySharingState contactId={contactId} hasBooks={books.length > 0} />

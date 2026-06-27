@@ -632,6 +632,24 @@ exports.Prisma.GroupScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SharedBookPermissionAuditEventScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  groupType: 'groupType',
+  groupName: 'groupName',
+  groupAddressBookId: 'groupAddressBookId',
+  groupAddressBookName: 'groupAddressBookName',
+  actorUserId: 'actorUserId',
+  actorName: 'actorName',
+  targetMemberId: 'targetMemberId',
+  targetUserId: 'targetUserId',
+  targetName: 'targetName',
+  permissionKind: 'permissionKind',
+  beforeValue: 'beforeValue',
+  afterValue: 'afterValue',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.GroupMemberScalarFieldEnum = {
   id: 'id',
   groupId: 'groupId',
@@ -1144,6 +1162,11 @@ exports.GroupType = exports.$Enums.GroupType = {
   TEAM: 'TEAM'
 };
 
+exports.SharedBookPermissionKind = exports.$Enums.SharedBookPermissionKind = {
+  FAMILY_CAN_EDIT: 'FAMILY_CAN_EDIT',
+  TEAM_BOOK_ACCESS: 'TEAM_BOOK_ACCESS'
+};
+
 exports.GroupRole = exports.$Enums.GroupRole = {
   OWNER: 'OWNER',
   ADMIN: 'ADMIN',
@@ -1234,6 +1257,7 @@ exports.Prisma.ModelName = {
   AdminSupportCase: 'AdminSupportCase',
   FeatureFlag: 'FeatureFlag',
   Group: 'Group',
+  SharedBookPermissionAuditEvent: 'SharedBookPermissionAuditEvent',
   GroupMember: 'GroupMember',
   GroupAddressBook: 'GroupAddressBook',
   AddressBook: 'AddressBook',

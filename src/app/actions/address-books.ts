@@ -26,6 +26,11 @@ const cleanName = (name: string) => {
   return trimmed.slice(0, 80);
 };
 
+const readString = (formData: FormData, key: string) => {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+};
+
 const slugify = (name: string) =>
   name
     .toLowerCase()
@@ -52,9 +57,11 @@ const uniqueSlug = async (userId: string, base: string) => {
   return `${base}-${Date.now()}`;
 };
 
-export async function createAddressBook(input: { name: string }): Promise<{ id: string }> {
+export async function createAddressBook(
+  input: { name: string } | FormData,
+): Promise<{ id: string }> {
   const userId = await requireUserId();
-  const name = cleanName(input.name);
+  const name = cleanName(input instanceof FormData ? readString(input, "name") : input.name);
   const slug = await uniqueSlug(userId, slugify(name));
 
   const created = await db.addressBook.create({
@@ -62,21 +69,33 @@ export async function createAddressBook(input: { name: string }): Promise<{ id: 
     select: { id: true },
   });
   revalidatePath("/contacts");
+  revalidatePath("/contacts/new");
+  revalidatePath("/settings/books");
   return created;
 }
 
-export async function renameAddressBook(input: { id: string; name: string }): Promise<void> {
+export async function createAddressBookFromForm(formData: FormData): Promise<void> {
+  await createAddressBook(formData);
+}
+
+export async function renameAddressBook(
+  input: { id: string; name: string } | FormData,
+): Promise<void> {
   const userId = await requireUserId();
-  const book = await db.addressBook.findFirst({ where: { id: input.id, userId } });
+  const id = input instanceof FormData ? readString(input, "id") : input.id;
+  const name = input instanceof FormData ? readString(input, "name") : input.name;
+  const book = await db.addressBook.findFirst({ where: { id, userId } });
   if (!book) throw new Error("That book no longer exists.");
   if (book.isDefault) throw new Error("The default book can't be renamed.");
 
   // Name only — slug is intentionally preserved (CardDAV stability).
   await db.addressBook.update({
     where: { id: book.id },
-    data: { name: cleanName(input.name) },
+    data: { name: cleanName(name) },
   });
   revalidatePath("/contacts");
+  revalidatePath("/contacts/new");
+  revalidatePath("/settings/books");
 }
 
 export async function archiveAddressBook(id: string): Promise<void> {
@@ -85,16 +104,66 @@ export async function archiveAddressBook(id: string): Promise<void> {
   if (!book) throw new Error("That book no longer exists.");
   if (book.isDefault) throw new Error("The default book can't be archived.");
 
-  const now = new Date();
-  await db.$transaction([
-    db.addressBook.update({ where: { id: book.id }, data: { archivedAt: now } }),
-    // Archive the book's contacts alongside it (only those not already archived).
-    db.contact.updateMany({
-      where: { userId, bookId: book.id, archivedAt: null },
-      data: { archivedAt: now },
-    }),
-  ]);
+  if (book.archivedAt) {
+    await db.$transaction([
+      db.addressBook.update({ where: { id: book.id }, data: { archivedAt: null } }),
+      db.contact.updateMany({
+        where: { userId, bookId: book.id },
+        data: { archivedAt: null },
+      }),
+    ]);
+  } else {
+    const now = new Date();
+    await db.$transaction([
+      db.addressBook.update({ where: { id: book.id }, data: { archivedAt: now } }),
+      // Archive the book's contacts alongside it (only those not already archived).
+      db.contact.updateMany({
+        where: { userId, bookId: book.id, archivedAt: null },
+        data: { archivedAt: now },
+      }),
+    ]);
+  }
   revalidatePath("/contacts");
+  revalidatePath("/contacts/new");
+  revalidatePath("/settings/books");
+}
+
+export async function setDefaultAddressBook(targetBookId: string): Promise<void> {
+  const userId = await requireUserId();
+  const target = await db.addressBook.findFirst({
+    where: { id: targetBookId, userId, archivedAt: null },
+    select: { id: true, isDefault: true },
+  });
+  if (!target) throw new Error("That book is unavailable.");
+  if (target.isDefault) return;
+
+  const currentDefault = await db.addressBook.findFirst({
+    where: { userId, isDefault: true },
+    select: { id: true },
+  });
+  if (!currentDefault) throw new Error("Default book not found.");
+
+  await db.$transaction(async (tx) => {
+    // Null bookId rows historically belonged to the current default book. Pin
+    // them there before switching so changing the default does not silently move
+    // legacy contacts to the new book.
+    await tx.contact.updateMany({
+      where: { userId, bookId: null, groupContacts: { none: {} } },
+      data: { bookId: currentDefault.id },
+    });
+    await tx.addressBook.updateMany({
+      where: { userId, isDefault: true },
+      data: { isDefault: false },
+    });
+    await tx.addressBook.update({
+      where: { id: target.id },
+      data: { isDefault: true },
+    });
+  });
+
+  revalidatePath("/contacts");
+  revalidatePath("/contacts/new");
+  revalidatePath("/settings/books");
 }
 
 export async function moveContactsToBook(input: {
@@ -120,4 +189,5 @@ export async function moveContactsToBook(input: {
     },
   });
   revalidatePath("/contacts");
+  revalidatePath("/settings/books");
 }

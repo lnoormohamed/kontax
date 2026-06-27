@@ -16,6 +16,11 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary, isActivityLogEnabled } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
+import {
+  countContactsByHealth,
+  matchesContactHealth,
+  type ContactHealthKey,
+} from "~/server/contact-health";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
@@ -94,6 +99,22 @@ const getSelectedView = async (
   if (view === "cozy") return "cozy";
   if (view === "compact") return "compact";
   return prefDefault;
+};
+
+const getSelectedHealth = async (
+  searchParams?: ContactsPageProps["searchParams"],
+): Promise<ContactHealthKey | null> => {
+  const health = await getSingleParam(searchParams, "health");
+  if (
+    health === "missing-methods" ||
+    health === "missing-context" ||
+    health === "unlabeled" ||
+    health === "missing-dates" ||
+    health === "sync-attention"
+  ) {
+    return health;
+  }
+  return null;
 };
 
 const getSearchConditions = (query: string) =>
@@ -215,12 +236,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   const prefs = session.user.preferences ?? DEFAULT_PREFERENCES;
 
-  const [query, selectedTab, selectedFilter, selectedSort, selectedView] = await Promise.all([
+  const [query, selectedTab, selectedFilter, selectedSort, selectedView, selectedHealth] = await Promise.all([
     getQueryValue(searchParams),
     getSelectedTab(searchParams),
     getSelectedFilter(searchParams),
     getSelectedSort(searchParams, prefs.defaultSort),
     getSelectedView(searchParams, prefs.defaultViewMode),
+    getSelectedHealth(searchParams),
   ]);
 
   const params = searchParams ? await searchParams : undefined;
@@ -276,6 +298,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     company: true,
     phoneticCompany: true,
     jobTitle: true,
+    department: true,
     website: true,
     birthday: true,
     address: true,
@@ -284,6 +307,19 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     notes: true,
     archivedAt: true,
     updatedAt: true,
+    significantDates: true,
+    syncLinks: {
+      select: {
+        lastSyncedAt: true,
+        lastErrorCode: true,
+        syncAccount: {
+          select: {
+            status: true,
+            lastSucceededAt: true,
+          },
+        },
+      },
+    },
     // P31B-06: labels for chip rendering on rows
     labels: true,
   } as const;
@@ -538,6 +574,70 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     selectedSort === "name"
       ? [...archivedWithFlag].sort(compareWorkspaceContacts)
       : archivedWithFlag;
+  const filteredActiveContacts = selectedHealth
+    ? sortedActiveContacts.filter((contact) => matchesContactHealth(contact, selectedHealth))
+    : sortedActiveContacts;
+  const healthCounts = countContactsByHealth(sortedActiveContacts);
+  const healthHrefBase = new URLSearchParams();
+  healthHrefBase.set("tab", "people");
+  healthHrefBase.set("filter", "all");
+  healthHrefBase.set("sort", selectedSort);
+  healthHrefBase.set("view", selectedView);
+  const healthCards = [
+    {
+      key: "duplicate-risk" as const,
+      title: "Duplicate risk",
+      description: "Suggested pairs ready for merge review.",
+      count: duplicatesCount,
+      href: `/contacts?${new URLSearchParams([
+        ["tab", "duplicates"],
+        ["filter", "all"],
+        ["sort", selectedSort],
+        ["view", selectedView],
+      ]).toString()}`,
+      active: false,
+    },
+    {
+      key: "missing-methods" as const,
+      title: "Missing methods",
+      description: "No phone number or email on file.",
+      count: healthCounts["missing-methods"],
+      href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "missing-methods"]]).toString()}`,
+      active: selectedHealth === "missing-methods",
+    },
+    {
+      key: "missing-context" as const,
+      title: "Weak metadata",
+      description: "Missing company, role, and department context.",
+      count: healthCounts["missing-context"],
+      href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "missing-context"]]).toString()}`,
+      active: selectedHealth === "missing-context",
+    },
+    {
+      key: "unlabeled" as const,
+      title: "Missing labels",
+      description: "Still needs categories or tags for quick grouping.",
+      count: healthCounts.unlabeled,
+      href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "unlabeled"]]).toString()}`,
+      active: selectedHealth === "unlabeled",
+    },
+    {
+      key: "missing-dates" as const,
+      title: "Incomplete dates",
+      description: "No birthday or other saved date entries.",
+      count: healthCounts["missing-dates"],
+      href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "missing-dates"]]).toString()}`,
+      active: selectedHealth === "missing-dates",
+    },
+    {
+      key: "sync-attention" as const,
+      title: "Sync attention",
+      description: "Linked records with stale or failed sync state.",
+      count: healthCounts["sync-attention"],
+      href: `/contacts?${new URLSearchParams([...healthHrefBase.entries(), ["health", "sync-attention"]]).toString()}`,
+      active: selectedHealth === "sync-attention",
+    },
+  ];
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
   const userInitials = getInitials(userLabel);
@@ -572,6 +672,12 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           </Link>
 
           <SearchInput
+            extraParams={{
+              book: activeBook ?? activePersonalBookId,
+              health: selectedHealth,
+              label: labelParam || null,
+              scope: !activeBook && !activePersonalBookId && scope !== "all" ? scope : null,
+            }}
             filter={selectedFilter}
             initialQuery={query}
             sort={selectedSort}
@@ -608,7 +714,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       <SecurityAlertBannerSlot userId={session.user.id} />
 
       <ContactDashboard
-        activeContacts={sortedActiveContacts}
+        activeContacts={filteredActiveContacts}
         archivedContacts={sortedArchivedContacts}
         currentFilter={selectedFilter}
         currentSort={selectedSort}
@@ -655,6 +761,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         recentMerges={recentMerges}
         incomingShares={incomingSharesCount || undefined}
         onboarding={onboarding}
+        currentHealth={selectedHealth}
+        healthCards={healthCards}
+        visiblePeopleCount={filteredActiveContacts.length}
       />
 
       <MobileCreateFab
