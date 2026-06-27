@@ -12,11 +12,13 @@ export function AdminHeader({
   title,
   crumbs,
   adminName,
+  adminRoleLabel = "Platform admin",
   showSearch = true,
 }: {
   title: string;
   crumbs?: AdminCrumb[];
   adminName: string;
+  adminRoleLabel?: string;
   showSearch?: boolean;
 }) {
   return (
@@ -53,7 +55,7 @@ export function AdminHeader({
             />
           </form>
         ) : null}
-        <span className="ad-header-role">Platform admin</span>
+        <span className="ad-header-role">{adminRoleLabel}</span>
         <span className="ad-header-name">{adminName}</span>
         <Avatar name={adminName} size={32} />
       </div>

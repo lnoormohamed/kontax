@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { AdminAccessPanel } from "../../_components/admin-access-panel";
 import { AdminHeader } from "../../_components/admin-header";
 import { AD } from "../../_components/admin-icons";
 import { InvestigationTimeline } from "../../_components/investigation-timeline";
@@ -36,6 +37,30 @@ export default async function AdminSyncConnectionDetailPage({
     redirect("/contacts");
   }
 
+  if (!admin.capabilities["sync.view"]) {
+    return (
+      <>
+        <AdminHeader
+          title="Sync connection"
+          adminName={admin.name}
+          adminRoleLabel={admin.tierLabel}
+          crumbs={[{ label: "Operations" }, { label: "Sync ops", href: "/admin/sync" }]}
+        />
+        <div className="adm-content">
+          <div className="ad-page">
+            <AdminAccessPanel
+              title="Sync connection detail is unavailable"
+              body="Sync diagnostics and connection operations are limited to sync ops and governance admins."
+              requiredTierLabel="Sync ops or governance"
+              currentTierLabel={admin.tierLabel}
+              policySource={admin.policySource}
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
   const { id } = await params;
   const d = await loadAdminSyncConnectionDetail(id);
   if (!d) notFound();
@@ -49,6 +74,7 @@ export default async function AdminSyncConnectionDetailPage({
       <AdminHeader
         title={d.label}
         adminName={admin.name}
+        adminRoleLabel={admin.tierLabel}
         crumbs={[{ label: "Operations" }, { label: "Sync ops", href: "/admin/sync" }]}
       />
       <div className="adm-content">
@@ -313,6 +339,7 @@ export default async function AdminSyncConnectionDetailPage({
               providerLabel={d.providerLabel}
               currentOverride={d.capabilityProfileOverride}
               canOverride={d.provider === "CARDDAV"}
+              canManageOverride={admin.capabilities["sync.override"]}
             />
           </div>
         </div>

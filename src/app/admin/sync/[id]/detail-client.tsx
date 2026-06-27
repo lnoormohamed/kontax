@@ -27,6 +27,7 @@ export function SyncConnectionActions({
   providerLabel,
   currentOverride,
   canOverride,
+  canManageOverride,
 }: {
   syncAccountId: string;
   userId: string;
@@ -35,6 +36,7 @@ export function SyncConnectionActions({
   providerLabel: string;
   currentOverride: string | null;
   canOverride: boolean;
+  canManageOverride: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -56,13 +58,15 @@ export function SyncConnectionActions({
           <button
             className="ad-btn ad-btn--secondary ad-btn--full"
             onClick={() => setOpen(true)}
-            disabled={!canOverride}
+            disabled={!canOverride || !canManageOverride}
           >
             <AdIcon name="flag" size={15} c="currentColor" />
             Override capability profile
           </button>
           <div className="ad-action-note">
-            {canOverride
+            {!canManageOverride
+              ? "Capability-profile overrides are limited to sync ops and governance admins."
+              : canOverride
               ? `Current override: ${currentOverride ?? "Auto-detect"}`
               : `${providerLabel} connections use their built-in profile and can’t be overridden here.`}
           </div>

@@ -18,10 +18,17 @@ export default async function AdminOverviewPage() {
   }
 
   const overview = await loadAdminOverview();
+  const quickActions = overview.quickActions.filter((action) => {
+    if (action.id === "metrics") return admin.capabilities["sync.view"];
+    if (action.id === "audit") return admin.capabilities["audit.view"];
+    if (action.id === "broadcast") return admin.capabilities["broadcast.manage"];
+    if (action.id === "flags") return admin.capabilities["flags.manage"];
+    return true;
+  });
 
   return (
     <>
-      <AdminHeader title="Overview" adminName={admin.name} />
+      <AdminHeader title="Overview" adminName={admin.name} adminRoleLabel={admin.tierLabel} />
       <div className="adm-content">
         <div className="ad-page">
           <section className="ad-home-hero">
@@ -33,6 +40,10 @@ export default async function AdminOverviewPage() {
                 most recent privileged changes without hopping between pages.
               </p>
               <div className="ad-home-hero__chips">
+                <span className="ad-home-chip" data-tone="healthy">
+                  <span className="ad-home-chip__dot" />
+                  {admin.tierLabel}
+                </span>
                 <span
                   className="ad-home-chip"
                   data-tone={overview.summary.actionRequiredCount > 0 ? "critical" : "healthy"}
@@ -206,7 +217,7 @@ export default async function AdminOverviewPage() {
 
           <div className="ad-section-label">Quick actions</div>
           <section className="ad-home-action-grid">
-            {overview.quickActions.map((action) => (
+            {quickActions.map((action) => (
               <Link
                 key={action.id}
                 href={action.href}

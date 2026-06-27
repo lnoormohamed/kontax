@@ -120,6 +120,7 @@ export function UserActions({
   overriddenLabel,
   suspended,
   deletionScheduled,
+  permissions,
 }: {
   userId: string;
   user: { name: string; email: string; plan: string };
@@ -128,6 +129,14 @@ export function UserActions({
   overriddenLabel: string | null;
   suspended: boolean;
   deletionScheduled: boolean;
+  permissions: {
+    canPlanOverride: boolean;
+    canLifecycle: boolean;
+    canImpersonate: boolean;
+    planOverrideReason: string;
+    lifecycleReason: string;
+    impersonationReason: string;
+  };
 }) {
   const [dialog, setDialog] = useState<DialogKind | null>(null);
   const router = useRouter();
@@ -153,17 +162,23 @@ export function UserActions({
           <button
             className="ad-btn ad-btn--secondary ad-btn--full"
             onClick={() => setDialog("override")}
-            disabled={suspended}
+            disabled={suspended || !permissions.canPlanOverride}
           >
             <AdIcon name="card" size={15} c="currentColor" />
             Override plan
           </button>
           <div className="ad-action-note">
-            Current: <strong>{planLabel}</strong>
+            {!permissions.canPlanOverride ? (
+              permissions.planOverrideReason
+            ) : (
+              <>
+                Current: <strong>{planLabel}</strong>
             {overridden && overriddenLabel && (
               <span className="ad-action-flag">
                 <AdIcon name="flag" size={11} c={AD.blue} /> {overriddenLabel}
               </span>
+            )}
+              </>
             )}
           </div>
         </div>
@@ -172,19 +187,22 @@ export function UserActions({
           <button
             className="ad-btn ad-btn--danger-outline ad-btn--full"
             onClick={() => setDialog(suspended ? "unsuspend" : "suspend")}
+            disabled={!permissions.canLifecycle}
           >
             {suspended ? "Unlock account" : "Suspend account"}
           </button>
+          {!permissions.canLifecycle ? <div className="ad-action-note">{permissions.lifecycleReason}</div> : null}
         </div>
 
         <div className="ad-action-block">
           <button
             className="ad-btn ad-btn--danger-outline ad-btn--full"
             onClick={() => setDialog("delete")}
-            disabled={deletionScheduled}
+            disabled={deletionScheduled || !permissions.canLifecycle}
           >
             {deletionScheduled ? "Deletion scheduled" : "Schedule deletion"}
           </button>
+          {!permissions.canLifecycle ? <div className="ad-action-note">{permissions.lifecycleReason}</div> : null}
         </div>
 
         <div className="ad-actions-rule" />
@@ -193,13 +211,15 @@ export function UserActions({
           <button
             className="ad-btn ad-btn--secondary ad-btn--full"
             onClick={() => setDialog("impersonate")}
-            disabled={suspended}
+            disabled={suspended || !permissions.canImpersonate}
           >
             <AdIcon name="eye" size={15} c="currentColor" />
             View as user
           </button>
           <div className="ad-action-note">
-            Starts a read-only impersonation session. A banner pins above the user’s app while active.
+            {permissions.canImpersonate
+              ? "Starts a read-only impersonation session. A banner pins above the user’s app while active."
+              : permissions.impersonationReason}
           </div>
         </div>
       </div>

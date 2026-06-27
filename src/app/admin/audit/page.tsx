@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AdminAccessPanel } from "../_components/admin-access-panel";
 import { assertAdmin } from "~/server/admin/guard";
 import { buildAdminAuditHref, loadAdminAudit } from "~/server/admin/audit";
 import {
@@ -53,7 +54,9 @@ export default async function AdminAuditPage({
   const range = typeof sp.range === "string" ? sp.range : defaults.range;
   const page = typeof sp.page === "string" ? Math.max(0, parseInt(sp.page, 10) || 0) : 0;
 
-  const data = await loadAdminAudit({ action, actor, target, entity, severity: severity as "all" | "high" | "standard", q, range, page });
+  const data = admin.capabilities["audit.view"]
+    ? await loadAdminAudit({ action, actor, target, entity, severity: severity as "all" | "high" | "standard", q, range, page })
+    : null;
 
   const buildHref = (p: number) => {
     const href = buildAdminAuditHref({ action, actor, target, entity, severity, q, range });
@@ -61,17 +64,28 @@ export default async function AdminAuditPage({
     return `${href}${href.includes("?") ? "&" : "?"}page=${p}`;
   };
 
-  const start = data.page * data.pageSize;
+  const start = data ? data.page * data.pageSize : 0;
 
   return (
     <>
       <AdminHeader
         title="Audit log"
         adminName={admin.name}
+        adminRoleLabel={admin.tierLabel}
         crumbs={[{ label: "Governance" }]}
       />
       <div className="adm-content">
         <div className="ad-page">
+          {!admin.capabilities["audit.view"] || !data ? (
+            <AdminAccessPanel
+              title="Audit log access is unavailable"
+              body="The audit log is limited to governance admins because it exposes privileged history across support, billing, sync, and platform controls."
+              requiredTierLabel="Governance"
+              currentTierLabel={admin.tierLabel}
+              policySource={admin.policySource}
+            />
+          ) : (
+            <>
           <div className="ad-section-label">Saved views</div>
           <div className="ad-support-tabs">
             {ADMIN_AUDIT_VIEWS.map((item) => (
@@ -175,6 +189,8 @@ export default async function AdminAuditPage({
                 )}
               </div>
             </div>
+          )}
+            </>
           )}
         </div>
       </div>

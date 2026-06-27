@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AD, AdIcon } from "./admin-icons";
-import { activeAdminNavId, ADMIN_NAV_GROUPS } from "./admin-nav";
+import { activeAdminNavId, type AdminNavGroup } from "./admin-nav";
 
-export function AdminSidebar() {
+export function AdminSidebar({ groups }: { groups: AdminNavGroup[] }) {
   const pathname = usePathname() ?? "/admin";
   const active = activeAdminNavId(pathname);
 
@@ -18,7 +18,7 @@ export function AdminSidebar() {
         <span className="ad-admin-badge">Admin</span>
       </div>
       <nav className="ad-side-nav">
-        {ADMIN_NAV_GROUPS.map((group) => (
+        {groups.map((group) => (
           <div key={group.id} className="ad-side-section">
             <div className="ad-side-section__label">{group.label}</div>
             <div className="ad-side-section__items">

@@ -77,6 +77,7 @@ export default async function AdminUserDetailPage({
     targetUserId: d.id,
     targetEmail: d.email,
     details: {},
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   const overriddenLabel = d.overriddenAt
@@ -92,6 +93,7 @@ export default async function AdminUserDetailPage({
           { label: "Users", href: "/admin/users" },
         ]}
         adminName={admin.name}
+        adminRoleLabel={admin.tierLabel}
       />
       <div className="adm-content">
         <div className="ad-page">
@@ -369,6 +371,14 @@ export default async function AdminUserDetailPage({
               overriddenLabel={overriddenLabel}
               suspended={d.suspended}
               deletionScheduled={d.deletionScheduled}
+              permissions={{
+                canPlanOverride: admin.capabilities["plan.override"],
+                canLifecycle: admin.capabilities["account.lifecycle"],
+                canImpersonate: admin.capabilities.impersonation,
+                planOverrideReason: "Plan overrides are limited to billing ops and governance admins.",
+                lifecycleReason: "Suspensions and deletion schedules are limited to billing ops and governance admins.",
+                impersonationReason: "Impersonation is limited to governance admins.",
+              }}
             />
           </div>
         </div>

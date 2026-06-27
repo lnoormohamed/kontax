@@ -27,6 +27,7 @@ export async function toggleFeatureFlag(input: { key: string; enable: boolean; r
 
   const flag = await db.featureFlag.findUnique({ where: { key: input.key } });
   if (!flag) return { error: "FLAG_NOT_FOUND" };
+  if (!admin.capabilities["flags.manage"]) return { error: "FORBIDDEN" };
 
   const restore = (input.restoreMode?.toUpperCase() as FeatureFlagMode) ?? "ALL";
   const nextMode: FeatureFlagMode = input.enable
@@ -44,6 +45,7 @@ export async function toggleFeatureFlag(input: { key: string; enable: boolean; r
     adminId: admin.adminId,
     action: ADMIN_ACTIONS.FEATURE_FLAG_CHANGED,
     details: { flag: input.key, from: flag.mode, to: nextMode },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin/feature-flags");
@@ -76,6 +78,7 @@ export async function saveFeatureFlag(input: {
   if (!MODES.includes(mode)) return { error: "INVALID_MODE" };
   const changeSummary = input.changeSummary.trim();
   if (!changeSummary) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["flags.manage"]) return { error: "FORBIDDEN" };
 
   const flag = await db.featureFlag.findUnique({ where: { key: input.key } });
   if (!flag) return { error: "FLAG_NOT_FOUND" };
@@ -117,6 +120,7 @@ export async function saveFeatureFlag(input: {
       allowedUserCount: allowedUserIds.length,
       changeSummary,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin/feature-flags");

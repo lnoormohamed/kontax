@@ -1,4 +1,10 @@
-export const ADMIN_NAV_GROUPS = [
+export type AdminNavGroup = {
+  id: string;
+  label: string;
+  items: Array<{ id: string; label: string; icon: string; href: string }>;
+};
+
+export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     id: "overview",
     label: "Overview",
@@ -28,7 +34,7 @@ export const ADMIN_NAV_GROUPS = [
       { id: "broadcast", label: "Broadcast", icon: "share", href: "/admin/broadcast" },
     ],
   },
-] as const;
+];
 
 export function activeAdminNavId(pathname: string): string {
   if (pathname === "/admin") return "overview";

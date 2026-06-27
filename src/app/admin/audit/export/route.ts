@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { assertAdmin } from "~/server/admin/guard";
+import { assertAdmin, requireAdminCapability } from "~/server/admin/guard";
 import { exportAdminAudit } from "~/server/admin/audit";
 
 function csvEscape(value: string) {
@@ -11,8 +11,10 @@ function csvEscape(value: string) {
 }
 
 export async function GET(request: Request) {
+  let admin;
   try {
-    await assertAdmin();
+    admin = await assertAdmin();
+    requireAdminCapability(admin, "audit.view");
   } catch {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }

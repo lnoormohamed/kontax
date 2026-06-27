@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { activeAdminNavId, ADMIN_NAV_GROUPS } from "./admin-nav";
+import { activeAdminNavId, type AdminNavGroup } from "./admin-nav";
 
-export function AdminMobileNav() {
+export function AdminMobileNav({ groups }: { groups: AdminNavGroup[] }) {
   const pathname = usePathname() ?? "/admin";
   const active = activeAdminNavId(pathname);
 
   return (
     <nav className="ad-mob-nav" aria-label="Admin navigation">
-      {ADMIN_NAV_GROUPS.map((group) => (
+      {groups.map((group) => (
         <div key={group.id} className="ad-mob-nav__group">
           <div className="ad-mob-nav__label">{group.label}</div>
           <div className="ad-mob-nav__items">

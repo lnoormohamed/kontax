@@ -56,6 +56,7 @@ export async function overridePlan(input: {
 
   const reason = input.reason.trim();
   if (!reason) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["plan.override"]) return { error: "FORBIDDEN" };
   const plan = input.plan.toUpperCase() as SubscriptionPlan;
   if (!PLANS.includes(plan)) return { error: "INVALID_PLAN" };
 
@@ -99,6 +100,7 @@ export async function overridePlan(input: {
     targetUserId: target.id,
     targetEmail: target.email,
     details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() || null },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
@@ -118,6 +120,7 @@ export async function suspendAccount(input: { userId: string; reason: string; re
 
   const reason = input.reason.trim();
   if (!reason) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["account.lifecycle"]) return { error: "FORBIDDEN" };
 
   const target = await loadTarget(input.userId);
   if (!target) return { error: "USER_NOT_FOUND" };
@@ -137,6 +140,7 @@ export async function suspendAccount(input: { userId: string; reason: string; re
     targetUserId: target.id,
     targetEmail: target.email,
     details: { reason, reasonCategory: input.reasonCategory?.trim() || null },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
@@ -154,6 +158,7 @@ export async function unsuspendAccount(input: { userId: string; reason?: string;
 
   const target = await loadTarget(input.userId);
   if (!target) return { error: "USER_NOT_FOUND" };
+  if (!admin.capabilities["account.lifecycle"]) return { error: "FORBIDDEN" };
 
   await db.user.update({
     where: { id: target.id },
@@ -169,6 +174,7 @@ export async function unsuspendAccount(input: { userId: string; reason?: string;
       reason: input.reason?.trim() ? input.reason.trim() : null,
       reasonCategory: input.reasonCategory?.trim() || null,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
@@ -186,6 +192,7 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
 
   const reason = input.reason.trim();
   if (!reason) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["account.lifecycle"]) return { error: "FORBIDDEN" };
 
   const target = await loadTarget(input.userId);
   if (!target) return { error: "USER_NOT_FOUND" };
@@ -208,6 +215,7 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
       purgeAt: scheduledDeleteAt.toISOString(),
       reasonCategory: input.reasonCategory?.trim() || null,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath(`/admin/users/${target.id}`);
@@ -230,6 +238,7 @@ export async function addAdminSupportNote(input: {
 
   const body = input.body.trim();
   if (!body) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["support.manage"]) return { error: "FORBIDDEN" };
 
   await db.adminSupportNote.create({
     data: {
@@ -271,6 +280,7 @@ export async function createAdminSupportCase(input: {
 
   const title = input.title.trim();
   if (!title) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["support.manage"]) return { error: "FORBIDDEN" };
 
   const severity = ((input.severity?.trim().toUpperCase() as AdminSupportCaseSeverity | undefined) ?? "NORMAL");
   const status = ((input.status?.trim().toUpperCase() as AdminSupportCaseStatus | undefined) ?? "OPEN");
@@ -306,6 +316,7 @@ export async function createAdminSupportCase(input: {
       severity,
       status,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin");
@@ -347,6 +358,7 @@ export async function updateAdminSupportCase(input: {
     },
   });
   if (!existing) return { error: "USER_NOT_FOUND" };
+  if (!admin.capabilities["support.manage"]) return { error: "FORBIDDEN" };
 
   const severity = input.severity
     ? (input.severity.trim().toUpperCase() as AdminSupportCaseSeverity)
@@ -396,6 +408,7 @@ export async function updateAdminSupportCase(input: {
       assignedToSelf: !!input.assignToSelf,
       clearedAssignment: !!input.clearAssignment,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin");
@@ -421,6 +434,7 @@ export async function updateSyncCapabilityOverride(input: {
 
   const reason = input.reason.trim();
   if (!reason) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities["sync.override"]) return { error: "FORBIDDEN" };
 
   const normalizedOverride = coerceCardDavCapabilityProfileOverrideId(input.capabilityProfileOverride);
   if (input.capabilityProfileOverride && !normalizedOverride) {
@@ -465,6 +479,7 @@ export async function updateSyncCapabilityOverride(input: {
       nextOverride: normalizedOverride,
       reason,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin");
@@ -487,6 +502,7 @@ export async function startImpersonation(input: { userId: string; reason: string
 
   const reason = input.reason.trim();
   if (!reason) return { error: "REASON_REQUIRED" };
+  if (!admin.capabilities.impersonation) return { error: "FORBIDDEN" };
 
   const target = await loadTarget(input.userId);
   if (!target) return { error: "USER_NOT_FOUND" };
@@ -505,6 +521,7 @@ export async function startImpersonation(input: { userId: string; reason: string
       reasonCategory: input.reasonCategory?.trim() || null,
       expiresInMinutes: 30,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   return { success: true };
@@ -554,12 +571,14 @@ export async function previewProductBroadcastAudience(input: {
   providers?: string[];
   featureFlagKeys?: string[];
 }): Promise<Result & { recipients?: number; sample?: string[] }> {
+  let admin;
   try {
-    await assertAdmin();
+    admin = await assertAdmin();
   } catch (e) {
     if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
     throw e;
   }
+  if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
 
   const audience = await resolveBroadcastAudience(normalizeAudienceFilters(input));
   return { success: true, recipients: audience.count, sample: audience.sample };
@@ -589,6 +608,7 @@ export async function saveProductBroadcast(input: {
   const body = input.body.trim();
   const trimmedUrl = input.actionUrl?.trim();
   const actionUrl = trimmedUrl && trimmedUrl.length > 0 ? trimmedUrl : undefined;
+  if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
   if (!title) return { error: "TITLE_REQUIRED" };
   if (!body) return { error: "BODY_REQUIRED" };
 
@@ -633,6 +653,7 @@ export async function saveProductBroadcast(input: {
       recipients,
       scheduledFor: scheduledFor?.toISOString() ?? null,
     },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin");
@@ -650,6 +671,7 @@ export async function retractProductBroadcast(input: {
     if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
     throw e;
   }
+  if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
 
   const retracted = await retractAdminBroadcast({
     adminId: admin.adminId,
@@ -661,6 +683,7 @@ export async function retractProductBroadcast(input: {
     adminId: admin.adminId,
     action: ADMIN_ACTIONS.PRODUCT_BROADCAST_RETRACTED,
     details: { broadcastId: input.broadcastId, title: retracted.title },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin");
@@ -678,6 +701,7 @@ export async function sendSavedProductBroadcast(input: {
     if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
     throw e;
   }
+  if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
 
   const sent = await sendAdminBroadcast({ adminId: admin.adminId, broadcastId: input.broadcastId });
   if (!sent) return { error: "USER_NOT_FOUND" };
@@ -686,6 +710,7 @@ export async function sendSavedProductBroadcast(input: {
     adminId: admin.adminId,
     action: ADMIN_ACTIONS.PRODUCT_BROADCAST,
     details: { broadcastId: sent.id, title: sent.title, status: "SEND_NOW", recipients: sent.deliveredRecipientCount },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
   revalidatePath("/admin");
@@ -710,12 +735,14 @@ export async function broadcastProductUpdate(input: {
 }
 
 export async function loadAdminBroadcastPanel(query = "") {
+  let admin;
   try {
-    await assertAdmin();
+    admin = await assertAdmin();
   } catch (e) {
     if (e instanceof AdminForbiddenError) return null;
     throw e;
   }
+  if (!admin.capabilities["broadcast.manage"]) return null;
 
   await processScheduledAdminBroadcasts();
 

@@ -60,15 +60,28 @@ export async function emitAdminEvent(args: {
   targetUserId?: string | null;
   targetEmail?: string | null;
   details?: Record<string, unknown>;
+  actorContext?: {
+    tier: string;
+    policySource: string;
+  };
 }): Promise<void> {
   try {
+    const details = {
+      ...(args.details ?? {}),
+      ...(args.actorContext
+        ? {
+            actorTier: args.actorContext.tier,
+            actorPolicySource: args.actorContext.policySource,
+          }
+        : {}),
+    };
     await db.adminAuditEvent.create({
       data: {
         adminUserId: args.adminId,
         action: args.action,
         targetUserId: args.targetUserId ?? null,
         targetEmail: args.targetEmail ?? null,
-        details: (args.details ?? {}) as Prisma.InputJsonValue,
+        details: details as Prisma.InputJsonValue,
         ipAddress: await clientIp(),
       },
     });
