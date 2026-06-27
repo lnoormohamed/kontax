@@ -1,7 +1,11 @@
 import { type MetadataRoute } from "next";
+import { unstable_noStore as noStore } from "next/cache";
 
 import { db } from "~/server/db";
 import { SITE_URL } from "~/lib/site-url";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // P34C-21 — sitemap listing all public, indexable routes.
 // Authenticated app surfaces (/contacts, /settings, /admin, /api, …) are
@@ -54,6 +58,7 @@ async function getPublicCardUrls(): Promise<MetadataRoute.Sitemap> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  noStore();
   const lastModified = new Date();
 
   const staticUrls: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
