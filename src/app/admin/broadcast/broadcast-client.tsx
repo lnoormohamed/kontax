@@ -622,7 +622,7 @@ export function BroadcastForm({
 
         <div style={{ display: "grid", gap: 10 }}>
           <div className="ad-kv-k">Templates</div>
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
             {TEMPLATES.map((template) => (
               <button
                 key={template.id}
@@ -637,11 +637,14 @@ export function BroadcastForm({
                   borderColor: templateId === template.id ? "#4158f4" : "#e1e6df",
                   background: templateId === template.id ? "#eef1fe" : "#fff",
                   textAlign: "left",
+                  whiteSpace: "normal",
                 }}
               >
-                <div style={{ display: "grid", gap: 4 }}>
+                <div style={{ display: "grid", gap: 4, minWidth: 0, width: "100%" }}>
                   <strong style={{ color: "#1d2823" }}>{template.label}</strong>
-                  <span style={{ fontSize: 13, color: "#5c655e", lineHeight: 1.45 }}>{template.summary}</span>
+                  <span style={{ fontSize: 13, color: "#5c655e", lineHeight: 1.45, whiteSpace: "normal" }}>
+                    {template.summary}
+                  </span>
                 </div>
               </button>
             ))}
