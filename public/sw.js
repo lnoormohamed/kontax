@@ -1,7 +1,7 @@
 // @ts-nocheck
-// Bump ALL three version strings together on every deploy that changes chunk hashes.
-// Mismatched versions across shell/page/asset caches can cause "module factory not
-// available" errors if an old HTML shell references new chunk names (or vice-versa).
+// This worker keeps offline support intentionally small. Next.js build assets are
+// already content-hashed and handled well by the browser HTTP cache; caching them
+// again here makes deploy-time chunk mismatches much more likely.
 const SHELL_CACHE = "kontax-shell-v7";
 const PAGE_CACHE = "kontax-pages-v7";
 const ASSET_CACHE = "kontax-assets-v7";
@@ -36,8 +36,14 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Static assets — cache first, then network.
-  if (/\.(?:js|css|png|jpg|jpeg|svg|ico|woff2?)(\?|$)/.test(url.pathname)) {
+  // Let the browser handle hashed Next.js build assets directly. Service-worker
+  // cache-first logic here can pin an old runtime or route chunk across deploys.
+  if (url.pathname.startsWith("/_next/static/")) {
+    return;
+  }
+
+  // Public assets — cache first, then network.
+  if (/\.(?:png|jpg|jpeg|svg|ico|woff2?)(\?|$)/.test(url.pathname)) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached;
