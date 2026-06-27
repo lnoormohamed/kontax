@@ -206,12 +206,31 @@ const RowBadges = memo(function RowBadges({ contact, mode }: { contact: Workspac
 });
 
 function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+  const [, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [optimisticFavorite, setOptimisticFavorite] = useState(contact.isFavorite);
+
+  useEffect(() => {
+    setOptimisticFavorite(contact.isFavorite);
+  }, [contact.isFavorite]);
+
+  const handleFavoriteToggle = () => {
+    setOptimisticFavorite((current) => !current);
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("contactId", contact.id);
+      await toggleFavoriteContact(fd);
+    });
+    setMenuOpen(false);
+  };
+
+  const triggerClassName = "h-[30px] w-[30px] place-items-center rounded-md text-lg leading-none text-slate-500 transition hover:bg-[rgba(0,0,0,0.06)] hover:text-slate-700";
+
   return (
     <div className="relative flex items-center justify-end gap-0.5">
       <Link
         aria-label="Edit contact"
-        className="hidden h-[30px] w-[30px] place-items-center rounded-md text-slate-500 transition hover:bg-[rgba(0,0,0,0.06)] hover:text-slate-700 group-hover:grid"
+        className={`hidden ${triggerClassName} group-hover:grid`}
         href={`/contacts/${contact.id}`}
         prefetch={false}
         onClick={(event) => event.stopPropagation()}
@@ -220,7 +239,7 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
       </Link>
       <button
         aria-label="More actions"
-        className="hidden h-[30px] w-[30px] place-items-center rounded-md text-lg leading-none text-slate-500 transition hover:bg-[rgba(0,0,0,0.06)] hover:text-slate-700 group-hover:grid"
+        className={`grid ${triggerClassName} lg:hidden lg:group-hover:grid`}
         onClick={(event) => {
           event.stopPropagation();
           setMenuOpen((open) => !open);
@@ -242,6 +261,18 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
             <Link className="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50" href={`/contacts/${contact.id}`} prefetch={false}>
               Open
             </Link>
+            {mode === "active" ? (
+              <button
+                className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleFavoriteToggle();
+                }}
+                type="button"
+              >
+                {optimisticFavorite ? "Unfavorite" : "Favorite"}
+              </button>
+            ) : null}
             {mode === "active" ? (
               <form action={archiveContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
@@ -490,6 +521,66 @@ const ContactRow = memo(function ContactRow({
   const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
   const contactLabels = parseLabels(contact.labels);
   const matchSnippet = inferMatchSnippet(contact, query);
+  const mobileContext = [
+    contact.isEmergency ? "Emergency" : null,
+    contact.sharedKind === "family" ? "Family" : null,
+    contact.sharedKind === "team" ? "Team" : null,
+    contactLabels.length > 0 ? `${contactLabels.length} label${contactLabels.length === 1 ? "" : "s"}` : null,
+  ].filter((value): value is string => Boolean(value));
+
+  const mobileStacked = (
+    <div className="flex min-w-0 flex-1 items-center gap-3">
+      {avatarSlot}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start gap-2">
+          <Link
+            className="min-w-0 flex-1 truncate"
+            href={`/contacts/${contact.id}`}
+            onClick={() => onOpenContact(contact.id)}
+            onPointerDown={() => onOpenContact(contact.id)}
+            prefetch={false}
+          >
+            <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
+              <Highlight query={query} text={displayName} />
+            </span>
+          </Link>
+          <RowActions contact={contact} mode={mode} />
+        </div>
+        <p className="truncate text-[12.5px] text-[#8b938c]">
+          {meta.length > 0
+            ? meta.map((value, index) => (
+                <span key={index}>
+                  {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
+                  <Highlight query={query} text={value!} />
+                </span>
+              ))
+            : "No details yet"}
+        </p>
+        {mobileContext.length > 0 ? (
+          <p className="mt-0.5 truncate text-[11.5px] text-[#8b938c]">
+            {mobileContext.join(" · ")}
+          </p>
+        ) : null}
+        {matchSnippet && (
+          <p className="mt-0.5 truncate text-[11.5px] text-[#8b938c]" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {matchSnippet.field === "label" ? (
+              <>
+                <LabelDot col={labelColors[matchSnippet.snippet] ?? "#aeb4ac"} />
+                <span style={{ color: "#5c655e", fontWeight: 500 }}>{matchSnippet.snippet}</span>
+              </>
+            ) : (
+              <>
+                <span style={{ color: "#aeb4ac" }}>Note:</span>
+                <span className="truncate">
+                  <Highlight query={query} text={matchSnippet.snippet} />
+                </span>
+              </>
+            )}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 
   const stacked = (
     <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -606,7 +697,7 @@ const ContactRow = memo(function ContactRow({
           onToggleFavourite={handleSwipeFavourite}
         >
           <div className={`flex min-h-[60px] items-center px-3 ${selected ? "bg-[#edf0fe]" : "bg-white"}`}>
-            {stacked}
+            {mobileStacked}
           </div>
         </SwipeableRow>
       </div>
