@@ -31,19 +31,26 @@ const STATIC_ROUTES: {
 ];
 
 async function getPublicCardUrls(): Promise<MetadataRoute.Sitemap> {
-  const users = await db.user.findMany({
-    where: { username: { not: null } },
-    select: { username: true, updatedAt: true },
-  });
+  try {
+    const users = await db.user.findMany({
+      where: { username: { not: null } },
+      select: { username: true, updatedAt: true },
+    });
 
-  return users
-    .filter((u): u is typeof u & { username: string } => u.username !== null)
-    .map((u) => ({
-      url: `${SITE_URL}/u/${u.username}`,
-      lastModified: u.updatedAt,
-      priority: 0.6 as const,
-      changeFrequency: "weekly" as const,
-    }));
+    return users
+      .filter((u): u is typeof u & { username: string } => u.username !== null)
+      .map((u) => ({
+        url: `${SITE_URL}/u/${u.username}`,
+        lastModified: u.updatedAt,
+        priority: 0.6 as const,
+        changeFrequency: "weekly" as const,
+      }));
+  } catch (error) {
+    // Keep sitemap generation resilient during builds and transient database
+    // outages; the static public routes remain safe to publish on their own.
+    console.warn("[sitemap] Skipping public card URLs because the database is unavailable.", error);
+    return [];
+  }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
