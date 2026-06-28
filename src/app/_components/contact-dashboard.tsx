@@ -392,13 +392,49 @@ export function ContactDashboard({
         : `${counts.duplicates} duplicates`;
 
   const currentHealthTitle = healthCards.find((card) => card.key === currentHealth)?.title ?? null;
+  const useCondensedTabletOverviewRail = currentTab === "overview";
+  const sidebarSummaryItem = (
+    href: string,
+    icon: string,
+    label: string,
+    detail: string,
+    count?: string,
+  ) => (
+    <Link
+      className="flex items-start gap-2.5 rounded-xl border border-[#e5e9e3] bg-[#f8faf7] px-3 py-2.5 transition hover:border-[#d8ddd6] hover:bg-white"
+      href={href}
+      key={label}
+    >
+      <span className="mt-0.5 rounded-lg bg-white p-1 text-[#5c655e] shadow-[0_1px_2px_rgba(20,30,25,0.06)]">
+        <WorkspaceIcon name={icon} size={15} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center justify-between gap-2 text-[12.5px] font-semibold text-[#1d2823]">
+          <span>{label}</span>
+          {count ? <span className="text-[11px] font-medium text-[#8b938c]">{count}</span> : null}
+        </span>
+        <span className="mt-0.5 block text-[11.5px] leading-5 text-[#6f786f]">{detail}</span>
+      </span>
+    </Link>
+  );
+  const condensedSharedCount = sharedBooks.length;
+  const condensedSharedDetail =
+    condensedSharedCount === 0
+      ? "No family or team books connected yet."
+      : `${condensedSharedCount} shared space${condensedSharedCount === 1 ? "" : "s"} ready when you need them.`;
 
   return (
     <div className="flex min-h-0 flex-1">
       {/* sidebar */}
-      <aside className="hidden w-[248px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-3.5 md:flex">
+      <aside
+        className={`hidden shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-3.5 md:flex ${
+          useCondensedTabletOverviewRail ? "w-[248px] md:w-[216px] lg:w-[248px]" : "w-[248px]"
+        }`}
+      >
         <Link
-          className="mb-2 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] p-2.5 transition hover:bg-[#f2f4f0]"
+          className={`mb-2 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] transition hover:bg-[#f2f4f0] ${
+            useCondensedTabletOverviewRail ? "p-2 md:gap-2 md:p-2 lg:gap-3 lg:p-2.5" : "p-2.5"
+          }`}
           href="/settings"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#17352e] text-xs font-semibold text-[#dff0e7]">
@@ -406,7 +442,9 @@ export function ContactDashboard({
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[13px] font-semibold text-[#1d2823]">{account.name}</span>
-            <span className="block truncate text-[11px] text-[#8b938c]">{account.email}</span>
+            <span className={`truncate text-[11px] text-[#8b938c] ${useCondensedTabletOverviewRail ? "hidden lg:block" : "block"}`}>
+              {account.email}
+            </span>
           </span>
           <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#17352e]">
             {planSummary.planLabel}
@@ -436,50 +474,147 @@ export function ContactDashboard({
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
         {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
 
-        {/* P28-01/03: smart lists ("My Lists") + personal address books ("Books") */}
-        <SmartListsBooks lists={savedFilters} books={personalBooks} />
-
-        {/* Shared books (P15-04 family + P14-07 teams) — membership views live
-            here, not mixed into the personal Favorites/Emergency filters */}
-        {hasShared ? (
-          <div className="mt-3">
-            <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
-              Shared
+        {useCondensedTabletOverviewRail ? (
+          <>
+            <div className="mt-3 grid gap-2 lg:hidden">
+              {sidebarSummaryItem(
+                buildHref("people", { filter: "all", health: null }),
+                "layoutList",
+                "My Lists",
+                savedFilters.length === 0
+                  ? "No saved shortcuts yet."
+                  : "Saved filters stay one tap away.",
+                savedFilters.length === 0 ? undefined : `${savedFilters.length} saved`,
+              )}
+              {sidebarSummaryItem(
+                buildHref("people", { filter: "all", book: null }),
+                "book",
+                "Books",
+                `${personalBooks.length === 1 ? "Your main address book is ready." : "Your address books are ready."}`,
+                `${personalBooks.length} total`,
+              )}
+              {sidebarSummaryItem(
+                buildHref("people", { filter: "all", health: null }),
+                hasShared ? "users" : "download",
+                "Shared",
+                condensedSharedDetail,
+                condensedSharedCount > 0 ? `${condensedSharedCount} linked` : undefined,
+              )}
+              {sidebarSummaryItem(
+                buildHref("people", { filter: "all", health: null }),
+                "tag",
+                "Labels",
+                sidebarLabels.length === 0
+                  ? "Create labels from any contact."
+                  : "Review the full label list inside People.",
+                sidebarLabels.length === 0 ? undefined : `${sidebarLabels.length} active`,
+              )}
             </div>
-            {(["family", "team"] as const).map((kind) => {
-              const group = sharedBooks.filter((b) => b.kind === kind);
-              if (group.length === 0) return null;
-              return (
-                <div key={kind}>
-                  <div className="flex items-center gap-2 px-2.5 pb-0.5 pt-1.5 text-[11.5px] font-semibold text-[#5c655e]">
-                    <WorkspaceIcon name={kind === "team" ? "team" : "users"} size={13} />
-                    <span>{kind === "team" ? "Teams" : "Family"}</span>
+
+            <div className="mt-auto border-t border-[#e9ece7] pt-2 lg:hidden">
+              <div className="px-2.5 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+                Quick links
+              </div>
+              {sideLink("/import-export", "upload", "Import")}
+              {sideLink("/import-export", "download", "Export")}
+              {sideLink("/sync", "sync", "Sync", true)}
+            </div>
+
+            <div className="hidden lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+              {/* P28-01/03: smart lists ("My Lists") + personal address books ("Books") */}
+              <SmartListsBooks lists={savedFilters} books={personalBooks} />
+
+              {/* Shared books (P15-04 family + P14-07 teams) — membership views live
+                  here, not mixed into the personal Favorites/Emergency filters */}
+              {hasShared ? (
+                <div className="mt-3">
+                  <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+                    Shared
                   </div>
-                  <div className="pl-2">
-                    {group.map((b) =>
-                      navItem(
-                        currentTab === "people" && currentBook === b.id,
-                        buildHref("people", { filter: "all", book: b.id }),
-                        b.kind === "team" ? "team" : "users",
-                        b.name,
-                        null,
-                      ),
-                    )}
-                  </div>
+                  {(["family", "team"] as const).map((kind) => {
+                    const group = sharedBooks.filter((b) => b.kind === kind);
+                    if (group.length === 0) return null;
+                    return (
+                      <div key={kind}>
+                        <div className="flex items-center gap-2 px-2.5 pb-0.5 pt-1.5 text-[11.5px] font-semibold text-[#5c655e]">
+                          <WorkspaceIcon name={kind === "team" ? "team" : "users"} size={13} />
+                          <span>{kind === "team" ? "Teams" : "Family"}</span>
+                        </div>
+                        <div className="pl-2">
+                          {group.map((b) =>
+                            navItem(
+                              false,
+                              buildHref("people", { filter: "all", book: b.id }),
+                              b.kind === "team" ? "team" : "users",
+                              b.name,
+                              null,
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        ) : null}
+              ) : null}
 
-        {/* P31B-04: real Labels sidebar section */}
-        <LabelsSidebar labels={sidebarLabels} activeLabel={currentLabel} />
+              {/* P31B-04: real Labels sidebar section */}
+              <LabelsSidebar labels={sidebarLabels} activeLabel={currentLabel} />
 
-        <div className="mt-auto border-t border-[#e9ece7] pt-2">
-          {sideLink("/import-export", "upload", "Import")}
-          {sideLink("/import-export", "download", "Export")}
-          {sideLink("/sync", "sync", "Sync", true)}
-        </div>
+              <div className="mt-auto border-t border-[#e9ece7] pt-2">
+                {sideLink("/import-export", "upload", "Import")}
+                {sideLink("/import-export", "download", "Export")}
+                {sideLink("/sync", "sync", "Sync", true)}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* P28-01/03: smart lists ("My Lists") + personal address books ("Books") */}
+            <SmartListsBooks lists={savedFilters} books={personalBooks} />
+
+            {/* Shared books (P15-04 family + P14-07 teams) — membership views live
+                here, not mixed into the personal Favorites/Emergency filters */}
+            {hasShared ? (
+              <div className="mt-3">
+                <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+                  Shared
+                </div>
+                {(["family", "team"] as const).map((kind) => {
+                  const group = sharedBooks.filter((b) => b.kind === kind);
+                  if (group.length === 0) return null;
+                  return (
+                    <div key={kind}>
+                      <div className="flex items-center gap-2 px-2.5 pb-0.5 pt-1.5 text-[11.5px] font-semibold text-[#5c655e]">
+                        <WorkspaceIcon name={kind === "team" ? "team" : "users"} size={13} />
+                        <span>{kind === "team" ? "Teams" : "Family"}</span>
+                      </div>
+                      <div className="pl-2">
+                        {group.map((b) =>
+                          navItem(
+                            currentTab === "people" && currentBook === b.id,
+                            buildHref("people", { filter: "all", book: b.id }),
+                            b.kind === "team" ? "team" : "users",
+                            b.name,
+                            null,
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {/* P31B-04: real Labels sidebar section */}
+            <LabelsSidebar labels={sidebarLabels} activeLabel={currentLabel} />
+
+            <div className="mt-auto border-t border-[#e9ece7] pt-2">
+              {sideLink("/import-export", "upload", "Import")}
+              {sideLink("/import-export", "download", "Export")}
+              {sideLink("/sync", "sync", "Sync", true)}
+            </div>
+          </>
+        )}
       </aside>
 
       {/* list area */}
