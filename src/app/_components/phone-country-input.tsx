@@ -62,6 +62,7 @@ export function PhoneCountryInput({
   const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
   const [mounted, setMounted] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const lastEmittedValueRef = useRef<string | null>(null);
@@ -147,6 +148,7 @@ export function PhoneCountryInput({
             />
             <div
               className="max-h-72 overflow-y-auto rounded-[14px] border border-[#d8ddd6] bg-white p-1.5 shadow-[0_16px_36px_rgba(20,30,25,0.16)]"
+              ref={menuRef}
               style={menuStyle}
             >
               {COUNTRY_OPTIONS.map((rule) => (
@@ -155,6 +157,9 @@ export function PhoneCountryInput({
                     rule.iso2 === iso2 ? "bg-[#eef3ff]" : "hover:bg-[#f6f7f4]"
                   }`}
                   key={rule.iso2}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                  }}
                   onClick={(event) => {
                     event.stopPropagation();
                     selectCountry(rule.iso2);
@@ -178,7 +183,9 @@ export function PhoneCountryInput({
         className={wrapperClassName ?? "flex min-w-0 flex-1 items-center"}
         onBlur={(event) => {
           const nextTarget = event.relatedTarget as Node | null;
-          if (!nextTarget || !rootRef.current?.contains(nextTarget)) {
+          const focusStayedInsideField = nextTarget && rootRef.current?.contains(nextTarget);
+          const focusMovedIntoMenu = nextTarget && menuRef.current?.contains(nextTarget);
+          if (!focusStayedInsideField && !focusMovedIntoMenu) {
             emit(draftValue, true);
             setOpen(false);
           }

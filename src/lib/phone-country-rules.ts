@@ -1764,6 +1764,10 @@ export const findPhoneCountryRuleByCallingCode = (digits: string) => {
   return fallback;
 };
 
+export const findPhoneCountryRuleByExactCallingCode = (digits: string) => {
+  return PHONE_COUNTRY_RULE_LIST.find((rule) => rule.callingCode === digits) ?? null;
+};
+
 export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
   let bestMatch:
     | { rule: PhoneCountryRule; nationalDigits: string; score: number }

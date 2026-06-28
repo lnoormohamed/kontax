@@ -1,4 +1,5 @@
 import {
+  findPhoneCountryRuleByExactCallingCode,
   findPhoneCountryRuleByCallingCode,
   getPhoneCountryRule,
 } from "./phone-country-rules";
@@ -24,7 +25,8 @@ export const parsePhoneCountryInputValue = (
   if (raw.startsWith("+")) {
     const match = /^\+(\d{1,4})/.exec(raw);
     const rule = match?.[1]
-      ? findPhoneCountryRuleByCallingCode(match[1])?.rule ?? null
+      ? findPhoneCountryRuleByCallingCode(match[1])?.rule ??
+        findPhoneCountryRuleByExactCallingCode(match[1])
       : null;
     return {
       iso2: iso2 ?? rule?.iso2 ?? null,
