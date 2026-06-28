@@ -61,6 +61,15 @@ Relevant implementation anchors:
 - The error was seen while verifying authenticated app routes, not just one
   isolated surface.
 
+### Resolution
+
+- The notification bell was using `Date.now()` during render to group feed rows
+  and format relative timestamps.
+- That made the initial client render drift from the server-rendered HTML,
+  which is consistent with a hydration mismatch.
+- The fix shipped in `81357b1` seeds the bell's initial time reference from the
+  server slot and reuses that value during hydration.
+
 ### Notes from verification
 
 - The localhost environment also emitted separate auth/database errors during
@@ -112,6 +121,16 @@ Start with the most likely classes of causes:
   - mobile `390x844`
   - desktop `1440x900`
 - Record the exact route and console state after each pass.
+
+## Verification
+
+- Verified on the deployed app on 2026-06-28 after `81357b1`.
+- Checked while signed in at both `390x844` and `1440x900`:
+  - `/contacts/new`
+  - `/merge/manual`
+  - `/import-export?tab=export`
+- Result: no console warnings, no console errors, and no React `#418`
+  hydration error on any of the tested routes.
 
 ## Documentation
 

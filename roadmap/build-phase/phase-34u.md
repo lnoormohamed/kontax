@@ -5,7 +5,7 @@
 > form clarity, and manual-merge discovery.
 
 ## Phase status
-In progress
+Complete
 
 ## Portfolio priority
 5 of 5 (`34Q-34U`)
@@ -37,6 +37,14 @@ audit before the second audit pass continues deeper into remaining surfaces.
    interaction redesign
 5. P34U-05 — production console/runtime cleanup because the UX fixes are now
    verified and the next risk is hidden client instability on deployed routes
+
+## Completion summary
+
+- `P34U-01` verified
+- `P34U-02` verified
+- `P34U-03` verified
+- `P34U-04` verified
+- `P34U-05` verified
 
 ## Why this phase sits here
 
