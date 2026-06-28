@@ -77,10 +77,17 @@ function LoadingRows() {
  * Replaces the legacy pending-shares bell (Resolution 1). SECURITY rows open the
  * anomaly drawer; rows with an actionUrl navigate.
  */
-export function NotificationBell({ initialItems }: { initialItems: FeedItem[] }) {
+export function NotificationBell({
+  initialItems,
+  renderedAt,
+}: {
+  initialItems: FeedItem[];
+  renderedAt: number;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(initialItems);
+  const [referenceNow, setReferenceNow] = useState(renderedAt);
   const [alert, setAlert] = useState<SecurityAlertView | null>(null);
   const [loadingSecurityId, setLoadingSecurityId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -88,6 +95,7 @@ export function NotificationBell({ initialItems }: { initialItems: FeedItem[] })
 
   // Re-seed from server props after router.refresh().
   useEffect(() => setItems(initialItems), [initialItems]);
+  useEffect(() => setReferenceNow(renderedAt), [renderedAt]);
 
   useEffect(() => {
     if (!open) return;
@@ -117,12 +125,12 @@ export function NotificationBell({ initialItems }: { initialItems: FeedItem[] })
   const unread = items.filter((n) => !n.read).length;
   const display = unread > 9 ? "9+" : String(unread);
   const grouped = useMemo(() => {
-    const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    const dayAgo = referenceNow - 24 * 60 * 60 * 1000;
     return {
       fresh: items.filter((n) => !n.read || new Date(n.createdAt).getTime() >= dayAgo),
       earlier: items.filter((n) => n.read && new Date(n.createdAt).getTime() < dayAgo),
     };
-  }, [items]);
+  }, [items, referenceNow]);
   const showLoading = isPending || Boolean(loadingSecurityId);
 
   const openRow = async (n: FeedItem) => {
@@ -183,7 +191,7 @@ export function NotificationBell({ initialItems }: { initialItems: FeedItem[] })
             {n.body}
           </div>
           <div className="mt-1 hidden items-center gap-1.5 text-[11.5px] font-medium text-[#8b938c] max-md:flex">
-            <span suppressHydrationWarning>{relativeTime(n.createdAt)}</span>
+            <span suppressHydrationWarning>{relativeTime(n.createdAt, referenceNow)}</span>
             {n.category === "SECURITY" ? (
               <>
                 <span aria-hidden>·</span>
@@ -199,7 +207,7 @@ export function NotificationBell({ initialItems }: { initialItems: FeedItem[] })
         </div>
         <div className="flex flex-none flex-col items-end gap-1.5 max-md:hidden">
           <span className="text-[11px] text-[#8b938c] tabular-nums" suppressHydrationWarning>
-            {relativeTime(n.createdAt)}
+            {relativeTime(n.createdAt, referenceNow)}
           </span>
           <button
             aria-label="Dismiss"

@@ -8,6 +8,7 @@ import { getNotificationFeed } from "~/server/notifications";
  */
 export async function NotificationBellSlot({ userId }: { userId: string }) {
   const feed = await getNotificationFeed(userId);
+  const renderedAt = Date.now();
   const items = feed.map((n) => ({
     id: n.id,
     category: n.category,
@@ -18,5 +19,5 @@ export async function NotificationBellSlot({ userId }: { userId: string }) {
     securityAlertId: n.securityAlertId,
     createdAt: n.createdAt.toISOString(),
   }));
-  return <NotificationBell initialItems={items} />;
+  return <NotificationBell initialItems={items} renderedAt={renderedAt} />;
 }
