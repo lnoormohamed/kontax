@@ -57,9 +57,9 @@
 | UX-002 | Fixed | Medium | App navigation | `/contacts?tab=overview` | Tablet | Tablet left rail is too dense and competes with overview content | [P34U-01](../build-phase/p34u-01-tablet-overview-nav-density.md) | Codex |  | Shipped to `staging` in `9613403`; tablet re-test and after screenshot still pending |
 | UX-003 | Verified | Medium | Contacts list | `/contacts?tab=people&filter=all&sort=name&view=compact` | Mobile | Contact rows expose too many always-visible actions | [P34U-02](../build-phase/p34u-02-mobile-people-row-action-hierarchy.md) | Codex | Codex | Fixed with decluttered compact rows, overflow fallback, and before/after screenshots |
 | UX-004 | Fixed | Medium | Create contact | `/contacts/new` | Mobile | Phone control is icon-only and underlabelled | [P34U-03](../build-phase/p34u-03-phone-country-selector-clarity.md) | Codex |  | Shipped to `staging` in `7df2027` with interaction follow-up in `91b673d`; responsive re-test still pending |
-| UX-005 | Logged | Medium | Auth | `/forgot-password` | Mobile, Desktop | Forgot-password breaks the login/register visual system | Pending |  |  | Layout and CTA styling diverge from main auth surfaces |
+| UX-005 | Verified | Medium | Auth | `/forgot-password` | Mobile, Desktop | Forgot-password breaks the login/register visual system | Pending | Codex | Codex | Verified on deployed production HTML on 2026-06-28 after `5cd5c6b`; signed-in visits now redirect to `/contacts` as expected |
 | UX-006 | Verified | Medium | Sync | `/sync?account=cmq446geh0001j5uhqoo4ps11` | Mobile | Sync history is too repetitive and hard to scan on small screens | Pending | Codex | Codex | Verified on production at `390x844` on 2026-06-28 after `0ad964e`; mobile history now renders as compact cards |
-| UX-007 | Logged | Low | Auth | `/forgot-password` | Mobile, Desktop | Metadata description is generic instead of recovery-specific | Pending |  |  | Small clarity and SEO/content issue |
+| UX-007 | Verified | Low | Auth | `/forgot-password` | Mobile, Desktop | Metadata description is generic instead of recovery-specific | Pending | Codex | Codex | Verified on deployed production HTML on 2026-06-28 after `5cd5c6b`; reset-specific description, canonical, and sharing metadata are live |
 | UX-008 | Fixed | Medium | Merge review | `/merge/manual` | Mobile | Manual merge entry layout is still desktop-shaped | [P34U-04](../build-phase/p34u-04-manual-merge-searchable-pickers.md) | Codex |  | Shipped to `staging` in `f5f5a91`; live mobile re-test still pending |
 | UX-009 | Logged | Low | Contact detail | `/contacts/[id]` | Mobile | Edit action is repeated across header, hero, and FAB | Pending |  |  | Reduce redundant primary actions |
 | UX-010 | Logged | Low | Import / export | `/import-export?tab=export` | Mobile, Tablet, Desktop | Export mode still shows import-only quota/history modules | Pending |  |  | Consider task-focused tab-specific secondary content |
@@ -111,9 +111,9 @@ Acceptance check
 | UX-002 | `9613403` | Tablet `768x1024` | Fixed | Condensed tablet overview rail shipped to `staging`; capture/re-test still pending |
 | UX-003 | Local preview fix for `P34U-02` | Mobile `390x844` | Verified | Compact mobile rows now prioritize open-contact with a single overflow control; artifacts saved in `ux-audit-before-after/` |
 | UX-004 | `7df2027`, `91b673d` | Mobile `390x844` | Fixed | Country selector clarity and follow-up interaction fix shipped to `staging`; artifact capture still pending |
-| UX-005 |  | Login/register/forgot-password system |  |  |
+| UX-005 | `5cd5c6b` | Login/register/forgot-password system | Verified | Verified on production on 2026-06-28 from the deployed unauthenticated HTML; signed-in visits correctly redirect to `/contacts` |
 | UX-006 | `0ad964e` | Mobile `390x844` | Verified | Verified on production on 2026-06-28; repeated table labels are gone and history rows read as compact cards |
-| UX-007 |  | Forgot-password metadata |  |  |
+| UX-007 | `5cd5c6b` | Forgot-password metadata | Verified | Verified on production on 2026-06-28; reset-specific title, description, canonical, Open Graph, and Twitter metadata are live |
 | UX-008 | `f5f5a91` | Merge/manual mobile | Fixed | Mobile stacked manual-merge entry shipped to `staging`; live breakpoint re-test still pending |
 | UX-009 |  | Contact detail mobile |  |  |
 | UX-010 |  | Export tab responsive states |  |  |

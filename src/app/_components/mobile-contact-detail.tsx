@@ -521,35 +521,8 @@ export function MobileContactDetail({
       {/* Tab content */}
       <div>{children}</div>
 
-      {/* FAB — opens the edit sheet; hidden when not editable (variance gating) */}
-      {isEditable && !editing && (
-        <button
-          aria-label="Edit contact"
-          onClick={() => setSheetOpen(true)}
-          style={{
-            position: "fixed",
-            bottom: `calc(72px + env(safe-area-inset-bottom))`,
-            right: 20,
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
-            backgroundColor: "#17352e",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-            display: "grid",
-            placeItems: "center",
-            zIndex: 35,
-            boxShadow: "0 4px 16px rgba(23,53,46,0.32)",
-            WebkitTapHighlightColor: "transparent",
-          }}
-          type="button"
-        >
-          <WorkspaceIcon name="pencil" size={22} />
-        </button>
-      )}
-
-      {/* Edit sheet (P24B-DB19) — only mountable when editable */}
+      {/* Edit sheet (P24B-DB19) — only mountable when editable.
+          Mobile keeps the top-right Edit action as the single entry point. */}
       {isEditable ? (
         <MobileContactSheet isOpen={sheetOpen} onClose={() => setSheetOpen(false)} initial={editInitial} />
       ) : null}

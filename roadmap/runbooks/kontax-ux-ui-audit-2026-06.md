@@ -158,9 +158,9 @@ mid-size and mobile surfaces.
 | UX-002 | Medium | App navigation | `/contacts?tab=overview` | Tablet | Tablet keeps the full desktop-style left rail, including a very long labels section, which competes heavily with the main overview content | Primary tasks become harder to scan because secondary navigation and metadata dominate the screen at a mid-size breakpoint | Collapse labels/books behind progressive disclosure on tablet, or shift to a lighter tablet nav model | Overview review at `768x1024` on 2026-06-27 | [P34U-01](../build-phase/p34u-01-tablet-overview-nav-density.md) |
 | UX-003 | Medium | Contacts list | `/contacts?tab=people&filter=all&sort=name&view=compact` | Mobile | Each contact row exposes several competing actions around the primary row target | Dense rows increase cognitive load and raise the risk of accidental taps when users mainly want to open a contact | Reduce always-visible row actions on mobile and move secondary actions into swipe, long-press, or overflow patterns | People list review at `390x844` on 2026-06-27 | [P34U-02](../build-phase/p34u-02-mobile-people-row-action-hierarchy.md) |
 | UX-004 | Medium | Create contact | `/contacts/new` | Mobile | Phone input flow exposes an icon-only globe control with a weak accessible name (`🌐`) | The control is unclear visually and underspecified for assistive technology, especially inside a critical form flow | Replace the icon-only affordance with a labelled country-code selector and a descriptive accessible name | Create-contact review at `390x844` on 2026-06-27 | [P34U-03](../build-phase/p34u-03-phone-country-selector-clarity.md) |
-| UX-005 | Medium | Auth | `/forgot-password` | Mobile, Desktop | Forgot-password uses a noticeably different visual language from login/register | Breaking the shared auth pattern can make the reset path feel less connected and less trustworthy than the main auth entry points | Align card treatment, CTA color, and typographic rhythm with the login/register system | Unauthenticated HTML and code review on 2026-06-27 | Pending |
+| UX-005 | Medium | Auth | `/forgot-password` | Mobile, Desktop | Forgot-password uses a noticeably different visual language from login/register | Breaking the shared auth pattern can make the reset path feel less connected and less trustworthy than the main auth entry points | Align card treatment, CTA color, and typographic rhythm with the login/register system | Unauthenticated HTML and code review on 2026-06-27; shared auth-card recovery flow shipped in `5cd5c6b` and verified on deployed production HTML on 2026-06-28 | Verified |
 | UX-006 | Medium | Sync | `/sync?account=cmq446geh0001j5uhqoo4ps11` | Mobile | Sync history becomes a long repetitive stack with repeated labels like `Date`, `Direction`, `Changes`, and blank-feeling `Status` markers | The detail page becomes hard to scan quickly on mobile, especially for a support-heavy surface where users need fast diagnosis | Compress sync-history rows for mobile and make status/value groupings more compact and explicit | Sync detail review at `390x844` on 2026-06-27; mobile card refactor shipped in `0ad964e` and verified on production on 2026-06-28 | Verified |
-| UX-007 | Low | Auth | `/forgot-password` | Desktop, Mobile | Reset-password metadata still uses the generic product description instead of reset-specific messaging | It weakens clarity in previews and search results for a recovery-focused page | Give the page its own description and sharing metadata aligned with password recovery | Unauthenticated HTML review on 2026-06-27 | Pending |
+| UX-007 | Low | Auth | `/forgot-password` | Desktop, Mobile | Reset-password metadata still uses the generic product description instead of reset-specific messaging | It weakens clarity in previews and search results for a recovery-focused page | Give the page its own description and sharing metadata aligned with password recovery | Unauthenticated HTML review on 2026-06-27; reset-specific metadata shipped in `5cd5c6b` and verified on deployed production HTML on 2026-06-28 | Verified |
 | UX-008 | Medium | Merge review | `/merge/manual` | Mobile | Manual merge picker uses a fixed three-column selector row with no mobile override | On small screens, the first step of manual merge is likely cramped before the user even reaches the actual review | Add a stacked mobile layout for the pair picker and keep the compare action separate from the field controls | Code review of `src/app/merge/manual/page.tsx` and `src/app/_components/merge-review.tsx` on 2026-06-27 | [P34U-04](../build-phase/p34u-04-manual-merge-searchable-pickers.md) |
 | UX-009 | Low | Contact detail | `/contacts/[id]` | Mobile | Mobile contact detail exposes multiple simultaneous `Edit` affordances | Repeating the same primary action in the compact header, hero header, and FAB adds visual noise to an already dense detail surface | Choose one dominant edit entry point per state and remove redundant duplicates | Code review of `src/app/_components/mobile-contact-detail.tsx` on 2026-06-27 | Pending |
 | UX-010 | Low | Import / export | `/import-export?tab=export` | Mobile, Tablet, Desktop | Export mode still shows import-oriented secondary modules like monthly import quota and import history | The page asks users to context-switch between export and unrelated import admin details during a focused export task | Hide or de-emphasize import-only secondary sections when the export tab is active, especially below the fold on smaller screens | Mobile export-tab review at `390x844` plus page code review on 2026-06-27 | Pending |
@@ -187,7 +187,7 @@ mid-size and mobile surfaces.
 - **Recommendation:** Replace the CTA with `Open Kontax`, `Go to contacts`, or
   another returning-user action whenever an authenticated session is present.
 - **Evidence:** Logged-in homepage observations at `390x844` and `1440x900`.
-- **Linked ticket:** Fixed in `0ad964e`; verified on production on 2026-06-28 at `390x844`
+- **Linked ticket:** Pending
 
 ### Finding `UX-002` — Tablet overview inherits too much left-rail density
 
@@ -274,7 +274,7 @@ mid-size and mobile surfaces.
   or align its layout, button styling, and typographic hierarchy with it.
 - **Evidence:** Unauthenticated HTML for `/login`, `/register`, and
   `/forgot-password`, plus auth component review on 2026-06-27.
-- **Linked ticket:** Pending
+- **Linked ticket:** Fixed in `5cd5c6b`; verified on deployed production HTML on 2026-06-28
 
 ### Finding `UX-006` — Mobile sync history is too repetitive to scan quickly
 
@@ -296,7 +296,7 @@ mid-size and mobile surfaces.
 - **Recommendation:** Collapse rows into tighter mobile cards or summary lines,
   and make status a clearly rendered value rather than a repeated label slot.
 - **Evidence:** Sync detail observations at `390x844`.
-- **Linked ticket:** Pending
+- **Linked ticket:** Fixed in `0ad964e`; verified on production on 2026-06-28 at `390x844`
 
 ### Finding `UX-007` — Forgot-password metadata is still generic
 
@@ -318,7 +318,7 @@ mid-size and mobile surfaces.
   metadata.
 - **Evidence:** Unauthenticated HTML response from `/forgot-password` on
   2026-06-27.
-- **Linked ticket:** Pending
+- **Linked ticket:** Fixed in `5cd5c6b`; verified on deployed production HTML on 2026-06-28
 
 ### Finding `UX-008` — Manual merge entry layout is still desktop-shaped
 
@@ -433,8 +433,8 @@ mid-size and mobile surfaces.
 
 1. Re-test shipped fixes `P34U-01`, `P34U-03`, and `P34U-04` at their target
    breakpoints and capture the missing after artifacts.
-2. Treat `UX-005`, `UX-007`, `UX-009`, and `UX-010` as the remaining open
-   implementation backlog from this audit.
+2. Treat `UX-009` and `UX-010` as the remaining open implementation backlog
+   from this audit.
 3. Handle `UX-001` as a low-priority marketing polish item once the product
    surfaces above are settled.
 4. Run a short second-pass polish audit after the remaining open backlog items
@@ -444,5 +444,4 @@ mid-size and mobile surfaces.
 
 - Shipped to `staging`: `P34U-01`, `P34U-02`, `P34U-03`, `P34U-04`, `UX-006`
 - Verified with artifacts: `P34U-02`
-- Still open from the June 2026 audit: `UX-001`, `UX-005`, `UX-007`, `UX-009`,
-  `UX-010`
+- Still open from the June 2026 audit: `UX-001`, `UX-009`, `UX-010`
