@@ -708,6 +708,11 @@ function HistoryTable({
   const [errId, setErrId] = useState<string | null>(null);
   const dirGlyph = { TWO_WAY: "↕", IMPORT_ONLY: "↓", EXPORT_ONLY: "↑" };
   const dirLabel = { TWO_WAY: "Two-way", IMPORT_ONLY: "Import", EXPORT_ONLY: "Export" };
+  const statusMeta = {
+    ok: { label: "Healthy", color: T.sgreen, bg: T.sgreenWash },
+    pending: { label: "Queued", color: T.mute, bg: T.wash },
+    fail: { label: "Needs review", color: T.red, bg: T.redWash },
+  } as const;
   // Order by the time actually shown (`when` is the completed/started/created
   // ISO timestamp). The server orders by createdAt, which can differ from
   // completion order, so re-sort here so the rows read newest-first by date.
@@ -790,6 +795,7 @@ function HistoryTable({
             );
             return (
               <div
+                className="sy-history-legend"
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
@@ -820,21 +826,40 @@ function HistoryTable({
               className="sy-trow"
               style={{ borderTop: `1px solid ${T.line2}`, animation: "sy-fade .15s ease" }}
             >
-              <span data-th="Date" style={{ color: T.ink2 }}>In progress</span>
-              <span data-th="Direction" style={{ color: T.mute }}>↕ Two-way</span>
-              <span data-th="Changes" style={{ color: T.mute }}>—</span>
+              <span className="sy-date-cell" data-th="Date" style={{ color: T.ink2 }}>In progress</span>
+              <span className="sy-direction-cell" data-th="Direction" style={{ color: T.mute }}>
+                {dirGlyph.TWO_WAY} {dirLabel.TWO_WAY}
+              </span>
+              <span className="sy-changes-cell" data-th="Changes" style={{ color: T.mute }}>
+                Waiting to start
+              </span>
               <span
+                className="sy-status-cell"
                 data-th="Status"
                 style={{
                   display: "flex",
                   justifyContent: "flex-end",
                   alignItems: "center",
                   gap: 6,
-                  color: T.sgreen,
+                  color: T.mute,
                   fontWeight: 600,
                 }}
               >
                 <Spinner size={13} color={T.sgreen} />
+                <span
+                  className="sy-status-label"
+                  style={{
+                    display: "none",
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: T.ink2,
+                    background: T.wash,
+                    borderRadius: 999,
+                    padding: "3px 8px",
+                  }}
+                >
+                  Running
+                </span>
               </span>
             </div>
           )}
@@ -845,67 +870,145 @@ function HistoryTable({
               className="sy-trow"
               style={{ borderTop: `1px solid ${T.line2}`, position: "relative" }}
             >
-              <span data-th="Date" style={{ color: T.ink2 }}><SyncTimestamp iso={j.when} /></span>
-              <span data-th="Direction" style={{ color: T.mute }}>
-                {dirGlyph[j.direction]} {dirLabel[j.direction]}
+              <span className="sy-date-cell" data-th="Date" style={{ color: T.ink2 }}>
+                <SyncTimestamp iso={j.when} />
               </span>
               <span
+                className="sy-direction-cell"
+                data-th="Direction"
+                style={{ color: T.mute }}
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    borderRadius: 999,
+                    background: T.wash,
+                    padding: "4px 9px",
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: T.ink2,
+                  }}
+                >
+                {dirGlyph[j.direction]} {dirLabel[j.direction]}
+                </span>
+              </span>
+              <span
+                className="sy-changes-cell"
                 data-th="Changes"
                 style={{
-                  fontFamily: '"Geist Mono", ui-monospace, monospace',
                   color: T.ink2,
                   fontSize: 12.5,
                 }}
               >
                 {j.status === "ok" ? (
-                  <span style={{ display: "grid", gap: 2 }}>
+                  <span className="sy-change-lines" style={{ display: "grid", gap: 6 }}>
                     <span
+                      className="sy-change-line"
                       title={`Kontax: ${j.added} added · ${j.modified} updated · ${j.deleted} removed`}
+                      style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}
                     >
-                      <span style={{ color: T.mute }}>Kontax</span> +{j.added} ~{j.modified} −
-                      {j.deleted}
+                      <span style={{ color: T.mute, fontSize: 11.5, fontWeight: 600 }}>Pulled into Kontax</span>
+                      <span
+                        style={{
+                          fontFamily: '"Geist Mono", ui-monospace, monospace',
+                          color: T.ink2,
+                        }}
+                      >
+                        +{j.added} ~{j.modified} −{j.deleted}
+                      </span>
                     </span>
                     <span
+                      className="sy-change-line"
                       title={`${remoteLabel}: ${j.pushedAdded} added · ${j.pushedModified} updated · ${j.pushedDeleted} removed`}
+                      style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}
                     >
-                      <span style={{ color: T.mute }}>{remoteLabel}</span> +{j.pushedAdded} ~
-                      {j.pushedModified} −{j.pushedDeleted}
+                      <span style={{ color: T.mute, fontSize: 11.5, fontWeight: 600 }}>
+                        Pushed to {remoteLabel}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: '"Geist Mono", ui-monospace, monospace',
+                          color: T.ink2,
+                        }}
+                      >
+                        +{j.pushedAdded} ~{j.pushedModified} −{j.pushedDeleted}
+                      </span>
                     </span>
                   </span>
                 ) : (
-                  "—"
+                  <span style={{ color: T.mute, fontSize: 12 }}>No completed change summary</span>
                 )}
               </span>
-              <span data-th="Status" style={{ display: "flex", justifyContent: "flex-end" }}>
+              <span
+                className="sy-status-cell"
+                data-th="Status"
+                style={{ display: "flex", justifyContent: "flex-end" }}
+              >
                 {j.status === "ok" ? (
-                  <svg
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke={T.sgreen}
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 7,
+                      borderRadius: 999,
+                      background: statusMeta.ok.bg,
+                      color: statusMeta.ok.color,
+                      padding: "4px 9px",
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                    }}
                   >
-                    <path d="M5 12.5l4 4 10-10" />
-                  </svg>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={T.sgreen}
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12.5l4 4 10-10" />
+                    </svg>
+                    <span className="sy-status-label" style={{ display: "none" }}>
+                      {statusMeta.ok.label}
+                    </span>
+                  </span>
                 ) : j.status === "pending" ? (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke={T.mute}
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-label="Queued — waiting to run"
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 7,
+                      borderRadius: 999,
+                      background: statusMeta.pending.bg,
+                      color: statusMeta.pending.color,
+                      padding: "4px 9px",
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                    }}
                   >
-                    <title>Queued — waiting to run</title>
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 7v5l3 2" />
-                  </svg>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={T.mute}
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-label="Queued — waiting to run"
+                    >
+                      <title>Queued — waiting to run</title>
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" />
+                    </svg>
+                    <span className="sy-status-label" style={{ display: "none" }}>
+                      {statusMeta.pending.label}
+                    </span>
+                  </span>
                 ) : (
                   <button
                     type="button"
@@ -920,24 +1023,42 @@ function HistoryTable({
                       color: T.red,
                       fontSize: 12.5,
                       fontWeight: 600,
-                      padding: 0,
+                      padding: "4px 0",
                     }}
                   >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke={T.red}
-                      strokeWidth="2.4"
-                      strokeLinecap="round"
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 7,
+                        borderRadius: 999,
+                        background: statusMeta.fail.bg,
+                        color: statusMeta.fail.color,
+                        padding: "4px 9px",
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                      }}
                     >
-                      <path d="M6 6l12 12M18 6L6 18" />
-                    </svg>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke={T.red}
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                      >
+                        <path d="M6 6l12 12M18 6L6 18" />
+                      </svg>
+                      <span className="sy-status-label" style={{ display: "none" }}>
+                        {errId === j.id ? "Hide error" : statusMeta.fail.label}
+                      </span>
+                    </span>
                   </button>
                 )}
                 {errId === j.id && j.error && (
                   <span
+                    className="sy-error-popover"
                     style={{
                       position: "absolute",
                       right: 0,
@@ -3307,10 +3428,32 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
         .sy-modal { background: #fff; border-radius: 16px; padding: 28px 32px; width: 100%; max-width: 400px; box-shadow: 0 24px 60px rgba(20,30,25,0.25); }
         @media (max-width: 767px) {
           .sy-row-wrap .sy-gear-btn { opacity: 1; }
-          .sy-trow { grid-template-columns: 1fr auto; row-gap: 4px; column-gap: 10px; }
+          .sy-history-legend { gap: 8px 12px !important; font-size: 11px !important; padding: 6px 0 2px !important; }
+          .sy-trow {
+            grid-template-columns: minmax(0, 1fr) auto;
+            row-gap: 10px;
+            column-gap: 10px;
+            padding: 14px;
+            margin-top: 10px;
+            border: 1px solid ${T.line2} !important;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(20,30,25,0.03);
+          }
           .sy-thead { display: none; }
-          .sy-trow > span[data-th]::before { content: attr(data-th) ": "; color: ${T.mute}; font-size: 11px; font-weight: 600; margin-right: 4px; }
-          .sy-trow > span[data-th="Date"] { font-weight: 600; }
+          .sy-trow > span[data-th]::before { display: none; }
+          .sy-date-cell { grid-column: 1; font-weight: 600; }
+          .sy-status-cell { grid-column: 2; justify-self: end; align-self: start; }
+          .sy-direction-cell { grid-column: 1 / -1; }
+          .sy-changes-cell { grid-column: 1 / -1; }
+          .sy-change-lines { gap: 7px !important; }
+          .sy-status-label { display: inline !important; }
+          .sy-error-popover {
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px) !important;
+            width: auto !important;
+          }
           .sy-cmp-grid { grid-template-columns: 1fr; }
           .sy-cmp-head { display: none; }
           .sy-cmp-remote { border-left: none !important; border-top: 1px solid ${T.line2}; }
