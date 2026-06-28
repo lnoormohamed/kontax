@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
+import { ManualMergeEntry } from "~/app/_components/manual-merge-entry";
 import {
   MergeReview,
   type MergeReviewContact,
@@ -60,6 +61,22 @@ const toReviewContact = (c: {
   birthday: c.birthday,
   notes: c.notes,
   ...survivorMetaFor(c),
+});
+
+const toManualMergeOption = (contact: {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  book: { name: string } | null;
+}) => ({
+  id: contact.id,
+  fullName: contact.fullName,
+  email: contact.email,
+  phone: contact.phone,
+  company: contact.company,
+  bookName: contact.book?.name ?? null,
 });
 
 export default async function ManualMergePage({ searchParams }: ManualMergePageProps) {
@@ -204,143 +221,7 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
               Choose the two records to combine. You&apos;ll decide what to keep, field by field, before anything changes.
             </p>
           )}
-          <form
-            method="get"
-            style={{
-              marginTop: 20,
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr",
-              gap: 16,
-              alignItems: "end",
-            }}
-          >
-            <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>Contact A</span>
-              <select
-                defaultValue={leftId}
-                name="left"
-                style={{
-                  height: 44,
-                  padding: "0 12px",
-                  borderRadius: 11,
-                  border: `1px solid ${C.line}`,
-                  background: "#fff",
-                  fontSize: 13.5,
-                  color: C.ink,
-                  outline: "none",
-                }}
-              >
-                <option value="">Search contacts…</option>
-                {contacts.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <span
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: C.wash,
-                display: "grid",
-                placeItems: "center",
-                marginBottom: 6,
-                flexShrink: 0,
-              }}
-            >
-              <svg fill="none" height="16" stroke={C.mute} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
-                <path d="M7 4v6a5 5 0 005 5h5" />
-                <path d="M17 4v6" />
-                <path d="M14 12l3 3-3 3" />
-                <path d="M7 4l-2 2" />
-                <path d="M7 4l2 2" />
-              </svg>
-            </span>
-
-            <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>Contact B</span>
-              <select
-                defaultValue={rightId}
-                name="right"
-                style={{
-                  height: 44,
-                  padding: "0 12px",
-                  borderRadius: 11,
-                  border: `1px solid ${C.line}`,
-                  background: "#fff",
-                  fontSize: 13.5,
-                  color: C.ink,
-                  outline: "none",
-                }}
-              >
-                <option value="">Search contacts…</option>
-                {contacts.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div
-              style={{
-                gridColumn: "1 / -1",
-                display: "flex",
-                alignItems: "center",
-                gap: 14,
-                marginTop: 4,
-              }}
-            >
-              <button
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  height: 44,
-                  padding: "0 20px",
-                  borderRadius: 11,
-                  border: "none",
-                  background: C.blue,
-                  color: "#fff",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                type="submit"
-              >
-                <svg fill="none" height="16" stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
-                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-                  <rect height="4" rx="1" width="6" x="9" y="3" />
-                  <path d="M9 12h6M9 16h4" />
-                </svg>
-                Load merge preview
-              </button>
-              {!validPair && (
-                <span style={{ fontSize: 12.5, color: C.ink2 }}>
-                  No system suggestion needed — pick any two active contacts.
-                </span>
-              )}
-            </div>
-          </form>
-
-          {leftId && rightId && !validPair && (
-            <div
-              style={{
-                marginTop: 14,
-                padding: "10px 14px",
-                borderRadius: 10,
-                border: "1px solid #ecdcb6",
-                background: "rgba(191,133,38,0.08)",
-                fontSize: 13,
-                color: "#7a5512",
-              }}
-            >
-              Choose two different active contacts to review a merge.
-            </div>
-          )}
+          <ManualMergeEntry contacts={contacts.map(toManualMergeOption)} leftId={leftId} rightId={rightId} />
         </section>
 
         {/* Step 2 — field review */}
