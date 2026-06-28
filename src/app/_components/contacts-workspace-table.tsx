@@ -529,8 +529,8 @@ const ContactRow = memo(function ContactRow({
   ].filter((value): value is string => Boolean(value));
 
   const mobileStacked = (
-    <div className="flex min-w-0 flex-1 items-center gap-3">
-      {avatarSlot}
+    <div className="flex min-w-0 flex-1 items-start gap-3">
+      <span className="pt-0.5">{avatarSlot}</span>
       <div className="min-w-0 flex-1">
         <div className="flex items-start gap-2">
           <Link
@@ -544,7 +544,9 @@ const ContactRow = memo(function ContactRow({
               <Highlight query={query} text={displayName} />
             </span>
           </Link>
-          <RowActions contact={contact} mode={mode} />
+          <div className="shrink-0 pt-0.5">
+            <RowActions contact={contact} mode={mode} />
+          </div>
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
           {meta.length > 0
@@ -696,7 +698,7 @@ const ContactRow = memo(function ContactRow({
           onArchive={handleSwipeArchive}
           onToggleFavourite={handleSwipeFavourite}
         >
-          <div className={`flex min-h-[60px] items-center px-3 ${selected ? "bg-[#edf0fe]" : "bg-white"}`}>
+          <div className={`flex min-h-[76px] items-start px-3 py-2 ${selected ? "bg-[#edf0fe]" : "bg-white"}`}>
             {mobileStacked}
           </div>
         </SwipeableRow>
