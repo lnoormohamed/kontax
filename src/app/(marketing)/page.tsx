@@ -369,10 +369,16 @@ export default async function HomePage() {
       {/* ═══════════════════════════ CTA BAND ═══════════════════════════ */}
       <section className="mkt-cta-band">
         <div className="mkt-cta-band__inner">
-          <h2 className="mkt-cta-band__title">Ready to get started?</h2>
-          <p className="mkt-cta-band__sub">Free plan, no credit card required.</p>
-          <Link className="mkt-cta-band__btn" href="/register">
-            Get started free
+          <h2 className="mkt-cta-band__title">
+            {session ? "Ready to jump back in?" : "Ready to get started?"}
+          </h2>
+          <p className="mkt-cta-band__sub">
+            {session
+              ? "Your contacts are already waiting for you."
+              : "Free plan, no credit card required."}
+          </p>
+          <Link className="mkt-cta-band__btn" href={session ? "/contacts?tab=overview" : "/register"}>
+            {session ? "Open Kontax" : "Get started free"}
             <svg
               width="17"
               height="17"
