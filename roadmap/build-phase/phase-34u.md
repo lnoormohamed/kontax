@@ -25,6 +25,7 @@ audit before the second audit pass continues deeper into remaining surfaces.
 > - [P34U-02 — Mobile people list action hierarchy and row decluttering](p34u-02-mobile-people-row-action-hierarchy.md)
 > - [P34U-03 — Phone country selector clarity in create/edit flows](p34u-03-phone-country-selector-clarity.md)
 > - [P34U-04 — Manual merge searchable pickers and mobile entry cleanup](p34u-04-manual-merge-searchable-pickers.md)
+> - [P34U-05 — Investigate production React `#418` console error on authenticated app routes](p34u-05-production-react-console-error.md)
 
 ## Suggested implementation order
 1. P34U-03 — shared phone-input clarity because it improves both create and edit
@@ -34,6 +35,8 @@ audit before the second audit pass continues deeper into remaining surfaces.
    and perceived polish
 4. P34U-04 — manual merge entry because it benefits from a more deliberate
    interaction redesign
+5. P34U-05 — production console/runtime cleanup because the UX fixes are now
+   verified and the next risk is hidden client instability on deployed routes
 
 ## Why this phase sits here
 
