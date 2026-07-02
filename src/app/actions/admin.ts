@@ -6,6 +6,7 @@ import { assertAdmin, AdminForbiddenError } from "~/server/admin/guard";
 import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
 import { db } from "~/server/db";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { sendAccountSuspendedEmail } from "~/server/billing-emails";
 import { coerceCardDavCapabilityProfileOverrideId } from "~/server/sync-provider-capabilities";
 import {
@@ -131,6 +132,8 @@ export async function suspendAccount(input: { userId: string; reason: string; re
     where: { id: target.id },
     data: { lifecycleState: "LOCKED", sessionVersion: { increment: 1 } },
   });
+  // P38-09: the lock must beat the 45s validation cache
+  await invalidateSessionValidation(target.id);
 
   void sendAccountSuspendedEmail({ userId: target.id, reason });
 
@@ -204,6 +207,8 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
     where: { id: target.id },
     data: { lifecycleState: "LOCKED", scheduledDeleteAt, sessionVersion: { increment: 1 } },
   });
+  // P38-09: the lock must beat the 45s validation cache
+  await invalidateSessionValidation(target.id);
 
   await emitAdminEvent({
     adminId: admin.adminId,

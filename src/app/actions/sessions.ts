@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "~/server/auth";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { db } from "~/server/db";
 
 export interface SessionSummary {
@@ -54,6 +55,8 @@ export async function revokeSession(
     where: { id: sessionId },
     data: { revokedAt: new Date() },
   });
+  // P38-09: revocation must beat the 45s validation cache
+  await invalidateSessionValidation(session.user.id, row.jti);
 
   await db.activityEvent.create({
     data: {
@@ -81,6 +84,8 @@ export async function revokeAllOtherSessions(): Promise<{ revokedCount: number }
     },
     data: { revokedAt: new Date() },
   });
+  // P38-09: revocation must beat the 45s validation cache
+  await invalidateSessionValidation(session.user.id);
 
   if (result.count > 0) {
     await db.activityEvent.create({

@@ -1,5 +1,33 @@
 # P38-09 — Redis-Backed Session Validation Cache
 
+## Status
+Implemented & verified 2026-07-02.
+
+**Close-out:**
+- `src/server/session-validation-cache.ts`: 45s Redis snapshot keyed
+  `sessval:v1:{userId}:{sid}`, wrapped into the JWT callback's steady-state
+  branch. Cache hit → 0 session-validation DB queries; miss → the existing
+  2 queries + write-back. `getRedis()` now exported from rate-limit.ts.
+- Fail-open everywhere: Redis down or `SESSION_VALIDATION_CACHE=off` → falls
+  through to the DB. pendingTotp sessions bypass the cache (need a fresh
+  totpChallengeVerified read so the 2FA gate lifts immediately).
+- Invalidation wired into every security-relevant write (each deletes the
+  affected key(s) so revocation beats the TTL): device revoke + revoke-all
+  (sessions.ts), password change + self-service deletion (account.ts), admin
+  suspend + admin delete (admin.ts), security-alert lockdown
+  (notifications.ts), email change (email-verification.ts). Single-key for
+  the current session, SCAN-based sweep for all-sessions.
+- Impersonation: the impersonated identity is resolved by the `auth()`
+  wrapper AFTER the JWT callback, and impersonation is short-lived/low-volume
+  — the cache keys off the underlying token sub/sid, and admin lock of the
+  impersonated user invalidates it, so no bypass needed.
+- Tested end-to-end against an in-process RESP server
+  (tests/node/session-validation-cache.test.ts): read/write round trip, 45s
+  SETEX TTL, single-key invalidation, SCAN invalidate-all scoped per user,
+  and the env-flag off no-op.
+- **Prod note**: REDIS_URL is already set (rate limiter uses it); no new infra.
+  Watch for it: staging/dev without REDIS_URL simply runs uncached (verified).
+
 ## Purpose
 
 Cut the two database queries that `auth()` runs on **every authenticated

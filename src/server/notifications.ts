@@ -4,6 +4,7 @@ import type { DigestCadence, NotificationCategory, Prisma } from "../../generate
 
 import SuspiciousActivity from "~/emails/suspicious-activity";
 import { db } from "~/server/db";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { appUrl, sendEmail } from "~/server/email";
 import { renderEmail } from "~/server/render-email";
 
@@ -329,6 +330,8 @@ export async function resolveSecurityAlert(
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+    // P38-09: lockdown must beat the 45s validation cache
+    await invalidateSessionValidation(userId);
   }
 }
 

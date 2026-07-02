@@ -13,6 +13,10 @@ const redisClient =
       })
     : null;
 
+// P38-09: shared client for other Redis-backed concerns (session validation
+// cache). Null when REDIS_URL is unset — callers must fail open to the DB.
+export const getRedis = () => redisClient;
+
 function makeLimiter(points: number, duration: number, keyPrefix: string): Limiter {
   if (!redisClient) {
     // Dev fallback: per-process in-memory store. Not shared across instances.

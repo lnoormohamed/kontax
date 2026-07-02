@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db } from "~/server/db";
 import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
 import { checkRateLimit, peekRateLimit, rateLimiters } from "~/server/rate-limit";
+import { readSessionValidation, writeSessionValidation } from "~/server/session-validation-cache";
 import { getPreferences } from "~/server/preferences";
 import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences-shared";
 
@@ -198,38 +199,69 @@ export const authConfig = {
         }
 
       } else if (token.sub && token.sid) {
-        // Every subsequent request: validate sessionVersion + session revocation
-        const [dbUser, userSession] = await Promise.all([
-          db.user.findUnique({
-            where: { id: token.sub },
-            select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
-          }),
-          db.userSession.findUnique({
-            where: { jti: token.sid as string },
-            select: { revokedAt: true, lastActiveAt: true, totpChallengeVerified: true },
-          }),
-        ]);
+        // Every subsequent request: validate sessionVersion + session revocation.
+        // P38-09: a 45s Redis snapshot fronts the two DB queries; every
+        // security-relevant write (revoke, revoke-all, password change,
+        // lockdown, admin lock, deletion, email change) explicitly deletes the
+        // affected keys, so revocation still takes effect on the next request.
+        // pendingTotp sessions bypass the cache — they need a fresh
+        // totpChallengeVerified read so the 2FA gate lifts immediately.
+        const cached = token.pendingTotp
+          ? null
+          : await readSessionValidation(token.sub, token.sid as string);
 
-        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
-          return {};
-        }
+        if (cached) {
+          if (cached.revoked || cached.lifecycleState === "LOCKED" || cached.sessionVersion !== token.sv) {
+            return {};
+          }
+          token.emailVerified = cached.emailVerified;
+          token.role = cached.role;
+          // lastActiveAt refresh is skipped on cache hits: the 45s TTL is far
+          // inside the 5-minute staleness window, so a miss updates it soon.
+        } else {
+          const [dbUser, userSession] = await Promise.all([
+            db.user.findUnique({
+              where: { id: token.sub },
+              select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
+            }),
+            db.userSession.findUnique({
+              where: { jti: token.sid as string },
+              select: { revokedAt: true, lastActiveAt: true, totpChallengeVerified: true },
+            }),
+          ]);
 
-        // P18-07: TOTP challenge completed — clear pendingTotp from token
-        if (token.pendingTotp && userSession.totpChallengeVerified) {
-          token.pendingTotp = undefined;
-        }
+          if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
+            return {};
+          }
 
-        // Keep emailVerified + role fresh
-        token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
-        token.role = dbUser.role;
+          // P18-07: TOTP challenge completed — clear pendingTotp from token
+          if (token.pendingTotp && userSession.totpChallengeVerified) {
+            token.pendingTotp = undefined;
+          }
 
-        // Update lastActiveAt if stale by > 5 minutes (fire-and-forget)
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        if (userSession.lastActiveAt < fiveMinutesAgo) {
-          void db.userSession.update({
-            where: { jti: token.sid as string },
-            data: { lastActiveAt: new Date() },
-          });
+          // Keep emailVerified + role fresh
+          token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
+          token.role = dbUser.role;
+
+          // Update lastActiveAt if stale by > 5 minutes (fire-and-forget)
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          if (userSession.lastActiveAt < fiveMinutesAgo) {
+            void db.userSession.update({
+              where: { jti: token.sid as string },
+              data: { lastActiveAt: new Date() },
+            });
+          }
+
+          // Only cache fully-validated, non-pendingTotp sessions.
+          if (!token.pendingTotp) {
+            void writeSessionValidation(token.sub, token.sid as string, {
+              sessionVersion: dbUser.sessionVersion,
+              lifecycleState: dbUser.lifecycleState,
+              role: dbUser.role,
+              emailVerified: dbUser.emailVerified?.toISOString() ?? null,
+              revoked: false,
+            });
+          }
         }
 
       } else if (token.sub && !token.sid) {
