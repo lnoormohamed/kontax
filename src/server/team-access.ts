@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { db } from "~/server/db";
 
 export type TeamGraceState = "active" | "grace" | "locked";
@@ -64,7 +66,8 @@ export const resolveBookPermission = (
 };
 
 // The (non-archived) team books the user can see, with their permission.
-export const getAccessibleTeamBooks = async (
+// P38-04: request-scoped cache — see billing.ts convention note.
+export const getAccessibleTeamBooks = cache(async (
   userId: string,
 ): Promise<{ id: string; name: string; permission: BookPermission }[]> => {
   const membership = await getUserTeamMembership(userId);
@@ -77,7 +80,7 @@ export const getAccessibleTeamBooks = async (
   return books
     .map((b) => ({ id: b.id, name: b.name, permission: resolveBookPermission(membership, b.id) }))
     .filter((b) => b.permission !== "NONE");
-};
+});
 
 // Can the user EDIT this team book right now? (membership + not archived + EDIT)
 export const canEditTeamBook = async (userId: string, bookId: string): Promise<boolean> => {

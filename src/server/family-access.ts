@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import type { Prisma } from "../../generated/prisma";
 import { db } from "~/server/db";
 
@@ -18,7 +20,8 @@ export type FamilyMembership = {
 };
 
 // The user's accepted FAMILY membership (owner or member), if any. v1: one per user.
-export const getUserFamilyMembership = async (
+// P38-04: request-scoped cache — see billing.ts convention note.
+export const getUserFamilyMembership = cache(async (
   userId: string,
 ): Promise<FamilyMembership | null> => {
   const member = await db.groupMember.findFirst({
@@ -34,7 +37,7 @@ export const getUserFamilyMembership = async (
     isOwner: member.role === "OWNER",
     groupName: member.group.name,
   };
-};
+});
 
 // Prisma `where` fragment: a contact the user may MUTATE — owns it, or it is in
 // a family book they can edit. Drop-in replacement for `{ id, userId }` lookups.

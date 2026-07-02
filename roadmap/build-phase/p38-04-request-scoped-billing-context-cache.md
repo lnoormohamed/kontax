@@ -1,5 +1,28 @@
 # P38-04 — Request-Scoped Billing & Shared-Context Cache
 
+## Status
+Implemented & verified 2026-07-02.
+
+**Close-out:**
+- Wrapped in React `cache()`: `getUserBillingContext`, `getUserPlanSummary`
+  (billing.ts), `getUserFamilyMembership` (family-access.ts),
+  `getAccessibleTeamBooks` (team-access.ts), and `getNotificationFeed`
+  (notifications.ts — the desktop and mobile header bells both resolve it).
+- Deviations from the original scope: `getLabels` was NOT wrapped (it has a
+  single call site per request after P38-03, and it's a "use server" action);
+  `getNotificationFeed` was added (measured 2× per view).
+- Read-after-write audit: every call site in `src/app/actions/*` and
+  `src/app/api/**` reads billing/membership context once as an up-front guard
+  before any write — no read→write→read patterns found. Files checked:
+  contacts, family, teams, shares, api-tokens, upgrade-onboarding,
+  import-export, bulk-edit, merge, sync actions; api/v1/contacts route.
+- Verified via Prisma query log: billing-context queries (User lifecycle +
+  Subscription plan) and the notification feed each run once per `/contacts`
+  view (previously twice). Per-view total: ~26 → ~23 queries.
+- Remaining fat to reach the P38-03 ≤12 aspiration: `getUserPlanSummary`'s 4
+  usage counts (could fold into `getWorkspaceCounts`), the banner's own 2
+  queries, and the 2 auth queries (P38-09).
+
 ## Purpose
 
 Deduplicate per-request work that multiple server components repeat today —

@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { type Prisma, type SubscriptionPlan } from "../../generated/prisma";
 
 import { db } from "~/server/db";
@@ -207,7 +209,13 @@ const getMonthStart = () => {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
 };
 
-export const getUserBillingContext = async (userId: string): Promise<BillingContext> => {
+// P38-04: read-only per-user context getters used by both pages and
+// layout-level slots (BillingBannerSlot etc.) are wrapped in React cache()
+// so one request computes them once. cache() scopes per RSC render / server
+// action invocation, so a mutation followed by revalidation reads fresh.
+// Do NOT call these after a write inside the same action — audit note in
+// roadmap/build-phase/p38-04-request-scoped-billing-context-cache.md.
+export const getUserBillingContext = cache(async (userId: string): Promise<BillingContext> => {
   const user = await db.user.findUnique({
     where: { id: userId },
     select: {
@@ -246,7 +254,7 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
     planLabel: PLAN_LABELS[plan],
     entitlements,
   };
-};
+});
 
 const assertWritableAccount = (context: BillingContext) => {
   const policy = getLifecycleAccessPolicy(context.lifecycleState);
@@ -270,7 +278,7 @@ const assertExportableAccount = (context: BillingContext) => {
   }
 };
 
-export const getUserPlanSummary = async (userId: string) => {
+export const getUserPlanSummary = cache(async (userId: string) => {
   const context = await getUserBillingContext(userId);
   const monthStart = getMonthStart();
 
@@ -302,7 +310,7 @@ export const getUserPlanSummary = async (userId: string) => {
     syncAccountsUsed,
     appPasswordsUsed,
   };
-};
+});
 
 export const assertCanCreateContacts = async (userId: string, incomingCount = 1) => {
   const summary = await getUserPlanSummary(userId);

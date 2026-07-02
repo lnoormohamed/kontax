@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import type { DigestCadence, NotificationCategory, Prisma } from "../../generated/prisma";
 
 import SuspiciousActivity from "~/emails/suspicious-activity";
@@ -141,10 +143,12 @@ export type FeedNotification = {
 };
 
 /** Non-dismissed feed rows, newest first, for the dropdown. */
-export async function getNotificationFeed(
+// P38-04: request-scoped cache — the desktop header bell and the mobile
+// home-header bell both resolve the feed in one page render.
+export const getNotificationFeed = cache(async (
   userId: string,
   limit = FEED_LIMIT,
-): Promise<FeedNotification[]> {
+): Promise<FeedNotification[]> => {
   return db.notification.findMany({
     where: { userId, dismissedAt: null },
     orderBy: { createdAt: "desc" },
@@ -160,7 +164,7 @@ export async function getNotificationFeed(
       createdAt: true,
     },
   });
-}
+});
 
 export async function getUnreadCount(userId: string): Promise<number> {
   return db.notification.count({ where: { userId, read: false, dismissedAt: null } });
