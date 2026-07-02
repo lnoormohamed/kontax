@@ -260,6 +260,8 @@ export default async function PublicCardPage({
 
   const isLoggedIn = !!session?.user?.id;
   const isOwnCard = session?.user?.id === card.userId;
+  // SEC-02: nonce injected by middleware for /u/* under the strict CSP.
+  const nonce = hdrs.get("x-nonce") ?? undefined;
 
   // Record view — fire-and-forget, skip self-views
   if (!isOwnCard) {
@@ -272,7 +274,7 @@ export default async function PublicCardPage({
 
   return (
     <div className="kx" style={{ minHeight: "100dvh", background: "#f6f7f4" }}>
-      <JsonLd data={buildPersonSchema(card)} />
+      <JsonLd data={buildPersonSchema(card)} nonce={nonce} />
       <CardNav />
       <main style={{ padding: "0 16px" }}>
         <PublicCard card={card} isLoggedIn={isLoggedIn} isOwnCard={isOwnCard} />

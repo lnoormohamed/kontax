@@ -52,6 +52,46 @@ const hasAuthSessionCookie = (req: NextRequest) =>
     .getAll()
     .some(({ name }) => name.includes("authjs.session-token"));
 
+// SEC-02: public contact cards (/u/*) render user-controlled JSON-LD (display
+// name, company, etc.). They are the one surface where a non-nonced inline
+// <script> would be attacker-influenced. Serve them an ADDITIONAL, stricter
+// nonce-based script-src on top of the global CSP set in next.config.js. The
+// browser enforces both policies, so a non-nonced inline script is blocked by
+// this policy even though the global one still allows 'unsafe-inline' elsewhere.
+//
+// The nonce is set on the REQUEST CSP header so Next.js applies it to its own
+// inline hydration scripts (this only works because /u/[username] is already
+// dynamically rendered — it calls auth() and headers()). Our JsonLd <script>
+// reads the nonce from the x-nonce request header and sets it explicitly.
+//
+// Directives below mirror next.config.js — keep them in sync — with script-src
+// swapped for the nonce form. All other directives must be present so the page
+// still renders under the intersection of the two policies.
+const withStrictCardCsp = (req: NextRequest): NextResponse => {
+  const nonce = crypto.randomUUID().replace(/-/g, "");
+  const csp = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' https://js.stripe.com`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://media.getkontax.com",
+    "font-src 'self'",
+    "connect-src 'self' https://api.stripe.com https://checkout.stripe.com",
+    "frame-src https://js.stripe.com https://hooks.stripe.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("content-security-policy", csp);
+
+  const res = NextResponse.next({ request: { headers: requestHeaders } });
+  res.headers.set("content-security-policy", csp);
+  return res;
+};
+
 // The middleware intentionally does NOT use NextAuth(authConfigEdge) as a
 // wrapper. In a self-hosted Docker deployment (Coolify), AUTH_SECRET is a
 // runtime env var that is NOT available at `npm run build` time. Next.js
@@ -89,6 +129,10 @@ export default function middleware(req: NextRequest) {
   // 2. Public content: pass through; the page self-selects logged-out vs
   //    logged-in content.
   if (pathname === "/" || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    // Public user cards get the stricter nonce-based CSP (SEC-02).
+    if (pathname.startsWith("/u/")) {
+      return withStrictCardCsp(req);
+    }
     return NextResponse.next();
   }
 
