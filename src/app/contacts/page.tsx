@@ -25,6 +25,7 @@ import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
 import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
+import { buildNoteMatchExcerpt } from "~/lib/note-match";
 import { db } from "~/server/db";
 import { getLabels } from "~/app/actions/labels";
 import { DEFAULT_PREFERENCES } from "~/lib/preferences";
@@ -262,6 +263,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   const searchConditions = supportsContactSearch ? getSearchConditions(query) : {};
 
+  // P38-01: full note text only leaves the database when a search is active
+  // (it feeds the per-row "matched in notes" excerpt); it never reaches the
+  // client — rows ship a pre-computed excerpt instead.
+  const includeNoteSnippets = supportsContactSearch && query.length > 0;
+
   // P28-07: full-text search over the user's own contacts (notes, JSON contact
   // methods, custom fields, ranked). Short/symbol-only queries fall back to the
   // multi-field ILIKE path. Shared/family/team contacts keep ILIKE (they aren't
@@ -301,14 +307,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     phoneticCompany: true,
     jobTitle: true,
     department: true,
-    website: true,
     birthday: true,
-    address: true,
     avatarUrl: true,
     isFavorite: true,
     isEmergency: true,
-    notes: true,
-    archivedAt: true,
+    notes: includeNoteSnippets,
     updatedAt: true,
     significantDates: true,
     syncLinks: {
@@ -581,6 +584,51 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     ? sortedActiveContacts.filter((contact) => matchesContactHealth(contact, selectedHealth))
     : sortedActiveContacts;
   const healthCounts = countContactsByHealth(sortedActiveContacts);
+
+  // P38-01: sorting and health checks above need the full rows; the client
+  // table does not. Strip to the fields a row actually renders before the
+  // client boundary so notes/sync/phonetic/date data stays out of the RSC
+  // payload. Extend consciously — every field added here ships for every row.
+  const toWorkspaceRow = (contact: {
+    id: string;
+    fullName: string;
+    firstName: string | null;
+    lastName: string | null;
+    nickname: string | null;
+    email: string | null;
+    phone: string | null;
+    company: string | null;
+    avatarUrl: string | null;
+    isFavorite: boolean;
+    isEmergency: boolean;
+    sharedKind: "family" | "team" | null;
+    labels: unknown;
+    notes?: string | null;
+  }) => {
+    // Omitted (not null) when absent so 1000s of rows don't each serialize
+    // a "noteMatchSnippet": null into the RSC payload.
+    const noteMatchSnippet = includeNoteSnippets
+      ? buildNoteMatchExcerpt(contact.notes ?? null, query)
+      : null;
+    return {
+      id: contact.id,
+      fullName: contact.fullName,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      nickname: contact.nickname,
+      email: contact.email,
+      phone: contact.phone,
+      company: contact.company,
+      avatarUrl: contact.avatarUrl,
+      isFavorite: contact.isFavorite,
+      isEmergency: contact.isEmergency,
+      sharedKind: contact.sharedKind,
+      labels: contact.labels,
+      ...(noteMatchSnippet ? { noteMatchSnippet } : {}),
+    };
+  };
+  const activeWorkspaceRows = filteredActiveContacts.map(toWorkspaceRow);
+  const archivedWorkspaceRows = sortedArchivedContacts.map(toWorkspaceRow);
   const healthHrefBase = new URLSearchParams();
   healthHrefBase.set("tab", "people");
   healthHrefBase.set("filter", "all");
@@ -725,8 +773,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       <SecurityAlertBannerSlot userId={session.user.id} />
 
       <ContactDashboard
-        activeContacts={filteredActiveContacts}
-        archivedContacts={sortedArchivedContacts}
+        activeContacts={activeWorkspaceRows}
+        archivedContacts={archivedWorkspaceRows}
         currentFilter={selectedFilter}
         currentSort={selectedSort}
         currentTab={selectedTab}

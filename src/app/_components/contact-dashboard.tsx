@@ -18,39 +18,25 @@ import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion, RecentMerge } from "~/server/contact-merge";
 import type { OnboardingChecklist as OnboardingChecklistData } from "~/server/onboarding";
 
+// P38-01: lean row shape — only what a workspace row renders. Sorting, health
+// checks, and note-excerpt extraction run server-side on full rows in
+// contacts/page.tsx; every field added here ships to the client for every row.
 type DashboardContact = {
   id: string;
   fullName: string;
   firstName: string | null;
   lastName: string | null;
-  phoneticFirstName: string | null;
-  phoneticLastName: string | null;
   nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
-  phoneticCompany: string | null;
-  jobTitle: string | null;
-  department?: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
+  avatarUrl?: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
-  notes: string | null;
-  archivedAt: Date | null;
-  updatedAt: Date;
   labels?: unknown; // P31B-06: JSON string[] from Prisma
-  significantDates?: unknown;
-  syncLinks?: Array<{
-    lastSyncedAt: Date | null;
-    lastErrorCode: string | null;
-    syncAccount: {
-      status: string;
-      lastSucceededAt: Date | null;
-    } | null;
-  }>;
+  // P38-01: server-computed excerpt, set when the search query matched notes.
+  noteMatchSnippet?: string | null;
 };
 
 type PlanSummary = {

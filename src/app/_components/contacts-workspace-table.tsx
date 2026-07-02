@@ -21,30 +21,25 @@ import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
+// P38-01: lean row shape — only what a row renders. Full contact data (notes,
+// sync state, phonetic fields, dates) stays server-side in contacts/page.tsx.
 type WorkspaceContact = {
   id: string;
   fullName: string;
   firstName: string | null;
   lastName: string | null;
-  phoneticFirstName: string | null;
-  phoneticLastName: string | null;
   nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
-  phoneticCompany: string | null;
-  jobTitle: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
+  avatarUrl?: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
-  notes: string | null;
-  archivedAt: Date | null;
-  updatedAt: Date;
   // P31B-06: JSON string[] from Prisma (optional — may be absent on older data)
   labels?: unknown;
+  // P38-01: server-computed excerpt, set when the search query matched notes.
+  noteMatchSnippet?: string | null;
 };
 
 type ContactsWorkspaceTableProps = {
@@ -130,16 +125,9 @@ function inferMatchSnippet(
     : [];
   const matchedLabel = labels.find((l) => l.toLowerCase().includes(ql));
   if (matchedLabel) return { field: "label", snippet: matchedLabel };
-  // notes match
-  if (contact.notes?.toLowerCase().includes(ql)) {
-    const notes = contact.notes;
-    const i = notes.toLowerCase().indexOf(ql);
-    let start = Math.max(0, i - 28);
-    if (start > 0) { const sp = notes.indexOf(" ", start); if (sp > -1 && sp < i) start = sp + 1; }
-    let end = Math.min(notes.length, start + 90);
-    if (end < notes.length) { const sp = notes.lastIndexOf(" ", end); if (sp > start + 20) end = sp; }
-    const excerpt = (start > 0 ? "…" : "") + notes.slice(start, end).trim() + (end < notes.length ? "…" : "");
-    return { field: "notes", snippet: excerpt };
+  // notes match — excerpt computed server-side (P38-01); full notes don't ship
+  if (contact.noteMatchSnippet) {
+    return { field: "notes", snippet: contact.noteMatchSnippet };
   }
   return null;
 }
