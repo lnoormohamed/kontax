@@ -1,5 +1,33 @@
 # P38-06 — Stored tsvector + GIN Index for Full-Text Search
 
+## Status
+Implemented & verified 2026-07-02. **Applied to staging DB** (2,752 rows
+backfilled); prod needs `npm run search:setup-index` before/with deploy
+(harmless if run twice — fully idempotent).
+
+**Close-out:**
+- `Contact.searchVector` declared as `Unsupported("tsvector")?` plus
+  `@@index([searchVector], type: Gin)` in schema.prisma. The index MUST be in
+  the schema: without it `prisma migrate diff` flags the GIN index as drift
+  and deploy-time `db push` would drop it (caught during implementation).
+  Fresh databases get column + index from `db push` alone; the trigger comes
+  from the setup script, and `check-schema-drift.mjs` now fails fast if it's
+  missing.
+- `searchContactIds` restructured into UNION ALL branches (FTS / phone-digits
+  / order-aware names) with `max(rank)` per id — OR-ing the branches would
+  have forced a seq scan for all three. GREATEST semantics preserved exactly.
+- Parity: staging (real + seeded accounts, 5 term shapes, no LIMIT) —
+  identical match counts and rank sums to the old inline expression. App
+  level: marmalade 500, acme 333, phone 900123 → 1, note excerpts intact.
+- Plans: Bitmap Index Scan on Contact_searchVector_idx for the FTS branch;
+  20k-row scratch DB: 290ms → 91ms per search (FTS branch alone 14ms — the
+  remaining cost is the un-indexed name-ILIKE branch, the documented trigram
+  follow-up).
+- Trigger freshness: fires on INSERT (20,000/20,000 seeded rows vectorised)
+  and on UPDATE of any source column (edited notes searchable immediately).
+- Import throughput risk (trigger cost per bulk insert row) not yet measured
+  — check on the next large import.
+
 ## Purpose
 
 Move contact full-text search from a per-request sequential scan with

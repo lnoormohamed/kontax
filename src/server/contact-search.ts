@@ -89,74 +89,60 @@ export async function searchContactIds(
   const reversedNameLikeParam = `%${reversedNameQuery ?? ""}%`;
   // Nothing to search on (too short / symbol-only and not a phone number).
   if (!tsq && digits.length < 3) return [];
-  // A phone-only query may not be text-eligible; a tsquery that matches nothing
-  // keeps the SQL shape uniform so the phone branch can still run.
-  const tsqParam = tsq ?? "x0x0x0nomatch0x0x0:*";
 
   const scopeWhere =
     "userId" in scope
       ? Prisma.sql`"userId" = ${scope.userId}`
       : Prisma.sql`id IN (SELECT "contactId" FROM "GroupContact" WHERE "groupAddressBookId" IN (${Prisma.join(scope.groupBookIds)}))`;
 
-  const rows = await db.$queryRaw<{ id: string; rank: number }[]>(Prisma.sql`
-    WITH scored AS (
-      SELECT
-        id,
-        setweight(to_tsvector('english', coalesce("fullName", '') || ' ' || coalesce("nickname", '')), 'A') ||
-        setweight(to_tsvector('english', coalesce("company", '') || ' ' || coalesce("jobTitle", '')), 'B') ||
-        setweight(to_tsvector('english',
-          coalesce("notes", '') || ' ' || coalesce("department", '') || ' ' ||
-          coalesce("email", '') || ' ' || coalesce("phone", '') || ' ' || coalesce("address", '') || ' ' ||
-          coalesce("emailEntries"::text, '') || ' ' || coalesce("phoneEntries"::text, '') || ' ' ||
-          coalesce("addressEntries"::text, '') || ' ' || coalesce("postalAddresses"::text, '') || ' ' ||
-          coalesce("emailAddresses"::text, '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' ||
-          coalesce("customFields"::text, '') || ' ' ||
-          coalesce((SELECT string_agg(val, ' ') FROM jsonb_array_elements_text(CASE WHEN jsonb_typeof("labels") = 'array' THEN "labels" ELSE '[]'::jsonb END) AS val), '')
-        ), 'C') AS vec,
-        -- all phone sources stripped to digits, for substring matching
-        regexp_replace(
-          coalesce("phone", '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' || coalesce("phoneEntries"::text, ''),
-          '[^0-9]', '', 'g'
-        ) AS phone_digits,
-        -- Name matching is order-aware outside FTS so "first last" and
-        -- "last first" both work, including for CJK names that Postgres'
-        -- english text search does not reliably tokenize.
-        regexp_replace(trim(coalesce("fullName", '')), '[[:space:]]+', ' ', 'g') AS full_name_normalized,
-        regexp_replace(trim(coalesce("nickname", '')), '[[:space:]]+', ' ', 'g') AS nickname_normalized,
-        regexp_replace(trim(concat_ws(' ', "firstName", "lastName")), '[[:space:]]+', ' ', 'g') AS first_last_name,
-        regexp_replace(trim(concat_ws(' ', "lastName", "firstName")), '[[:space:]]+', ' ', 'g') AS last_first_name,
-        regexp_replace(trim(concat_ws(' ', "phoneticFirstName", "phoneticLastName")), '[[:space:]]+', ' ', 'g') AS phonetic_first_last_name,
-        regexp_replace(trim(concat_ws(' ', "phoneticLastName", "phoneticFirstName")), '[[:space:]]+', ' ', 'g') AS phonetic_last_first_name
+  // P38-06: the weighted tsvector is stored (Contact."searchVector",
+  // trigger-maintained by scripts/setup-contact-search-index.mjs) and GIN
+  // indexed. The three match kinds are separate UNION branches so the FTS
+  // branch can use the index — OR-ing them into one WHERE would force a
+  // sequential scan for all three. A contact matching several branches keeps
+  // its best rank (max), matching the old GREATEST() semantics exactly.
+  const branches: Prisma.Sql[] = [];
+
+  if (tsq) {
+    branches.push(Prisma.sql`
+      SELECT id, ts_rank("searchVector", to_tsquery('english', ${tsq}))::float8 AS rank
       FROM "Contact"
-      WHERE ${scopeWhere}
+      WHERE ${scopeWhere} AND "searchVector" @@ to_tsquery('english', ${tsq})
+    `);
+  }
+
+  if (digits.length >= 3) {
+    branches.push(Prisma.sql`
+      SELECT id, 1.0::float8 AS rank
+      FROM "Contact"
+      WHERE ${scopeWhere} AND regexp_replace(
+        coalesce("phone", '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' || coalesce("phoneEntries"::text, ''),
+        '[^0-9]', '', 'g'
+      ) LIKE '%' || ${digits} || '%'
+    `);
+  }
+
+  // Name matching is order-aware outside FTS so "first last" and "last first"
+  // both work, including for CJK names that Postgres' english text search
+  // does not reliably tokenize.
+  branches.push(Prisma.sql`
+    SELECT id, 1.2::float8 AS rank
+    FROM "Contact"
+    WHERE ${scopeWhere} AND (
+      regexp_replace(trim(coalesce("fullName", '')), '[[:space:]]+', ' ', 'g') ILIKE ${nameLikeParam}
+      OR regexp_replace(trim(coalesce("fullName", '')), '[[:space:]]+', ' ', 'g') ILIKE ${reversedNameLikeParam}
+      OR regexp_replace(trim(coalesce("nickname", '')), '[[:space:]]+', ' ', 'g') ILIKE ${nameLikeParam}
+      OR regexp_replace(trim(concat_ws(' ', "firstName", "lastName")), '[[:space:]]+', ' ', 'g') ILIKE ${nameLikeParam}
+      OR regexp_replace(trim(concat_ws(' ', "lastName", "firstName")), '[[:space:]]+', ' ', 'g') ILIKE ${nameLikeParam}
+      OR regexp_replace(trim(concat_ws(' ', "phoneticFirstName", "phoneticLastName")), '[[:space:]]+', ' ', 'g') ILIKE ${nameLikeParam}
+      OR regexp_replace(trim(concat_ws(' ', "phoneticLastName", "phoneticFirstName")), '[[:space:]]+', ' ', 'g') ILIKE ${nameLikeParam}
     )
-    SELECT
-      id,
-      GREATEST(
-        ts_rank(vec, to_tsquery('english', ${tsqParam})),
-        CASE WHEN length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%' THEN 1.0 ELSE 0 END,
-        CASE WHEN (
-          full_name_normalized ILIKE ${nameLikeParam}
-          OR full_name_normalized ILIKE ${reversedNameLikeParam}
-          OR nickname_normalized ILIKE ${nameLikeParam}
-          OR first_last_name ILIKE ${nameLikeParam}
-          OR last_first_name ILIKE ${nameLikeParam}
-          OR phonetic_first_last_name ILIKE ${nameLikeParam}
-          OR phonetic_last_first_name ILIKE ${nameLikeParam}
-        ) THEN 1.2 ELSE 0 END
-      ) AS rank
-    FROM scored
-    WHERE vec @@ to_tsquery('english', ${tsqParam})
-       OR (length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%')
-       OR (
-          full_name_normalized ILIKE ${nameLikeParam}
-          OR full_name_normalized ILIKE ${reversedNameLikeParam}
-          OR nickname_normalized ILIKE ${nameLikeParam}
-          OR first_last_name ILIKE ${nameLikeParam}
-          OR last_first_name ILIKE ${nameLikeParam}
-          OR phonetic_first_last_name ILIKE ${nameLikeParam}
-          OR phonetic_last_first_name ILIKE ${nameLikeParam}
-       )
+  `);
+
+  const rows = await db.$queryRaw<{ id: string; rank: number }[]>(Prisma.sql`
+    SELECT id, max(rank) AS rank
+    FROM (${Prisma.join(branches, " UNION ALL ")}) matches
+    GROUP BY id
     ORDER BY rank DESC
     LIMIT ${limit}
   `);
