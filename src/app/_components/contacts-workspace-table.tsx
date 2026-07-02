@@ -20,6 +20,10 @@ import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-sh
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import {
+  loadWorkspaceContactsPage,
+  type WorkspaceListRequest,
+} from "~/app/actions/workspace-list";
 
 // P38-01: lean row shape — only what a row renders. Full contact data (notes,
 // sync state, phonetic fields, dates) stays server-side in contacts/page.tsx.
@@ -44,6 +48,12 @@ type WorkspaceContact = {
 
 type ContactsWorkspaceTableProps = {
   contacts: WorkspaceContact[];
+  // P38-02: the list is one continuous phone-book list; `contacts` is only the
+  // first server-rendered window. Further windows stream in via the load-more
+  // server action as the user scrolls. The parent keys this component on the
+  // request so pages reset when any filter changes.
+  totalCount: number;
+  listRequest: WorkspaceListRequest;
   emptyState: string;
   mode: "active" | "archived";
   viewMode: "compact" | "cozy";
@@ -764,6 +774,8 @@ const clearRestoreContactParam = () => {
 
 export function ContactsWorkspaceTable({
   contacts,
+  totalCount,
+  listRequest,
   emptyState,
   mode,
   viewMode,
@@ -804,9 +816,55 @@ export function ContactsWorkspaceTable({
     [labelRegistry],
   );
 
+  // P38-02: windows streamed in after the initial server-rendered one. The
+  // parent keys this component on the list request, so a filter/search change
+  // remounts and clears them.
+  const [extraPages, setExtraPages] = useState<WorkspaceContact[][]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  // Offset of the last window requested — guards against duplicate fetches
+  // while scroll events race the response.
+  const requestedOffsetRef = useRef<number | null>(null);
+
+  const allContacts = useMemo(() => {
+    if (extraPages.length === 0) return contacts;
+    const seen = new Set(contacts.map((c) => c.id));
+    const merged = [...contacts];
+    for (const page of extraPages) {
+      for (const c of page) {
+        // Offsets can drift when contacts are created/removed between windows;
+        // dedupe by id so a shifted row never renders twice.
+        if (!seen.has(c.id)) {
+          seen.add(c.id);
+          merged.push(c);
+        }
+      }
+    }
+    return merged;
+  }, [contacts, extraPages]);
+
+  const loadedCount = allContacts.length;
+  const hasMore = loadedCount < totalCount;
+
+  const loadMore = useCallback(() => {
+    const offset = contacts.length + extraPages.reduce((n, p) => n + p.length, 0);
+    if (requestedOffsetRef.current === offset) return;
+    requestedOffsetRef.current = offset;
+    setLoadingMore(true);
+    loadWorkspaceContactsPage({ ...listRequest, offset })
+      .then((res) => {
+        setExtraPages((pages) => [...pages, res.rows]);
+      })
+      .catch((error) => {
+        console.error("Failed to load more contacts", error);
+        // Allow a retry on the next scroll tick.
+        requestedOffsetRef.current = null;
+      })
+      .finally(() => setLoadingMore(false));
+  }, [contacts.length, extraPages, listRequest]);
+
   const visibleContacts = useMemo(
-    () => contacts.filter((c) => !hiddenIds.has(c.id)),
-    [contacts, hiddenIds],
+    () => allContacts.filter((c) => !hiddenIds.has(c.id)),
+    [allContacts, hiddenIds],
   );
 
   const scrollMemoryKey = useMemo(
@@ -869,7 +927,7 @@ export function ContactsWorkspaceTable({
   // manager and the merge primary-picker.
   const selectedContacts = useMemo(
     () =>
-      contacts
+      allContacts
         .filter((c) => selectedSet.has(c.id))
         .map((c) => ({
           id: c.id,
@@ -878,7 +936,7 @@ export function ContactsWorkspaceTable({
             ? (c.labels as unknown[]).filter((v): v is string => typeof v === "string")
             : [],
         })),
-    [contacts, selectedSet, nameDisplayOrder],
+    [allContacts, selectedSet, nameDisplayOrder],
   );
 
   const toggleSelectAll = useCallback(() => {
@@ -985,6 +1043,15 @@ export function ContactsWorkspaceTable({
         : undefined,
   });
   const virtualItems = virtualizer.getVirtualItems();
+
+  // P38-02: stream the next window in as the user nears the end of the loaded
+  // list, keeping the phone-book scroll continuous with no visible pagination.
+  const lastVirtualIndex = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1]!.index : -1;
+  useEffect(() => {
+    if (!hasMore || loadingMore || lastVirtualIndex < 0) return;
+    if (lastVirtualIndex < flatRows.length - 40) return;
+    loadMore();
+  }, [lastVirtualIndex, flatRows.length, hasMore, loadingMore, loadMore]);
 
   // P28-05: keyboard shortcuts. Focused-row navigation + global actions, scoped
   // to the contacts workspace and suppressed while an input/textarea is focused.

@@ -17,6 +17,7 @@ import type { ContactHealthKey } from "~/server/contact-health";
 import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion, RecentMerge } from "~/server/contact-merge";
 import type { OnboardingChecklist as OnboardingChecklistData } from "~/server/onboarding";
+import type { WorkspaceListRequest } from "~/app/actions/workspace-list";
 
 // P38-01: lean row shape — only what a workspace row renders. Sorting, health
 // checks, and note-excerpt extraction run server-side on full rows in
@@ -72,6 +73,10 @@ type HealthCard = {
 type ContactDashboardProps = {
   activeContacts: DashboardContact[];
   archivedContacts: DashboardContact[];
+  // P38-02: windowed list — the first window renders here; the table streams
+  // further windows via the load-more server action using this descriptor.
+  listRequest: WorkspaceListRequest;
+  listTotalCount: number;
   currentFilter: WorkspaceFilter;
   currentSort: WorkspaceSort;
   currentTab: WorkspaceTab;
@@ -120,6 +125,8 @@ const getInitials = (value: string) =>
 export function ContactDashboard({
   activeContacts,
   archivedContacts,
+  listRequest,
+  listTotalCount,
   currentFilter,
   currentSort,
   currentTab,
@@ -869,7 +876,10 @@ export function ContactDashboard({
               </EmptyState>
             ) : (
               <ContactsWorkspaceTable
+                key={JSON.stringify(listRequest)}
                 contacts={activeContacts}
+                totalCount={listTotalCount}
+                listRequest={listRequest}
                 emptyState={
                   query
                     ? `No contacts match "${query}".`
@@ -898,7 +908,10 @@ export function ContactDashboard({
 
           {currentTab === "archived" ? (
             <ContactsWorkspaceTable
+              key={JSON.stringify(listRequest)}
               contacts={archivedContacts}
+              totalCount={listTotalCount}
+              listRequest={listRequest}
               emptyState={query ? `No archived contacts match "${query}".` : "No archived contacts."}
               groupByLetter={groupByLetter}
               mode="archived"

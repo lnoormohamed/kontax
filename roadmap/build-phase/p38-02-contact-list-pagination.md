@@ -1,5 +1,37 @@
 # P38-02 — Contact List Pagination / Windowed Fetch
 
+## Status
+Implemented & verified 2026-07-02.
+
+**Close-out** (seeded 1,000-contact account, dev against staging DB):
+- Initial view fetches exactly one 300-row window (`WORKSPACE_PAGE_SIZE`);
+  scrolling streams 3 further windows until all 1,000 rows are loaded, no
+  visible pagination, no duplicate rows.
+- One SQL query replaces the 3 per-scope `findMany` + JS merge/sort/health
+  filter; `count(*) OVER ()` supplies the exact total.
+- Health cards, health filter (400), label filter (333), FTS search (500 with
+  note excerpts), updated-sort, and archived tab all verified against the
+  P38-01 baseline numbers.
+- Multi-branch UNION (family/team scopes + FTS rank join + sync-attention
+  EXISTS) proven against staging via psql; **follow-up**: smoke-test with a
+  real family/team account before promoting to prod.
+- Known accepted drift: ordering authority is Postgres collation — names
+  containing digit runs sort lexicographically (old `Intl.Collator` was
+  `numeric: true`).
+- Scroll-restore going back to a row beyond the first window clamps to the
+  loaded window; acceptable v1 (noted in Risks). **Product decision (user)**: the list must stay one
+continuous phone-book-style list — no visible pagination. Windowed fetch is
+invisible: the virtualizer streams further rows in as the user scrolls.
+
+**Revised approach**: no persisted `sortKey` column (write-path drift risk
+eliminated). Instead, the name-aware ordering moves into a SQL expression in a
+single raw query that UNIONs the private/family/team scopes, ordered globally
+and paged with LIMIT/OFFSET (+ id tiebreak). One query replaces the three
+scope queries and the JS merge/sort; the same WHERE fragments feed the health
+counts (shared groundwork with P38-03). Ordering authority moves from
+`Intl.Collator` to Postgres collation — accepted drift on numeric/accent edge
+cases.
+
 ## Purpose
 
 Cap the initial contacts query so `/contacts` stops scaling linearly with total
