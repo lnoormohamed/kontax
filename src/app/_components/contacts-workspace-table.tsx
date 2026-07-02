@@ -17,6 +17,7 @@ import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
+import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -164,12 +165,32 @@ const Highlight = memo(function Highlight({ text, query }: { text: string; query
 const Avatar = memo(function Avatar({
   fullName,
   company,
+  avatarUrl,
   size,
 }: {
   fullName: string | null | undefined;
   company?: string | null;
+  avatarUrl?: string | null;
   size: number;
 }) {
+  // P38-08: Kontax-hosted avatars load the 96px webp thumb in list rows;
+  // external URLs (helper returns null) and pre-backfill uploads (thumb 404s
+  // → onError) fall back to the original.
+  const thumb = getAvatarThumbUrl(avatarUrl);
+  const [thumbFailed, setThumbFailed] = useState(false);
+  useEffect(() => setThumbFailed(false), [avatarUrl]);
+  if (avatarUrl) {
+    const src = thumb && !thumbFailed ? thumb : avatarUrl;
+    return (
+      <img
+        alt={fullName?.trim() || company?.trim() || "Contact photo"}
+        className="shrink-0 rounded-full object-cover"
+        src={src}
+        onError={src !== avatarUrl ? () => setThumbFailed(true) : undefined}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
   const [bg] = tintForName(fullName, company);
   const initials = getInitials(fullName, company);
   return (
@@ -531,7 +552,12 @@ const ContactRow = memo(function ContactRow({
   const avatarSlot = (
     <span className="relative inline-grid place-items-center" style={{ width: 40, height: 40 }}>
       <span className={selected ? "opacity-0" : "opacity-100 group-hover:opacity-0"}>
-        <Avatar fullName={contact.fullName} company={contact.company} size={avatarSize} />
+        <Avatar
+          fullName={contact.fullName}
+          company={contact.company}
+          avatarUrl={contact.avatarUrl}
+          size={avatarSize}
+        />
       </span>
       <button
         aria-label={selected ? "Deselect contact" : "Select contact"}

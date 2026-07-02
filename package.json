@@ -43,7 +43,8 @@
     "start:production": "node scripts/start-production.mjs",
     "typecheck": "tsc --noEmit",
     "seed:phase37:asia-latam": "node scripts/seed-phase37-asia-latam.mjs",
-    "search:setup-index": "node scripts/setup-contact-search-index.mjs"
+    "search:setup-index": "node scripts/setup-contact-search-index.mjs",
+    "backfill:avatar-thumbs": "node scripts/backfill-avatar-thumbs.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
@@ -70,6 +71,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^6.6.0",
+    "sharp": "^0.35.3",
     "stripe": "^22.2.0",
     "transliteration": "^2.6.1",
     "zod": "^3.24.2"

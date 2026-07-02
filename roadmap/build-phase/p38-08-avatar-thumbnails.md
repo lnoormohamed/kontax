@@ -1,5 +1,41 @@
 # P38-08 — Avatar Thumbnails for List Rows
 
+## Status
+Implemented & verified 2026-07-02.
+
+**Reality check found during implementation** (adjusts the ticket's premise):
+- The MinIO upload route (`/api/upload/avatar`) is only used for USER profile
+  avatars today. CONTACT avatars are a pasted-URL text field (arbitrary
+  external URLs), and zero contacts on staging have avatars at all — so the
+  "photo-heavy list" cost is prospective, not current. The mechanism is built
+  now because contact-photo work is in flight (P34S-04 / uncommitted
+  avatar-in-rows rendering), so every Kontax-hosted avatar gets a thumb from
+  day one.
+- Sync engines do not write avatarUrl (no provider photo ingestion yet) —
+  the upload route remains the single controlled write path.
+
+**Close-out:**
+- Upload route generates a 96×96 webp (quality 80, EXIF-rotated) sibling at
+  `<key minus ext>-thumb.webp`; generation failure never blocks the upload.
+- `src/lib/avatar-thumb.ts` derives thumb URLs by key convention
+  (`/avatars/<uid>/<id>.<ext>` shape only); external URLs return null. Pinned
+  by tests/node/avatar-thumb.test.ts.
+- List-row Avatar loads the thumb first with `onError` fallback to the
+  original (covers pre-backfill uploads); detail pages keep the original.
+- `npm run backfill:avatar-thumbs` (supports `--dry-run`) backfills existing
+  MinIO-hosted avatars; run against prod after deploy (needs MINIO_* env).
+- Verified: sharp pipeline (3.1KB jpeg → 92-byte 96×96 webp; corrupt input
+  rejected inside the guard), thumb-first request → 404 → original fallback
+  observed in the browser network log, external URLs pass through untouched.
+  End-to-end upload not testable locally (no MINIO_* in dev env) — smoke-test
+  a profile-picture upload on staging Coolify after deploy.
+- Docker: node:22-alpine builder installs sharp's musl prebuilds; runner
+  copies node_modules from the builder, so no Dockerfile change needed.
+- **Side-finding**: external pasted avatar URLs are blocked by the app CSP
+  (`img-src` allows only self/data/blob/media.getkontax.com) — they render
+  broken today. Flagged as a separate task (widen CSP vs proxy vs
+  upload-only).
+
 ## Purpose
 
 Stop downloading full-size contact photos to render 32–40px list avatars. On a
