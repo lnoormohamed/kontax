@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { useEffect, useRef, useState } from "react";
 
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
@@ -15,6 +16,7 @@ interface MobileContactDetailProps {
   backHref: string;
   avatarBg: string;
   avatarFg: string;
+  avatarUrl?: string | null;
   initials: string;
   subtitle: string | null;
   phone: string | null;
@@ -44,6 +46,7 @@ export function MobileContactDetail({
   backHref,
   avatarBg,
   avatarFg,
+  avatarUrl,
   initials,
   subtitle,
   phone,
@@ -375,24 +378,38 @@ export function MobileContactDetail({
 
         {/* Avatar + name */}
         <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              background: avatarBg,
-              color: avatarFg,
-              display: "inline-grid",
-              placeItems: "center",
-              fontSize: 28,
-              fontWeight: 700,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {initials ? initials : (
-              <WorkspaceIcon name="person" size={32} strokeWidth={1.6} className="text-[#aeb4ac]" />
-            )}
-          </div>
+          {avatarUrl ? (
+            <img
+              alt={contactName}
+              src={resolveAvatarSrc(avatarUrl) ?? avatarUrl}
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: "50%",
+                objectFit: "cover",
+                display: "inline-block",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: "50%",
+                background: avatarBg,
+                color: avatarFg,
+                display: "inline-grid",
+                placeItems: "center",
+                fontSize: 28,
+                fontWeight: 700,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {initials ? initials : (
+                <WorkspaceIcon name="person" size={32} strokeWidth={1.6} className="text-[#aeb4ac]" />
+              )}
+            </div>
+          )}
           <h1
             style={{
               marginTop: 12,

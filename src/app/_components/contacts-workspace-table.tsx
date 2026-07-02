@@ -17,7 +17,7 @@ import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
-import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
+import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -173,20 +173,22 @@ const Avatar = memo(function Avatar({
   avatarUrl?: string | null;
   size: number;
 }) {
-  // P38-08: Kontax-hosted avatars load the 96px webp thumb in list rows;
-  // external URLs (helper returns null) and pre-backfill uploads (thumb 404s
-  // → onError) fall back to the original.
-  const thumb = getAvatarThumbUrl(avatarUrl);
+  // P38-08: list rows load the small variant — the 96px webp thumb for
+  // Kontax-hosted avatars, the 96px proxy rendition for external URLs (kept
+  // same-origin so the strict CSP holds). Pre-backfill uploads 404 the thumb
+  // → onError falls back to the full-size source.
+  const thumbSrc = resolveAvatarSrc(avatarUrl, { thumb: true });
+  const fullSrc = resolveAvatarSrc(avatarUrl);
   const [thumbFailed, setThumbFailed] = useState(false);
   useEffect(() => setThumbFailed(false), [avatarUrl]);
-  if (avatarUrl) {
-    const src = thumb && !thumbFailed ? thumb : avatarUrl;
+  if (avatarUrl && fullSrc) {
+    const src = thumbSrc && !thumbFailed ? thumbSrc : fullSrc;
     return (
       <img
         alt={fullName?.trim() || company?.trim() || "Contact photo"}
         className="shrink-0 rounded-full object-cover"
         src={src}
-        onError={src !== avatarUrl ? () => setThumbFailed(true) : undefined}
+        onError={src !== fullSrc ? () => setThumbFailed(true) : undefined}
         style={{ width: size, height: size }}
       />
     );

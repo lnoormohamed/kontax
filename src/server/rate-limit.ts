@@ -57,6 +57,10 @@ export const rateLimiters = {
   // P34C-14: contact form — 3 submissions per IP per hour
   contactForm: makeLimiter(3, 60 * 60, "rl:contact-form"),
 
+  // P38-08 follow-up: external avatar image proxy — 240 fetches per user per
+  // minute (a full list window of proxied avatars stays well under this).
+  imageProxy: makeLimiter(240, 60, "rl:image-proxy"),
+
   // P34D-01: login brute-force — 5 wrong-password attempts per email per 15 minutes
   loginByEmail: makeLimiter(5, 15 * 60, "rl:login-email"),
   // P34D-01: login brute-force — 20 attempts per IP per 15 minutes (shared across accounts)

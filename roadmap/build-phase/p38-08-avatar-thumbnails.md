@@ -31,10 +31,18 @@ Implemented & verified 2026-07-02.
   a profile-picture upload on staging Coolify after deploy.
 - Docker: node:22-alpine builder installs sharp's musl prebuilds; runner
   copies node_modules from the builder, so no Dockerfile change needed.
-- **Side-finding**: external pasted avatar URLs are blocked by the app CSP
-  (`img-src` allows only self/data/blob/media.getkontax.com) — they render
-  broken today. Flagged as a separate task (widen CSP vs proxy vs
-  upload-only).
+- **Side-finding (resolved in follow-up)**: external pasted avatar URLs were
+  blocked by the app CSP. Resolved with option (b): a same-origin
+  `/api/image-proxy` (auth-gated, rate-limited, SSRF-hardened — DNS-pinned
+  connects, private/reserved ranges blocked, redirects re-validated,
+  image/* + 5MB + 6s caps) that re-encodes through sharp (96px list /
+  512px detail webp), so the CSP stays strict and raw third-party bytes are
+  never served. `src/lib/avatar-src.ts#resolveAvatarSrc` picks direct vs
+  thumb vs proxy per URL; wired into list rows, contact detail,
+  mobile detail, and the create-form preview. Chosen over widening
+  `img-src` because photo sync (P34S-04) will feed provider-origin URLs and
+  the prod server lives on a LAN beside MinIO/Proxmox/Coolify. Guards pinned
+  by tests/node/safe-image-fetch.test.ts.
 
 ## Purpose
 
