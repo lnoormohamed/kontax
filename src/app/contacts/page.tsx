@@ -19,6 +19,7 @@ import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server
 import { type ContactHealthKey } from "~/server/contact-health";
 import {
   buildWorkspaceScope,
+  getWorkspaceCounts,
   getWorkspaceHealthCounts,
   listWorkspaceContacts,
   resolveWorkspaceFts,
@@ -165,7 +166,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   // P31B-05: label filter — ?label=<name> shows only contacts carrying that label.
   const labelParam = (await getSingleParam(searchParams, "label"))?.trim() ?? "";
 
-  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, labelRows, sidebarLabels] =
+  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, sidebarLabels, planSummary, mergeSuggestions, recentMerges] =
     await Promise.all([
       getUserFamilyMembership(session.user.id),
       getAccessibleTeamBooks(session.user.id),
@@ -187,31 +188,21 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } },
         _count: { _all: true },
       }),
-      // P28-04: existing labels to suggest in the bulk "Add label" popover.
-      shouldLoadLabelSuggestions
-        ? db.contact.findMany({
-            where: { userId: session.user.id, archivedAt: null },
-            select: { labels: true },
-            take: 2000,
-          })
-        : Promise.resolve([]),
-      // P31B-04: label registry for the sidebar Labels section.
+      // P31B-04: label registry for the sidebar Labels section (also feeds the
+      // bulk "Add label" suggestions — getLabels() backfills the registry from
+      // contact labels, so the old 2000-contact scan is gone; P38-03).
       getLabels(),
+      getUserPlanSummary(session.user.id),
+      shouldLoadDuplicateDetails
+        ? getOpenMergeSuggestionsForUser(session.user.id, { take: DUPLICATE_SUGGESTION_BATCH_SIZE })
+        : Promise.resolve([]),
+      shouldLoadDuplicateDetails ? getRecentMergesForUser(session.user.id) : Promise.resolve([]),
     ]);
 
-  // Flatten + dedupe label strings (case-insensitive), capped for the popover.
-  const labelSuggestions = (() => {
-    const seen = new Map<string, string>();
-    for (const row of labelRows) {
-      if (!Array.isArray(row.labels)) continue;
-      for (const value of row.labels) {
-        if (typeof value !== "string") continue;
-        const key = value.trim().toLowerCase();
-        if (key && !seen.has(key)) seen.set(key, value.trim());
-      }
-    }
-    return [...seen.values()].sort((a, b) => a.localeCompare(b)).slice(0, 24);
-  })();
+  // P28-04: suggestions in the bulk "Add label" popover, from the registry.
+  const labelSuggestions = shouldLoadLabelSuggestions
+    ? sidebarLabels.map((l) => l.name).sort((a, b) => a.localeCompare(b)).slice(0, 24)
+    : [];
   const familyBookId = familyMembership?.bookId ?? null;
   const teamBookIds = accessibleTeamBooks.map((b) => b.id);
   const sharedBooks = [
@@ -275,11 +266,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     activeList,
     archivedList,
     healthCounts,
-    mergeSuggestions,
-    mergeSuggestionCount,
-    highConfidenceSuggestionCount,
-    recentMerges,
-    planSummary,
+    workspaceCounts,
   ] = await Promise.all([
       showsPeopleList
         ? listWorkspaceContacts({
@@ -317,53 +304,22 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             "missing-dates": 0,
             "sync-attention": 0,
           } satisfies Record<ContactHealthKey, number>),
-      shouldLoadDuplicateDetails
-        ? getOpenMergeSuggestionsForUser(session.user.id, { take: DUPLICATE_SUGGESTION_BATCH_SIZE })
-        : Promise.resolve([]),
-      db.mergeSuggestion.count({
-        where: { userId: session.user.id, status: "OPEN" },
-      }),
-      db.mergeSuggestion.count({
-        where: { userId: session.user.id, status: "OPEN", confidence: "HIGH" },
-      }),
-      shouldLoadDuplicateDetails ? getRecentMergesForUser(session.user.id) : Promise.resolve([]),
-      getUserPlanSummary(session.user.id),
+      // P38-03: all nav/badge counts in one round trip (replaces the former
+      // wave of 9 count queries + 2 merge-suggestion counts).
+      getWorkspaceCounts(session.user.id, sharedBooks.map((b) => b.id)),
     ]);
 
-  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount, unreadCount, syncErrorCount, connectedSyncCount] =
-    await Promise.all([
-      db.contact.count({ where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } } }),
-      sharedBooks.length > 0
-        ? db.contact.count({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: sharedBooks.map((b) => b.id) } } } },
-          })
-        : Promise.resolve(0),
-      db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
-      db.contact.count({ where: { userId: session.user.id, archivedAt: null, isEmergency: true } }),
-      db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
-      db.contactShare.count({
-        where: {
-          recipientUserId: session.user.id,
-          shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
-          status: "ACTIVE",
-          recipientContactId: null,
-        },
-      }),
-      db.notification.count({ where: { userId: session.user.id, readAt: null, dismissedAt: null } }),
-      db.syncAccount.count({ where: { userId: session.user.id, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
-      db.syncAccount.count({ where: { userId: session.user.id, status: "ACTIVE" } }),
-    ]);
-  const peopleCount = privatePeopleCount + sharedPeopleCount;
+  const peopleCount = workspaceCounts.privatePeople + workspaceCounts.sharedPeople;
 
   // P26-04: first-run onboarding checklist (shown above the people list).
   const onboarding = await getOnboardingChecklist({
     userId: session.user.id,
-    hasContact: privatePeopleCount > 0,
-    hasSync: connectedSyncCount > 0,
+    hasContact: workspaceCounts.privatePeople > 0,
+    hasSync: workspaceCounts.connectedSync > 0,
   });
 
-  const duplicatesCount = mergeSuggestionCount;
-  const highConfidenceCount = highConfidenceSuggestionCount;
+  const duplicatesCount = workspaceCounts.openMergeSuggestions;
+  const highConfidenceCount = workspaceCounts.highConfidenceMergeSuggestions;
 
   // P38-02: rows arrive lean (P38-01 shape), ordered, and windowed from SQL.
   // The client streams further windows via the load-more server action using
@@ -561,16 +517,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         currentLabel={labelParam || null}
         counts={{
           people: peopleCount,
-          favorites: favoritesCount,
-          emergency: emergencyCount,
-          archived: archivedCount,
+          favorites: workspaceCounts.favorites,
+          emergency: workspaceCounts.emergency,
+          archived: workspaceCounts.archived,
           duplicates: duplicatesCount,
         }}
         account={{ name: userLabel, email: session.user.email ?? "" }}
         syncState="ok"
         highConfidenceCount={highConfidenceCount}
         recentMerges={recentMerges}
-        incomingShares={incomingSharesCount || undefined}
+        incomingShares={workspaceCounts.incomingShares || undefined}
         onboarding={onboarding}
         currentHealth={selectedHealth}
         healthCards={healthCards}
@@ -582,7 +538,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         show={selectedTab === "people"}
         atLimit={planSummary.contactsRemaining !== null && planSummary.contactsRemaining <= 0}
       />
-      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
+      <BottomNav unreadCount={workspaceCounts.unreadNotifications} syncErrorCount={workspaceCounts.syncErrors} />
     </main>
   );
 }

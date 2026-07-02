@@ -451,6 +451,111 @@ export async function listWorkspaceContacts(
   };
 }
 
+// --- workspace badge/nav counts (P38-03) -------------------------------------
+
+export type WorkspaceCounts = {
+  privatePeople: number;
+  sharedPeople: number;
+  favorites: number;
+  emergency: number;
+  archived: number;
+  incomingShares: number;
+  unreadNotifications: number;
+  syncErrors: number;
+  connectedSync: number;
+  openMergeSuggestions: number;
+  highConfidenceMergeSuggestions: number;
+};
+
+/**
+ * P38-03: the workspace's nav/badge counts in one round trip. Replaces the
+ * former wave of 9 separate `count` queries plus 2 merge-suggestion counts.
+ */
+export async function getWorkspaceCounts(
+  userId: string,
+  sharedBookIds: string[],
+): Promise<WorkspaceCounts> {
+  const sharedCount =
+    sharedBookIds.length > 0
+      ? Prisma.sql`(
+          SELECT count(*) FROM "Contact" sc
+          WHERE sc."archivedAt" IS NULL AND EXISTS (
+            SELECT 1 FROM "GroupContact" gc
+            WHERE gc."contactId" = sc.id AND gc."groupAddressBookId" = ANY(${sharedBookIds}::text[])
+          )
+        )`
+      : Prisma.sql`0`;
+
+  const [row] = await db.$queryRaw<
+    Array<{
+      private_people: bigint;
+      shared_people: bigint;
+      favorites: bigint;
+      emergency: bigint;
+      archived: bigint;
+      incoming_shares: bigint;
+      unread: bigint;
+      sync_errors: bigint;
+      connected_sync: bigint;
+      open_suggestions: bigint;
+      high_confidence: bigint;
+    }>
+  >(Prisma.sql`
+    SELECT
+      count(*) FILTER (
+        WHERE c."archivedAt" IS NULL
+          AND NOT EXISTS (SELECT 1 FROM "GroupContact" gc WHERE gc."contactId" = c.id)
+      ) AS private_people,
+      count(*) FILTER (WHERE c."archivedAt" IS NULL AND c."isFavorite") AS favorites,
+      count(*) FILTER (WHERE c."archivedAt" IS NULL AND c."isEmergency") AS emergency,
+      count(*) FILTER (WHERE c."archivedAt" IS NOT NULL) AS archived,
+      ${sharedCount} AS shared_people,
+      (
+        SELECT count(*) FROM "ContactShare" cs
+        WHERE cs."recipientUserId" = ${userId}
+          AND cs."shareType"::text IN ('STATIC_COPY', 'LIVE_SYNC')
+          AND cs.status::text = 'ACTIVE'
+          AND cs."recipientContactId" IS NULL
+      ) AS incoming_shares,
+      (
+        SELECT count(*) FROM "Notification" n
+        WHERE n."userId" = ${userId} AND n."readAt" IS NULL AND n."dismissedAt" IS NULL
+      ) AS unread,
+      (
+        SELECT count(*) FROM "SyncAccount" sa
+        WHERE sa."userId" = ${userId} AND sa.status::text IN ('ERROR', 'NEEDS_REAUTH')
+      ) AS sync_errors,
+      (
+        SELECT count(*) FROM "SyncAccount" sa
+        WHERE sa."userId" = ${userId} AND sa.status::text = 'ACTIVE'
+      ) AS connected_sync,
+      (
+        SELECT count(*) FROM "MergeSuggestion" ms
+        WHERE ms."userId" = ${userId} AND ms.status::text = 'OPEN'
+      ) AS open_suggestions,
+      (
+        SELECT count(*) FROM "MergeSuggestion" ms
+        WHERE ms."userId" = ${userId} AND ms.status::text = 'OPEN' AND ms.confidence::text = 'HIGH'
+      ) AS high_confidence
+    FROM "Contact" c
+    WHERE c."userId" = ${userId}
+  `);
+
+  return {
+    privatePeople: Number(row?.private_people ?? 0n),
+    sharedPeople: Number(row?.shared_people ?? 0n),
+    favorites: Number(row?.favorites ?? 0n),
+    emergency: Number(row?.emergency ?? 0n),
+    archived: Number(row?.archived ?? 0n),
+    incomingShares: Number(row?.incoming_shares ?? 0n),
+    unreadNotifications: Number(row?.unread ?? 0n),
+    syncErrors: Number(row?.sync_errors ?? 0n),
+    connectedSync: Number(row?.connected_sync ?? 0n),
+    openMergeSuggestions: Number(row?.open_suggestions ?? 0n),
+    highConfidenceMergeSuggestions: Number(row?.high_confidence ?? 0n),
+  };
+}
+
 /**
  * Health-card counts over the same scope/search/filter/label conditions as the
  * list (minus any active health filter), computed in SQL so they stay exact

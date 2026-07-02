@@ -1,5 +1,13 @@
 # P38-07 — Server Hot-Path Micro-Fixes
 
+## Status
+Complete 2026-07-02 — both items landed via other tickets, no separate work
+remains. (1) The per-comparison `Intl.Collator` was deleted entirely by P38-02
+(ordering moved into SQL; `compareWorkspaceContacts` no longer exists).
+(2) The 2,000-contact label-suggestion scan was removed by P38-03 (suggestions
+come from the Label registry; `getLabels()` now backfills the registry from a
+single grouped SQL scan with no row cap).
+
 ## Purpose
 
 Two small, zero-risk fixes on the `/contacts` request path that are cheap to

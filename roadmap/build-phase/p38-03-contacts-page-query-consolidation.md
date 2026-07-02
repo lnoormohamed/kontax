@@ -1,5 +1,30 @@
 # P38-03 — Contacts Page Query Consolidation
 
+## Status
+Implemented & verified 2026-07-02.
+
+**Close-out:**
+- The 9-count wave + 2 merge-suggestion counts collapsed into one
+  `getWorkspaceCounts` raw query (count FILTER + scalar subselects); verified
+  identical to individual counts on both the seeded account and a real
+  account with live shares/notifications/sync/merge data.
+- `getLabels()` turned out to be the worst offender (found during
+  implementation): every view ran the registry backfill (label fetch +
+  2,000-contact scan + aggregate) plus **one count query per label**. Now one
+  grouped `jsonb_array_elements_text` query supplies both usage counts and
+  backfill detection (extra writes only when something is missing) — and the
+  2,000-contact backfill cap is gone.
+- The bulk-edit label-suggestion 2,000-row scan is deleted (suggestions come
+  from the registry) — this plus the P38-02 collator removal completes P38-07.
+- Await tiers after auth: tier 1 (books/labels/plan/merge) → optional FTS →
+  tier 2 (list windows + health + counts) → onboarding.
+- Measured per view (Prisma query log, dev): **~26 real queries, down from
+  ~35+** (~40+ for label-heavy users). The remaining fat is duplicated
+  per-request context — billing context runs twice (page + BillingBannerSlot),
+  the notification feed twice (desktop + mobile bell) — which is exactly
+  P38-04's request-scoped `cache()` scope, plus `getUserPlanSummary`'s 5
+  queries. The original ≤12 target lands with P38-04.
+
 ## Purpose
 
 Reduce a `/contacts` page view from ~30 queries in 4+ sequential await waves to
