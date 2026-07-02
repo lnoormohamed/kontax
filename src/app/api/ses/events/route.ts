@@ -1,8 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { db } from "~/server/db";
+import { isSnsHttpsUrl, verifySnsSignature } from "~/server/sns-verify";
 
 export const dynamic = "force-dynamic";
+// X509Certificate / createVerify (used by verifySnsSignature) require the Node
+// runtime; be explicit rather than relying on the default.
+export const runtime = "nodejs";
 
 // Minimal shapes for the SES notification payload SNS delivers (P20-10).
 interface SnsEnvelope {
@@ -34,27 +38,36 @@ type SesNotification =
  * `kontax-email-events` SNS topic (P20-01), which POSTs here. Hard bounces and
  * complaints mark the recipient's `emailStatus` so future sends are suppressed.
  *
- * This route is excluded from session auth (see PUBLIC_PATHS in middleware).
- * v1 trusts the (unguessable) endpoint URL; production hardening should verify
- * the SNS message signature.
+ * This route is excluded from session auth (see PUBLIC_PATHS in middleware). It
+ * is public, so every message is authenticated via its SNS signature (SEC-03)
+ * before we act on it — otherwise an attacker could forge bounce/complaint
+ * notifications to suppress any user's email, or trigger SSRF via SubscribeURL.
  */
 export async function POST(req: NextRequest) {
-  // SNS sets the message type in a header; fall back to the body's Type field.
-  let body: SnsEnvelope;
+  let body: SnsEnvelope & Record<string, unknown>;
   try {
-    body = (await req.json()) as SnsEnvelope;
+    body = (await req.json()) as SnsEnvelope & Record<string, unknown>;
   } catch {
     // Empty or malformed body — never from real SNS. Return 400 (not 500) so it
     // isn't treated as a server fault that SNS would keep retrying.
     return NextResponse.json({ error: "invalid body" }, { status: 400 });
   }
-  const messageType =
-    req.headers.get("x-amz-sns-message-type") ?? body.Type ?? "";
 
-  // First delivery: confirm the subscription by fetching the SubscribeURL.
+  // Authenticate: reject anything that isn't a signature-valid SNS message.
+  const authentic = await verifySnsSignature(body);
+  if (!authentic) {
+    return NextResponse.json({ error: "signature verification failed" }, { status: 403 });
+  }
+
+  // Type is signature-covered, so trust the body field over the header now.
+  const messageType = typeof body.Type === "string" ? body.Type : "";
+
+  // First delivery: confirm the subscription by fetching the SubscribeURL. The
+  // URL is signature-covered, but enforce the AWS-SNS host allowlist before the
+  // fetch as belt-and-braces against SSRF.
   if (messageType === "SubscriptionConfirmation") {
-    if (body.SubscribeURL) {
-      await fetch(body.SubscribeURL).catch((err) =>
+    if (isSnsHttpsUrl(body.SubscribeURL)) {
+      await fetch(body.SubscribeURL!).catch((err) =>
         console.error("[ses-events] subscription confirm failed:", err),
       );
     }
