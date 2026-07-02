@@ -1,0 +1,363 @@
+{
+  "harness": "phase44-photo-roundtrip",
+  "version": 1,
+  "account": {
+    "id": "cmqfr967400l9oc2muykimp51",
+    "provider": "CARDDAV",
+    "label": "iCloud",
+    "baseUrl": "https://contacts.icloud.com",
+    "addressBookUrl": "https://p185-contacts.icloud.com/162481109/carddavhome/card/",
+    "userEmail": "li@linoormohamed.com"
+  },
+  "providerKey": "carddav-icloud",
+  "vcardFlavor": 3,
+  "referenceImages": [
+    {
+      "id": "jpeg-100",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 100,
+      "height": 75,
+      "byteLength": 1423,
+      "sha256": "4f1edc8542f703cb4511b7606b099d452faf828e61d4e638f1c3e24bc5c85089",
+      "exifMarker": "kontax-p44 jpeg-100"
+    },
+    {
+      "id": "jpeg-512",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 512,
+      "height": 384,
+      "byteLength": 1829,
+      "sha256": "f68c81e622791e22bf243531f1e101fdafe222aa63d29314547a5ab690499ac5",
+      "exifMarker": "kontax-p44 jpeg-512"
+    },
+    {
+      "id": "jpeg-1024",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 1024,
+      "height": 768,
+      "byteLength": 5487,
+      "sha256": "f595bd95a63b248c140facf523bd8f6d88eda64b0bae7b162fd75dc7808437b0",
+      "exifMarker": "kontax-p44 jpeg-1024"
+    },
+    {
+      "id": "jpeg-2048",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 2048,
+      "height": 1536,
+      "byteLength": 19583,
+      "sha256": "71f7247d9bd5762080f79b51c1347571454eef66befdbe9dbd3d6f9c2a81d12a",
+      "exifMarker": "kontax-p44 jpeg-2048"
+    },
+    {
+      "id": "png-512",
+      "format": "png",
+      "mime": "image/png",
+      "vcardType": "PNG",
+      "width": 512,
+      "height": 384,
+      "byteLength": 6428,
+      "sha256": "706891e888e7013e0459d3482a71a6890a32e846585f96eaeb5d64b4c3f97d72",
+      "exifMarker": "kontax-p44 png-512"
+    },
+    {
+      "id": "webp-512",
+      "format": "webp",
+      "mime": "image/webp",
+      "vcardType": "WEBP",
+      "width": 512,
+      "height": 384,
+      "byteLength": 948,
+      "sha256": "62d4964b1968480ac2b723333668c66cfc932409f8bace5ca651808bddefe654",
+      "exifMarker": "kontax-p44 webp-512"
+    },
+    {
+      "id": "jpeg-large",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 2448,
+      "height": 1836,
+      "byteLength": 3269341,
+      "sha256": "41b9aeecc82dd7362196b5a0d5e2b34e1fc66732da17c953dbe9653a8fdf5011",
+      "exifMarker": "kontax-p44 jpeg-large"
+    }
+  ],
+  "push": {
+    "at": "2026-07-02T16:15:57.015Z",
+    "results": [
+      {
+        "imageId": "jpeg-100",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-100",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-100.vcf",
+          "etag": "\"mr3pho3b\""
+        }
+      },
+      {
+        "imageId": "jpeg-512",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-512",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-512.vcf",
+          "etag": "\"mr3php7q\""
+        }
+      },
+      {
+        "imageId": "jpeg-1024",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-1024",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-1024.vcf",
+          "etag": "\"mr3phpyc\""
+        }
+      },
+      {
+        "imageId": "jpeg-2048",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-2048",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-2048.vcf",
+          "etag": "\"mr3phqwz\""
+        }
+      },
+      {
+        "imageId": "png-512",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-png-512",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-png-512.vcf",
+          "etag": "\"mr3phrm0\""
+        }
+      },
+      {
+        "imageId": "webp-512",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-webp-512",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-webp-512.vcf",
+          "etag": "\"mr3phsf8\""
+        }
+      },
+      {
+        "imageId": "jpeg-large",
+        "ok": false,
+        "httpStatus": 403,
+        "error": "HTTP 403",
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-large",
+          "href": "https://p185-contacts.icloud.com/162481109/carddavhome/card/kontax-p44-photoqa-cmqfr967400l9oc2muykimp51-jpeg-large.vcf",
+          "etag": null
+        }
+      }
+    ]
+  },
+  "pulls": [
+    {
+      "label": "initial",
+      "at": "2026-07-02T16:17:42.035Z",
+      "results": [
+        {
+          "imageId": "jpeg-100",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "4f1edc8542f703cb4511b7606b099d452faf828e61d4e638f1c3e24bc5c85089",
+            "byteLength": 1423,
+            "width": 100,
+            "height": 75,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"mr3pho3b\"",
+            "photoRawSha256": "d15417a1295194f49480e3b371904341e0efab2f9665b97dbec9b6a52584928b",
+            "photoUri": "https://gateway.icloud.com/contacts/162481109/ck/card/59bd997da131bb46774aa14d543a6d94"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "uri",
+            "photoMime": null,
+            "uriFetchStatus": 200,
+            "uriFetchAuthed": true
+          }
+        },
+        {
+          "imageId": "jpeg-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "f68c81e622791e22bf243531f1e101fdafe222aa63d29314547a5ab690499ac5",
+            "byteLength": 1829,
+            "width": 512,
+            "height": 384,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"mr3php7q\"",
+            "photoRawSha256": "7b4bda8cef2a0c791c3f8316f7bbb58cd3ff52b4da6f27a1c8f97dfef1f67d2c",
+            "photoUri": "https://gateway.icloud.com/contacts/162481109/ck/card/b0f329612d51cd79f9bab3ab5ded97c0"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "uri",
+            "photoMime": null,
+            "uriFetchStatus": 200,
+            "uriFetchAuthed": true
+          }
+        },
+        {
+          "imageId": "jpeg-1024",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "f595bd95a63b248c140facf523bd8f6d88eda64b0bae7b162fd75dc7808437b0",
+            "byteLength": 5487,
+            "width": 1024,
+            "height": 768,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"mr3phpyc\"",
+            "photoRawSha256": "08b32a0e952fa1f89ef5f642ed685dc594195e98aaf7b05ff83e09e180bd200f",
+            "photoUri": "https://gateway.icloud.com/contacts/162481109/ck/card/ad2ce714b90589aa3b21eb5496a9e629"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "uri",
+            "photoMime": null,
+            "uriFetchStatus": 200,
+            "uriFetchAuthed": true
+          }
+        },
+        {
+          "imageId": "jpeg-2048",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "71f7247d9bd5762080f79b51c1347571454eef66befdbe9dbd3d6f9c2a81d12a",
+            "byteLength": 19583,
+            "width": 2048,
+            "height": 1536,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"mr3phqwz\"",
+            "photoRawSha256": "7e3f33222163c3dc02e498703eb0413d93393dd6b0e14a42394ffa2cbe7d4145",
+            "photoUri": "https://gateway.icloud.com/contacts/162481109/ck/card/fc76c07c8aaaba903f7e75f3c04ab389"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "uri",
+            "photoMime": null,
+            "uriFetchStatus": 200,
+            "uriFetchAuthed": true
+          }
+        },
+        {
+          "imageId": "png-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "706891e888e7013e0459d3482a71a6890a32e846585f96eaeb5d64b4c3f97d72",
+            "byteLength": 6428,
+            "width": 512,
+            "height": 384,
+            "format": "png",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"mr3phrm0\"",
+            "photoRawSha256": "6792c479e5d31fc2f8b51530367b42d20cd2045fb8833fd8d128355bc7385fe0",
+            "photoUri": "https://gateway.icloud.com/contacts/162481109/ck/card/9630c1eeafe537c86a7199f22163deb1"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "uri",
+            "photoMime": null,
+            "uriFetchStatus": 200,
+            "uriFetchAuthed": true
+          }
+        },
+        {
+          "imageId": "webp-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "62d4964b1968480ac2b723333668c66cfc932409f8bace5ca651808bddefe654",
+            "byteLength": 948,
+            "width": 512,
+            "height": 384,
+            "format": "webp",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"mr3phsf8\"",
+            "photoRawSha256": "331ddb06c84998fc3830a3b08105e1b03c05cf062f4aa62685ccb4f1920024fb",
+            "photoUri": "https://gateway.icloud.com/contacts/162481109/ck/card/d5a8a755fb2f98fa35013b229d773a30"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "uri",
+            "photoMime": null,
+            "uriFetchStatus": 200,
+            "uriFetchAuthed": true
+          }
+        },
+        {
+          "imageId": "jpeg-large",
+          "found": false,
+          "error": "not pushed (push failed)",
+          "photo": null,
+          "matchesPushedBytes": null,
+          "matchesPreviousPull": null,
+          "identifier": {},
+          "identifierStableWithinRun": null,
+          "extra": {}
+        }
+      ]
+    }
+  ],
+  "cleanup": null
+}

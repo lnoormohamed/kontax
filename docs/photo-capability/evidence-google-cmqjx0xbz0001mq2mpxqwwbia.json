@@ -1,0 +1,359 @@
+{
+  "harness": "phase44-photo-roundtrip",
+  "version": 1,
+  "account": {
+    "id": "cmqjx0xbz0001mq2mpxqwwbia",
+    "provider": "GOOGLE",
+    "label": "Google Contacts (li@noormohamed.uk)",
+    "baseUrl": "https://people.googleapis.com/v1",
+    "addressBookUrl": null,
+    "userEmail": "li@linoormohamed.com"
+  },
+  "providerKey": "google",
+  "vcardFlavor": 3,
+  "referenceImages": [
+    {
+      "id": "jpeg-100",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 100,
+      "height": 75,
+      "byteLength": 1423,
+      "sha256": "4f1edc8542f703cb4511b7606b099d452faf828e61d4e638f1c3e24bc5c85089",
+      "exifMarker": "kontax-p44 jpeg-100"
+    },
+    {
+      "id": "jpeg-512",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 512,
+      "height": 384,
+      "byteLength": 1829,
+      "sha256": "f68c81e622791e22bf243531f1e101fdafe222aa63d29314547a5ab690499ac5",
+      "exifMarker": "kontax-p44 jpeg-512"
+    },
+    {
+      "id": "jpeg-1024",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 1024,
+      "height": 768,
+      "byteLength": 5487,
+      "sha256": "f595bd95a63b248c140facf523bd8f6d88eda64b0bae7b162fd75dc7808437b0",
+      "exifMarker": "kontax-p44 jpeg-1024"
+    },
+    {
+      "id": "jpeg-2048",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 2048,
+      "height": 1536,
+      "byteLength": 19583,
+      "sha256": "71f7247d9bd5762080f79b51c1347571454eef66befdbe9dbd3d6f9c2a81d12a",
+      "exifMarker": "kontax-p44 jpeg-2048"
+    },
+    {
+      "id": "png-512",
+      "format": "png",
+      "mime": "image/png",
+      "vcardType": "PNG",
+      "width": 512,
+      "height": 384,
+      "byteLength": 6428,
+      "sha256": "706891e888e7013e0459d3482a71a6890a32e846585f96eaeb5d64b4c3f97d72",
+      "exifMarker": "kontax-p44 png-512"
+    },
+    {
+      "id": "webp-512",
+      "format": "webp",
+      "mime": "image/webp",
+      "vcardType": "WEBP",
+      "width": 512,
+      "height": 384,
+      "byteLength": 948,
+      "sha256": "62d4964b1968480ac2b723333668c66cfc932409f8bace5ca651808bddefe654",
+      "exifMarker": "kontax-p44 webp-512"
+    },
+    {
+      "id": "jpeg-large",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 2448,
+      "height": 1836,
+      "byteLength": 3267931,
+      "sha256": "0c62240cfd20a184a8490e6ad66a3966a1d01fe6b73e97189b974316adfc881a",
+      "exifMarker": "kontax-p44 jpeg-large"
+    }
+  ],
+  "push": {
+    "at": "2026-07-02T16:49:47.642Z",
+    "results": [
+      {
+        "imageId": "jpeg-100",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c3868685594382530359",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzE_IZs6ka2HpnKjR84n1lRsV5ztQUKA-OMoLuz-FxKHdgALRtIC=s100"
+        }
+      },
+      {
+        "imageId": "jpeg-512",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c5126968518092998354",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzFIk6Nld46bvS86C_BiBrd12q0tqePINfo_rzm5WRKogsDSPh0k=s100"
+        }
+      },
+      {
+        "imageId": "jpeg-1024",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c6711977375554954838",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzEp6bjGi7xXuLhbjxJGn_mzzMknu9Y8EIhgV8tY0GLYiIp3tgHC=s100"
+        }
+      },
+      {
+        "imageId": "jpeg-2048",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c8836600173237046387",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzHaBuQu45hVVJy5vJronEVxvu97DQdBcO5vezYKfhV-dieDynDl=s100"
+        }
+      },
+      {
+        "imageId": "png-512",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c8548869093494336291",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzE0BvxXKOL86Hl02u-eE-f216OzzLkiShEnEoWq7OWKY_oy8dhu=s100"
+        }
+      },
+      {
+        "imageId": "webp-512",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c7395759660407741617",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzGXwZeu7et_7C5HRVvaMFdn9jO4CJ0BTvIZWD8KAgoXShLsR2gU=s100"
+        }
+      },
+      {
+        "imageId": "jpeg-large",
+        "ok": true,
+        "httpStatus": 200,
+        "error": null,
+        "remote": {
+          "resourceName": "people/c7657218932026660050",
+          "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzHn71_n_X6nepR7hfFMZVMtYuPP2yvmZTwhe_B2Cv3ECMpO0Qbp=s100"
+        }
+      }
+    ]
+  },
+  "pulls": [
+    {
+      "label": "initial",
+      "at": "2026-07-02T16:50:02.431Z",
+      "results": [
+        {
+          "imageId": "jpeg-100",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "106e31374b3a1afde9a9ac2378ca5b9d3d41feaa15d1a5f8493a0bdee6a836ae",
+            "byteLength": 1160,
+            "width": 100,
+            "height": 75,
+            "format": "jpeg",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgxNcE9uQjVveFpQVT0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzE_IZs6ka2HpnKjR84n1lRsV5ztQUKA-OMoLuz-FxKHdgALRtIC=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzE_IZs6ka2HpnKjR84n1lRsV5ztQUKA-OMoLuz-FxKHdgALRtIC",
+            "photoSourceId": "35b0550d08d77737"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 jpeg",
+            "fetchedVariant": "s0"
+          }
+        },
+        {
+          "imageId": "jpeg-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "9489dd60a8d8b3c7154a7a4a983d16fde67ee54810679251c7217406d6a955a3",
+            "byteLength": 2128,
+            "width": 512,
+            "height": 384,
+            "format": "jpeg",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgxCVDdyam9ST01pcz0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzFIk6Nld46bvS86C_BiBrd12q0tqePINfo_rzm5WRKogsDSPh0k=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzFIk6Nld46bvS86C_BiBrd12q0tqePINfo_rzm5WRKogsDSPh0k",
+            "photoSourceId": "4726a6b40f8b46d2"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 jpeg",
+            "fetchedVariant": "s0"
+          }
+        },
+        {
+          "imageId": "jpeg-1024",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "d121486d9ed2c1d3387229d79d1fc9dc5def8b2217aa631ad3c0309b6317e243",
+            "byteLength": 6615,
+            "width": 1024,
+            "height": 768,
+            "format": "jpeg",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgxyd1kzZ1hpb3ZXND0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzEp6bjGi7xXuLhbjxJGn_mzzMknu9Y8EIhgV8tY0GLYiIp3tgHC=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzEp6bjGi7xXuLhbjxJGn_mzzMknu9Y8EIhgV8tY0GLYiIp3tgHC",
+            "photoSourceId": "5d25bbdc8a696656"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 jpeg",
+            "fetchedVariant": "s0"
+          }
+        },
+        {
+          "imageId": "jpeg-2048",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "3c60cfac9898dc0935dd2061e723df722d1063a867a8cbfda27d37bfb9908d6e",
+            "byteLength": 21605,
+            "width": 2048,
+            "height": 1536,
+            "format": "jpeg",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgxqZ1FxRkwvK25Hbz0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzHaBuQu45hVVJy5vJronEVxvu97DQdBcO5vezYKfhV-dieDynDl=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzHaBuQu45hVVJy5vJronEVxvu97DQdBcO5vezYKfhV-dieDynDl",
+            "photoSourceId": "7aa1e90a0bf30c73"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 jpeg",
+            "fetchedVariant": "s0"
+          }
+        },
+        {
+          "imageId": "png-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "e7d26c55cc2d350d5b7873e06cd2f5ab0ed38588dc8692d9ffe2bb73292f22f5",
+            "byteLength": 1574,
+            "width": 512,
+            "height": 384,
+            "format": "png",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgxGUFdhcURUZ1R3Yz0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzE0BvxXKOL86Hl02u-eE-f216OzzLkiShEnEoWq7OWKY_oy8dhu=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzE0BvxXKOL86Hl02u-eE-f216OzzLkiShEnEoWq7OWKY_oy8dhu",
+            "photoSourceId": "76a3af258d0bab23"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 png",
+            "fetchedVariant": "s0"
+          }
+        },
+        {
+          "imageId": "webp-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "7b5976c6226d6fa80d867f40160fa5fc44baa4f340ace0cab7ba902724352577",
+            "byteLength": 6793,
+            "width": 512,
+            "height": 384,
+            "format": "jpeg",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgw5eVc2WENTVC94MD0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzGXwZeu7et_7C5HRVvaMFdn9jO4CJ0BTvIZWD8KAgoXShLsR2gU=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzGXwZeu7et_7C5HRVvaMFdn9jO4CJ0BTvIZWD8KAgoXShLsR2gU",
+            "photoSourceId": "66a3043a0ac45cb1"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 jpeg",
+            "fetchedVariant": "s0"
+          }
+        },
+        {
+          "imageId": "jpeg-large",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "e75cbde7cfd7a6dfb541a3549a20fcf57b09702fbcd2d6d9f9e8f7a2dfadb9fe",
+            "byteLength": 1756341,
+            "width": 2448,
+            "height": 1836,
+            "format": "jpeg",
+            "exifMarkerSurvived": false
+          },
+          "matchesPushedBytes": false,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "personEtag": "%EgQBAy43GgQBAgUHIgxWY1dRSkxrV2VCMD0=",
+            "photoUrl": "https://lh3.googleusercontent.com/contacts/AG6tpzHn71_n_X6nepR7hfFMZVMtYuPP2yvmZTwhe_B2Cv3ECMpO0Qbp=s100",
+            "photoUrlBase": "https://lh3.googleusercontent.com/contacts/AG6tpzHn71_n_X6nepR7hfFMZVMtYuPP2yvmZTwhe_B2Cv3ECMpO0Qbp",
+            "photoSourceId": "6a43e80c8ad854d2"
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "defaultUrlDims": "100x75 jpeg",
+            "fetchedVariant": "s0"
+          }
+        }
+      ]
+    }
+  ],
+  "cleanup": null
+}
