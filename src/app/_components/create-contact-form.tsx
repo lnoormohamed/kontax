@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { useMemo, useState } from "react";
 
 import { createContact } from "~/app/actions/contacts";
@@ -16,6 +17,7 @@ const EMAIL_LABELS = ["Home", "Work", "iCloud", "Other"];
 const PHONE_LABELS = ["Mobile", "Home", "Work", "Main", "iPhone", "Other"];
 const WEB_LABELS = ["Homepage", "Work", "Other"];
 const ADDR_LABELS = ["Home", "Work", "Other"];
+const DATE_LABELS = ["Anniversary", "Lunar birthday", "Other"];
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -167,6 +169,7 @@ export function CreateContactForm({
   const [phoneticLast, setPhoneticLast] = useState("");
 
   const [company, setCompany] = useState(prefill?.company ?? "");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [phoneticCompany, setPhoneticCompany] = useState("");
   const [jobTitle, setJobTitle] = useState(prefill?.jobTitle ?? "");
 
@@ -216,6 +219,7 @@ export function CreateContactForm({
     phoneticFirstName: phoneticFirst,
     phoneticLastName: phoneticLast,
     company,
+    avatarUrl,
     phoneticCompany,
     jobTitle,
     email: emails[0]?.value ?? "",
@@ -339,9 +343,17 @@ export function CreateContactForm({
 
           {/* avatar + person/org toggle */}
           <div className="flex flex-col items-center gap-3">
-            <div className="grid h-20 w-20 place-items-center rounded-full bg-[#e7efe9] text-2xl font-semibold text-[#17352e]">
-              {displayName.trim() ? initials(displayName) : "+"}
-            </div>
+            {avatarUrl.trim() ? (
+              <img
+                alt={displayName.trim() || "Contact photo"}
+                className="h-20 w-20 rounded-full object-cover"
+                src={resolveAvatarSrc(avatarUrl.trim()) ?? avatarUrl}
+              />
+            ) : (
+              <div className="grid h-20 w-20 place-items-center rounded-full bg-[#e7efe9] text-2xl font-semibold text-[#17352e]">
+                {displayName.trim() ? initials(displayName) : "+"}
+              </div>
+            )}
             <div className="inline-flex rounded-[0.8rem] bg-[#f2f4f0] p-1 text-[13px] font-semibold">
               {(["person", "org"] as const).map((m) => (
                 <button
@@ -356,6 +368,13 @@ export function CreateContactForm({
                 </button>
               ))}
             </div>
+            <input
+              className={`${FIELD} max-w-[320px] text-center`}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              placeholder="Photo URL (optional)"
+              type="url"
+              value={avatarUrl}
+            />
           </div>
 
           {/* identity */}
@@ -519,10 +538,21 @@ export function CreateContactForm({
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">Significant dates</p>
                 {dates.map((d, i) => (
                   <div className="flex items-center gap-2" key={i}>
-                    <input className={`${LABEL_SELECT} w-28`} onChange={(e) => setDates(dates.map((x, idx) => (idx === i ? { ...x, label: e.target.value } : x)))} placeholder="Label" value={d.label} />
+                    <input
+                      className={`${LABEL_SELECT} w-28`}
+                      list="contact-date-labels"
+                      onChange={(e) => setDates(dates.map((x, idx) => (idx === i ? { ...x, label: e.target.value } : x)))}
+                      placeholder="Label"
+                      value={d.label}
+                    />
                     <input className={FIELD} onChange={(e) => setDates(dates.map((x, idx) => (idx === i ? { ...x, date: e.target.value } : x)))} placeholder="YYYY-MM-DD" value={d.date} />
                   </div>
                 ))}
+                <datalist id="contact-date-labels">
+                  {DATE_LABELS.map((label) => (
+                    <option key={label} value={label} />
+                  ))}
+                </datalist>
                 <button className="justify-self-start text-[13px] font-semibold text-[#4158f4]" onClick={() => setDates([...dates, { label: "Other", date: "" }])} type="button">
                   + Add date
                 </button>

@@ -3,8 +3,6 @@ import type { Metadata } from "next";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
 import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
-import { auth } from "~/server/auth";
-import { getUserBillingContext } from "~/server/billing";
 import { getStripeCatalog } from "~/server/stripe-catalog";
 import type { StripePrices } from "./_pricing-toggle";
 import "./pricing.css";
@@ -86,14 +84,12 @@ function Cell({ yes, text }: { yes?: boolean; text?: string }) {
   return <span className="pr-cell-no" aria-label="Not included">—</span>;
 }
 
+// P38-10: statically rendered with hourly ISR for the Stripe price fetch;
+// the visitor's current plan resolves client-side inside PricingToggle.
+export const revalidate = 3600;
+
 export default async function PricingPage() {
-  const session = await auth();
-  const [currentPlan, stripePrices] = await Promise.all([
-    session?.user?.id
-      ? getUserBillingContext(session.user.id).then((b) => b.plan).catch(() => null)
-      : Promise.resolve(null),
-    fetchStripePrices(),
-  ]);
+  const stripePrices = await fetchStripePrices();
 
   return (
     <>
@@ -112,7 +108,7 @@ export default async function PricingPage() {
       </section>
 
       {/* ── Billing toggle + Plan cards (client interactive) ── */}
-      <PricingToggle currentPlan={currentPlan} stripePrices={stripePrices} />
+      <PricingToggle stripePrices={stripePrices} />
 
       {/* ── Feature matrix ── */}
       <section className="pr-matrix-sec">

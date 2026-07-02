@@ -1,13 +1,36 @@
-import { auth } from "~/server/auth";
+"use client";
+
+import { useEffect, useState } from "react";
+
 import { EndImpersonationButton, ImpersonationBannerClient } from "./impersonation-banner-client";
 
-// P21-07: pinned full-width banner shown above the normal app while an admin is
-// impersonating a user. Rendered in the root layout so it appears everywhere.
-// Returns null for everyone except an active impersonation session.
-export async function ImpersonationBanner() {
-  const session = await auth();
-  if (!session?.impersonatedBy) return null;
-  const email = session.user?.email ?? "user";
+// P21-07: pinned full-width banner shown above the normal app while an admin
+// is impersonating a user. Rendered in the root layout so it appears
+// everywhere.
+//
+// P38-10: resolves its state client-side (was a server component calling
+// auth(), which forced every route in the app to render dynamically).
+// Impersonation is rare, so the extra fetch is paid only after hydration and
+// the whole app can render statically where nothing else is dynamic.
+type ImpersonationState = { active: true; email: string; expiresAt: number | null } | { active: false };
+
+export function ImpersonationBanner() {
+  const [state, setState] = useState<ImpersonationState>({ active: false });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/impersonation")
+      .then((res) => (res.ok ? res.json() : { active: false }))
+      .then((data: ImpersonationState) => {
+        if (!cancelled) setState(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!state.active) return null;
 
   return (
     <div
@@ -32,11 +55,9 @@ export async function ImpersonationBanner() {
           <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
         </svg>
         <span>
-          Viewing as <strong style={{ fontWeight: 600 }}>{email}</strong>{" "}
+          Viewing as <strong style={{ fontWeight: 600 }}>{state.email}</strong>{" "}
           <span style={{ color: "rgba(255,255,255,0.65)" }}>(read-only)</span>{" "}
-          {typeof (session as { impersonationExpiresAt?: number }).impersonationExpiresAt === "number" ? (
-            <ImpersonationBannerClient expiresAt={(session as { impersonationExpiresAt: number }).impersonationExpiresAt} />
-          ) : null}
+          {state.expiresAt !== null ? <ImpersonationBannerClient expiresAt={state.expiresAt} /> : null}
         </span>
       </span>
       <EndImpersonationButton />

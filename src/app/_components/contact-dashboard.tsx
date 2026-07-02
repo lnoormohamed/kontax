@@ -17,40 +17,27 @@ import type { ContactHealthKey } from "~/server/contact-health";
 import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion, RecentMerge } from "~/server/contact-merge";
 import type { OnboardingChecklist as OnboardingChecklistData } from "~/server/onboarding";
+import type { WorkspaceListRequest } from "~/app/actions/workspace-list";
 
+// P38-01: lean row shape — only what a workspace row renders. Sorting, health
+// checks, and note-excerpt extraction run server-side on full rows in
+// contacts/page.tsx; every field added here ships to the client for every row.
 type DashboardContact = {
   id: string;
   fullName: string;
   firstName: string | null;
   lastName: string | null;
-  phoneticFirstName: string | null;
-  phoneticLastName: string | null;
   nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
-  phoneticCompany: string | null;
-  jobTitle: string | null;
-  department?: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
+  avatarUrl?: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
-  notes: string | null;
-  archivedAt: Date | null;
-  updatedAt: Date;
   labels?: unknown; // P31B-06: JSON string[] from Prisma
-  significantDates?: unknown;
-  syncLinks?: Array<{
-    lastSyncedAt: Date | null;
-    lastErrorCode: string | null;
-    syncAccount: {
-      status: string;
-      lastSucceededAt: Date | null;
-    } | null;
-  }>;
+  // P38-01: server-computed excerpt, set when the search query matched notes.
+  noteMatchSnippet?: string | null;
 };
 
 type PlanSummary = {
@@ -86,6 +73,10 @@ type HealthCard = {
 type ContactDashboardProps = {
   activeContacts: DashboardContact[];
   archivedContacts: DashboardContact[];
+  // P38-02: windowed list — the first window renders here; the table streams
+  // further windows via the load-more server action using this descriptor.
+  listRequest: WorkspaceListRequest;
+  listTotalCount: number;
   currentFilter: WorkspaceFilter;
   currentSort: WorkspaceSort;
   currentTab: WorkspaceTab;
@@ -134,6 +125,8 @@ const getInitials = (value: string) =>
 export function ContactDashboard({
   activeContacts,
   archivedContacts,
+  listRequest,
+  listTotalCount,
   currentFilter,
   currentSort,
   currentTab,
@@ -883,7 +876,10 @@ export function ContactDashboard({
               </EmptyState>
             ) : (
               <ContactsWorkspaceTable
+                key={JSON.stringify(listRequest)}
                 contacts={activeContacts}
+                totalCount={listTotalCount}
+                listRequest={listRequest}
                 emptyState={
                   query
                     ? `No contacts match "${query}".`
@@ -912,7 +908,10 @@ export function ContactDashboard({
 
           {currentTab === "archived" ? (
             <ContactsWorkspaceTable
+              key={JSON.stringify(listRequest)}
               contacts={archivedContacts}
+              totalCount={listTotalCount}
+              listRequest={listRequest}
               emptyState={query ? `No archived contacts match "${query}".` : "No archived contacts."}
               groupByLetter={groupByLetter}
               mode="archived"

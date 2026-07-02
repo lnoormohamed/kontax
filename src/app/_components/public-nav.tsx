@@ -1,11 +1,18 @@
+"use client";
+
 import Link from "next/link";
+
+import { useSessionUser } from "~/app/_components/use-session-user";
 
 /**
  * Shared sticky nav for the public site (landing, pricing, privacy, terms).
  * Section links point at the landing-page anchors so they work from any
  * sub-page. Pass `active` to mark the current page.
  */
-export function PublicNav({ active, isAuthenticated }: { active?: "pricing"; isAuthenticated?: boolean }) {
+export function PublicNav({ active }: { active?: "pricing" }) {
+  // P38-10: pages using this nav render statically; the CTA swap resolves
+  // client-side after hydration.
+  const isAuthenticated = Boolean(useSessionUser());
   return (
     <header className="nav">
       <div className="nav__inner">

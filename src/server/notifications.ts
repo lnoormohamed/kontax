@@ -1,7 +1,10 @@
+import { cache } from "react";
+
 import type { DigestCadence, NotificationCategory, Prisma } from "../../generated/prisma";
 
 import SuspiciousActivity from "~/emails/suspicious-activity";
 import { db } from "~/server/db";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { appUrl, sendEmail } from "~/server/email";
 import { renderEmail } from "~/server/render-email";
 
@@ -141,10 +144,12 @@ export type FeedNotification = {
 };
 
 /** Non-dismissed feed rows, newest first, for the dropdown. */
-export async function getNotificationFeed(
+// P38-04: request-scoped cache — the desktop header bell and the mobile
+// home-header bell both resolve the feed in one page render.
+export const getNotificationFeed = cache(async (
   userId: string,
   limit = FEED_LIMIT,
-): Promise<FeedNotification[]> {
+): Promise<FeedNotification[]> => {
   return db.notification.findMany({
     where: { userId, dismissedAt: null },
     orderBy: { createdAt: "desc" },
@@ -160,7 +165,7 @@ export async function getNotificationFeed(
       createdAt: true,
     },
   });
-}
+});
 
 export async function getUnreadCount(userId: string): Promise<number> {
   return db.notification.count({ where: { userId, read: false, dismissedAt: null } });
@@ -325,6 +330,8 @@ export async function resolveSecurityAlert(
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+    // P38-09: lockdown must beat the 45s validation cache
+    await invalidateSessionValidation(userId);
   }
 }
 

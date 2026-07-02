@@ -16,15 +16,18 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary, isActivityLogEnabled } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
+import { type ContactHealthKey } from "~/server/contact-health";
 import {
-  countContactsByHealth,
-  matchesContactHealth,
-  type ContactHealthKey,
-} from "~/server/contact-health";
+  buildWorkspaceScope,
+  getWorkspaceCounts,
+  getWorkspaceHealthCounts,
+  listWorkspaceContacts,
+  resolveWorkspaceFts,
+  WORKSPACE_PAGE_SIZE,
+} from "~/server/contacts-workspace";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
-import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
 import { db } from "~/server/db";
 import { getLabels } from "~/app/actions/labels";
 import { DEFAULT_PREFERENCES } from "~/lib/preferences";
@@ -117,25 +120,6 @@ const getSelectedHealth = async (
   return null;
 };
 
-const getSearchConditions = (query: string) =>
-  query
-    ? {
-        OR: [
-          { fullName: { contains: query, mode: "insensitive" as const } },
-          { phoneticFirstName: { contains: query, mode: "insensitive" as const } },
-          { phoneticLastName: { contains: query, mode: "insensitive" as const } },
-          { nickname: { contains: query, mode: "insensitive" as const } },
-          { email: { contains: query, mode: "insensitive" as const } },
-          { phone: { contains: query, mode: "insensitive" as const } },
-          { company: { contains: query, mode: "insensitive" as const } },
-          { phoneticCompany: { contains: query, mode: "insensitive" as const } },
-          { jobTitle: { contains: query, mode: "insensitive" as const } },
-          { website: { contains: query, mode: "insensitive" as const } },
-          { address: { contains: query, mode: "insensitive" as const } },
-        ],
-      }
-    : {};
-
 const getInitials = (value: string) =>
   value
     .split(" ")
@@ -144,91 +128,6 @@ const getInitials = (value: string) =>
     .slice(0, 2)
     .join("")
     .toUpperCase();
-
-const normalizeSortText = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
-
-const getNameAwareSortKeys = ({
-  firstName, lastName, phoneticFirstName, phoneticLastName, company, phoneticCompany, fullName,
-}: {
-  firstName: string | null;
-  lastName: string | null;
-  phoneticFirstName: string | null;
-  phoneticLastName: string | null;
-  company: string | null;
-  phoneticCompany: string | null;
-  fullName: string | null;
-}) => {
-  const first = normalizeSortText(firstName);
-  const last = normalizeSortText(lastName);
-  const phoneticFirst = normalizeSortText(phoneticFirstName);
-  const phoneticLast = normalizeSortText(phoneticLastName);
-  const companyValue = normalizeSortText(company);
-  const phoneticCompanyValue = normalizeSortText(phoneticCompany);
-  const full = normalizeSortText(fullName);
-
-  const firstOrReading = phoneticFirst || first;
-  const lastOrReading = phoneticLast || last;
-  const companyOrReading = phoneticCompanyValue || companyValue;
-
-  if (!firstOrReading || !lastOrReading) {
-    const fallback = companyOrReading || companyValue || full;
-    return {
-      primary: fallback,
-      secondary: fallback,
-      company: companyOrReading || companyValue,
-      full: full || companyValue || companyOrReading,
-    };
-  }
-
-  return {
-    primary: lastOrReading,
-    secondary: firstOrReading,
-    company: companyOrReading || companyValue,
-    full: full,
-  };
-};
-
-const compareWorkspaceContacts = (
-  left: {
-    isFavorite: boolean;
-    firstName: string | null;
-    lastName: string | null;
-    phoneticFirstName: string | null;
-    phoneticLastName: string | null;
-    company: string | null;
-    phoneticCompany: string | null;
-    fullName: string | null;
-  },
-  right: {
-    isFavorite: boolean;
-    firstName: string | null;
-    lastName: string | null;
-    phoneticFirstName: string | null;
-    phoneticLastName: string | null;
-    company: string | null;
-    phoneticCompany: string | null;
-    fullName: string | null;
-  },
-) => {
-  if (left.isFavorite !== right.isFavorite) {
-    return left.isFavorite ? -1 : 1;
-  }
-
-  const leftKeys = getNameAwareSortKeys(left);
-  const rightKeys = getNameAwareSortKeys(right);
-  const collation = new Intl.Collator("en", { sensitivity: "base", numeric: true });
-
-  const primaryCompare = collation.compare(leftKeys.primary, rightKeys.primary);
-  if (primaryCompare !== 0) return primaryCompare;
-
-  const secondaryCompare = collation.compare(leftKeys.secondary, rightKeys.secondary);
-  if (secondaryCompare !== 0) return secondaryCompare;
-
-  const companyCompare = collation.compare(leftKeys.company, rightKeys.company);
-  if (companyCompare !== 0) return companyCompare;
-
-  return collation.compare(leftKeys.full, rightKeys.full);
-};
 
 export default async function ContactsPage({ searchParams }: ContactsPageProps) {
   const session = await auth();
@@ -255,87 +154,19 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const showsOverview = selectedTab === "overview";
   const showsPeopleList = selectedTab === "people";
   const showsArchivedList = selectedTab === "archived";
-  const shouldLoadActiveContacts = showsOverview || showsPeopleList;
   const shouldLoadDuplicateDetails = selectedTab === "duplicates";
   const supportsContactSearch = showsPeopleList || showsArchivedList;
   const shouldLoadLabelSuggestions = showsPeopleList || showsArchivedList;
 
-  const searchConditions = supportsContactSearch ? getSearchConditions(query) : {};
-
-  // P28-07: full-text search over the user's own contacts (notes, JSON contact
-  // methods, custom fields, ranked). Short/symbol-only queries fall back to the
-  // multi-field ILIKE path. Shared/family/team contacts keep ILIKE (they aren't
-  // owned by this user, so they're outside the per-user full-text scan).
-  const ftsActive = !!(supportsContactSearch && query && isFullTextEligible(query));
-  const ftsPrivateRows = ftsActive
-    ? await searchContactIds({ userId: session.user.id }, query)
-    : null;
-  const privateSearchConditions = ftsPrivateRows
-    ? { id: { in: ftsPrivateRows.map((r) => r.id) } }
-    : searchConditions;
-
-  const recentCutoff = new Date();
-  recentCutoff.setDate(recentCutoff.getDate() - 30);
-  const filterConditions =
-    selectedFilter === "recent"
-      ? { updatedAt: { gte: recentCutoff } }
-      : selectedFilter === "incomplete"
-        ? { OR: [{ email: null }, { email: "" }, { phone: null }, { phone: "" }] }
-        : selectedFilter === "favorites"
-          ? { isFavorite: true }
-          : selectedFilter === "emergency"
-            ? { isEmergency: true }
-            : {};
-
-  const contactListSelect = {
-    id: true,
-    fullName: true,
-    firstName: true,
-    lastName: true,
-    phoneticFirstName: true,
-    phoneticLastName: true,
-    nickname: true,
-    email: true,
-    phone: true,
-    company: true,
-    phoneticCompany: true,
-    jobTitle: true,
-    department: true,
-    website: true,
-    birthday: true,
-    address: true,
-    avatarUrl: true,
-    isFavorite: true,
-    isEmergency: true,
-    notes: true,
-    archivedAt: true,
-    updatedAt: true,
-    significantDates: true,
-    syncLinks: {
-      select: {
-        lastSyncedAt: true,
-        lastErrorCode: true,
-        syncAccount: {
-          select: {
-            status: true,
-            lastSucceededAt: true,
-          },
-        },
-      },
-    },
-    // P31B-06: labels for chip rendering on rows
-    labels: true,
-  } as const;
+  // P38-02: the list itself (search, filters, ordering, windowing) is built by
+  // src/server/contacts-workspace.ts in a single SQL query; only the effective
+  // search text is computed here. Overview never applies search.
+  const effectiveQuery = supportsContactSearch ? query : "";
 
   // P31B-05: label filter — ?label=<name> shows only contacts carrying that label.
   const labelParam = (await getSingleParam(searchParams, "label"))?.trim() ?? "";
-  // Prisma JSON filter: Contact.labels is a Json string[]; array_contains checks membership.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const labelFilterCondition: Record<string, any> = labelParam
-    ? { labels: { array_contains: labelParam } }
-    : {};
 
-  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, labelRows, sidebarLabels] =
+  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, sidebarLabels, planSummary, mergeSuggestions, recentMerges] =
     await Promise.all([
       getUserFamilyMembership(session.user.id),
       getAccessibleTeamBooks(session.user.id),
@@ -357,31 +188,21 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } },
         _count: { _all: true },
       }),
-      // P28-04: existing labels to suggest in the bulk "Add label" popover.
-      shouldLoadLabelSuggestions
-        ? db.contact.findMany({
-            where: { userId: session.user.id, archivedAt: null },
-            select: { labels: true },
-            take: 2000,
-          })
-        : Promise.resolve([]),
-      // P31B-04: label registry for the sidebar Labels section.
+      // P31B-04: label registry for the sidebar Labels section (also feeds the
+      // bulk "Add label" suggestions — getLabels() backfills the registry from
+      // contact labels, so the old 2000-contact scan is gone; P38-03).
       getLabels(),
+      getUserPlanSummary(session.user.id),
+      shouldLoadDuplicateDetails
+        ? getOpenMergeSuggestionsForUser(session.user.id, { take: DUPLICATE_SUGGESTION_BATCH_SIZE })
+        : Promise.resolve([]),
+      shouldLoadDuplicateDetails ? getRecentMergesForUser(session.user.id) : Promise.resolve([]),
     ]);
 
-  // Flatten + dedupe label strings (case-insensitive), capped for the popover.
-  const labelSuggestions = (() => {
-    const seen = new Map<string, string>();
-    for (const row of labelRows) {
-      if (!Array.isArray(row.labels)) continue;
-      for (const value of row.labels) {
-        if (typeof value !== "string") continue;
-        const key = value.trim().toLowerCase();
-        if (key && !seen.has(key)) seen.set(key, value.trim());
-      }
-    }
-    return [...seen.values()].sort((a, b) => a.localeCompare(b)).slice(0, 24);
-  })();
+  // P28-04: suggestions in the bulk "Add label" popover, from the registry.
+  const labelSuggestions = shouldLoadLabelSuggestions
+    ? sidebarLabels.map((l) => l.name).sort((a, b) => a.localeCompare(b)).slice(0, 24)
+    : [];
   const familyBookId = familyMembership?.bookId ?? null;
   const teamBookIds = accessibleTeamBooks.map((b) => b.id);
   const sharedBooks = [
@@ -409,178 +230,111 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   // A personal book filter (mutually exclusive with shared-book selection).
   const activePersonalBookId =
     bookParam && personalBooksRaw.some((b) => b.id === bookParam) ? bookParam : null;
-  // Default book also owns un-booked contacts (bookId = null), so don't filter
-  // those out when the default book is selected.
-  const activePersonalBookIsDefault =
-    activePersonalBookId != null &&
-    (personalBooksRaw.find((b) => b.id === activePersonalBookId)?.isDefault ?? false);
   const scopeParam = await getSingleParam(searchParams, "scope");
-  const scope = scopeParam === "private" || scopeParam === "shared" ? scopeParam : "all";
+  const scope: "all" | "private" | "shared" =
+    scopeParam === "private" || scopeParam === "shared" ? scopeParam : "all";
 
-  const includePrivate = !activeBook && scope !== "shared";
-  // A selected personal book restricts to that book only (no shared contacts).
-  const includeShared = scope !== "private" && !activePersonalBookId;
-  const familyTargetId = activeBook ? (activeBook === familyBookId ? familyBookId : null) : familyBookId;
-  const teamTargetIds = activeBook ? (teamBookIds.includes(activeBook) ? [activeBook] : []) : teamBookIds;
+  // P38-02: effective query scope + FTS resolution, shared with the load-more
+  // server action (src/app/actions/workspace-list.ts).
+  const workspaceScope = buildWorkspaceScope(
+    session.user.id,
+    {
+      familyBookId,
+      teamBookIds,
+      personalBooks: personalBooksRaw.map((b) => ({ id: b.id, isDefault: b.isDefault })),
+    },
+    bookParam ?? null,
+    scope,
+  );
+  const listTab = showsArchivedList ? ("archived" as const) : ("people" as const);
+  const fts = effectiveQuery
+    ? await resolveWorkspaceFts(workspaceScope, listTab, effectiveQuery)
+    : { ftsPrivateIds: null, ftsSharedIds: null, ftsRanked: null };
 
-  // P28-07: full-text + phone search over the shared (group) books in view, so
-  // family/team contacts match the same way private ones do.
-  const sharedBookIds = [familyTargetId, ...teamTargetIds].filter((id): id is string => !!id);
-  const ftsSharedRows =
-    ftsActive && showsPeopleList && includeShared && sharedBookIds.length > 0
-      ? await searchContactIds({ groupBookIds: sharedBookIds }, query)
-      : null;
-  const sharedSearchConditions = ftsSharedRows
-    ? { id: { in: ftsSharedRows.map((r) => r.id) } }
-    : searchConditions;
-  // Relevance ranking spans both scopes (used to order the merged result set).
-  const ftsRankById = ftsActive && showsPeopleList
-    ? new Map([...(ftsPrivateRows ?? []), ...(ftsSharedRows ?? [])].map((r) => [r.id, r.rank]))
-    : null;
-
-  // P28-03: scope the private query to the selected personal book. The default
-  // book additionally claims un-booked contacts (bookId = null).
-  const personalBookWhere = activePersonalBookId
-    ? activePersonalBookIsDefault
-      ? { OR: [{ bookId: activePersonalBookId }, { bookId: null }] }
-      : { bookId: activePersonalBookId }
-    : {};
-
-  const sortOrder =
-    selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const };
+  const baseListParams = {
+    scope: workspaceScope,
+    query: effectiveQuery,
+    ...fts,
+    filter: selectedFilter,
+    sort: selectedSort,
+    includeNotes: effectiveQuery.length > 0,
+    limit: WORKSPACE_PAGE_SIZE,
+    offset: 0,
+  };
 
   const [
-    privateActive,
-    familyActive,
-    teamActive,
-    archivedContacts,
-    mergeSuggestions,
-    mergeSuggestionCount,
-    highConfidenceSuggestionCount,
-    recentMerges,
-    planSummary,
+    activeList,
+    archivedList,
+    healthCounts,
+    workspaceCounts,
   ] = await Promise.all([
-      shouldLoadActiveContacts && includePrivate
-        ? db.contact.findMany({
-            // AND the fragments rather than spreading: personalBookWhere,
-            // searchConditions, and the "incomplete" filter each carry a
-            // top-level `OR`, which would clobber each other if spread.
-            where: {
-              userId: session.user.id,
-              archivedAt: null,
-              groupContacts: { none: {} },
-              AND: [personalBookWhere, privateSearchConditions, filterConditions, labelFilterCondition],
-            },
-            orderBy: sortOrder,
-            select: contactListSelect,
+      showsPeopleList
+        ? listWorkspaceContacts({
+            ...baseListParams,
+            archived: false,
+            label: labelParam || null,
+            health: selectedHealth,
           })
-        : Promise.resolve([]),
-      shouldLoadActiveContacts && includeShared && familyTargetId
-        ? db.contact.findMany({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
-            orderBy: { updatedAt: "desc" as const },
-            select: contactListSelect,
-          })
-        : Promise.resolve([]),
-      shouldLoadActiveContacts && includeShared && teamTargetIds.length > 0
-        ? db.contact.findMany({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
-            orderBy: { updatedAt: "desc" as const },
-            select: contactListSelect,
-          })
-        : Promise.resolve([]),
+        : Promise.resolve({ rows: [], totalCount: 0 }),
       showsArchivedList
-        ? db.contact.findMany({
-            where: {
-              userId: session.user.id,
-              NOT: { archivedAt: null },
-              ...privateSearchConditions,
-              ...filterConditions,
-            },
-            orderBy:
-              selectedSort === "name"
-                ? [{ isFavorite: "desc" as const }, { archivedAt: "desc" as const }]
-                : { archivedAt: "desc" },
-            select: contactListSelect,
+        ? listWorkspaceContacts({
+            ...baseListParams,
+            archived: true,
+            // parity with the legacy archived query: no label/health filters
+            label: null,
+            health: null,
           })
-        : Promise.resolve([]),
-      shouldLoadDuplicateDetails
-        ? getOpenMergeSuggestionsForUser(session.user.id, { take: DUPLICATE_SUGGESTION_BATCH_SIZE })
-        : Promise.resolve([]),
-      db.mergeSuggestion.count({
-        where: { userId: session.user.id, status: "OPEN" },
-      }),
-      db.mergeSuggestion.count({
-        where: { userId: session.user.id, status: "OPEN", confidence: "HIGH" },
-      }),
-      shouldLoadDuplicateDetails ? getRecentMergesForUser(session.user.id) : Promise.resolve([]),
-      getUserPlanSummary(session.user.id),
+        : Promise.resolve({ rows: [], totalCount: 0 }),
+      // Health cards (overview + people): exact counts in SQL over the same
+      // scope/search/filter/label conditions, minus any active health filter.
+      showsPeopleList || showsOverview
+        ? getWorkspaceHealthCounts({
+            scope: workspaceScope,
+            archived: false,
+            query: effectiveQuery,
+            ftsPrivateIds: fts.ftsPrivateIds,
+            ftsSharedIds: fts.ftsSharedIds,
+            filter: selectedFilter,
+            label: labelParam || null,
+          })
+        : Promise.resolve({
+            "missing-methods": 0,
+            "missing-context": 0,
+            unlabeled: 0,
+            "missing-dates": 0,
+            "sync-attention": 0,
+          } satisfies Record<ContactHealthKey, number>),
+      // P38-03: all nav/badge counts in one round trip (replaces the former
+      // wave of 9 count queries + 2 merge-suggestion counts).
+      getWorkspaceCounts(session.user.id, sharedBooks.map((b) => b.id)),
     ]);
 
-  const activeContacts = [
-    ...privateActive.map((c) => ({ ...c, sharedKind: null as "family" | "team" | null })),
-    ...familyActive.map((c) => ({ ...c, sharedKind: "family" as const })),
-    ...teamActive.map((c) => ({ ...c, sharedKind: "team" as const })),
-  ];
-
-  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount, unreadCount, syncErrorCount, connectedSyncCount] =
-    await Promise.all([
-      db.contact.count({ where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } } }),
-      sharedBooks.length > 0
-        ? db.contact.count({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: sharedBooks.map((b) => b.id) } } } },
-          })
-        : Promise.resolve(0),
-      db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
-      db.contact.count({ where: { userId: session.user.id, archivedAt: null, isEmergency: true } }),
-      db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
-      db.contactShare.count({
-        where: {
-          recipientUserId: session.user.id,
-          shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
-          status: "ACTIVE",
-          recipientContactId: null,
-        },
-      }),
-      db.notification.count({ where: { userId: session.user.id, readAt: null, dismissedAt: null } }),
-      db.syncAccount.count({ where: { userId: session.user.id, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
-      db.syncAccount.count({ where: { userId: session.user.id, status: "ACTIVE" } }),
-    ]);
-  const peopleCount = privatePeopleCount + sharedPeopleCount;
+  const peopleCount = workspaceCounts.privatePeople + workspaceCounts.sharedPeople;
 
   // P26-04: first-run onboarding checklist (shown above the people list).
   const onboarding = await getOnboardingChecklist({
     userId: session.user.id,
-    hasContact: privatePeopleCount > 0,
-    hasSync: connectedSyncCount > 0,
+    hasContact: workspaceCounts.privatePeople > 0,
+    hasSync: workspaceCounts.connectedSync > 0,
   });
 
-  const duplicatesCount = mergeSuggestionCount;
-  const highConfidenceCount = highConfidenceSuggestionCount;
+  const duplicatesCount = workspaceCounts.openMergeSuggestions;
+  const highConfidenceCount = workspaceCounts.highConfidenceMergeSuggestions;
 
-  const archivedWithFlag = archivedContacts.map((c) => ({
-    ...c,
-    sharedKind: null as "family" | "team" | null,
-  }));
-  const sortedActiveContacts = ftsRankById
-    ? // P28-07: full-text results lead with relevance. Private contacts carry a
-      // rank; shared (ILIKE-matched) contacts have none and fall to the bottom.
-      [...activeContacts].sort(
-        (a, b) =>
-          (ftsRankById.get(b.id) ?? -1) - (ftsRankById.get(a.id) ?? -1) ||
-          compareWorkspaceContacts(a, b),
-      )
-    : selectedSort === "name"
-      ? [...activeContacts].sort(compareWorkspaceContacts)
-      : [...activeContacts].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-  const sortedArchivedContacts =
-    selectedSort === "name"
-      ? [...archivedWithFlag].sort(compareWorkspaceContacts)
-      : archivedWithFlag;
-  const filteredActiveContacts = selectedTab === "people" && selectedHealth
-    ? sortedActiveContacts.filter((contact) => matchesContactHealth(contact, selectedHealth))
-    : sortedActiveContacts;
-  const healthCounts = countContactsByHealth(sortedActiveContacts);
+  // P38-02: rows arrive lean (P38-01 shape), ordered, and windowed from SQL.
+  // The client streams further windows via the load-more server action using
+  // this request descriptor.
+  const listRequest = {
+    tab: listTab,
+    query: effectiveQuery,
+    filter: selectedFilter,
+    sort: selectedSort,
+    label: labelParam || null,
+    health: selectedHealth,
+    book: activeBook ?? activePersonalBookId,
+    scope,
+    offset: 0,
+  };
   const healthHrefBase = new URLSearchParams();
   healthHrefBase.set("tab", "people");
   healthHrefBase.set("filter", "all");
@@ -725,8 +479,10 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       <SecurityAlertBannerSlot userId={session.user.id} />
 
       <ContactDashboard
-        activeContacts={filteredActiveContacts}
-        archivedContacts={sortedArchivedContacts}
+        activeContacts={activeList.rows}
+        archivedContacts={archivedList.rows}
+        listRequest={listRequest}
+        listTotalCount={showsArchivedList ? archivedList.totalCount : activeList.totalCount}
         currentFilter={selectedFilter}
         currentSort={selectedSort}
         currentTab={selectedTab}
@@ -761,20 +517,20 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         currentLabel={labelParam || null}
         counts={{
           people: peopleCount,
-          favorites: favoritesCount,
-          emergency: emergencyCount,
-          archived: archivedCount,
+          favorites: workspaceCounts.favorites,
+          emergency: workspaceCounts.emergency,
+          archived: workspaceCounts.archived,
           duplicates: duplicatesCount,
         }}
         account={{ name: userLabel, email: session.user.email ?? "" }}
         syncState="ok"
         highConfidenceCount={highConfidenceCount}
         recentMerges={recentMerges}
-        incomingShares={incomingSharesCount || undefined}
+        incomingShares={workspaceCounts.incomingShares || undefined}
         onboarding={onboarding}
         currentHealth={selectedHealth}
         healthCards={healthCards}
-        visiblePeopleCount={filteredActiveContacts.length}
+        visiblePeopleCount={activeList.totalCount}
       />
 
       <MobileCreateFab
@@ -782,7 +538,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         show={selectedTab === "people"}
         atLimit={planSummary.contactsRemaining !== null && planSummary.contactsRemaining <= 0}
       />
-      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
+      <BottomNav unreadCount={workspaceCounts.unreadNotifications} syncErrorCount={workspaceCounts.syncErrors} />
     </main>
   );
 }

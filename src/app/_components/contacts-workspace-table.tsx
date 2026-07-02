@@ -17,38 +17,44 @@ import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
+import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import {
+  loadWorkspaceContactsPage,
+  type WorkspaceListRequest,
+} from "~/app/actions/workspace-list";
 
+// P38-01: lean row shape — only what a row renders. Full contact data (notes,
+// sync state, phonetic fields, dates) stays server-side in contacts/page.tsx.
 type WorkspaceContact = {
   id: string;
   fullName: string;
   firstName: string | null;
   lastName: string | null;
-  phoneticFirstName: string | null;
-  phoneticLastName: string | null;
   nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
-  phoneticCompany: string | null;
-  jobTitle: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
+  avatarUrl?: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
-  notes: string | null;
-  archivedAt: Date | null;
-  updatedAt: Date;
   // P31B-06: JSON string[] from Prisma (optional — may be absent on older data)
   labels?: unknown;
+  // P38-01: server-computed excerpt, set when the search query matched notes.
+  noteMatchSnippet?: string | null;
 };
 
 type ContactsWorkspaceTableProps = {
   contacts: WorkspaceContact[];
+  // P38-02: the list is one continuous phone-book list; `contacts` is only the
+  // first server-rendered window. Further windows stream in via the load-more
+  // server action as the user scrolls. The parent keys this component on the
+  // request so pages reset when any filter changes.
+  totalCount: number;
+  listRequest: WorkspaceListRequest;
   emptyState: string;
   mode: "active" | "archived";
   viewMode: "compact" | "cozy";
@@ -130,16 +136,9 @@ function inferMatchSnippet(
     : [];
   const matchedLabel = labels.find((l) => l.toLowerCase().includes(ql));
   if (matchedLabel) return { field: "label", snippet: matchedLabel };
-  // notes match
-  if (contact.notes?.toLowerCase().includes(ql)) {
-    const notes = contact.notes;
-    const i = notes.toLowerCase().indexOf(ql);
-    let start = Math.max(0, i - 28);
-    if (start > 0) { const sp = notes.indexOf(" ", start); if (sp > -1 && sp < i) start = sp + 1; }
-    let end = Math.min(notes.length, start + 90);
-    if (end < notes.length) { const sp = notes.lastIndexOf(" ", end); if (sp > start + 20) end = sp; }
-    const excerpt = (start > 0 ? "…" : "") + notes.slice(start, end).trim() + (end < notes.length ? "…" : "");
-    return { field: "notes", snippet: excerpt };
+  // notes match — excerpt computed server-side (P38-01); full notes don't ship
+  if (contact.noteMatchSnippet) {
+    return { field: "notes", snippet: contact.noteMatchSnippet };
   }
   return null;
 }
@@ -166,12 +165,34 @@ const Highlight = memo(function Highlight({ text, query }: { text: string; query
 const Avatar = memo(function Avatar({
   fullName,
   company,
+  avatarUrl,
   size,
 }: {
   fullName: string | null | undefined;
   company?: string | null;
+  avatarUrl?: string | null;
   size: number;
 }) {
+  // P38-08: list rows load the small variant — the 96px webp thumb for
+  // Kontax-hosted avatars, the 96px proxy rendition for external URLs (kept
+  // same-origin so the strict CSP holds). Pre-backfill uploads 404 the thumb
+  // → onError falls back to the full-size source.
+  const thumbSrc = resolveAvatarSrc(avatarUrl, { thumb: true });
+  const fullSrc = resolveAvatarSrc(avatarUrl);
+  const [thumbFailed, setThumbFailed] = useState(false);
+  useEffect(() => setThumbFailed(false), [avatarUrl]);
+  if (avatarUrl && fullSrc) {
+    const src = thumbSrc && !thumbFailed ? thumbSrc : fullSrc;
+    return (
+      <img
+        alt={fullName?.trim() || company?.trim() || "Contact photo"}
+        className="shrink-0 rounded-full object-cover"
+        src={src}
+        onError={src !== fullSrc ? () => setThumbFailed(true) : undefined}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
   const [bg] = tintForName(fullName, company);
   const initials = getInitials(fullName, company);
   return (
@@ -205,7 +226,18 @@ const RowBadges = memo(function RowBadges({ contact, mode }: { contact: Workspac
   );
 });
 
-function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+function RowActions({
+  contact,
+  mode,
+  onArchived,
+  onRemoved,
+}: {
+  contact: WorkspaceContact;
+  mode: "active" | "archived";
+  onArchived: (contactId: string) => void;
+  // P38-05: restore/delete hide the row immediately (no undo toast).
+  onRemoved: (contactId: string) => void;
+}) {
   const [, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
   const [optimisticFavorite, setOptimisticFavorite] = useState(contact.isFavorite);
@@ -273,30 +305,56 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
                 {optimisticFavorite ? "Unfavorite" : "Favorite"}
               </button>
             ) : null}
+            {/* P38-05: optimistic — the row reacts immediately; the action runs
+                in a transition and the page revalidates behind it. */}
             {mode === "active" ? (
-              <form action={archiveContact}>
-                <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/contacts?tab=people" />
-                <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
-                  Archive
-                </button>
-              </form>
-            ) : (
-              <form action={restoreContact}>
-                <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/contacts?tab=archived" />
-                <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
-                  Restore
-                </button>
-              </form>
-            )}
-            <form action={permanentlyDeleteContact}>
-              <input name="contactId" type="hidden" value={contact.id} />
-              <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
-              <button className="block w-full px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50" type="submit">
-                Delete permanently
+              <button
+                className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onArchived(contact.id);
+                  startTransition(async () => {
+                    const fd = new FormData();
+                    fd.set("contactId", contact.id);
+                    await archiveContact(fd);
+                  });
+                }}
+              >
+                Archive
               </button>
-            </form>
+            ) : (
+              <button
+                className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onRemoved(contact.id);
+                  startTransition(async () => {
+                    const fd = new FormData();
+                    fd.set("contactId", contact.id);
+                    await restoreContact(fd);
+                  });
+                }}
+              >
+                Restore
+              </button>
+            )}
+            <button
+              className="block w-full px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onRemoved(contact.id);
+                startTransition(async () => {
+                  const fd = new FormData();
+                  fd.set("contactId", contact.id);
+                  await permanentlyDeleteContact(fd);
+                });
+              }}
+            >
+              Delete permanently
+            </button>
           </div>
         </>
       ) : null}
@@ -450,6 +508,7 @@ const ContactRow = memo(function ContactRow({
   nameDisplayOrder,
   onToggleSelect,
   onArchived,
+  onRemoved,
   onOpenContact,
 }: {
   contact: WorkspaceContact;
@@ -462,6 +521,7 @@ const ContactRow = memo(function ContactRow({
   nameDisplayOrder?: "first-last" | "last-first";
   onToggleSelect: (id: string, shiftKey: boolean) => void;
   onArchived: (contactId: string) => void;
+  onRemoved: (contactId: string) => void;
   onOpenContact: (contactId: string) => void;
 }) {
   const [, startTransition] = useTransition();
@@ -494,7 +554,12 @@ const ContactRow = memo(function ContactRow({
   const avatarSlot = (
     <span className="relative inline-grid place-items-center" style={{ width: 40, height: 40 }}>
       <span className={selected ? "opacity-0" : "opacity-100 group-hover:opacity-0"}>
-        <Avatar fullName={contact.fullName} company={contact.company} size={avatarSize} />
+        <Avatar
+          fullName={contact.fullName}
+          company={contact.company}
+          avatarUrl={contact.avatarUrl}
+          size={avatarSize}
+        />
       </span>
       <button
         aria-label={selected ? "Deselect contact" : "Select contact"}
@@ -545,7 +610,7 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <div className="shrink-0 pt-0.5">
-            <RowActions contact={contact} mode={mode} />
+            <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
           </div>
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
@@ -631,7 +696,7 @@ const ContactRow = memo(function ContactRow({
           </p>
         )}
       </div>
-      <RowActions contact={contact} mode={mode} />
+      <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
     </div>
   );
 
@@ -690,7 +755,7 @@ const ContactRow = memo(function ContactRow({
         <div className="truncate text-[13px] tabular-nums text-[#5c655e]">
           <Cell query={query} value={contact.phone} />
         </div>
-        <RowActions contact={contact} mode={mode} />
+        <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
       </div>
       <div className="lg:hidden">
         <SwipeableRow
@@ -776,6 +841,8 @@ const clearRestoreContactParam = () => {
 
 export function ContactsWorkspaceTable({
   contacts,
+  totalCount,
+  listRequest,
   emptyState,
   mode,
   viewMode,
@@ -816,9 +883,103 @@ export function ContactsWorkspaceTable({
     [labelRegistry],
   );
 
+  // P38-02: windows streamed in after the initial server-rendered one. The
+  // parent keys this component on the list request, so a filter/search change
+  // remounts and clears them.
+  const [extraPages, setExtraPages] = useState<WorkspaceContact[][]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  // Offset of the last window requested — guards against duplicate fetches
+  // while scroll events race the response.
+  const requestedOffsetRef = useRef<number | null>(null);
+
+  const allContacts = useMemo(() => {
+    if (extraPages.length === 0) return contacts;
+    const seen = new Set(contacts.map((c) => c.id));
+    const merged = [...contacts];
+    for (const page of extraPages) {
+      for (const c of page) {
+        // Offsets can drift when contacts are created/removed between windows;
+        // dedupe by id so a shifted row never renders twice.
+        if (!seen.has(c.id)) {
+          seen.add(c.id);
+          merged.push(c);
+        }
+      }
+    }
+    return merged;
+  }, [contacts, extraPages]);
+
+  // P38-05: optimistic row overlay. Row-menu and bulk operations patch the
+  // on-screen rows immediately; when the server re-delivers the first window
+  // (revalidation), its patches are pruned so server truth wins. Rows held in
+  // client state (scrolled-in windows) keep their patches — revalidation
+  // cannot reach them.
+  const [rowPatches, setRowPatches] = useState<Record<string, Partial<WorkspaceContact>>>({});
+  const applyRowPatches = useCallback((patches: Record<string, Partial<WorkspaceContact>>) => {
+    setRowPatches((prev) => {
+      const next = { ...prev };
+      for (const [id, patch] of Object.entries(patches)) {
+        next[id] = { ...next[id], ...patch };
+      }
+      return next;
+    });
+  }, []);
+  useEffect(() => {
+    // Fresh server data for the first window supersedes its patches.
+    setRowPatches((prev) => {
+      const serverIds = new Set(contacts.map((c) => c.id));
+      const kept = Object.entries(prev).filter(([id]) => !serverIds.has(id));
+      if (kept.length === Object.keys(prev).length) return prev;
+      return Object.fromEntries(kept);
+    });
+  }, [contacts]);
+
+  const patchedContacts = useMemo(() => {
+    if (Object.keys(rowPatches).length === 0) return allContacts;
+    return allContacts.map((c) => (rowPatches[c.id] ? { ...c, ...rowPatches[c.id] } : c));
+  }, [allContacts, rowPatches]);
+
+  const loadedCount = allContacts.length;
+  const hasMore = loadedCount < totalCount;
+
+  // Optimistic removal (restore / delete / bulk archive): hide instantly.
+  const hideRows = useCallback((ids: string[]) => {
+    setHiddenIds((prev) => new Set([...prev, ...ids]));
+  }, []);
+  // A failed action reverts both hides and patches for the affected rows.
+  const revertOptimistic = useCallback((ids: string[]) => {
+    setHiddenIds((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) next.delete(id);
+      return next;
+    });
+    setRowPatches((prev) => {
+      const next = { ...prev };
+      for (const id of ids) delete next[id];
+      return next;
+    });
+  }, []);
+
+  const loadMore = useCallback(() => {
+    const offset = contacts.length + extraPages.reduce((n, p) => n + p.length, 0);
+    if (requestedOffsetRef.current === offset) return;
+    requestedOffsetRef.current = offset;
+    setLoadingMore(true);
+    loadWorkspaceContactsPage({ ...listRequest, offset })
+      .then((res) => {
+        setExtraPages((pages) => [...pages, res.rows]);
+      })
+      .catch((error) => {
+        console.error("Failed to load more contacts", error);
+        // Allow a retry on the next scroll tick.
+        requestedOffsetRef.current = null;
+      })
+      .finally(() => setLoadingMore(false));
+  }, [contacts.length, extraPages, listRequest]);
+
   const visibleContacts = useMemo(
-    () => contacts.filter((c) => !hiddenIds.has(c.id)),
-    [contacts, hiddenIds],
+    () => patchedContacts.filter((c) => !hiddenIds.has(c.id)),
+    [patchedContacts, hiddenIds],
   );
 
   const scrollMemoryKey = useMemo(
@@ -881,7 +1042,7 @@ export function ContactsWorkspaceTable({
   // manager and the merge primary-picker.
   const selectedContacts = useMemo(
     () =>
-      contacts
+      patchedContacts
         .filter((c) => selectedSet.has(c.id))
         .map((c) => ({
           id: c.id,
@@ -890,7 +1051,7 @@ export function ContactsWorkspaceTable({
             ? (c.labels as unknown[]).filter((v): v is string => typeof v === "string")
             : [],
         })),
-    [contacts, selectedSet, nameDisplayOrder],
+    [patchedContacts, selectedSet, nameDisplayOrder],
   );
 
   const toggleSelectAll = useCallback(() => {
@@ -997,6 +1158,15 @@ export function ContactsWorkspaceTable({
         : undefined,
   });
   const virtualItems = virtualizer.getVirtualItems();
+
+  // P38-02: stream the next window in as the user nears the end of the loaded
+  // list, keeping the phone-book scroll continuous with no visible pagination.
+  const lastVirtualIndex = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1]!.index : -1;
+  useEffect(() => {
+    if (!hasMore || loadingMore || lastVirtualIndex < 0) return;
+    if (lastVirtualIndex < flatRows.length - 40) return;
+    loadMore();
+  }, [lastVirtualIndex, flatRows.length, hasMore, loadingMore, loadMore]);
 
   // P28-05: keyboard shortcuts. Focused-row navigation + global actions, scoped
   // to the contacts workspace and suppressed while an input/textarea is focused.
@@ -1251,6 +1421,9 @@ export function ContactsWorkspaceTable({
           books={books}
           labelSuggestions={labelSuggestions}
           onClear={clearSelection}
+          onOptimisticPatch={applyRowPatches}
+          onOptimisticRemove={hideRows}
+          onOptimisticError={revertOptimistic}
         />
       ) : null}
 
@@ -1302,6 +1475,7 @@ export function ContactsWorkspaceTable({
                   mode={mode}
                   nameDisplayOrder={nameDisplayOrder}
                   onArchived={handleArchived}
+                  onRemoved={(id) => hideRows([id])}
                   onOpenContact={saveListScrollPosition}
                   onToggleSelect={handleToggleSelect}
                   query={query}

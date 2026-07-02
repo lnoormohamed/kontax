@@ -10,7 +10,7 @@ export function PublicLanding({ isAuthenticated }: { isAuthenticated?: boolean }
     <div className="kx">
       <LandingReveal />
 
-      <PublicNav isAuthenticated={isAuthenticated} />
+      <PublicNav />
 
       <main id="top">
         {/* ─────────────────────────── HERO ─────────────────────────── */}

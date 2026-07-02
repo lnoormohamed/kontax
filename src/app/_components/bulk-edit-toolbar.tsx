@@ -103,6 +103,9 @@ export function BulkEditToolbar({
   books,
   labelSuggestions,
   onClear,
+  onOptimisticPatch,
+  onOptimisticRemove,
+  onOptimisticError,
 }: {
   selectedIds: string[];
   selectedContacts: ToolbarContact[];
@@ -110,6 +113,11 @@ export function BulkEditToolbar({
   books: ToolbarBook[];
   labelSuggestions: string[];
   onClear: () => void;
+  // P38-05: optimistic hooks — patch/hide the on-screen rows immediately;
+  // onOptimisticError reverts both when the action fails.
+  onOptimisticPatch?: (patches: Record<string, { isFavorite?: boolean; company?: string | null; labels?: string[] }>) => void;
+  onOptimisticRemove?: (ids: string[]) => void;
+  onOptimisticError?: (ids: string[]) => void;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -134,8 +142,10 @@ export function BulkEditToolbar({
   }, [selectedContacts]);
   useEffect(() => setLabelOverrides({}), [selectedContacts]);
 
-  const run = (fn: () => Promise<unknown>) => {
+  const run = (fn: () => Promise<unknown>, optimistic?: () => void) => {
     setBusy(true);
+    const ids = selectedIds;
+    optimistic?.();
     void (async () => {
       try {
         await fn();
@@ -145,6 +155,7 @@ export function BulkEditToolbar({
         onClear();
         startTransition(() => router.refresh());
       } catch (err) {
+        onOptimisticError?.(ids);
         alert(err instanceof Error ? err.message : "Something went wrong.");
       } finally {
         setBusy(false);
@@ -155,8 +166,10 @@ export function BulkEditToolbar({
   // No redirectTo: a server-action redirect() re-runs middleware via a cookieless
   // internal sub-request and bounces to /login. Instead the action revalidates and
   // we refresh + clear on the client.
-  const runForm = (action: (fd: FormData) => Promise<void>) => {
+  const runForm = (action: (fd: FormData) => Promise<void>, optimistic?: () => void) => {
     setBusy(true);
+    const ids = selectedIds;
+    optimistic?.();
     const fd = new FormData();
     selectedIds.forEach((id) => fd.append("contactIds", id));
     startTransition(async () => {
@@ -168,6 +181,7 @@ export function BulkEditToolbar({
         onClear();
         router.refresh();
       } catch (err) {
+        onOptimisticError?.(ids);
         alert(err instanceof Error ? err.message : "Something went wrong.");
       } finally {
         setBusy(false);
@@ -201,12 +215,30 @@ export function BulkEditToolbar({
     return labelOverrides[l] !== was;
   });
   const applyLabels = () =>
-    run(async () => {
-      for (const label of pendingLabelChanges) {
-        if (labelOverrides[label]) await addLabelBulk({ contactIds: selectedIds, label });
-        else await removeLabelBulk({ contactIds: selectedIds, label });
-      }
-    });
+    run(
+      async () => {
+        for (const label of pendingLabelChanges) {
+          if (labelOverrides[label]) await addLabelBulk({ contactIds: selectedIds, label });
+          else await removeLabelBulk({ contactIds: selectedIds, label });
+        }
+      },
+      () => {
+        // P38-05: chips update immediately on every selected row.
+        const patches: Record<string, { labels: string[] }> = {};
+        for (const c of selectedContacts) {
+          let next = [...c.labels];
+          for (const label of pendingLabelChanges) {
+            if (labelOverrides[label]) {
+              if (!next.some((l) => l.toLowerCase() === label.toLowerCase())) next.push(label);
+            } else {
+              next = next.filter((l) => l.toLowerCase() !== label.toLowerCase());
+            }
+          }
+          patches[c.id] = { labels: next };
+        }
+        onOptimisticPatch?.(patches);
+      },
+    );
 
   // ── merge ─────────────────────────────────────────────────────────────────
   const personalBooks = books;
@@ -326,7 +358,7 @@ export function BulkEditToolbar({
                         value={companyText}
                         onChange={(e) => setCompanyText(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") run(() => setCompanyBulk({ contactIds: selectedIds, company: companyText }));
+                          if (e.key === "Enter") run(() => setCompanyBulk({ contactIds: selectedIds, company: companyText }), () => onOptimisticPatch?.(Object.fromEntries(selectedIds.map((id) => [id, { company: companyText.trim() || null }]))));
                         }}
                         placeholder="Company name…"
                         className="h-9 w-full rounded-[9px] border-[1.5px] border-[#4158f4] px-2.5 text-[13px] text-[#1d2823] outline-none"
@@ -337,7 +369,7 @@ export function BulkEditToolbar({
                       <button type="button" className="h-8 rounded-lg border border-[#d8ddd6] px-3 text-[13px] font-semibold text-[#5c655e]" onClick={() => setOpen(null)}>
                         Cancel
                       </button>
-                      <button type="button" disabled={busy} className="h-8 rounded-lg bg-[#4158f4] px-3 text-[13px] font-semibold text-white disabled:opacity-50" onClick={() => run(() => setCompanyBulk({ contactIds: selectedIds, company: companyText }))}>
+                      <button type="button" disabled={busy} className="h-8 rounded-lg bg-[#4158f4] px-3 text-[13px] font-semibold text-white disabled:opacity-50" onClick={() => run(() => setCompanyBulk({ contactIds: selectedIds, company: companyText }), () => onOptimisticPatch?.(Object.fromEntries(selectedIds.map((id) => [id, { company: companyText.trim() || null }]))))}>
                         Apply to {count}
                       </button>
                     </div>
@@ -358,7 +390,7 @@ export function BulkEditToolbar({
               </Act>
             </div>
           ) : (
-            <Act onClick={() => runForm(restoreContactsBulk)}>
+            <Act onClick={() => runForm(restoreContactsBulk, () => onOptimisticRemove?.(selectedIds))}>
               <IconRestore />
               <span className="hidden md:inline">Restore</span>
             </Act>
@@ -372,7 +404,7 @@ export function BulkEditToolbar({
             {open === "more" ? (
               <Pop onClose={() => setOpen(null)} width={224}>
                 {mode === "active" ? (
-                  <button type="button" className={popItem} onClick={() => runForm(favoriteContactsBulk)}>
+                  <button type="button" className={popItem} onClick={() => runForm(favoriteContactsBulk, () => onOptimisticPatch?.(Object.fromEntries(selectedIds.map((id) => [id, { isFavorite: true }]))))}>
                     Favorite all
                   </button>
                 ) : null}
@@ -424,7 +456,7 @@ export function BulkEditToolbar({
         body="They’ll be hidden from People and your books, but never deleted. You can restore them anytime."
         confirmLabel="Archive"
         onClose={() => setConfirm(null)}
-        onConfirm={() => runForm(archiveContactsBulk)}
+        onConfirm={() => runForm(archiveContactsBulk, () => onOptimisticRemove?.(selectedIds))}
       />
       <ConfirmDialog
         open={confirm === "delete"}
@@ -434,7 +466,7 @@ export function BulkEditToolbar({
         body="This can’t be undone. The contacts and their sync links will be removed from Kontax."
         confirmLabel={`Delete ${count}`}
         onClose={() => setConfirm(null)}
-        onConfirm={() => runForm(deleteContactsBulk)}
+        onConfirm={() => runForm(deleteContactsBulk, () => onOptimisticRemove?.(selectedIds))}
       />
     </>
   );

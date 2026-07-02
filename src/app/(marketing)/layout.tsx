@@ -3,7 +3,6 @@ import "./_components/marketing.css";
 import type { Metadata } from "next";
 import { MarketingFooter } from "./_components/marketing-footer";
 import { MarketingNav } from "./_components/marketing-nav";
-import { auth } from "~/server/auth";
 
 export const metadata: Metadata = {
   // Marketing page titles already include "— Kontax"; suppress the root
@@ -15,15 +14,16 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export default async function MarketingLayout({
+// P38-10: no server-side session read here — the nav resolves it
+// client-side, so every page in this group can render statically.
+export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
   return (
     <div className="mkt-wrap" style={{ background: "#fff", color: "#1d2823", colorScheme: "light" }}>
-      <MarketingNav sessionUser={session?.user ?? null} />
+      <MarketingNav />
       <main>{children}</main>
       <MarketingFooter />
     </div>

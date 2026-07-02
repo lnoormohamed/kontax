@@ -108,32 +108,55 @@ export type LabelWithCount = {
 export async function getLabels(): Promise<LabelWithCount[]> {
   const userId = await requireUserId();
 
-  await ensureLabelRegistry();
+  // P38-03: one grouped scan over Contact.labels replaces the per-view
+  // registry backfill (label fetch + 2000-contact scan + aggregate) AND the
+  // one-count-query-per-label loop. Ungrouped scan also removes the old
+  // 2000-contact backfill cap.
+  const [labels, usageRows] = await Promise.all([
+    db.label.findMany({
+      where: { userId },
+      orderBy: { position: "asc" },
+      select: { id: true, name: true, color: true, position: true },
+    }),
+    db.$queryRaw<Array<{ name: string; count: bigint }>>`
+      SELECT lv.value AS name, count(DISTINCT c.id) AS count
+      FROM "Contact" c,
+        jsonb_array_elements_text(
+          CASE WHEN jsonb_typeof(c.labels) = 'array' THEN c.labels ELSE '[]'::jsonb END
+        ) AS lv(value)
+      WHERE c."userId" = ${userId} AND c."archivedAt" IS NULL AND trim(lv.value) <> ''
+      GROUP BY lv.value
+    `,
+  ]);
 
-  const labels = await db.label.findMany({
-    where: { userId },
-    orderBy: { position: "asc" },
-    select: { id: true, name: true, color: true, position: true },
-  });
+  // Registry backfill (labels attached via import/sync before registration):
+  // only pays extra queries when something is actually missing.
+  const registeredNames = new Set(labels.map((l) => l.name.toLowerCase()));
+  const missing = new Map<string, string>(); // lowercase → canonical
+  for (const row of usageRows) {
+    const key = row.name.trim().toLowerCase();
+    if (key && !registeredNames.has(key) && !missing.has(key)) missing.set(key, row.name.trim());
+  }
+  if (missing.size > 0) {
+    const usedColors = new Set(labels.map((l) => l.color));
+    let pos = labels.reduce((max, l) => Math.max(max, l.position), -1) + 1;
+    await db.label.createMany({
+      data: [...missing.values()].map((name) => {
+        const color = pickLabelColor(usedColors);
+        usedColors.add(color);
+        return { userId, name, color, position: pos++ };
+      }),
+      skipDuplicates: true,
+    });
+    return getLabels();
+  }
 
   if (labels.length === 0) return [];
 
-  // Count contacts per label. Contact.labels is a JSON string[] so we count
-  // contacts where the JSON array contains each label name (case-sensitive;
-  // registry names are canonical after backfill).
-  const counts = await Promise.all(
-    labels.map((l) =>
-      db.contact.count({
-        where: {
-          userId,
-          archivedAt: null,
-          labels: { array_contains: l.name },
-        },
-      }),
-    ),
-  );
-
-  return labels.map((l, i) => ({ ...l, count: counts[i] ?? 0 }));
+  // Case-sensitive name match — registry names are canonical after backfill,
+  // matching the previous array_contains counting exactly.
+  const usage = new Map(usageRows.map((r) => [r.name, Number(r.count)]));
+  return labels.map((l) => ({ ...l, count: usage.get(l.name) ?? 0 }));
 }
 
 // ── mutations ─────────────────────────────────────────────────────────────────

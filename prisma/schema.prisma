@@ -481,6 +481,11 @@ model Contact {
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
 
+    // P38-06: trigger-maintained weighted search vector (function + GIN index
+    // owned by scripts/setup-contact-search-index.mjs; declared here so
+    // `prisma db push` keeps the column). Queried by src/server/contact-search.ts.
+    searchVector Unsupported("tsvector")?
+
     @@unique([userId, syncUid])
     @@index([userId, archivedAt, fullName])
     @@index([userId, archivedAt, nickname])
@@ -489,6 +494,9 @@ model Contact {
     @@index([userId, importJobId])
     @@index([userId, mergedIntoContactId])
     @@index([bookId, archivedAt, fullName])
+    // P38-06: GIN index over the trigger-maintained search vector. Declared so
+    // `prisma db push` (which runs on deploy) does not drop it as drift.
+    @@index([searchVector], type: Gin)
 }
 
 model SubscriptionCustomer {

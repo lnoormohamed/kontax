@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useSessionUser } from "~/app/_components/use-session-user";
+
 const NAV_LINKS = [
   { label: "Features",  href: "/features"  },
   { label: "Pricing",   href: "/pricing"   },
@@ -21,11 +23,10 @@ function initials(name: string | null | undefined): string {
     .join("");
 }
 
-interface MarketingNavProps {
-  sessionUser?: { name?: string | null } | null;
-}
-
-export function MarketingNav({ sessionUser }: MarketingNavProps) {
+export function MarketingNav() {
+  // P38-10: the marketing pages render statically; the session (for the
+  // account chip vs Log in CTA) resolves client-side after hydration.
+  const sessionUser = useSessionUser() ?? null;
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

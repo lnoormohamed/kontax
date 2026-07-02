@@ -13,6 +13,10 @@ const redisClient =
       })
     : null;
 
+// P38-09: shared client for other Redis-backed concerns (session validation
+// cache). Null when REDIS_URL is unset — callers must fail open to the DB.
+export const getRedis = () => redisClient;
+
 function makeLimiter(points: number, duration: number, keyPrefix: string): Limiter {
   if (!redisClient) {
     // Dev fallback: per-process in-memory store. Not shared across instances.
@@ -56,6 +60,10 @@ export const rateLimiters = {
 
   // P34C-14: contact form — 3 submissions per IP per hour
   contactForm: makeLimiter(3, 60 * 60, "rl:contact-form"),
+
+  // P38-08 follow-up: external avatar image proxy — 240 fetches per user per
+  // minute (a full list window of proxied avatars stays well under this).
+  imageProxy: makeLimiter(240, 60, "rl:image-proxy"),
 
   // P34D-01: login brute-force — 5 wrong-password attempts per email per 15 minutes
   loginByEmail: makeLimiter(5, 15 * 60, "rl:login-email"),

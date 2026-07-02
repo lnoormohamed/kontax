@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { createBillingPortalSession, createCheckoutSession } from "~/app/actions/billing";
 
@@ -132,12 +132,25 @@ function buildPlans(stripePrices: StripePrices | null): Plan[] {
 }
 
 export function PricingToggle({
-  currentPlan,
   stripePrices,
 }: {
-  currentPlan?: string | null;
   stripePrices?: StripePrices | null;
 }) {
+  // P38-10: the page renders statically; highlight the visitor's current
+  // plan after hydration instead of forcing the whole page dynamic.
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/billing/plan")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { plan: string | null } | null) => {
+        if (!cancelled && data?.plan) setCurrentPlan(data.plan);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const prices = stripePrices ?? FALLBACK_PRICES;
   const PLANS = buildPlans(prices);
   const currencySymbol = sym(prices.currency);

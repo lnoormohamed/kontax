@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
-import { auth } from "~/server/auth";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
@@ -203,13 +202,11 @@ const TOC_ITEMS = [
   { href: "#examples", label: "Code examples" },
 ];
 
-export default async function DevelopersPage() {
-  const session = await auth();
-  const isAuthenticated = !!session?.user?.id;
+export default function DevelopersPage() {
 
   return (
     <div className="kx">
-      <PublicNav isAuthenticated={isAuthenticated} />
+      <PublicNav />
 
       <div
         style={{

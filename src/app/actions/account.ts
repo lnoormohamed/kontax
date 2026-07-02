@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { sendAccountDeletionScheduledEmail } from "~/server/billing-emails";
 import { auth } from "~/server/auth";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -88,6 +89,8 @@ export async function changePassword(input: {
     where: { id: session.user.id },
     data: { password: newHash, sessionVersion: { increment: 1 } },
   });
+  // P38-09: the sessionVersion bump must beat the 45s validation cache
+  await invalidateSessionValidation(session.user.id);
 
   await db.activityEvent.create({
     data: {
@@ -278,6 +281,8 @@ export async function scheduleAccountDeletion(input: {
       sessionVersion: { increment: 1 },
     },
   });
+  // P38-09: the lock must beat the 45s validation cache
+  await invalidateSessionValidation(session.user.id);
 
   // Delete MinIO avatar (best effort)
   const avatarUrl = user?.avatarUrl;

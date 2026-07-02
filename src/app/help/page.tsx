@@ -6,7 +6,6 @@ import { HelpProviderGuides } from "~/app/_components/help-provider-guides";
 import { breadcrumbSchema, faqPageSchema, JsonLd } from "~/app/_components/json-ld";
 import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
-import { auth } from "~/server/auth";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
@@ -16,8 +15,7 @@ export const metadata: Metadata = {
 };
 
 // P26-12 · public /help FAQ page.
-export default async function HelpPage() {
-  const session = await auth();
+export default function HelpPage() {
 
   return (
     <div className="kx">
@@ -30,7 +28,7 @@ export default async function HelpPage() {
           faqPageSchema(HELP_FAQ.flatMap((s) => s.items)),
         ]}
       />
-      <PublicNav isAuthenticated={!!session?.user?.id} />
+      <PublicNav />
       <main>
         <div className="help-wrap">
           <div className="help-head">

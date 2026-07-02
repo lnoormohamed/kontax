@@ -3,6 +3,7 @@ import crypto from "crypto";
 import type { EmailVerificationTokenType } from "../../generated/prisma";
 import VerifyEmail from "~/emails/verify-email";
 import { db } from "~/server/db";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { sendEmail } from "~/server/email";
 import { renderEmail } from "~/server/render-email";
 
@@ -94,6 +95,8 @@ export async function activateEmailChange(
       sessionVersion: { increment: 1 },
     },
   });
+  // P38-09: the sessionVersion bump must beat the 45s validation cache
+  await invalidateSessionValidation(userId);
 
   await db.activityEvent.create({
     data: {

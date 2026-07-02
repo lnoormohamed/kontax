@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { resolveAvatarSrc } from "~/lib/avatar-src";
 
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
@@ -554,6 +555,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const editorContact = {
     id: contact.id,
     fullName: contact.fullName,
+    avatarUrl: contact.avatarUrl,
     firstName: contact.firstName,
     middleName: contact.middleName,
     lastName: contact.lastName,
@@ -609,6 +611,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   // P24B-DB19: prefill payload for the mobile edit sheet (full field coverage).
   const sheetInitial = {
     id: contact.id,
+    avatarUrl: contact.avatarUrl,
     firstName: contact.firstName,
     lastName: contact.lastName,
     company: contact.company,
@@ -663,6 +666,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           archiveOrRestoreAction={contact.archivedAt ? restoreContact : archiveContact}
           avatarBg={avatarBg}
           avatarFg={avatarFg}
+          avatarUrl={contact.avatarUrl}
           backHref="/contacts"
           contactId={contact.id}
           contactName={contact.fullName}
@@ -874,10 +878,18 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               const avatarInitials = getInitials(contact.fullName, contact.company);
               return (
                 <div
-                  className="relative inline-flex h-[88px] w-[88px] items-center justify-center rounded-full text-3xl font-bold"
-                  style={{ background: avatarBg, color: avatarFg }}
+                  className="relative inline-flex h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-full text-3xl font-bold"
+                  style={contact.avatarUrl ? undefined : { background: avatarBg, color: avatarFg }}
                 >
-                  {avatarInitials ? avatarInitials : (
+                  {contact.avatarUrl ? (
+                    <img
+                      alt={contact.fullName || contact.company || "Contact photo"}
+                      className="h-full w-full object-cover"
+                      src={resolveAvatarSrc(contact.avatarUrl) ?? contact.avatarUrl}
+                    />
+                  ) : avatarInitials ? (
+                    avatarInitials
+                  ) : (
                     <WorkspaceIcon name="person" size={36} strokeWidth={1.6} className="text-[#aeb4ac]" />
                   )}
                   {contact.isFavorite ? (
