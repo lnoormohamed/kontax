@@ -1,5 +1,39 @@
 # P38-10 — Static Marketing Pages + Import-Export Bundle Split
 
+## Status
+Marketing static conversion implemented & verified 2026-07-02. Import-export
+split deferred (see below).
+
+**Root cause found:** every route was `ƒ` (dynamic) not because of the pages
+themselves but because the ROOT layout rendered `<ImpersonationBanner>`, a
+server component calling `auth()` on every request. Moving that to a
+client-side fetch (`/api/impersonation`) was the unlock — a broader win than
+the ticket scoped.
+
+**Done:**
+- `/changelog`, `/developers`, `/features`, `/help`, `/privacy`, `/security`,
+  `/terms` → `○` Static; `/pricing` → Static with 1h ISR (Stripe prices) and
+  client-resolved current-plan highlight (`/api/billing/plan`). All were `ƒ`.
+- Session-aware chrome resolves client-side after hydration:
+  `useSessionUser` hook (`/api/auth/session`) feeds MarketingNav + PublicNav;
+  ImpersonationBanner and the pricing plan badge fetch their own state.
+- Middleware lets `/api/impersonation` + `/api/billing/plan` through so anon
+  visitors get clean JSON instead of a redirect to /login.
+- Verified: static pages serve in 4–15ms with no auth cookie; logged-out nav
+  shows Log in / Get started; logged-in session peek returns the user and the
+  page still serves statically (nav swaps client-side); app routes stay gated.
+- `/` (homepage) intentionally stays dynamic — its hero personalises on the
+  server for logged-in users.
+
+**Deferred — import-export bundle split:** the 139 kB route weight is
+hand-written wizard code (import-preview-form 723 + import-field-mapping 652
+lines), not a heavy dependency. A `next/dynamic` wrapper splits the chunk but
+the wizard renders on page load, so it stays in first-load JS — the <150 kB
+criterion isn't met without gating the wizard behind an interaction (a page
+restructure into client tab-state that risks the export flow). Reverted the
+ineffective wrapper; tracked as a follow-up. The marketing conversion is the
+phase's real rendering win.
+
 ## Purpose
 
 Two independent low-priority wins bundled as one ticket: stop server-rendering

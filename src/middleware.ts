@@ -36,6 +36,11 @@ const PUBLIC_PREFIXES = [
   "/privacy", // legal
   "/terms", // legal
   "/api/register", // Account creation
+  // P38-10: read-only session peeks for statically-rendered public pages.
+  // Both call auth() themselves and return a null-ish payload when logged
+  // out, so let them run instead of redirecting the fetch to /login.
+  "/api/impersonation",
+  "/api/billing/plan",
   "/api/cron", // Protected separately by CRON_SECRET
   "/api/stripe/webhook", // Authenticated by Stripe signature, not session
   "/api/ses/events", // SNS bounce/complaint webhook (P20-10)
