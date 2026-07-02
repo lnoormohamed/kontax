@@ -12,6 +12,15 @@ import type {
   SuggestionContact,
 } from "~/server/contact-merge";
 
+// Next.js throws this when the browser has a stale bundle from a prior deploy.
+const toMergeError = (e: unknown) => {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (msg.includes("was not found on the server") || msg.includes("Server Action")) {
+    return "Page is out of date — please hard-refresh (⌘⇧R) and try again.";
+  }
+  return msg || "Merge failed — try again";
+};
+
 // ── Comparison table ─────────────────────────────────────────────────────────
 
 type Field = { key: keyof SuggestionContact; label: string };
@@ -310,7 +319,7 @@ export function MergeSuggestionCard({
         onDismissed();
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Merge failed — try again");
+        setError(toMergeError(e));
         setMerging(false);
       }
     });
@@ -483,7 +492,7 @@ function MergeSuggestionGroup({
         router.refresh();
         onAllDismissed();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Merge failed — try again");
+        setError(toMergeError(e));
         setMerging(false);
       }
     });
