@@ -10,7 +10,15 @@ import { SITE_URL } from "~/lib/site-url";
 // the raw-text breakout; ">" and "&" are escaped as defence in depth. All three
 // are valid JSON and decode back to the original characters, so consumers read
 // the schema identically.
-export function JsonLd({ data }: { data: Record<string, unknown> | Record<string, unknown>[] }) {
+export function JsonLd({
+  data,
+  nonce,
+}: {
+  data: Record<string, unknown> | Record<string, unknown>[];
+  // SEC-02: on pages served under a nonce-based CSP (the public card at
+  // /u/[username]), pass the request nonce so this inline script is permitted.
+  nonce?: string;
+}) {
   const json = JSON.stringify(data)
     .replace(/</g, "\\u003c")
     .replace(/>/g, "\\u003e")
@@ -19,6 +27,7 @@ export function JsonLd({ data }: { data: Record<string, unknown> | Record<string
   return (
     <script
       type="application/ld+json"
+      nonce={nonce}
       dangerouslySetInnerHTML={{ __html: json }}
     />
   );
