@@ -1,5 +1,32 @@
 # P38-05 — Optimistic UI for Row-Level Mutations
 
+## Status
+Implemented & verified 2026-07-02.
+
+**Close-out:**
+- Already optimistic before this ticket (no work needed): single favorite
+  toggle (row menu, swipe, badge cluster) and swipe-archive (hiddenIds +
+  mobile undo toast).
+- Made optimistic here: desktop row-menu Archive / Restore / Delete (were
+  plain form posts — row now hides in the same frame); bulk archive, restore,
+  delete (hide instantly); bulk favorite, label add/remove, and set-company
+  (rows patch instantly). Failed actions revert hides and patches.
+- New row-patch overlay in ContactsWorkspaceTable also fixes a P38-02 gap:
+  revalidation only re-delivers the first window, so bulk edits on
+  scrolled-in rows would otherwise show stale chips. Patches persist for
+  client-held rows; fresh server data for the first window prunes its
+  patches (server truth wins).
+- Verified on the seeded account (dev against ~200ms-RTT staging DB, so the
+  optimistic gap is very visible): label chips updated 250ms after Apply vs
+  ~2s+ round trip; archive/restore rows hide instantly; server state
+  converged (sidebar label count 333→335, contact restored + labeled in DB).
+- Emergency toggle: no row-level control exists in the table (badge only) —
+  nothing to make optimistic; detail-page control unchanged.
+- Undo toast remains mobile-only (existing design); desktop archive now hides
+  instantly instead of redirecting.
+- Real-device pass for the mobile selection toolbar still recommended
+  (preview cannot emulate touch).
+
 ## Purpose
 
 Make favorite, label, and archive toggles feel instant. Today every row-level

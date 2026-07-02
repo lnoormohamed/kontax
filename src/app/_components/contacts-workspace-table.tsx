@@ -203,7 +203,18 @@ const RowBadges = memo(function RowBadges({ contact, mode }: { contact: Workspac
   );
 });
 
-function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+function RowActions({
+  contact,
+  mode,
+  onArchived,
+  onRemoved,
+}: {
+  contact: WorkspaceContact;
+  mode: "active" | "archived";
+  onArchived: (contactId: string) => void;
+  // P38-05: restore/delete hide the row immediately (no undo toast).
+  onRemoved: (contactId: string) => void;
+}) {
   const [, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
   const [optimisticFavorite, setOptimisticFavorite] = useState(contact.isFavorite);
@@ -271,30 +282,56 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
                 {optimisticFavorite ? "Unfavorite" : "Favorite"}
               </button>
             ) : null}
+            {/* P38-05: optimistic — the row reacts immediately; the action runs
+                in a transition and the page revalidates behind it. */}
             {mode === "active" ? (
-              <form action={archiveContact}>
-                <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/contacts?tab=people" />
-                <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
-                  Archive
-                </button>
-              </form>
-            ) : (
-              <form action={restoreContact}>
-                <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/contacts?tab=archived" />
-                <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
-                  Restore
-                </button>
-              </form>
-            )}
-            <form action={permanentlyDeleteContact}>
-              <input name="contactId" type="hidden" value={contact.id} />
-              <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
-              <button className="block w-full px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50" type="submit">
-                Delete permanently
+              <button
+                className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onArchived(contact.id);
+                  startTransition(async () => {
+                    const fd = new FormData();
+                    fd.set("contactId", contact.id);
+                    await archiveContact(fd);
+                  });
+                }}
+              >
+                Archive
               </button>
-            </form>
+            ) : (
+              <button
+                className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onRemoved(contact.id);
+                  startTransition(async () => {
+                    const fd = new FormData();
+                    fd.set("contactId", contact.id);
+                    await restoreContact(fd);
+                  });
+                }}
+              >
+                Restore
+              </button>
+            )}
+            <button
+              className="block w-full px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onRemoved(contact.id);
+                startTransition(async () => {
+                  const fd = new FormData();
+                  fd.set("contactId", contact.id);
+                  await permanentlyDeleteContact(fd);
+                });
+              }}
+            >
+              Delete permanently
+            </button>
           </div>
         </>
       ) : null}
@@ -448,6 +485,7 @@ const ContactRow = memo(function ContactRow({
   nameDisplayOrder,
   onToggleSelect,
   onArchived,
+  onRemoved,
   onOpenContact,
 }: {
   contact: WorkspaceContact;
@@ -460,6 +498,7 @@ const ContactRow = memo(function ContactRow({
   nameDisplayOrder?: "first-last" | "last-first";
   onToggleSelect: (id: string, shiftKey: boolean) => void;
   onArchived: (contactId: string) => void;
+  onRemoved: (contactId: string) => void;
   onOpenContact: (contactId: string) => void;
 }) {
   const [, startTransition] = useTransition();
@@ -543,7 +582,7 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <div className="shrink-0 pt-0.5">
-            <RowActions contact={contact} mode={mode} />
+            <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
           </div>
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
@@ -629,7 +668,7 @@ const ContactRow = memo(function ContactRow({
           </p>
         )}
       </div>
-      <RowActions contact={contact} mode={mode} />
+      <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
     </div>
   );
 
@@ -688,7 +727,7 @@ const ContactRow = memo(function ContactRow({
         <div className="truncate text-[13px] tabular-nums text-[#5c655e]">
           <Cell query={query} value={contact.phone} />
         </div>
-        <RowActions contact={contact} mode={mode} />
+        <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
       </div>
       <div className="lg:hidden">
         <SwipeableRow
@@ -842,8 +881,56 @@ export function ContactsWorkspaceTable({
     return merged;
   }, [contacts, extraPages]);
 
+  // P38-05: optimistic row overlay. Row-menu and bulk operations patch the
+  // on-screen rows immediately; when the server re-delivers the first window
+  // (revalidation), its patches are pruned so server truth wins. Rows held in
+  // client state (scrolled-in windows) keep their patches — revalidation
+  // cannot reach them.
+  const [rowPatches, setRowPatches] = useState<Record<string, Partial<WorkspaceContact>>>({});
+  const applyRowPatches = useCallback((patches: Record<string, Partial<WorkspaceContact>>) => {
+    setRowPatches((prev) => {
+      const next = { ...prev };
+      for (const [id, patch] of Object.entries(patches)) {
+        next[id] = { ...next[id], ...patch };
+      }
+      return next;
+    });
+  }, []);
+  useEffect(() => {
+    // Fresh server data for the first window supersedes its patches.
+    setRowPatches((prev) => {
+      const serverIds = new Set(contacts.map((c) => c.id));
+      const kept = Object.entries(prev).filter(([id]) => !serverIds.has(id));
+      if (kept.length === Object.keys(prev).length) return prev;
+      return Object.fromEntries(kept);
+    });
+  }, [contacts]);
+
+  const patchedContacts = useMemo(() => {
+    if (Object.keys(rowPatches).length === 0) return allContacts;
+    return allContacts.map((c) => (rowPatches[c.id] ? { ...c, ...rowPatches[c.id] } : c));
+  }, [allContacts, rowPatches]);
+
   const loadedCount = allContacts.length;
   const hasMore = loadedCount < totalCount;
+
+  // Optimistic removal (restore / delete / bulk archive): hide instantly.
+  const hideRows = useCallback((ids: string[]) => {
+    setHiddenIds((prev) => new Set([...prev, ...ids]));
+  }, []);
+  // A failed action reverts both hides and patches for the affected rows.
+  const revertOptimistic = useCallback((ids: string[]) => {
+    setHiddenIds((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) next.delete(id);
+      return next;
+    });
+    setRowPatches((prev) => {
+      const next = { ...prev };
+      for (const id of ids) delete next[id];
+      return next;
+    });
+  }, []);
 
   const loadMore = useCallback(() => {
     const offset = contacts.length + extraPages.reduce((n, p) => n + p.length, 0);
@@ -863,8 +950,8 @@ export function ContactsWorkspaceTable({
   }, [contacts.length, extraPages, listRequest]);
 
   const visibleContacts = useMemo(
-    () => allContacts.filter((c) => !hiddenIds.has(c.id)),
-    [allContacts, hiddenIds],
+    () => patchedContacts.filter((c) => !hiddenIds.has(c.id)),
+    [patchedContacts, hiddenIds],
   );
 
   const scrollMemoryKey = useMemo(
@@ -927,7 +1014,7 @@ export function ContactsWorkspaceTable({
   // manager and the merge primary-picker.
   const selectedContacts = useMemo(
     () =>
-      allContacts
+      patchedContacts
         .filter((c) => selectedSet.has(c.id))
         .map((c) => ({
           id: c.id,
@@ -936,7 +1023,7 @@ export function ContactsWorkspaceTable({
             ? (c.labels as unknown[]).filter((v): v is string => typeof v === "string")
             : [],
         })),
-    [allContacts, selectedSet, nameDisplayOrder],
+    [patchedContacts, selectedSet, nameDisplayOrder],
   );
 
   const toggleSelectAll = useCallback(() => {
@@ -1306,6 +1393,9 @@ export function ContactsWorkspaceTable({
           books={books}
           labelSuggestions={labelSuggestions}
           onClear={clearSelection}
+          onOptimisticPatch={applyRowPatches}
+          onOptimisticRemove={hideRows}
+          onOptimisticError={revertOptimistic}
         />
       ) : null}
 
@@ -1357,6 +1447,7 @@ export function ContactsWorkspaceTable({
                   mode={mode}
                   nameDisplayOrder={nameDisplayOrder}
                   onArchived={handleArchived}
+                  onRemoved={(id) => hideRows([id])}
                   onOpenContact={saveListScrollPosition}
                   onToggleSelect={handleToggleSelect}
                   query={query}
