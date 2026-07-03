@@ -43,6 +43,9 @@ const securityHeaders = [
 
 /** @type {import("next").NextConfig} */
 const config = {
+  // Allow parallel dev + prod-verification servers in the same checkout
+  // (each Claude/terminal session sets its own NEXT_DIST_DIR).
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   eslint: {
     ignoreDuringBuilds: true,
   },

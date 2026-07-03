@@ -120,6 +120,38 @@ export function DataExportSection({ hasPassword }: { hasPassword: boolean }) {
         billing summary, and account info.
       </p>
 
+      {/* P45-DB01 Surface 6: open-format framing — only on this page, the
+          highest-trust surface. Elsewhere the picker one-liner carries it. */}
+      <div className="mb-4 flex items-start gap-3.5 rounded-[12px] border border-[#e9ece7] bg-[#f8faf8] px-[17px] py-[15px]">
+        <span className="grid h-[38px] w-[38px] flex-none place-items-center rounded-[10px] bg-[#e7efe9] text-[#17352e]">
+          <svg fill="none" height="19" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24" width="19">
+            <rect height="10" rx="2" width="18" x="3" y="11" />
+            <path d="M7 11V8a5 5 0 019.9-1" />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13.5px] font-bold text-[#1d2823]">Your data, in an open format</p>
+          <p className="mt-0.5 text-[12.5px] leading-[1.5] text-[#5c655e]">
+            A Kontax Archive is documented JSON and standard photos — no lock-in. Read it,
+            script it, or move it anywhere.{" "}
+            <a className="font-semibold text-[#4158f4] no-underline" href="/developers">
+              Read the format spec →
+            </a>
+          </p>
+          <a
+            className="mt-2.5 inline-flex items-center gap-1.5 font-mono text-[12px] font-semibold text-[#4158f4] no-underline"
+            href="https://github.com/getkontax/contact-format"
+            rel="noreferrer"
+            target="_blank"
+          >
+            <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24" width="14">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 00-1.3-3.2 4.2 4.2 0 00-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 00-6.2 0C6.6 2.2 5.5 2.5 5.5 2.5a4.2 4.2 0 00-.1 3.2A4.6 4.6 0 004 8.9c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+            </svg>
+            github.com/getkontax/contact-format
+          </a>
+        </div>
+      </div>
+
       {isExpired && (
         <p className="mb-3 text-[13px] text-[#9a3a23]">
           Your previous export has expired. Request a new one below.

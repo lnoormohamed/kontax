@@ -130,6 +130,8 @@ export function BulkEditToolbar({
   const [mergeOpen, setMergeOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [labelSearch, setLabelSearch] = useState("");
+  // P45-DB01: inline confirmation after kicking off a Kontax Archive export.
+  const [archiveSent, setArchiveSent] = useState(false);
   const [labelOverrides, setLabelOverrides] = useState<Record<string, boolean>>({});
   const [companyText, setCompanyText] = useState("");
 
@@ -142,6 +144,20 @@ export function BulkEditToolbar({
   useEffect(() => {
     if (offline) setOpen(null);
   }, [offline]);
+
+  // Reset the archive confirmation when the More menu closes.
+  useEffect(() => {
+    if (open !== "more") setArchiveSent(false);
+  }, [open]);
+
+  const exportKontaxArchive = () => {
+    void fetch("/api/exports/kontax", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ includePhotos: true, includeVcardFallback: false, ids: selectedIds }),
+    }).catch(() => undefined);
+    setArchiveSent(true);
+  };
 
   // Per-label membership across the selection → tri-state. Reset overrides when
   // the selection changes so the manager reflects the new set.
@@ -440,6 +456,15 @@ export function BulkEditToolbar({
                 >
                   Export as CSV
                 </a>
+                {archiveSent ? (
+                  <div className="flex min-h-9 items-center gap-2 rounded-[7px] px-2.5 py-1.5 text-[12.5px] font-medium leading-[1.4] text-[#1f8a5b]">
+                    Preparing archive — we’ll notify you when it’s ready.
+                  </div>
+                ) : (
+                  <button type="button" className={popItem} onClick={exportKontaxArchive}>
+                    Export as Kontax Archive
+                  </button>
+                )}
                 <button
                   type="button"
                   className={popItem}

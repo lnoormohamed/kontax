@@ -1,9 +1,17 @@
 import { spawnSync } from "node:child_process";
 
 const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
+const nodeEnv = (process.env.NODE_ENV ?? "").trim().toLowerCase();
 const requestedMode = (process.env.KONTAX_SCHEMA_MODE ?? "").trim().toLowerCase();
-const schemaMode =
-  requestedMode || (deployEnv === "production" ? "validate" : "push");
+const inferredProduction = !deployEnv && nodeEnv === "production";
+const defaultSchemaMode = deployEnv
+  ? deployEnv === "production"
+    ? "validate"
+    : "push"
+  : inferredProduction
+    ? "validate"
+    : "push";
+const schemaMode = requestedMode || defaultSchemaMode;
 
 const run = (command, args) => {
   const result = spawnSync(command, args, {
@@ -23,8 +31,14 @@ if (!["push", "validate", "skip"].includes(schemaMode)) {
 }
 
 console.log(
-  `[startup] Deploy environment: ${deployEnv || "unspecified"} · schema mode: ${schemaMode}`,
+  `[startup] Deploy environment: ${deployEnv || "unspecified"} · node env: ${nodeEnv || "unspecified"} · schema mode: ${schemaMode}`,
 );
+
+if (!requestedMode && inferredProduction) {
+  console.warn(
+    "[startup] KONTAX_DEPLOY_ENV is unset while NODE_ENV=production; defaulting schema mode to validate for safety.",
+  );
+}
 
 if (schemaMode === "push") {
   console.log("[startup] Applying prisma db push before boot.");

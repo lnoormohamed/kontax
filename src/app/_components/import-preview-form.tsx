@@ -22,6 +22,17 @@ type PreviewContact = {
   company?: string | null;
 };
 
+// P45-DB01 Surface 5: recognition result from /api/imports/contacts/kontax/preview.
+// Recognition is content-based on the server — the extension only routes the
+// file into this flow, so a renamed file still recognizes correctly.
+type KontaxRecognition =
+  | { kind: "archive"; formatVersion: string; contactCount: number; photoCount: number; fileName: string; size: number }
+  | { kind: "document"; formatVersion: string; customFieldCount: number; hasPhoto: boolean; displayName: string | null; fileName: string; size: number }
+  | { kind: "unsupported-version"; formatVersion: string; major: number; container: "archive" | "document"; fileName: string; size: number }
+  | { kind: "unrecognized"; fileName: string; size: number };
+
+type KontaxImportResult = { importedCount: number; skippedCount: number; jobId: string };
+
 type MatchedPreset = {
   id: string;
   name: string;
@@ -56,6 +67,44 @@ const formatSize = (bytes?: number) => {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB · CSV`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB · CSV`;
 };
+
+const formatBytes = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const formatMajor = (formatVersion: string) => formatVersion.split(".")[0] ?? formatVersion;
+
+function BoxGlyph() {
+  return (
+    <svg fill="none" height={22} stroke="#1f8a5b" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} viewBox="0 0 24 24" width={22}>
+      <path d="M21 8l-9-5-9 5v8l9 5 9-5V8z" />
+      <path d="M3 8l9 5 9-5" />
+      <path d="M12 13v8" />
+    </svg>
+  );
+}
+
+function FilePageGlyph() {
+  return (
+    <svg fill="none" height={22} stroke="#17352e" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} viewBox="0 0 24 24" width={22}>
+      <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+      <path d="M14 3v4h4" />
+      <path d="M9 13h6M9 16.5h6" />
+    </svg>
+  );
+}
+
+function WarnTriangleGlyph() {
+  return (
+    <svg fill="none" height={22} stroke="#b5472f" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} viewBox="0 0 24 24" width={22}>
+      <path d="M10.3 4.1L2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.1a2 2 0 0 0-3.4 0z" />
+      <path d="M12 9v5" />
+      <path d="M12 17.5h.01" />
+    </svg>
+  );
+}
 
 function DocGlyph() {
   return (
@@ -117,6 +166,150 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 | 4 }) {
   );
 }
 
+function KontaxStat({ value, caption }: { value: string; caption: string }) {
+  return (
+    <div className="flex flex-col">
+      <span className="font-mono text-[20px] font-semibold leading-tight tabular-nums text-[#1d2823]">{value}</span>
+      <span className="text-[11px] text-[#8b938c]">{caption}</span>
+    </div>
+  );
+}
+
+function KontaxFileChip({ text }: { text: string }) {
+  return (
+    <span className="inline-block max-w-full truncate rounded-[7px] border border-[#e9ece7] bg-white px-2.5 py-1 font-mono text-[12px] text-[#5c655e]">
+      {text}
+    </span>
+  );
+}
+
+// P45-DB01 Surface 5: recognition panel shown in place of the dropzone once
+// a .json/.zip file has been sniffed by the server.
+function KontaxRecognitionPanel({
+  info,
+  busy,
+  blocked,
+  onImport,
+  onReset,
+}: {
+  info: KontaxRecognition;
+  busy: boolean;
+  blocked: boolean;
+  onImport: () => void;
+  onReset: () => void;
+}) {
+  const chooseDifferent = (
+    <button
+      className="h-11 rounded-[10px] border border-[#d8ddd6] bg-white px-[18px] text-[14px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
+      disabled={busy}
+      onClick={onReset}
+      type="button"
+    >
+      Choose a different file
+    </button>
+  );
+
+  if (info.kind === "unsupported-version" || info.kind === "unrecognized") {
+    const unsupported = info.kind === "unsupported-version";
+    return (
+      <div className="grid gap-3.5 rounded-[14px] border border-[#e8c6ba] bg-[#f9ece7] p-5">
+        <div className="flex items-start gap-3.5">
+          <span className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-[11px] bg-[#f3e1da]">
+            <WarnTriangleGlyph />
+          </span>
+          <div className="min-w-0">
+            <div className="text-[15px] font-bold text-[#1d2823]">
+              {unsupported ? "This file needs a newer Kontax" : "We couldn't read this file"}
+            </div>
+            <div className="mt-0.5 text-[13px] leading-[1.5] text-[#5c655e]">
+              {unsupported && info.kind === "unsupported-version"
+                ? `It's a Kontax ${info.container === "archive" ? "Archive" : "contact"} saved in format v${info.major} — this version reads up to v1. Update Kontax, then try again.`
+                : "It may be damaged or not a Kontax export — try re-exporting it."}
+            </div>
+          </div>
+        </div>
+        <KontaxFileChip
+          text={
+            info.kind === "unsupported-version"
+              ? `${info.fileName} · format v${info.major}`
+              : `${info.fileName} · ${formatBytes(info.size)}`
+          }
+        />
+        <div className="flex">{chooseDifferent}</div>
+      </div>
+    );
+  }
+
+  const archive = info.kind === "archive";
+  const major = formatMajor(info.formatVersion);
+  const importCount = archive && info.kind === "archive" ? info.contactCount : 1;
+  const documentSub =
+    info.kind === "document"
+      ? info.hasPhoto && info.customFieldCount > 0
+        ? "One contact, with its photo and custom fields."
+        : info.hasPhoto
+          ? "One contact, with its photo."
+          : info.customFieldCount > 0
+            ? `One contact, with ${info.customFieldCount} custom field${info.customFieldCount === 1 ? "" : "s"}.`
+            : "One contact."
+      : "";
+
+  return (
+    <div className="grid gap-3.5 rounded-[14px] border border-[#cfe4d7] bg-[#f4faf6] p-5">
+      <div className="flex items-start gap-3.5">
+        <span
+          className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-[11px]"
+          style={{ background: archive ? "#e3efe7" : "#e7efe9" }}
+        >
+          {archive ? <BoxGlyph /> : <FilePageGlyph />}
+        </span>
+        <div className="min-w-0">
+          <div className="text-[15px] font-bold text-[#1d2823]">
+            {archive ? "Kontax Archive recognized" : "Kontax contact recognized"}
+          </div>
+          <div className="mt-0.5 text-[13px] leading-[1.5] text-[#5c655e]">
+            {archive
+              ? "Everything transfers — photos, custom fields, and labels come across intact."
+              : documentSub}
+          </div>
+        </div>
+      </div>
+      <KontaxFileChip text={`${info.fileName} · ${formatBytes(info.size)}`} />
+      <div className="flex gap-6">
+        {info.kind === "archive" ? (
+          <>
+            <KontaxStat caption="contacts" value={String(info.contactCount)} />
+            <KontaxStat caption="photos" value={String(info.photoCount)} />
+            <KontaxStat caption="format" value={`v${major}`} />
+          </>
+        ) : info.kind === "document" ? (
+          <>
+            <KontaxStat caption="contact" value="1" />
+            {info.customFieldCount > 0 ? (
+              <KontaxStat
+                caption={`custom field${info.customFieldCount === 1 ? "" : "s"}`}
+                value={String(info.customFieldCount)}
+              />
+            ) : null}
+            <KontaxStat caption="format" value={`v${major}`} />
+          </>
+        ) : null}
+      </div>
+      <div className="flex flex-col-reverse gap-2.5 sm:flex-row">
+        {chooseDifferent}
+        <button
+          className="flex h-11 flex-1 items-center justify-center rounded-[10px] bg-[#4158f4] px-[18px] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={busy || blocked}
+          onClick={onImport}
+          type="button"
+        >
+          {busy ? "Importing…" : `Import ${importCount} contact${importCount === 1 ? "" : "s"}`}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ImportPreviewForm({
   gate,
   quota,
@@ -147,6 +340,10 @@ export function ImportPreviewForm({
   const [presetSaved, setPresetSaved] = useState(false);
   const [presetName, setPresetName] = useState("");
   const [presetSaving, setPresetSaving] = useState(false);
+  // P45-DB01 Surface 5: Kontax-format (.json/.zip) import flow state.
+  const [kontaxFile, setKontaxFile] = useState<File | null>(null);
+  const [kontaxInfo, setKontaxInfo] = useState<KontaxRecognition | null>(null);
+  const [kontaxResult, setKontaxResult] = useState<KontaxImportResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -160,17 +357,65 @@ export function ImportPreviewForm({
     setPresetApplied(false);
     setPresetSaved(false);
     setPresetName("");
+    setKontaxFile(null);
+    setKontaxInfo(null);
+    setKontaxResult(null);
     setError("");
+  };
+
+  // The extension only routes into the recognition call — the recognition
+  // result itself is content-based on the server.
+  const isKontaxCandidate = (file: File) =>
+    /\.(json|zip)$/i.test(file.name) ||
+    ["application/json", "application/zip"].includes(file.type);
+
+  const takeKontaxFile = async (file: File) => {
+    setKontaxFile(file);
+    setBusy(true);
+    setError("");
+    const body = new FormData();
+    body.append("file", file);
+    const res = await fetch("/api/imports/contacts/kontax/preview", { method: "POST", body });
+    const data = (await res.json().catch(() => null)) as (KontaxRecognition & { message?: string }) | null;
+    setBusy(false);
+    if (!res.ok || !data) {
+      setKontaxFile(null);
+      setError(data?.message ?? "Couldn't read this file. Check the format and try again.");
+      return;
+    }
+    setKontaxInfo(data);
   };
 
   const takeFile = async (file: File | undefined) => {
     if (!file) return;
+    if (isKontaxCandidate(file)) {
+      await takeKontaxFile(file);
+      return;
+    }
     setFileName(file.name);
     setFileSize(file.size);
     setCsvText(await file.text());
     setPaste("");
     setError("");
     if (/google/i.test(file.name)) setProfile("GOOGLE");
+  };
+
+  const doKontaxImport = async () => {
+    if (!kontaxFile) return;
+    setBusy(true);
+    setError("");
+    const body = new FormData();
+    body.append("file", kontaxFile);
+    const res = await fetch("/api/imports/contacts/kontax/commit", { method: "POST", body });
+    const data = (await res.json().catch(() => null)) as (KontaxImportResult & { error?: string }) | null;
+    setBusy(false);
+    if (!res.ok || !data || typeof data.importedCount !== "number") {
+      setError(data?.error ?? "Import failed.");
+      return;
+    }
+    setKontaxResult(data);
+    setImportedCount(data.importedCount);
+    setStep(4);
   };
 
   const onDrop = (e: DragEvent) => {
@@ -238,13 +483,16 @@ export function ImportPreviewForm({
   };
 
   const doUndo = async () => {
-    if (!preview) return;
+    // Rollback works for any ImportJob — the Kontax commit endpoint creates
+    // one just like the CSV flow, so undo posts whichever jobId applies.
+    const jobId = kontaxResult?.jobId ?? preview?.jobId;
+    if (!jobId) return;
     setConfirmUndo(false);
     setBusy(true);
     const res = await fetch("/api/imports/contacts/rollback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jobId: preview.jobId }),
+      body: JSON.stringify({ jobId }),
     });
     if (res.ok) {
       window.location.href = "/import-export?rolledBack=1";
@@ -331,6 +579,17 @@ export function ImportPreviewForm({
                 Your import limit resets on <b className="text-[#1d2823]">{quota.reset}</b>.
               </div>
             </div>
+          ) : kontaxInfo ? (
+            <KontaxRecognitionPanel
+              blocked={blocked}
+              busy={busy}
+              info={kontaxInfo}
+              onImport={() => void doKontaxImport()}
+              onReset={() => {
+                reset();
+                if (inputRef.current) inputRef.current.value = "";
+              }}
+            />
           ) : fileName ? (
             <div className="flex items-center gap-3 rounded-xl border border-[#d8ddd6] bg-[#f2f4f0] px-4 py-3.5">
               <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[9px] border border-[#d8ddd6] bg-white">
@@ -370,25 +629,25 @@ export function ImportPreviewForm({
                 <div className="text-[15px] font-semibold text-[#4158f4]">Release to upload</div>
               ) : (
                 <>
-                  <div className="hidden text-[16px] font-semibold text-[#5c655e] md:block">Drag &amp; drop your CSV file here</div>
+                  <div className="hidden text-[16px] font-semibold text-[#5c655e] md:block">Drag &amp; drop your CSV file or Kontax export here</div>
                   <div className="text-[14px] text-[#8b938c]">
                     <span className="font-semibold text-[#4158f4]">Choose file</span>
                     <span className="hidden md:inline"> or drag &amp; drop</span>
                   </div>
-                  <div className="text-[12px] text-[#8b938c]">CSV files only</div>
+                  <div className="text-[12px] text-[#8b938c]">CSV, or a Kontax Archive (.zip) or contact (.json)</div>
                 </>
               )}
             </button>
           )}
           <input
-            accept=".csv,text/csv"
+            accept=".csv,text/csv,.json,application/json,.zip,application/zip"
             className="hidden"
             onChange={(e: ChangeEvent<HTMLInputElement>) => void takeFile(e.target.files?.[0])}
             ref={inputRef}
             type="file"
           />
 
-          {!blocked ? (
+          {!blocked && !kontaxInfo ? (
             <div>
               <button
                 className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-[#5c655e]"
@@ -411,7 +670,8 @@ export function ImportPreviewForm({
             </div>
           ) : null}
 
-          {/* source format — 2×2 on mobile, 4-col on sm+ */}
+          {/* source format — 2×2 on mobile, 4-col on sm+ (hidden in the Kontax flow) */}
+          {kontaxInfo ? null : (
           <div className="grid gap-2.5" style={{ opacity: blocked ? 0.45 : 1, pointerEvents: blocked ? "none" : "auto" }}>
             <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">Source format</div>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -437,8 +697,9 @@ export function ImportPreviewForm({
               })}
             </div>
           </div>
+          )}
 
-          {!blocked ? (
+          {!blocked && !kontaxInfo ? (
             <button
               className="flex h-11 w-full items-center justify-center rounded-[10px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] disabled:cursor-not-allowed disabled:opacity-50"
               disabled={!canContinue || busy}
@@ -633,14 +894,17 @@ export function ImportPreviewForm({
             <div>
               <b className="font-semibold text-[#1d2823]">{importedCount} contacts</b> imported
             </div>
-            {preview && preview.skippedCount > 0 ? (
+            {(kontaxResult?.skippedCount ?? preview?.skippedCount ?? 0) > 0 ? (
               <div>
-                <span className="font-semibold text-[#bf8526]">{preview.skippedCount} skipped</span>
+                <span className="font-semibold text-[#bf8526]">
+                  {kontaxResult?.skippedCount ?? preview?.skippedCount} skipped
+                </span>
               </div>
             ) : null}
           </div>
-          {/* Save-as-preset prompt — hidden when preset was auto-applied or already saved */}
-          {!presetApplied && !presetSaved ? (
+          {/* Save-as-preset prompt — hidden when preset was auto-applied or already
+              saved, and in the Kontax flow (no column mapping to save) */}
+          {!presetApplied && !presetSaved && !kontaxResult ? (
             <div className="rounded-[12px] border border-[#d8ddd6] bg-[#f9faf8] p-4">
               <div className="mb-3 text-[13.5px] font-semibold text-[#1d2823]">
                 {preview?.matchedPreset

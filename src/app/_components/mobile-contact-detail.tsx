@@ -6,6 +6,7 @@ import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { cameFromContactList } from "~/lib/contact-list-scroll";
 import { useEffect, useRef, useState } from "react";
 
+import { MobileContactExport } from "~/app/_components/contact-export-button";
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
 import { LabelChip } from "~/app/_components/label-chip";
 import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
@@ -71,6 +72,7 @@ export function MobileContactDetail({
   const editing = mode === "edit";
   const [moreOpen, setMoreOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [heroVisible, setHeroVisible] = useState(true);
@@ -497,7 +499,7 @@ export function MobileContactDetail({
         </div>
       </div>
 
-      {/* More actions sheet — Favourite · Archive · Share */}
+      {/* More actions sheet — Favourite · Share · Export · Archive */}
       <MobileBottomSheet isOpen={moreOpen} onClose={() => setMoreOpen(false)} title={contactName}>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <form action={toggleFavoriteAction} onSubmit={() => setMoreOpen(false)}>
@@ -511,6 +513,17 @@ export function MobileContactDetail({
             <WorkspaceIcon name="share" size={20} className="text-[#5c655e]" />
             <span style={moreLabelStyle}>Share</span>
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setMoreOpen(false);
+              setExportOpen(true);
+            }}
+            style={moreRowStyle}
+          >
+            <WorkspaceIcon name="download" size={20} className="text-[#5c655e]" />
+            <span style={moreLabelStyle}>Export</span>
+          </button>
           <form action={archiveOrRestoreAction} onSubmit={() => setMoreOpen(false)}>
             <input name="contactId" type="hidden" value={contactId} />
             <button type="submit" style={{ ...moreRowStyle, color: isArchived ? "#1d2823" : "#b5472f" }}>
@@ -520,6 +533,14 @@ export function MobileContactDetail({
           </form>
         </div>
       </MobileBottomSheet>
+
+      {/* Export sheet (P45-DB01) — format picker + share-sheet handoff */}
+      <MobileContactExport
+        contactId={contactId}
+        contactName={contactName}
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+      />
 
       {/* Sticky tab bar */}
       <div

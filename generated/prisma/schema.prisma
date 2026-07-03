@@ -130,6 +130,16 @@ enum ContactExportFormat {
   VCARD_4
 }
 
+// P45: the open export format's async archive jobs live in their own model
+// (KontaxExportJob) rather than extending ExportJob — the legacy
+// ContactExportFormat enum is owned by the postgres role and can't be altered
+// by the app role, and the archive lifecycle (progress, time-boxed download)
+// is different enough to warrant its own table.
+enum KontaxExportKind {
+  DOCUMENT
+  ARCHIVE
+}
+
 enum ImportSourceProfile {
   GENERIC
   GOOGLE
@@ -295,6 +305,7 @@ model User {
   contacts                         Contact[]
   importJobs                       ImportJob[]
   exportJobs                       ExportJob[]
+  kontaxExportJobs                 KontaxExportJob[]
   mergeSuggestions                 MergeSuggestion[]
   mergeDecisions                   MergeDecision[]
   dismissals                       MergeDismissal[]
@@ -621,6 +632,40 @@ model ExportJob {
   user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status, createdAt])
+}
+
+// P45: async job for Kontax Archive (.zip) exports — bulk/book/account scale.
+// Bare-document and small exports download synchronously and never create one
+// of these. Download links are time-boxed (7 days, stated up front) and jobs
+// are re-runnable after expiry (P45-DB01 Surface 4).
+model KontaxExportJob {
+  id                   String                @id @default(cuid())
+  userId               String
+  kind                 KontaxExportKind      @default(ARCHIVE)
+  status               ImportExportJobStatus @default(PENDING)
+  includeArchived      Boolean               @default(false)
+  includePhotos        Boolean               @default(true)
+  includeVcardFallback Boolean               @default(false)
+  // Scope: explicit ids (bulk selection) or a book; null = all contacts.
+  contactIds           Json?
+  bookId               String?
+  filterQuery          String?
+  totalCount           Int?
+  progressCount        Int                   @default(0)
+  photoCount           Int                   @default(0)
+  exportedCount        Int                   @default(0)
+  downloadUrl          String?
+  fileSizeBytes        Int?
+  expiresAt            DateTime?
+  errorSummary         String?
+  createdAt            DateTime              @default(now())
+  startedAt            DateTime?
+  completedAt          DateTime?
+  updatedAt            DateTime              @updatedAt
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status, createdAt])
+  @@index([status, expiresAt])
 }
 
 model MergeSuggestion {

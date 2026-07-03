@@ -323,6 +323,31 @@ exports.Prisma.ExportJobScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.KontaxExportJobScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  status: 'status',
+  includeArchived: 'includeArchived',
+  includePhotos: 'includePhotos',
+  includeVcardFallback: 'includeVcardFallback',
+  contactIds: 'contactIds',
+  bookId: 'bookId',
+  filterQuery: 'filterQuery',
+  totalCount: 'totalCount',
+  progressCount: 'progressCount',
+  photoCount: 'photoCount',
+  exportedCount: 'exportedCount',
+  downloadUrl: 'downloadUrl',
+  fileSizeBytes: 'fileSizeBytes',
+  expiresAt: 'expiresAt',
+  errorSummary: 'errorSummary',
+  createdAt: 'createdAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.MergeSuggestionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1012,6 +1037,11 @@ exports.ContactExportFormat = exports.$Enums.ContactExportFormat = {
   VCARD_4: 'VCARD_4'
 };
 
+exports.KontaxExportKind = exports.$Enums.KontaxExportKind = {
+  DOCUMENT: 'DOCUMENT',
+  ARCHIVE: 'ARCHIVE'
+};
+
 exports.MergeSuggestionStatus = exports.$Enums.MergeSuggestionStatus = {
   OPEN: 'OPEN',
   DISMISSED: 'DISMISSED',
@@ -1244,6 +1274,7 @@ exports.Prisma.ModelName = {
   Subscription: 'Subscription',
   ImportJob: 'ImportJob',
   ExportJob: 'ExportJob',
+  KontaxExportJob: 'KontaxExportJob',
   MergeSuggestion: 'MergeSuggestion',
   MergeDecision: 'MergeDecision',
   MergeDismissal: 'MergeDismissal',

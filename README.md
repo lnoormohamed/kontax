@@ -166,6 +166,7 @@ container now boots through `scripts/start-production.mjs`:
 If `KONTAX_SCHEMA_MODE` is unset, the startup script defaults to:
 
 - `validate` when `KONTAX_DEPLOY_ENV=production`
+- `validate` when `KONTAX_DEPLOY_ENV` is unset but `NODE_ENV=production`
 - `push` otherwise
 
 Runbooks:

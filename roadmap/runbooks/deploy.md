@@ -27,6 +27,7 @@ Default behavior:
 
 - when `KONTAX_SCHEMA_MODE` is set, that value wins
 - otherwise `KONTAX_DEPLOY_ENV=production` defaults to `validate`
+- otherwise `NODE_ENV=production` with no `KONTAX_DEPLOY_ENV` also defaults to `validate`
 - all other environments default to `push`
 
 ---

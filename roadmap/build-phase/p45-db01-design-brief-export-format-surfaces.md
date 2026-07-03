@@ -1,5 +1,15 @@
 # P45-DB01 — Design Brief: Export Format Surfaces & Naming
 
+Status: **Done** (2026-07-03). Brief delivered at
+[roadmap/design-briefs/p45-db01-export-format-surfaces.md](../design-briefs/p45-db01-export-format-surfaces.md)
+(companion visual canvas in the design tool). Naming decision: **Kontax
+Archive** (.zip) / **Kontax contact** (.json) as UI labels only — neutral
+extensions and MIME types, recognition via the in-file
+`getkontax.com:formatVersion` property (P45-02 §7.4/§8). All six surfaces
+implemented in-app same day (format picker + comparison, single-contact
+export split-button + mobile share sheet, async archive job states with
+notification, import recognition, open-format callout on data export).
+
 ## Purpose
 
 Specify how the new open export format shows up in the product: the format

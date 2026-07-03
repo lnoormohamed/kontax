@@ -16,6 +16,7 @@ import { MobileContactDetail } from "~/app/_components/mobile-contact-detail";
 import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
+import { ContactExportButton } from "~/app/_components/contact-export-button";
 import { MoreMenu } from "~/app/_components/more-menu";
 import { MergeWithButton } from "~/app/_components/merge-picker-button";
 import { LabelChip } from "~/app/_components/label-chip";
@@ -807,6 +808,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               <WorkspaceIcon name="share" size={16} />
               Share
             </Link>
+            <ContactExportButton contactId={contact.id} contactName={contact.fullName} />
             <form action={contact.archivedAt ? restoreContact : archiveContact}>
               <input name="contactId" type="hidden" value={contact.id} />
               <button

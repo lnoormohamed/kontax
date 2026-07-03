@@ -15,6 +15,13 @@ P45-02 complete (2026-07-03): published spec + JSON Schema + complete vCard
 mapping table. See
 [p45-02-schema-spec-vcard-mapping.md](p45-02-schema-spec-vcard-mapping.md) and
 [docs/contact-export-format-spec.md](../../docs/contact-export-format-spec.md).
+P45-DB01 complete (2026-07-03): brief + all six surfaces implemented
+([design brief](../design-briefs/p45-db01-export-format-surfaces.md)). The
+build pulled forward the working core of P45-04/05 (serializer, single/bulk
+export incl. async archive job, import recognition + lossless import in
+`src/server/export-format/`); those tickets now cover hardening + the
+remaining seams (P45-03 container spec, preset surfaces, full data-export
+job integration, round-trip QA harness).
 
 ## Strategic guardrail (from the P37 Part 4 exploration)
 [phase-37/04-open-standard-exploration.md](../phase-37/04-open-standard-exploration.md)
@@ -64,7 +71,7 @@ not the default.
 | [P45-05](p45-05-importer.md) | Importer: lossless round-trip of our own format | P1 | P45-04 |
 | [P45-06](p45-06-open-source-publication.md) | Open-source publication: repo, license, validator | P1 | P45-02, P45-03 |
 | [P45-07](p45-07-developers-page-format-docs.md) | Publish the format docs on `/developers` (+ Help entry) | P2 | P45-02, P45-06 |
-| [P45-DB01](p45-db01-design-brief-export-format-surfaces.md) | Design brief: export format surfaces & naming | P1 | P45-01 |
+| [P45-DB01](p45-db01-design-brief-export-format-surfaces.md) ✅ | Design brief: export format surfaces & naming | P1 | P45-01 |
 
 > Tickets are split into standalone files (linked above); the sections
 > below remain the phase-level overview.

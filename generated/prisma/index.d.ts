@@ -59,6 +59,11 @@ export type ImportJob = $Result.DefaultSelection<Prisma.$ImportJobPayload>
  */
 export type ExportJob = $Result.DefaultSelection<Prisma.$ExportJobPayload>
 /**
+ * Model KontaxExportJob
+ * 
+ */
+export type KontaxExportJob = $Result.DefaultSelection<Prisma.$KontaxExportJobPayload>
+/**
  * Model MergeSuggestion
  * 
  */
@@ -438,6 +443,14 @@ export const ContactExportFormat: {
 export type ContactExportFormat = (typeof ContactExportFormat)[keyof typeof ContactExportFormat]
 
 
+export const KontaxExportKind: {
+  DOCUMENT: 'DOCUMENT',
+  ARCHIVE: 'ARCHIVE'
+};
+
+export type KontaxExportKind = (typeof KontaxExportKind)[keyof typeof KontaxExportKind]
+
+
 export const ImportSourceProfile: {
   GENERIC: 'GENERIC',
   GOOGLE: 'GOOGLE',
@@ -768,6 +781,10 @@ export type ContactExportFormat = $Enums.ContactExportFormat
 
 export const ContactExportFormat: typeof $Enums.ContactExportFormat
 
+export type KontaxExportKind = $Enums.KontaxExportKind
+
+export const KontaxExportKind: typeof $Enums.KontaxExportKind
+
 export type ImportSourceProfile = $Enums.ImportSourceProfile
 
 export const ImportSourceProfile: typeof $Enums.ImportSourceProfile
@@ -1067,6 +1084,16 @@ export class PrismaClient<
     * ```
     */
   get exportJob(): Prisma.ExportJobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.kontaxExportJob`: Exposes CRUD operations for the **KontaxExportJob** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more KontaxExportJobs
+    * const kontaxExportJobs = await prisma.kontaxExportJob.findMany()
+    * ```
+    */
+  get kontaxExportJob(): Prisma.KontaxExportJobDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.mergeSuggestion`: Exposes CRUD operations for the **MergeSuggestion** model.
@@ -1917,6 +1944,7 @@ export namespace Prisma {
     Subscription: 'Subscription',
     ImportJob: 'ImportJob',
     ExportJob: 'ExportJob',
+    KontaxExportJob: 'KontaxExportJob',
     MergeSuggestion: 'MergeSuggestion',
     MergeDecision: 'MergeDecision',
     MergeDismissal: 'MergeDismissal',
@@ -1975,7 +2003,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "kontaxExportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2642,6 +2670,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ExportJobCountArgs<ExtArgs>
             result: $Utils.Optional<ExportJobCountAggregateOutputType> | number
+          }
+        }
+      }
+      KontaxExportJob: {
+        payload: Prisma.$KontaxExportJobPayload<ExtArgs>
+        fields: Prisma.KontaxExportJobFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.KontaxExportJobFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.KontaxExportJobFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          findFirst: {
+            args: Prisma.KontaxExportJobFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.KontaxExportJobFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          findMany: {
+            args: Prisma.KontaxExportJobFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>[]
+          }
+          create: {
+            args: Prisma.KontaxExportJobCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          createMany: {
+            args: Prisma.KontaxExportJobCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.KontaxExportJobCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>[]
+          }
+          delete: {
+            args: Prisma.KontaxExportJobDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          update: {
+            args: Prisma.KontaxExportJobUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          deleteMany: {
+            args: Prisma.KontaxExportJobDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.KontaxExportJobUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.KontaxExportJobUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>[]
+          }
+          upsert: {
+            args: Prisma.KontaxExportJobUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          aggregate: {
+            args: Prisma.KontaxExportJobAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateKontaxExportJob>
+          }
+          groupBy: {
+            args: Prisma.KontaxExportJobGroupByArgs<ExtArgs>
+            result: $Utils.Optional<KontaxExportJobGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.KontaxExportJobCountArgs<ExtArgs>
+            result: $Utils.Optional<KontaxExportJobCountAggregateOutputType> | number
           }
         }
       }
@@ -5710,6 +5812,7 @@ export namespace Prisma {
     subscription?: SubscriptionOmit
     importJob?: ImportJobOmit
     exportJob?: ExportJobOmit
+    kontaxExportJob?: KontaxExportJobOmit
     mergeSuggestion?: MergeSuggestionOmit
     mergeDecision?: MergeDecisionOmit
     mergeDismissal?: MergeDismissalOmit
@@ -5834,6 +5937,7 @@ export namespace Prisma {
     contacts: number
     importJobs: number
     exportJobs: number
+    kontaxExportJobs: number
     mergeSuggestions: number
     mergeDecisions: number
     dismissals: number
@@ -5876,6 +5980,7 @@ export namespace Prisma {
     contacts?: boolean | UserCountOutputTypeCountContactsArgs
     importJobs?: boolean | UserCountOutputTypeCountImportJobsArgs
     exportJobs?: boolean | UserCountOutputTypeCountExportJobsArgs
+    kontaxExportJobs?: boolean | UserCountOutputTypeCountKontaxExportJobsArgs
     mergeSuggestions?: boolean | UserCountOutputTypeCountMergeSuggestionsArgs
     mergeDecisions?: boolean | UserCountOutputTypeCountMergeDecisionsArgs
     dismissals?: boolean | UserCountOutputTypeCountDismissalsArgs
@@ -5950,6 +6055,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ExportJobWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountKontaxExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KontaxExportJobWhereInput
   }
 
   /**
@@ -7214,6 +7326,7 @@ export namespace Prisma {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
+    kontaxExportJobs?: boolean | User$kontaxExportJobsArgs<ExtArgs>
     mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
     mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
     dismissals?: boolean | User$dismissalsArgs<ExtArgs>
@@ -7357,6 +7470,7 @@ export namespace Prisma {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
+    kontaxExportJobs?: boolean | User$kontaxExportJobsArgs<ExtArgs>
     mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
     mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
     dismissals?: boolean | User$dismissalsArgs<ExtArgs>
@@ -7407,6 +7521,7 @@ export namespace Prisma {
       contacts: Prisma.$ContactPayload<ExtArgs>[]
       importJobs: Prisma.$ImportJobPayload<ExtArgs>[]
       exportJobs: Prisma.$ExportJobPayload<ExtArgs>[]
+      kontaxExportJobs: Prisma.$KontaxExportJobPayload<ExtArgs>[]
       mergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
       mergeDecisions: Prisma.$MergeDecisionPayload<ExtArgs>[]
       dismissals: Prisma.$MergeDismissalPayload<ExtArgs>[]
@@ -7874,6 +7989,7 @@ export namespace Prisma {
     contacts<T extends User$contactsArgs<ExtArgs> = {}>(args?: Subset<T, User$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importJobs<T extends User$importJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$importJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     exportJobs<T extends User$exportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    kontaxExportJobs<T extends User$kontaxExportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$kontaxExportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergeSuggestions<T extends User$mergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergeDecisions<T extends User$mergeDecisionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dismissals<T extends User$dismissalsArgs<ExtArgs> = {}>(args?: Subset<T, User$dismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8451,6 +8567,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ExportJobScalarFieldEnum | ExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * User.kontaxExportJobs
+   */
+  export type User$kontaxExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    where?: KontaxExportJobWhereInput
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    cursor?: KontaxExportJobWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
   }
 
   /**
@@ -19995,6 +20135,1331 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ExportJobInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model KontaxExportJob
+   */
+
+  export type AggregateKontaxExportJob = {
+    _count: KontaxExportJobCountAggregateOutputType | null
+    _avg: KontaxExportJobAvgAggregateOutputType | null
+    _sum: KontaxExportJobSumAggregateOutputType | null
+    _min: KontaxExportJobMinAggregateOutputType | null
+    _max: KontaxExportJobMaxAggregateOutputType | null
+  }
+
+  export type KontaxExportJobAvgAggregateOutputType = {
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    fileSizeBytes: number | null
+  }
+
+  export type KontaxExportJobSumAggregateOutputType = {
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    fileSizeBytes: number | null
+  }
+
+  export type KontaxExportJobMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    kind: $Enums.KontaxExportKind | null
+    status: $Enums.ImportExportJobStatus | null
+    includeArchived: boolean | null
+    includePhotos: boolean | null
+    includeVcardFallback: boolean | null
+    bookId: string | null
+    filterQuery: string | null
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    expiresAt: Date | null
+    errorSummary: string | null
+    createdAt: Date | null
+    startedAt: Date | null
+    completedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type KontaxExportJobMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    kind: $Enums.KontaxExportKind | null
+    status: $Enums.ImportExportJobStatus | null
+    includeArchived: boolean | null
+    includePhotos: boolean | null
+    includeVcardFallback: boolean | null
+    bookId: string | null
+    filterQuery: string | null
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    expiresAt: Date | null
+    errorSummary: string | null
+    createdAt: Date | null
+    startedAt: Date | null
+    completedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type KontaxExportJobCountAggregateOutputType = {
+    id: number
+    userId: number
+    kind: number
+    status: number
+    includeArchived: number
+    includePhotos: number
+    includeVcardFallback: number
+    contactIds: number
+    bookId: number
+    filterQuery: number
+    totalCount: number
+    progressCount: number
+    photoCount: number
+    exportedCount: number
+    downloadUrl: number
+    fileSizeBytes: number
+    expiresAt: number
+    errorSummary: number
+    createdAt: number
+    startedAt: number
+    completedAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type KontaxExportJobAvgAggregateInputType = {
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    fileSizeBytes?: true
+  }
+
+  export type KontaxExportJobSumAggregateInputType = {
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    fileSizeBytes?: true
+  }
+
+  export type KontaxExportJobMinAggregateInputType = {
+    id?: true
+    userId?: true
+    kind?: true
+    status?: true
+    includeArchived?: true
+    includePhotos?: true
+    includeVcardFallback?: true
+    bookId?: true
+    filterQuery?: true
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    expiresAt?: true
+    errorSummary?: true
+    createdAt?: true
+    startedAt?: true
+    completedAt?: true
+    updatedAt?: true
+  }
+
+  export type KontaxExportJobMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    kind?: true
+    status?: true
+    includeArchived?: true
+    includePhotos?: true
+    includeVcardFallback?: true
+    bookId?: true
+    filterQuery?: true
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    expiresAt?: true
+    errorSummary?: true
+    createdAt?: true
+    startedAt?: true
+    completedAt?: true
+    updatedAt?: true
+  }
+
+  export type KontaxExportJobCountAggregateInputType = {
+    id?: true
+    userId?: true
+    kind?: true
+    status?: true
+    includeArchived?: true
+    includePhotos?: true
+    includeVcardFallback?: true
+    contactIds?: true
+    bookId?: true
+    filterQuery?: true
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    expiresAt?: true
+    errorSummary?: true
+    createdAt?: true
+    startedAt?: true
+    completedAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type KontaxExportJobAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KontaxExportJob to aggregate.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned KontaxExportJobs
+    **/
+    _count?: true | KontaxExportJobCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: KontaxExportJobAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: KontaxExportJobSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: KontaxExportJobMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: KontaxExportJobMaxAggregateInputType
+  }
+
+  export type GetKontaxExportJobAggregateType<T extends KontaxExportJobAggregateArgs> = {
+        [P in keyof T & keyof AggregateKontaxExportJob]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateKontaxExportJob[P]>
+      : GetScalarType<T[P], AggregateKontaxExportJob[P]>
+  }
+
+
+
+
+  export type KontaxExportJobGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KontaxExportJobWhereInput
+    orderBy?: KontaxExportJobOrderByWithAggregationInput | KontaxExportJobOrderByWithAggregationInput[]
+    by: KontaxExportJobScalarFieldEnum[] | KontaxExportJobScalarFieldEnum
+    having?: KontaxExportJobScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: KontaxExportJobCountAggregateInputType | true
+    _avg?: KontaxExportJobAvgAggregateInputType
+    _sum?: KontaxExportJobSumAggregateInputType
+    _min?: KontaxExportJobMinAggregateInputType
+    _max?: KontaxExportJobMaxAggregateInputType
+  }
+
+  export type KontaxExportJobGroupByOutputType = {
+    id: string
+    userId: string
+    kind: $Enums.KontaxExportKind
+    status: $Enums.ImportExportJobStatus
+    includeArchived: boolean
+    includePhotos: boolean
+    includeVcardFallback: boolean
+    contactIds: JsonValue | null
+    bookId: string | null
+    filterQuery: string | null
+    totalCount: number | null
+    progressCount: number
+    photoCount: number
+    exportedCount: number
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    expiresAt: Date | null
+    errorSummary: string | null
+    createdAt: Date
+    startedAt: Date | null
+    completedAt: Date | null
+    updatedAt: Date
+    _count: KontaxExportJobCountAggregateOutputType | null
+    _avg: KontaxExportJobAvgAggregateOutputType | null
+    _sum: KontaxExportJobSumAggregateOutputType | null
+    _min: KontaxExportJobMinAggregateOutputType | null
+    _max: KontaxExportJobMaxAggregateOutputType | null
+  }
+
+  type GetKontaxExportJobGroupByPayload<T extends KontaxExportJobGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<KontaxExportJobGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof KontaxExportJobGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], KontaxExportJobGroupByOutputType[P]>
+            : GetScalarType<T[P], KontaxExportJobGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type KontaxExportJobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kontaxExportJob"]>
+
+  export type KontaxExportJobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kontaxExportJob"]>
+
+  export type KontaxExportJobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kontaxExportJob"]>
+
+  export type KontaxExportJobSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type KontaxExportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "kind" | "status" | "includeArchived" | "includePhotos" | "includeVcardFallback" | "contactIds" | "bookId" | "filterQuery" | "totalCount" | "progressCount" | "photoCount" | "exportedCount" | "downloadUrl" | "fileSizeBytes" | "expiresAt" | "errorSummary" | "createdAt" | "startedAt" | "completedAt" | "updatedAt", ExtArgs["result"]["kontaxExportJob"]>
+  export type KontaxExportJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type KontaxExportJobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type KontaxExportJobIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $KontaxExportJobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "KontaxExportJob"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      kind: $Enums.KontaxExportKind
+      status: $Enums.ImportExportJobStatus
+      includeArchived: boolean
+      includePhotos: boolean
+      includeVcardFallback: boolean
+      contactIds: Prisma.JsonValue | null
+      bookId: string | null
+      filterQuery: string | null
+      totalCount: number | null
+      progressCount: number
+      photoCount: number
+      exportedCount: number
+      downloadUrl: string | null
+      fileSizeBytes: number | null
+      expiresAt: Date | null
+      errorSummary: string | null
+      createdAt: Date
+      startedAt: Date | null
+      completedAt: Date | null
+      updatedAt: Date
+    }, ExtArgs["result"]["kontaxExportJob"]>
+    composites: {}
+  }
+
+  type KontaxExportJobGetPayload<S extends boolean | null | undefined | KontaxExportJobDefaultArgs> = $Result.GetResult<Prisma.$KontaxExportJobPayload, S>
+
+  type KontaxExportJobCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<KontaxExportJobFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: KontaxExportJobCountAggregateInputType | true
+    }
+
+  export interface KontaxExportJobDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KontaxExportJob'], meta: { name: 'KontaxExportJob' } }
+    /**
+     * Find zero or one KontaxExportJob that matches the filter.
+     * @param {KontaxExportJobFindUniqueArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends KontaxExportJobFindUniqueArgs>(args: SelectSubset<T, KontaxExportJobFindUniqueArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one KontaxExportJob that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {KontaxExportJobFindUniqueOrThrowArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends KontaxExportJobFindUniqueOrThrowArgs>(args: SelectSubset<T, KontaxExportJobFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KontaxExportJob that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobFindFirstArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends KontaxExportJobFindFirstArgs>(args?: SelectSubset<T, KontaxExportJobFindFirstArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KontaxExportJob that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobFindFirstOrThrowArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends KontaxExportJobFindFirstOrThrowArgs>(args?: SelectSubset<T, KontaxExportJobFindFirstOrThrowArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more KontaxExportJobs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all KontaxExportJobs
+     * const kontaxExportJobs = await prisma.kontaxExportJob.findMany()
+     * 
+     * // Get first 10 KontaxExportJobs
+     * const kontaxExportJobs = await prisma.kontaxExportJob.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const kontaxExportJobWithIdOnly = await prisma.kontaxExportJob.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends KontaxExportJobFindManyArgs>(args?: SelectSubset<T, KontaxExportJobFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a KontaxExportJob.
+     * @param {KontaxExportJobCreateArgs} args - Arguments to create a KontaxExportJob.
+     * @example
+     * // Create one KontaxExportJob
+     * const KontaxExportJob = await prisma.kontaxExportJob.create({
+     *   data: {
+     *     // ... data to create a KontaxExportJob
+     *   }
+     * })
+     * 
+     */
+    create<T extends KontaxExportJobCreateArgs>(args: SelectSubset<T, KontaxExportJobCreateArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many KontaxExportJobs.
+     * @param {KontaxExportJobCreateManyArgs} args - Arguments to create many KontaxExportJobs.
+     * @example
+     * // Create many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends KontaxExportJobCreateManyArgs>(args?: SelectSubset<T, KontaxExportJobCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many KontaxExportJobs and returns the data saved in the database.
+     * @param {KontaxExportJobCreateManyAndReturnArgs} args - Arguments to create many KontaxExportJobs.
+     * @example
+     * // Create many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many KontaxExportJobs and only return the `id`
+     * const kontaxExportJobWithIdOnly = await prisma.kontaxExportJob.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends KontaxExportJobCreateManyAndReturnArgs>(args?: SelectSubset<T, KontaxExportJobCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a KontaxExportJob.
+     * @param {KontaxExportJobDeleteArgs} args - Arguments to delete one KontaxExportJob.
+     * @example
+     * // Delete one KontaxExportJob
+     * const KontaxExportJob = await prisma.kontaxExportJob.delete({
+     *   where: {
+     *     // ... filter to delete one KontaxExportJob
+     *   }
+     * })
+     * 
+     */
+    delete<T extends KontaxExportJobDeleteArgs>(args: SelectSubset<T, KontaxExportJobDeleteArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one KontaxExportJob.
+     * @param {KontaxExportJobUpdateArgs} args - Arguments to update one KontaxExportJob.
+     * @example
+     * // Update one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends KontaxExportJobUpdateArgs>(args: SelectSubset<T, KontaxExportJobUpdateArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more KontaxExportJobs.
+     * @param {KontaxExportJobDeleteManyArgs} args - Arguments to filter KontaxExportJobs to delete.
+     * @example
+     * // Delete a few KontaxExportJobs
+     * const { count } = await prisma.kontaxExportJob.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends KontaxExportJobDeleteManyArgs>(args?: SelectSubset<T, KontaxExportJobDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KontaxExportJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends KontaxExportJobUpdateManyArgs>(args: SelectSubset<T, KontaxExportJobUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KontaxExportJobs and returns the data updated in the database.
+     * @param {KontaxExportJobUpdateManyAndReturnArgs} args - Arguments to update many KontaxExportJobs.
+     * @example
+     * // Update many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more KontaxExportJobs and only return the `id`
+     * const kontaxExportJobWithIdOnly = await prisma.kontaxExportJob.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends KontaxExportJobUpdateManyAndReturnArgs>(args: SelectSubset<T, KontaxExportJobUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one KontaxExportJob.
+     * @param {KontaxExportJobUpsertArgs} args - Arguments to update or create a KontaxExportJob.
+     * @example
+     * // Update or create a KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.upsert({
+     *   create: {
+     *     // ... data to create a KontaxExportJob
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the KontaxExportJob we want to update
+     *   }
+     * })
+     */
+    upsert<T extends KontaxExportJobUpsertArgs>(args: SelectSubset<T, KontaxExportJobUpsertArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of KontaxExportJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobCountArgs} args - Arguments to filter KontaxExportJobs to count.
+     * @example
+     * // Count the number of KontaxExportJobs
+     * const count = await prisma.kontaxExportJob.count({
+     *   where: {
+     *     // ... the filter for the KontaxExportJobs we want to count
+     *   }
+     * })
+    **/
+    count<T extends KontaxExportJobCountArgs>(
+      args?: Subset<T, KontaxExportJobCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], KontaxExportJobCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a KontaxExportJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends KontaxExportJobAggregateArgs>(args: Subset<T, KontaxExportJobAggregateArgs>): Prisma.PrismaPromise<GetKontaxExportJobAggregateType<T>>
+
+    /**
+     * Group by KontaxExportJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends KontaxExportJobGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: KontaxExportJobGroupByArgs['orderBy'] }
+        : { orderBy?: KontaxExportJobGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, KontaxExportJobGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKontaxExportJobGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the KontaxExportJob model
+   */
+  readonly fields: KontaxExportJobFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for KontaxExportJob.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__KontaxExportJobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the KontaxExportJob model
+   */
+  interface KontaxExportJobFieldRefs {
+    readonly id: FieldRef<"KontaxExportJob", 'String'>
+    readonly userId: FieldRef<"KontaxExportJob", 'String'>
+    readonly kind: FieldRef<"KontaxExportJob", 'KontaxExportKind'>
+    readonly status: FieldRef<"KontaxExportJob", 'ImportExportJobStatus'>
+    readonly includeArchived: FieldRef<"KontaxExportJob", 'Boolean'>
+    readonly includePhotos: FieldRef<"KontaxExportJob", 'Boolean'>
+    readonly includeVcardFallback: FieldRef<"KontaxExportJob", 'Boolean'>
+    readonly contactIds: FieldRef<"KontaxExportJob", 'Json'>
+    readonly bookId: FieldRef<"KontaxExportJob", 'String'>
+    readonly filterQuery: FieldRef<"KontaxExportJob", 'String'>
+    readonly totalCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly progressCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly photoCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly exportedCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly downloadUrl: FieldRef<"KontaxExportJob", 'String'>
+    readonly fileSizeBytes: FieldRef<"KontaxExportJob", 'Int'>
+    readonly expiresAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly errorSummary: FieldRef<"KontaxExportJob", 'String'>
+    readonly createdAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly startedAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly completedAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly updatedAt: FieldRef<"KontaxExportJob", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * KontaxExportJob findUnique
+   */
+  export type KontaxExportJobFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob findUniqueOrThrow
+   */
+  export type KontaxExportJobFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob findFirst
+   */
+  export type KontaxExportJobFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KontaxExportJobs.
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KontaxExportJobs.
+     */
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * KontaxExportJob findFirstOrThrow
+   */
+  export type KontaxExportJobFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KontaxExportJobs.
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KontaxExportJobs.
+     */
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * KontaxExportJob findMany
+   */
+  export type KontaxExportJobFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJobs to fetch.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing KontaxExportJobs.
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * KontaxExportJob create
+   */
+  export type KontaxExportJobCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * The data needed to create a KontaxExportJob.
+     */
+    data: XOR<KontaxExportJobCreateInput, KontaxExportJobUncheckedCreateInput>
+  }
+
+  /**
+   * KontaxExportJob createMany
+   */
+  export type KontaxExportJobCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many KontaxExportJobs.
+     */
+    data: KontaxExportJobCreateManyInput | KontaxExportJobCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * KontaxExportJob createManyAndReturn
+   */
+  export type KontaxExportJobCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * The data used to create many KontaxExportJobs.
+     */
+    data: KontaxExportJobCreateManyInput | KontaxExportJobCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * KontaxExportJob update
+   */
+  export type KontaxExportJobUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * The data needed to update a KontaxExportJob.
+     */
+    data: XOR<KontaxExportJobUpdateInput, KontaxExportJobUncheckedUpdateInput>
+    /**
+     * Choose, which KontaxExportJob to update.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob updateMany
+   */
+  export type KontaxExportJobUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update KontaxExportJobs.
+     */
+    data: XOR<KontaxExportJobUpdateManyMutationInput, KontaxExportJobUncheckedUpdateManyInput>
+    /**
+     * Filter which KontaxExportJobs to update
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * Limit how many KontaxExportJobs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * KontaxExportJob updateManyAndReturn
+   */
+  export type KontaxExportJobUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * The data used to update KontaxExportJobs.
+     */
+    data: XOR<KontaxExportJobUpdateManyMutationInput, KontaxExportJobUncheckedUpdateManyInput>
+    /**
+     * Filter which KontaxExportJobs to update
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * Limit how many KontaxExportJobs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * KontaxExportJob upsert
+   */
+  export type KontaxExportJobUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * The filter to search for the KontaxExportJob to update in case it exists.
+     */
+    where: KontaxExportJobWhereUniqueInput
+    /**
+     * In case the KontaxExportJob found by the `where` argument doesn't exist, create a new KontaxExportJob with this data.
+     */
+    create: XOR<KontaxExportJobCreateInput, KontaxExportJobUncheckedCreateInput>
+    /**
+     * In case the KontaxExportJob was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<KontaxExportJobUpdateInput, KontaxExportJobUncheckedUpdateInput>
+  }
+
+  /**
+   * KontaxExportJob delete
+   */
+  export type KontaxExportJobDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter which KontaxExportJob to delete.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob deleteMany
+   */
+  export type KontaxExportJobDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KontaxExportJobs to delete
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * Limit how many KontaxExportJobs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * KontaxExportJob without action
+   */
+  export type KontaxExportJobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
   }
 
 
@@ -67414,6 +68879,34 @@ export namespace Prisma {
   export type ExportJobScalarFieldEnum = (typeof ExportJobScalarFieldEnum)[keyof typeof ExportJobScalarFieldEnum]
 
 
+  export const KontaxExportJobScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    kind: 'kind',
+    status: 'status',
+    includeArchived: 'includeArchived',
+    includePhotos: 'includePhotos',
+    includeVcardFallback: 'includeVcardFallback',
+    contactIds: 'contactIds',
+    bookId: 'bookId',
+    filterQuery: 'filterQuery',
+    totalCount: 'totalCount',
+    progressCount: 'progressCount',
+    photoCount: 'photoCount',
+    exportedCount: 'exportedCount',
+    downloadUrl: 'downloadUrl',
+    fileSizeBytes: 'fileSizeBytes',
+    expiresAt: 'expiresAt',
+    errorSummary: 'errorSummary',
+    createdAt: 'createdAt',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type KontaxExportJobScalarFieldEnum = (typeof KontaxExportJobScalarFieldEnum)[keyof typeof KontaxExportJobScalarFieldEnum]
+
+
   export const MergeSuggestionScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -68399,6 +69892,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'KontaxExportKind'
+   */
+  export type EnumKontaxExportKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KontaxExportKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'KontaxExportKind[]'
+   */
+  export type ListEnumKontaxExportKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KontaxExportKind[]'>
+    
+
+
+  /**
    * Reference to a field of type 'MergeSuggestionStatus'
    */
   export type EnumMergeSuggestionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeSuggestionStatus'>
@@ -68872,6 +70379,7 @@ export namespace Prisma {
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
+    kontaxExportJobs?: KontaxExportJobListRelationFilter
     mergeSuggestions?: MergeSuggestionListRelationFilter
     mergeDecisions?: MergeDecisionListRelationFilter
     dismissals?: MergeDismissalListRelationFilter
@@ -68946,6 +70454,7 @@ export namespace Prisma {
     contacts?: ContactOrderByRelationAggregateInput
     importJobs?: ImportJobOrderByRelationAggregateInput
     exportJobs?: ExportJobOrderByRelationAggregateInput
+    kontaxExportJobs?: KontaxExportJobOrderByRelationAggregateInput
     mergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
     mergeDecisions?: MergeDecisionOrderByRelationAggregateInput
     dismissals?: MergeDismissalOrderByRelationAggregateInput
@@ -69023,6 +70532,7 @@ export namespace Prisma {
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
+    kontaxExportJobs?: KontaxExportJobListRelationFilter
     mergeSuggestions?: MergeSuggestionListRelationFilter
     mergeDecisions?: MergeDecisionListRelationFilter
     dismissals?: MergeDismissalListRelationFilter
@@ -70180,6 +71690,148 @@ export namespace Prisma {
     startedAt?: DateTimeWithAggregatesFilter<"ExportJob"> | Date | string
     completedAt?: DateTimeNullableWithAggregatesFilter<"ExportJob"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"ExportJob"> | Date | string
+  }
+
+  export type KontaxExportJobWhereInput = {
+    AND?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    OR?: KontaxExportJobWhereInput[]
+    NOT?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    id?: StringFilter<"KontaxExportJob"> | string
+    userId?: StringFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableFilter<"KontaxExportJob">
+    bookId?: StringNullableFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntFilter<"KontaxExportJob"> | number
+    photoCount?: IntFilter<"KontaxExportJob"> | number
+    exportedCount?: IntFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type KontaxExportJobOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    contactIds?: SortOrderInput | SortOrder
+    bookId?: SortOrderInput | SortOrder
+    filterQuery?: SortOrderInput | SortOrder
+    totalCount?: SortOrderInput | SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrderInput | SortOrder
+    fileSizeBytes?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    errorSummary?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type KontaxExportJobWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    OR?: KontaxExportJobWhereInput[]
+    NOT?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    userId?: StringFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableFilter<"KontaxExportJob">
+    bookId?: StringNullableFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntFilter<"KontaxExportJob"> | number
+    photoCount?: IntFilter<"KontaxExportJob"> | number
+    exportedCount?: IntFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type KontaxExportJobOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    contactIds?: SortOrderInput | SortOrder
+    bookId?: SortOrderInput | SortOrder
+    filterQuery?: SortOrderInput | SortOrder
+    totalCount?: SortOrderInput | SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrderInput | SortOrder
+    fileSizeBytes?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    errorSummary?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: KontaxExportJobCountOrderByAggregateInput
+    _avg?: KontaxExportJobAvgOrderByAggregateInput
+    _max?: KontaxExportJobMaxOrderByAggregateInput
+    _min?: KontaxExportJobMinOrderByAggregateInput
+    _sum?: KontaxExportJobSumOrderByAggregateInput
+  }
+
+  export type KontaxExportJobScalarWhereWithAggregatesInput = {
+    AND?: KontaxExportJobScalarWhereWithAggregatesInput | KontaxExportJobScalarWhereWithAggregatesInput[]
+    OR?: KontaxExportJobScalarWhereWithAggregatesInput[]
+    NOT?: KontaxExportJobScalarWhereWithAggregatesInput | KontaxExportJobScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"KontaxExportJob"> | string
+    userId?: StringWithAggregatesFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindWithAggregatesFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusWithAggregatesFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolWithAggregatesFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolWithAggregatesFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolWithAggregatesFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableWithAggregatesFilter<"KontaxExportJob">
+    bookId?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableWithAggregatesFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntWithAggregatesFilter<"KontaxExportJob"> | number
+    photoCount?: IntWithAggregatesFilter<"KontaxExportJob"> | number
+    exportedCount?: IntWithAggregatesFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableWithAggregatesFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableWithAggregatesFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"KontaxExportJob"> | Date | string
   }
 
   export type MergeSuggestionWhereInput = {
@@ -73900,6 +75552,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -73974,6 +75627,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -74048,6 +75702,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -74122,6 +75777,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -75494,6 +77150,180 @@ export namespace Prisma {
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobCreateInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutKontaxExportJobsInput
+  }
+
+  export type KontaxExportJobUncheckedCreateInput = {
+    id?: string
+    userId: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutKontaxExportJobsNestedInput
+  }
+
+  export type KontaxExportJobUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobCreateManyInput = {
+    id?: string
+    userId: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -79713,6 +81543,12 @@ export namespace Prisma {
     none?: ExportJobWhereInput
   }
 
+  export type KontaxExportJobListRelationFilter = {
+    every?: KontaxExportJobWhereInput
+    some?: KontaxExportJobWhereInput
+    none?: KontaxExportJobWhereInput
+  }
+
   export type MergeSuggestionListRelationFilter = {
     every?: MergeSuggestionWhereInput
     some?: MergeSuggestionWhereInput
@@ -79926,6 +81762,10 @@ export namespace Prisma {
   }
 
   export type ExportJobOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type KontaxExportJobOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -81105,6 +82945,112 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumContactExportFormatFilter<$PrismaModel>
     _max?: NestedEnumContactExportFormatFilter<$PrismaModel>
+  }
+
+  export type EnumKontaxExportKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindFilter<$PrismaModel> | $Enums.KontaxExportKind
+  }
+
+  export type KontaxExportJobCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    contactIds?: SortOrder
+    bookId?: SortOrder
+    filterQuery?: SortOrder
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    expiresAt?: SortOrder
+    errorSummary?: SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KontaxExportJobAvgOrderByAggregateInput = {
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    fileSizeBytes?: SortOrder
+  }
+
+  export type KontaxExportJobMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    bookId?: SortOrder
+    filterQuery?: SortOrder
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    expiresAt?: SortOrder
+    errorSummary?: SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KontaxExportJobMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    bookId?: SortOrder
+    filterQuery?: SortOrder
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    expiresAt?: SortOrder
+    errorSummary?: SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KontaxExportJobSumOrderByAggregateInput = {
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    fileSizeBytes?: SortOrder
+  }
+
+  export type EnumKontaxExportKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindWithAggregatesFilter<$PrismaModel> | $Enums.KontaxExportKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+    _max?: NestedEnumKontaxExportKindFilter<$PrismaModel>
   }
 
   export type EnumMergeSuggestionStatusFilter<$PrismaModel = never> = {
@@ -83753,6 +85699,13 @@ export namespace Prisma {
     connect?: ExportJobWhereUniqueInput | ExportJobWhereUniqueInput[]
   }
 
+  export type KontaxExportJobCreateNestedManyWithoutUserInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+  }
+
   export type MergeSuggestionCreateNestedManyWithoutUserInput = {
     create?: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput> | MergeSuggestionCreateWithoutUserInput[] | MergeSuggestionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: MergeSuggestionCreateOrConnectWithoutUserInput | MergeSuggestionCreateOrConnectWithoutUserInput[]
@@ -84042,6 +85995,13 @@ export namespace Prisma {
     connectOrCreate?: ExportJobCreateOrConnectWithoutUserInput | ExportJobCreateOrConnectWithoutUserInput[]
     createMany?: ExportJobCreateManyUserInputEnvelope
     connect?: ExportJobWhereUniqueInput | ExportJobWhereUniqueInput[]
+  }
+
+  export type KontaxExportJobUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
   }
 
   export type MergeSuggestionUncheckedCreateNestedManyWithoutUserInput = {
@@ -84401,6 +86361,20 @@ export namespace Prisma {
     update?: ExportJobUpdateWithWhereUniqueWithoutUserInput | ExportJobUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ExportJobUpdateManyWithWhereWithoutUserInput | ExportJobUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ExportJobScalarWhereInput | ExportJobScalarWhereInput[]
+  }
+
+  export type KontaxExportJobUpdateManyWithoutUserNestedInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    upsert?: KontaxExportJobUpsertWithWhereUniqueWithoutUserInput | KontaxExportJobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    set?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    disconnect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    delete?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    update?: KontaxExportJobUpdateWithWhereUniqueWithoutUserInput | KontaxExportJobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: KontaxExportJobUpdateManyWithWhereWithoutUserInput | KontaxExportJobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
   }
 
   export type MergeSuggestionUpdateManyWithoutUserNestedInput = {
@@ -84977,6 +86951,20 @@ export namespace Prisma {
     update?: ExportJobUpdateWithWhereUniqueWithoutUserInput | ExportJobUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ExportJobUpdateManyWithWhereWithoutUserInput | ExportJobUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ExportJobScalarWhereInput | ExportJobScalarWhereInput[]
+  }
+
+  export type KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    upsert?: KontaxExportJobUpsertWithWhereUniqueWithoutUserInput | KontaxExportJobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    set?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    disconnect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    delete?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    update?: KontaxExportJobUpdateWithWhereUniqueWithoutUserInput | KontaxExportJobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: KontaxExportJobUpdateManyWithWhereWithoutUserInput | KontaxExportJobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
   }
 
   export type MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput = {
@@ -86423,6 +88411,24 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutExportJobsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutExportJobsInput, UserUpdateWithoutExportJobsInput>, UserUncheckedUpdateWithoutExportJobsInput>
+  }
+
+  export type UserCreateNestedOneWithoutKontaxExportJobsInput = {
+    create?: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKontaxExportJobsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumKontaxExportKindFieldUpdateOperationsInput = {
+    set?: $Enums.KontaxExportKind
+  }
+
+  export type UserUpdateOneRequiredWithoutKontaxExportJobsNestedInput = {
+    create?: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKontaxExportJobsInput
+    upsert?: UserUpsertWithoutKontaxExportJobsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutKontaxExportJobsInput, UserUpdateWithoutKontaxExportJobsInput>, UserUncheckedUpdateWithoutKontaxExportJobsInput>
   }
 
   export type UserCreateNestedOneWithoutMergeSuggestionsInput = {
@@ -88827,6 +90833,23 @@ export namespace Prisma {
     _max?: NestedEnumContactExportFormatFilter<$PrismaModel>
   }
 
+  export type NestedEnumKontaxExportKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindFilter<$PrismaModel> | $Enums.KontaxExportKind
+  }
+
+  export type NestedEnumKontaxExportKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindWithAggregatesFilter<$PrismaModel> | $Enums.KontaxExportKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+    _max?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+  }
+
   export type NestedEnumMergeSuggestionStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
@@ -89625,6 +91648,64 @@ export namespace Prisma {
 
   export type ExportJobCreateManyUserInputEnvelope = {
     data: ExportJobCreateManyUserInput | ExportJobCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type KontaxExportJobCreateWithoutUserInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobUncheckedCreateWithoutUserInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobCreateOrConnectWithoutUserInput = {
+    where: KontaxExportJobWhereUniqueInput
+    create: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput>
+  }
+
+  export type KontaxExportJobCreateManyUserInputEnvelope = {
+    data: KontaxExportJobCreateManyUserInput | KontaxExportJobCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -91275,6 +93356,50 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ExportJob"> | Date | string
   }
 
+  export type KontaxExportJobUpsertWithWhereUniqueWithoutUserInput = {
+    where: KontaxExportJobWhereUniqueInput
+    update: XOR<KontaxExportJobUpdateWithoutUserInput, KontaxExportJobUncheckedUpdateWithoutUserInput>
+    create: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput>
+  }
+
+  export type KontaxExportJobUpdateWithWhereUniqueWithoutUserInput = {
+    where: KontaxExportJobWhereUniqueInput
+    data: XOR<KontaxExportJobUpdateWithoutUserInput, KontaxExportJobUncheckedUpdateWithoutUserInput>
+  }
+
+  export type KontaxExportJobUpdateManyWithWhereWithoutUserInput = {
+    where: KontaxExportJobScalarWhereInput
+    data: XOR<KontaxExportJobUpdateManyMutationInput, KontaxExportJobUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type KontaxExportJobScalarWhereInput = {
+    AND?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
+    OR?: KontaxExportJobScalarWhereInput[]
+    NOT?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
+    id?: StringFilter<"KontaxExportJob"> | string
+    userId?: StringFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableFilter<"KontaxExportJob">
+    bookId?: StringNullableFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntFilter<"KontaxExportJob"> | number
+    photoCount?: IntFilter<"KontaxExportJob"> | number
+    exportedCount?: IntFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+  }
+
   export type MergeSuggestionUpsertWithWhereUniqueWithoutUserInput = {
     where: MergeSuggestionWhereUniqueInput
     update: XOR<MergeSuggestionUpdateWithoutUserInput, MergeSuggestionUncheckedUpdateWithoutUserInput>
@@ -92493,6 +94618,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -92566,6 +94692,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -92655,6 +94782,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -92728,6 +94856,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -92801,6 +94930,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -92874,6 +95004,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -92963,6 +95094,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -93036,6 +95168,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -93108,6 +95241,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -93181,6 +95315,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -93324,6 +95459,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -93397,6 +95533,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -93512,6 +95649,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -93585,6 +95723,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -94461,6 +96600,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -94534,6 +96674,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -95072,6 +97213,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -95145,6 +97287,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -95361,6 +97504,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -95434,6 +97578,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -95574,6 +97719,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -95647,6 +97793,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -95858,6 +98005,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -95931,6 +98079,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -96103,6 +98252,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -96176,6 +98326,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -96401,6 +98552,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -96474,6 +98626,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -96563,6 +98716,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -96636,6 +98790,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -96725,6 +98880,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -96798,6 +98954,319 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutKontaxExportJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutKontaxExportJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutKontaxExportJobsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+  }
+
+  export type UserUpsertWithoutKontaxExportJobsInput = {
+    update: XOR<UserUpdateWithoutKontaxExportJobsInput, UserUncheckedUpdateWithoutKontaxExportJobsInput>
+    create: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutKontaxExportJobsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutKontaxExportJobsInput, UserUncheckedUpdateWithoutKontaxExportJobsInput>
+  }
+
+  export type UserUpdateWithoutKontaxExportJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutKontaxExportJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -96872,6 +99341,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
@@ -96945,6 +99415,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
@@ -97334,6 +99805,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
@@ -97407,6 +99879,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
@@ -97813,6 +100286,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
@@ -97886,6 +100360,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
@@ -98024,6 +100499,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
@@ -98097,6 +100573,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
@@ -98170,6 +100647,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
@@ -98243,6 +100721,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
@@ -98594,6 +101073,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
@@ -98667,6 +101147,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
@@ -99014,6 +101495,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -99087,6 +101569,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -99828,6 +102311,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -99901,6 +102385,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102024,6 +104509,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -102097,6 +104583,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -102186,6 +104673,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102259,6 +104747,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102332,6 +104821,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -102405,6 +104895,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -102494,6 +104985,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102567,6 +105059,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102640,6 +105133,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -102713,6 +105207,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -102802,6 +105297,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102875,6 +105371,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102948,6 +105445,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -103021,6 +105519,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -103110,6 +105609,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -103183,6 +105683,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -103256,6 +105757,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -103329,6 +105831,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -103549,6 +106052,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -103622,6 +106126,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -103832,6 +106337,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -103905,6 +106411,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -103994,6 +106501,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -104067,6 +106575,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -104140,6 +106649,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104213,6 +106723,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104302,6 +106813,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -104375,6 +106887,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -104448,6 +106961,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104521,6 +107035,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104599,6 +107114,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104672,6 +107188,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104750,6 +107267,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104823,6 +107341,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104912,6 +107431,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -104985,6 +107505,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -105069,6 +107590,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -105142,6 +107664,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -105226,6 +107749,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -105299,6 +107823,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -105372,6 +107897,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -105445,6 +107971,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -105870,6 +108397,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -105943,6 +108471,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -106401,6 +108930,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -106474,6 +109004,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -106614,6 +109145,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -106687,6 +109219,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -106940,6 +109473,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -107013,6 +109547,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -107238,6 +109773,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -107311,6 +109847,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -107400,6 +109937,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -107473,6 +110011,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -107562,6 +110101,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -107635,6 +110175,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -107708,6 +110249,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -107781,6 +110323,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -107922,6 +110465,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -107995,6 +110539,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -108817,6 +111362,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -108890,6 +111436,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -109099,6 +111646,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -109172,6 +111720,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -109392,6 +111941,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -109465,6 +112015,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -109686,6 +112237,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -109759,6 +112311,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -109969,6 +112522,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110042,6 +112596,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110205,6 +112760,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -110278,6 +112834,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -110437,6 +112994,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110510,6 +113068,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110588,6 +113147,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110661,6 +113221,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110739,6 +113300,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110812,6 +113374,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110939,6 +113502,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111012,6 +113576,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111096,6 +113661,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111169,6 +113735,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111253,6 +113820,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111326,6 +113894,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111415,6 +113984,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -111488,6 +114058,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -111615,6 +114186,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111688,6 +114260,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111777,6 +114350,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -111850,6 +114424,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -111939,6 +114514,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -112012,6 +114588,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -112085,6 +114662,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -112158,6 +114736,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -112247,6 +114826,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -112320,6 +114900,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -112393,6 +114974,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -112466,6 +115048,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -112686,6 +115269,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -112759,6 +115343,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -112969,6 +115554,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113042,6 +115628,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -113131,6 +115718,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -113204,6 +115792,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113277,6 +115866,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113350,6 +115940,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -113439,6 +116030,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -113512,6 +116104,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113585,6 +116178,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113658,6 +116252,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -113747,6 +116342,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -113820,6 +116416,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113893,6 +116490,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113966,6 +116564,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -114055,6 +116654,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -114128,6 +116728,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -114201,6 +116802,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -114274,6 +116876,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -114363,6 +116966,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -114436,6 +117040,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -114571,6 +117176,30 @@ export namespace Prisma {
     errorSummary?: string | null
     createdAt?: Date | string
     startedAt?: Date | string
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobCreateManyUserInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
     completedAt?: Date | string | null
     updatedAt?: Date | string
   }
@@ -115395,6 +118024,78 @@ export namespace Prisma {
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
