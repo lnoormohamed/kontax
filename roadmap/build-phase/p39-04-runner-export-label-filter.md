@@ -1,6 +1,6 @@
 # P39-04 — Runner: export label filter
 
-Status: Not started · Priority: P1 · Depends: —
+Status: Done — new-push gating in all three connectors (2026-07-03) · Priority: P1 · Depends: —
 Phase: [Phase 39](phase-39.md)
 
 ## Problem

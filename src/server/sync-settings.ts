@@ -68,6 +68,34 @@ export const getEffectiveSyncAccountSettings = async (
 };
 
 /**
+ * P39-04: Prisma where-fragment restricting outbound CREATE candidates to
+ * contacts carrying at least one of the connection's export-filter labels.
+ * The filter stores Label ids but Contact.labels holds label *names* (the
+ * P31B registry maps between them), so the ids resolve to names first.
+ *
+ * Returns null when the filter is empty (= push all). Labels deleted since
+ * the filter was saved drop out; if every selected label is gone the filter
+ * matches nothing — "only these labels" with none left means no new pushes,
+ * not all of them.
+ *
+ * New pushes only, per the P36 brief: contacts already linked to the remote
+ * keep syncing and are never deleted for losing the label.
+ */
+export const buildExportLabelFilterWhere = async (
+  userId: string,
+  exportLabelFilter: string[],
+): Promise<Prisma.ContactWhereInput | null> => {
+  if (exportLabelFilter.length === 0) return null;
+
+  const labels = await db.label.findMany({
+    where: { id: { in: exportLabelFilter }, userId },
+    select: { name: true },
+  });
+
+  return { OR: labels.map((label) => ({ labels: { array_contains: label.name } })) };
+};
+
+/**
  * Lazily create (or return the existing) settings row for an account. Idempotent:
  * safe to call repeatedly. The edit drawer (P23-02) calls this before applying a
  * patch so existing accounts gain a row on first save.

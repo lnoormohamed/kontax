@@ -32,6 +32,7 @@ import {
   googleUpdateFieldsFor,
   stripExcludedPortableFields,
 } from "~/server/sync-field-exclusions";
+import { buildExportLabelFilterWhere } from "~/server/sync-settings";
 import {
   addImportBatch,
   applyRemoteToContact,
@@ -128,6 +129,8 @@ export type GoogleImportAccount = GoogleSyncAccount & {
   deletionGuard?: ImportDeletionGuard;
   // P39-03: normalized field-exclusion tokens (see sync-field-exclusions.ts).
   excludedFields?: Set<string>;
+  // P39-04: label ids gating NEW outbound pushes (empty/omitted = push all).
+  exportLabelFilter?: string[];
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -778,7 +781,12 @@ export const pushLocalChangesToGoogle = async (
 
   // 2) CREATES — user-created local contacts not yet on Google. Restricted to
   //    MANUAL contacts so we don't propagate contacts imported from other
-  //    sources into Google.
+  //    sources into Google. P39-04: the export label filter gates these new
+  //    pushes only — linked contacts keep syncing regardless of labels.
+  const exportLabelWhere = await buildExportLabelFilterWhere(
+    account.userId,
+    account.exportLabelFilter ?? [],
+  );
   const unlinked = await db.contact.findMany({
     where: {
       userId: account.userId,
@@ -786,6 +794,7 @@ export const pushLocalChangesToGoogle = async (
       syncTombstoneAt: null,
       lastMutatedBy: "MANUAL",
       syncLinks: { none: { syncAccountId: account.id } },
+      ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
     },
     select: pushContactSelect,
   });

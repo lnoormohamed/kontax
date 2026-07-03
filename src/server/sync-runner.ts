@@ -54,6 +54,7 @@ import {
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
 import {
+  buildExportLabelFilterWhere,
   DEFAULT_SYNC_FREQUENCY_MINUTES,
   getEffectiveSyncAccountSettings,
   isManualSyncFrequency,
@@ -988,6 +989,7 @@ export const runQueuedSyncJobs = async ({
             syncDirection: job.syncAccount.syncDirection,
             deletionGuard: buildDeletionGuardContext(job, settings.maxDeletionsThreshold),
             excludedFields: normalizeExcludedFields(settings.excludedFields),
+            exportLabelFilter: settings.exportLabelFilter,
           }),
         (error) => (error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED"),
       );
@@ -1014,6 +1016,7 @@ export const runQueuedSyncJobs = async ({
             syncDirection: job.syncAccount.syncDirection,
             deletionGuard: buildDeletionGuardContext(job, settings.maxDeletionsThreshold),
             excludedFields: normalizeExcludedFields(settings.excludedFields),
+            exportLabelFilter: settings.exportLabelFilter,
           }),
         (error) => (error instanceof MicrosoftSyncError ? error.code : "MICROSOFT_SYNC_FAILED"),
       );
@@ -1295,6 +1298,12 @@ export const runQueuedSyncJobs = async ({
         remoteSnapshot: unknown;
         strategy: "KEEP_REMOTE" | "KEEP_LOCAL";
       }> = [];
+      // P39-04: the export label filter gates NEW outbound pushes only —
+      // already-linked contacts keep syncing and are never deleted for
+      // losing the label.
+      const exportLabelWhere = canWrite
+        ? await buildExportLabelFilterWhere(job.syncAccount.userId, settings.exportLabelFilter)
+        : null;
       const localCreateCandidates: SyncPushContactRow[] =
         canWrite
           ? await db.contact.findMany({
@@ -1304,6 +1313,7 @@ export const runQueuedSyncJobs = async ({
                 syncTombstoneAt: null,
                 lastMutatedBy: "MANUAL",
                 syncLinks: { none: { syncAccountId: job.syncAccountId } },
+                ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
               },
               select: cardDavPushContactSelect,
             })
