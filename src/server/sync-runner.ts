@@ -2072,6 +2072,16 @@ export const runQueuedSyncJobs = async ({
                 : null,
           },
         });
+      },
+      // A large book issues hundreds of sequential writes in this commit
+      // (link upserts, metadata refreshes, bulk first imports) — the Prisma
+      // interactive-transaction default of 5s aborts mid-commit on big books
+      // or high-latency links. P39-08 surfaced this on a ~1k-contact book.
+      // SYNC_COMMIT_TX_TIMEOUT_MS overrides for high-latency DB links (e.g.
+      // the QA harness running over VPN against the staging DB).
+      {
+        maxWait: 15_000,
+        timeout: Number(process.env.SYNC_COMMIT_TX_TIMEOUT_MS ?? "") || 120_000,
       });
 
       if (conflictEntries.length > 0) {

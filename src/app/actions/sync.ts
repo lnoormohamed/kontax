@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { Prisma } from "../../../generated/prisma";
-import type { DeletionHoldPayload } from "~/server/sync-deletion-guard";
 import { auth } from "~/server/auth";
 import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
@@ -951,178 +950,36 @@ export const activateSyncAccount = async (formData: FormData) => {
 };
 
 // ── P39-02: deletion-safety hold review + the two resume paths ───────────────
-
-const readDeletionHold = async (userId: string, syncAccountId: string) => {
-  const account = await db.syncAccount.findFirst({
-    where: { id: syncAccountId, userId },
-    select: { id: true, status: true, lastErrorCode: true, deletionHold: true },
-  });
-  if (
-    account?.status !== "PAUSED" ||
-    account.lastErrorCode !== "DELETION_THRESHOLD_EXCEEDED" ||
-    !account.deletionHold
-  ) {
-    return null;
-  }
-  return account.deletionHold as unknown as DeletionHoldPayload;
-};
-
-export type DeletionHoldReview = {
-  total: number;
-  threshold: number;
-  /** Held deletions not yet reconciled by a later sync — 0 means resume is safe. */
-  remaining: number;
-  byBook: Array<{ name: string; detail: string | null; count: number }>;
-  preview: Array<{ contactId: string; name: string }>;
-};
+// Thin auth/revalidate wrappers — the flows live in
+// src/server/sync-deletion-resume.ts so the P39-08 QA harness can exercise
+// the exact product code paths headlessly.
 
 /** Review payload for the paused-for-deletions surface (P39-DB01 §1a/1d). */
-export const getDeletionHoldReview = async (
-  formData: FormData,
-): Promise<{ ok: true; review: DeletionHoldReview } | { ok: false; error: string }> => {
+export const getDeletionHoldReview = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-
-  const hold = await readDeletionHold(userId, syncAccountId);
-  if (!hold) {
-    return { ok: false, error: "This connection has no pending deletion review." };
-  }
-
-  // "Already reconciled" (§1d empty state): held links a later sync (or the
-  // other resume path) has since tombstoned no longer count as pending.
-  const heldLinkIds = [...hold.inboundLinkIds, ...hold.outboundLinkIds];
-  const remaining =
-    heldLinkIds.length > 0
-      ? await db.syncContactLink.count({
-          where: { id: { in: heldLinkIds }, tombstonedAt: null },
-        })
-      : 0;
-
-  return {
-    ok: true,
-    review: {
-      total: hold.total,
-      threshold: hold.threshold,
-      remaining,
-      byBook: hold.byBook,
-      preview: hold.preview,
-    },
-  };
+  const { getDeletionHoldReviewCore } = await import("~/server/sync-deletion-resume");
+  return getDeletionHoldReviewCore(userId, syncAccountId);
 };
 
-/**
- * "Resume without deleting" (P39-DB01 §1c): reconcile the held links so the
- * pending removals never replay — outbound holds are tombstoned without the
- * remote delete (local stays archived, remote copy kept); inbound holds are
- * tombstoned without archiving the local contact (remote deleted it, Kontax
- * keeps it) — then reactivate the account.
- */
-export const resumeSyncWithoutDeletions = async (
-  formData: FormData,
-): Promise<{ ok: true } | { ok: false; error: string }> => {
+/** "Resume without deleting" (P39-DB01 §1c). */
+export const resumeSyncWithoutDeletions = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-
-  const hold = await readDeletionHold(userId, syncAccountId);
-  if (!hold) {
-    return { ok: false, error: "This connection has no pending deletion review." };
-  }
-
-  const now = new Date();
-  await db.$transaction([
-    ...(hold.outboundLinkIds.length > 0
-      ? [
-          db.syncContactLink.updateMany({
-            where: { id: { in: hold.outboundLinkIds }, syncAccountId },
-            data: { tombstonedAt: now, lastSyncedAt: now },
-          }),
-        ]
-      : []),
-    ...(hold.inboundLinkIds.length > 0
-      ? [
-          db.syncContactLink.updateMany({
-            where: { id: { in: hold.inboundLinkIds }, syncAccountId },
-            data: { tombstonedAt: now, remoteDeletedAt: now, lastSyncedAt: now },
-          }),
-        ]
-      : []),
-    db.syncAccount.update({
-      where: { id: syncAccountId },
-      data: {
-        status: "ACTIVE",
-        lastErrorAt: null,
-        lastErrorCode: null,
-        lastErrorMessage: null,
-        deletionHold: Prisma.DbNull,
-        deletionHoldAt: null,
-        deletionGuardBypassOnce: false,
-      },
-    }),
-  ]);
-
+  const { resumeSyncWithoutDeletionsCore } = await import("~/server/sync-deletion-resume");
+  const result = await resumeSyncWithoutDeletionsCore(userId, syncAccountId);
   revalidateSyncViews();
-  return { ok: true };
+  return result;
 };
 
-/**
- * "Resume and allow deletions" (P39-DB01 §1f, post-confirm): arm the one-shot
- * guard bypass and run a sync immediately so the held deletions commit once.
- */
-export const resumeSyncAllowDeletions = async (
-  formData: FormData,
-): Promise<{ ok: true } | { ok: false; error: string }> => {
+/** "Resume and allow deletions" (P39-DB01 §1f, post-confirm). */
+export const resumeSyncAllowDeletions = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-
-  const hold = await readDeletionHold(userId, syncAccountId);
-  if (!hold) {
-    return { ok: false, error: "This connection has no pending deletion review." };
-  }
-
-  const account = await db.syncAccount.findFirst({
-    where: { id: syncAccountId, userId },
-    select: { syncDirection: true },
-  });
-  if (!account) {
-    return { ok: false, error: "Sync account not found." };
-  }
-
-  await db.$transaction([
-    db.syncAccount.update({
-      where: { id: syncAccountId },
-      data: {
-        status: "ACTIVE",
-        lastErrorAt: null,
-        lastErrorCode: null,
-        lastErrorMessage: null,
-        deletionGuardBypassOnce: true,
-      },
-    }),
-    db.syncJob.create({
-      data: {
-        syncAccountId,
-        status: "QUEUED",
-        trigger: "MANUAL",
-        syncDirection: account.syncDirection,
-        attemptCount: 1,
-        maxAttempts: 5,
-        nextRetryAt: new Date(),
-        idempotencyKey: createIdempotencyKey([syncAccountId, "resume-allow-deletions"]),
-      },
-    }),
-  ]);
-
-  // Apply the deletions right away (same inline pattern as "Sync now"). The
-  // run's success transaction clears the hold and resets the bypass.
-  try {
-    const { runQueuedSyncJobs } = await import("~/server/sync-runner");
-    await runQueuedSyncJobs({ syncAccountId, limit: 1 });
-  } catch (error) {
-    console.error("[sync] resume-allow-deletions inline run failed:", error);
-  }
-
+  const { resumeSyncAllowDeletionsCore } = await import("~/server/sync-deletion-resume");
+  const result = await resumeSyncAllowDeletionsCore(userId, syncAccountId);
   revalidateSyncViews();
-  return { ok: true };
+  return result;
 };
 
 export type SyncReconnectMatch = {
