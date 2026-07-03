@@ -36,6 +36,7 @@ import {
   DeletionThresholdError,
   exceedsDeletionThreshold,
 } from "~/server/sync-deletion-guard";
+import { stripExcludedPortableFields } from "~/server/sync-field-exclusions";
 import {
   addImportBatch,
   applyRemoteToContact,
@@ -163,6 +164,8 @@ export type MicrosoftImportAccount = MicrosoftSyncAccount & {
   syncDirection: SyncDirection;
   // P39-02: deletion-safety guard shared across the run's import batches.
   deletionGuard?: ImportDeletionGuard;
+  // P39-03: normalized field-exclusion tokens (see sync-field-exclusions.ts).
+  excludedFields?: Set<string>;
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -185,6 +188,7 @@ const toEngineAccount = (account: MicrosoftImportAccount): ImportEngineAccount =
   sourceType: "SYNC_MICROSOFT",
   providerName: "Outlook",
   deletionGuard: account.deletionGuard,
+  excludedFields: account.excludedFields,
 });
 
 const MICROSOFT_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
@@ -430,6 +434,10 @@ export const pushMicrosoftContact = async (
   contact: MicrosoftPushContact,
 ): Promise<MicrosoftPushResult> => {
   const accessToken = await getMicrosoftAccessToken(account);
+  // P39-03: Graph PATCH only touches keys present in the body — stripping the
+  // excluded fields (mapper drops null/undefined keys) leaves Outlook's own
+  // values for them untouched.
+  contact = stripExcludedPortableFields(contact, account.excludedFields ?? new Set<string>());
   const body = JSON.stringify(mapKontaxContactToGraph(contact));
 
   const patched = await graphPatchContact(accessToken, link.remoteUid, link.remoteETag ?? "*", body);
@@ -659,6 +667,11 @@ const createMicrosoftContactRemote = async (
   contact: PushContactRow,
 ): Promise<boolean> => {
   const accessToken = await getMicrosoftAccessToken(account);
+  // P39-03: excluded fields never reach a freshly-created remote contact.
+  const pushSource = stripExcludedPortableFields(
+    buildMicrosoftPushContact(contact),
+    account.excludedFields ?? new Set<string>(),
+  );
   const res = await fetch(`${GRAPH_BASE}/me/contacts`, {
     method: "POST",
     headers: {
@@ -666,7 +679,7 @@ const createMicrosoftContactRemote = async (
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify(mapKontaxContactToGraph(buildMicrosoftPushContact(contact))),
+    body: JSON.stringify(mapKontaxContactToGraph(pushSource)),
   });
   if (!res.ok) {
     throw normaliseMicrosoftError({ statusCode: res.status, message: await res.text().catch(() => "") });
@@ -681,9 +694,7 @@ const createMicrosoftContactRemote = async (
       remoteUid: created.id,
       remoteETag: created["@odata.etag"] ?? null,
       capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
-      supportedFieldShadow: buildMicrosoftPushShadow(
-        buildMicrosoftPushContact(contact),
-      ) as Prisma.InputJsonValue,
+      supportedFieldShadow: buildMicrosoftPushShadow(pushSource) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
     },
   });

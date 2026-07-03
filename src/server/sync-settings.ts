@@ -41,6 +41,8 @@ export const getEffectiveSyncAccountSettings = async (
   syncWindowEnd: number | null;
   syncWindowTimezone: string | null;
   maxAttemptsBeforePause: number | null;
+  excludedFields: string[];
+  exportLabelFilter: string[];
 }> => {
   const settings = await db.syncAccountSettings.findUnique({
     where: { syncAccountId },
@@ -60,6 +62,8 @@ export const getEffectiveSyncAccountSettings = async (
     syncWindowEnd: settings?.syncWindowEnd ?? null,
     syncWindowTimezone: settings?.syncWindowTimezone ?? null,
     maxAttemptsBeforePause: settings?.maxAttemptsBeforePause ?? null,
+    excludedFields: settings?.excludedFields ?? [],
+    exportLabelFilter: settings?.exportLabelFilter ?? [],
   };
 };
 

@@ -1,6 +1,6 @@
 # P39-03 — Runner: field exclusions on read and write
 
-Status: Not started · Priority: P1 · Depends: —
+Status: Done — enforced in runner, engine & both OAuth connectors (2026-07-03) · Priority: P1 · Depends: —
 Phase: [Phase 39](phase-39.md)
 
 ## Problem

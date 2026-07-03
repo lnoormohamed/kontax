@@ -28,6 +28,10 @@ import {
   DeletionThresholdError,
   exceedsDeletionThreshold,
 } from "~/server/sync-deletion-guard";
+import {
+  omitExcludedContactWriteData,
+  stripExcludedPortableFields,
+} from "~/server/sync-field-exclusions";
 import { MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
 import {
   buildProviderCapabilityDiagnostics,
@@ -54,12 +58,20 @@ export type ImportEngineAccount = {
   // deltas accumulate. Omit when the threshold is disabled or the account's
   // one-shot guard bypass is set.
   deletionGuard?: ImportDeletionGuard;
+  // P39-03: normalized field-exclusion tokens. Excluded fields are dropped
+  // from inbound writes and from both shadow sides, so an excluded-only
+  // change never syncs in either direction.
+  excludedFields?: Set<string>;
 };
 
 export type ImportDeletionGuard = {
   threshold: number;
   candidates: DeletionHoldCandidate[];
 };
+
+const NO_EXCLUSIONS = new Set<string>();
+const exclusionsOf = (account: ImportEngineAccount): Set<string> =>
+  account.excludedFields ?? NO_EXCLUSIONS;
 
 const parseValueEntries = (value: unknown) =>
   Array.isArray(value)
@@ -241,9 +253,11 @@ export const applyRemoteToContact = async (
   now: Date,
   capabilityDiagnostics: ProviderCapabilityDiagnostics | null = null,
 ) => {
-  const data = mappedContactToWriteData(mapped);
+  // P39-03: excluded fields never overwrite local values (keys removed, not
+  // nulled) and stay out of the stored shadow.
+  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped), exclusionsOf(account));
   const supportedFieldShadow = buildProviderSupportedContactShadow(
-    mappedContactToPortableContact(mapped),
+    stripExcludedPortableFields(mappedContactToPortableContact(mapped), exclusionsOf(account)),
     account.capabilityProfile,
   );
   await db.$transaction(async (tx) => {
@@ -471,9 +485,10 @@ const createContact = async (
   mapped: MappedContact,
   now: Date,
 ) => {
-  const data = mappedContactToWriteData(mapped);
+  // P39-03: excluded fields are not imported on create either.
+  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped), exclusionsOf(account));
   const supportedFieldShadow = buildProviderSupportedContactShadow(
-    mappedContactToPortableContact(mapped),
+    stripExcludedPortableFields(mappedContactToPortableContact(mapped), exclusionsOf(account)),
     account.capabilityProfile,
   );
   await db.$transaction(async (tx) => {
@@ -610,12 +625,14 @@ export const importRemoteContactBatch = async (
 
     const remoteChanged = item.etag !== link.remoteETag;
     const localChanged = isLocalChanged(link.lastSyncedAt, link.contact.updatedAt);
+    // P39-03: excluded fields are stripped from both shadow sides — a change
+    // confined to an excluded field is invisible to change detection.
     const localSupportedShadow = buildProviderSupportedContactShadow(
-      linkedContactToPortable(link.contact),
+      stripExcludedPortableFields(linkedContactToPortable(link.contact), exclusionsOf(account)),
       account.capabilityProfile,
     );
     const remoteSupportedShadow = buildProviderSupportedContactShadow(
-      mappedContactToPortableContact(item.mapped),
+      stripExcludedPortableFields(mappedContactToPortableContact(item.mapped), exclusionsOf(account)),
       account.capabilityProfile,
     );
     const supportedFieldsDiffer = !providerSupportedShadowsEqual(

@@ -32,6 +32,12 @@ import {
   notifySyncDeletionPause,
   notifySyncNeedsReauth,
 } from "~/server/sync-enforcement-notifications";
+import {
+  mergeExcludedFieldsFromRemote,
+  normalizeExcludedFields,
+  omitExcludedContactWriteData,
+  stripExcludedPortableFields,
+} from "~/server/sync-field-exclusions";
 import { isWithinSyncWindow, SYNC_WINDOW_DEFERRED_CODE } from "~/server/sync-window";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
@@ -981,6 +987,7 @@ export const runQueuedSyncJobs = async ({
             conflictPolicy: settings.conflictPolicy,
             syncDirection: job.syncAccount.syncDirection,
             deletionGuard: buildDeletionGuardContext(job, settings.maxDeletionsThreshold),
+            excludedFields: normalizeExcludedFields(settings.excludedFields),
           }),
         (error) => (error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED"),
       );
@@ -1006,6 +1013,7 @@ export const runQueuedSyncJobs = async ({
             conflictPolicy: settings.conflictPolicy,
             syncDirection: job.syncAccount.syncDirection,
             deletionGuard: buildDeletionGuardContext(job, settings.maxDeletionsThreshold),
+            excludedFields: normalizeExcludedFields(settings.excludedFields),
           }),
         (error) => (error instanceof MicrosoftSyncError ? error.code : "MICROSOFT_SYNC_FAILED"),
       );
@@ -1116,6 +1124,11 @@ export const runQueuedSyncJobs = async ({
 
     try {
       const now = new Date();
+      // P39-03: excluded fields are stripped from both shadow sides (so a
+      // change confined to them never syncs), omitted from inbound writes, and
+      // grafted from the remote card into outbound vCard PUTs so the remote's
+      // own values survive un-scrubbed.
+      const excludedFields = normalizeExcludedFields(settings.excludedFields);
       const capabilityProfile = resolveSyncProviderCapabilityProfile({
         provider: job.syncAccount.provider,
         baseUrl: job.syncAccount.baseUrl,
@@ -1251,6 +1264,9 @@ export const runQueuedSyncJobs = async ({
         remoteHref: string;
         remoteUid: string;
         contact: SyncPushContactRow;
+        // P39-03: the remote card's current values, grafted back into the
+        // pushed vCard for excluded fields.
+        remotePortable: PortableContactInput | null;
         capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
       const localDeleteCandidates: Array<{
@@ -1308,12 +1324,12 @@ export const runQueuedSyncJobs = async ({
           link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
         const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
         const localSupportedShadow = buildProviderSupportedContactShadow(
-          contactToPortable(link.contact),
+          stripExcludedPortableFields(contactToPortable(link.contact), excludedFields),
           capabilityProfile,
         );
         const remoteSupportedShadow = remoteCard
           ? buildProviderSupportedContactShadow(
-              cardDavCardToPortable(remoteCard),
+              stripExcludedPortableFields(cardDavCardToPortable(remoteCard), excludedFields),
               capabilityProfile,
             )
           : null;
@@ -1426,6 +1442,7 @@ export const runQueuedSyncJobs = async ({
               remoteHref: link.remoteHref,
               remoteUid: remoteUid ?? link.remoteHref,
               contact: link.contact,
+              remotePortable: remoteCard ? cardDavCardToPortable(remoteCard) : null,
               capabilityDiagnostics: buildProviderCapabilityDiagnostics(
                 contactToPortable(link.contact),
                 capabilityProfile,
@@ -1512,7 +1529,13 @@ export const runQueuedSyncJobs = async ({
               password: decryptedCredentials.password,
             },
             remoteUid: candidate.remoteUid,
-            contact: contactToPortable(candidate.contact),
+            // P39-03: the full-card PUT carries the remote's own values for
+            // excluded fields — local edits to them never propagate.
+            contact: mergeExcludedFieldsFromRemote(
+              contactToPortable(candidate.contact),
+              candidate.remotePortable,
+              excludedFields,
+            ),
             capabilityProfile,
             hrefOverride: candidate.remoteHref || undefined,
           });
@@ -1532,7 +1555,8 @@ export const runQueuedSyncJobs = async ({
               password: decryptedCredentials.password,
             },
             remoteUid: contact.syncUid,
-            contact: contactToPortable(contact),
+            // P39-03: excluded fields never reach a freshly-created remote card.
+            contact: stripExcludedPortableFields(contactToPortable(contact), excludedFields),
             capabilityProfile,
           });
           createdLinks.push({
@@ -1541,7 +1565,7 @@ export const runQueuedSyncJobs = async ({
             remoteHref: result.href,
             remoteETag: result.etag,
             supportedFieldShadow: buildProviderSupportedContactShadow(
-              contactToPortable(contact),
+              stripExcludedPortableFields(contactToPortable(contact), excludedFields),
               capabilityProfile,
             ),
             lastSyncedAt: contact.updatedAt,
@@ -1593,7 +1617,10 @@ export const runQueuedSyncJobs = async ({
               supportedFieldShadow:
                 remoteCardByUid.has(entry.uid)
                   ? (buildProviderSupportedContactShadow(
-                      cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                      stripExcludedPortableFields(
+                        cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                        excludedFields,
+                      ),
                       capabilityProfile,
                     ) as Prisma.InputJsonValue)
                   : undefined,
@@ -1607,7 +1634,10 @@ export const runQueuedSyncJobs = async ({
               supportedFieldShadow:
                 remoteCardByUid.has(entry.uid)
                   ? (buildProviderSupportedContactShadow(
-                      cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                      stripExcludedPortableFields(
+                        cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                        excludedFields,
+                      ),
                       capabilityProfile,
                     ) as Prisma.InputJsonValue)
                   : undefined,
@@ -1654,8 +1684,9 @@ export const runQueuedSyncJobs = async ({
         }
 
         for (const card of unmatchedCards) {
+          // P39-03: excluded fields are dropped from the imported contact.
           const createdContact = await tx.contact.create({
-            data: {
+            data: omitExcludedContactWriteData({
               userId: scopeUserId,
               syncUid: card.uid,
               fullName: card.fullName,
@@ -1688,7 +1719,7 @@ export const runQueuedSyncJobs = async ({
               sourceDetail: scopeLabel,
               lastMutatedBy: "SYNC_CARDDAV",
               lastMutatedByDetail: scopeLabel,
-            },
+            }, excludedFields),
             select: {
               id: true,
               updatedAt: true,
@@ -1764,9 +1795,13 @@ export const runQueuedSyncJobs = async ({
               id: remoteApply.contactId,
             },
             data: {
-              ...buildContactWriteDataFromRemoteSnapshot(
-                remoteApply.remoteSnapshot,
-                capabilityProfile,
+              // P39-03: excluded remote fields never overwrite local values.
+              ...omitExcludedContactWriteData(
+                buildContactWriteDataFromRemoteSnapshot(
+                  remoteApply.remoteSnapshot,
+                  capabilityProfile,
+                ),
+                excludedFields,
               ),
               lastMutatedBy: "SYNC_CARDDAV",
               lastMutatedByDetail: job.syncAccount.label,
@@ -1785,7 +1820,10 @@ export const runQueuedSyncJobs = async ({
                 remoteETag: remoteApply.remoteETag,
                 capabilityProfileId: capabilityProfile.id,
                 supportedFieldShadow: buildProviderSupportedContactShadow(
-                  cardDavCardToPortable(remoteApply.remoteSnapshot as CardDavContactCard),
+                  stripExcludedPortableFields(
+                    cardDavCardToPortable(remoteApply.remoteSnapshot as CardDavContactCard),
+                    excludedFields,
+                  ),
                   capabilityProfile,
                 ) as Prisma.InputJsonValue,
                 remoteDeletedAt: null,
@@ -1855,7 +1893,10 @@ export const runQueuedSyncJobs = async ({
               ...(pushedLink
                 ? {
                     supportedFieldShadow: buildProviderSupportedContactShadow(
-                      contactToPortable(pushedLink.contact),
+                      stripExcludedPortableFields(
+                        contactToPortable(pushedLink.contact),
+                        excludedFields,
+                      ),
                       capabilityProfile,
                     ) as Prisma.InputJsonValue,
                   }

@@ -29,6 +29,10 @@ import {
   exceedsDeletionThreshold,
 } from "~/server/sync-deletion-guard";
 import {
+  googleUpdateFieldsFor,
+  stripExcludedPortableFields,
+} from "~/server/sync-field-exclusions";
+import {
   addImportBatch,
   applyRemoteToContact,
   emptyImportBatch,
@@ -122,6 +126,8 @@ export type GoogleImportAccount = GoogleSyncAccount & {
   // P39-02: deletion-safety guard shared across the run's import batches and
   // the push-delete phase. Omitted = threshold disabled or bypassed once.
   deletionGuard?: ImportDeletionGuard;
+  // P39-03: normalized field-exclusion tokens (see sync-field-exclusions.ts).
+  excludedFields?: Set<string>;
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -145,6 +151,7 @@ const toEngineAccount = (account: GoogleImportAccount): ImportEngineAccount => (
   sourceType: "SYNC_GOOGLE",
   providerName: "Google",
   deletionGuard: account.deletionGuard,
+  excludedFields: account.excludedFields,
 });
 
 const GOOGLE_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
@@ -382,6 +389,13 @@ export const pushGoogleContact = async (
   const { client } = await getGoogleClientForAccount(account);
   const peopleApi = people({ version: "v1", auth: client });
 
+  // P39-03: excluded fields are stripped from the body AND withheld from the
+  // update mask — Google keeps its current values for withheld families
+  // instead of clearing them.
+  const exclusions = account.excludedFields ?? new Set<string>();
+  contact = stripExcludedPortableFields(contact, exclusions);
+  const updatePersonFields = googleUpdateFieldsFor(GOOGLE_UPDATE_PERSON_FIELDS, exclusions);
+
   const body = mapContactToGooglePerson(contact);
   // Google requires the current etag in the body for optimistic concurrency.
   body.etag = link.remoteETag ?? undefined;
@@ -389,7 +403,7 @@ export const pushGoogleContact = async (
   try {
     const res = await peopleApi.people.updateContact({
       resourceName: link.remoteUid,
-      updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
+      updatePersonFields,
       requestBody: body,
     });
     const localShadow = buildGooglePushShadow(contact);
@@ -452,7 +466,7 @@ export const pushGoogleContact = async (
     retryBody.etag = latestEtag ?? undefined;
     const res = await peopleApi.people.updateContact({
       resourceName: link.remoteUid,
-      updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
+      updatePersonFields,
       requestBody: retryBody,
     });
     const localShadow = buildGooglePushShadow(contact);
@@ -632,9 +646,14 @@ const createGoogleContactRemote = async (
   const { client } = await getGoogleClientForAccount(account);
   const peopleApi = people({ version: "v1", auth: client });
   let created: people_v1.Schema$Person;
+  // P39-03: excluded fields never reach a freshly-created remote contact.
+  const pushSource = stripExcludedPortableFields(
+    buildGooglePushContact(contact),
+    account.excludedFields ?? new Set<string>(),
+  );
   try {
     const res = await peopleApi.people.createContact({
-      requestBody: mapContactToGooglePerson(buildGooglePushContact(contact)),
+      requestBody: mapContactToGooglePerson(pushSource),
     });
     created = res.data;
   } catch (error) {
@@ -649,9 +668,7 @@ const createGoogleContactRemote = async (
       remoteUid: created.resourceName,
       remoteETag: created.etag ?? null,
       capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
-      supportedFieldShadow: buildGooglePushShadow(
-        buildGooglePushContact(contact),
-      ) as Prisma.InputJsonValue,
+      supportedFieldShadow: buildGooglePushShadow(pushSource) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
     },
   });
