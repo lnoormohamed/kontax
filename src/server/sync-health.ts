@@ -1,6 +1,13 @@
 import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
 
 export const AUTO_PAUSE_FAILURE_STREAK = 3;
+// P39-05: the platform default for maxAttemptsBeforePause (the P36 panel calls
+// it "Platform default (5 failures)"). A per-connection setting overrides it;
+// 0 = never auto-pause.
+export const DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE = 5;
+// P39-05: lastErrorCode set on the account when retry sensitivity trips. The
+// underlying error stays on the tripping SyncJob row.
+export const SYNC_AUTO_PAUSED_CODE = "SYNC_AUTO_PAUSED";
 // P23-05: a connection auto-pauses once its manual conflict queue reaches this many
 // OPEN conflicts, to stop the queue flooding unattended.
 export const MANUAL_CONFLICT_QUEUE_LIMIT = 50;
@@ -8,7 +15,14 @@ export const MANUAL_CONFLICT_QUEUE_LIMIT = 50;
 export const CONFLICT_QUEUE_FULL_CODE = "SYNC_CONFLICT_QUEUE_FULL";
 
 export type SyncAccountStatus = SyncAccountLifecycleStatus;
-export type SyncJobStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED";
+export type SyncJobStatus =
+  | "QUEUED"
+  | "RUNNING"
+  | "SUCCEEDED"
+  | "PARTIAL"
+  | "FAILED"
+  | "SKIPPED"
+  | "HALTED";
 export type SyncSupportBucket =
   | "authentication"
   | "connectivity"
@@ -86,6 +100,12 @@ export const getConsecutiveFailureStreak = (
   let streak = 0;
 
   for (const job of jobs) {
+    // P39-01/02: window-skipped and threshold-halted rows are informational —
+    // they neither extend nor reset a failure streak.
+    if (job.status === "SKIPPED" || job.status === "HALTED") {
+      continue;
+    }
+
     if (job.status !== "FAILED") {
       break;
     }
@@ -117,6 +137,15 @@ export const getSyncAccountOperationalHealth = ({
 
   // P23-05: auto-pause for a full manual conflict queue is also a "safety" pause.
   if (status === "PAUSED" && lastErrorCode === CONFLICT_QUEUE_FULL_CODE) {
+    return "paused_for_safety";
+  }
+
+  // P39-02/05: deletion-threshold holds and retry-sensitivity trips are
+  // protective stops, marked by their distinct account error codes.
+  if (
+    status === "PAUSED" &&
+    (lastErrorCode === "DELETION_THRESHOLD_EXCEEDED" || lastErrorCode === SYNC_AUTO_PAUSED_CODE)
+  ) {
     return "paused_for_safety";
   }
 

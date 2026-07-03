@@ -32,10 +32,16 @@ import {
 import type { ValueEntry } from "~/server/sync-contact-mapping";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
+  buildDeletionHoldPayload,
+  DeletionThresholdError,
+  exceedsDeletionThreshold,
+} from "~/server/sync-deletion-guard";
+import {
   addImportBatch,
   applyRemoteToContact,
   emptyImportBatch,
   type ImportBatchSummary,
+  type ImportDeletionGuard,
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
@@ -155,6 +161,8 @@ export type MicrosoftImportAccount = MicrosoftSyncAccount & {
   conflictPolicy: ConflictPolicy;
   // Drives the push phase: only TWO_WAY / EXPORT_ONLY accounts push local edits.
   syncDirection: SyncDirection;
+  // P39-02: deletion-safety guard shared across the run's import batches.
+  deletionGuard?: ImportDeletionGuard;
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -176,6 +184,7 @@ const toEngineAccount = (account: MicrosoftImportAccount): ImportEngineAccount =
   capabilityProfile: resolveSyncProviderCapabilityProfile({ provider: "MICROSOFT" }),
   sourceType: "SYNC_MICROSOFT",
   providerName: "Outlook",
+  deletionGuard: account.deletionGuard,
 });
 
 const MICROSOFT_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
@@ -802,8 +811,35 @@ export const pushLocalChangesToMicrosoft = async (
       remoteDeletedAt: null,
       contact: { OR: [{ archivedAt: { not: null } }, { syncTombstoneAt: { not: null } }] },
     },
-    select: { id: true, remoteUid: true },
+    select: {
+      id: true,
+      remoteUid: true,
+      contact: { select: { id: true, fullName: true, book: { select: { name: true } } } },
+    },
   });
+
+  // P39-02: deletion-safety threshold — the outbound delete list is known in
+  // full before any remote delete runs, so the guard aborts before the first.
+  if (account.deletionGuard) {
+    const guard = account.deletionGuard;
+    guard.candidates.push(
+      ...removedLinks
+        .filter((link) => link.remoteUid)
+        .map((link) => ({
+          linkId: link.id,
+          contactId: link.contact?.id ?? "",
+          name: link.contact?.fullName ?? "Unknown contact",
+          bookName: link.contact?.book?.name ?? "Personal",
+          bookDetail: link.contact?.book ? null : "default",
+          direction: "outbound" as const,
+        })),
+    );
+    const outboundCount = guard.candidates.filter((c) => c.direction === "outbound").length;
+    if (exceedsDeletionThreshold({ inbound: 0, outbound: outboundCount }, guard.threshold)) {
+      throw new DeletionThresholdError(buildDeletionHoldPayload(guard.candidates, guard.threshold));
+    }
+  }
+
   for (const link of removedLinks) {
     if (!link.remoteUid) continue;
     await deleteMicrosoftContactRemote(account, { id: link.id, remoteUid: link.remoteUid });

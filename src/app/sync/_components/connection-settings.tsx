@@ -3,6 +3,7 @@
 import { type ReactNode, useEffect, useState } from "react";
 
 import { completeSyncSetup, updateBookAllowlist, updateSyncAccountSettings } from "~/app/actions/sync";
+import { ConfirmDialog } from "~/app/_components/confirm-dialog";
 
 import { ELEVATION_REQUIRED, Spinner, T } from "./sync-shared";
 import type { LabelOption, SyncAccountData } from "./sync-page-client";
@@ -576,6 +577,7 @@ export function ConnectionSettings({
   onSaved,
   setToast,
   onNeedElevation,
+  onDirtyChange,
 }: {
   account: SyncAccountData;
   labels: LabelOption[];
@@ -588,11 +590,16 @@ export function ConnectionSettings({
   onSaved: () => void;
   setToast: (msg: string) => void;
   onNeedElevation: (retry: () => void) => void;
+  // P39-06: lets the parent guard external navigation (rail switch, Edit
+  // credentials) behind the same dirty prompt this panel uses for its close.
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
   const baseline = seedDraft(account);
   const [draft, setDraft] = useState<SettingsDraft>(baseline);
   const [saving, setSaving] = useState(false);
   const [windowErrShown, setWindowErrShown] = useState(false);
+  // P39-06: "Discard unsaved settings?" prompt, fired by any leave-while-dirty.
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
 
   // Re-seed when the selected account changes (or after a refresh re-supplies props).
   useEffect(() => {
@@ -640,6 +647,27 @@ export function ConnectionSettings({
     JSON.stringify(draft.exportLabelFilter) !== JSON.stringify(baseline.exportLabelFilter) ||
     draft.retry !== baseline.retry;
 
+  // P39-06: surface dirty state to the parent for its navigation guard.
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty]);
+  // Reset the parent's flag when this panel unmounts (saved, closed, discarded).
+  useEffect(() => {
+    return () => onDirtyChange?.(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // P39-01: the window hours are wall-clock in the user's current zone — send
+  // the IANA zone with every window change so the runner tracks DST correctly.
+  const localTimezone = () => {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   const patch = (next: Partial<SettingsDraft>) => {
     setDraft((d) => ({ ...d, ...next }));
     setWindowErrShown(false);
@@ -674,8 +702,12 @@ export function ConnectionSettings({
     maxDeletionsThreshold: maxDeletionsValue(),
     notifyOnFailure: draft.notifyOnFailure,
     ...(draft.windowEnabled
-      ? { syncWindowStart: Number(draft.windowStart), syncWindowEnd: Number(draft.windowEnd) }
-      : { syncWindowStart: null, syncWindowEnd: null }),
+      ? {
+          syncWindowStart: Number(draft.windowStart),
+          syncWindowEnd: Number(draft.windowEnd),
+          syncWindowTimezone: localTimezone(),
+        }
+      : { syncWindowStart: null, syncWindowEnd: null, syncWindowTimezone: null }),
     excludedFields: draft.excludedFields,
     exportLabelFilter: draft.exportLabelFilter,
     maxAttemptsBeforePause: selectToRetry(draft.retry),
@@ -733,8 +765,12 @@ export function ConnectionSettings({
       (draft.windowEnabled &&
         (draft.windowStart !== baseline.windowStart || draft.windowEnd !== baseline.windowEnd))
         ? draft.windowEnabled
-          ? { syncWindowStart: Number(draft.windowStart), syncWindowEnd: Number(draft.windowEnd) }
-          : { syncWindowStart: null, syncWindowEnd: null }
+          ? {
+              syncWindowStart: Number(draft.windowStart),
+              syncWindowEnd: Number(draft.windowEnd),
+              syncWindowTimezone: localTimezone(),
+            }
+          : { syncWindowStart: null, syncWindowEnd: null, syncWindowTimezone: null }
         : {}),
       ...(JSON.stringify(draft.excludedFields) !== JSON.stringify(baseline.excludedFields)
         ? { excludedFields: draft.excludedFields }
@@ -760,12 +796,24 @@ export function ConnectionSettings({
   };
 
   // Closing first-run still starts the sync with defaults; otherwise just revert.
+  // P39-06: a dirty panel prompts before discarding — clean panels close silently.
   const onCancel = () => {
     if (firstRun) {
       void finishSetup(true);
       return;
     }
+    if (dirty) {
+      setConfirmDiscard(true);
+      return;
+    }
     setDraft(baseline);
+    onClose();
+  };
+
+  const discardAndClose = () => {
+    setConfirmDiscard(false);
+    setDraft(baseline);
+    onDirtyChange?.(false);
     onClose();
   };
 
@@ -777,9 +825,29 @@ export function ConnectionSettings({
   const importLabel = labels.find((l) => l.id === draft.importLabelId);
 
   return (
-    <div id="sy-settings-zone">
+    <>
+      {/* P39-07: <768px the panel presents as a bottom sheet — scrim + grabber +
+          pinned Save (P39-DB01 §6). Desktop keeps the inline detail takeover. */}
+      <style>{`
+        .sy-sheet-grabber { display: none; }
+        .sy-settings-scrim { display: none; }
+        @media (max-width: 767px) {
+          .sy-settings-scrim { display: block; position: fixed; inset: 0; background: rgba(20,28,24,0.42); z-index: 94; }
+          .sy-settings-panel { position: fixed; left: 0; right: 0; bottom: 0; top: 70px; z-index: 95; background: #fff; border-radius: 22px 22px 0 0; box-shadow: 0 18px 50px rgba(0,0,0,0.28); display: flex; flex-direction: column; padding: 0 18px; overflow: hidden; }
+          .sy-sheet-grabber { display: block; width: 38px; height: 5px; border-radius: 999px; background: ${T.line}; margin: 10px auto 4px; flex: 0 0 auto; }
+          .sy-settings-head { border-bottom: 1px solid ${T.line2}; padding-bottom: 14px; margin-bottom: 0 !important; flex: 0 0 auto; }
+          .sy-settings-body { flex: 1 1 auto; overflow-y: auto; padding-top: 20px; max-width: none !important; }
+          .sy-settings-foot { position: sticky; bottom: 0; background: #fff; border-top: 1px solid ${T.line2} !important; margin-top: 0 !important; padding: 14px 0 calc(14px + env(safe-area-inset-bottom)) !important; }
+          .sy-save-btn { width: 100% !important; height: 48px !important; border-radius: 12px !important; font-size: 15px !important; justify-content: center !important; }
+          .sy-settings-cancel { display: none !important; }
+        }
+      `}</style>
+      {/* tap outside — dirty guard fires via onCancel (§6a) */}
+      <div className="sy-settings-scrim" onClick={onCancel} />
+    <div id="sy-settings-zone" className="sy-settings-panel">
+      <div className="sy-sheet-grabber" />
       {/* panel header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
+      <div className="sy-settings-head" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
         <div style={{ minWidth: 0 }}>
           <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: "-0.01em", color: T.ink }}>
             {firstRun ? "Set up sync" : "Sync settings"}
@@ -811,7 +879,7 @@ export function ConnectionSettings({
         </button>
       </div>
 
-      <div style={{ maxWidth: 520 }}>
+      <div className="sy-settings-body" style={{ maxWidth: 520 }}>
         {account.capabilityNoteTitle && account.capabilityNoteBody ? (
           <div
             style={{
@@ -1098,9 +1166,10 @@ export function ConnectionSettings({
         </OptSection>
 
         {/* pinned actions — first-run starts the held sync; edit mode saves a diff */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, borderTop: `1px solid ${T.line2}`, marginTop: 26, paddingTop: 20, flexWrap: "wrap" }}>
+        <div className="sy-settings-foot" style={{ display: "flex", alignItems: "center", gap: 14, borderTop: `1px solid ${T.line2}`, marginTop: 26, paddingTop: 20, flexWrap: "wrap" }}>
           <button
             type="button"
+            className="sy-save-btn"
             onClick={onSave}
             disabled={saving || (!firstRun && !dirty)}
             style={{
@@ -1124,6 +1193,7 @@ export function ConnectionSettings({
           </button>
           <button
             type="button"
+            className="sy-settings-cancel"
             onClick={onCancel}
             disabled={saving}
             style={{ border: "none", background: "transparent", color: T.ink2, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
@@ -1132,6 +1202,19 @@ export function ConnectionSettings({
           </button>
         </div>
       </div>
+
+      {/* P39-06: dirty guard — Keep editing is the safe path; Discard reverts. */}
+      <ConfirmDialog
+        open={confirmDiscard}
+        onClose={() => setConfirmDiscard(false)}
+        onConfirm={discardAndClose}
+        title="Discard unsaved settings?"
+        body="You've changed sync settings for this connection. If you leave now, your changes won't be saved."
+        confirmLabel="Discard changes"
+        cancelLabel="Keep editing"
+        destructive
+      />
     </div>
+    </>
   );
 }

@@ -398,6 +398,9 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   booksDiscoveredAt: 'booksDiscoveredAt',
   setupCompletedAt: 'setupCompletedAt',
   disconnectedAt: 'disconnectedAt',
+  deletionHold: 'deletionHold',
+  deletionHoldAt: 'deletionHoldAt',
+  deletionGuardBypassOnce: 'deletionGuardBypassOnce',
   retiredAt: 'retiredAt',
   retiredReason: 'retiredReason',
   createdAt: 'createdAt',
@@ -418,6 +421,7 @@ exports.Prisma.SyncAccountSettingsScalarFieldEnum = {
   notifyOnFailure: 'notifyOnFailure',
   syncWindowStart: 'syncWindowStart',
   syncWindowEnd: 'syncWindowEnd',
+  syncWindowTimezone: 'syncWindowTimezone',
   excludedFields: 'excludedFields',
   exportLabelFilter: 'exportLabelFilter',
   maxAttemptsBeforePause: 'maxAttemptsBeforePause',
@@ -1059,7 +1063,9 @@ exports.SyncJobStatus = exports.$Enums.SyncJobStatus = {
   RUNNING: 'RUNNING',
   SUCCEEDED: 'SUCCEEDED',
   PARTIAL: 'PARTIAL',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED',
+  HALTED: 'HALTED'
 };
 
 exports.SyncJobTrigger = exports.$Enums.SyncJobTrigger = {

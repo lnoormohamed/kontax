@@ -210,6 +210,12 @@ enum SyncJobStatus {
   SUCCEEDED
   PARTIAL
   FAILED
+  // P39-01: a scheduled run held because the current time is outside the
+  // account's sync window. Informational — never counts as a failure.
+  SKIPPED
+  // P39-02: a run aborted before commit by the deletion-safety threshold.
+  // Renders as "Paused for review" while the hold is open, "Resolved" after.
+  HALTED
 }
 
 enum SyncConflictType {
@@ -481,6 +487,11 @@ model Contact {
   createdAt                DateTime                @default(now())
   updatedAt                DateTime                @updatedAt
 
+  // P38-06: trigger-maintained weighted search vector (function + GIN index
+  // owned by scripts/setup-contact-search-index.mjs; declared here so
+  // `prisma db push` keeps the column). Queried by src/server/contact-search.ts.
+  searchVector Unsupported("tsvector")?
+
   @@unique([userId, syncUid])
   @@index([userId, archivedAt, fullName])
   @@index([userId, archivedAt, nickname])
@@ -489,6 +500,9 @@ model Contact {
   @@index([userId, importJobId])
   @@index([userId, mergedIntoContactId])
   @@index([bookId, archivedAt, fullName])
+  // P38-06: GIN index over the trigger-maintained search vector. Declared so
+  // `prisma db push` (which runs on deploy) does not drop it as drift.
+  @@index([searchVector], type: Gin)
 }
 
 model SubscriptionCustomer {
@@ -723,6 +737,16 @@ model SyncAccount {
   setupCompletedAt          DateTime?
   // P36-DB03: when the user soft-disconnected this connection (status DISCONNECTED).
   disconnectedAt            DateTime?
+  // P39-02: deletion-safety hold. Set when a run halts because it would delete
+  // more contacts than maxDeletionsThreshold. Payload: { total, inboundCount,
+  // outboundCount, threshold, byBook: [{ name, detail, count }],
+  // preview: [{ contactId, name }] (first 50), inboundLinkIds, outboundLinkIds }.
+  // Cleared by either resume path.
+  deletionHold              Json?
+  deletionHoldAt            DateTime?
+  // P39-02: one-shot bypass set by "Resume and allow deletions" — the next run
+  // skips the deletion guard once, then the runner resets this to false.
+  deletionGuardBypassOnce   Boolean              @default(false)
   retiredAt                 DateTime?
   retiredReason             String?
   createdAt                 DateTime             @default(now())
@@ -775,6 +799,10 @@ model SyncAccountSettings {
   // Sync window: only run scheduled syncs within this local-hour range (null = no restriction, 0–23)
   syncWindowStart        Int?
   syncWindowEnd          Int?
+  // P39-01: IANA timezone the window hours are expressed in (e.g. "America/Toronto").
+  // null = legacy row saved before timezones were captured — evaluated as UTC
+  // (the pre-P39 stored semantics) until the user re-saves the panel.
+  syncWindowTimezone     String?
   // Field exclusions: vCard field names to skip during sync (e.g. "NOTE", "BDAY")
   excludedFields         String[]
   // Export label filter: only push contacts with one of these label IDs to remote (empty = push all)

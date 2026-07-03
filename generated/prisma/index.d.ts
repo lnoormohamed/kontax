@@ -530,7 +530,9 @@ export const SyncJobStatus: {
   RUNNING: 'RUNNING',
   SUCCEEDED: 'SUCCEEDED',
   PARTIAL: 'PARTIAL',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED',
+  HALTED: 'HALTED'
 };
 
 export type SyncJobStatus = (typeof SyncJobStatus)[keyof typeof SyncJobStatus]
@@ -23548,6 +23550,8 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    deletionHoldAt: Date | null
+    deletionGuardBypassOnce: boolean | null
     retiredAt: Date | null
     retiredReason: string | null
     createdAt: Date | null
@@ -23586,6 +23590,8 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    deletionHoldAt: Date | null
+    deletionGuardBypassOnce: boolean | null
     retiredAt: Date | null
     retiredReason: string | null
     createdAt: Date | null
@@ -23625,6 +23631,9 @@ export namespace Prisma {
     booksDiscoveredAt: number
     setupCompletedAt: number
     disconnectedAt: number
+    deletionHold: number
+    deletionHoldAt: number
+    deletionGuardBypassOnce: number
     retiredAt: number
     retiredReason: number
     createdAt: number
@@ -23673,6 +23682,8 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    deletionHoldAt?: true
+    deletionGuardBypassOnce?: true
     retiredAt?: true
     retiredReason?: true
     createdAt?: true
@@ -23711,6 +23722,8 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    deletionHoldAt?: true
+    deletionGuardBypassOnce?: true
     retiredAt?: true
     retiredReason?: true
     createdAt?: true
@@ -23750,6 +23763,9 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    deletionHold?: true
+    deletionHoldAt?: true
+    deletionGuardBypassOnce?: true
     retiredAt?: true
     retiredReason?: true
     createdAt?: true
@@ -23876,6 +23892,9 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    deletionHold: JsonValue | null
+    deletionHoldAt: Date | null
+    deletionGuardBypassOnce: boolean
     retiredAt: Date | null
     retiredReason: string | null
     createdAt: Date
@@ -23934,6 +23953,9 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
     createdAt?: boolean
@@ -23984,6 +24006,9 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
     createdAt?: boolean
@@ -24026,6 +24051,9 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
     createdAt?: boolean
@@ -24068,13 +24096,16 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "connectionId" | "replacesSyncAccountId" | "replacedBySyncAccountId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "disconnectedAt" | "retiredAt" | "retiredReason" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "connectionId" | "replacesSyncAccountId" | "replacedBySyncAccountId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "disconnectedAt" | "deletionHold" | "deletionHoldAt" | "deletionGuardBypassOnce" | "retiredAt" | "retiredReason" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
   export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
@@ -24146,6 +24177,9 @@ export namespace Prisma {
       booksDiscoveredAt: Date | null
       setupCompletedAt: Date | null
       disconnectedAt: Date | null
+      deletionHold: Prisma.JsonValue | null
+      deletionHoldAt: Date | null
+      deletionGuardBypassOnce: boolean
       retiredAt: Date | null
       retiredReason: string | null
       createdAt: Date
@@ -24615,6 +24649,9 @@ export namespace Prisma {
     readonly booksDiscoveredAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly setupCompletedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly disconnectedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly deletionHold: FieldRef<"SyncAccount", 'Json'>
+    readonly deletionHoldAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly deletionGuardBypassOnce: FieldRef<"SyncAccount", 'Boolean'>
     readonly retiredAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly retiredReason: FieldRef<"SyncAccount", 'String'>
     readonly createdAt: FieldRef<"SyncAccount", 'DateTime'>
@@ -25270,6 +25307,7 @@ export namespace Prisma {
     notifyOnFailure: boolean | null
     syncWindowStart: number | null
     syncWindowEnd: number | null
+    syncWindowTimezone: string | null
     maxAttemptsBeforePause: number | null
     lastModifiedAt: Date | null
     createdAt: Date | null
@@ -25288,6 +25326,7 @@ export namespace Prisma {
     notifyOnFailure: boolean | null
     syncWindowStart: number | null
     syncWindowEnd: number | null
+    syncWindowTimezone: string | null
     maxAttemptsBeforePause: number | null
     lastModifiedAt: Date | null
     createdAt: Date | null
@@ -25307,6 +25346,7 @@ export namespace Prisma {
     notifyOnFailure: number
     syncWindowStart: number
     syncWindowEnd: number
+    syncWindowTimezone: number
     excludedFields: number
     exportLabelFilter: number
     maxAttemptsBeforePause: number
@@ -25345,6 +25385,7 @@ export namespace Prisma {
     notifyOnFailure?: true
     syncWindowStart?: true
     syncWindowEnd?: true
+    syncWindowTimezone?: true
     maxAttemptsBeforePause?: true
     lastModifiedAt?: true
     createdAt?: true
@@ -25363,6 +25404,7 @@ export namespace Prisma {
     notifyOnFailure?: true
     syncWindowStart?: true
     syncWindowEnd?: true
+    syncWindowTimezone?: true
     maxAttemptsBeforePause?: true
     lastModifiedAt?: true
     createdAt?: true
@@ -25382,6 +25424,7 @@ export namespace Prisma {
     notifyOnFailure?: true
     syncWindowStart?: true
     syncWindowEnd?: true
+    syncWindowTimezone?: true
     excludedFields?: true
     exportLabelFilter?: true
     maxAttemptsBeforePause?: true
@@ -25490,6 +25533,7 @@ export namespace Prisma {
     notifyOnFailure: boolean
     syncWindowStart: number | null
     syncWindowEnd: number | null
+    syncWindowTimezone: string | null
     excludedFields: string[]
     exportLabelFilter: string[]
     maxAttemptsBeforePause: number | null
@@ -25530,6 +25574,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
@@ -25553,6 +25598,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
@@ -25576,6 +25622,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
@@ -25599,6 +25646,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
@@ -25606,7 +25654,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
+  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "syncWindowTimezone" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
   export type SyncAccountSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
     importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
@@ -25640,6 +25688,7 @@ export namespace Prisma {
       notifyOnFailure: boolean
       syncWindowStart: number | null
       syncWindowEnd: number | null
+      syncWindowTimezone: string | null
       excludedFields: string[]
       exportLabelFilter: string[]
       maxAttemptsBeforePause: number | null
@@ -26083,6 +26132,7 @@ export namespace Prisma {
     readonly notifyOnFailure: FieldRef<"SyncAccountSettings", 'Boolean'>
     readonly syncWindowStart: FieldRef<"SyncAccountSettings", 'Int'>
     readonly syncWindowEnd: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly syncWindowTimezone: FieldRef<"SyncAccountSettings", 'String'>
     readonly excludedFields: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly exportLabelFilter: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly maxAttemptsBeforePause: FieldRef<"SyncAccountSettings", 'Int'>
@@ -67448,6 +67498,9 @@ export namespace Prisma {
     booksDiscoveredAt: 'booksDiscoveredAt',
     setupCompletedAt: 'setupCompletedAt',
     disconnectedAt: 'disconnectedAt',
+    deletionHold: 'deletionHold',
+    deletionHoldAt: 'deletionHoldAt',
+    deletionGuardBypassOnce: 'deletionGuardBypassOnce',
     retiredAt: 'retiredAt',
     retiredReason: 'retiredReason',
     createdAt: 'createdAt',
@@ -67471,6 +67524,7 @@ export namespace Prisma {
     notifyOnFailure: 'notifyOnFailure',
     syncWindowStart: 'syncWindowStart',
     syncWindowEnd: 'syncWindowEnd',
+    syncWindowTimezone: 'syncWindowTimezone',
     excludedFields: 'excludedFields',
     exportLabelFilter: 'exportLabelFilter',
     maxAttemptsBeforePause: 'maxAttemptsBeforePause',
@@ -70441,6 +70495,9 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
@@ -70490,6 +70547,9 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrderInput | SortOrder
     setupCompletedAt?: SortOrderInput | SortOrder
     disconnectedAt?: SortOrderInput | SortOrder
+    deletionHold?: SortOrderInput | SortOrder
+    deletionHoldAt?: SortOrderInput | SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrderInput | SortOrder
     retiredReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -70543,6 +70603,9 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
@@ -70592,6 +70655,9 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrderInput | SortOrder
     setupCompletedAt?: SortOrderInput | SortOrder
     disconnectedAt?: SortOrderInput | SortOrder
+    deletionHold?: SortOrderInput | SortOrder
+    deletionHoldAt?: SortOrderInput | SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrderInput | SortOrder
     retiredReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -70639,6 +70705,9 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableWithAggregatesFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolWithAggregatesFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
@@ -70662,6 +70731,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
@@ -70685,6 +70755,7 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrderInput | SortOrder
     syncWindowEnd?: SortOrderInput | SortOrder
+    syncWindowTimezone?: SortOrderInput | SortOrder
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrderInput | SortOrder
@@ -70711,6 +70782,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
@@ -70734,6 +70806,7 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrderInput | SortOrder
     syncWindowEnd?: SortOrderInput | SortOrder
+    syncWindowTimezone?: SortOrderInput | SortOrder
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrderInput | SortOrder
@@ -70763,6 +70836,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolWithAggregatesFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
@@ -75744,6 +75818,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -75793,6 +75870,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -75836,6 +75916,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -75885,6 +75968,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -75931,6 +76017,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -75967,6 +76056,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -76006,6 +76098,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -76024,6 +76119,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -76047,6 +76143,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -76066,6 +76163,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -76089,6 +76187,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -76110,6 +76209,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -76129,6 +76229,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -76150,6 +76251,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -81339,6 +81441,9 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    deletionHold?: SortOrder
+    deletionHoldAt?: SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrder
     retiredReason?: SortOrder
     createdAt?: SortOrder
@@ -81381,6 +81486,8 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    deletionHoldAt?: SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrder
     retiredReason?: SortOrder
     createdAt?: SortOrder
@@ -81419,6 +81526,8 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    deletionHoldAt?: SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrder
     retiredReason?: SortOrder
     createdAt?: SortOrder
@@ -81498,6 +81607,7 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrder
     syncWindowEnd?: SortOrder
+    syncWindowTimezone?: SortOrder
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrder
@@ -81526,6 +81636,7 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrder
     syncWindowEnd?: SortOrder
+    syncWindowTimezone?: SortOrder
     maxAttemptsBeforePause?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
@@ -81544,6 +81655,7 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrder
     syncWindowEnd?: SortOrder
+    syncWindowTimezone?: SortOrder
     maxAttemptsBeforePause?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
@@ -89656,6 +89768,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -89703,6 +89818,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -91308,6 +91426,9 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
@@ -99040,6 +99161,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99088,6 +99212,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99135,6 +99262,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99182,6 +99312,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99235,6 +99368,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99283,6 +99419,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99330,6 +99469,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99377,6 +99519,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -99603,6 +99748,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -99624,6 +99770,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -99834,6 +99981,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99882,6 +100032,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99951,6 +100104,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99999,6 +100155,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -100159,6 +100318,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -100180,6 +100340,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -100217,6 +100378,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -100265,6 +100429,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -100348,6 +100515,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -100396,6 +100566,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -100469,6 +100642,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -100517,6 +100693,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -100760,6 +100939,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -100808,6 +100990,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -101003,6 +101188,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -101051,6 +101239,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -101109,6 +101300,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -101157,6 +101351,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -101199,6 +101396,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -101247,6 +101447,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -101504,6 +101707,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -101552,6 +101758,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -107628,6 +107837,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -107649,6 +107859,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -107856,6 +108067,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
@@ -107938,6 +108150,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -107986,6 +108201,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -108126,6 +108344,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -108174,6 +108395,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -114422,6 +114646,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -115321,6 +115548,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -115368,6 +115598,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -115413,6 +115646,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118169,6 +118405,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -118207,6 +118446,9 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
@@ -118312,6 +118554,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118359,6 +118604,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118404,6 +118652,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118440,6 +118691,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118487,6 +118741,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118532,6 +118789,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119498,6 +119758,7 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
@@ -119517,6 +119778,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -119538,6 +119800,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
@@ -119558,6 +119821,7 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null

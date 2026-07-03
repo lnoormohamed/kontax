@@ -22,6 +22,12 @@ import {
   mappedContactToPortableContact,
   mappedContactToWriteData,
 } from "~/server/sync-contact-mapping";
+import {
+  buildDeletionHoldPayload,
+  type DeletionHoldCandidate,
+  DeletionThresholdError,
+  exceedsDeletionThreshold,
+} from "~/server/sync-deletion-guard";
 import { MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
 import {
   buildProviderCapabilityDiagnostics,
@@ -41,6 +47,18 @@ export type ImportEngineAccount = {
   sourceType: Extract<SourceType, "SYNC_GOOGLE" | "SYNC_MICROSOFT">;
   // Human provider name used in conflict resolution notes ("Google", "Outlook").
   providerName: string;
+  // P39-02: deletion-safety guard context. When set, every batch pre-scans its
+  // tombstones and the run aborts (DeletionThresholdError) before applying any
+  // of that batch's deletions once the accumulated inbound count exceeds the
+  // threshold. `candidates` is shared across batches of one run so multi-page
+  // deltas accumulate. Omit when the threshold is disabled or the account's
+  // one-shot guard bypass is set.
+  deletionGuard?: ImportDeletionGuard;
+};
+
+export type ImportDeletionGuard = {
+  threshold: number;
+  candidates: DeletionHoldCandidate[];
 };
 
 const parseValueEntries = (value: unknown) =>
@@ -495,12 +513,72 @@ const createContact = async (
 
 // Process a batch of normalised remote items: create / update / conflict /
 // tombstone according to link state and the conflict policy.
+// P39-02: pre-scan a batch's tombstones for the deletions handleTombstone
+// would actually archive (link + active contact, and the policy would apply
+// the delete rather than open/ignore it). Mirrors handleTombstone's branches.
+const collectProspectiveInboundDeletions = async (
+  account: ImportEngineAccount,
+  items: RemoteContactItem[],
+): Promise<DeletionHoldCandidate[]> => {
+  const prospective: DeletionHoldCandidate[] = [];
+  for (const item of items) {
+    if (!item.deleted || !item.remoteUid) continue;
+    const link = await db.syncContactLink.findUnique({
+      where: {
+        syncAccountId_remoteUid: { syncAccountId: account.id, remoteUid: item.remoteUid },
+      },
+      select: {
+        id: true,
+        lastSyncedAt: true,
+        contact: {
+          select: {
+            id: true,
+            fullName: true,
+            archivedAt: true,
+            updatedAt: true,
+            book: { select: { name: true } },
+          },
+        },
+      },
+    });
+    if (!link?.contact || link.contact.archivedAt) continue;
+    // MANUAL opens a conflict; DEVICE_WINS with a local edit keeps the contact.
+    if (account.conflictPolicy === "MANUAL") continue;
+    if (
+      account.conflictPolicy === "DEVICE_WINS" &&
+      isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)
+    ) {
+      continue;
+    }
+    prospective.push({
+      linkId: link.id,
+      contactId: link.contact.id,
+      name: link.contact.fullName,
+      bookName: link.contact.book?.name ?? "Personal",
+      bookDetail: link.contact.book ? null : "default",
+      direction: "inbound",
+    });
+  }
+  return prospective;
+};
+
 export const importRemoteContactBatch = async (
   account: ImportEngineAccount,
   items: RemoteContactItem[],
 ): Promise<ImportBatchSummary> => {
   const summary = emptyImportBatch();
   const now = new Date();
+
+  // P39-02: deletion-safety threshold — abort before applying this batch's
+  // deletions once the run's accumulated inbound deletions exceed the limit.
+  if (account.deletionGuard) {
+    const guard = account.deletionGuard;
+    guard.candidates.push(...(await collectProspectiveInboundDeletions(account, items)));
+    const inbound = guard.candidates.filter((c) => c.direction === "inbound").length;
+    if (exceedsDeletionThreshold({ inbound, outbound: 0 }, guard.threshold)) {
+      throw new DeletionThresholdError(buildDeletionHoldPayload(guard.candidates, guard.threshold));
+    }
+  }
 
   for (const item of items) {
     if (!item.remoteUid) continue;

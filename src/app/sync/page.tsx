@@ -259,6 +259,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
               notifyOnFailure: true,
               syncWindowStart: true,
               syncWindowEnd: true,
+              syncWindowTimezone: true,
               excludedFields: true,
               exportLabelFilter: true,
               maxAttemptsBeforePause: true,
@@ -317,6 +318,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
               notifyOnFailure: true,
               syncWindowStart: true,
               syncWindowEnd: true,
+              syncWindowTimezone: true,
               excludedFields: true,
               exportLabelFilter: true,
               maxAttemptsBeforePause: true,
@@ -387,6 +389,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
       diagnosticsWarnings.push(
         "Kontax paused this connection because the manual conflict queue is full.",
       );
+    } else if (
+      acct.status === "PAUSED" &&
+      acct.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED"
+    ) {
+      diagnosticsWarnings.push(
+        "Kontax paused this connection before committing deletions that exceeded your safety limit. Review and resume from the connection detail.",
+      );
     } else if (health === "paused_for_safety") {
       diagnosticsWarnings.push(
         "Kontax paused this connection after repeated failures so it does not keep retrying unattended.",
@@ -420,7 +429,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
           ? "ok"
           : j.status === "QUEUED" || j.status === "RUNNING"
             ? "pending"
-            : "fail",
+            : j.status === "SKIPPED"
+              ? "skipped"
+              : j.status === "HALTED"
+                ? "halted"
+                : "fail",
       error: j.errorSummary ?? null,
     }));
 
@@ -481,6 +494,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
       notifyOnFailure: acct.settings?.notifyOnFailure ?? true,
       syncWindowStart: acct.settings?.syncWindowStart ?? null,
       syncWindowEnd: acct.settings?.syncWindowEnd ?? null,
+      syncWindowTimezone: acct.settings?.syncWindowTimezone ?? null,
       excludedFields: acct.settings?.excludedFields ?? [],
       exportLabelFilter: acct.settings?.exportLabelFilter ?? [],
       maxAttemptsBeforePause: acct.settings?.maxAttemptsBeforePause ?? null,
@@ -528,6 +542,16 @@ export default async function SyncPage({ searchParams }: PageProps) {
       // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
       conflictQueueFull:
         acct.status === "PAUSED" && acct.lastErrorCode === "SYNC_CONFLICT_QUEUE_FULL",
+      // P39-02: deletion-safety hold summary for the paused-for-review surface.
+      // The review card fetches the full breakdown via getDeletionHoldReview.
+      deletionHoldTotal:
+        acct.status === "PAUSED" && acct.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED"
+          ? ((acct.deletionHold as { total?: number } | null)?.total ?? null)
+          : null,
+      deletionHoldThreshold:
+        acct.status === "PAUSED" && acct.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED"
+          ? ((acct.deletionHold as { threshold?: number } | null)?.threshold ?? null)
+          : null,
       // P27-08: duplicates found by the most recently *completed* import (0 hides
       // the banner). Pick by latest completedAt, not list order (a job can finish
       // out of creation order).

@@ -34,6 +34,13 @@ export const getEffectiveSyncAccountSettings = async (
   bookAllowlist: string[];
   syncFrequencyMinutes: number | null;
   requireReauthToEdit: boolean;
+  // P39 enforcement inputs (all optional in the P36 panel).
+  maxDeletionsThreshold: number | null;
+  notifyOnFailure: boolean;
+  syncWindowStart: number | null;
+  syncWindowEnd: number | null;
+  syncWindowTimezone: string | null;
+  maxAttemptsBeforePause: number | null;
 }> => {
   const settings = await db.syncAccountSettings.findUnique({
     where: { syncAccountId },
@@ -47,6 +54,12 @@ export const getEffectiveSyncAccountSettings = async (
       settings?.syncFrequencyMinutes ?? SYNC_SETTINGS_DEFAULTS.syncFrequencyMinutes,
     requireReauthToEdit:
       settings?.requireReauthToEdit ?? SYNC_SETTINGS_DEFAULTS.requireReauthToEdit,
+    maxDeletionsThreshold: settings?.maxDeletionsThreshold ?? null,
+    notifyOnFailure: settings?.notifyOnFailure ?? true,
+    syncWindowStart: settings?.syncWindowStart ?? null,
+    syncWindowEnd: settings?.syncWindowEnd ?? null,
+    syncWindowTimezone: settings?.syncWindowTimezone ?? null,
+    maxAttemptsBeforePause: settings?.maxAttemptsBeforePause ?? null,
   };
 };
 
