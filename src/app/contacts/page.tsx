@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
 import { BottomNav } from "~/app/_components/bottom-nav";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
@@ -408,6 +409,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         userId={session.user.id}
         tab={selectedTab}
         labelRegistry={sidebarLabels.map((l) => ({ name: l.name, color: l.color }))}
+        statusChip={<OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />}
         filterSlot={
           selectedTab === "overview" ? null : (
             <MobileFilterButton
@@ -451,6 +453,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           />
 
           <div className="flex shrink-0 items-center gap-2.5">
+            {/* P42-DB01 §3b: offline persists as a chip while account-state owns the slot */}
+            <OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />
             <Link
               className={`inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition ${
                 planSummary.lifecyclePolicy.canWrite
@@ -477,6 +481,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
       {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
       <SecurityAlertBannerSlot userId={session.user.id} />
+
+      {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
+      <ConnectionBanner readOnly={!planSummary.lifecyclePolicy.canWrite} />
 
       <ContactDashboard
         activeContacts={activeList.rows}

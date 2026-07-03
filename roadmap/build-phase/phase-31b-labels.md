@@ -5,7 +5,11 @@
 > as agreed. Renumber freely if a flat sequence is preferred.
 
 ## Phase status
-Pre-plan
+Complete — verified in code 2026-07-02. All five tickets are shipped: `Label`
+registry model (prisma), sidebar section with rename/recolor/merge/delete
+(`labels-sidebar.tsx`, `labels-manage-modal.tsx`), `?label=` filter wired into
+`contact-filter-state` with Save-as-list (`label-filter-bar.tsx`), and chips
+(`label-chip.tsx`). The per-ticket "Not Started" lines below predate the build.
 
 ## Phase objective
 Make **labels** a first-class organizing primitive. Labels can already be

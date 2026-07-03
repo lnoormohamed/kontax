@@ -722,8 +722,8 @@ export function ContactSharing({
           <div className="mx-3 my-1 rounded-[12px] border border-dashed border-[#d8ddd6] px-4 py-4 text-center">
             <p className="text-[13.5px] font-semibold text-[#1d2823]">No shared books yet</p>
             <p className="mx-auto mt-0.5 max-w-sm text-[12.5px] text-[#8b938c]">
-              Family &amp; team books are coming soon — everyone in a book can help keep shared
-              contacts up to date.
+              Create or join a family or team book to keep shared contacts up to date in one
+              place.
             </p>
           </div>
         )}

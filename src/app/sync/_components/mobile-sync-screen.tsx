@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import { OfflineBanner } from "~/app/_components/offline-banner";
-import { ReadOnlyBanner, UpsellCard } from "~/app/_components/mobile-variance";
+import { useOffline } from "~/app/_components/connectivity";
+import { UpsellCard } from "~/app/_components/mobile-variance";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { SyncAccountData } from "./sync-page-client";
 
@@ -54,7 +53,6 @@ export function MobileSyncScreen({
   cardDavEnabled,
   syncAccountsLimit,
   canWrite,
-  lifecycleLabel = "Active",
   planLabel = "Free",
   upgradeableAtCap = false,
   upgradePlan = "Pro",
@@ -71,28 +69,16 @@ export function MobileSyncScreen({
   syncAccountsLimit: number;
   /** Read-only lifecycle (GRACE/LOCKED) disables Add. */
   canWrite: boolean;
-  /** Lifecycle label used to pick ReadOnlyBanner variant ("Grace" → "grace", else "locked"). */
-  lifecycleLabel?: string;
   /** Plan name shown in the at-cap copy (e.g. "Free"). */
   planLabel?: string;
   /** True when a higher tier raises the cap (Free) → show an upgrade nudge at the cap. */
   upgradeableAtCap?: boolean;
   upgradePlan?: string;
 }) {
-  // Offline state (DB21): when offline we show the offline banner and disable
-  // Add. Read-only takes priority over offline (it has its own banner + reason).
-  const [offline, setOffline] = useState(false);
-  useEffect(() => {
-    setOffline(!navigator.onLine);
-    const goOnline = () => setOffline(false);
-    const goOffline = () => setOffline(true);
-    window.addEventListener("online", goOnline);
-    window.addEventListener("offline", goOffline);
-    return () => {
-      window.removeEventListener("online", goOnline);
-      window.removeEventListener("offline", goOffline);
-    };
-  }, []);
+  // P42-DB01: connectivity comes from the shared store; the banner itself now
+  // lives in the page-level ConnectionBanner slot (account-state ▸ connectivity
+  // ▸ update), so this screen only gates its own write affordance (Add).
+  const offline = useOffline();
 
   if (hidden) return null;
 
@@ -131,7 +117,6 @@ export function MobileSyncScreen({
 
   return (
     <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
-      {!canWrite ? <ReadOnlyBanner variant={lifecycleLabel === "Grace" ? "grace" : "locked"} /> : <OfflineBanner />}
       <div className="mob-scroll" style={{ flex: 1, padding: "16px 0 28px" }}>
         {accounts.length === 0 ? (
           <div style={{ margin: "0 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "40px 24px", textAlign: "center" }}>

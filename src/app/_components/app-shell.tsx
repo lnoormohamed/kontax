@@ -2,15 +2,16 @@ import Link from "next/link";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { BottomNav } from "~/app/_components/bottom-nav";
+import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { MobileSecondaryHeader } from "~/app/_components/mobile-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
-import { OfflineBanner } from "~/app/_components/offline-banner";
 import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchDropdown } from "~/app/_components/search-dropdown";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
+import { getLifecycleAccessPolicy, getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 
 type AppShellAccount = { name: string; email: string; plan: string };
@@ -49,6 +50,11 @@ export async function AppShell({
   // Pending incoming shares → badge on "Shared with me" (P12-05 indicator).
   const session = await auth();
   const userId = session?.user?.id;
+
+  // P42-DB01: account lifecycle feeds the banner slot's rank-1 state — a
+  // read-only account (CANCELED / LOCKED) outranks connectivity in the slot.
+  const billing = userId ? await getUserBillingContext(userId) : null;
+  const readOnly = billing ? !getLifecycleAccessPolicy(billing.lifecycleState).canWrite : false;
 
   const [incomingShares, syncConnected, unreadCount, syncErrorCount, labelRegistry] = userId
     ? await Promise.all([
@@ -97,6 +103,7 @@ export async function AppShell({
           title={mobileTitle}
           backHref={mobileBackHref}
           backLabel={mobileBackLabel}
+          action={<OfflineChip readOnly={readOnly} />}
         />
       )}
 
@@ -113,6 +120,8 @@ export async function AppShell({
           <SearchDropdown labelRegistry={labelRegistry} />
 
           <div className="flex shrink-0 items-center gap-2.5">
+            {/* P42-DB01 §3b: offline persists as a chip while account-state owns the slot */}
+            <OfflineChip readOnly={readOnly} />
             <Link
               className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#4158f4] px-4 text-sm font-semibold text-white transition hover:bg-[#3248db]"
               href="/contacts/new"
@@ -138,8 +147,8 @@ export async function AppShell({
       {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
       {session?.user?.id ? <SecurityAlertBannerSlot userId={session.user.id} /> : null}
 
-      {/* P24-08: offline indicator */}
-      <OfflineBanner />
+      {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
+      <ConnectionBanner readOnly={readOnly} />
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}

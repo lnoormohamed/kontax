@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 
 import { createContact, updateContact } from "~/app/actions/contacts";
+import { OfflineWriteNote } from "~/app/_components/connection-banner";
+import { useOffline } from "~/app/_components/connectivity";
 import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -29,6 +31,7 @@ type AddressRow = { label: string; street: string; city: string; postcode: strin
 
 export type ContactSheetInitial = {
   id: string;
+  avatarUrl?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   company?: string | null;
@@ -58,7 +61,7 @@ const EMAIL_LABELS = ["Work", "Personal", "Home", "School", "Other"];
 const WEBSITE_LABELS = ["Work", "Personal", "Blog", "Portfolio", "Other"];
 const ADDRESS_LABELS = ["Home", "Work", "Other"];
 const RELATED_LABELS = ["Spouse", "Partner", "Child", "Parent", "Sibling", "Assistant", "Manager", "Friend", "Other"];
-const DATE_LABELS = ["Anniversary", "Other"];
+const DATE_LABELS = ["Anniversary", "Lunar birthday", "Other"];
 
 // ── shared styles (focus ring + error states need :focus, so inline <style>) ──
 const STYLES = `
@@ -280,6 +283,9 @@ export function MobileContactSheet({
 }) {
   const isEdit = Boolean(initial);
   const router = useRouter();
+  // P42-DB01 Surface 2a: Save disabled offline; the draft stays in the open
+  // sheet and nothing submits automatically on reconnect.
+  const offline = useOffline();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -288,6 +294,7 @@ export function MobileContactSheet({
   const [first, setFirst] = useState(initial?.firstName ?? "");
   const [last, setLast] = useState(initial?.lastName ?? "");
   const [company, setCompany] = useState(initial?.company ?? "");
+  const [avatarUrl, setAvatarUrl] = useState(initial?.avatarUrl ?? "");
   const [phones, setPhones] = useState<ValueRow[]>(initial?.phones ?? []);
   const [emails, setEmails] = useState<ValueRow[]>(initial?.emails ?? []);
   const [websites, setWebsites] = useState<ValueRow[]>(initial?.websites ?? []);
@@ -379,6 +386,7 @@ export function MobileContactSheet({
     set("firstName", first);
     set("lastName", last);
     set("company", company);
+    set("avatarUrl", avatarUrl);
 
     set("phone", phones[0]?.value);
     set("phoneLabel", phones[0]?.label);
@@ -451,28 +459,38 @@ export function MobileContactSheet({
   };
 
   const footer = (
-    <button
-      type="button"
-      disabled={isPending}
-      onClick={handleSave}
-      style={{
-        width: "100%",
-        height: 50,
-        borderRadius: 13,
-        border: "none",
-        background: isPending ? "#7d8bf6" : "#4158f4",
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: 600,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 9,
-        cursor: isPending ? "default" : "pointer",
-      }}
-    >
-      {isPending ? "Saving…" : isEdit ? "Save changes" : "Save contact"}
-    </button>
+    <>
+      {offline ? (
+        <OfflineWriteNote
+          title="Can’t save while offline."
+          body="Keep this open — your edits stay here, and you can save once you’re back online."
+          style={{ marginBottom: 10 }}
+        />
+      ) : null}
+      <button
+        type="button"
+        disabled={isPending || offline}
+        onClick={handleSave}
+        style={{
+          width: "100%",
+          height: 50,
+          borderRadius: 13,
+          border: "none",
+          background: isPending ? "#7d8bf6" : "#4158f4",
+          color: "#fff",
+          fontSize: 16,
+          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 9,
+          cursor: isPending || offline ? "default" : "pointer",
+          opacity: offline ? 0.5 : 1,
+        }}
+      >
+        {isPending ? "Saving…" : isEdit ? "Save changes" : "Save contact"}
+      </button>
+    </>
   );
 
   return (
@@ -483,6 +501,7 @@ export function MobileContactSheet({
         <Field label="First name" value={first} onChange={setFirst} placeholder="First name" error={errors.name} refCb={(n) => (errRefs.current.name = n)} />
         <Field label="Last name" value={last} onChange={setLast} placeholder="Last name" />
         <Field label="Company" value={company} onChange={setCompany} placeholder="Company" />
+        <Field label="Photo URL" value={avatarUrl} onChange={setAvatarUrl} placeholder="https://…" type="url" />
       </Section>
 
       <Section id="phones" title="Phone numbers" count={phones.length} open={open.phones ?? false} onToggle={toggle}>

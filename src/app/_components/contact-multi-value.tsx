@@ -29,7 +29,7 @@ export const LABEL_OPTIONS: Record<string, string[]> = {
   websites: ["Portfolio", "Company", "Blog", "Other"],
   addresses: ["Home", "Work", "Other"],
   related: ["Spouse", "Partner", "Child", "Parent", "Sibling", "Assistant", "Other"],
-  dates: ["Anniversary", "Other"],
+  dates: ["Anniversary", "Lunar birthday", "Other"],
 };
 
 const formatDateDisplay = (value: string): string => {

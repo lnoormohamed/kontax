@@ -16,7 +16,6 @@ import {
   attachSyncCredentials,
   confirmSyncSettingsPassword,
   createSyncAccount,
-  type DeletionHoldReview,
   disconnectSyncAccount,
   getDeletionHoldReview,
   pauseSyncAccount,
@@ -25,7 +24,10 @@ import {
   resumeSyncAllowDeletions,
   resumeSyncWithoutDeletions,
 } from "~/app/actions/sync";
+import type { DeletionHoldReview } from "~/server/sync-deletion-resume";
 import { ConfirmDialog } from "~/app/_components/confirm-dialog";
+import { OfflineWriteNote } from "~/app/_components/connection-banner";
+import { useOffline } from "~/app/_components/connectivity";
 import { HelpTooltip } from "~/app/_components/help-tooltip";
 import { SyncTimestamp } from "./sync-timestamp";
 
@@ -2271,6 +2273,9 @@ function AccountHeader({
   reauthEmail?: string | null;
 }) {
   const [copiedUrl, setCopiedUrl] = useState(false);
+  // P42-DB01 Surface 2c: manual sync is a write to the server queue — gate it
+  // on connectivity. Scheduled syncs resume server-side by themselves.
+  const offline = useOffline();
   const isPaused = account.status === "PAUSED";
   const isRetired = account.status === "RETIRED";
   const dir = DIR_BADGE[account.direction];
@@ -2544,7 +2549,7 @@ function AccountHeader({
         >
           <input type="hidden" name="syncAccountId" value={account.id} />
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <ActionBtn variant="primary" type="submit" disabled={isSyncing || isPaused}>
+          <ActionBtn variant="primary" type="submit" disabled={isSyncing || isPaused || offline}>
             {isSyncing ? (
               <>
                 <Spinner size={13} color="#fff" /> Syncing…
@@ -2586,6 +2591,15 @@ function AccountHeader({
           Disconnect
         </ActionBtn>
       </div>
+      ) : null}
+      {/* P42-DB01 Surface 2c: honest offline note — scheduled sync genuinely
+          resumes on its own, so the copy can promise it. */}
+      {!isRetired && offline ? (
+        <OfflineWriteNote
+          title="Can’t sync while offline."
+          body="Scheduled and manual syncs resume automatically when you’re back online."
+          style={{ marginTop: 12, maxWidth: 560 }}
+        />
       ) : null}
       {/* P39-01 §2b: no hover on touch — the tooltip becomes an inline caption */}
       {!isRetired && hasSyncWindow && !isPaused && (

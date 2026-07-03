@@ -5,6 +5,8 @@ import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { useMemo, useState } from "react";
 
 import { createContact } from "~/app/actions/contacts";
+import { OfflineWriteNote } from "~/app/_components/connection-banner";
+import { useOffline } from "~/app/_components/connectivity";
 import { PhoneCountryInput } from "~/app/_components/phone-country-input";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { CardPrefillData } from "~/app/u/[username]/add-to-kontax";
@@ -198,8 +200,11 @@ export function CreateContactForm({
   const [dates, setDates] = useState<DateRow[]>([{ label: "Anniversary", date: "" }]);
   const [customs, setCustoms] = useState<ValueRow[]>([{ label: "", value: "" }]);
 
+  // P42-DB01 Surface 2a: no offline mutation queue — Save is disabled offline
+  // and re-enables on reconnect. The draft is held in the open form only.
+  const offline = useOffline();
   const displayName = mode === "org" ? company : [first, last].filter(Boolean).join(" ");
-  const canSave = mode === "org" ? company.trim().length > 0 : Boolean(first.trim() || last.trim());
+  const canSave = (mode === "org" ? company.trim().length > 0 : Boolean(first.trim() || last.trim())) && !offline;
 
   const birthday = useMemo(() => {
     if (!bMonth || !bDay) return "";
@@ -304,6 +309,12 @@ export function CreateContactForm({
         </div>
 
         <div className="mx-auto grid w-full max-w-[600px] gap-5 px-4 py-7 lg:px-0">
+          {offline ? (
+            <OfflineWriteNote
+              title="Can’t save while offline."
+              body="Keep this open — your edits stay here, and you can save once you’re back online."
+            />
+          ) : null}
           {/* save-to target (Family / Team members) */}
           {(familyBookName || teamBooks.length > 0) && !familyCanEdit ? (
             // View-only members can't add to the family book

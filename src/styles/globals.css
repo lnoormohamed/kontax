@@ -43,3 +43,11 @@
 /* P33-02: search result row hover/active states */
 .se-row { transition: background 0.08s; cursor: pointer; }
 .se-row:hover { background: #f2f4f0; }
+
+/* P42-DB01: connection banner enter — slide-down + fade per toast conventions */
+@keyframes cxBannerIn   { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes cxBannerFade { from { opacity: 0; } to { opacity: 1; } }
+.cx-banner { animation: cxBannerIn 0.18s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .cx-banner { animation: cxBannerFade 0.18s ease-out; }
+}

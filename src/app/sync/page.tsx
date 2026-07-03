@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
+import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
 import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
@@ -594,6 +595,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
           <SearchInput filter="all" initialQuery="" sort="name" tab="people" view="compact" />
 
           <div className="flex shrink-0 items-center gap-2.5">
+            {/* P42-DB01 §3b: offline persists as a chip while account-state owns the slot */}
+            <OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />
             <Link
               className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#4158f4] px-4 text-sm font-semibold text-white transition hover:bg-[#3248db]"
               href="/contacts/new"
@@ -625,6 +628,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
       {/* ── Mobile header — "Sync" title, shown only on mobile (P24B-01) ── */}
       <MobilePlainHeader title="Sync" bell={<NotificationBellSlot userId={userId} />} />
 
+      {/* P42-DB01: single banner slot — replaces the mobile sync screen's
+          hard-coded read-only/offline either/or with the fixed priority rule. */}
+      <ConnectionBanner
+        readOnly={!planSummary.lifecyclePolicy.canWrite}
+        readOnlyVariant={planSummary.lifecyclePolicy.label === "Grace" ? "grace" : "locked"}
+      />
+
       {/* ── three-rail body ── */}
       <div className="flex min-h-0 flex-1">
         {/* Rail 1: Settings sidebar — hidden on mobile and tablet */}
@@ -643,7 +653,6 @@ export default async function SyncPage({ searchParams }: PageProps) {
           cardDavEnabled={planSummary.entitlements.cardDavSyncEnabled}
           syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
           canWrite={planSummary.lifecyclePolicy.canWrite}
-          lifecycleLabel={planSummary.lifecyclePolicy.label}
           planLabel={planSummary.planLabel}
           upgradeableAtCap={planSummary.plan === "FREE"}
         />

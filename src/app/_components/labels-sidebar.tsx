@@ -167,13 +167,16 @@ function LabelRow({
   return (
     <>
       <div
-        className={`relative flex h-8 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 transition ${
-          active ? "border-l-[3px] border-[#17352e] bg-[#e3efe7]" : "border-l-[3px] border-transparent"
+        className={`relative flex h-8 cursor-pointer items-center gap-2.5 rounded-[10px] pl-3 pr-1.5 transition ${
+          active ? "bg-[#e3efe7]" : ""
         } ${hover && !active ? "bg-[#f2f4f0]" : ""}`}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => { setHover(false); if (!menuOpen && !recoloring && !mergingWith) setMenuOpen(false); }}
         onClick={() => { if (!renaming && !menuOpen) onNavigate(label.name); }}
       >
+        {active ? (
+          <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-[#17352e]" />
+        ) : null}
         <LabelDot col={label.color} size={9} />
 
         {renaming ? (
@@ -190,7 +193,13 @@ function LabelRow({
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
-          <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-[#5c655e]">{label.name}</span>
+          <span
+            className={`min-w-0 flex-1 truncate text-[12.5px] font-medium ${
+              active ? "text-[#1d2823]" : "text-[#5c655e]"
+            }`}
+          >
+            {label.name}
+          </span>
         )}
 
         {!renaming && (
@@ -198,13 +207,15 @@ function LabelRow({
             <button
               type="button"
               aria-label={`Options for ${label.name}`}
-              className="grid h-5 w-5 place-items-center rounded transition hover:bg-[#e9ece7]"
+              className="grid h-5 w-5 shrink-0 place-items-center rounded transition hover:bg-[#e9ece7]"
               onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
             >
               <DotsIcon />
             </button>
           ) : (
-            <span className="tabular-nums text-[12px] text-[#8b938c]">{label.count}</span>
+            <span className="min-w-[20px] shrink-0 text-right tabular-nums text-[12px] text-[#8b938c]">
+              {label.count}
+            </span>
           )
         )}
 
@@ -339,8 +350,8 @@ export function LabelsSidebar({
 
       {/* inline create row */}
       {creating && (
-        <div className="flex items-center gap-2 px-2 py-0.5">
-          <span className="h-[14px] w-[14px] rounded-sm bg-[#6fa3a0]" />
+        <div className="flex h-8 items-center gap-2.5 px-3">
+          <span className="h-[14px] w-[14px] rounded-[4px] bg-[#6fa3a0]" />
           <input
             ref={createRef}
             className="h-7 min-w-0 flex-1 rounded border border-[#4158f4] px-1.5 text-[12.5px] text-[#1d2823] outline-none ring-2 ring-[#edf0fe]"

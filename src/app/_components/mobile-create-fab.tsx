@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useOffline } from "~/app/_components/connectivity";
 import { MobileContactSheet } from "~/app/_components/mobile-contact-sheet";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -17,6 +18,9 @@ interface MobileCreateFabProps {
 
 export function MobileCreateFab({ canWrite, show = true, atLimit = false }: MobileCreateFabProps) {
   const [open, setOpen] = useState(false);
+  // P42-DB01 §5a: creating a contact is a write — the FAB disables (not hides)
+  // while offline; the banner above explains why.
+  const offline = useOffline();
 
   if (!canWrite || !show || atLimit) return null;
 
@@ -25,7 +29,9 @@ export function MobileCreateFab({ canWrite, show = true, atLimit = false }: Mobi
       {/* Floating "+" button — mobile only */}
       <button
         aria-label="Create new contact"
+        aria-disabled={offline}
         className="grid md:hidden"
+        disabled={offline}
         onClick={() => setOpen(true)}
         style={{
           position: "fixed",
@@ -37,7 +43,8 @@ export function MobileCreateFab({ canWrite, show = true, atLimit = false }: Mobi
           backgroundColor: "#17352e",
           color: "#fff",
           border: "none",
-          cursor: "pointer",
+          cursor: offline ? "default" : "pointer",
+          opacity: offline ? 0.5 : 1,
           placeItems: "center",
           zIndex: 35,
           boxShadow: "0 6px 18px rgba(23,53,46,0.3), 0 2px 5px rgba(0,0,0,0.12)",

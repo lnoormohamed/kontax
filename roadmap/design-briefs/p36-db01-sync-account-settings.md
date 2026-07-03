@@ -1,8 +1,22 @@
 # P36-DB01 — Sync Account Settings (Edit Sync Options)
 
-**Surface:** Inline settings panel within `/sync` account detail  
+**Surface:** Settings panel within `/sync` account detail  
 **Trigger:** "Settings" button in the account action row  
 **Priority:** P1 — directional control, frequency, and safety rails are core to user trust.
+
+> **Status — built (2026-06-19).** Implemented in
+> [`connection-settings.tsx`](../../src/app/sync/_components/connection-settings.tsx)
+> (extracted from `sync-page-client.tsx`) backed by the
+> `updateSyncAccountSettings` server action. The `[Settings]` action-row button
+> opens a dedicated panel that takes over the detail zone — mutually exclusive
+> with the Edit-credentials form. Sections §1–§4 (direction, frequency, conflict
+> policy, address books) originally shipped in **Phase 23** and are reused here;
+> §5–§11 (the **Advanced** block) plus the new `SyncAccountSettings` columns are
+> the net-new P36 work. **Runner enforcement** of the advanced fields (sync
+> window, deletion threshold, field exclusions, export filter, etc.) is separate
+> follow-up — see "Runner integration notes" at the end. **All P36 follow-ups
+> (runner enforcement, dirty guard, mobile bottom sheet) are ticketed as
+> [Phase 39](../build-phase/phase-39.md).**
 
 ---
 
@@ -37,7 +51,16 @@ Action row after this feature:
 [Sync now]  [Pause]  [Settings]  [Edit credentials]  [Disconnect]
 ```
 
-**"Settings"** opens the settings panel inline, morphing the header zone. "Settings" and "Edit credentials" are mutually exclusive — opening one closes the other.
+**"Settings"** opens the settings panel, which **takes over the detail zone**
+(replacing the account header / history / conflicts while open), mirroring how
+the Edit-credentials form behaves. "Settings" and "Edit credentials" are
+**mutually exclusive** — opening one closes the other. The same panel opens from
+the gear icon on a list-rail row (selects that account first). Closing the panel
+([×] or Cancel) returns to the normal detail view.
+
+The panel header shows **"Sync settings"** with the account's email (OAuth) or
+label (CardDAV) beneath it, so the user knows which connection they're editing,
+and a **[×]** close on the right.
 
 ---
 
@@ -46,6 +69,7 @@ Action row after this feature:
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  Sync settings                                      [×]  │
+│  li@kontax.io                                            │  ← account email / label
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │  DIRECTION                                               │
@@ -286,17 +310,31 @@ Below: `font-size: 12px`, `color: #8b938c` — "After this many consecutive fail
 
 ## Save / Cancel
 
-**Save:** `background: #4158f4`, `color: #fff`, `height: 34px`, `border-radius: 8px`. Upserts `SyncAccountSettings` + mirrors `syncDirection` onto `SyncAccount`. On success: collapses panel, shows "Settings saved" toast (2s). On error: inline red message below Save.
+Pinned at the foot of the panel, always visible (a panel, not a collapsing
+disclosure).
 
-**Cancel:** text button, `color: #5c655e`. Discards changes, collapses panel.
+**Save settings:** `background: #4158f4`, `color: #fff`, `height: 36px`,
+`border-radius: 8px`. **Disabled (0.55 opacity) until the form is dirty.** Sends
+**only the changed fields** to `updateSyncAccountSettings` (keeps the audit diff
+meaningful). On success: toast "Settings saved", `router.refresh()`, panel
+closes. On `SYNC_SETTINGS_ELEVATION_REQUIRED`: keeps the draft, opens re-auth,
+retries once elevated. On other errors: reverts the draft to baseline and toasts
+the message.
 
-**Dirty guard:** switching accounts with unsaved changes shows "Discard unsaved settings?" — "Discard" / "Keep editing".
+**Cancel:** text button, `color: #5c655e`. Reverts the draft and closes the
+panel (same as [×]).
+
+> **Not yet built — dirty guard.** The brief's intended "Discard unsaved
+> settings?" prompt when navigating away mid-edit is **not** implemented; today
+> selecting another account simply discards the draft. Track as a follow-up.
 
 ---
 
 ## Post-save header updates
 
-After save, the Direction badge in the account header reflects the new value immediately (optimistic update):
+After a successful save the panel closes and the detail view re-renders via
+`router.refresh()`, so the Direction badge in the account header reflects the new
+value:
 - `↕ Two-way` — `background: #e3efe7`, `color: #1c6b48`
 - `↓ Import only` — `background: #f2f4f0`, `color: #5c655e`
 - `↑ Export only` — `background: #f2f4f0`, `color: #5c655e`
@@ -305,29 +343,49 @@ After save, the Direction badge in the account header reflects the new value imm
 
 ## Mobile Layout (< 768px)
 
-Full-screen bottom sheet. Sheet handle at top. Header "Sync settings" + close ×. Sections stack vertically with 24px spacing. Save button full-width, pinned above safe area.
+**Intended:** full-screen bottom sheet — handle at top, "Sync settings" + close ×,
+sections stacked with 24px spacing, full-width Save pinned above the safe area.
+
+> **As-built:** on mobile the panel renders inline within the `SyncPageClient`
+> detail takeover (the same panel as desktop, full-width), **not** the dedicated
+> bottom-sheet treatment above. The sheet styling is a follow-up.
 
 ---
 
 ## States
 
-**Loading:** skeleton rows per section while fetching current settings.  
+**Initial values:** seeded from the account's current settings (server-rendered
+via `page.tsx`); no client fetch / skeleton needed.  
 **No settings row yet:** show all defaults — no error.  
-**Save in progress:** Save → "Saving…" + spinner, inputs disabled.  
-**Save success:** panel collapses, toast appears.  
-**Save error:** red inline message, panel stays open.
+**Clean (not dirty):** Save is disabled (greyed); Cancel/[×] still close.  
+**Save in progress:** Save → "Saving…" + spinner, button disabled.  
+**Save success:** toast "Settings saved", `router.refresh()`, panel closes back to
+the detail view.  
+**Re-auth required:** if the save returns `SYNC_SETTINGS_ELEVATION_REQUIRED`, the
+dirty draft is kept and the password re-auth modal opens; the save retries once
+elevated (P23-06).  
+**Save error (other):** the draft reverts to baseline and the message is toasted.
 
 ---
 
 ## Server Action
 
-`updateSyncAccountSettings(accountId, settings)`
+`updateSyncAccountSettings({ syncAccountId, ...patch })` — all fields optional;
+the client sends only what changed.
 
-- Validates `accountId` belongs to `session.user.id`.
-- Validates `importLabelId` (if set) belongs to the same user.
-- Upserts `SyncAccountSettings`.
-- Mirrors `syncDirection` onto `SyncAccount` (P23-01: the field lives in two places — keep them in sync on write).
-- Returns the updated settings row.
+- Requires a valid `SyncSettingsElevation` (P23-06); returns
+  `SYNC_SETTINGS_ELEVATION_REQUIRED` otherwise so the client can prompt re-auth.
+- Validates `syncAccountId` belongs to `session.user.id`.
+- Validates `importLabelId` (if non-null) belongs to the same user.
+- Validates the sync window: both bounds or neither, and start ≠ end.
+- Upserts `SyncAccountSettings` (a shared patch object seeds create + update).
+- Mirrors `syncDirection` onto `SyncAccount` (P23-01: the field lives in two
+  places — keep them in sync on write) and queues a catch-up re-sync on a
+  direction change to a pulling mode (P23-04).
+- Auto-resolves the open conflict queue when leaving the `MANUAL` policy (P23-05).
+- Emits a `SYNC_SETTINGS_CHANGED` activity event with a per-field before/after
+  diff (P23-06), covering the new advanced fields.
+- Returns `{ ok: true }` or `{ ok: false, error }`.
 
 ---
 
