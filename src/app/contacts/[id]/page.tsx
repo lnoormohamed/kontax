@@ -802,6 +802,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <Link
               className="flex h-[34px] items-center gap-1.5 rounded-[8px] border border-transparent px-3 text-[13px] font-semibold text-[#5c655e] transition hover:border-[#d8ddd6] hover:bg-[#f2f4f0]"
               href={`/contacts/${contact.id}?tab=sharing`}
+              replace
             >
               <WorkspaceIcon name="share" size={16} />
               Share
@@ -1026,6 +1027,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 aria-label="Share"
                 className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
                 href={`/contacts/${contact.id}?tab=sharing`}
+                replace
                 title="Share"
               >
                 <WorkspaceIcon name="share" size={17} />
@@ -1117,6 +1119,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               }`}
               href={`/contacts/${contact.id}?tab=${key}`}
               key={key}
+              replace
             >
               <WorkspaceIcon name={icon} size={16} />
               {label}

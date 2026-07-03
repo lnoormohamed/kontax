@@ -19,6 +19,11 @@ import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
+import {
+  CONTACT_LIST_RESTORE_PARAM,
+  CONTACT_LIST_SCROLL_KEY,
+  CONTACT_LIST_SCROLL_MAX_AGE,
+} from "~/lib/contact-list-scroll";
 import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
@@ -815,9 +820,6 @@ type VRow =
 
 const FAVE_H = 28; // Favourites header — same height as letter headers
 const LETTER_H = 28; // Alphabetical letter headers per design spec
-const CONTACT_LIST_SCROLL_KEY = "kontax:contacts:list-scroll";
-const CONTACT_LIST_SCROLL_MAX_AGE = 10 * 60 * 1000;
-const CONTACT_LIST_RESTORE_PARAM = "restoreContact";
 
 const getScrollParent = (node: HTMLElement | null) => {
   let el: Element | null = node?.parentElement ?? null;

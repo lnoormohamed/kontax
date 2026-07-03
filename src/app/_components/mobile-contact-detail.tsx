@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { resolveAvatarSrc } from "~/lib/avatar-src";
+import { cameFromContactList } from "~/lib/contact-list-scroll";
 import { useEffect, useRef, useState } from "react";
 
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
@@ -62,6 +64,7 @@ export function MobileContactDetail({
   archiveOrRestoreAction,
   children,
 }: MobileContactDetailProps) {
+  const router = useRouter();
   // Inline-edit machinery is retained for the dormant read view; editing now
   // happens in the bottom sheet (P24B-DB19), so mode stays "read" on mobile.
   const { mode, saving, cancel, save } = useContactEdit();
@@ -168,6 +171,16 @@ export function MobileContactDetail({
   const showCompactHeader = !heroVisible || editing;
   const tabBarTop = showCompactHeader ? 52 : 0;
 
+  // When the list opened this contact, "back" must be a real history back so
+  // the list URL (filters, search, restoreContact marker) and Next's cached
+  // page state survive — pushing a bare backHref resets the list to the top.
+  // Deep links (no list state) keep the plain href navigation.
+  const handleBack = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!cameFromContactList(contactId)) return;
+    event.preventDefault();
+    router.back();
+  };
+
   return (
     <div ref={containerRef}>
       {/* Fixed compact header — appears when hero scrolls off screen or when editing */}
@@ -231,6 +244,7 @@ export function MobileContactDetail({
           <Link
             aria-label={`Back to ${backHref === "/contacts" ? "Contacts" : "back"}`}
             href={backHref}
+            onClick={handleBack}
             style={{
               display: "flex",
               alignItems: "center",
@@ -350,6 +364,7 @@ export function MobileContactDetail({
         >
             <Link
               href={backHref}
+              onClick={handleBack}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -492,7 +507,7 @@ export function MobileContactDetail({
               <span style={moreLabelStyle}>{isFavorite ? "Remove from favourites" : "Add to favourites"}</span>
             </button>
           </form>
-          <Link href={`/contacts/${contactId}?tab=sharing`} prefetch={false} onClick={() => setMoreOpen(false)} style={moreRowStyle}>
+          <Link href={`/contacts/${contactId}?tab=sharing`} prefetch={false} replace onClick={() => setMoreOpen(false)} style={moreRowStyle}>
             <WorkspaceIcon name="share" size={20} className="text-[#5c655e]" />
             <span style={moreLabelStyle}>Share</span>
           </Link>
@@ -525,6 +540,7 @@ export function MobileContactDetail({
             key={key}
             href={`/contacts/${contactId}?tab=${key}`}
             prefetch={false}
+            replace
             style={{
               display: "flex",
               alignItems: "center",
