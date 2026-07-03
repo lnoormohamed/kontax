@@ -332,16 +332,22 @@ export function MobileContactDetail({
           transition: "background-color 200ms ease",
         }}
       >
-        {/* In-hero nav row — only visible when compact header is hidden */}
-        {!showCompactHeader && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 20,
-            }}
-          >
+        {/* In-hero nav row — fades out when the compact header takes over.
+            Kept mounted so hero height is constant: unmounting it shrank the
+            page ~64px right at the hide threshold, which dropped scrollTop
+            below the show threshold and made the header oscillate on iPhone
+            for contacts whose content barely scrolls. */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 20,
+            opacity: showCompactHeader ? 0 : 1,
+            pointerEvents: showCompactHeader ? "none" : "auto",
+            transition: "opacity 160ms ease",
+          }}
+        >
             <Link
               href={backHref}
               style={{
@@ -381,8 +387,7 @@ export function MobileContactDetail({
             ) : !isEditable ? (
               <ReadOnlyChip />
             ) : null}
-          </div>
-        )}
+        </div>
 
         {/* Avatar + name */}
         <div style={{ textAlign: "center" }}>
