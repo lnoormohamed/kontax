@@ -74,6 +74,8 @@ export function MobileContactDetail({
   const heroVisibleRef = useRef(true);
   const scrollFrameRef = useRef<number | null>(null);
   const viewportFrameRef = useRef<number | null>(null);
+  const HERO_HIDE_THRESHOLD = 96;
+  const HERO_SHOW_THRESHOLD = 48;
 
   // Walk up the DOM once to find the nearest scroll container
   const findScrollContainer = () => {
@@ -86,13 +88,16 @@ export function MobileContactDetail({
     return null;
   };
 
-  // Show/hide compact header based on scroll position (scrollTop > 80px threshold)
+  // Show/hide compact header with hysteresis so iPhone inertial scrolling
+  // doesn't flicker at a single threshold and make the detail view feel jumpy.
   useEffect(() => {
     const container = findScrollContainer();
     const scrollTarget = container ?? window;
     const updateHeroVisibility = () => {
       const top = container ? container.scrollTop : window.scrollY;
-      const next = top < 80;
+      const next = heroVisibleRef.current
+        ? top < HERO_HIDE_THRESHOLD
+        : top < HERO_SHOW_THRESHOLD;
       if (heroVisibleRef.current !== next) {
         heroVisibleRef.current = next;
         setHeroVisible(next);
@@ -176,11 +181,14 @@ export function MobileContactDetail({
           zIndex: 40,
           backgroundColor: editing ? "#f3f5ff" : "#ffffff",
           borderBottom: `1px solid ${editing ? "rgba(65,88,244,0.28)" : "#d8ddd6"}`,
-          display: showCompactHeader ? "flex" : "none",
+          display: "flex",
           alignItems: "center",
           padding: "0 4px",
           gap: 4,
-          transition: "background-color 200ms ease",
+          opacity: showCompactHeader ? 1 : 0,
+          pointerEvents: showCompactHeader ? "auto" : "none",
+          transform: showCompactHeader ? "translateY(0)" : "translateY(-100%)",
+          transition: "opacity 160ms ease, transform 160ms ease, background-color 200ms ease",
         }}
       >
         {editing ? (
@@ -504,7 +512,6 @@ export function MobileContactDetail({
           display: "flex",
           overflowX: "auto",
           scrollbarWidth: "none",
-          transition: "top 150ms ease",
           WebkitOverflowScrolling: "touch",
         }}
       >
