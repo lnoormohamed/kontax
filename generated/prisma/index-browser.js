@@ -834,7 +834,10 @@ exports.Prisma.NotificationScalarFieldEnum = {
   actionUrl: 'actionUrl',
   securityAlertId: 'securityAlertId',
   adminBroadcastId: 'adminBroadcastId',
-  createdAt: 'createdAt'
+  contactShareId: 'contactShareId',
+  createdAt: 'createdAt',
+  eventAt: 'eventAt',
+  expiresAt: 'expiresAt'
 };
 
 exports.Prisma.AdminBroadcastScalarFieldEnum = {

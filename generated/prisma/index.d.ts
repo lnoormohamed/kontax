@@ -7090,6 +7090,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type ContactShareCountOutputType
+   */
+
+  export type ContactShareCountOutputType = {
+    notifications: number
+  }
+
+  export type ContactShareCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    notifications?: boolean | ContactShareCountOutputTypeCountNotificationsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ContactShareCountOutputType without action
+   */
+  export type ContactShareCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShareCountOutputType
+     */
+    select?: ContactShareCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ContactShareCountOutputType without action
+   */
+  export type ContactShareCountOutputTypeCountNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationWhereInput
+  }
+
+
+  /**
    * Count Type AdminBroadcastCountOutputType
    */
 
@@ -56730,6 +56761,8 @@ export namespace Prisma {
     contact?: boolean | ContactShare$contactArgs<ExtArgs>
     recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
     recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+    notifications?: boolean | ContactShare$notificationsArgs<ExtArgs>
+    _count?: boolean | ContactShareCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["contactShare"]>
 
   export type ContactShareSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -56812,6 +56845,8 @@ export namespace Prisma {
     contact?: boolean | ContactShare$contactArgs<ExtArgs>
     recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
     recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+    notifications?: boolean | ContactShare$notificationsArgs<ExtArgs>
+    _count?: boolean | ContactShareCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ContactShareIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -56833,6 +56868,7 @@ export namespace Prisma {
       contact: Prisma.$ContactPayload<ExtArgs> | null
       recipientUser: Prisma.$UserPayload<ExtArgs> | null
       recipientContact: Prisma.$ContactPayload<ExtArgs> | null
+      notifications: Prisma.$NotificationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -57252,6 +57288,7 @@ export namespace Prisma {
     contact<T extends ContactShare$contactArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$contactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     recipientUser<T extends ContactShare$recipientUserArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$recipientUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     recipientContact<T extends ContactShare$recipientContactArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$recipientContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    notifications<T extends ContactShare$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -57750,6 +57787,30 @@ export namespace Prisma {
      */
     include?: ContactInclude<ExtArgs> | null
     where?: ContactWhereInput
+  }
+
+  /**
+   * ContactShare.notifications
+   */
+  export type ContactShare$notificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    where?: NotificationWhereInput
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    cursor?: NotificationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
   }
 
   /**
@@ -58788,7 +58849,10 @@ export namespace Prisma {
     actionUrl: string | null
     securityAlertId: string | null
     adminBroadcastId: string | null
+    contactShareId: string | null
     createdAt: Date | null
+    eventAt: Date | null
+    expiresAt: Date | null
   }
 
   export type NotificationMaxAggregateOutputType = {
@@ -58803,7 +58867,10 @@ export namespace Prisma {
     actionUrl: string | null
     securityAlertId: string | null
     adminBroadcastId: string | null
+    contactShareId: string | null
     createdAt: Date | null
+    eventAt: Date | null
+    expiresAt: Date | null
   }
 
   export type NotificationCountAggregateOutputType = {
@@ -58818,7 +58885,10 @@ export namespace Prisma {
     actionUrl: number
     securityAlertId: number
     adminBroadcastId: number
+    contactShareId: number
     createdAt: number
+    eventAt: number
+    expiresAt: number
     _all: number
   }
 
@@ -58835,7 +58905,10 @@ export namespace Prisma {
     actionUrl?: true
     securityAlertId?: true
     adminBroadcastId?: true
+    contactShareId?: true
     createdAt?: true
+    eventAt?: true
+    expiresAt?: true
   }
 
   export type NotificationMaxAggregateInputType = {
@@ -58850,7 +58923,10 @@ export namespace Prisma {
     actionUrl?: true
     securityAlertId?: true
     adminBroadcastId?: true
+    contactShareId?: true
     createdAt?: true
+    eventAt?: true
+    expiresAt?: true
   }
 
   export type NotificationCountAggregateInputType = {
@@ -58865,7 +58941,10 @@ export namespace Prisma {
     actionUrl?: true
     securityAlertId?: true
     adminBroadcastId?: true
+    contactShareId?: true
     createdAt?: true
+    eventAt?: true
+    expiresAt?: true
     _all?: true
   }
 
@@ -58953,7 +59032,10 @@ export namespace Prisma {
     actionUrl: string | null
     securityAlertId: string | null
     adminBroadcastId: string | null
+    contactShareId: string | null
     createdAt: Date
+    eventAt: Date | null
+    expiresAt: Date | null
     _count: NotificationCountAggregateOutputType | null
     _min: NotificationMinAggregateOutputType | null
     _max: NotificationMaxAggregateOutputType | null
@@ -58985,10 +59067,14 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -59003,10 +59089,14 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -59021,10 +59111,14 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectScalar = {
@@ -59039,24 +59133,30 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "title" | "body" | "read" | "readAt" | "dismissedAt" | "actionUrl" | "securityAlertId" | "adminBroadcastId" | "createdAt", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "title" | "body" | "read" | "readAt" | "dismissedAt" | "actionUrl" | "securityAlertId" | "adminBroadcastId" | "contactShareId" | "createdAt" | "eventAt" | "expiresAt", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }
   export type NotificationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }
   export type NotificationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }
 
   export type $NotificationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -59065,6 +59165,7 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       securityAlert: Prisma.$SecurityAlertPayload<ExtArgs> | null
       adminBroadcast: Prisma.$AdminBroadcastPayload<ExtArgs> | null
+      contactShare: Prisma.$ContactSharePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -59078,7 +59179,10 @@ export namespace Prisma {
       actionUrl: string | null
       securityAlertId: string | null
       adminBroadcastId: string | null
+      contactShareId: string | null
       createdAt: Date
+      eventAt: Date | null
+      expiresAt: Date | null
     }, ExtArgs["result"]["notification"]>
     composites: {}
   }
@@ -59476,6 +59580,7 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     securityAlert<T extends Notification$securityAlertArgs<ExtArgs> = {}>(args?: Subset<T, Notification$securityAlertArgs<ExtArgs>>): Prisma__SecurityAlertClient<$Result.GetResult<Prisma.$SecurityAlertPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     adminBroadcast<T extends Notification$adminBroadcastArgs<ExtArgs> = {}>(args?: Subset<T, Notification$adminBroadcastArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    contactShare<T extends Notification$contactShareArgs<ExtArgs> = {}>(args?: Subset<T, Notification$contactShareArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -59516,7 +59621,10 @@ export namespace Prisma {
     readonly actionUrl: FieldRef<"Notification", 'String'>
     readonly securityAlertId: FieldRef<"Notification", 'String'>
     readonly adminBroadcastId: FieldRef<"Notification", 'String'>
+    readonly contactShareId: FieldRef<"Notification", 'String'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
+    readonly eventAt: FieldRef<"Notification", 'DateTime'>
+    readonly expiresAt: FieldRef<"Notification", 'DateTime'>
   }
     
 
@@ -59948,6 +60056,25 @@ export namespace Prisma {
      */
     include?: AdminBroadcastInclude<ExtArgs> | null
     where?: AdminBroadcastWhereInput
+  }
+
+  /**
+   * Notification.contactShare
+   */
+  export type Notification$contactShareArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    where?: ContactShareWhereInput
   }
 
   /**
@@ -72182,7 +72309,10 @@ export namespace Prisma {
     actionUrl: 'actionUrl',
     securityAlertId: 'securityAlertId',
     adminBroadcastId: 'adminBroadcastId',
-    createdAt: 'createdAt'
+    contactShareId: 'contactShareId',
+    createdAt: 'createdAt',
+    eventAt: 'eventAt',
+    expiresAt: 'expiresAt'
   };
 
   export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -77415,6 +77545,7 @@ export namespace Prisma {
     contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     recipientUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     recipientContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    notifications?: NotificationListRelationFilter
   }
 
   export type ContactShareOrderByWithRelationInput = {
@@ -77441,6 +77572,7 @@ export namespace Prisma {
     contact?: ContactOrderByWithRelationInput
     recipientUser?: UserOrderByWithRelationInput
     recipientContact?: ContactOrderByWithRelationInput
+    notifications?: NotificationOrderByRelationAggregateInput
   }
 
   export type ContactShareWhereUniqueInput = Prisma.AtLeast<{
@@ -77470,6 +77602,7 @@ export namespace Prisma {
     contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     recipientUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     recipientContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    notifications?: NotificationListRelationFilter
   }, "id" | "token">
 
   export type ContactShareOrderByWithAggregationInput = {
@@ -77591,10 +77724,14 @@ export namespace Prisma {
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
+    contactShareId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     securityAlert?: XOR<SecurityAlertNullableScalarRelationFilter, SecurityAlertWhereInput> | null
     adminBroadcast?: XOR<AdminBroadcastNullableScalarRelationFilter, AdminBroadcastWhereInput> | null
+    contactShare?: XOR<ContactShareNullableScalarRelationFilter, ContactShareWhereInput> | null
   }
 
   export type NotificationOrderByWithRelationInput = {
@@ -77609,10 +77746,14 @@ export namespace Prisma {
     actionUrl?: SortOrderInput | SortOrder
     securityAlertId?: SortOrderInput | SortOrder
     adminBroadcastId?: SortOrderInput | SortOrder
+    contactShareId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
     securityAlert?: SecurityAlertOrderByWithRelationInput
     adminBroadcast?: AdminBroadcastOrderByWithRelationInput
+    contactShare?: ContactShareOrderByWithRelationInput
   }
 
   export type NotificationWhereUniqueInput = Prisma.AtLeast<{
@@ -77630,10 +77771,14 @@ export namespace Prisma {
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
+    contactShareId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     securityAlert?: XOR<SecurityAlertNullableScalarRelationFilter, SecurityAlertWhereInput> | null
     adminBroadcast?: XOR<AdminBroadcastNullableScalarRelationFilter, AdminBroadcastWhereInput> | null
+    contactShare?: XOR<ContactShareNullableScalarRelationFilter, ContactShareWhereInput> | null
   }, "id">
 
   export type NotificationOrderByWithAggregationInput = {
@@ -77648,7 +77793,10 @@ export namespace Prisma {
     actionUrl?: SortOrderInput | SortOrder
     securityAlertId?: SortOrderInput | SortOrder
     adminBroadcastId?: SortOrderInput | SortOrder
+    contactShareId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     _count?: NotificationCountOrderByAggregateInput
     _max?: NotificationMaxOrderByAggregateInput
     _min?: NotificationMinOrderByAggregateInput
@@ -77669,7 +77817,10 @@ export namespace Prisma {
     actionUrl?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     securityAlertId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
+    contactShareId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableWithAggregatesFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"Notification"> | Date | string | null
   }
 
   export type AdminBroadcastWhereInput = {
@@ -83429,6 +83580,7 @@ export namespace Prisma {
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateInput = {
@@ -83451,6 +83603,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUpdateInput = {
@@ -83473,6 +83626,7 @@ export namespace Prisma {
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateInput = {
@@ -83495,6 +83649,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareCreateManyInput = {
@@ -83625,9 +83780,12 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     user: UserCreateNestedOneWithoutNotificationsInput
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
     adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateInput = {
@@ -83642,7 +83800,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateInput = {
@@ -83655,9 +83816,12 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
     adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateInput = {
@@ -83672,7 +83836,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationCreateManyInput = {
@@ -83687,7 +83854,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateManyMutationInput = {
@@ -83700,6 +83870,8 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyInput = {
@@ -83714,7 +83886,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AdminBroadcastCreateInput = {
@@ -88393,6 +88568,11 @@ export namespace Prisma {
     isNot?: AdminBroadcastWhereInput | null
   }
 
+  export type ContactShareNullableScalarRelationFilter = {
+    is?: ContactShareWhereInput | null
+    isNot?: ContactShareWhereInput | null
+  }
+
   export type NotificationCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -88405,7 +88585,10 @@ export namespace Prisma {
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
     adminBroadcastId?: SortOrder
+    contactShareId?: SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type NotificationMaxOrderByAggregateInput = {
@@ -88420,7 +88603,10 @@ export namespace Prisma {
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
     adminBroadcastId?: SortOrder
+    contactShareId?: SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type NotificationMinOrderByAggregateInput = {
@@ -88435,7 +88621,10 @@ export namespace Prisma {
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
     adminBroadcastId?: SortOrder
+    contactShareId?: SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type EnumNotificationCategoryWithAggregatesFilter<$PrismaModel = never> = {
@@ -93564,6 +93753,20 @@ export namespace Prisma {
     connect?: ContactWhereUniqueInput
   }
 
+  export type NotificationCreateNestedManyWithoutContactShareInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type NotificationUncheckedCreateNestedManyWithoutContactShareInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
   export type EnumShareTypeFieldUpdateOperationsInput = {
     set?: $Enums.ShareType
   }
@@ -93610,6 +93813,34 @@ export namespace Prisma {
     update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSharesAsRecipientCopyInput, ContactUpdateWithoutSharesAsRecipientCopyInput>, ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput>
   }
 
+  export type NotificationUpdateManyWithoutContactShareNestedInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutContactShareInput | NotificationUpsertWithWhereUniqueWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutContactShareInput | NotificationUpdateWithWhereUniqueWithoutContactShareInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutContactShareInput | NotificationUpdateManyWithWhereWithoutContactShareInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutContactShareNestedInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutContactShareInput | NotificationUpsertWithWhereUniqueWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutContactShareInput | NotificationUpdateWithWhereUniqueWithoutContactShareInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutContactShareInput | NotificationUpdateManyWithWhereWithoutContactShareInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutNotificationsInput = {
     create?: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
     connectOrCreate?: UserCreateOrConnectWithoutNotificationsInput
@@ -93626,6 +93857,12 @@ export namespace Prisma {
     create?: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
     connectOrCreate?: AdminBroadcastCreateOrConnectWithoutNotificationsInput
     connect?: AdminBroadcastWhereUniqueInput
+  }
+
+  export type ContactShareCreateNestedOneWithoutNotificationsInput = {
+    create?: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: ContactShareCreateOrConnectWithoutNotificationsInput
+    connect?: ContactShareWhereUniqueInput
   }
 
   export type EnumNotificationCategoryFieldUpdateOperationsInput = {
@@ -93658,6 +93895,16 @@ export namespace Prisma {
     delete?: AdminBroadcastWhereInput | boolean
     connect?: AdminBroadcastWhereUniqueInput
     update?: XOR<XOR<AdminBroadcastUpdateToOneWithWhereWithoutNotificationsInput, AdminBroadcastUpdateWithoutNotificationsInput>, AdminBroadcastUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type ContactShareUpdateOneWithoutNotificationsNestedInput = {
+    create?: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: ContactShareCreateOrConnectWithoutNotificationsInput
+    upsert?: ContactShareUpsertWithoutNotificationsInput
+    disconnect?: ContactShareWhereInput | boolean
+    delete?: ContactShareWhereInput | boolean
+    connect?: ContactShareWhereUniqueInput
+    update?: XOR<XOR<ContactShareUpdateToOneWithWhereWithoutNotificationsInput, ContactShareUpdateWithoutNotificationsInput>, ContactShareUncheckedUpdateWithoutNotificationsInput>
   }
 
   export type UserCreateNestedOneWithoutBroadcastsCreatedInput = {
@@ -95726,6 +95973,7 @@ export namespace Prisma {
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutOwnerInput = {
@@ -95747,6 +95995,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutOwnerInput = {
@@ -95778,6 +96027,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutRecipientUserInput = {
@@ -95799,6 +96049,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutRecipientUserInput = {
@@ -96043,8 +96294,11 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
     adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutUserInput = {
@@ -96058,7 +96312,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationCreateOrConnectWithoutUserInput = {
@@ -97637,7 +97894,10 @@ export namespace Prisma {
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
+    contactShareId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
   }
 
   export type SecurityAlertUpsertWithWhereUniqueWithoutUserInput = {
@@ -99751,6 +100011,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutContactInput = {
@@ -99772,6 +100033,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutContactInput = {
@@ -99803,6 +100065,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutRecipientContactInput = {
@@ -99824,6 +100087,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutRecipientContactInput = {
@@ -117111,6 +117375,50 @@ export namespace Prisma {
     create: XOR<ContactCreateWithoutSharesAsRecipientCopyInput, ContactUncheckedCreateWithoutSharesAsRecipientCopyInput>
   }
 
+  export type NotificationCreateWithoutContactShareInput = {
+    id?: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
+    user: UserCreateNestedOneWithoutNotificationsInput
+    securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+    adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+  }
+
+  export type NotificationUncheckedCreateWithoutContactShareInput = {
+    id?: string
+    userId: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    securityAlertId?: string | null
+    adminBroadcastId?: string | null
+    createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
+  }
+
+  export type NotificationCreateOrConnectWithoutContactShareInput = {
+    where: NotificationWhereUniqueInput
+    create: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput>
+  }
+
+  export type NotificationCreateManyContactShareInputEnvelope = {
+    data: NotificationCreateManyContactShareInput | NotificationCreateManyContactShareInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutContactSharesOwnedInput = {
     update: XOR<UserUpdateWithoutContactSharesOwnedInput, UserUncheckedUpdateWithoutContactSharesOwnedInput>
     create: XOR<UserCreateWithoutContactSharesOwnedInput, UserUncheckedCreateWithoutContactSharesOwnedInput>
@@ -117715,6 +118023,22 @@ export namespace Prisma {
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
+  export type NotificationUpsertWithWhereUniqueWithoutContactShareInput = {
+    where: NotificationWhereUniqueInput
+    update: XOR<NotificationUpdateWithoutContactShareInput, NotificationUncheckedUpdateWithoutContactShareInput>
+    create: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput>
+  }
+
+  export type NotificationUpdateWithWhereUniqueWithoutContactShareInput = {
+    where: NotificationWhereUniqueInput
+    data: XOR<NotificationUpdateWithoutContactShareInput, NotificationUncheckedUpdateWithoutContactShareInput>
+  }
+
+  export type NotificationUpdateManyWithWhereWithoutContactShareInput = {
+    where: NotificationScalarWhereInput
+    data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutContactShareInput>
+  }
+
   export type UserCreateWithoutNotificationsInput = {
     id?: string
     name?: string | null
@@ -117942,6 +118266,55 @@ export namespace Prisma {
   export type AdminBroadcastCreateOrConnectWithoutNotificationsInput = {
     where: AdminBroadcastWhereUniqueInput
     create: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
+  }
+
+  export type ContactShareCreateWithoutNotificationsInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    downloadCount?: number
+    maxDownloads?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutContactSharesOwnedInput
+    contact?: ContactCreateNestedOneWithoutSharesFromContactInput
+    recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+  }
+
+  export type ContactShareUncheckedCreateWithoutNotificationsInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    downloadCount?: number
+    maxDownloads?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateOrConnectWithoutNotificationsInput = {
+    where: ContactShareWhereUniqueInput
+    create: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
   }
 
   export type UserUpsertWithoutNotificationsInput = {
@@ -118187,6 +118560,61 @@ export namespace Prisma {
     audienceSummary?: JsonNullValueInput | InputJsonValue
     previewRecipientCount?: IntFieldUpdateOperationsInput | number
     deliveredRecipientCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUpsertWithoutNotificationsInput = {
+    update: XOR<ContactShareUpdateWithoutNotificationsInput, ContactShareUncheckedUpdateWithoutNotificationsInput>
+    create: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+    where?: ContactShareWhereInput
+  }
+
+  export type ContactShareUpdateToOneWithWhereWithoutNotificationsInput = {
+    where?: ContactShareWhereInput
+    data: XOR<ContactShareUpdateWithoutNotificationsInput, ContactShareUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type ContactShareUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
+    contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
+    recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -118666,8 +119094,11 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     user: UserCreateNestedOneWithoutNotificationsInput
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutAdminBroadcastInput = {
@@ -118681,7 +119112,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationCreateOrConnectWithoutAdminBroadcastInput = {
@@ -119358,8 +119792,11 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     user: UserCreateNestedOneWithoutNotificationsInput
     adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutSecurityAlertInput = {
@@ -119373,7 +119810,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationCreateOrConnectWithoutSecurityAlertInput = {
@@ -122775,7 +123215,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type SecurityAlertCreateManyUserInput = {
@@ -123927,6 +124370,7 @@ export namespace Prisma {
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutOwnerInput = {
@@ -123948,6 +124392,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutOwnerInput = {
@@ -123990,6 +124435,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutRecipientUserInput = {
@@ -124011,6 +124457,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutRecipientUserInput = {
@@ -124269,8 +124716,11 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
     adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutUserInput = {
@@ -124284,7 +124734,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyWithoutUserInput = {
@@ -124298,7 +124751,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SecurityAlertUpdateWithoutUserInput = {
@@ -125617,6 +126073,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutContactInput = {
@@ -125638,6 +126095,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutContactInput = {
@@ -125680,6 +126138,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutRecipientContactInput = {
@@ -125701,6 +126160,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutRecipientContactInput = {
@@ -128211,6 +128671,74 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type NotificationCreateManyContactShareInput = {
+    id?: string
+    userId: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    securityAlertId?: string | null
+    adminBroadcastId?: string | null
+    createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
+  }
+
+  export type NotificationUpdateWithoutContactShareInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
+    securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+    adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+  }
+
+  export type NotificationUncheckedUpdateWithoutContactShareInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutContactShareInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type NotificationCreateManyAdminBroadcastInput = {
     id?: string
     userId: string
@@ -128222,7 +128750,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateWithoutAdminBroadcastInput = {
@@ -128235,8 +128766,11 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutAdminBroadcastInput = {
@@ -128250,7 +128784,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyWithoutAdminBroadcastInput = {
@@ -128264,7 +128801,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationCreateManySecurityAlertInput = {
@@ -128278,7 +128818,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateWithoutSecurityAlertInput = {
@@ -128291,8 +128834,11 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutSecurityAlertInput = {
@@ -128306,7 +128852,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyWithoutSecurityAlertInput = {
@@ -128320,7 +128869,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

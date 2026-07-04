@@ -264,7 +264,7 @@ export const createStaticShare = async (formData: FormData) => {
       ? trimmedOwnerName
       : (owner?.email ?? "A Kontax user");
 
-  await db.contactShare.create({
+  const share = await db.contactShare.create({
     data: {
       ownerUserId: userId,
       contactId,
@@ -276,6 +276,7 @@ export const createStaticShare = async (formData: FormData) => {
       // later edits/archives/deletes the original (P12-03 risk note).
       snapshot: { ...contact, ownerName },
     },
+    select: { id: true, expiresAt: true },
   });
 
   await sendShareInviteEmail({
@@ -287,6 +288,8 @@ export const createStaticShare = async (formData: FormData) => {
   });
 
   // P22-DB05: in-app SHARING notification for registered recipients.
+  // P46-DB03: link to the invite so the feed can derive its live/expired/accepted
+  // state at read time; expiresAt is the display hint.
   if (recipient?.id) {
     await createNotification({
       userId: recipient.id,
@@ -294,6 +297,8 @@ export const createStaticShare = async (formData: FormData) => {
       title: `${ownerName} shared a contact`,
       body: `"${contact.fullName ?? "A contact"}" was shared with you — accept it in Shared with me.`,
       actionUrl: "/shares",
+      contactShareId: share.id,
+      expiresAt: share.expiresAt,
     });
   }
 
@@ -484,7 +489,7 @@ export const createLiveShare = async (formData: FormData) => {
       ? trimmedOwnerName
       : (owner?.email ?? "A Kontax user");
 
-  await db.contactShare.create({
+  const share = await db.contactShare.create({
     data: {
       ownerUserId: userId,
       contactId,
@@ -494,6 +499,7 @@ export const createLiveShare = async (formData: FormData) => {
       recipientEmail,
       snapshot: { ...snapshotFields, ownerName },
     },
+    select: { id: true, expiresAt: true },
   });
 
   await sendShareInviteEmail({
@@ -505,6 +511,7 @@ export const createLiveShare = async (formData: FormData) => {
   });
 
   // P22-DB05: in-app SHARING notification for registered recipients.
+  // P46-DB03: link to the invite for read-time validity derivation.
   if (recipient?.id) {
     await createNotification({
       userId: recipient.id,
@@ -512,6 +519,8 @@ export const createLiveShare = async (formData: FormData) => {
       title: `${ownerName} shared a contact`,
       body: `"${snapshotFields.fullName ?? "A contact"}" was shared with you — accept it in Shared with me.`,
       actionUrl: "/shares",
+      contactShareId: share.id,
+      expiresAt: share.expiresAt,
     });
   }
 

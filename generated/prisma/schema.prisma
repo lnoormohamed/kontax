@@ -1537,15 +1537,15 @@ enum ShareStatus {
 }
 
 model ContactShare {
-  id                 String      @id @default(cuid())
+  id                 String         @id @default(cuid())
   ownerUserId        String
   contactId          String?
   shareType          ShareType
-  token              String?     @unique
+  token              String?        @unique
   recipientUserId    String?
   recipientEmail     String?
   recipientContactId String?
-  status             ShareStatus @default(ACTIVE)
+  status             ShareStatus    @default(ACTIVE)
   // Snapshot of the shared contact's portable fields at share time, so a
   // static share is still deliverable if the owner edits/archives/deletes the
   // original before the recipient accepts (P12-03).
@@ -1557,14 +1557,16 @@ model ContactShare {
   // is paused (e.g. recipient account locked); cleared on the next success.
   lastErrorAt        DateTime?
   lastErrorCode      String?
-  downloadCount      Int         @default(0)
+  downloadCount      Int            @default(0)
   maxDownloads       Int? // null = unlimited; 1 = single-use
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  owner              User        @relation("ShareOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
-  contact            Contact?    @relation("ShareSourceContact", fields: [contactId], references: [id], onDelete: SetNull)
-  recipientUser      User?       @relation("ShareRecipient", fields: [recipientUserId], references: [id], onDelete: SetNull)
-  recipientContact   Contact?    @relation("ShareRecipientContact", fields: [recipientContactId], references: [id], onDelete: SetNull)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  owner              User           @relation("ShareOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  contact            Contact?       @relation("ShareSourceContact", fields: [contactId], references: [id], onDelete: SetNull)
+  recipientUser      User?          @relation("ShareRecipient", fields: [recipientUserId], references: [id], onDelete: SetNull)
+  recipientContact   Contact?       @relation("ShareRecipientContact", fields: [recipientContactId], references: [id], onDelete: SetNull)
+  // P46-DB03: recipient's SHARING notification(s) that point at this invite.
+  notifications      Notification[]
 
   @@index([ownerUserId, status, createdAt])
   @@index([recipientUserId, status])
@@ -1615,15 +1617,26 @@ model Notification {
   // SECURITY rows deep-link 1:1 to their anomaly (Resolution 3).
   securityAlertId  String?
   adminBroadcastId String?
+  // P46-DB03 (D3): SHARING rows link to their invite so the feed can derive the
+  // invite's live/expired/accepted state at read time (the field is the display
+  // hint, the entity is the truth).
+  contactShareId   String?
   createdAt        DateTime             @default(now())
+  // P46-DB03 (D5): event-passed aging. Set by the emitting source that knows the
+  // real moment; both null on existing rows → "no event" → can age but never
+  // event-passed. event-passed = (eventAt ?? expiresAt) < now.
+  eventAt          DateTime? // the dated moment (e.g. birthday/anniversary)
+  expiresAt        DateTime? // action deadline (e.g. sync window / invite expiry)
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   securityAlert  SecurityAlert?  @relation(fields: [securityAlertId], references: [id], onDelete: SetNull)
   adminBroadcast AdminBroadcast? @relation(fields: [adminBroadcastId], references: [id], onDelete: SetNull)
+  contactShare   ContactShare?   @relation(fields: [contactShareId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, read])
   @@index([adminBroadcastId])
+  @@index([contactShareId])
 }
 
 model AdminBroadcast {

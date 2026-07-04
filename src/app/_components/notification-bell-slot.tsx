@@ -18,6 +18,10 @@ export async function NotificationBellSlot({ userId }: { userId: string }) {
     actionUrl: n.actionUrl,
     securityAlertId: n.securityAlertId,
     createdAt: n.createdAt.toISOString(),
+    eventAt: n.eventAt?.toISOString() ?? null,
+    expiresAt: n.expiresAt?.toISOString() ?? null,
+    entityPassed: n.entityPassed,
+    shareOutcome: n.shareOutcome,
   }));
   return <NotificationBell initialItems={items} renderedAt={renderedAt} />;
 }
