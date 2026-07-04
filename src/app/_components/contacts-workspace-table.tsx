@@ -1404,7 +1404,9 @@ export function ContactsWorkspaceTable({
       if (row?.type === "group-header") return row;
     }
     return null;
-  }, [flatRows, scrollEl?.scrollTop, virtualItems]);
+    // virtualItems changes on every scroll frame, so the memo recomputes then and
+    // reads the current scrollEl.scrollTop inside.
+  }, [flatRows, scrollEl, virtualItems]);
 
   // P46-01 — alphabet scrubber wiring.
   //
@@ -1426,36 +1428,37 @@ export function ContactsWorkspaceTable({
     return map;
   }, [flatRows]);
   const scrollToLetter = useCallback(
-    (letter: string, { smooth }: { smooth: boolean }) => {
+    (letter: string) => {
       const index = letterRowIndex.get(letter);
       if (index === undefined) return;
-      // NOTE: @tanstack/react-virtual silently drops `behavior: "smooth"` when
-      // dynamic measurement (measureElement, above) is active. For the eased tap
-      // jump we therefore scroll the viewport natively to the row's offset; for
-      // instant drag-scrub (and reduced motion) we use scrollToIndex, which
-      // self-corrects the offset as rows measure.
-      const offset = smooth ? virtualizer.getOffsetForIndex(index, "start")?.[0] : undefined;
-      if (offset !== undefined && scrollEl) {
-        scrollEl.scrollTo({ top: offset, behavior: "smooth" });
-      } else {
-        virtualizer.scrollToIndex(index, { align: "start" });
-      }
+      // Jumps are instant (like a native phone-book index). We can't use a smooth
+      // scroll here: @tanstack/react-virtual drops behavior:"smooth" under dynamic
+      // measurement, and a native smooth scrollTo to a precomputed offset stalls
+      // mid-list because rows re-measure and shift the target as it travels.
+      // scrollToIndex self-corrects the offset as rows measure, so it lands true.
+      virtualizer.scrollToIndex(index, { align: "start" });
     },
-    [letterRowIndex, scrollEl, virtualizer],
+    [letterRowIndex, virtualizer],
   );
   // The passive "where am I" letter — the current section, unless it's Favourites.
   const activeScrubLetter =
     stickySection && !stickySection.favorites ? stickySection.label : null;
-  // Show conditions (all must hold): mobile, sorted-by-name & not searching
-  // (i.e. the list is grouped), long enough to need it (> ~2 screens), and at
-  // least 4 present letters. Any false → the rail is not rendered (no lingering
-  // gesture zone), and it re-evaluates when any input changes.
-  const showScrubber =
+  // The rail must map the WHOLE list, not just the windows loaded so far — or it
+  // grows letter-by-letter as you scroll and drops the late letters (W–Z) that
+  // live in unloaded tail windows. So when a long, name-sorted mobile list is in
+  // view we eagerly pull the remaining windows, and only show the rail once the
+  // full set is loaded (`!hasMore`) — it appears complete instead of filling in.
+  const railListEligible =
     isMobile &&
     groups !== null &&
-    scrubberSections.length >= 4 &&
     scrollViewportH > 0 &&
     virtualizer.getTotalSize() > 2 * scrollViewportH;
+
+  useEffect(() => {
+    if (railListEligible && hasMore && !loadingMore) loadMore();
+  }, [railListEligible, hasMore, loadingMore, loadMore]);
+
+  const showScrubber = railListEligible && !hasMore && scrubberSections.length >= 4;
 
   const restoredScrollRef = useRef(false);
   const restoreTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);

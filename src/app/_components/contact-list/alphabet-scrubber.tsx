@@ -23,23 +23,15 @@ interface AlphabetScrubberProps {
   activeLetter: string | null;
   /** The scroll viewport the rail overlays — used to anchor and size the track. */
   viewportEl: HTMLElement | null;
-  /** Jump to a letter's section. `smooth` is honoured only when motion is allowed. */
-  onJump: (letter: string, opts: { smooth: boolean }) => void;
+  /** Jump the list to a letter's section (instant, like a native phone-book index). */
+  onJump: (letter: string) => void;
 }
 
 const HIT_WIDTH = 28; // touch strip — wider than the 22px visual for a comfortable target
 const INSET = 6; // track inset from the top/bottom of the scroll area
-const MIN_CELL = 18; // each letter reserves ≥18px of track before decimation kicks in
+const PAD = 8; // rail's own vertical padding (matches .kx-scrub padding)
+const MIN_CELL = 15; // each rendered letter reserves ≥15px of track before decimation
 const EDGE_GAP = 2; // rail sits 2px from the viewport's right edge
-
-/** Motion is off under the P43 "Off" preference or system reduced-motion (unless forced on). */
-function motionIsReduced(): boolean {
-  if (typeof window === "undefined") return false;
-  const pref = document.documentElement.dataset.motion;
-  if (pref === "on") return false;
-  if (pref === "off") return true;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }: AlphabetScrubberProps) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -75,16 +67,28 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
     };
   }, [viewportEl, measure]);
 
-  // Decimation: when even the present letters can't each hold MIN_CELL of track,
-  // show every other letter (keeping first + last) with a dot between, and snap
-  // the thumb to the nearest real letter. `null` display slots render as dots.
-  const trackH = box ? box.height : 0;
-  const decimated = sections.length > 1 && sections.length * MIN_CELL > trackH && trackH > 0;
-  const display = sections.map((s, i) => {
-    if (!decimated) return s;
-    const keep = i % 2 === 0 || i === sections.length - 1;
-    return keep ? s : null;
-  });
+  // Decimation: the whole present-letter set must fit the track. Each rendered
+  // cell needs ≥ MIN_CELL of height, so at most floor(track / MIN_CELL) letters
+  // can show. When there are more, sample that many evenly (first & last always
+  // kept) — the dropped letters stay reachable because the drag maps
+  // proportionally across ALL sections, and the bubble snaps to the real letter.
+  const trackH = box ? Math.max(0, box.height - PAD * 2) : 0;
+  const maxCells = trackH > 0 ? Math.max(4, Math.floor(trackH / MIN_CELL)) : sections.length;
+  const display =
+    sections.length <= maxCells
+      ? sections
+      : (() => {
+          const picked: typeof sections = [];
+          const seen = new Set<number>();
+          for (let k = 0; k < maxCells; k++) {
+            const idx = Math.round((k * (sections.length - 1)) / (maxCells - 1));
+            if (!seen.has(idx)) {
+              seen.add(idx);
+              picked.push(sections[idx]!);
+            }
+          }
+          return picked;
+        })();
 
   // Map a pointer Y to the nearest present section — proportional across the
   // whole track, so a touch 60% down maps to ~60% into the list (3·B).
@@ -112,7 +116,7 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
         /* setPointerCapture can throw for a stale/synthetic pointer id — ignore */
       }
       // Show the bubble immediately; the jump waits for a move (drag) or the
-      // release (tap) so a tap gets the eased scroll and a drag tracks 1:1.
+      // release (tap) so a plain tap jumps once, on release.
       setScrub(hit);
     },
     [sectionAtY],
@@ -127,7 +131,7 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
         if (prev?.letter !== hit.letter) {
           movedRef.current = true;
           // Drag-scrub sets the scroll directly (no smooth) so it tracks the finger.
-          onJump(hit.letter, { smooth: false });
+          onJump(hit.letter);
         }
         return hit;
       });
@@ -140,8 +144,8 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
       if (railRef.current?.hasPointerCapture(e.pointerId)) {
         railRef.current.releasePointerCapture(e.pointerId);
       }
-      // A press with no cross-letter movement is a tap → eased jump to that letter.
-      if (!movedRef.current && scrub) onJump(scrub.letter, { smooth: !motionIsReduced() });
+      // A press with no cross-letter movement is a tap → jump to that letter.
+      if (!movedRef.current && scrub) onJump(scrub.letter);
       setScrub(null);
     },
     [onJump, scrub],
@@ -156,7 +160,7 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
         movedRef.current = false;
         return;
       }
-      onJump(letter, { smooth: !motionIsReduced() });
+      onJump(letter);
     },
     [onJump],
   );
@@ -191,8 +195,7 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
         onPointerCancel={endScrub}
         style={{ top: box.top, height: box.height, right: box.right, width: HIT_WIDTH }}
       >
-        {display.map((s, i) => {
-          if (!s) return <span key={`dot-${i}`} aria-hidden="true" className="kx-scrub-dot">·</span>;
+        {display.map((s) => {
           const isActive = active ? s.letter === active : activeLetter === s.letter;
           const noun = s.count === 1 ? "contact" : "contacts";
           const label =
