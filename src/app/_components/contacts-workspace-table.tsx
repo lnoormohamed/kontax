@@ -996,6 +996,23 @@ export function ContactsWorkspaceTable({
     url.searchParams.set(CONTACT_LIST_RESTORE_PARAM, contactId);
     window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
 
+    // How far down the scroll viewport the tapped row currently sits. On mobile
+    // the restore anchors this row to the viewport top and then nudges it back
+    // down by this offset, reproducing the exact position the list was in —
+    // which a raw scrollTop can't, because rows with a label sub-line are
+    // taller than the virtualiser's estimate and shift the pixel mapping once
+    // re-measured.
+    let contactOffset: number | null = null;
+    if (activeScrollEl) {
+      const rowEl = activeScrollEl
+        .querySelector(`a[href="/contacts/${contactId}"]`)
+        ?.closest<HTMLElement>("[data-index]");
+      if (rowEl) {
+        contactOffset =
+          rowEl.getBoundingClientRect().top - activeScrollEl.getBoundingClientRect().top;
+      }
+    }
+
     sessionStorage.setItem(
       CONTACT_LIST_SCROLL_KEY,
       JSON.stringify({
@@ -1003,6 +1020,7 @@ export function ContactsWorkspaceTable({
         key: scrollMemoryKey,
         contactId,
         scrollTop: activeScrollEl?.scrollTop ?? null,
+        contactOffset,
         windowY: window.scrollY,
       }),
     );
@@ -1324,6 +1342,7 @@ export function ContactsWorkspaceTable({
             createdAt?: number;
             contactId?: string;
             scrollTop?: number | null;
+            contactOffset?: number | null;
             windowY?: number;
           }
         : {
@@ -1331,6 +1350,7 @@ export function ContactsWorkspaceTable({
             createdAt: Date.now(),
             contactId: restoreContactId,
             scrollTop: null,
+            contactOffset: null,
             windowY: undefined,
           };
 
@@ -1355,7 +1375,24 @@ export function ContactsWorkspaceTable({
         if (isMobileViewport && saved.contactId) {
           const index = flatRows.findIndex((row) => row.type === "contact" && row.contact.id === saved.contactId);
           if (index >= 0) {
-            virtualizer.scrollToIndex(index, { align: "center" });
+            if (scrollEl && typeof saved.contactOffset === "number") {
+              // The raw scrollTop above lands us close; now nudge by the row's
+              // real on-screen delta so the tapped contact sits exactly where
+              // it did when tapped. Anchoring to the measured row (not a pixel)
+              // absorbs the height drift from taller label rows above it, and
+              // the browser clamps scrollTop so near-bottom rows stay put. If
+              // the row isn't rendered yet this pass, the raw scrollTop stands
+              // and a later timer pass corrects it.
+              const rowEl = scrollEl.querySelector<HTMLElement>(`[data-index="${index}"]`);
+              if (rowEl) {
+                const cur = rowEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top;
+                scrollEl.scrollTop += cur - saved.contactOffset;
+              }
+            } else {
+              // Deep link with no saved offset — centre on the contact so it's
+              // at least on screen.
+              virtualizer.scrollToIndex(index, { align: "center" });
+            }
           }
         }
       };
