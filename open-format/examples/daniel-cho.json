@@ -1,0 +1,70 @@
+{
+  "@type": "Card",
+  "version": "1.0",
+  "uid": "3b1e4c7a-2f90-4d81-9c2a-7e5b6d4f0a11",
+  "created": "2024-02-11T08:30:00Z",
+  "updated": "2026-05-19T14:02:00Z",
+  "prodId": "kontax/1.0",
+  "getkontax.com:formatVersion": "1.0",
+  "getkontax.com:exportedAt": "2026-07-04T14:30:00Z",
+
+  "name": {
+    "full": "Daniel Cho",
+    "components": [
+      { "kind": "given", "value": "Daniel" },
+      { "kind": "surname", "value": "Cho" }
+    ]
+  },
+  "nicknames": { "n1": { "name": "Dan" } },
+
+  "organizations": { "o1": { "name": "Northwind Studio", "units": ["Design"] } },
+  "titles": { "t1": { "name": "Art Director", "organizationId": "o1" } },
+
+  "emails": {
+    "e1": { "address": "daniel@northwind.example", "contexts": { "work": true }, "pref": 1 }
+  },
+  "phones": {
+    "p1": { "number": "+1 (415) 555-0132", "features": { "mobile": true }, "pref": 1, "getkontax.com:e164": "+14155550132" }
+  },
+  "addresses": {
+    "a1": {
+      "contexts": { "private": true },
+      "components": [
+        { "kind": "name", "value": "48 Alder Street" },
+        { "kind": "locality", "value": "San Francisco" },
+        { "kind": "region", "value": "CA" },
+        { "kind": "postcode", "value": "94110" },
+        { "kind": "country", "value": "United States" }
+      ]
+    }
+  },
+  "links": { "w1": { "uri": "https://northwind.example", "label": "Company" } },
+
+  "anniversaries": {
+    "d1": { "kind": "birth", "date": { "@type": "PartialDate", "year": 1990, "month": 9, "day": 4 } }
+  },
+
+  "keywords": { "Clients": true },
+  "getkontax.com:labels": { "l1": { "name": "Clients", "color": "#4158f4", "position": 0 } },
+  "getkontax.com:books": ["Work"],
+
+  "getkontax.com:customFields": [
+    { "label": "Client ID", "value": "NW-0042" }
+  ],
+
+  "notes": "Met at DesignWeek 2024. Prefers email.",
+  "getkontax.com:favorite": true,
+
+  "media": {
+    "m1": {
+      "kind": "photo",
+      "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "mediaType": "image/png",
+      "getkontax.com:sha256": "a4dd28db6e6d3fc0d43cdbef1e8ef161b353ce67d27e81d400f796bc77045ae6",
+      "getkontax.com:width": 1,
+      "getkontax.com:height": 1
+    }
+  },
+
+  "getkontax.com:source": { "origin": "MANUAL" }
+}

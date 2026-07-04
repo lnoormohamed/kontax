@@ -37,6 +37,7 @@
     "qa:phase44:photos": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000 --experimental-strip-types --loader ./scripts/node-test-loader.mjs scripts/phase44-photo-roundtrip-harness.ts",
     "qa:phase44:photo-decision": "node --experimental-strip-types --loader ./scripts/node-test-loader.mjs scripts/phase44-photo-decision-selftest.ts",
     "qa:phase45:archive": "node --experimental-strip-types --loader ./scripts/node-test-loader.mjs scripts/phase45-archive-selftest.ts",
+    "qa:phase45:openformat": "node scripts/phase45-openformat-check.mjs",
     "seed:phase37:sub-saharan-africa": "node scripts/seed-phase37-sub-saharan-africa.mjs",
     "seed:phase37:southern-europe": "node scripts/seed-phase37-southern-europe.mjs",
     "seed:phase37:uk-ie": "node scripts/seed-phase37-uk-ireland.mjs",
