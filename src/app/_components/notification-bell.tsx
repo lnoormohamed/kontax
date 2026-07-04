@@ -304,19 +304,22 @@ export function NotificationBell({
           className="absolute right-[-4px] top-[50px] z-[65] flex max-h-[480px] w-[360px] flex-col overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white shadow-[0_8px_32px_rgba(29,40,35,0.12)] max-md:fixed max-md:inset-0 max-md:top-0 max-md:z-[100] max-md:h-[100dvh] max-md:max-h-none max-md:w-screen max-md:rounded-none max-md:border-0"
           role="dialog"
         >
-          <div className="flex h-11 flex-none items-center gap-2.5 border-b border-[#f2f4f0] px-3.5 max-md:h-[52px] max-md:border-[#d8ddd6] max-md:bg-white max-md:px-3">
-            <span className="text-[14px] font-bold text-[#1d2823] max-md:text-[19px] max-md:font-bold">Notifications</span>
+          <div className="flex h-11 flex-none items-center gap-2.5 border-b border-[#f2f4f0] px-3.5 max-md:h-[52px] max-md:gap-[11px] max-md:border-[#e9ece7] max-md:bg-white max-md:px-4">
+            {/* P46-DB03 D6·B: mobile full-screen overlay leads with a back button
+                (.pwa-head/.sx — wash-filled 30px square, left-aligned) that
+                dismisses the overlay. The desktop dropdown has no back affordance. */}
             <button
-              aria-label="Close"
-              className="ml-auto grid h-[44px] w-[44px] place-items-center rounded-xl text-[#3a4540] hover:bg-[#f2f4f0] md:hidden"
+              aria-label="Back"
+              className="hidden h-[30px] w-[30px] flex-none place-items-center rounded-lg bg-[#f2f4f0] text-[#5c655e] transition hover:bg-[#e9ece7] max-md:grid"
               onClick={() => setOpen(false)}
               type="button"
             >
-              <WorkspaceIcon name="x" size={18} />
+              <WorkspaceIcon name="arrowLeft" size={18} strokeWidth={2} />
             </button>
+            <span className="text-[14px] font-bold text-[#1d2823] max-md:text-[17px]">Notifications</span>
             {unread > 0 && (
               <button
-                className="ml-auto p-1 text-[13px] font-medium text-[#4158f4] hover:underline max-md:ml-0 max-md:text-[13.5px] max-md:font-semibold"
+                className="ml-auto p-1 text-[13px] font-medium text-[#4158f4] hover:underline max-md:text-[13px] max-md:font-semibold"
                 disabled={isPending}
                 onClick={markAll}
                 type="button"
