@@ -969,6 +969,9 @@ model SyncContactLink {
   remoteETag           String?
   capabilityProfileId  String?
   supportedFieldShadow Json?
+  // P44-02/03/04: per-link photo shadow (docs/adr/0001) — canonical remote
+  // signal + local hash for photo change detection / echo suppression.
+  photoShadow          Json?
   lastSyncedAt         DateTime?
   tombstonedAt         DateTime?
   remoteDeletedAt      DateTime?

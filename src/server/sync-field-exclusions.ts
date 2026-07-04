@@ -28,6 +28,11 @@ const TOKEN_KEYS: Record<string, PortableKey[]> = {
   BDAY: ["birthday", "significantDates"],
   ADR: ["address", "postalAddresses", "addressEntries"],
   "X-CUSTOM": ["customFields"],
+  // P44-03: photos are a field family, but the image is not a portable-contact
+  // key — it syncs through its own pipeline (contact-photo-sync). No portable
+  // keys to strip; the entry exists so PHOTO survives normalizeExcludedFields
+  // and the photo seams can gate on it via isPhotoExcluded().
+  PHOTO: [],
 };
 
 // Token → Google updatePersonFields families to withhold from replacement.
@@ -36,6 +41,8 @@ const TOKEN_GOOGLE_FAMILIES: Record<string, string[]> = {
   BDAY: ["birthdays"],
   ADR: ["addresses"],
   // X-CUSTOM: userDefined is not in the push mask today — nothing to subtract.
+  // PHOTO: photos are not in the base push mask (dedicated photo endpoint) —
+  // the photo pipeline checks isPhotoExcluded() directly.
 };
 
 /** Uppercased known tokens only — unknown values drop out silently. */
@@ -47,6 +54,10 @@ export const normalizeExcludedFields = (
       .map((token) => token.trim().toUpperCase())
       .filter((token) => token in TOKEN_KEYS),
   );
+
+/** P44-03: whether the photo family is excluded on this connection. */
+export const isPhotoExcluded = (excludedFields: string[] | null | undefined): boolean =>
+  normalizeExcludedFields(excludedFields).has("PHOTO");
 
 const keysFor = (excluded: Set<string>): PortableKey[] =>
   [...excluded].flatMap((token) => TOKEN_KEYS[token] ?? []);

@@ -76,6 +76,7 @@ const FIELD_OPTS: { token: string; label: string }[] = [
   { token: "BDAY", label: "Birthdays" },
   { token: "ADR", label: "Addresses" },
   { token: "X-CUSTOM", label: "Custom fields" },
+  { token: "PHOTO", label: "Photos" }, // P44-03
 ];
 
 // freq <-> syncFrequencyMinutes (null = plan default, 0 = manual, else minutes)

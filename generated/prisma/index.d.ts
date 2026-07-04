@@ -31697,6 +31697,7 @@ export namespace Prisma {
     remoteETag: number
     capabilityProfileId: number
     supportedFieldShadow: number
+    photoShadow: number
     lastSyncedAt: number
     tombstonedAt: number
     remoteDeletedAt: number
@@ -31751,6 +31752,7 @@ export namespace Prisma {
     remoteETag?: true
     capabilityProfileId?: true
     supportedFieldShadow?: true
+    photoShadow?: true
     lastSyncedAt?: true
     tombstonedAt?: true
     remoteDeletedAt?: true
@@ -31842,6 +31844,7 @@ export namespace Prisma {
     remoteETag: string | null
     capabilityProfileId: string | null
     supportedFieldShadow: JsonValue | null
+    photoShadow: JsonValue | null
     lastSyncedAt: Date | null
     tombstonedAt: Date | null
     remoteDeletedAt: Date | null
@@ -31877,6 +31880,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -31899,6 +31903,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -31919,6 +31924,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -31939,6 +31945,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -31948,7 +31955,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SyncContactLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "contactId" | "remoteHref" | "remoteUid" | "remoteETag" | "capabilityProfileId" | "supportedFieldShadow" | "lastSyncedAt" | "tombstonedAt" | "remoteDeletedAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncContactLink"]>
+  export type SyncContactLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "contactId" | "remoteHref" | "remoteUid" | "remoteETag" | "capabilityProfileId" | "supportedFieldShadow" | "photoShadow" | "lastSyncedAt" | "tombstonedAt" | "remoteDeletedAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncContactLink"]>
   export type SyncContactLinkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
     contact?: boolean | ContactDefaultArgs<ExtArgs>
@@ -31980,6 +31987,7 @@ export namespace Prisma {
       remoteETag: string | null
       capabilityProfileId: string | null
       supportedFieldShadow: Prisma.JsonValue | null
+      photoShadow: Prisma.JsonValue | null
       lastSyncedAt: Date | null
       tombstonedAt: Date | null
       remoteDeletedAt: Date | null
@@ -32421,6 +32429,7 @@ export namespace Prisma {
     readonly remoteETag: FieldRef<"SyncContactLink", 'String'>
     readonly capabilityProfileId: FieldRef<"SyncContactLink", 'String'>
     readonly supportedFieldShadow: FieldRef<"SyncContactLink", 'Json'>
+    readonly photoShadow: FieldRef<"SyncContactLink", 'Json'>
     readonly lastSyncedAt: FieldRef<"SyncContactLink", 'DateTime'>
     readonly tombstonedAt: FieldRef<"SyncContactLink", 'DateTime'>
     readonly remoteDeletedAt: FieldRef<"SyncContactLink", 'DateTime'>
@@ -71766,6 +71775,7 @@ export namespace Prisma {
     remoteETag: 'remoteETag',
     capabilityProfileId: 'capabilityProfileId',
     supportedFieldShadow: 'supportedFieldShadow',
+    photoShadow: 'photoShadow',
     lastSyncedAt: 'lastSyncedAt',
     tombstonedAt: 'tombstonedAt',
     remoteDeletedAt: 'remoteDeletedAt',
@@ -75457,6 +75467,7 @@ export namespace Prisma {
     remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableFilter<"SyncContactLink">
+    photoShadow?: JsonNullableFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
@@ -75478,6 +75489,7 @@ export namespace Prisma {
     remoteETag?: SortOrderInput | SortOrder
     capabilityProfileId?: SortOrderInput | SortOrder
     supportedFieldShadow?: SortOrderInput | SortOrder
+    photoShadow?: SortOrderInput | SortOrder
     lastSyncedAt?: SortOrderInput | SortOrder
     tombstonedAt?: SortOrderInput | SortOrder
     remoteDeletedAt?: SortOrderInput | SortOrder
@@ -75505,6 +75517,7 @@ export namespace Prisma {
     remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableFilter<"SyncContactLink">
+    photoShadow?: JsonNullableFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
@@ -75526,6 +75539,7 @@ export namespace Prisma {
     remoteETag?: SortOrderInput | SortOrder
     capabilityProfileId?: SortOrderInput | SortOrder
     supportedFieldShadow?: SortOrderInput | SortOrder
+    photoShadow?: SortOrderInput | SortOrder
     lastSyncedAt?: SortOrderInput | SortOrder
     tombstonedAt?: SortOrderInput | SortOrder
     remoteDeletedAt?: SortOrderInput | SortOrder
@@ -75550,6 +75564,7 @@ export namespace Prisma {
     remoteETag?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableWithAggregatesFilter<"SyncContactLink">
+    photoShadow?: JsonNullableWithAggregatesFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
@@ -81246,6 +81261,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -81267,6 +81283,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -81284,6 +81301,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -81305,6 +81323,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -81324,6 +81343,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -81340,6 +81360,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -81358,6 +81379,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -86903,6 +86925,7 @@ export namespace Prisma {
     remoteETag?: SortOrder
     capabilityProfileId?: SortOrder
     supportedFieldShadow?: SortOrder
+    photoShadow?: SortOrder
     lastSyncedAt?: SortOrder
     tombstonedAt?: SortOrder
     remoteDeletedAt?: SortOrder
@@ -99584,6 +99607,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -99603,6 +99627,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -100547,6 +100572,7 @@ export namespace Prisma {
     remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableFilter<"SyncContactLink">
+    photoShadow?: JsonNullableFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
@@ -106834,6 +106860,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -106853,6 +106880,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -108847,6 +108875,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -108867,6 +108896,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -109170,6 +109200,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -109190,6 +109221,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -125091,6 +125123,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -125420,6 +125453,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -125439,6 +125473,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -125457,6 +125492,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -126561,6 +126597,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -126909,6 +126946,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -126928,6 +126966,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -126946,6 +126985,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

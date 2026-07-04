@@ -1,15 +1,26 @@
 import { Prisma } from "../../generated/prisma";
 import {
   type CardDavContactCard,
+  type CardDavRawPhoto,
   CardDavPreflightError,
   deleteCardDavContact,
   fetchCardDavAddressBookCards,
   fetchCardDavAddressBookIndex,
+  fetchCardDavPhotoBytes,
   pushCardDavContact,
 } from "~/server/carddav";
 import type { PortableContactInput } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import { PHOTO_SYNC_ENABLED } from "~/lib/photo-sync-flags";
+import {
+  hashBytes,
+  parsePhotoShadow,
+  type PhotoSignalKind,
+  type PushSeed,
+  type RemotePhotoState,
+} from "~/server/contact-photo-sync";
+import { runPhotoPass, type PhotoPassLink } from "~/server/sync-photo-pass";
 import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
 import {
   CONFLICT_QUEUE_FULL_CODE,
@@ -33,6 +44,7 @@ import {
   notifySyncNeedsReauth,
 } from "~/server/sync-enforcement-notifications";
 import {
+  isPhotoExcluded,
   mergeExcludedFieldsFromRemote,
   normalizeExcludedFields,
   omitExcludedContactWriteData,
@@ -1153,6 +1165,8 @@ export const runQueuedSyncJobs = async ({
           username: decryptedCredentials.username,
           password: decryptedCredentials.password,
         },
+        // P44-03: decode PHOTO only when photo sync is on (avoids the b64 cost).
+        includePhoto: PHOTO_SYNC_ENABLED,
       });
 
       const remoteUids = remoteEntries.map((entry) => entry.uid);
@@ -1183,6 +1197,7 @@ export const runQueuedSyncJobs = async ({
           remoteETag: true,
           capabilityProfileId: true,
           supportedFieldShadow: true,
+          photoShadow: true,
           lastSyncedAt: true,
           contactId: true,
           contact: {
@@ -1192,6 +1207,7 @@ export const runQueuedSyncJobs = async ({
               syncVersion: true,
               updatedAt: true,
               archivedAt: true,
+              avatarUrl: true,
               // P39-02: book grouping for the deletion-hold review card.
               book: { select: { name: true } },
               fullName: true,
@@ -1530,6 +1546,22 @@ export const runQueuedSyncJobs = async ({
       }> = [];
       const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = [];
 
+      // P44-04: a full-card PUT with no PHOTO line would wipe the remote photo
+      // (and cascade into deleting the local one on the next photo pass). While
+      // photo sync is on, carry the remote card's current photo through every
+      // field-push; the dedicated photo pass (below) is what changes it.
+      const cardPhotoToBase64 = async (
+        photo: CardDavRawPhoto | null | undefined,
+      ): Promise<string | null> => {
+        if (!PHOTO_SYNC_ENABLED || !photo) return null;
+        if (photo.kind === "inline") return photo.base64.replace(/\s+/g, "");
+        const bytes = await fetchCardDavPhotoBytes(photo.uri, {
+          username: decryptedCredentials.username,
+          password: decryptedCredentials.password,
+        });
+        return bytes ? bytes.toString("base64") : null;
+      };
+
       for (const candidate of localPushCandidates) {
         try {
           const result = await pushCardDavContact({
@@ -1548,6 +1580,7 @@ export const runQueuedSyncJobs = async ({
             ),
             capabilityProfile,
             hrefOverride: candidate.remoteHref || undefined,
+            photoBase64: await cardPhotoToBase64(remoteCardByUid.get(candidate.remoteUid)?.photo),
           });
           pushedLinks.push({ linkId: candidate.linkId, newETag: result.etag, newHref: result.href });
         } catch (err) {
@@ -2083,6 +2116,114 @@ export const runQueuedSyncJobs = async ({
         maxWait: 15_000,
         timeout: Number(process.env.SYNC_COMMIT_TX_TIMEOUT_MS ?? "") || 120_000,
       });
+
+      // P44-03/04: contact photo pass. Runs after the field commit (so contacts
+      // and links exist) and outside any DB transaction (it does network I/O).
+      // Only reconciles contacts still present remotely — remote deletions are
+      // handled by the conflict path above, not here.
+      if (PHOTO_SYNC_ENABLED) {
+        try {
+          const photoExcluded = isPhotoExcluded(settings.excludedFields);
+          // EXPORT_ONLY is rejected earlier for CardDAV, so inbound is always
+          // permitted here; outbound follows canWrite (false for IMPORT_ONLY).
+          const cap = {
+            canPull: !photoExcluded,
+            canPush: !photoExcluded && canWrite,
+          };
+          const creds = {
+            username: decryptedCredentials.username,
+            password: decryptedCredentials.password,
+          };
+          const abUrl: string = job.syncAccount.addressBookUrl;
+          const photoLinks: PhotoPassLink[] = [];
+          for (const link of existingLinks) {
+            if (!link.remoteUid) continue;
+            const uid: string = link.remoteUid;
+            const card = remoteCardByUid.get(uid);
+            if (!card) continue; // not present remotely → deletion path owns it
+            const photo = card.photo ?? null;
+
+            let remote: RemotePhotoState;
+            let signalKind: PhotoSignalKind;
+            let loadRemoteBytes: () => Promise<Buffer | null>;
+            if (!photo) {
+              remote = { hasPhoto: false, signal: null };
+              signalKind = "contentHash";
+              loadRemoteBytes = async () => null;
+            } else if (photo.kind === "inline") {
+              const bytes = Buffer.from(photo.base64.replace(/\s+/g, ""), "base64");
+              remote = { hasPhoto: bytes.length > 0, signal: bytes.length > 0 ? hashBytes(bytes) : null };
+              signalKind = "contentHash";
+              loadRemoteBytes = async () => bytes;
+            } else {
+              remote = { hasPhoto: true, signal: photo.uri };
+              signalKind = "resourceIdentifier";
+              loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds);
+            }
+
+            const pushCardWithPhoto = async (photoBase64: string | null): Promise<string | null> => {
+              const res = await pushCardDavContact({
+                addressBookUrl: abUrl,
+                credentials: creds,
+                remoteUid: uid,
+                contact: mergeExcludedFieldsFromRemote(
+                  contactToPortable(link.contact),
+                  cardDavCardToPortable(card),
+                  excludedFields,
+                ),
+                capabilityProfile,
+                hrefOverride: link.remoteHref || undefined,
+                photoBase64,
+              });
+              return res.etag;
+            };
+
+            photoLinks.push({
+              linkId: link.id,
+              contactId: link.contactId,
+              avatarUrl: link.contact.avatarUrl ?? null,
+              shadow: parsePhotoShadow(link.photoShadow),
+              signalKind,
+              remote,
+              loadRemoteBytes,
+              pushCanonical: async (b64): Promise<PushSeed> => {
+                const decoded = Buffer.from(b64, "base64");
+                const etag = await pushCardWithPhoto(b64);
+                // CardDAV is byte-stable (P44-01) → the canonical remote copy is
+                // exactly what we pushed; no read-back round trip needed.
+                return { remoteSignal: hashBytes(decoded), remoteCanonicalHash: hashBytes(decoded), remoteETag: etag };
+              },
+              deleteRemote: async () => {
+                await pushCardWithPhoto(null);
+              },
+            });
+          }
+
+          const tally = await runPhotoPass(
+            db,
+            {
+              userId: job.syncAccount.userId,
+              syncAccountId: job.syncAccountId,
+              syncAccountLabel: job.syncAccount.label,
+            },
+            cap,
+            photoLinks,
+          );
+          const inbound = tally.pulled + tally.deletedLocal;
+          const outbound = tally.pushed + tally.deletedRemote;
+          if (inbound + outbound > 0) {
+            await db.syncJob.update({
+              where: { id: job.id },
+              data: {
+                updatedCount: { increment: inbound },
+                pushedUpdatedCount: { increment: outbound },
+              },
+            });
+          }
+        } catch (error) {
+          console.warn(`[Kontax] CardDAV photo pass failed for account ${job.syncAccountId}`, error);
+        }
+      }
 
       if (conflictEntries.length > 0) {
         summary.partial += 1;

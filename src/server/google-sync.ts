@@ -10,7 +10,10 @@ import { auth as googleAuth, people, type people_v1 } from "@googleapis/people";
 import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
 import { emitEvent } from "~/lib/activity";
+import { PHOTO_SYNC_ENABLED } from "~/lib/photo-sync-flags";
 import { db } from "~/server/db";
+import { parsePhotoShadow, type PushSeed } from "~/server/contact-photo-sync";
+import { runPhotoPass, type PhotoPassLink, type PhotoPassTally } from "~/server/sync-photo-pass";
 import {
   parseContactDateEntries,
   parseContactPostalAddresses,
@@ -881,18 +884,86 @@ export const runGoogleSync = async (
         queueFull: await isConflictQueueFull(account.id),
       };
 
+  // P44-03/04: photo pass (flag-gated). Failures never fail the sync.
+  const photoTally = PHOTO_SYNC_ENABLED
+    ? await runGooglePhotoPass(account, { inbound, outbound })
+    : { pulled: 0, pushed: 0, deletedLocal: 0, deletedRemote: 0, conflicts: 0 };
+
   return {
     created: importSummary.created,
-    updated: importSummary.updated,
+    updated: importSummary.updated + photoTally.pulled + photoTally.deletedLocal,
     deleted: importSummary.deleted,
     conflicts: importSummary.conflicts + push.conflicts,
     // A push that opened a MANUAL conflict may have filled the queue.
     queueFull:
       push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,
     pushedCreated: push.created,
-    pushedUpdated: push.updated,
+    pushedUpdated: push.updated + photoTally.pushed + photoTally.deletedRemote,
     pushedDeleted: push.deleted,
   };
+};
+
+/**
+ * P44-03/04 Google photo pass: reconcile every linked contact's photo via the
+ * dedicated photo endpoint (getBatchGet to read, updateContactPhoto to write —
+ * no full-contact PUT, so no field-wipe hazard). See docs/adr/0001.
+ */
+const runGooglePhotoPass = async (
+  account: GoogleImportAccount,
+  dir: { inbound: boolean; outbound: boolean },
+): Promise<PhotoPassTally> => {
+  const photoExcluded = account.excludedFields?.has("PHOTO") ?? false;
+  const cap = { canPull: dir.inbound && !photoExcluded, canPush: dir.outbound && !photoExcluded };
+  if (!cap.canPull && !cap.canPush) {
+    return { pulled: 0, pushed: 0, deletedLocal: 0, deletedRemote: 0, conflicts: 0 };
+  }
+
+  const links = await db.syncContactLink.findMany({
+    where: { syncAccountId: account.id, remoteUid: { not: null }, tombstonedAt: null },
+    select: {
+      id: true,
+      remoteUid: true,
+      contactId: true,
+      photoShadow: true,
+      contact: { select: { avatarUrl: true } },
+    },
+  });
+  if (links.length === 0) {
+    return { pulled: 0, pushed: 0, deletedLocal: 0, deletedRemote: 0, conflicts: 0 };
+  }
+
+  const resourceNames = links.map((l) => l.remoteUid).filter((u): u is string => u != null);
+  const remotePhotos = await fetchGoogleRemotePhotos(account, resourceNames);
+
+  const passLinks: PhotoPassLink[] = links
+    .filter((l): l is typeof l & { remoteUid: string } => l.remoteUid != null)
+    .map((link) => {
+      const rn = link.remoteUid;
+      const remote = remotePhotos.get(rn) ?? { hasPhoto: false, url: null, signal: null };
+      return {
+        linkId: link.id,
+        contactId: link.contactId,
+        avatarUrl: link.contact.avatarUrl ?? null,
+        shadow: parsePhotoShadow(link.photoShadow),
+        signalKind: "resourceIdentifier" as const,
+        remote: { hasPhoto: remote.hasPhoto, signal: remote.signal },
+        loadRemoteBytes: async () => (remote.url ? fetchGooglePhotoBytes(remote.url) : null),
+        pushCanonical: async (b64: string): Promise<PushSeed> => {
+          const res = await pushGooglePhoto(account, rn, b64);
+          return { remoteSignal: res.signal, remoteCanonicalHash: null, remoteETag: res.etag };
+        },
+        deleteRemote: async () => {
+          await deleteGooglePhoto(account, rn);
+        },
+      };
+    });
+
+  return runPhotoPass(
+    db,
+    { userId: account.userId, syncAccountId: account.id, syncAccountLabel: account.label },
+    cap,
+    passLinks,
+  );
 };
 
 // ── Disconnect (token revocation) — used by P27-07 ───────────────────────────
@@ -912,4 +983,96 @@ export const revokeGoogleToken = async (account: GoogleSyncAccount): Promise<voi
   } catch {
     // Best-effort: a revoked/expired token may already be invalid at Google.
   }
+};
+
+// ── P44-03/04 photo transport ────────────────────────────────────────────────
+// Google keeps photos on a dedicated endpoint, not a contact field (which is
+// why GOOGLE_PERSON_FIELDS omits them). The change-detection signal is the
+// photo resource URL with its volatile size suffix (=sNN) stripped — stable on
+// no-op re-pull per P44-01. `=s0` returns the full original for storage.
+export type GoogleRemotePhoto = { hasPhoto: boolean; url: string | null; signal: string | null };
+
+const GOOGLE_PHOTO_PERSON_FIELDS = "photos,metadata";
+const stripGooglePhotoSize = (url: string): string => url.replace(/=s\d+(-c)?$/i, "");
+const googlePhotoFullUrl = (url: string): string => `${stripGooglePhotoSize(url)}=s0`;
+
+/**
+ * Batch-fetch remote photo state for up to any number of contacts (People API
+ * getBatchGet caps at 200 resource names per call). Returns a map keyed by
+ * resource name; contacts with only Google's default silhouette map to
+ * `hasPhoto: false`.
+ */
+export const fetchGoogleRemotePhotos = async (
+  account: GoogleSyncAccount,
+  resourceNames: string[],
+): Promise<Map<string, GoogleRemotePhoto>> => {
+  const out = new Map<string, GoogleRemotePhoto>();
+  if (resourceNames.length === 0) return out;
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  for (let i = 0; i < resourceNames.length; i += 200) {
+    const chunk = resourceNames.slice(i, i + 200);
+    const res = await peopleApi.people.getBatchGet({
+      resourceNames: chunk,
+      personFields: GOOGLE_PHOTO_PERSON_FIELDS,
+    });
+    for (const r of res.data.responses ?? []) {
+      const rn = r.requestedResourceName ?? r.person?.resourceName ?? null;
+      if (!rn) continue;
+      const photo = (r.person?.photos ?? []).find((p) => !p.default) ?? null;
+      const url = photo?.url ?? null;
+      out.set(
+        rn,
+        url
+          ? { hasPhoto: true, url, signal: stripGooglePhotoSize(url) }
+          : { hasPhoto: false, url: null, signal: null },
+      );
+    }
+  }
+  return out;
+};
+
+/** Fetch the full-resolution bytes behind a People API photo URL. */
+export const fetchGooglePhotoBytes = async (url: string): Promise<Buffer | null> => {
+  try {
+    const res = await fetch(googlePhotoFullUrl(url));
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Upload a canonical JPEG as the contact's photo. Returns the new person etag
+ * and the new photo signal (resource URL, size-suffix stripped) read back from
+ * the response — this is the shadow seed that suppresses the next-pull echo.
+ */
+export const pushGooglePhoto = async (
+  account: GoogleSyncAccount,
+  resourceName: string,
+  base64Jpeg: string,
+): Promise<{ etag: string | null; signal: string | null }> => {
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  const res = await peopleApi.people.updateContactPhoto({
+    resourceName,
+    requestBody: { photoBytes: base64Jpeg, personFields: GOOGLE_PHOTO_PERSON_FIELDS },
+  });
+  const url = (res.data.person?.photos ?? []).find((p) => !p.default)?.url ?? null;
+  return { etag: res.data.person?.etag ?? null, signal: url ? stripGooglePhotoSize(url) : null };
+};
+
+/** Remove the contact's photo. Returns the new person etag. */
+export const deleteGooglePhoto = async (
+  account: GoogleSyncAccount,
+  resourceName: string,
+): Promise<{ etag: string | null }> => {
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  const res = await peopleApi.people.deleteContactPhoto({
+    resourceName,
+    personFields: GOOGLE_PHOTO_PERSON_FIELDS,
+  });
+  return { etag: res.data.person?.etag ?? null };
 };
