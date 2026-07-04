@@ -455,7 +455,10 @@ export function SearchResultsList({
   return (
     <div>
       {sections.map((s) => {
-        const cap = s.field === "name" ? NAME_CAP : GROUP_CAP;
+        // Mobile search is a full-screen, scrollable overlay — show every result
+        // instead of capping to a "+N more" expander (that cap keeps the compact
+        // desktop dropdown short). P46.
+        const cap = mob ? Infinity : s.field === "name" ? NAME_CAP : GROUP_CAP;
         const isExpanded = expanded[s.field];
         const shown = isExpanded ? s.rows : s.rows.slice(0, cap);
         const hidden = s.rows.length - shown.length;
