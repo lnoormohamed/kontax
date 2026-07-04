@@ -7,6 +7,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { DEFAULT_PREFERENCES } from "~/lib/preferences";
 import { DisplayPreferencesSection } from "./_components/display-preferences-section";
+import { InterfacePreferencesSection } from "./_components/interface-preferences-section";
 
 function Switch({ defaultChecked, name }: { defaultChecked: boolean; name: string }) {
   return (
@@ -73,6 +74,7 @@ export default async function SettingsPreferencesPage() {
         </form>
       </SettingsCard>
       <DisplayPreferencesSection initialPreferences={preferences} />
+      <InterfacePreferencesSection initialPreferences={preferences} />
     </SessionProvider>
   );
 }

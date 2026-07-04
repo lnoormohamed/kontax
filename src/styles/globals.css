@@ -49,5 +49,38 @@
 @keyframes cxBannerFade { from { opacity: 0; } to { opacity: 1; } }
 .cx-banner { animation: cxBannerIn 0.18s ease-out; }
 @media (prefers-reduced-motion: reduce) {
-  .cx-banner { animation: cxBannerFade 0.18s ease-out; }
+  html:not([data-motion="on"]) .cx-banner { animation: cxBannerFade 0.18s ease-out; }
+}
+
+/* ── P43-01: Animations & transitions preference ───────────────────────────────
+   One knob, three values, resolved at the root via a data-motion attribute set
+   by <MotionPreference>:
+     • "system" (default) → no attribute; the native prefers-reduced-motion
+       query below is in charge.
+     • "on"     → data-motion="on"; opts back in even when the OS asks for
+       reduced motion (the reduced-motion rule is scoped :not([data-motion="on"])).
+     • "off"    → data-motion="off"; zeroes transition/animation durations
+       globally, the same end-state reduced motion produces.
+   Slide entrances degrade to their visible end-state (no opacity:0 traps). */
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  transition-duration: 0.001ms !important;
+  transition-delay: 0s !important;
+  animation-duration: 0.001ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="on"]) *,
+  html:not([data-motion="on"]) *::before,
+  html:not([data-motion="on"]) *::after {
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -25,6 +25,7 @@ import {
   CONTACT_LIST_SCROLL_MAX_AGE,
 } from "~/lib/contact-list-scroll";
 import { getDisplayName } from "~/lib/display-name";
+import { useResolvedRowLabels, type ResolvedRowLabels } from "~/lib/interface-preferences";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   loadWorkspaceContactsPage,
@@ -66,6 +67,8 @@ type ContactsWorkspaceTableProps = {
   groupByLetter: boolean;
   query: string;
   nameDisplayOrder?: "first-last" | "last-first";
+  // P43-01: saved "Labels on rows" value; resolved per-device inside the table.
+  rowLabels?: "hover" | "always" | "off";
   // P28-04: bulk-edit toolbar data.
   books: ToolbarBook[];
   labelSuggestions: string[];
@@ -373,16 +376,48 @@ const parseLabels = (raw: unknown): string[] => {
   return raw.filter((v): v is string => typeof v === "string");
 };
 
+// P43-01 "Labels on rows: always" — full chips inline on every row, with a +N
+// roll-up past a small cap so long lists don't wrap the name column.
+const ALWAYS_INLINE_CAP = 3;
+const AlwaysRowChips = memo(function AlwaysRowChips({
+  labels,
+  labelColors,
+}: {
+  labels: string[];
+  labelColors: Record<string, string>;
+}) {
+  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
+  const shown = labels.slice(0, ALWAYS_INLINE_CAP);
+  const overflow = labels.length - shown.length;
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, flexShrink: 1, minWidth: 0, flexWrap: "nowrap", overflow: "hidden" }}>
+      {shown.map((name, i) => (
+        <LabelChip key={`${name}-${i}`} name={name} col={col(name)} sz="sm" />
+      ))}
+      {overflow > 0 && (
+        <span style={{ color: "#8b938c", fontSize: 11, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>
+          +{overflow}
+        </span>
+      )}
+    </span>
+  );
+});
+
 // Compact list labels: dot cluster + optional +N overflow, matching the
 // compact contact-row treatment from the handoff and browser screenshots.
+// P43-01: `mode` decides the treatment — "hover" (default, dot cluster with a
+// hover overlay of full chips), "always" (full chips inline). "off" is handled
+// by the caller, which skips rendering this element entirely.
 const RowLabelChips = memo(function RowLabelChips({
   labels,
   labelColors,
   isMobile,
+  mode = "hover",
 }: {
   labels: string[];
   labelColors: Record<string, string>;
   isMobile?: boolean;
+  mode?: ResolvedRowLabels;
 }) {
   const [overflowOpen, setOverflowOpen] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
@@ -452,6 +487,12 @@ const RowLabelChips = memo(function RowLabelChips({
 
   if (labels.length === 0) return null;
 
+  // "Always" renders full chips inline; the hover overlay machinery above is
+  // inert in this mode (no mouse-enter handlers wired below).
+  if (mode === "always") {
+    return <AlwaysRowChips labels={labels} labelColors={labelColors} />;
+  }
+
   return (
     <span
       ref={anchorRef}
@@ -510,6 +551,7 @@ const ContactRow = memo(function ContactRow({
   selected,
   focused,
   labelColors,
+  rowLabels,
   nameDisplayOrder,
   onToggleSelect,
   onArchived,
@@ -523,6 +565,8 @@ const ContactRow = memo(function ContactRow({
   selected: boolean;
   focused: boolean;
   labelColors: Record<string, string>;
+  // P43-01: device-resolved "Labels on rows" mode for this table.
+  rowLabels: ResolvedRowLabels;
   nameDisplayOrder?: "first-last" | "last-first";
   onToggleSelect: (id: string, shiftKey: boolean) => void;
   onArchived: (contactId: string) => void;
@@ -671,7 +715,9 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
-          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} labelColors={labelColors} isMobile />}
+          {rowLabels !== "off" && contactLabels.length > 0 && (
+            <RowLabelChips labels={contactLabels} labelColors={labelColors} mode={rowLabels} isMobile />
+          )}
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
           {meta.length > 0
@@ -749,7 +795,9 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
-          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} labelColors={labelColors} />}
+          {rowLabels !== "off" && contactLabels.length > 0 && (
+            <RowLabelChips labels={contactLabels} labelColors={labelColors} mode={rowLabels} />
+          )}
         </div>
         <div className="truncate text-[13px] text-[#5c655e]">
           <Cell query={query} value={contact.company} />
@@ -851,12 +899,16 @@ export function ContactsWorkspaceTable({
   groupByLetter,
   query,
   nameDisplayOrder,
+  rowLabels,
   books,
   labelSuggestions,
   smartLists,
   labelRegistry,
 }: ContactsWorkspaceTableProps) {
   const router = useRouter();
+  // P43-01: resolve the desktop-only "Labels on rows" knob once per table (a
+  // context/hook read here, never per row) so the virtualized rows stay cheap.
+  const resolvedRowLabels = useResolvedRowLabels(rowLabels);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   // Anchor for shift-click range selection — the last row toggled without shift.
   const selectionAnchorRef = useRef<string | null>(null);
@@ -1522,6 +1574,7 @@ export function ContactsWorkspaceTable({
                   focused={focusedId === row.contact.id}
                   viewMode={viewMode}
                   labelColors={labelColors}
+                  rowLabels={resolvedRowLabels}
                 />
               )}
             </div>

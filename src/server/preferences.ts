@@ -7,6 +7,8 @@ const VALID_KEYS = new Set<keyof UserPreferences>([
   "dateFormat",
   "nameDisplayOrder",
   "weekStartsOn",
+  "rowLabels",
+  "motion",
 ]);
 
 export async function getPreferences(userId: string): Promise<Required<UserPreferences>> {

@@ -108,6 +108,8 @@ type ContactDashboardProps = {
   recentMerges: RecentMerge[];
   onboarding: OnboardingChecklistData;
   nameDisplayOrder?: "first-last" | "last-first";
+  // P43-01: "Labels on rows" saved value; resolved per-device in the table.
+  rowLabels?: "hover" | "always" | "off";
   currentHealth: ContactHealthKey | null;
   healthCards: HealthCard[];
   visiblePeopleCount: number;
@@ -152,6 +154,7 @@ export function ContactDashboard({
   incomingShares,
   onboarding,
   nameDisplayOrder,
+  rowLabels,
   currentHealth,
   healthCards,
   visiblePeopleCount,
@@ -896,6 +899,7 @@ export function ContactDashboard({
                 groupByLetter={groupByLetter}
                 mode="active"
                 nameDisplayOrder={nameDisplayOrder}
+                rowLabels={rowLabels}
                 query={query}
                 viewMode={viewMode}
                 books={personalBooks}
@@ -916,6 +920,7 @@ export function ContactDashboard({
               groupByLetter={groupByLetter}
               mode="archived"
               nameDisplayOrder={nameDisplayOrder}
+              rowLabels={rowLabels}
               query={query}
               viewMode={viewMode}
               books={personalBooks}

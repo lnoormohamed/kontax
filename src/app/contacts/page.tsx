@@ -494,6 +494,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         currentSort={selectedSort}
         currentTab={selectedTab}
         nameDisplayOrder={prefs.nameDisplayOrder}
+        rowLabels={prefs.rowLabels}
         mergeSuggestions={mergeSuggestions}
         mergeSuggestionsRefreshed={mergeSuggestionsRefreshed}
         planSummary={{
