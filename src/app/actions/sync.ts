@@ -376,8 +376,16 @@ const buildContactWriteDataFromRemoteSnapshot = (
     ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
     : [];
 
+  // P44-05: only touch avatarUrl when the snapshot carries it (newer conflicts);
+  // pre-P44-05 snapshots omit it → the local photo is left untouched.
+  const avatarPatch =
+    "avatarUrl" in snapshot
+      ? { avatarUrl: typeof snapshot.avatarUrl === "string" ? snapshot.avatarUrl : null }
+      : {};
+
   const writeData = {
     fullName,
+    ...avatarPatch,
     firstName: typeof snapshot.firstName === "string" ? snapshot.firstName : null,
     middleName: typeof snapshot.middleName === "string" ? snapshot.middleName : null,
     lastName: typeof snapshot.lastName === "string" ? snapshot.lastName : null,

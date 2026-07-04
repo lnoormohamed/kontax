@@ -355,8 +355,33 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
       case "noop":
         return NOOP("noop");
 
-      case "conflict":
+      case "conflict": {
+        // P44-05: both sides changed to the SAME image after normalization →
+        // auto-resolve silently (no conflict). Only meaningful when both sides
+        // still have a photo (changed×changed); delete-vs-change is a real
+        // conflict. Costs one remote fetch, in the conflict case only.
+        if (local === "changed" && remoteState === "changed" && canonicalLocal) {
+          const raw = await input.loadRemoteBytes();
+          const remoteNorm = raw ? await normalizeContactPhoto(raw) : null;
+          if (remoteNorm && remoteNorm.sha256 === canonicalLocal.sha256) {
+            return {
+              action: "noop",
+              shadow: {
+                signalKind,
+                remoteSignal: remote.signal,
+                remoteCanonicalHash: raw ? hashBytes(raw) : null,
+                localAvatarUrl: avatarUrl,
+                localPhotoHash: canonicalLocal.sha256,
+                lastSyncedRemoteAt: null,
+                lastPushRejected: false,
+              },
+              activity: null,
+              conflict: false,
+            };
+          }
+        }
         return { action, activity: null, conflict: true };
+      }
 
       case "pull": {
         const raw = await input.loadRemoteBytes();

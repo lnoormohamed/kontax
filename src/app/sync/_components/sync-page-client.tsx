@@ -56,6 +56,8 @@ export type ConflictComparisonRow = {
   label: string;
   local: string;
   remote: string;
+  // P44-05: "photo" rows carry image URLs rendered as side-by-side thumbnails.
+  kind?: "text" | "photo";
 };
 
 export type SyncConflictData = {
@@ -65,6 +67,21 @@ export type SyncConflictData = {
   date: string;
   comparisonRows: ConflictComparisonRow[];
 };
+
+// P44-05: a conflict "Photo" row cell — thumbnail with a broken-image fallback.
+function ConflictPhotoCell({ url, alt }: { url: string; alt: string }) {
+  if (!url || url === "—") return <span style={{ fontSize: 12, color: T.mute }}>None</span>;
+  return (
+    <img
+      src={url}
+      alt={alt}
+      style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", border: `1px solid ${T.line2}` }}
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+      }}
+    />
+  );
+}
 
 export type SyncFieldSupportRow = {
   key:
@@ -629,7 +646,7 @@ function ConflictRow({
                         background: "rgba(65,88,244,0.05)",
                       }}
                     >
-                      {r.local}
+                      {r.kind === "photo" ? <ConflictPhotoCell url={r.local} alt="Local photo" /> : r.local}
                     </span>
                     <span
                       className="sy-cmp-remote"
@@ -641,7 +658,7 @@ function ConflictRow({
                         borderLeft: `1px solid ${T.line2}`,
                       }}
                     >
-                      {r.remote}
+                      {r.kind === "photo" ? <ConflictPhotoCell url={r.remote} alt="Remote photo" /> : r.remote}
                     </span>
                   </div>
                 ))}
@@ -710,7 +727,7 @@ function ConflictRow({
                               {lbl}
                             </span>
                             <span style={{ display: "block", fontSize: 13, color: T.ink }}>
-                              {val}
+                              {r.kind === "photo" ? <ConflictPhotoCell url={val} alt={lbl} /> : val}
                             </span>
                           </button>
                         );

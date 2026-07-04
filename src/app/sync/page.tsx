@@ -123,7 +123,7 @@ const getSnapshotText = (snapshot: unknown, key: string): string => {
 const buildConflictRows = (
   local: unknown,
   remote: unknown,
-): Array<{ label: string; local: string; remote: string }> => {
+): Array<{ label: string; local: string; remote: string; kind: "text" | "photo" }> => {
   const fields: Array<[string, string]> = [
     ["Full name", "fullName"],
     ["Emails", "emailAddresses"],
@@ -134,13 +134,23 @@ const buildConflictRows = (
     ["Birthday", "birthday"],
     ["Notes", "notes"],
   ];
-  return fields
+  const textRows = fields
     .map(([label, key]) => ({
       label,
       local: getSnapshotText(local, key),
       remote: getSnapshotText(remote, key),
+      kind: "text" as const,
     }))
     .filter((r) => r.local !== "—" || r.remote !== "—");
+  // P44-05: photo row — the values are image URLs, rendered as side-by-side
+  // thumbnails by the review UI rather than as text.
+  const localPhoto = getSnapshotText(local, "avatarUrl");
+  const remotePhoto = getSnapshotText(remote, "avatarUrl");
+  const photoRows =
+    localPhoto !== "—" || remotePhoto !== "—"
+      ? [{ label: "Photo", local: localPhoto, remote: remotePhoto, kind: "photo" as const }]
+      : [];
+  return [...textRows, ...photoRows];
 };
 
 // ── page ──────────────────────────────────────────────────────────────────────
