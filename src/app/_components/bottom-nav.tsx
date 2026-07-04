@@ -11,7 +11,10 @@ interface BottomNavProps {
 }
 
 const TABS = [
-  { key: "contacts", label: "Contacts", icon: "layoutList", href: "/contacts?tab=overview" },
+  // Mobile lands on the contacts list, not the Overview dashboard (a desktop
+  // concept). Overview stays reachable via the Kontax wordmark in the mobile
+  // header, so Duplicates/Archived/Shared aren't stranded.
+  { key: "contacts", label: "Contacts", icon: "layoutList", href: "/contacts" },
   { key: "activity", label: "Activity", icon: "activity", href: "/contacts?tab=activity" },
   { key: "sync", label: "Sync", icon: "sync", href: "/sync" },
   { key: "settings", label: "Settings", icon: "gear", href: "/settings" },
