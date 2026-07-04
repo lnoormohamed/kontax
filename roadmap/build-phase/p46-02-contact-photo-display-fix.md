@@ -1,16 +1,24 @@
 # P46-02 — Contact photo display fix (diagnosis + fallbacks)
 
-Status: **Built 2026-07-04 (needs staging verify)** · Priority: P1 · Depends: —
+Status: **Built + verified on staging 2026-07-04** · Priority: P1 · Depends: —
 Phase: [Phase 46](phase-46-alphabet-scrubber.md)
 Feeds: [P46-DB02](p46-db02-design-brief-contact-photo-model.md) (Display resolution section)
 
-> **Built 2026-07-04.** Config-driven host in `src/lib/avatar-src.ts` (exported
-> `isKontaxHosted`, matches `NEXT_PUBLIC_MEDIA_HOST` + legacy literal). New
-> shared client component `src/app/_components/contact-hero-avatar.tsx`
-> (thumb→canonical→initials chain) wired into the desktop hero
-> (`contacts/[id]/page.tsx`) and mobile hero (`mobile-contact-detail.tsx`).
-> Typecheck clean. Still needs the staging repro to confirm which display
-> suspect actually bit (and, if it's missing `MINIO_*` env, the deploy fix).
+> **Built + verified 2026-07-04.** Config-driven host in `src/lib/avatar-src.ts`
+> (exported `isKontaxHosted`, matches `NEXT_PUBLIC_MEDIA_HOST` + legacy literal);
+> CSP `img-src` config-driven from the same var in `next.config.js` +
+> `src/middleware.ts`. New shared client component
+> `src/app/_components/contact-hero-avatar.tsx` (thumb→canonical→initials),
+> hardened against an SSR-error race (re-checks `complete && naturalWidth===0`
+> after mount), wired into desktop (`contacts/[id]/page.tsx`) + mobile
+> (`mobile-contact-detail.tsx`) heroes.
+>
+> **Root cause confirmed on staging:** `MINIO_PUBLIC_URL` = `http://10.0.0.144:9000`,
+> so the old hardcoded `media.getkontax.com` regex sent every avatar to
+> `/api/image-proxy`, which **blocks private IPs → 502** (that's the "images
+> not displaying"). After the fix the hero resolves to the **direct MinIO URL**;
+> the initials fallback engages for an unreachable image. (Suspect #1, not the
+> missing-env suspect #2.) Typecheck clean.
 
 > User report: "images are not being displayed." The reporter isn't sure
 > where — treat this as **diagnose first, then fix**. Thumbnail infrastructure

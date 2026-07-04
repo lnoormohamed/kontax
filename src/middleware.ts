@@ -74,13 +74,32 @@ const hasAuthSessionCookie = (req: NextRequest) =>
 // Directives below mirror next.config.js — keep them in sync — with script-src
 // swapped for the nonce form. All other directives must be present so the page
 // still renders under the intersection of the two policies.
+// P46-02: keep the img-src in sync with next.config.js — legacy media host plus
+// the deploy's configured media host (NEXT_PUBLIC_MEDIA_HOST), so Kontax-hosted
+// avatars load directly instead of being CSP-blocked.
+const MEDIA_HOST_ORIGIN = (() => {
+  try {
+    return process.env.NEXT_PUBLIC_MEDIA_HOST
+      ? new URL(process.env.NEXT_PUBLIC_MEDIA_HOST).origin
+      : null;
+  } catch {
+    return null;
+  }
+})();
+const IMG_SRC = [
+  "img-src 'self' data: blob: https://media.getkontax.com",
+  MEDIA_HOST_ORIGIN && MEDIA_HOST_ORIGIN !== "https://media.getkontax.com" ? MEDIA_HOST_ORIGIN : "",
+]
+  .filter(Boolean)
+  .join(" ");
+
 const withStrictCardCsp = (req: NextRequest): NextResponse => {
   const nonce = crypto.randomUUID().replace(/-/g, "");
   const csp = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' https://js.stripe.com`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://media.getkontax.com",
+    IMG_SRC,
     "font-src 'self'",
     "connect-src 'self' https://api.stripe.com https://checkout.stripe.com",
     "frame-src https://js.stripe.com https://hooks.stripe.com",

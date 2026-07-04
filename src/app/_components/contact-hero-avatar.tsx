@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { resolveAvatarSrc } from "~/lib/avatar-src";
 
@@ -47,6 +47,17 @@ export function ContactHeroAvatar({
   const [stage, setStage] = useState(0);
   useEffect(() => setStage(0), [avatarUrl]);
 
+  // The <img> is server-rendered, so it can finish loading — and error — before
+  // React hydrates and attaches onError, which would leave a broken image with
+  // no fallback. After each render, catch an already-errored image (complete but
+  // zero natural size) and advance. A still-loading image reports complete=false,
+  // so this never false-fires mid-load.
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth === 0) setStage((s) => s + 1);
+  }, [stage]);
+
   const dim = size ? { width: size, height: size } : undefined;
 
   if (stage < candidates.length) {
@@ -55,6 +66,7 @@ export function ContactHeroAvatar({
         alt={alt}
         className={className}
         onError={() => setStage((s) => s + 1)}
+        ref={imgRef}
         src={candidates[stage]}
         style={{ objectFit: "cover", ...dim, ...style }}
       />

@@ -73,9 +73,31 @@ Two intentional deviations from the canvas, with reasons:
 2. **Host match uses `NEXT_PUBLIC_MEDIA_HOST`, not raw `MINIO_PUBLIC_URL`.**
    `resolveAvatarSrc` runs on client **and** server; a server-only env var is
    `undefined` in the browser bundle and would cause a hydration mismatch. The
-   public var guarantees both sides agree. **Deploy action:** a deploy whose
-   media host isn't `media.getkontax.com` must set `NEXT_PUBLIC_MEDIA_HOST`
-   *and* add that host to the CSP `img-src`.
+   public var guarantees both sides agree. The CSP `img-src` (in both
+   `next.config.js` and `src/middleware.ts`) is now **config-driven from the
+   same var**, so it no longer needs a manual per-deploy edit. **Deploy action
+   (reduced):** a deploy whose media host isn't `media.getkontax.com` only needs
+   to set `NEXT_PUBLIC_MEDIA_HOST` — CSP follows automatically.
+
+3. **Fallback catches images that error before hydration.** Live testing
+   surfaced an SSR-race: a server-rendered `<img>` can finish loading and error
+   before React attaches `onError`, stranding a broken image. `ContactHeroAvatar`
+   now re-checks `complete && naturalWidth === 0` after mount and advances the
+   chain, so the initials fallback always wins.
+
+## Live verification (2026-07-04, dev server → staging DB + MinIO)
+
+- **P46-03**: uploaded a 1600×1200 PNG → stored a single 1024×768 **JPEG**
+  (EXIF stripped) + 96px webp thumb, **zero raw originals** in MinIO. Replace
+  with `prevUrl` deleted the prior object + thumb. Verified by listing MinIO.
+- **P46-02**: the contact detail hero resolved to the **direct MinIO URL** (not
+  `/api/image-proxy`) — confirming the host-match root cause + fix. The initials
+  fallback engaged for an unreachable image (`img` removed, "AL" shown).
+- **P46-05**: clicking Sharing → History → Details kept `history.length`
+  constant — `replace` prevents tab stacking at runtime.
+- Local caveat: staging MinIO is `http://` on a private IP, so
+  `upgrade-insecure-requests` stops the browser painting the photo locally
+  (prod media host is https); this exercised the fallback path.
 
 Backfill key-stability choice: Job 1 overwrites bytes at the **same key/ext**
 with the normalized JPEG (a `.png` object may then hold JPEG bytes) so no DB

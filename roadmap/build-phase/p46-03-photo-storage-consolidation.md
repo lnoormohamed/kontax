@@ -1,7 +1,13 @@
 # P46-03 — Photo storage consolidation (optimize-on-upload, no raw original, cleanup)
 
-Status: **Built 2026-07-04 (needs staging verify)** · Priority: P1 · Depends: [P46-DB02](p46-db02-design-brief-contact-photo-model.md)
+Status: **Built + verified on staging 2026-07-04** (backfill live run still pending) · Priority: P1 · Depends: [P46-DB02](p46-db02-design-brief-contact-photo-model.md)
 Phase: [Phase 46](phase-46-alphabet-scrubber.md)
+
+> **Verified on staging 2026-07-04:** uploaded a 1600×1200 PNG → one 1024×768
+> JPEG (EXIF stripped) + 96px webp thumb, **zero raw originals** in MinIO;
+> replace with `prevUrl` deleted the prior object + thumb. Confirmed by direct
+> MinIO listing. Outstanding: the `scripts/backfill-avatars.mjs` dry-run →
+> `--commit` run against existing staging state.
 
 > **Built 2026-07-04.** Upload route `src/app/api/upload/avatar/route.ts`
 > rewritten to `normalizeContactPhoto`→`storeContactPhoto` (no raw write) +
