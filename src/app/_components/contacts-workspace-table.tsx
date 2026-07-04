@@ -34,6 +34,12 @@ import {
   type WorkspaceListRequest,
 } from "~/app/actions/workspace-list";
 
+// Module-scoped so it survives the list unmount/remount cycle of an in-app
+// back navigation (a component ref would reset). Flipped true the first time
+// the list's scroll-restore effect runs in this document session — used to
+// scope the mobile "reload" guard to the *initial* load only (see below).
+let listRestoreInitialLoadHandled = false;
+
 // P38-01: lean row shape — only what a row renders. Full contact data (notes,
 // sync state, phonetic fields, dates) stays server-side in contacts/page.tsx.
 type WorkspaceContact = {
@@ -1468,7 +1474,14 @@ export function ContactsWorkspaceTable({
 
     const isMobileViewport = window.matchMedia("(max-width: 1023px)").matches;
     const navigationEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    if (isMobileViewport && navigationEntry?.type === "reload") {
+    // `navigationEntry.type` reflects the *document* load and never changes for
+    // the SPA session, so guarding on it alone permanently disabled restore
+    // after any refresh — every subsequent in-app back landed at the top. Scope
+    // the guard to the genuine initial load; later back-navigations restore
+    // normally regardless of how the document was first loaded.
+    const isInitialSessionLoad = !listRestoreInitialLoadHandled;
+    listRestoreInitialLoadHandled = true;
+    if (isMobileViewport && navigationEntry?.type === "reload" && isInitialSessionLoad) {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       clearRestoreContactParam();
       restoredScrollRef.current = true;
