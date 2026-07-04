@@ -69,7 +69,12 @@ export const env = createEnv({
     // + thumb) vs external (proxied). Only needed when the media host differs
     // from the built-in `media.getkontax.com`; set it to the origin of
     // `MINIO_PUBLIC_URL`. Must be public (NEXT_PUBLIC_) so it's inlined at build.
-    NEXT_PUBLIC_MEDIA_HOST: z.string().url().optional(),
+    // Intentionally NOT `.url()`: a malformed value must never crash app boot
+    // (it's an optional display var). Consumers — avatar-src.ts, next.config.js,
+    // middleware.ts — all parse it through a try/caught `new URL()` and fall back
+    // to the legacy media host, so a bad value degrades gracefully to the default
+    // instead of taking down the whole site.
+    NEXT_PUBLIC_MEDIA_HOST: z.string().optional(),
     // Display-only price strings shown on the pricing page (P19-08).
     // Keep server-side Stripe price IDs separate — only display strings are public.
     NEXT_PUBLIC_PRICE_PRO_MONTHLY: z.string().optional(),
