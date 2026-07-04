@@ -288,7 +288,10 @@ function RowActions({
       </Link>
       <button
         aria-label="More actions"
-        className={`grid ${triggerClassName} lg:hidden lg:group-hover:grid`}
+        // P46-DB04 §1·A — the mobile row's right edge is star + swipe gestures,
+        // no kebab. Hidden below lg; on desktop it still appears on row hover.
+        // Archive / Delete permanently remain on the contact's detail screen.
+        className={`hidden ${triggerClassName} lg:group-hover:grid`}
         onClick={(event) => {
           event.stopPropagation();
           setMenuOpen((open) => !open);
@@ -641,7 +644,12 @@ const ContactRow = memo(function ContactRow({
     </span>
   );
 
-  const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
+  // P46-DB04 §1·B — the stacked (mobile/cozy) row shows ONE secondary line:
+  // company → email → phone, first non-empty. (Previously it concatenated all
+  // three with "·", which over-stuffed the row.) The desktop compact grid keeps
+  // its own company/email/phone columns below and is unaffected.
+  const primaryDetail = [contact.company, contact.email, contact.phone].find((value) => value?.trim());
+  const meta = primaryDetail ? [primaryDetail] : [];
   const contactLabels = parseLabels(contact.labels);
   const matchSnippet = inferMatchSnippet(contact, query);
   const mobileContext = [
@@ -676,7 +684,7 @@ const ContactRow = memo(function ContactRow({
             ? meta.map((value, index) => (
                 <span key={index}>
                   {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
-                  <Highlight query={query} text={value!} />
+                  <Highlight query={query} text={value} />
                 </span>
               ))
             : "No details yet"}
@@ -733,7 +741,7 @@ const ContactRow = memo(function ContactRow({
             ? meta.map((value, index) => (
                 <span key={index}>
                   {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
-                  <Highlight query={query} text={value!} />
+                  <Highlight query={query} text={value} />
                 </span>
               ))
             : "No details yet"}
@@ -1244,7 +1252,13 @@ export function ContactsWorkspaceTable({
     [orderedVisibleIds],
   );
 
-  const rowH = viewMode === "cozy" ? 60 : 52;
+  // P46-DB04 §D4 — cozy is the canonical mobile row (40px avatar, name + one
+  // secondary line). The density toggle isn't reachable on mobile, so below
+  // 1024px we always render cozy; desktop keeps its selected mode (compact grid
+  // by default). Explicit density choices still apply on desktop.
+  const effectiveViewMode = isMobile ? "cozy" : viewMode;
+
+  const rowH = effectiveViewMode === "cozy" ? 60 : 52;
 
   const virtualizer = useVirtualizer({
     count: flatRows.length,
@@ -1678,7 +1692,7 @@ export function ContactsWorkspaceTable({
                   query={query}
                   selected={selectedSet.has(row.contact.id)}
                   focused={focusedId === row.contact.id}
-                  viewMode={viewMode}
+                  viewMode={effectiveViewMode}
                   labelColors={labelColors}
                   rowLabels={resolvedRowLabels}
                 />
