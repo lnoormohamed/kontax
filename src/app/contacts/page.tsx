@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { BooksMigrationExplainer } from "~/app/_components/books-migration-explainer";
@@ -488,9 +489,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
       <ConnectionBanner readOnly={!planSummary.lifecyclePolicy.canWrite} />
 
-      {/* P40-08: one-time books migration explainer — existing users only */}
+      {/* P40-08: one-time books migration explainer — existing users only.
+          Wrapped in SessionProvider so the banner can call useSession().update()
+          on dismiss — preferences live in the JWT and would otherwise stay stale
+          until re-login, making the banner reappear on refresh. */}
       {!prefs.booksNative && !prefs.booksExplainerDismissedAt ? (
-        <BooksMigrationExplainer />
+        <SessionProvider session={session}>
+          <BooksMigrationExplainer />
+        </SessionProvider>
       ) : null}
 
       <ContactDashboard
