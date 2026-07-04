@@ -1,6 +1,6 @@
 # P40-01 — Schema: `ContactBookMembership` (additive)
 
-Status: Not started · Priority: P0 · Depends: —
+Status: Schema landed (uncommitted, 2026-07-04) · Priority: P0 · Depends: —
 Phase: [Phase 40](phase-40.md) · Source spec: [phase-37/01 §3.1](../phase-37/01-data-model-build-now.md)
 
 ## Scope

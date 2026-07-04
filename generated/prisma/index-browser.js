@@ -235,6 +235,26 @@ exports.Prisma.ContactScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContactBookMembershipScalarFieldEnum = {
+  id: 'id',
+  contactId: 'contactId',
+  addressBookId: 'addressBookId',
+  isPrimary: 'isPrimary',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ContactPrivateFieldScalarFieldEnum = {
+  id: 'id',
+  contactId: 'contactId',
+  userId: 'userId',
+  fieldType: 'fieldType',
+  label: 'label',
+  value: 'value',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SubscriptionCustomerScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -428,6 +448,7 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   deletionGuardBypassOnce: 'deletionGuardBypassOnce',
   retiredAt: 'retiredAt',
   retiredReason: 'retiredReason',
+  destinationBookId: 'destinationBookId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -689,6 +710,7 @@ exports.Prisma.GroupMemberScalarFieldEnum = {
   canEdit: 'canEdit',
   canManageBilling: 'canManageBilling',
   addressBookPermissions: 'addressBookPermissions',
+  sharingPolicy: 'sharingPolicy',
   inviteToken: 'inviteToken',
   inviteExpiresAt: 'inviteExpiresAt',
   invitedAt: 'invitedAt',
@@ -703,6 +725,7 @@ exports.Prisma.GroupAddressBookScalarFieldEnum = {
   name: 'name',
   description: 'description',
   isDefault: 'isDefault',
+  minimumSharingPolicy: 'minimumSharingPolicy',
   archivedAt: 'archivedAt',
   dissolvedToBookId: 'dissolvedToBookId',
   createdAt: 'createdAt',
@@ -1270,6 +1293,8 @@ exports.Prisma.ModelName = {
   UserOnboardingState: 'UserOnboardingState',
   AppPassword: 'AppPassword',
   Contact: 'Contact',
+  ContactBookMembership: 'ContactBookMembership',
+  ContactPrivateField: 'ContactPrivateField',
   SubscriptionCustomer: 'SubscriptionCustomer',
   Subscription: 'Subscription',
   ImportJob: 'ImportJob',
