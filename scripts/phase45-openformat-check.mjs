@@ -22,12 +22,30 @@ const fail = (label, detail) => {
   console.error(`✗ ${label}${detail ? `\n    ${detail}` : ""}`);
 };
 
-// 1. schema parity
+// 1. schema parity: docs/schemas → open-format/schemas
 for (const name of ["kontax-contact.v1.schema.json", "kontax-archive.v1.schema.json"]) {
   const canonical = readFileSync(join(ROOT, "docs", "schemas", name), "utf8");
   const vendored = readFileSync(join(BUNDLE, "schemas", name), "utf8");
   if (canonical === vendored) ok(`schema in sync: ${name}`);
   else fail(`schema drift: open-format/schemas/${name} ≠ docs/schemas/${name}`, "re-copy the canonical schema into the bundle");
+}
+
+// 1b. public/format parity: the /developers page (P45-07) serves these static
+// copies of the bundle. They MUST match open-format/ byte-for-byte.
+const PUBLIC = join(ROOT, "public", "format");
+const PUBLIC_MIRROR = [
+  ["kontax-contact.v1.schema.json", join(BUNDLE, "schemas", "kontax-contact.v1.schema.json")],
+  ["kontax-archive.v1.schema.json", join(BUNDLE, "schemas", "kontax-archive.v1.schema.json")],
+  ["daniel-cho.json", join(BUNDLE, "examples", "daniel-cho.json")],
+  ["example-archive.zip", join(BUNDLE, "examples", "example-archive.zip")],
+  ["validate.mjs", join(BUNDLE, "bin", "validate.mjs")],
+  ["spec.md", join(BUNDLE, "spec.md")],
+];
+for (const [name, source] of PUBLIC_MIRROR) {
+  const served = readFileSync(join(PUBLIC, name));
+  const canonical = readFileSync(source);
+  if (served.equals(canonical)) ok(`public/format in sync: ${name}`);
+  else fail(`public/format drift: public/format/${name} ≠ its open-format source`, "re-copy from open-format/ into public/format/");
 }
 
 // 2. validator accepts the good examples (exit 0)

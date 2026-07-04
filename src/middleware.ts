@@ -49,6 +49,8 @@ const PUBLIC_PREFIXES = [
   "/api/card", // P30-01: public card click-tracking (unauthenticated)
   "/api/health", // uptime monitoring — no auth required
   "/developers", // P29-07: public API documentation page
+  "/format/", // P45-07: public export-format artifacts (schemas, examples,
+  // validator, spec) linked from /developers — no login required
   "/u/", // P30-01: public contact cards — no login required
 ];
 
