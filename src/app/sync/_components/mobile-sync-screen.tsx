@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { useOffline } from "~/app/_components/connectivity";
 import { UpsellCard } from "~/app/_components/mobile-variance";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
-import type { SyncAccountData } from "./sync-page-client";
+import type { BookOption, SyncAccountData } from "./sync-page-client";
 
 // ── Mobile sync summary (md:hidden) ──────────────────────────────────────────
 // Mirrors the Mobile-PWA design's SyncScreen: clean connection cards with an
@@ -49,6 +50,8 @@ function statusVisual(a: SyncAccountData): StatusVisual {
 
 export function MobileSyncScreen({
   accounts,
+  books,
+  hasBookModel,
   hidden,
   cardDavEnabled,
   syncAccountsLimit,
@@ -58,6 +61,10 @@ export function MobileSyncScreen({
   upgradePlan = "Pro",
 }: {
   accounts: SyncAccountData[];
+  /** P41-DB01: the user's books, for the stacked book-first grouping. */
+  books: BookOption[];
+  /** §7B: false when the account predates the P40 book model. */
+  hasBookModel: boolean;
   /** True when a connection is selected or the add form is open — the full
    *  SyncPageClient takes over the screen, so the summary is suppressed. */
   hidden: boolean;
@@ -79,6 +86,27 @@ export function MobileSyncScreen({
   // lives in the page-level ConnectionBanner slot (account-state ▸ connectivity
   // ▸ update), so this screen only gates its own write affordance (Add).
   const offline = useOffline();
+
+  // P41-DB01 Surface 6A: the stacked rail groups by destination book by default;
+  // a persisted toggle restores the provider grouping. Shares the desktop key so
+  // the choice follows the device across layouts.
+  const [groupMode, setGroupMode] = useState<"book" | "provider">("book");
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("kontax:sync:groupMode");
+      if (saved === "book" || saved === "provider") setGroupMode(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const changeGroupMode = (mode: "book" | "provider") => {
+    setGroupMode(mode);
+    try {
+      window.localStorage.setItem("kontax:sync:groupMode", mode);
+    } catch {
+      /* ignore */
+    }
+  };
 
   if (hidden) return null;
 
@@ -115,6 +143,83 @@ export function MobileSyncScreen({
           : `You're using all ${syncAccountsLimit} sync ${acctWord}.`
         : null;
 
+  // P41-DB01 Surface 6A: one connection card. In book view its status line
+  // restates the projection ("Pushes: Work · never private").
+  const renderCard = (a: SyncAccountData, isLast: boolean) => {
+    const v = statusVisual(a);
+    const bookSub =
+      groupMode === "book" && hasBookModel
+        ? a.projectionRowState === "misconfigured"
+          ? "Projection paused — book removed"
+          : a.projectionRowState === "v1-only"
+            ? "No destination book"
+            : a.projectionSummary
+        : v.sub;
+    const subTone =
+      groupMode === "book" && hasBookModel && a.projectionRowState === "misconfigured"
+        ? "#b5472f"
+        : v.tone;
+    return (
+      <Link
+        key={a.id}
+        href={`/sync?account=${a.id}`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 13,
+          padding: "14px 16px",
+          borderBottom: isLast ? "none" : "1px solid #e9ece7",
+          textDecoration: "none",
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        <span style={{ width: 38, height: 38, borderRadius: 10, background: "#e7efe9", display: "grid", placeItems: "center", flex: "0 0 auto" }}>
+          <WorkspaceIcon name="sync" size={19} className="text-[#17352e]" strokeWidth={1.8} />
+        </span>
+        <span style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ display: "block", fontSize: 15, fontWeight: 600, color: "#1d2823", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {a.label}
+          </span>
+          <span style={{ display: "block", fontSize: 12.5, color: subTone, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {bookSub}
+          </span>
+        </span>
+        <span style={{ width: 9, height: 9, borderRadius: "50%", background: v.dot, flex: "0 0 auto" }} />
+      </Link>
+    );
+  };
+
+  // Book-first stacked groups (Surface 6A). Provider view keeps the single flat
+  // card list.
+  const useBook = groupMode === "book" && hasBookModel && accounts.length > 0;
+  const bookOrder = new Map(books.map((b, i) => [b.id, i]));
+  type MobileGroup = { key: string; label: string; items: SyncAccountData[]; sort: number };
+  const mobileGroups: MobileGroup[] = [];
+  if (useBook) {
+    for (const a of accounts) {
+      let key: string, label: string, sort: number;
+      if (a.projectionRowState === "v1-only" || a.projectionRowState === "misconfigured") {
+        key = "__all__";
+        label = "All contacts";
+        sort = 9000;
+      } else {
+        key = [...a.projectionBookIds].sort().join("+") || "__all__";
+        label = a.projectionBookNames.join(" + ") || "All contacts";
+        sort =
+          a.projectionRowState === "multi-book"
+            ? 1000 + Math.min(...a.projectionBookIds.map((id) => bookOrder.get(id) ?? 500))
+            : bookOrder.get(a.projectionBookIds[0] ?? "") ?? 500;
+      }
+      let g = mobileGroups.find((x) => x.key === key);
+      if (!g) {
+        g = { key, label, items: [], sort };
+        mobileGroups.push(g);
+      }
+      g.items.push(a);
+    }
+    mobileGroups.sort((x, y) => x.sort - y.sort);
+  }
+
   return (
     <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
       <div className="mob-scroll" style={{ flex: 1, padding: "16px 0 28px" }}>
@@ -135,39 +240,58 @@ export function MobileSyncScreen({
             </Link>
           </div>
         ) : (
-          <div style={{ margin: "0 16px 16px", border: "1px solid #d8ddd6", borderRadius: 14, background: "#fff", overflow: "hidden" }}>
-            {accounts.map((a, i) => {
-              const v = statusVisual(a);
-              return (
-                <Link
-                  key={a.id}
-                  href={`/sync?account=${a.id}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 13,
-                    padding: "14px 16px",
-                    borderBottom: i < accounts.length - 1 ? "1px solid #e9ece7" : "none",
-                    textDecoration: "none",
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                >
-                  <span style={{ width: 38, height: 38, borderRadius: 10, background: "#e7efe9", display: "grid", placeItems: "center", flex: "0 0 auto" }}>
-                    <WorkspaceIcon name="sync" size={19} className="text-[#17352e]" strokeWidth={1.8} />
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: "block", fontSize: 15, fontWeight: 600, color: "#1d2823", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {a.label}
-                    </span>
-                    <span style={{ display: "block", fontSize: 12.5, color: v.tone, marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {v.sub}
-                    </span>
-                  </span>
-                  <span style={{ width: 9, height: 9, borderRadius: "50%", background: v.dot, flex: "0 0 auto" }} />
-                </Link>
-              );
-            })}
-          </div>
+          <>
+            {/* Surface 6A: Book / Provider toggle in the summary header. */}
+            {hasBookModel ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 16px 12px" }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b938c" }}>
+                  Group by
+                </span>
+                <div style={{ display: "inline-flex", background: "#f2f4f0", borderRadius: 8, padding: 2, gap: 2 }}>
+                  {(["book", "provider"] as const).map((m) => {
+                    const on = groupMode === m;
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => changeGroupMode(m)}
+                        style={{
+                          padding: "5px 11px",
+                          borderRadius: 6,
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 12,
+                          fontWeight: 600,
+                          background: on ? "#fff" : "transparent",
+                          color: on ? "#1d2823" : "#8b938c",
+                          boxShadow: on ? "0 1px 2px rgba(20,30,25,0.08)" : "none",
+                        }}
+                      >
+                        {m === "book" ? "Book" : "Provider"}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {useBook ? (
+              mobileGroups.map((g) => (
+                <div key={g.key} style={{ marginBottom: 18 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b938c", margin: "0 18px 6px" }}>
+                    {g.label}
+                  </div>
+                  <div style={{ margin: "0 16px", border: "1px solid #d8ddd6", borderRadius: 14, background: "#fff", overflow: "hidden" }}>
+                    {g.items.map((a, i) => renderCard(a, i === g.items.length - 1))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ margin: "0 16px 16px", border: "1px solid #d8ddd6", borderRadius: 14, background: "#fff", overflow: "hidden" }}>
+                {accounts.map((a, i) => renderCard(a, i === accounts.length - 1))}
+              </div>
+            )}
+          </>
         )}
 
         <div style={{ padding: "0 16px" }}>

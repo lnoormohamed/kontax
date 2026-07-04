@@ -29339,6 +29339,9 @@ export namespace Prisma {
     syncWindowEnd: number | null
     syncWindowTimezone: string | null
     maxAttemptsBeforePause: number | null
+    fieldPrecedence: string | null
+    autolinkCaveatDismissedAt: Date | null
+    conflictOverride: string | null
     lastModifiedAt: Date | null
     createdAt: Date | null
   }
@@ -29358,6 +29361,9 @@ export namespace Prisma {
     syncWindowEnd: number | null
     syncWindowTimezone: string | null
     maxAttemptsBeforePause: number | null
+    fieldPrecedence: string | null
+    autolinkCaveatDismissedAt: Date | null
+    conflictOverride: string | null
     lastModifiedAt: Date | null
     createdAt: Date | null
   }
@@ -29380,6 +29386,10 @@ export namespace Prisma {
     excludedFields: number
     exportLabelFilter: number
     maxAttemptsBeforePause: number
+    projectionBookIds: number
+    fieldPrecedence: number
+    autolinkCaveatDismissedAt: number
+    conflictOverride: number
     lastModifiedAt: number
     createdAt: number
     _all: number
@@ -29417,6 +29427,9 @@ export namespace Prisma {
     syncWindowEnd?: true
     syncWindowTimezone?: true
     maxAttemptsBeforePause?: true
+    fieldPrecedence?: true
+    autolinkCaveatDismissedAt?: true
+    conflictOverride?: true
     lastModifiedAt?: true
     createdAt?: true
   }
@@ -29436,6 +29449,9 @@ export namespace Prisma {
     syncWindowEnd?: true
     syncWindowTimezone?: true
     maxAttemptsBeforePause?: true
+    fieldPrecedence?: true
+    autolinkCaveatDismissedAt?: true
+    conflictOverride?: true
     lastModifiedAt?: true
     createdAt?: true
   }
@@ -29458,6 +29474,10 @@ export namespace Prisma {
     excludedFields?: true
     exportLabelFilter?: true
     maxAttemptsBeforePause?: true
+    projectionBookIds?: true
+    fieldPrecedence?: true
+    autolinkCaveatDismissedAt?: true
+    conflictOverride?: true
     lastModifiedAt?: true
     createdAt?: true
     _all?: true
@@ -29567,6 +29587,10 @@ export namespace Prisma {
     excludedFields: string[]
     exportLabelFilter: string[]
     maxAttemptsBeforePause: number | null
+    projectionBookIds: string[]
+    fieldPrecedence: string | null
+    autolinkCaveatDismissedAt: Date | null
+    conflictOverride: string | null
     lastModifiedAt: Date
     createdAt: Date
     _count: SyncAccountSettingsCountAggregateOutputType | null
@@ -29608,6 +29632,10 @@ export namespace Prisma {
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
@@ -29632,6 +29660,10 @@ export namespace Prisma {
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
@@ -29656,6 +29688,10 @@ export namespace Prisma {
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
@@ -29680,11 +29716,15 @@ export namespace Prisma {
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
   }
 
-  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "syncWindowTimezone" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
+  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "syncWindowTimezone" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "projectionBookIds" | "fieldPrecedence" | "autolinkCaveatDismissedAt" | "conflictOverride" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
   export type SyncAccountSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
     importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
@@ -29722,6 +29762,10 @@ export namespace Prisma {
       excludedFields: string[]
       exportLabelFilter: string[]
       maxAttemptsBeforePause: number | null
+      projectionBookIds: string[]
+      fieldPrecedence: string | null
+      autolinkCaveatDismissedAt: Date | null
+      conflictOverride: string | null
       lastModifiedAt: Date
       createdAt: Date
     }, ExtArgs["result"]["syncAccountSettings"]>
@@ -30166,6 +30210,10 @@ export namespace Prisma {
     readonly excludedFields: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly exportLabelFilter: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly maxAttemptsBeforePause: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly projectionBookIds: FieldRef<"SyncAccountSettings", 'String[]'>
+    readonly fieldPrecedence: FieldRef<"SyncAccountSettings", 'String'>
+    readonly autolinkCaveatDismissedAt: FieldRef<"SyncAccountSettings", 'DateTime'>
+    readonly conflictOverride: FieldRef<"SyncAccountSettings", 'String'>
     readonly lastModifiedAt: FieldRef<"SyncAccountSettings", 'DateTime'>
     readonly createdAt: FieldRef<"SyncAccountSettings", 'DateTime'>
   }
@@ -71687,6 +71735,10 @@ export namespace Prisma {
     excludedFields: 'excludedFields',
     exportLabelFilter: 'exportLabelFilter',
     maxAttemptsBeforePause: 'maxAttemptsBeforePause',
+    projectionBookIds: 'projectionBookIds',
+    fieldPrecedence: 'fieldPrecedence',
+    autolinkCaveatDismissedAt: 'autolinkCaveatDismissedAt',
+    conflictOverride: 'conflictOverride',
     lastModifiedAt: 'lastModifiedAt',
     createdAt: 'createdAt'
   };
@@ -75211,6 +75263,10 @@ export namespace Prisma {
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
@@ -75235,6 +75291,10 @@ export namespace Prisma {
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrderInput | SortOrder
+    projectionBookIds?: SortOrder
+    fieldPrecedence?: SortOrderInput | SortOrder
+    autolinkCaveatDismissedAt?: SortOrderInput | SortOrder
+    conflictOverride?: SortOrderInput | SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
     syncAccount?: SyncAccountOrderByWithRelationInput
@@ -75262,6 +75322,10 @@ export namespace Prisma {
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
@@ -75286,6 +75350,10 @@ export namespace Prisma {
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrderInput | SortOrder
+    projectionBookIds?: SortOrder
+    fieldPrecedence?: SortOrderInput | SortOrder
+    autolinkCaveatDismissedAt?: SortOrderInput | SortOrder
+    conflictOverride?: SortOrderInput | SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
     _count?: SyncAccountSettingsCountOrderByAggregateInput
@@ -75316,6 +75384,10 @@ export namespace Prisma {
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
   }
@@ -80947,6 +81019,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
@@ -80971,6 +81047,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -80991,6 +81071,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
@@ -81015,6 +81099,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -81037,6 +81125,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -81057,6 +81149,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -81079,6 +81175,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -86672,6 +86772,10 @@ export namespace Prisma {
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrder
+    projectionBookIds?: SortOrder
+    fieldPrecedence?: SortOrder
+    autolinkCaveatDismissedAt?: SortOrder
+    conflictOverride?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -86699,6 +86803,9 @@ export namespace Prisma {
     syncWindowEnd?: SortOrder
     syncWindowTimezone?: SortOrder
     maxAttemptsBeforePause?: SortOrder
+    fieldPrecedence?: SortOrder
+    autolinkCaveatDismissedAt?: SortOrder
+    conflictOverride?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -86718,6 +86825,9 @@ export namespace Prisma {
     syncWindowEnd?: SortOrder
     syncWindowTimezone?: SortOrder
     maxAttemptsBeforePause?: SortOrder
+    fieldPrecedence?: SortOrder
+    autolinkCaveatDismissedAt?: SortOrder
+    conflictOverride?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -92256,6 +92366,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type SyncAccountSettingsCreateprojectionBookIdsInput = {
+    set: string[]
+  }
+
   export type SyncAccountCreateNestedOneWithoutSettingsInput = {
     create?: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
     connectOrCreate?: SyncAccountCreateOrConnectWithoutSettingsInput
@@ -92283,6 +92397,11 @@ export namespace Prisma {
   }
 
   export type SyncAccountSettingsUpdateexportLabelFilterInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type SyncAccountSettingsUpdateprojectionBookIdsInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -106915,6 +107034,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     importLabel?: LabelCreateNestedOneWithoutSyncAccountSettingsInput
@@ -106937,6 +107060,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -107538,6 +107665,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     importLabel?: LabelUpdateOneWithoutSyncAccountSettingsNestedInput
@@ -107560,6 +107691,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -115386,6 +115521,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
@@ -115408,6 +115547,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -115620,6 +115763,10 @@ export namespace Prisma {
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
   }
@@ -127941,6 +128088,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -127961,6 +128112,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
@@ -127983,6 +128138,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -128004,6 +128163,10 @@ export namespace Prisma {
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

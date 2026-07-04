@@ -111,6 +111,23 @@ export type SyncAccountData = {
   // P23-01 convention: null = platform default (60 min), 0 = manual only.
   syncFrequencyMinutes: number | null;
   bookAllowlist: string[];
+  // ── P41-DB01 projection config (resolved for display) ──────────────────────
+  destinationBookId: string | null;
+  // Resolved name of the inbound-landing book, or null if unset. When the book
+  // was deleted out from under the connection, this is null and
+  // destinationBookMissing is true (the "misconfigured" row state).
+  destinationBookName: string | null;
+  destinationBookMissingName: string | null;
+  // Books this connection projects OUT, resolved to display names + slugs.
+  projectionBookIds: string[];
+  projectionBookNames: string[];
+  projectionBookSlugs: string[];
+  projectionSharedBook: boolean;
+  fieldPrecedence: "work" | "personal" | null;
+  autolinkCaveatDismissed: boolean;
+  conflictOverride: "account_default" | "remote_wins" | "queue_review" | null;
+  projectionRowState: ProjectionRowState;
+  projectionSummary: string;
   // P36 advanced settings.
   importLabelId: string | null;
   maxDeletionsThreshold: number | null;
@@ -170,6 +187,20 @@ export type LabelOption = {
   name: string;
   color: string;
 };
+
+// P41-DB01: a user's personal book, for the projection-scope picker + rail
+// grouping. `slug` maps to the projection-preview sample (personal/work);
+// `shared` marks a shared/group book (renders the SHARED tag).
+export type BookOption = {
+  id: string;
+  name: string;
+  slug: string;
+  isDefault: boolean;
+  shared?: boolean;
+};
+
+// P41-DB01 Surface 7: connection-row projection states a build must handle.
+export type ProjectionRowState = "single-book" | "multi-book" | "v1-only" | "misconfigured";
 
 // ── Health model (maps DB health → design visual state) ──────────────────────
 type VisualHealth =
@@ -1253,6 +1284,43 @@ function DuplicatesBanner({ count }: { count: number }) {
       >
         Review suggestions →
       </Link>
+    </div>
+  );
+}
+
+// ── P41-DB01 Surface 7: misconfigured projection (destination book removed) ───
+function ProjectionMisconfiguredBanner({ bookName, onFix }: { bookName: string; onFix: () => void }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "center",
+        background: T.redWash,
+        border: `1px solid #e8c6ba`,
+        borderRadius: 12,
+        padding: "13px 16px",
+        marginBottom: 22,
+      }}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.red} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+        <path d="M12 3l9 16H3z" />
+        <path d="M12 10v4" />
+        <path d="M12 17h.01" />
+      </svg>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: T.red }}>Projection paused</div>
+        <div style={{ fontSize: 13, color: T.ink2, marginTop: 2, lineHeight: 1.5 }}>
+          Its destination book “{bookName}” was removed. Pick a new book to resume projecting.
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onFix}
+        style={{ border: `1px solid ${T.line}`, background: "#fff", color: T.ink, fontSize: 13, fontWeight: 600, borderRadius: 8, padding: "7px 14px", cursor: "pointer", flexShrink: 0 }}
+      >
+        Fix
+      </button>
     </div>
   );
 }
@@ -3653,6 +3721,11 @@ export type SyncPageClientProps = {
   pastAccounts: SyncAccountData[];
   // P36: the user's labels, for the auto-label and export-filter pickers.
   labels: LabelOption[];
+  // P41-DB01: the user's personal books, for the projection-scope picker + rail.
+  books: BookOption[];
+  // P41-DB01 §7B: false when the account predates the P40 book model — projection
+  // sections stay hidden until the account is migrated.
+  hasBookModel: boolean;
   initialAccountId: string | null;
   // open the add-account form on mount (mobile deep-link from MobileSyncScreen)
   initialAdd?: boolean;
@@ -3663,7 +3736,7 @@ export type SyncPageClientProps = {
   upgradeableAtCap: boolean;
 };
 
-export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookModel, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
   const allAccounts = [...accounts, ...pastAccounts];
   // P36-DB02: a freshly-connected account awaiting setup wins the initial selection
   // so its first-run setup panel opens immediately.
@@ -3673,6 +3746,26 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
   );
   const [view, setView] = useState<"detail" | "add">(initialAdd ? "add" : "detail");
   const [editing, setEditing] = useState(false);
+  // P41-DB01 Surface 1: the rail groups by destination book first; a persisted
+  // toggle restores the P35 provider grouping losslessly. Default is book. The
+  // choice sticks per device via localStorage.
+  const [groupMode, setGroupMode] = useState<"book" | "provider">("book");
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("kontax:sync:groupMode");
+      if (saved === "book" || saved === "provider") setGroupMode(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const changeGroupMode = (mode: "book" | "provider") => {
+    setGroupMode(mode);
+    try {
+      window.localStorage.setItem("kontax:sync:groupMode", mode);
+    } catch {
+      /* ignore */
+    }
+  };
   // On mobile we deep-link straight into a connection or the add form, so the
   // detail pane should be active from the start in those cases.
   // syncingId reserved for future optimistic in-progress indicator
@@ -3815,6 +3908,13 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           key={selectedAccount.id}
           account={selectedAccount}
           labels={labels}
+          books={books}
+          hasBookModel={hasBookModel}
+          // P41-DB01 §4A: the iOS auto-link caveat fires on a second same-provider
+          // account on the same device (the two-iCloud "John" case).
+          showAutolinkCaveat={
+            accounts.filter((a) => a.provider === selectedAccount.provider).length >= 2
+          }
           freqProGated={upgradeableAtCap}
           firstRun={firstRun}
           onClose={() => {
@@ -3856,6 +3956,14 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           <CapabilityNote
             title={selectedAccount.capabilityNoteTitle}
             body={selectedAccount.capabilityNoteBody}
+          />
+        )}
+        {/* P41-DB01 Surface 7: destination book was archived → projection paused,
+            never silently re-routed. Fix opens the projection scope (2A). */}
+        {hasBookModel && selectedAccount.projectionRowState === "misconfigured" && (
+          <ProjectionMisconfiguredBanner
+            bookName={selectedAccount.destinationBookMissingName ?? "this book"}
+            onFix={() => openSettings(selectedAccount.id)}
           />
         )}
         <AccountHeader
@@ -4063,22 +4171,86 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           Sync accounts
         </div>
 
-        {/* P35: group accounts by provider; show group labels when multiple providers */}
+        {/* P41-DB01 Surface 1: Book / Provider grouping toggle (persisted). */}
+        {hasBookModel && accounts.length > 0 ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "0 12px 12px" }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: T.mute }}>
+              Group by
+            </span>
+            <div style={{ display: "inline-flex", background: T.wash, borderRadius: 8, padding: 2, gap: 2 }}>
+              {(["book", "provider"] as const).map((m) => {
+                const on = groupMode === m;
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => changeGroupMode(m)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "4px 9px",
+                      borderRadius: 6,
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      background: on ? "#fff" : "transparent",
+                      color: on ? T.ink : T.mute,
+                      boxShadow: on ? "0 1px 2px rgba(20,30,25,0.08)" : "none",
+                    }}
+                  >
+                    {m === "book" ? "Book" : "Provider"}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {/* P41-DB01 Surface 1 / P35: group by destination book (default) or by
+            provider. Book-first sections are the books a connection lands in; the
+            provider view restores the P35 groups losslessly. */}
         {(() => {
-          type Group = { key: string; label: string; items: SyncAccountData[] };
+          type Group = { key: string; label: string; items: SyncAccountData[]; sort: number };
           const GROUP_ORDER: Record<string, number> = { GOOGLE: 0, MICROSOFT: 1, CARDDAV: 2 };
           const GROUP_LABEL: Record<string, string> = { GOOGLE: "Google", MICROSOFT: "Microsoft", CARDDAV: "CardDAV" };
+          const bookOrder = new Map(books.map((b, i) => [b.id, i]));
           const grouped: Group[] = [];
-          accounts.forEach((a) => {
-            let g = grouped.find((x) => x.key === a.provider);
+          const useBook = groupMode === "book" && hasBookModel;
+
+          const put = (key: string, label: string, sort: number, a: SyncAccountData) => {
+            let g = grouped.find((x) => x.key === key);
             if (!g) {
-              g = { key: a.provider, label: GROUP_LABEL[a.provider] ?? a.provider, items: [] };
+              g = { key, label, items: [], sort };
               grouped.push(g);
             }
             g.items.push(a);
+          };
+
+          accounts.forEach((a) => {
+            if (useBook) {
+              // V1-only / misconfigured connections sit under a neutral "All
+              // contacts" group (never invented into a book).
+              if (a.projectionRowState === "v1-only" || a.projectionRowState === "misconfigured") {
+                put("__all__", "All contacts", 9000, a);
+                return;
+              }
+              const key = [...a.projectionBookIds].sort().join("+") || "__all__";
+              const label = a.projectionBookNames.join(" + ") || "All contacts";
+              // Single-book sorts by its book order; multi-book after all single
+              // books; shared last handled by book order.
+              const sort =
+                a.projectionRowState === "multi-book"
+                  ? 1000 + Math.min(...a.projectionBookIds.map((id) => bookOrder.get(id) ?? 500))
+                  : bookOrder.get(a.projectionBookIds[0] ?? "") ?? 500;
+              put(key, label, sort, a);
+            } else {
+              put(a.provider, GROUP_LABEL[a.provider] ?? a.provider, GROUP_ORDER[a.provider] ?? 9, a);
+            }
           });
-          grouped.sort((a, b) => (GROUP_ORDER[a.key] ?? 9) - (GROUP_ORDER[b.key] ?? 9));
-          const showGroupLabels = grouped.length > 1;
+          grouped.sort((a, b) => a.sort - b.sort);
+          const showGroupLabels = grouped.length > 1 || useBook;
           return (
         <div style={{ display: "grid", gap: 2 }}>
           {grouped.map((g) => (
@@ -4147,13 +4319,24 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
                       style={{
                         display: "block",
                         fontSize: 12,
-                        color: HEALTH_LIST_COLOR[vH],
+                        color:
+                          groupMode === "book" && a.projectionRowState === "misconfigured"
+                            ? T.red
+                            : HEALTH_LIST_COLOR[vH],
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {getAccountRailSubtitle(a, vH)}
+                      {/* P41-DB01: in book view the row restates its projection
+                          ("→ Work"); provider view keeps the health subtitle. */}
+                      {groupMode === "book" && hasBookModel
+                        ? a.projectionRowState === "misconfigured"
+                          ? "Projection paused — book removed"
+                          : a.projectionRowState === "v1-only"
+                            ? "No destination book"
+                            : `→ ${a.projectionBookNames.join(", ")}`
+                        : getAccountRailSubtitle(a, vH)}
                     </span>
                   </span>
                   {needsReview ? (

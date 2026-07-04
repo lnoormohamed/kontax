@@ -471,6 +471,10 @@ exports.Prisma.SyncAccountSettingsScalarFieldEnum = {
   excludedFields: 'excludedFields',
   exportLabelFilter: 'exportLabelFilter',
   maxAttemptsBeforePause: 'maxAttemptsBeforePause',
+  projectionBookIds: 'projectionBookIds',
+  fieldPrecedence: 'fieldPrecedence',
+  autolinkCaveatDismissedAt: 'autolinkCaveatDismissedAt',
+  conflictOverride: 'conflictOverride',
   lastModifiedAt: 'lastModifiedAt',
   createdAt: 'createdAt'
 };

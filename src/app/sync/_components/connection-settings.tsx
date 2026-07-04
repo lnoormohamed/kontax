@@ -2,11 +2,24 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 
-import { completeSyncSetup, updateBookAllowlist, updateSyncAccountSettings } from "~/app/actions/sync";
+import {
+  completeSyncSetup,
+  dismissProjectionAutolinkCaveat,
+  updateBookAllowlist,
+  updateSyncAccountSettings,
+} from "~/app/actions/sync";
 import { ConfirmDialog } from "~/app/_components/confirm-dialog";
+import { PROJECTION_COPY } from "~/lib/projection-copy";
+import { PROJECTION_ROUTING_ENABLED } from "~/lib/projection-flags";
+import {
+  JOHN_SAMPLE,
+  resolveCollision,
+  type Precedence,
+} from "~/lib/projection-preview";
 
 import { ELEVATION_REQUIRED, Spinner, T } from "./sync-shared";
-import type { LabelOption, SyncAccountData } from "./sync-page-client";
+import { CollisionChip, ProjectionExplainer } from "./projection-explainer";
+import type { BookOption, LabelOption, SyncAccountData } from "./sync-page-client";
 
 // ── design palette extras (not in the shared token set) ──────────────────────
 const FAINT = "#aeb4ac";
@@ -549,6 +562,12 @@ type SettingsDraft = {
   excludedFields: string[]; // vCard field tokens, e.g. "NOTE"
   exportLabelFilter: string[]; // label ids; [] = push all
   retry: string; // "default" | "0" | "1" | "3" | "5" | "10"
+  // ── P41-DB01 projection config ──────────────────────────────────────────────
+  // The inbound-landing book (SyncAccount.destinationBookId) follows the primary
+  // projected book, so projectionBookIds is the single control here.
+  projectionBookIds: string[]; // Kontax book ids this connection projects OUT
+  fieldPrecedence: "" | "work" | "personal"; // "" = default (favour home book)
+  conflictOverride: "" | "account_default" | "remote_wins" | "queue_review"; // V2
 };
 
 const seedDraft = (account: SyncAccountData): SettingsDraft => ({
@@ -566,11 +585,530 @@ const seedDraft = (account: SyncAccountData): SettingsDraft => ({
   excludedFields: [...account.excludedFields],
   exportLabelFilter: [...account.exportLabelFilter],
   retry: retryToSelect(account.maxAttemptsBeforePause),
+  projectionBookIds: [...account.projectionBookIds],
+  fieldPrecedence: account.fieldPrecedence ?? "",
+  conflictOverride: account.conflictOverride ?? "",
 });
+
+// ── P41-DB01 Surfaces 2–4: projection scope, precedence, explainer, caveat ────
+const SGREEN_TEXT = "#1c6b48";
+const SGREEN_WASH = "#e3efe7";
+const BLUE_WASH = "#edf0fe";
+
+function ScopeRow({
+  name,
+  on,
+  onClick,
+  tag,
+  tagPositive,
+}: {
+  name: string;
+  on: boolean;
+  onClick: () => void;
+  tag: string;
+  tagPositive?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={on}
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 11,
+        width: "100%",
+        padding: "11px 12px",
+        borderRadius: 10,
+        border: `1px solid ${on ? T.blue : T.line}`,
+        background: on ? CARD_SEL_BG : "#fff",
+        cursor: "pointer",
+        textAlign: "left",
+        transition: "border-color .14s ease, background .14s ease",
+      }}
+    >
+      {/* presentational check — the row itself is the control (no nested button) */}
+      <span
+        aria-hidden
+        style={{
+          width: 19,
+          height: 19,
+          borderRadius: 5,
+          flex: "0 0 auto",
+          display: "grid",
+          placeItems: "center",
+          border: `1.7px solid ${on ? T.blue : FAINT}`,
+          background: on ? T.blue : "#fff",
+        }}
+      >
+        {on ? (
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2.5 6.2l2.3 2.3L9.5 3.5" />
+          </svg>
+        ) : null}
+      </span>
+      <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: T.ink }}>{name}</span>
+      <span
+        style={{
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: "0.03em",
+          color: tagPositive ? SGREEN_TEXT : T.mute,
+          background: tagPositive ? SGREEN_WASH : T.wash,
+          borderRadius: 5,
+          padding: "2px 7px",
+        }}
+      >
+        {tag}
+      </span>
+    </button>
+  );
+}
+
+function PrecedenceOption({
+  label,
+  on,
+  onClick,
+  example,
+}: {
+  label: string;
+  on: boolean;
+  onClick: () => void;
+  example?: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={on}
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 12,
+        width: "100%",
+        padding: "11px 14px",
+        borderRadius: 10,
+        border: `1px solid ${on ? T.blue : T.line}`,
+        background: on ? CARD_SEL_BG : "#fff",
+        cursor: "pointer",
+        textAlign: "left",
+      }}
+    >
+      <ORadio on={on} />
+      <span style={{ minWidth: 0, flex: 1 }}>
+        <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.ink }}>{label}</span>
+        {example ? <div style={{ fontSize: 12, color: T.ink2, marginTop: 5, lineHeight: 1.5 }}>{example}</div> : null}
+      </span>
+    </button>
+  );
+}
+
+function ProjectionSection({
+  account,
+  books,
+  projectionBookIds,
+  fieldPrecedence,
+  onToggleBook,
+  onPrecedence,
+  conflictOverride,
+  onConflictOverride,
+  showAutolinkCaveat,
+  setToast,
+}: {
+  account: SyncAccountData;
+  books: BookOption[];
+  projectionBookIds: string[];
+  fieldPrecedence: "" | "work" | "personal";
+  onToggleBook: (id: string) => void;
+  onPrecedence: (p: "work" | "personal") => void;
+  conflictOverride: "" | "account_default" | "remote_wins" | "queue_review";
+  onConflictOverride: (v: "account_default" | "remote_wins" | "queue_review") => void;
+  showAutolinkCaveat: boolean;
+  setToast: (msg: string) => void;
+}) {
+  const [caveatDismissed, setCaveatDismissed] = useState(account.autolinkCaveatDismissed);
+
+  const selected = books.filter((b) => projectionBookIds.includes(b.id));
+  const projectionBookSlugs = selected.map((b) => b.slug);
+  const bookNames = Object.fromEntries(books.map((b) => [b.slug, b.name]));
+  // Default precedence favours the home book (Personal by seed); the sample only
+  // distinguishes work/personal, so map the default to "personal".
+  const precedence: Precedence = fieldPrecedence === "" ? "personal" : fieldPrecedence;
+  const multiBook = selected.length > 1;
+
+  const deviceSubtitle = selected.length
+    ? `projecting the ${selected.map((b) => b.name).join(", ")} book${selected.length > 1 ? "s" : ""} · ${
+        multiBook ? `favour ${precedence} fields` : "all fields"
+      }`
+    : "no books projected yet";
+
+  // 2B precedence example line, resolved from the sample "John".
+  const example = (p: Precedence) => {
+    const r = resolveCollision(JOHN_SAMPLE, "phone", p);
+    if (!r) return null;
+    return (
+      <>
+        John&apos;s phone →{" "}
+        <span style={{ color: SGREEN_TEXT, fontWeight: 600 }}>
+          {r.winner.value} ({r.winner.precedenceGroup})
+        </span>
+        {r.loser ? (
+          <>
+            <br />
+            not{" "}
+            <span style={{ color: T.mute, textDecoration: "line-through" }}>
+              {r.loser.value} ({r.loser.precedenceGroup === "personal" ? "mobile" : r.loser.precedenceGroup})
+            </span>
+          </>
+        ) : null}
+      </>
+    );
+  };
+
+  const dismissCaveat = async () => {
+    setCaveatDismissed(true); // optimistic
+    const result = await dismissProjectionAutolinkCaveat({ syncAccountId: account.id });
+    if (!result.ok) {
+      setCaveatDismissed(false);
+      setToast(result.error);
+    }
+  };
+
+  return (
+    <>
+      {/* 2A — what this connection projects (distinct from the allowlist) */}
+      <OptSection label="What this connection projects">
+        <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.5, marginBottom: 10, maxWidth: 460 }}>
+          {PROJECTION_COPY.projectionSub}
+        </div>
+        {books.length === 0 ? (
+          <OptHint>Create a book in Contacts to project it to this device.</OptHint>
+        ) : (
+          <div style={{ display: "grid", gap: 8 }}>
+            {books.map((b) => {
+              const on = projectionBookIds.includes(b.id);
+              return (
+                <ScopeRow
+                  key={b.id}
+                  name={b.name}
+                  on={on}
+                  onClick={() => onToggleBook(b.id)}
+                  tag={on ? "projecting" : "off"}
+                  tagPositive={on}
+                />
+              );
+            })}
+          </div>
+        )}
+        {/* disambiguation — why this is not the allowlist */}
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            alignItems: "flex-start",
+            marginTop: 12,
+            padding: "12px 14px",
+            borderRadius: 10,
+            background: BLUE_WASH,
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="2" style={{ flex: "0 0 auto", marginTop: 1 }}>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 8v5" />
+            <path d="M12 16h.01" />
+          </svg>
+          <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.55 }}>
+            <b style={{ color: T.ink }}>Why two controls?</b> {PROJECTION_COPY.disambiguation}
+          </div>
+        </div>
+      </OptSection>
+
+      {/* 2B — precedence with a concrete example per option */}
+      <OptSection label="When a contact is in more than one book">
+        <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.5, marginBottom: 10, maxWidth: 460 }}>
+          {PROJECTION_COPY.precedenceSub}
+        </div>
+        <div role="radiogroup" style={{ display: "grid", gap: 8 }}>
+          <PrecedenceOption
+            label={PROJECTION_COPY.favourWork}
+            on={fieldPrecedence === "work"}
+            onClick={() => onPrecedence("work")}
+            example={example("work")}
+          />
+          <PrecedenceOption
+            label={PROJECTION_COPY.favourPersonal}
+            on={fieldPrecedence === "personal"}
+            onClick={() => onPrecedence("personal")}
+            example={example("personal")}
+          />
+        </div>
+      </OptSection>
+
+      {/* 2B — private fields: a statement, not a control */}
+      <OptSection label="Private fields">
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            alignItems: "flex-start",
+            padding: "13px 15px",
+            borderRadius: 10,
+            border: `1px solid ${T.line2}`,
+            background: T.wash,
+          }}
+        >
+          <span
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 8,
+              background: "#fff",
+              border: `1px solid ${T.line}`,
+              display: "grid",
+              placeItems: "center",
+              flex: "0 0 auto",
+              color: T.ink2,
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+              <rect x="4" y="10" width="16" height="10" rx="2" />
+              <path d="M8 10V7a4 4 0 018 0v3" />
+            </svg>
+          </span>
+          <div>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>{PROJECTION_COPY.privateStatementTitle}</div>
+            <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.5, marginTop: 3 }}>{PROJECTION_COPY.privateStatementBody}</div>
+          </div>
+        </div>
+      </OptSection>
+
+      {/* Surface 3 — the live explainer */}
+      <OptSection label="What will this device see?">
+        <ProjectionExplainer
+          contact={JOHN_SAMPLE}
+          projectionBookSlugs={projectionBookSlugs}
+          precedence={precedence}
+          bookNames={bookNames}
+          deviceTitle={account.connectedEmail ?? account.label}
+          deviceSubtitle={deviceSubtitle}
+        />
+        {multiBook ? (
+          <div style={{ marginTop: 10 }}>
+            <CollisionChip winnerBook={precedence === "work" ? "Work" : "Personal"} />
+          </div>
+        ) : null}
+      </OptSection>
+
+      {/* Surface 4A — iOS auto-link caveat (info tone, once, dismissible) */}
+      {showAutolinkCaveat && !caveatDismissed ? (
+        <OptSection label="Heads-up">
+          <div
+            style={{
+              display: "flex",
+              gap: 11,
+              alignItems: "flex-start",
+              padding: "13px 15px",
+              borderRadius: 10,
+              background: "#f8faf8",
+              border: `1px solid ${T.line2}`,
+            }}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={T.ink2} strokeWidth="1.9" style={{ flex: "0 0 auto", marginTop: 1 }}>
+              <path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1" />
+              <path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1" />
+            </svg>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>{PROJECTION_COPY.autolinkTitle}</div>
+              <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.55, marginTop: 3 }}>{PROJECTION_COPY.autolinkBody}</div>
+            </div>
+            <button
+              type="button"
+              aria-label="Dismiss"
+              onClick={() => void dismissCaveat()}
+              style={{ border: "none", background: "transparent", cursor: "pointer", color: T.mute, flex: "0 0 auto", padding: 2 }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </OptSection>
+      ) : null}
+
+      {/* Surface 5 (V2 · behind projectionRouting) — inferred inbound routing +
+          per-connection conflict override + the "couldn't attribute" fallback.
+          Drawn dashed/violet so it never reads as live V1. */}
+      {PROJECTION_ROUTING_ENABLED ? (
+        <ProjectionRoutingV2
+          conflictOverride={conflictOverride}
+          onConflictOverride={onConflictOverride}
+        />
+      ) : null}
+    </>
+  );
+}
+
+// ── P41-DB01 Surface 5 (V2, behind projectionRouting) ────────────────────────
+const VIOLET = { bg: "#efeafb", border: "#ddd2f4", ink: "#6b4fb5" } as const;
+
+function V2Tag() {
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: "0.04em",
+        color: VIOLET.ink,
+        background: VIOLET.bg,
+        border: `1px solid ${VIOLET.border}`,
+        borderRadius: 5,
+        padding: "1px 6px",
+      }}
+    >
+      V2
+    </span>
+  );
+}
+
+function ProjectionRoutingV2({
+  conflictOverride,
+  onConflictOverride,
+}: {
+  conflictOverride: "" | "account_default" | "remote_wins" | "queue_review";
+  onConflictOverride: (v: "account_default" | "remote_wins" | "queue_review") => void;
+}) {
+  const overrideOpts: { v: "account_default" | "remote_wins" | "queue_review"; label: string; note?: string }[] = [
+    { v: "account_default", label: "Use account default", note: "— Ask me" },
+    { v: "remote_wins", label: "Remote wins for this connection" },
+    { v: "queue_review", label: "Queue for review" },
+  ];
+  const current = conflictOverride === "" ? "account_default" : conflictOverride;
+  const routingRows = [
+    { when: "Today 14:32", change: "Updated home phone", book: "Personal" },
+    { when: "Today 09:10", change: "Updated job title", book: "Work" },
+  ];
+
+  return (
+    <section
+      style={{
+        marginBottom: 24,
+        border: `1.5px dashed ${VIOLET.border}`,
+        borderRadius: 12,
+        background: "rgba(239,234,251,0.35)",
+        padding: "16px 16px 4px",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: VIOLET.ink }}>
+          Inbound routing &amp; override
+        </span>
+        <V2Tag />
+      </div>
+      <div style={{ fontSize: 12.5, color: T.ink2, lineHeight: 1.5, marginBottom: 14, maxWidth: 460 }}>
+        Behind a flag while the runner learns to persist per-field diffs. {PROJECTION_COPY.v2RoutingInferred}
+      </div>
+
+      {/* 5A — inferred routing history */}
+      <div style={{ border: `1px solid ${T.line2}`, borderRadius: 10, overflow: "hidden", marginBottom: 16, background: "#fff" }}>
+        {routingRows.map((r, i) => (
+          <div
+            key={r.when}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "10px 13px",
+              borderTop: i ? `1px solid ${T.line2}` : "none",
+              fontSize: 12.5,
+            }}
+          >
+            <span style={{ color: T.mute, width: 76, flex: "0 0 auto" }}>{r.when}</span>
+            <span style={{ flex: 1, minWidth: 0, color: T.ink }}>{r.change}</span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: T.blue,
+                background: "#edf0fe",
+                borderRadius: 5,
+                padding: "2px 7px",
+                flex: "0 0 auto",
+              }}
+            >
+              → {r.book} book
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* 5B — per-connection conflict override */}
+      <OptSection label="Conflict handling for this connection">
+        <div role="radiogroup" style={{ display: "grid", gap: 8 }}>
+          {overrideOpts.map((o) => {
+            const on = current === o.v;
+            return (
+              <button
+                key={o.v}
+                type="button"
+                role="radio"
+                aria-checked={on}
+                onClick={() => onConflictOverride(o.v)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: 10,
+                  border: `1px solid ${on ? T.blue : T.line}`,
+                  background: on ? CARD_SEL_BG : "#fff",
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}
+              >
+                <ORadio on={on} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
+                  {o.label}
+                  {o.note ? <span style={{ color: T.mute, fontWeight: 400 }}> {o.note}</span> : null}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </OptSection>
+
+      {/* 5C — "couldn't attribute this change" fallback (reuses the P23 review card) */}
+      <div style={{ border: `1px solid ${T.line2}`, borderRadius: 10, overflow: "hidden", marginBottom: 16, background: "#fff" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "11px 14px", background: T.wash, borderBottom: `1px solid ${T.line2}` }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: T.mute }}>
+            Needs review · unattributed
+          </span>
+          <span style={{ minWidth: 18, height: 18, padding: "0 5px", borderRadius: 999, background: WARN_BG, color: WARN_FG, fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+            1
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "11px 14px", fontSize: 13 }}>
+          <span style={{ color: T.ink }}>
+            Home address <small style={{ color: T.mute }}>changed remotely</small>
+          </span>
+          <span style={{ color: WARN_FG, fontSize: 12.5 }}>book unknown</span>
+        </div>
+        <div style={{ padding: "11px 14px", borderTop: `1px solid ${T.line2}`, fontSize: 12.5, color: T.ink2, lineHeight: 1.55 }}>
+          {PROJECTION_COPY.v2Unattributed}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export function ConnectionSettings({
   account,
   labels,
+  books,
+  hasBookModel,
+  showAutolinkCaveat = false,
   freqProGated = false,
   firstRun = false,
   onClose,
@@ -581,6 +1119,13 @@ export function ConnectionSettings({
 }: {
   account: SyncAccountData;
   labels: LabelOption[];
+  // P41-DB01: the user's personal books, for the projection-scope picker.
+  books: BookOption[];
+  // §7B: false when the account predates the P40 book model — projection sections
+  // stay hidden (the connection keeps syncing exactly as before).
+  hasBookModel: boolean;
+  // §4A: this is a second same-provider account on the same device.
+  showAutolinkCaveat?: boolean;
   // FREE plan → sub-30-minute frequencies are gated behind Pro.
   freqProGated?: boolean;
   // P36-DB02: initial-setup mode for a freshly-connected account — confirms setup
@@ -620,6 +1165,10 @@ export function ConnectionSettings({
     account.excludedFields,
     account.exportLabelFilter,
     account.maxAttemptsBeforePause,
+    account.destinationBookId,
+    account.projectionBookIds,
+    account.fieldPrecedence,
+    account.conflictOverride,
   ]);
 
   const isCardDAV = account.provider === "CARDDAV";
@@ -645,7 +1194,10 @@ export function ConnectionSettings({
       (draft.windowStart !== baseline.windowStart || draft.windowEnd !== baseline.windowEnd)) ||
     JSON.stringify(draft.excludedFields) !== JSON.stringify(baseline.excludedFields) ||
     JSON.stringify(draft.exportLabelFilter) !== JSON.stringify(baseline.exportLabelFilter) ||
-    draft.retry !== baseline.retry;
+    draft.retry !== baseline.retry ||
+    JSON.stringify(draft.projectionBookIds) !== JSON.stringify(baseline.projectionBookIds) ||
+    draft.fieldPrecedence !== baseline.fieldPrecedence ||
+    draft.conflictOverride !== baseline.conflictOverride;
 
   // P39-06: surface dirty state to the parent for its navigation guard.
   useEffect(() => {
@@ -711,6 +1263,12 @@ export function ConnectionSettings({
     excludedFields: draft.excludedFields,
     exportLabelFilter: draft.exportLabelFilter,
     maxAttemptsBeforePause: selectToRetry(draft.retry),
+    // The inbound-landing book follows the primary projected book, so one control
+    // ("What this connection projects") keeps both DB fields coherent.
+    destinationBookId: draft.projectionBookIds[0] ?? null,
+    projectionBookIds: draft.projectionBookIds,
+    fieldPrecedence: draft.fieldPrecedence === "" ? null : draft.fieldPrecedence,
+    conflictOverride: draft.conflictOverride === "" ? null : draft.conflictOverride,
   });
 
   // First-run: confirm setup with the chosen settings and start the held sync.
@@ -779,6 +1337,21 @@ export function ConnectionSettings({
         ? { exportLabelFilter: draft.exportLabelFilter }
         : {}),
       ...(draft.retry !== baseline.retry ? { maxAttemptsBeforePause: selectToRetry(draft.retry) } : {}),
+      // P41-DB01 projection config. Reconfiguring the projected books also moves
+      // the inbound-landing book to the primary one — this clears a stale
+      // destination when fixing a "misconfigured" connection.
+      ...(JSON.stringify(draft.projectionBookIds) !== JSON.stringify(baseline.projectionBookIds)
+        ? {
+            projectionBookIds: draft.projectionBookIds,
+            destinationBookId: draft.projectionBookIds[0] ?? null,
+          }
+        : {}),
+      ...(draft.fieldPrecedence !== baseline.fieldPrecedence
+        ? { fieldPrecedence: draft.fieldPrecedence === "" ? null : draft.fieldPrecedence }
+        : {}),
+      ...(draft.conflictOverride !== baseline.conflictOverride
+        ? { conflictOverride: draft.conflictOverride === "" ? null : draft.conflictOverride }
+        : {}),
     });
     setSaving(false);
     if (result.ok) {
@@ -1018,6 +1591,31 @@ export function ConnectionSettings({
           <OptSection label="Address books" gated="CardDAV only">
             <BookAllowlist account={account} onSaved={onSaved} setToast={setToast} onNeedElevation={onNeedElevation} />
           </OptSection>
+        ) : null}
+
+        {/* P41-DB01 Surfaces 2–4: projection scope, precedence, private statement,
+            the live explainer, and the iOS auto-link caveat. §7B: hidden entirely
+            for pre-P40 accounts (no book model) and for import-only connections
+            (nothing is projected outward). */}
+        {hasBookModel && draft.direction !== "IMPORT_ONLY" ? (
+          <ProjectionSection
+            account={account}
+            books={books}
+            projectionBookIds={draft.projectionBookIds}
+            fieldPrecedence={draft.fieldPrecedence}
+            onToggleBook={(id) =>
+              patch({
+                projectionBookIds: draft.projectionBookIds.includes(id)
+                  ? draft.projectionBookIds.filter((b) => b !== id)
+                  : [...draft.projectionBookIds, id],
+              })
+            }
+            onPrecedence={(p) => patch({ fieldPrecedence: p })}
+            conflictOverride={draft.conflictOverride}
+            onConflictOverride={(v) => patch({ conflictOverride: v })}
+            showAutolinkCaveat={showAutolinkCaveat}
+            setToast={setToast}
+          />
         ) : null}
 
         <AdvancedDivider />

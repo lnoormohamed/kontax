@@ -16,6 +16,7 @@ import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getUserTeamMembership } from "~/server/team-access";
 import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
+import { summarizeProjection } from "~/lib/projection-preview";
 import {
   getConsecutiveFailureStreak,
   getSyncAccountOperationalHealth,
@@ -192,7 +193,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, rawAccounts, rawPastAccounts] =
+  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, projectionBooks, rawAccounts, rawPastAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
       getUserFamilyMembership(userId),
@@ -211,6 +212,16 @@ export default async function SyncPage({ searchParams }: PageProps) {
         where: { userId },
         orderBy: { position: "asc" },
         select: { id: true, name: true, color: true },
+      }),
+      // P41-DB01: the user's personal books power the projection-scope picker and
+      // the book-first rail grouping. Default (home) book first, then by name.
+      // Archived books are included so a connection still pointing at one resolves
+      // to the "misconfigured" state (with its name); they're filtered out of the
+      // selectable picker below.
+      db.addressBook.findMany({
+        where: { userId },
+        orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+        select: { id: true, name: true, slug: true, isDefault: true, archivedAt: true },
       }),
       db.syncAccount.findMany({
         // Historical rows are preserved for reconnect/support flows but stay off
@@ -264,6 +275,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
               excludedFields: true,
               exportLabelFilter: true,
               maxAttemptsBeforePause: true,
+              // P41-DB01 projection config.
+              projectionBookIds: true,
+              fieldPrecedence: true,
+              autolinkCaveatDismissedAt: true,
+              conflictOverride: true,
             },
           },
           replacesSyncAccount: {
@@ -323,6 +339,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
               excludedFields: true,
               exportLabelFilter: true,
               maxAttemptsBeforePause: true,
+              // P41-DB01 projection config.
+              projectionBookIds: true,
+              fieldPrecedence: true,
+              autolinkCaveatDismissedAt: true,
+              conflictOverride: true,
             },
           },
           replacesSyncAccount: {
@@ -334,6 +355,14 @@ export default async function SyncPage({ searchParams }: PageProps) {
         },
       }),
     ]);
+
+  // P41-DB01: resolve projection book ids → display data. `books` is the user's
+  // non-archived personal books; the account may still reference a book id that
+  // was deleted (the "misconfigured" row state).
+  const bookById = new Map(projectionBooks.map((b) => [b.id, b]));
+  // Selectable books for the projection picker exclude archived ones.
+  const selectableBooks = projectionBooks.filter((b) => b.archivedAt == null);
+  const hasBookModel = selectableBooks.length > 0;
 
   const serialiseSyncAccount = (acct: (typeof rawAccounts)[number]): SyncAccountData => {
     const capabilityProfile = resolveSyncProviderCapabilityProfile({
@@ -446,6 +475,48 @@ export default async function SyncPage({ searchParams }: PageProps) {
       comparisonRows: buildConflictRows(cf.localSnapshot, cf.remoteSnapshot),
     }));
 
+    // ── P41-DB01: resolve this connection's projection view ──────────────────
+    // The projected set is the explicit projectionBookIds if configured, else it
+    // falls back to the single destination book. Empty on both = V1-only.
+    const rawProjectionIds = acct.settings?.projectionBookIds ?? [];
+    const destinationId = acct.destinationBookId ?? null;
+    const destinationBook = destinationId ? bookById.get(destinationId) ?? null : null;
+    // Misconfigured = the destination book exists but was archived out from under
+    // the connection (the FK is SetNull on delete, so an id that still resolves to
+    // an archived book is the real "book was removed" case).
+    const destinationBookMissing =
+      destinationId != null && (destinationBook == null || destinationBook.archivedAt != null);
+
+    const projectedIds = rawProjectionIds.length > 0
+      ? rawProjectionIds
+      : destinationId
+        ? [destinationId]
+        : [];
+    const projectedBooks = projectedIds
+      .map((id) => bookById.get(id))
+      .filter((b): b is NonNullable<typeof b> => b != null && b.archivedAt == null);
+    const projectionBookNames = projectedBooks.map((b) => b.name);
+    const projectionBookSlugs = projectedBooks.map((b) => b.slug);
+    const fieldPrecedence = (acct.settings?.fieldPrecedence ?? null) as
+      | "work"
+      | "personal"
+      | null;
+
+    const projectionRowState: SyncAccountData["projectionRowState"] = destinationBookMissing
+      ? "misconfigured"
+      : projectedBooks.length === 0
+        ? "v1-only"
+        : projectedBooks.length > 1
+          ? "multi-book"
+          : "single-book";
+
+    const projectionSummary = summarizeProjection({
+      bookNames: projectionBookNames,
+      precedence: fieldPrecedence,
+      v1Only: projectionRowState === "v1-only",
+      exportOnly: (acct.settings?.syncDirection ?? acct.syncDirection) === "EXPORT_ONLY",
+    });
+
     // P27-07: OAuth providers (Google/Microsoft) show a connected email + token
     // status instead of a server URL + credentials form.
     const isOAuth = acct.provider === "GOOGLE" || acct.provider === "MICROSOFT";
@@ -489,6 +560,19 @@ export default async function SyncPage({ searchParams }: PageProps) {
       ),
       syncFrequencyMinutes: acct.settings?.syncFrequencyMinutes ?? null,
       bookAllowlist: acct.settings?.bookAllowlist ?? [],
+      // P41-DB01 projection config (resolved).
+      destinationBookId: destinationId,
+      destinationBookName: destinationBook && destinationBook.archivedAt == null ? destinationBook.name : null,
+      destinationBookMissingName: destinationBookMissing ? destinationBook?.name ?? "this book" : null,
+      projectionBookIds: projectedIds,
+      projectionBookNames,
+      projectionBookSlugs,
+      projectionSharedBook: projectedBooks.some((b) => "shared" in b && (b as { shared?: boolean }).shared === true),
+      fieldPrecedence,
+      autolinkCaveatDismissed: acct.settings?.autolinkCaveatDismissedAt != null,
+      conflictOverride: (acct.settings?.conflictOverride ?? null) as SyncAccountData["conflictOverride"],
+      projectionRowState,
+      projectionSummary,
       // P36 advanced settings (fall back to column defaults when no row exists).
       importLabelId: acct.settings?.importLabelId ?? null,
       maxDeletionsThreshold: acct.settings?.maxDeletionsThreshold ?? null,
@@ -570,6 +654,14 @@ export default async function SyncPage({ searchParams }: PageProps) {
   const accounts: SyncAccountData[] = rawAccounts.map(serialiseSyncAccount);
   const pastAccounts: SyncAccountData[] = rawPastAccounts.map(serialiseSyncAccount);
 
+  // P41-DB01: selectable books for the projection-scope picker + rail grouping.
+  const bookOptions = selectableBooks.map((b) => ({
+    id: b.id,
+    name: b.name,
+    slug: b.slug,
+    isDefault: b.isDefault,
+  }));
+
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
   const shared: Array<{ id: "family" | "teams"; label: string; icon: string }> = [];
@@ -649,6 +741,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
             a connection/add takes over via SyncPageClient. */}
         <MobileSyncScreen
           accounts={accounts}
+          books={bookOptions}
+          hasBookModel={hasBookModel}
           hidden={mobileClientActive}
           cardDavEnabled={planSummary.entitlements.cardDavSyncEnabled}
           syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
@@ -671,6 +765,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
             accounts={accounts}
             pastAccounts={pastAccounts}
             labels={labels}
+            books={bookOptions}
+            hasBookModel={hasBookModel}
             initialAccountId={initialAccountId}
             initialAdd={addParam}
             flash={flashMsg}

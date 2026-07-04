@@ -920,6 +920,25 @@ model SyncAccountSettings {
   // Retry sensitivity: auto-pause after this many consecutive failures (null = platform default of 5)
   maxAttemptsBeforePause Int?
 
+  // ── P41-DB01: per-connection projection config ──────────────────────────────
+  // Which Kontax books this connection projects OUT to the remote device, by
+  // membership. Empty = not-yet-configured (the V1-only row state); the runner
+  // still lands inbound in destinationBook / the primary book unchanged. NOTE:
+  // this UI ticket persists the config only — the outbound sync runner does not
+  // yet enforce projection scope (deferred to P41-05+).
+  projectionBookIds         String[]
+  // When a contact lives in >1 projected book, which book's version of a colliding
+  // field this device receives. "work" | "personal"; null = default (favour the
+  // contact's home/primary book). Only affects fields that collide across books.
+  fieldPrecedence           String?
+  // P41-DB01 §4A: the iOS auto-link caveat is shown once per (device, provider) —
+  // this stamps the dismissal for this connection so it never re-nags.
+  autolinkCaveatDismissedAt DateTime?
+  // P41-DB01 §5B (behind the projectionRouting flag): overrides the account-wide
+  // conflict policy for inbound edits from this device only. null = use account
+  // default. Read/written only while the flag is on.
+  conflictOverride          String?
+
   lastModifiedAt DateTime @updatedAt
   createdAt      DateTime @default(now())
 

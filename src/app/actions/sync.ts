@@ -2190,6 +2190,13 @@ const updateSyncAccountSettingsSchema = z.object({
   exportLabelFilter: z.array(z.string().min(1)).max(64).optional(),
   // 0 = never auto-pause; null = platform default (5).
   maxAttemptsBeforePause: z.number().int().min(0).max(100).nullable().optional(),
+  // P41-DB01 projection config. destinationBookId lives on SyncAccount; the rest
+  // on SyncAccountSettings. All book ids are validated to belong to the user.
+  destinationBookId: z.string().min(1).nullable().optional(),
+  projectionBookIds: z.array(z.string().min(1)).max(64).optional(),
+  fieldPrecedence: z.enum(["work", "personal"]).nullable().optional(),
+  // Surface 5B — persisted but only consumed when projectionRouting is enabled.
+  conflictOverride: z.enum(["account_default", "remote_wins", "queue_review"]).nullable().optional(),
 });
 
 export type UpdateSyncAccountSettingsInput = z.infer<typeof updateSyncAccountSettingsSchema>;
@@ -2223,6 +2230,10 @@ export const updateSyncAccountSettings = async (
     excludedFields,
     exportLabelFilter,
     maxAttemptsBeforePause,
+    destinationBookId,
+    projectionBookIds,
+    fieldPrecedence,
+    conflictOverride,
   } = parsed.data;
 
   // A sync window needs both bounds or neither — reject a half-open range.
@@ -2291,6 +2302,23 @@ export const updateSyncAccountSettings = async (
     return { ok: false, error: "Only CardDAV connections can override provider capabilities." };
   }
 
+  // P41-DB01: every projected / destination book id must belong to this user and
+  // still exist (not archived). Guards against stale ids and cross-user writes.
+  const referencedBookIds = [
+    ...(destinationBookId ? [destinationBookId] : []),
+    ...(projectionBookIds ?? []),
+  ];
+  if (referencedBookIds.length > 0) {
+    const owned = await db.addressBook.findMany({
+      where: { id: { in: referencedBookIds }, userId, archivedAt: null },
+      select: { id: true },
+    });
+    const ownedIds = new Set(owned.map((b) => b.id));
+    if (referencedBookIds.some((id) => !ownedIds.has(id))) {
+      return { ok: false, error: "One of the selected books could not be found." };
+    }
+  }
+
   // P23-04: a change to a pulling direction (TWO_WAY / IMPORT_ONLY) may need to
   // catch up on remote contacts skipped while the connection was EXPORT_ONLY.
   const directionChanged = syncDirection != null && syncDirection !== account.syncDirection;
@@ -2325,6 +2353,10 @@ export const updateSyncAccountSettings = async (
     ...(excludedFields !== undefined ? { excludedFields } : {}),
     ...(exportLabelFilter !== undefined ? { exportLabelFilter } : {}),
     ...(maxAttemptsBeforePause !== undefined ? { maxAttemptsBeforePause } : {}),
+    // P41-DB01 projection config (destinationBookId is on SyncAccount, below).
+    ...(projectionBookIds !== undefined ? { projectionBookIds } : {}),
+    ...(fieldPrecedence !== undefined ? { fieldPrecedence } : {}),
+    ...(conflictOverride !== undefined ? { conflictOverride } : {}),
   };
 
   await db.$transaction(async (tx) => {
@@ -2341,6 +2373,15 @@ export const updateSyncAccountSettings = async (
       await tx.syncAccount.update({
         where: { id: syncAccountId },
         data: { syncDirection },
+      });
+    }
+
+    // P41-DB01: destinationBookId lives on SyncAccount (the inbound-landing book).
+    // undefined = untouched; null = clear back to the primary-book default.
+    if (destinationBookId !== undefined) {
+      await tx.syncAccount.update({
+        where: { id: syncAccountId },
+        data: { destinationBookId },
       });
     }
 
@@ -2531,6 +2572,10 @@ export const completeSyncSetup = async (
     excludedFields,
     exportLabelFilter,
     maxAttemptsBeforePause,
+    destinationBookId,
+    projectionBookIds,
+    fieldPrecedence,
+    conflictOverride,
   } = parsed.data;
 
   if ((syncWindowStart == null) !== (syncWindowEnd == null)) {
@@ -2575,6 +2620,22 @@ export const completeSyncSetup = async (
     return { ok: false, error: "Only CardDAV connections can override provider capabilities." };
   }
 
+  // P41-DB01: validate any projected / destination book id belongs to this user.
+  const setupBookIds = [
+    ...(destinationBookId ? [destinationBookId] : []),
+    ...(projectionBookIds ?? []),
+  ];
+  if (setupBookIds.length > 0) {
+    const owned = await db.addressBook.findMany({
+      where: { id: { in: setupBookIds }, userId, archivedAt: null },
+      select: { id: true },
+    });
+    const ownedIds = new Set(owned.map((b) => b.id));
+    if (setupBookIds.some((id) => !ownedIds.has(id))) {
+      return { ok: false, error: "One of the selected books could not be found." };
+    }
+  }
+
   const settingsPatch = {
     ...(syncDirection ? { syncDirection } : {}),
     ...(conflictPolicy ? { conflictPolicy } : {}),
@@ -2589,6 +2650,9 @@ export const completeSyncSetup = async (
     ...(excludedFields !== undefined ? { excludedFields } : {}),
     ...(exportLabelFilter !== undefined ? { exportLabelFilter } : {}),
     ...(maxAttemptsBeforePause !== undefined ? { maxAttemptsBeforePause } : {}),
+    ...(projectionBookIds !== undefined ? { projectionBookIds } : {}),
+    ...(fieldPrecedence !== undefined ? { fieldPrecedence } : {}),
+    ...(conflictOverride !== undefined ? { conflictOverride } : {}),
   };
 
   const now = new Date();
@@ -2604,7 +2668,11 @@ export const completeSyncSetup = async (
     });
     await tx.syncAccount.update({
       where: { id: syncAccountId },
-      data: { setupCompletedAt: now, ...(syncDirection ? { syncDirection } : {}) },
+      data: {
+        setupCompletedAt: now,
+        ...(syncDirection ? { syncDirection } : {}),
+        ...(destinationBookId !== undefined ? { destinationBookId } : {}),
+      },
     });
     // Queue the held first sync. EXPORT_ONLY has nothing to pull and isn't runnable
     // in the live slice yet, so skip it (mirrors updateSyncAccountSettings).
@@ -2633,6 +2701,47 @@ export const completeSyncSetup = async (
       syncAccountId,
       changes: [{ field: "setupCompletedAt", before: null, after: now.toISOString() }],
     },
+  });
+
+  revalidateSyncViews();
+  return { ok: true };
+};
+
+// P41-DB01 §4A: dismiss the "two iCloud accounts may merge on the device" caveat
+// for this connection. Shown once per (device, provider); dismissal persists so
+// it never re-nags. Not an elevated setting — it's a UI acknowledgement.
+const dismissProjectionAutolinkCaveatSchema = z.object({
+  syncAccountId: z.string().min(1, "Sync account id is required."),
+});
+
+export const dismissProjectionAutolinkCaveat = async (
+  input: z.infer<typeof dismissProjectionAutolinkCaveatSchema>,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  let userId: string;
+  try {
+    userId = await getRequiredUserId();
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+  }
+
+  const parsed = dismissProjectionAutolinkCaveatSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid request." };
+  }
+  const { syncAccountId } = parsed.data;
+
+  const account = await db.syncAccount.findFirst({
+    where: currentSyncAccountWhere(userId, syncAccountId),
+    select: { id: true },
+  });
+  if (!account) {
+    return { ok: false, error: "Sync account not found." };
+  }
+
+  await db.syncAccountSettings.upsert({
+    where: { syncAccountId },
+    create: { syncAccountId, autolinkCaveatDismissedAt: new Date() },
+    update: { autolinkCaveatDismissedAt: new Date() },
   });
 
   revalidateSyncViews();
