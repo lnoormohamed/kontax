@@ -1,7 +1,8 @@
 # P44-02 — Photo change detection & echo suppression model
 
-Status: Not started · Priority: P0 · Depends: [P44-01](p44-01-provider-photo-roundtrip-qa-harness.md)
+Status: Done (design) · Priority: P0 · Depends: [P44-01](p44-01-provider-photo-roundtrip-qa-harness.md)
 Phase: [Phase 44](phase-44-photo-sync.md)
+ADR: [docs/adr/0001-sync-shadow-store-and-photo-change-detection.md](../../docs/adr/0001-sync-shadow-store-and-photo-change-detection.md)
 
 ## Scope
 

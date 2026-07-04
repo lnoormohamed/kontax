@@ -52,6 +52,18 @@
 
 ## Reviewer notes
 
-<!-- Human analysis: which identifier should P44-02 use for change
-detection on this provider, size caps to apply on outbound push,
-any anomalies in the tables above. -->
+Resolved by [P44-02 ADR](../adr/0001-sync-shadow-store-and-photo-change-detection.md).
+
+- **Change-detection signal: `resourceIdentifier`.** Bytes are never stable
+  (0/7 byte-identical; always re-encodes, webp→jpeg, strips EXIF), so a
+  byte/content hash cannot be the primary signal for Google. Use the photo
+  endpoint's resource URL / token, which is stable on no-op re-pull. The
+  person-level `etag` is **not** usable — it changes on any field, not just the
+  photo.
+- **Outbound caps:** ≥ 3191 KB accepted, no observed square crop. Normalize to
+  our canonical format (jpeg) and cap max dimension before push per P44-04;
+  Google will re-encode regardless, which is fine — the identifier absorbs it.
+- **Anomaly / open question:** the ≥24 h async re-processing pull is still
+  outstanding. If Google rotates the resource token on async re-encode, the
+  no-op cell would false-positive once; `photoShadow.remoteCanonicalHash` is
+  stored as a tie-breaker (ADR §7). **Confirm before P44-03 builds.**
