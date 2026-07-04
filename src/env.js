@@ -64,6 +64,12 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    // P46-02: public origin of the media (MinIO/CDN) host that serves avatars,
+    // so the client + server agree on which avatar URLs are "ours" (direct load
+    // + thumb) vs external (proxied). Only needed when the media host differs
+    // from the built-in `media.getkontax.com`; set it to the origin of
+    // `MINIO_PUBLIC_URL`. Must be public (NEXT_PUBLIC_) so it's inlined at build.
+    NEXT_PUBLIC_MEDIA_HOST: z.string().url().optional(),
     // Display-only price strings shown on the pricing page (P19-08).
     // Keep server-side Stripe price IDs separate — only display strings are public.
     NEXT_PUBLIC_PRICE_PRO_MONTHLY: z.string().optional(),
@@ -112,6 +118,7 @@ export const env = createEnv({
     MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
     MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
     MICROSOFT_REDIRECT_URI: process.env.MICROSOFT_REDIRECT_URI,
+    NEXT_PUBLIC_MEDIA_HOST: process.env.NEXT_PUBLIC_MEDIA_HOST,
     NEXT_PUBLIC_PRICE_PRO_MONTHLY: process.env.NEXT_PUBLIC_PRICE_PRO_MONTHLY,
     NEXT_PUBLIC_PRICE_PRO_YEARLY: process.env.NEXT_PUBLIC_PRICE_PRO_YEARLY,
     NEXT_PUBLIC_PRICE_FAMILY_MONTHLY: process.env.NEXT_PUBLIC_PRICE_FAMILY_MONTHLY,

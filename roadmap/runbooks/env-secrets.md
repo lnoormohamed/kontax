@@ -56,9 +56,19 @@ The canonical reference is `.env.example` in the repo root. This runbook adds ro
 | `MINIO_ACCESS_KEY` | MinIO access key. Rotate in MinIO console → Access Keys. |
 | `MINIO_SECRET_KEY` | MinIO secret key. Rotate alongside access key. |
 | `MINIO_BUCKET` | Bucket name (default: `kontax-uploads`). |
-| `MINIO_PUBLIC_URL` | Public base URL for uploaded files. May differ from `MINIO_ENDPOINT` if behind a CDN. |
+| `MINIO_PUBLIC_URL` | Public base URL for uploaded files. May differ from `MINIO_ENDPOINT` if behind a CDN. **Must be publicly reachable from users' browsers over HTTPS** — a private-network URL (e.g. `http://10.x…`) will not load client-side. |
+| `NEXT_PUBLIC_MEDIA_HOST` | **(P46-02) Optional.** The public **origin** of the media host (e.g. `https://media.getkontax.com`). Only needed when `MINIO_PUBLIC_URL`'s origin is **not** `https://media.getkontax.com` (which is built-in). Set it to that origin so avatars resolve to a direct load + thumbnail instead of the SSRF proxy, and so the CSP `img-src` allows the host (both are derived from this var). **Build-time:** it's a `NEXT_PUBLIC_*` var — Next.js inlines it at **build**, so it must be present in the Coolify **build** environment, not just runtime. |
 
 If any MinIO var is unset, avatar upload falls back to URL-input-only mode (user pastes an HTTPS URL instead of uploading a file).
+
+### P46-02 avatar display — deploy checklist
+
+Symptom this fixes: uploaded avatars don't display (broken image / initials only), or every avatar is slow because it's routed through `/api/image-proxy`.
+
+1. **`MINIO_*` set** (esp. `MINIO_ENDPOINT`, `MINIO_PUBLIC_URL`) — without them uploads never store and `avatarUrl` stays null (initials only). This was the P44-06 blocker on `kontax.vexon.co`.
+2. **`MINIO_PUBLIC_URL` is a public HTTPS origin.** For prod that is `https://media.getkontax.com` (already whitelisted). If so, **you're done** — the built-in legacy match handles it and `NEXT_PUBLIC_MEDIA_HOST` is **not** required.
+3. **Only if `MINIO_PUBLIC_URL`'s origin ≠ `https://media.getkontax.com`:** set `NEXT_PUBLIC_MEDIA_HOST` to that origin **in the build environment**, then rebuild. The CSP `img-src` (next.config.js + middleware.ts) picks it up automatically — no manual CSP edit.
+4. Verify: open a contact with a photo → the `<img src>` should be the direct media URL, **not** `/api/image-proxy?...`.
 
 ---
 
