@@ -1,7 +1,16 @@
 # P44-04 — Outbound photo push with per-provider normalization
 
-Status: Not started · Priority: P1 · Depends: [P44-02](p44-02-photo-change-detection-echo-suppression.md), [P44-03](p44-03-inbound-photo-sync.md)
+Status: Built (flag-gated `PHOTO_SYNC_ENABLED`, off by default) · Priority: P1 · Depends: [P44-02](p44-02-photo-change-detection-echo-suppression.md), [P44-03](p44-03-inbound-photo-sync.md)
 Phase: [Phase 44](phase-44-photo-sync.md)
+
+> Built behind `PHOTO_SYNC_ENABLED` (off). Outbound normalizes to a canonical
+> 1024px JPEG (under every P44-01 cap incl. iCloud's ~1MB) before push; CardDAV
+> via a full-card PUT that carries the PHOTO (and preserves the remote photo on
+> ordinary field-pushes so it is never wiped), Google via updateContactPhoto.
+> The shadow is seeded from the provider-canonical copy immediately after push
+> (read-back), and a rejected push latches `lastPushRejected` to avoid a retry
+> loop. `IMPORT_ONLY` never pushes (cap gating). The two-cycle no-loop guarantee
+> is proven in the selftest; live verification is [P44-06](p44-06-photo-sync-qa-matrix.md).
 
 ## Scope
 

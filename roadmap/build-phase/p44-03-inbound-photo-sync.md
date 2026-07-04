@@ -1,7 +1,15 @@
 # P44-03 — Inbound photo sync (provider → MinIO → `avatarUrl`)
 
-Status: Not started · Priority: P1 · Depends: [P44-02](p44-02-photo-change-detection-echo-suppression.md)
+Status: Built (flag-gated `PHOTO_SYNC_ENABLED`, off by default) · Priority: P1 · Depends: [P44-02](p44-02-photo-change-detection-echo-suppression.md)
 Phase: [Phase 44](phase-44-photo-sync.md)
+
+> Built behind `PHOTO_SYNC_ENABLED` (off). Inbound pull wired for Google
+> (getBatchGet) and CardDAV (PHOTO decode); normalize→MinIO under the P38-08
+> key convention (thumbnails reuse the existing path); "Photos" added to the
+> Field Exclusions grid. Live provider round-trips are verified in
+> [P44-06](p44-06-photo-sync-qa-matrix.md). Impl: `src/server/contact-photo-sync.ts`,
+> `src/server/sync-photo-pass.ts`. Decision-table selftest:
+> `npm run qa:phase44:photo-decision`.
 
 ## Scope
 
