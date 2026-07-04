@@ -8,6 +8,7 @@ import {
   parseKontaxArchive,
   parseKontaxDocument,
   recognizeKontaxFile,
+  verifyKontaxArchiveIntegrity,
   type ImportedCardContact,
 } from "~/server/export-format/parse";
 
@@ -51,6 +52,18 @@ export async function POST(request: Request) {
   let parseSkippedCount = 0;
   let sourceDetail: string;
   if (recognition.kind === "archive") {
+    // Reject a truncated or tampered archive before landing anything — the
+    // manifest's integrity table (spec §7.3) makes a partial download
+    // detectable. Never a silent partial import.
+    const integrity = verifyKontaxArchiveIntegrity(buffer);
+    if (integrity.verified && !integrity.ok) {
+      return Response.json(
+        {
+          error: `This archive is corrupted or incomplete — ${integrity.problems.length} file(s) failed the integrity check. Re-export and try again.`,
+        },
+        { status: 400 },
+      );
+    }
     const parsed = parseKontaxArchive(buffer);
     contacts = parsed.contacts;
     parseSkippedCount = parsed.skippedCount;

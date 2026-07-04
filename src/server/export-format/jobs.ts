@@ -3,6 +3,10 @@
 // Runs through the same claim-based seam as the GDPR data-export job so the
 // cron runner (LXC 152) can drive it; an in-process kick keeps dev working.
 
+import { createReadStream, createWriteStream } from "fs";
+import { unlink } from "fs/promises";
+import { tmpdir } from "os";
+import { join } from "path";
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -15,9 +19,9 @@ import {
   type ContactValueEntryInput,
   type PortableContactInput,
 } from "~/server/contact-portability";
-import { buildKontaxArchive } from "./archive";
+import { streamKontaxArchive, type StreamArchiveResult } from "./archive";
 import {
-  buildCards,
+  iterateArchiveEntries,
   loadExportableContacts,
   type ExportContactsFilter,
   type ExportedContactRow,
@@ -224,56 +228,70 @@ export async function processKontaxExportJob(jobId: string): Promise<void> {
       data: { totalCount: contacts.length },
     });
 
-    const { cards, media, photoCount } = await buildCards(contacts, {
-      labelRegistry,
-      bookNames,
-      mode: "archive",
-      includePhotos: job.includePhotos,
-      exportedAt,
-      onProgress: async (done) => {
-        // Cancelled from the UI? Stop packing (job row deleted or FAILED).
-        const current = await db.kontaxExportJob.findUnique({
-          where: { id: jobId },
-          select: { status: true },
-        });
-        if (!current || current.status !== "PROCESSING") {
-          throw new JobCancelledError();
-        }
-        await db.kontaxExportJob.update({
-          where: { id: jobId },
-          data: { progressCount: done },
-        });
-      },
-    });
+    const s3 = getS3();
+    if (!s3) throw new Error("MinIO is not configured — set MINIO_ENDPOINT.");
 
     const vcardFallback = job.includeVcardFallback
       ? contactsToVCard(contacts.map(toPortableContact))
       : null;
 
-    const zip = await buildKontaxArchive({
-      cards,
-      media,
-      vcardFallback,
-      labelRegistry,
-      exportedAt,
-    });
+    // Stream the archive to a temp file (one photo held at a time, spec §7.8),
+    // then upload it with a known ContentLength — never assembling 10k photos
+    // or the whole zip in memory.
+    const tmpPath = join(tmpdir(), `kontax-archive-${jobId}.zip`);
+    const fileOut = createWriteStream(tmpPath);
+    let result: StreamArchiveResult;
+    let downloadUrl: string;
+    try {
+      result = await streamKontaxArchive(
+        {
+          entries: iterateArchiveEntries(contacts, {
+            labelRegistry,
+            bookNames,
+            includePhotos: job.includePhotos,
+            exportedAt,
+          }),
+          total: contacts.length,
+          vcardFallback,
+          labelRegistry,
+          exportedAt,
+          onProgress: async (done) => {
+            // Cancelled from the UI? Stop packing (job row deleted or FAILED).
+            const current = await db.kontaxExportJob.findUnique({
+              where: { id: jobId },
+              select: { status: true },
+            });
+            if (!current || current.status !== "PROCESSING") {
+              throw new JobCancelledError();
+            }
+            await db.kontaxExportJob.update({
+              where: { id: jobId },
+              data: { progressCount: done },
+            });
+          },
+        },
+        fileOut,
+      );
 
-    const s3 = getS3();
-    if (!s3) throw new Error("MinIO is not configured — set MINIO_ENDPOINT.");
-    const key = `exports/kontax-archive/${job.userId}-${jobId}.zip`;
-    await s3.send(
-      new PutObjectCommand({
-        Bucket: bucket(),
-        Key: key,
-        Body: zip,
-        ContentType: "application/zip",
-      }),
-    );
-    const downloadUrl = await getSignedUrl(
-      s3,
-      new GetObjectCommand({ Bucket: bucket(), Key: key }),
-      { expiresIn: DOWNLOAD_TTL_SECONDS },
-    );
+      const key = `exports/kontax-archive/${job.userId}-${jobId}.zip`;
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: bucket(),
+          Key: key,
+          Body: createReadStream(tmpPath),
+          ContentLength: result.byteLength,
+          ContentType: "application/zip",
+        }),
+      );
+      downloadUrl = await getSignedUrl(
+        s3,
+        new GetObjectCommand({ Bucket: bucket(), Key: key }),
+        { expiresIn: DOWNLOAD_TTL_SECONDS },
+      );
+    } finally {
+      fileOut.destroy();
+      await unlink(tmpPath).catch(() => undefined);
+    }
 
     const completedAt = new Date();
     const expiresAt = new Date(completedAt.getTime() + DOWNLOAD_TTL_SECONDS * 1000);
@@ -284,19 +302,19 @@ export async function processKontaxExportJob(jobId: string): Promise<void> {
         completedAt,
         expiresAt,
         downloadUrl,
-        fileSizeBytes: zip.length,
-        exportedCount: cards.length,
-        photoCount,
-        progressCount: cards.length,
+        fileSizeBytes: result.byteLength,
+        exportedCount: result.contactCount,
+        photoCount: result.photoCount,
+        progressCount: result.contactCount,
       },
     });
 
-    const sizeMb = Math.max(1, Math.round(zip.length / (1024 * 1024)));
+    const sizeMb = Math.max(1, Math.round(result.byteLength / (1024 * 1024)));
     await createNotification({
       userId: job.userId,
       category: "PRODUCT_UPDATES",
       title: "Your Kontax Archive is ready",
-      body: `${cards.length.toLocaleString()} contacts (${sizeMb} MB). The download link is valid for 7 days.`,
+      body: `${result.contactCount.toLocaleString()} contacts (${sizeMb} MB). The download link is valid for 7 days.`,
       actionUrl: "/import-export",
     });
   } catch (error) {

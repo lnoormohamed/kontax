@@ -15,11 +15,18 @@
 import { createHash } from "crypto";
 import { mkdirSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
+import { Writable } from "stream";
 import { fileURLToPath } from "url";
 import AdmZip from "adm-zip";
 
 import { contactToCard, type ExportableContact } from "../src/server/export-format/card";
-import { buildKontaxArchive, mediaRefPath, type ArchiveMediaFile } from "../src/server/export-format/archive";
+import {
+  buildKontaxArchive,
+  mediaRefPath,
+  streamKontaxArchive,
+  type ArchiveEntry,
+  type ArchiveMediaFile,
+} from "../src/server/export-format/archive";
 import { parseKontaxArchive, verifyKontaxArchiveIntegrity } from "../src/server/export-format/parse";
 import {
   ARCHIVE_MANIFEST_NAME,
@@ -103,17 +110,29 @@ const photoRef = {
 
 const labelRegistry = [{ name: "Clients", color: "#4158f4", position: 0 }];
 
+// The first contact exercises every array-shaped field family so the round-trip
+// is a real field-identity check, not just names.
+const CONTACT_1 = baseContact({
+  fullName: "Amelia Rowe-Nguyen",
+  firstName: "Amelia",
+  lastName: "Rowe-Nguyen",
+  emailEntries: [{ label: "Work", value: "amelia@vexonhealth.example", isPrimary: true }],
+  phoneEntries: [{ label: "Mobile", value: "+61 412 345 678", isPrimary: true }],
+  websiteEntries: [{ label: "Company", value: "https://vexonhealth.example" }],
+  customFields: [{ label: "Client ID", value: "VX-2201" }],
+  significantDates: [{ label: "Birthday", value: "1988-04-12", isPrimary: true }],
+  labels: ["Clients"],
+  isEmergency: true,
+});
+
 const cards = [
-  contactToCard(
-    baseContact({
-      fullName: "Amelia Rowe-Nguyen",
-      firstName: "Amelia",
-      lastName: "Rowe-Nguyen",
-      emailEntries: [{ label: "Work", value: "amelia@vexonhealth.example", isPrimary: true }],
-      labels: ["Clients"],
-    }),
-    { exportedAt: EXPORTED_AT, photo: photoRef, labelRegistry, books: ["Work"], uid: "8f14e45f-ceea-467e-9a19-2c6a7e5e6f01" },
-  ),
+  contactToCard(CONTACT_1, {
+    exportedAt: EXPORTED_AT,
+    photo: photoRef,
+    labelRegistry,
+    books: ["Work"],
+    uid: "8f14e45f-ceea-467e-9a19-2c6a7e5e6f01",
+  }),
   contactToCard(
     baseContact({ fullName: "Kim Rowe-Nguyen", firstName: "Kim", lastName: "Rowe-Nguyen" }),
     { exportedAt: EXPORTED_AT, photo: photoRef, books: ["Work"], uid: "b2c3d4e5-6f70-4812-9a3b-4c5d6e7f8091" },
@@ -234,6 +253,56 @@ const rtPhoto = parsed.contacts[0]!.photo;
 check(
   "round-trip recovers the photo byte-identically",
   !!rtPhoto && rtPhoto.bytes.equals(PHOTO_BYTES) && rtPhoto.mediaType === "image/png",
+);
+
+// Fuller field identity across families (the format's credibility, P45-05).
+const c1 = parsed.contacts[0]!;
+eq("round-trip preserves email", c1.emailEntries[0]?.value, "amelia@vexonhealth.example");
+eq("round-trip preserves phone", c1.phoneEntries[0]?.value, "+61 412 345 678");
+eq("round-trip preserves website", c1.websiteEntries[0]?.value, "https://vexonhealth.example");
+eq("round-trip preserves custom fields", c1.customFields, [{ label: "Client ID", value: "VX-2201" }]);
+eq("round-trip preserves birthday", c1.birthday, "1988-04-12");
+check("round-trip preserves emergency flag", c1.isEmergency === true);
+
+// ── streaming writer (§7.8) ───────────────────────────────────────────────────
+// Same cards + a shared photo, but through streamKontaxArchive (one photo held
+// at a time, manifest written last). Proves the streamed archive is valid,
+// dedups, and round-trips identically to the buffered writer.
+const streamEntries: ArchiveEntry[] = [
+  { card: cards[0]!, media: { sha256: PHOTO_SHA, extension: PHOTO_EXT, bytes: PHOTO_BYTES } },
+  { card: cards[1]!, media: { sha256: PHOTO_SHA, extension: PHOTO_EXT, bytes: PHOTO_BYTES } },
+];
+async function* streamSource() {
+  for (const e of streamEntries) yield e;
+}
+const streamChunks: Buffer[] = [];
+const sink = new Writable({
+  write(chunk: Buffer, _enc, cb) {
+    streamChunks.push(Buffer.from(chunk));
+    cb();
+  },
+});
+const streamResult = await streamKontaxArchive(
+  { entries: streamSource(), total: streamEntries.length, labelRegistry, vcardFallback: null, exportedAt: EXPORTED_AT },
+  sink,
+);
+const streamed = Buffer.concat(streamChunks);
+eq("stream reports 2 contacts", streamResult.contactCount, 2);
+eq("stream reports 1 deduped photo", streamResult.photoCount, 1);
+eq("stream byteLength matches emitted bytes", streamResult.byteLength, streamed.length);
+const streamZip = new AdmZip(streamed);
+eq(
+  "streamed archive dedups the shared photo",
+  streamZip.getEntries().map((e) => e.entryName).filter((n) => n.startsWith(ARCHIVE_MEDIA_DIR)),
+  [`${ARCHIVE_MEDIA_DIR}${PHOTO_SHA}.${PHOTO_EXT}`],
+);
+const streamIntegrity = verifyKontaxArchiveIntegrity(streamed);
+check("streamed archive passes integrity", streamIntegrity.verified && streamIntegrity.ok && streamIntegrity.problems.length === 0);
+const streamParsed = parseKontaxArchive(streamed);
+eq("streamed archive round-trips both contacts", streamParsed.contacts.length, 2);
+check(
+  "streamed archive recovers the photo byte-identically",
+  !!streamParsed.contacts[0]!.photo && streamParsed.contacts[0]!.photo!.bytes.equals(PHOTO_BYTES),
 );
 
 // ── write the committed worked-example fixture ────────────────────────────────

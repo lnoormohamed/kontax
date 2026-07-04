@@ -108,6 +108,34 @@ export function recognizeKontaxFile(buffer: Buffer): KontaxRecognition {
   return recognizeDocumentValue(tryParseJson(text));
 }
 
+// ── document validation (spec §2/§4/§7.5) ────────────────────────────────────
+// A focused, dependency-free check of the envelope invariants the published
+// JSON Schema (docs/schemas/kontax-contact.v1.schema.json) makes safety-
+// critical: it IS a JSContact Card, and its Kontax format major is one we
+// support. Optional/absent properties stay lenient — the schema doesn't require
+// most of them, and the field extractor below tolerates their absence — so a
+// slightly-minimal but well-formed document still imports.
+
+export function cardEnvelopeErrors(card: unknown): string[] {
+  const errors: string[] = [];
+  if (!isRecord(card)) return ["not a JSON object"];
+  if (card["@type"] !== "Card") errors.push('"@type" must be "Card"');
+  if (card.version !== undefined && card.version !== "1.0") {
+    errors.push('"version" must be "1.0"');
+  }
+  const formatVersion = card[FORMAT_VERSION_KEY];
+  if (typeof formatVersion !== "string") {
+    errors.push(`missing "${FORMAT_VERSION_KEY}"`);
+  } else {
+    const major = parseFormatMajor(formatVersion);
+    if (major === null) errors.push(`malformed "${FORMAT_VERSION_KEY}": ${formatVersion}`);
+    else if (major > MAX_SUPPORTED_MAJOR) errors.push(`unsupported format major ${major}`);
+  }
+  return errors;
+}
+
+const isValidCard = (card: unknown): card is KontaxCard => cardEnvelopeErrors(card).length === 0;
+
 // ── card → importable contact ───────────────────────────────────────────────
 
 export type ImportedCardContact = {
@@ -474,7 +502,9 @@ export function parseKontaxArchive(buffer: Buffer): ParsedKontaxArchive {
   let skippedCount = 0;
   for (const entry of contactEntries) {
     const card = tryParseJson(entry.getData().toString("utf8"));
-    const contact = isRecord(card) ? cardToImportedContact(card, resolveMediaRef) : null;
+    // Validate the envelope (spec §7.5 requires every entry to be a supported
+    // Card) before extracting; a bad entry is skipped, never silently mangled.
+    const contact = isValidCard(card) ? cardToImportedContact(card, resolveMediaRef) : null;
     if (contact) contacts.push(contact);
     else skippedCount += 1;
   }
@@ -483,5 +513,5 @@ export function parseKontaxArchive(buffer: Buffer): ParsedKontaxArchive {
 
 export function parseKontaxDocument(buffer: Buffer): ImportedCardContact | null {
   const card = tryParseJson(buffer.toString("utf8"));
-  return isRecord(card) ? cardToImportedContact(card) : null;
+  return isValidCard(card) ? cardToImportedContact(card) : null;
 }

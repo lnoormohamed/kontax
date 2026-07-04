@@ -193,10 +193,29 @@ export async function commitKontaxImport(
     });
     const bookIdByName = new Map(books.map((b) => [b.name, b.id]));
     const defaultBookId = books.find((b) => b.isDefault)?.id ?? null;
+    // The contact's home book: its first named book that resolves, else the
+    // account default. Its `bookId` column + primary membership.
     const resolveBookId = (contact: ImportedCardContact): string | null => {
       const first = contact.books[0];
       return (first ? bookIdByName.get(first) : undefined) ?? defaultBookId;
     };
+    // All books this contact belongs to (Phase 40 multi-book), by name, keeping
+    // only names that match an existing book in the target account. Non-matching
+    // names are dropped rather than auto-creating books on import.
+    const resolveAllBookIds = (contact: ImportedCardContact): string[] => {
+      const ids = new Set<string>();
+      const primary = resolveBookId(contact);
+      if (primary) ids.add(primary);
+      for (const name of contact.books) {
+        const id = bookIdByName.get(name);
+        if (id) ids.add(id);
+      }
+      return [...ids];
+    };
+
+    // Capture each created contact with its source card so we can dual-write
+    // memberships (primary + Phase-40 secondaries) after the rows land.
+    const landed: Array<{ id: string; source: ImportedCardContact; primaryBookId: string | null }> = [];
 
     // createMany can't carry per-contact photo URLs, so: upload photos for a
     // chunk, then create that chunk's contacts in one transaction.
@@ -211,7 +230,7 @@ export async function commitKontaxImport(
         );
       }
 
-      await db.$transaction(
+      const created = await db.$transaction(
         group.map((contact, index) =>
           db.contact.create({
             data: {
@@ -259,39 +278,38 @@ export async function commitKontaxImport(
           }),
         ),
       );
+      created.forEach((row, index) => {
+        const source = group[index]!;
+        landed.push({ id: row.id, source, primaryBookId: resolveBookId(source) });
+      });
       importedCount += group.length;
     }
 
     // Mirror the CSV commit route: one CONTACT_IMPORTED event per contact.
-    const importedContacts = await db.contact.findMany({
-      where: { userId, importJobId: job.id },
-      select: { id: true, bookId: true },
-    });
-    if (importedContacts.length > 0) {
+    if (landed.length > 0) {
       await db.activityEvent.createMany({
-        data: importedContacts.map((contact) => ({
+        data: landed.map((c) => ({
           userId,
-          contactId: contact.id,
+          contactId: c.id,
           eventType: "CONTACT_IMPORTED" as const,
           actor: "IMPORT" as const,
           actorDetail: sourceFileName,
           payload: { importJobId: job.id, sourceFileName },
         })),
       });
-      // P40-06: dual-write primary memberships for imported personal contacts
-      // (each is new with a single book, so its membership is primary).
-      const withBook = importedContacts.filter(
-        (c): c is { id: string; bookId: string } => c.bookId !== null,
-      );
-      if (withBook.length > 0) {
-        await db.contactBookMembership.createMany({
-          data: withBook.map((c) => ({
-            contactId: c.id,
-            addressBookId: c.bookId,
-            isPrimary: true,
-          })),
-          skipDuplicates: true,
-        });
+      // P40-06/Phase-40: dual-write memberships. The home book is primary; any
+      // additional books the card listed (that exist in this account) are
+      // secondary memberships so a multi-book contact round-trips.
+      const memberships = landed.flatMap((c) => {
+        const allBookIds = resolveAllBookIds(c.source);
+        return allBookIds.map((addressBookId) => ({
+          contactId: c.id,
+          addressBookId,
+          isPrimary: addressBookId === c.primaryBookId,
+        }));
+      });
+      if (memberships.length > 0) {
+        await db.contactBookMembership.createMany({ data: memberships, skipDuplicates: true });
       }
     }
 
