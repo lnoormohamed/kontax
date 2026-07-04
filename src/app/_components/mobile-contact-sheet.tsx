@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
 
 import { createContact, updateContact } from "~/app/actions/contacts";
+import { AvatarUploadButton } from "~/app/_components/avatar-upload-button";
 import { OfflineWriteNote } from "~/app/_components/connection-banner";
 import { useOffline } from "~/app/_components/connectivity";
 import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
@@ -502,6 +503,7 @@ export function MobileContactSheet({
         <Field label="Last name" value={last} onChange={setLast} placeholder="Last name" />
         <Field label="Company" value={company} onChange={setCompany} placeholder="Company" />
         <Field label="Photo URL" value={avatarUrl} onChange={setAvatarUrl} placeholder="https://…" type="url" />
+        <AvatarUploadButton currentUrl={avatarUrl.trim() || null} onUploaded={setAvatarUrl} label="Upload a photo" />
       </Section>
 
       <Section id="phones" title="Phone numbers" count={phones.length} open={open.phones ?? false} onToggle={toggle}>

@@ -5,6 +5,7 @@ import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { useMemo, useState } from "react";
 
 import { createContact } from "~/app/actions/contacts";
+import { AvatarUploadButton } from "~/app/_components/avatar-upload-button";
 import { OfflineWriteNote } from "~/app/_components/connection-banner";
 import { useOffline } from "~/app/_components/connectivity";
 import { PhoneCountryInput } from "~/app/_components/phone-country-input";
@@ -379,10 +380,14 @@ export function CreateContactForm({
                 </button>
               ))}
             </div>
+            <AvatarUploadButton
+              currentUrl={avatarUrl.trim() || null}
+              onUploaded={setAvatarUrl}
+            />
             <input
               className={`${FIELD} max-w-[320px] text-center`}
               onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="Photo URL (optional)"
+              placeholder="…or paste a photo URL"
               type="url"
               value={avatarUrl}
             />

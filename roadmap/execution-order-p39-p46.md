@@ -59,13 +59,31 @@
 13. ∥ [P42-01](build-phase/p42-01-offline-connection-banner.md) — banner
     replaces the full-page takeover (real-device airplane-mode pass)
 
-### Phase 46 — alphabet scrubber (builds on fresh P38-02 knowledge)
+### Phase 46 — contacts list & photo polish (builds on fresh P38-02 knowledge)
 
 14. [P46-DB01](build-phase/p46-db01-design-brief-alphabet-scrubber.md) —
     scrubber brief (present-letters-only rule, multi-language derivation)
 15. [P46-01](build-phase/p46-01-letter-index-data-scrubber-component.md) —
     letter map + component (includes the shared bucket-key/sortKey function
     and backfill)
+
+Added 2026-07-04 (photo + detail-nav workstreams — run independently of the
+scrubber; ∥ with each other except where deps noted):
+
+16. ∥ [P46-02](build-phase/p46-02-contact-photo-display-fix.md) — contact
+    photo display fix + diagnosis ("images not displaying"; media-host regex
+    vs `MINIO_PUBLIC_URL`, detail-hero `onError` fallbacks). Feeds DB02.
+17. ∥ [P46-05](build-phase/p46-05-contact-detail-tab-history.md) — detail
+    tabs Back-to-list (already uses `<Link replace>` — diagnose, don't just
+    re-add replace)
+18. [P46-DB02](build-phase/p46-db02-design-brief-contact-photo-model.md) —
+    photo model brief (2-variation set, optimize-on-upload/no raw original,
+    cleanup, display resolution). Front-runs 19/20.
+19. [P46-03](build-phase/p46-03-photo-storage-consolidation.md) — optimize on
+    upload, drop raw original, delete superseded objects + orphan sweep
+    (reuses the sync normalizer/cleanup)
+20. [P46-04](build-phase/p46-04-contact-photo-upload-ui.md) — contact photo
+    file upload UI, desktop + mobile (contacts are URL-paste only today)
 
 ### Phase 43 — interface preferences (gate passed; taste knob, low urgency)
 

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { resolveAvatarSrc } from "~/lib/avatar-src";
 import { cameFromContactList } from "~/lib/contact-list-scroll";
 import { useEffect, useRef, useState } from "react";
 
+import { ContactHeroAvatar } from "~/app/_components/contact-hero-avatar";
 import { MobileContactExport } from "~/app/_components/contact-export-button";
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
 import { LabelChip } from "~/app/_components/label-chip";
@@ -409,16 +409,14 @@ export function MobileContactDetail({
         {/* Avatar + name */}
         <div style={{ textAlign: "center" }}>
           {avatarUrl ? (
-            <img
+            <ContactHeroAvatar
               alt={contactName}
-              src={resolveAvatarSrc(avatarUrl) ?? avatarUrl}
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                objectFit: "cover",
-                display: "inline-block",
-              }}
+              avatarUrl={avatarUrl}
+              bg={avatarBg}
+              fg={avatarFg}
+              initials={initials}
+              size={80}
+              style={{ borderRadius: "50%", fontSize: 28, fontWeight: 700, letterSpacing: "-0.01em" }}
             />
           ) : (
             <div

@@ -21,6 +21,7 @@ import {
 import sharp from "sharp";
 
 import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
+import { fetchExternalImage } from "~/server/safe-image-fetch";
 
 // ── Canonical form ─────────────────────────────────────────────────────────
 // A single normalization serves both storage and outbound push: 1024px-capped
@@ -155,6 +156,28 @@ export async function deleteContactPhoto(avatarUrl: string): Promise<void> {
     s3.send(new DeleteObjectCommand({ Bucket: bucket(), Key: key })),
     s3.send(new DeleteObjectCommand({ Bucket: bucket(), Key: thumbKey })),
   ]);
+}
+
+/**
+ * P46-03 — fetch a user-pasted **external** image URL through the SSRF-hardened
+ * fetcher, normalize it, and store it as a Kontax-hosted object (canonical +
+ * thumb), returning the new URL. Best-effort: returns null on any failure (host
+ * down, SSRF block, non-image, timeout, or no storage) — the caller then keeps
+ * the pasted URL as-is and it renders through /api/image-proxy. Never throws.
+ */
+export async function internalizeExternalAvatar(
+  ownerId: string,
+  externalUrl: string,
+): Promise<string | null> {
+  try {
+    const { body } = await fetchExternalImage(externalUrl);
+    const normalized = await normalizeContactPhoto(body);
+    if (!normalized) return null;
+    return await storeContactPhoto(ownerId, normalized);
+  } catch (error) {
+    console.warn("[Kontax] internalize pasted avatar failed — keeping external URL", error);
+    return null;
+  }
 }
 
 /**

@@ -1,22 +1,23 @@
-# Phase 46 — Alphabet Scrubber (fast-scroll index rail)
+# Phase 46 — Contacts list & photo polish
 
-> **Mini-phase.** A vertical A–Z index rail on the right edge of the contacts
-> list (the classic phone-book scrubber — iOS Contacts, Reddit's subscription
-> list): tap or drag along it to jump to a letter, and see at a glance where
-> you are in the scroll. The list already renders alphabetical letter
-> section headers in the virtualized table
-> (`contacts-workspace-table.tsx`, `LETTER_H`), so the rail has existing
-> anchors — this phase adds the control, not the grouping.
+> **Mini-phase.** A grab-bag of contacts-surface fixes and small features,
+> in three workstreams:
+>
+> 1. **Alphabet scrubber** — a vertical A–Z index rail on the right edge of
+>    the contacts list (original scope; see below).
+> 2. **Contact photos** — fix images not displaying, optimize uploads and drop
+>    raw originals, add a real contact-photo file upload, and clean up orphaned
+>    objects (added 2026-07-04 from user report).
+> 3. **Contact detail navigation** — make the detail *tabs* not behave like
+>    pages so Back returns to the contact list (added 2026-07-04).
 
 ## Phase status
 Pre-plan
 
 ## Phase objective
-Make long address books navigable by letter on touch devices. Primarily a
-mobile/tablet affordance (desktop has a scrollbar, keyboard, and search;
-out of scope for v1). Complements — and depends on — the Phase 38 windowed
-fetch: jumping to "T" must work when the rows around "T" haven't been
-fetched yet.
+Polish the contacts list and detail surfaces: make long address books
+navigable by letter, make contact photos reliably display and store cheaply,
+and make detail-tab navigation behave.
 
 ## Tickets
 
@@ -24,9 +25,38 @@ fetched yet.
 | --- | --- | --- | --- |
 | [P46-DB01](p46-db01-design-brief-alphabet-scrubber.md) | Design brief: alphabet scrubber | P0 | — |
 | [P46-01](p46-01-letter-index-data-scrubber-component.md) | Letter index data + scrubber component | P1 | P46-DB01, P38-02 |
+| [P46-DB02](p46-db02-design-brief-contact-photo-model.md) | Design brief: contact photo storage/upload/display model | P0 | — |
+| [P46-02](p46-02-contact-photo-display-fix.md) | Contact photo display fix (diagnosis + fallbacks) | P1 | — |
+| [P46-03](p46-03-photo-storage-consolidation.md) | Photo storage consolidation (optimize-on-upload, cleanup) | P1 | P46-DB02 |
+| [P46-04](p46-04-contact-photo-upload-ui.md) | Contact photo upload UI (desktop + mobile) | P2 | P46-DB02, P46-03 |
+| [P46-05](p46-05-contact-detail-tab-history.md) | Contact detail tabs: Back returns to the list | P1 | — |
 
 > Tickets are split into standalone files (linked above); the sections
-> below remain the phase-level overview.
+> below remain the phase-level overview for the **alphabet scrubber**
+> workstream. The photo and navigation workstreams live entirely in their
+> ticket files.
+
+## Photo & navigation workstreams (summary)
+
+Verified 2026-07-04 (three read-only investigations of the current code):
+
+- **Images not displaying** — thumbnail infra already exists (96px webp on
+  both upload and sync paths); the failure is in resolution/serving. Top
+  suspect: `resolveAvatarSrc` hardcodes the media host to
+  `media.getkontax.com` while uploads use `MINIO_PUBLIC_URL`; also the detail
+  heroes lack the `onError` fallback that list rows have. → [P46-02](p46-02-contact-photo-display-fix.md).
+- **Optimize + drop original** — the profile-upload route stores the **raw**
+  original and nothing ever cleans up superseded objects; sync already
+  normalizes + cleans up. Consolidate on the shared normalizer, keep exactly
+  two objects (canonical + 96 thumb), delete on replace/clear/delete. →
+  [P46-DB02](p46-db02-design-brief-contact-photo-model.md) + [P46-03](p46-03-photo-storage-consolidation.md).
+- **Contact photo upload** — contacts today only accept a *pasted URL*; add a
+  real file upload (user decision 2026-07-04). → [P46-04](p46-04-contact-photo-upload-ui.md).
+- **Detail tabs vs Back** — tabs already use `<Link replace>`, so this is a
+  diagnosis, not an "add replace"; guarantee one Back press exits to the list.
+  → [P46-05](p46-05-contact-detail-tab-history.md).
+
+## Alphabet scrubber — phase overview
 
 ### P46-DB01 — Design brief: alphabet scrubber
 Specify:

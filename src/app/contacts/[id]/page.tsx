@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { resolveAvatarSrc } from "~/lib/avatar-src";
 
 import { AppShell } from "~/app/_components/app-shell";
+import { ContactHeroAvatar } from "~/app/_components/contact-hero-avatar";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactFamilyPanel } from "~/app/_components/contact-family-panel";
 import { ContactReminderOverride } from "~/app/_components/contact-reminder-override";
@@ -912,10 +912,13 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   style={contact.avatarUrl ? undefined : { background: avatarBg, color: avatarFg }}
                 >
                   {contact.avatarUrl ? (
-                    <img
+                    <ContactHeroAvatar
                       alt={contact.fullName || contact.company || "Contact photo"}
-                      className="h-full w-full object-cover"
-                      src={resolveAvatarSrc(contact.avatarUrl) ?? contact.avatarUrl}
+                      avatarUrl={contact.avatarUrl}
+                      bg={avatarBg}
+                      className="h-full w-full"
+                      fg={avatarFg}
+                      initials={avatarInitials}
                     />
                   ) : avatarInitials ? (
                     avatarInitials
