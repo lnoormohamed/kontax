@@ -250,7 +250,13 @@ export async function processKontaxExportJob(jobId: string): Promise<void> {
       ? contactsToVCard(contacts.map(toPortableContact))
       : null;
 
-    const zip = await buildKontaxArchive({ cards, media, vcardFallback, exportedAt });
+    const zip = await buildKontaxArchive({
+      cards,
+      media,
+      vcardFallback,
+      labelRegistry,
+      exportedAt,
+    });
 
     const s3 = getS3();
     if (!s3) throw new Error("MinIO is not configured — set MINIO_ENDPOINT.");

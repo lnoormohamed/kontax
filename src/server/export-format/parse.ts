@@ -3,10 +3,12 @@
 // getkontax.com:formatVersion property; an archive is a zip whose manifest.json
 // carries the same key. Never the file extension — a renamed .zip still lands.
 
+import { createHash } from "crypto";
 import AdmZip from "adm-zip";
 
 import {
   ARCHIVE_CONTACTS_DIR,
+  ARCHIVE_INTEGRITY_ALGORITHM,
   ARCHIVE_MANIFEST_NAME,
   ext,
   FORMAT_VERSION_KEY,
@@ -376,6 +378,69 @@ export function cardToImportedContact(
     birthday: birthdayEntry?.value ?? null,
     photo,
   };
+}
+
+// ── archive integrity (spec §7.3) ────────────────────────────────────────────
+// The manifest's `integrity` block lists every packed entry with its sha256 and
+// byte length. A truncated download — clipped central directory, a short entry,
+// or a dropped file — fails to match, so a partial archive is detectable before
+// any contact is committed. Older archives with no integrity block report
+// `verified: false` (nothing to check) rather than a spurious failure.
+
+export type ArchiveIntegrityProblem = {
+  path: string;
+  issue: "missing" | "size-mismatch" | "hash-mismatch";
+};
+
+export type ArchiveIntegrityResult = {
+  /** Whether the manifest carried an integrity block to check against. */
+  verified: boolean;
+  /** True when every listed entry is present and matches (or nothing to verify). */
+  ok: boolean;
+  entryCount: number;
+  problems: ArchiveIntegrityProblem[];
+};
+
+export function verifyKontaxArchiveIntegrity(buffer: Buffer): ArchiveIntegrityResult {
+  const unverified: ArchiveIntegrityResult = { verified: false, ok: true, entryCount: 0, problems: [] };
+
+  let zip: AdmZip;
+  try {
+    zip = new AdmZip(buffer);
+  } catch {
+    // A zip that won't even open is itself a truncation signal.
+    return { verified: true, ok: false, entryCount: 0, problems: [{ path: "", issue: "missing" }] };
+  }
+
+  const manifestEntry = zip.getEntry(ARCHIVE_MANIFEST_NAME);
+  if (!manifestEntry) return unverified;
+  const manifest = tryParseJson(manifestEntry.getData().toString("utf8"));
+  if (!isRecord(manifest) || !isRecord(manifest.integrity)) return unverified;
+  const entries = manifest.integrity.entries;
+  if (!Array.isArray(entries)) return unverified;
+
+  const problems: ArchiveIntegrityProblem[] = [];
+  let checked = 0;
+  for (const row of entries) {
+    if (!isRecord(row) || typeof row.path !== "string") continue;
+    checked += 1;
+    const entry = zip.getEntry(row.path);
+    if (!entry) {
+      problems.push({ path: row.path, issue: "missing" });
+      continue;
+    }
+    const bytes = entry.getData();
+    if (typeof row.bytes === "number" && bytes.length !== row.bytes) {
+      problems.push({ path: row.path, issue: "size-mismatch" });
+      continue;
+    }
+    if (typeof row.sha256 === "string") {
+      const actual = createHash(ARCHIVE_INTEGRITY_ALGORITHM).update(bytes).digest("hex");
+      if (actual !== row.sha256) problems.push({ path: row.path, issue: "hash-mismatch" });
+    }
+  }
+
+  return { verified: true, ok: problems.length === 0, entryCount: checked, problems };
 }
 
 // ── archive extraction ──────────────────────────────────────────────────────

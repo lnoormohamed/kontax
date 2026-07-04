@@ -297,27 +297,180 @@ convention for custom labels, matching existing behavior.
 Fields classified **never** (§3.8) have no vCard line — omission there is
 correct, not a gap.
 
-## 7. Archive envelope (interface only — full spec is P45-03)
+## 7. Archive container
 
-This section fixes only what P45-03 depends on; container internals, media
-deduplication, streaming, and integrity checksums are that ticket's scope.
+> **Normative as of P45-03** (this section was an interface stub in the v1.0.0
+> P45-02 publication; P45-03 hardens it in place — media dedup, integrity
+> checksums, streaming, and limits — without changing the on-the-wire layout
+> P45-DB01 already ships). The manifest is machine-checkable against
+> [kontax-archive.v1.schema.json](schemas/kontax-archive.v1.schema.json).
+
+Two serializations carry the §2–§6 documents:
 
 - **Bare document** (`.json`): a single Card, exactly as specified in §2–§6,
-  photo inlined per §3.6's `data:` URI form.
-- **Archive** (`.zip`): `manifest.json` + `contacts/*.json` (each file the
-  same Card schema, photo referenced by relative path per §3.6) +
-  `media/<sha256>.<ext>` + optional `vcards/contacts.vcf` (§6 projection).
+  photo inlined per §3.6's `data:` URI form. No container — nothing in this
+  section applies.
+- **Archive** (`.zip`): N Cards plus their media and a manifest. The rest of
+  this section specifies it.
 
-### 7.4 Recognition
+### 7.1 Layout
 
-- Bare document: `@type: "Card"` **and** a `getkontax.com:formatVersion`
-  property present at top level.
-- Archive: presence of `manifest.json` whose contents include the same
-  `getkontax.com:formatVersion` key, at the same value across every
-  `contacts/*.json` entry (mixed-version archives are invalid).
+```
+manifest.json            — required, exactly one, at the archive root
+contacts/0001.json       — one Card document (§2–§6) per contact, photo by ref
+contacts/0002.json
+   …
+media/<sha256>.<ext>     — content-addressed photo bytes (§7.4)
+vcards/contacts.vcf      — optional vCard 3.0 fallback (§7.6)
+```
 
-This recognition mechanism does **not** depend on any product-facing name —
-see §8.
+- **`contacts/` filenames are ordinals, not identity.** The content of each
+  document (its `uid`, §3.1) is the contact's identity; the filename is only a
+  stable sort key. Importers MUST NOT derive any meaning from it. Names are
+  zero-padded to a width that covers the archive's contact count
+  (`0001`…`9999`, then `00001`… for ≥ 10 000) so lexical entry-name order
+  always equals numeric order — a reader that sorts entries by name gets export
+  order back. Gaps (from a skipped/invalid contact) are permitted; ordinals
+  need not be contiguous.
+- Every `contacts/*.json` entry MUST declare the **same**
+  `getkontax.com:formatVersion` as the manifest. A mixed-version archive is
+  invalid (§7.5).
+- Unknown top-level entries (e.g. a future `attachments/` tree) MUST be ignored
+  by a v1 reader, never treated as an error — this is the container-level
+  analogue of RFC 9553's unknown-property rule.
+
+### 7.2 `manifest.json`
+
+The manifest is the archive's envelope and its integrity root. Shape:
+
+```json
+{
+  "@type": "getkontax.com:Archive",
+  "getkontax.com:formatVersion": "1.0",
+  "getkontax.com:exportedAt": "2026-07-04T14:30:00Z",
+  "exporter": "kontax/1.0",
+  "counts": { "contacts": 2, "photos": 1 },
+  "getkontax.com:labels": {
+    "l1": { "name": "Clients", "color": "#4158f4", "position": 0 }
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "entries": [
+      { "path": "contacts/0001.json", "sha256": "…", "bytes": 1180 },
+      { "path": "contacts/0002.json", "sha256": "…", "bytes": 1094 },
+      { "path": "media/3fa4c2….png", "sha256": "3fa4c2…", "bytes": 20481 }
+    ]
+  }
+}
+```
+
+| Property | Class | Notes |
+| --- | --- | --- |
+| `@type` | must | Fixed `"getkontax.com:Archive"`. Distinguishes a manifest from a stray Card at the root. |
+| `getkontax.com:formatVersion` | must | The archive's format major.minor (§4). Recognition (§7.7) keys off this. |
+| `getkontax.com:exportedAt` | must | Wall-clock time of the export run; matches every document's `getkontax.com:exportedAt`. |
+| `exporter` | optional | Producer id, e.g. `"kontax/1.0"`. |
+| `counts.contacts` / `counts.photos` | optional | Advisory totals for a progress UI; the authoritative counts are the actual entries. A reader MAY cross-check them but MUST NOT reject on a mismatch alone (they are a hint, not a checksum). |
+| `getkontax.com:labels` | optional | **Dedup hoist (SHOULD).** The label registry (name + color + position, §3.5) collected once at the archive level instead of copied into every document. Resolves §10-item-4: a per-document copy remains valid, so a document extracted from an archive still stands alone; when the manifest carries the registry, an importer SHOULD prefer it. |
+| `getkontax.com:books` | optional | Book descriptions (`{ name, description }`), the archive-level home for `AddressBook.description` (§3.5). Membership itself stays per-document (`getkontax.com:books` array on each Card). |
+| `integrity` | must | §7.3. |
+
+### 7.3 Integrity
+
+`integrity.entries[]` lists **every packed entry except `manifest.json`
+itself** (a manifest cannot checksum the document it lives in), each with:
+
+- `path` — the entry's archive-relative path.
+- `sha256` — hex SHA-256 of the entry's exact bytes. `integrity.algorithm`
+  names the hash (`"sha256"` in v1; a different algorithm is a MAJOR change).
+- `bytes` — the entry's uncompressed byte length.
+
+This makes a **truncated or corrupted archive detectable before any contact is
+committed**: a clipped download loses its zip central directory (fails to open
+→ integrity failure), and a short or dropped entry fails its length/hash check.
+For `media/*`, the filename is *already* the content hash (§7.4), so the
+integrity row is a belt-and-braces restatement that also lets a reader verify
+media without re-deriving paths.
+
+Reader rules:
+
+- A reader SHOULD verify integrity before import and refuse a mismatching
+  archive with a clear error, rather than importing a partial contact set.
+- An archive whose manifest has **no** `integrity` block (a pre-P45-03
+  producer) is not rejected on that basis — it is simply *unverified*; the
+  reader falls back to per-document JSON validity. New producers MUST emit it.
+
+### 7.4 Media deduplication
+
+Photo bytes live under `media/<sha256>.<ext>`, where `<sha256>` is the hex
+SHA-256 of the bytes and `<ext>` derives from the media type. Because the path
+is the content hash, **two contacts sharing an identical photo reference the
+same single `media/` file** — the exporter writes each distinct photo once.
+Documents reference media by the relative path (§3.6 F1), e.g.
+`"uri": "media/3fa4c2….png"`, resolved against the archive root.
+
+### 7.5 Versioning within an archive
+
+Every document and the manifest state `formatVersion` independently (design
+principle 1 — documents travel alone), but within one archive they MUST agree.
+A reader that finds two different majors, or a document major exceeding the
+manifest's, MUST treat the archive as invalid rather than importing the subset
+it understands (§4's "never a silent partial import", applied to the container).
+
+### 7.6 vCard fallback
+
+`vcards/contacts.vcf` is an **optional** single-file vCard 3.0 projection of
+the whole archive per the §6 mapping — a compatibility copy for tools that
+can't read JSContact. It is degraded by construction (X-props a generic reader
+drops) and always inlines photos (`PHOTO;ENCODING=b`), since a `.vcf` has no
+`media/` root to reference. It is never the round-trip source: an importer that
+recognizes the archive reads `contacts/`, not `vcards/`. Producing it is a
+per-export toggle (P45-DB01's picker).
+
+### 7.7 Recognition
+
+Content-based, never the file extension (a renamed `.zip` still imports):
+
+- **Bare document**: top-level `@type: "Card"` **and** a
+  `getkontax.com:formatVersion` property.
+- **Archive**: a `manifest.json` at the root carrying a
+  `getkontax.com:formatVersion` string. That value is authoritative for the
+  container; §7.5 requires every `contacts/*.json` to match it.
+
+This mechanism does **not** depend on any product-facing name — see §8.
+
+### 7.8 Streaming & limits (execution seam)
+
+A 10 000-contact book with photos MUST NOT be assembled in memory. The
+strategy the exporter (P45-04) implements against this spec:
+
+1. **Single pass builds the plan, not the bytes.** Loading contacts and
+   projecting Cards yields, per photo, its `sha256`, byte length, and media
+   type — the manifest's `integrity` table and `counts` are fully known from
+   this pass *without* holding photo bytes. So the manifest is finalized first,
+   cheaply.
+2. **Entries stream one at a time.** The zip writer emits `manifest.json`, then
+   each `contacts/*.json` (small, serialized on demand), then each distinct
+   `media/*` file whose bytes are pulled from object storage (MinIO) and piped
+   straight into the zip stream — never all resident at once. The whole zip
+   streams to its storage destination (the P45-DB01 `KontaxExportJob` +
+   presigned-download seam), so peak memory is one photo plus zip buffers, not
+   the archive.
+3. **The job, not the request, owns large exports.** Bulk archives run through
+   the async `KontaxExportJob` (cron-drainable), matching the GDPR
+   data-export job; a synchronous single-/few-contact export MAY build in
+   memory since the bound is small.
+
+Limits, enforced by the exporter and stated so importers can budget:
+
+| Bound | v1 value | Rationale |
+| --- | --- | --- |
+| Max contacts per archive | 100 000 | Ordinal width and job runtime; larger books split into multiple archives. |
+| Max single media file | 25 MB | Matches the avatar upload ceiling; larger images are re-encoded upstream, never exported raw. |
+| Compression | DEFLATE, level 6 | Photos are already compressed; the win is on JSON. |
+
+An importer MAY reject an archive that exceeds a limit it can't budget for, with
+a clear message — but MUST NOT silently import a truncated prefix.
 
 ## 8. Naming & recognition
 
@@ -401,7 +554,8 @@ Resolved (from P45-01 §"Open items handed to P45-02"):
 3. F5 phone `number` policy: free-text, with `"getkontax.com:e164"` as the
    companion canonical form (§3.4).
 4. Label registry placement: per-document vendor property now; archive
-   manifest-level dedup is a P45-03 SHOULD, not a MUST (§3.5).
+   manifest-level dedup is a SHOULD, not a MUST — now specified in §7.2 and
+   emitted into the manifest by P45-03's exporter (§3.5).
 5. Shared-book export field set: §9.
 
 ## Appendix: worked example
@@ -496,7 +650,12 @@ Resolved (from P45-01 §"Open items handed to P45-02"):
 
 Unchanged from the draft: the importer ([P45-05](../roadmap/build-phase/p45-05-importer.md))
 accepts both serializations and must round-trip losslessly per §1. The
-archive container ([P45-03](../roadmap/build-phase/p45-03-archive-container-spec.md))
-specifies `manifest.json`, media dedup, streaming, and integrity on top of
-§7's fixed interface. The [JSON Schema](schemas/kontax-contact.schema.json)
-is the machine-checkable form of §2–§6.
+archive container is specified in §7, hardened by
+[P45-03](../roadmap/build-phase/p45-03-archive-container-spec.md) (manifest,
+media dedup, integrity checksums, streaming, limits). The
+[contact JSON Schema](schemas/kontax-contact.v1.schema.json) is the
+machine-checkable form of §2–§6, and the
+[archive manifest JSON Schema](schemas/kontax-archive.v1.schema.json) the form
+of §7.2. A committed worked-example archive
+([tests/fixtures/kontax-archive/example.zip](../tests/fixtures/kontax-archive/example.zip))
+validates against both and round-trips through the importer (§7.8 acceptance).
