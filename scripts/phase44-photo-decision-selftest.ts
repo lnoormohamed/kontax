@@ -12,7 +12,7 @@ import {
   type PhotoAction,
   type PhotoShadow,
   type SideChange,
-} from "../src/server/contact-photo-sync.ts";
+} from "../src/server/contact-photo-sync";
 
 let failures = 0;
 const check = (label: string, actual: unknown, expected: unknown) => {
