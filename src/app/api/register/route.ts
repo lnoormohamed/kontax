@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import { seedDefaultBooksForNewUser } from "~/server/address-books";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -59,6 +60,13 @@ export async function POST(request: NextRequest) {
     },
     select: { id: true },
   });
+
+  // P40-05: seed the Personal + Work book pair for the new account. Non-blocking —
+  // if it fails, getUserDefaultBook() lazily provisions a default book later, so a
+  // transient hiccup here must never fail an otherwise-valid registration.
+  await seedDefaultBooksForNewUser(user.id).catch((err: unknown) =>
+    console.warn("[Kontax] Failed to seed default books:", err),
+  );
 
   // P12-06: link any pending shares sent to this email before the recipient had
   // an account, so they appear in "Shared with me" on first login.

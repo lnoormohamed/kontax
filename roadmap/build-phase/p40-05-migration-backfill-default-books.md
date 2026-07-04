@@ -1,6 +1,6 @@
 # P40-05 — Migration & backfill + default-book seeding
 
-Status: Not started · Priority: P0 · Depends: P40-01…04
+Status: Built (uncommitted, 2026-07-04) · Priority: P0 · Depends: P40-01…04
 Phase: [Phase 40](phase-40.md) · Source spec: [phase-37/01 §4](../phase-37/01-data-model-build-now.md)
 
 ## Scope
@@ -27,3 +27,22 @@ prod (startup `db push` deploy caution applies).
 - Existing accounts: zero new books created by the backfill.
 - New-account signup seeds the default pair.
 - Runbook (backfill + rollback) exists and is linked from the phase file.
+
+## Implementation (2026-07-04)
+
+- Backfill: `scripts/backfill-contact-book-memberships.mjs`
+  (`npm run backfill:book-memberships`, `--dry-run` supported). Cursor-batched
+  (1000/batch) for 10k+ scale; `createMany({ skipDuplicates })` on the
+  `(contactId, addressBookId)` unique → re-run is a no-op. Never creates a book:
+  a null-`bookId` contact with no default book is skipped + reported (run
+  `migrate:books` first). `isPrimary = true` on every backfilled row.
+- New-account seeding: `seedDefaultBooksForNewUser` in
+  `src/server/address-books.ts`, called from `src/app/api/register/route.ts`
+  (non-blocking). Seeds **Personal** (default) + **Work**; guarded to accounts
+  with zero existing books, so it never touches existing accounts.
+- Decisions recorded: source §4-step-3 "map existing default → Personal" is
+  **dropped** in favour of P40-05's "existing accounts keep their books exactly
+  as named" (no rename, zero new books). Offering "Work" as a suggested second
+  book to existing single-book users is a **product call deferred to
+  [P40-DB01](p40-db01-design-brief-books-first-navigation.md)** — not done here.
+- Runbook: [runbooks/p40-book-memberships-backfill.md](../runbooks/p40-book-memberships-backfill.md).

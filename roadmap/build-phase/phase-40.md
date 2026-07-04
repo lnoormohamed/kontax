@@ -134,4 +134,5 @@ mobile nav per roadmap/mobile-design-brief.md.
 ## Documentation (per roadmap/documentation-policy.md)
 - [ ] External · users — in-app Help: books, private fields, sharing policies
 - [ ] Internal · engineering — docs/organizing-contacts.md + new "privacy layers" section
-- [ ] Internal · admins/ops — runbook: backfill + rollback procedure
+- [x] Internal · admins/ops — runbook: backfill + rollback procedure —
+  [runbooks/p40-book-memberships-backfill.md](../runbooks/p40-book-memberships-backfill.md) (P40-05)

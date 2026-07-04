@@ -23,6 +23,7 @@
     "test:sync-fixtures": "node --experimental-strip-types --loader ./scripts/node-test-loader.mjs --test tests/node/sync-provider-capabilities.test.ts tests/node/sync-provider-identity.test.ts",
     "test:e2e": "playwright test",
     "migrate:books": "node scripts/migrate-default-address-books.mjs",
+    "backfill:book-memberships": "node scripts/backfill-contact-book-memberships.mjs",
     "backfill:sync-lineage": "node scripts/backfill-sync-account-lineage.mjs",
     "migrate:teams-billing": "node scripts/migrate-teams-billing-to-org.mjs",
     "migrate:teams-billing:apply": "node scripts/migrate-teams-billing-to-org.mjs --apply",
