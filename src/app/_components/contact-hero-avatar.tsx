@@ -68,12 +68,18 @@ export function ContactHeroAvatar({
         onError={() => setStage((s) => s + 1)}
         ref={imgRef}
         src={candidates[stage]}
-        style={{ objectFit: "cover", ...dim, ...style }}
+        // inline-block matches the original hero markup so the avatar sits at the
+        // same vertical position as the initials fallback (an inline <img> would
+        // baseline-align differently and appear shifted). Font styles from `style`
+        // are for the initials span only — they must not reach the <img>.
+        style={{ display: "inline-block", objectFit: "cover", ...dim, ...style }}
       />
     );
   }
 
-  // Guaranteed end — CSS initials. Never a broken-image icon.
+  // Guaranteed end — CSS initials. Never a broken-image icon. The initials font
+  // is derived from `size` (mobile) so callers don't pass font styles that would
+  // otherwise leak onto the <img>; desktop omits `size` and inherits its wrapper.
   return (
     <span
       aria-label={alt}
@@ -85,6 +91,7 @@ export function ContactHeroAvatar({
         justifyContent: "center",
         background: bg,
         color: fg,
+        ...(size ? { fontSize: Math.round(size * 0.35), fontWeight: 700, letterSpacing: "-0.01em" } : null),
         ...dim,
         ...style,
       }}

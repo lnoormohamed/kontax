@@ -416,7 +416,7 @@ export function MobileContactDetail({
               fg={avatarFg}
               initials={initials}
               size={80}
-              style={{ borderRadius: "50%", fontSize: 28, fontWeight: 700, letterSpacing: "-0.01em" }}
+              style={{ borderRadius: "50%" }}
             />
           ) : (
             <div
