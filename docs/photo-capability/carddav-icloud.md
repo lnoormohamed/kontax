@@ -52,6 +52,18 @@
 
 ## Reviewer notes
 
-<!-- Human analysis: which identifier should P44-02 use for change
-detection on this provider, size caps to apply on outbound push,
-any anomalies in the tables above. -->
+Resolved by [P44-02 ADR](../adr/0001-sync-shadow-store-and-photo-change-detection.md).
+
+- **Change-detection signal: `contentHash`** (SHA-256 of decoded `PHOTO`
+  bytes). No photo-specific identifier exists — the CardDAV `getetag` is
+  card-level (changes on any field) and is used only as a coarse "did the card
+  change" gate. Bytes are byte-stable (6/6 identical, EXIF survives), so the
+  content hash is exact.
+- **`PHOTO` transport:** returned as an **authenticated URI**, not inline —
+  the `contentHash` extractor must fetch it with the connection's CardDAV
+  credentials before hashing.
+- **Outbound cap (important):** > 1 MB is **rejected with HTTP 403**
+  (jpeg-large 3193 KB rejected; 19 KB accepted — cap lies between). P44-04 must
+  resize below ~1 MB before push; a still-rejected push latches
+  `photoShadow.lastPushRejected = true` so the runner does not retry every
+  cycle (cleared when the local photo version advances).

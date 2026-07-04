@@ -52,6 +52,15 @@
 
 ## Reviewer notes
 
-<!-- Human analysis: which identifier should P44-02 use for change
-detection on this provider, size caps to apply on outbound push,
-any anomalies in the tables above. -->
+Resolved by [P44-02 ADR](../adr/0001-sync-shadow-store-and-photo-change-detection.md).
+
+- **Change-detection signal: `contentHash`** (SHA-256 of decoded `PHOTO`
+  bytes). No photo-specific identifier (the `getetag` is card-level); bytes are
+  fully byte-stable (7/7 identical, EXIF survives), so the content hash is exact.
+- **`PHOTO` transport:** inline base64, transparent — hash the decoded value
+  directly (no credentialed fetch needed, unlike iCloud).
+- **Outbound caps:** ≥ 3192 KB accepted with no mutation; still normalize per
+  P44-04 for storage/consistency, but no provider-imposed resize is required.
+- **Role:** this is the **generic-CardDAV reference** for P44-02 — Nextcloud was
+  waived in P44-01 because Fastmail covers the transparent generic-CardDAV case.
+- No anomalies.
