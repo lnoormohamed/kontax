@@ -71,6 +71,10 @@ export type WorkspaceRow = {
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
   labels: unknown;
+  // P46-01: the list's primary sort key, lowercased (phoneticLastName ??
+  // lastName, else company/full). The alphabet scrubber folds this to an index
+  // letter so the rail, section headers, and sort share one key.
+  sortName: string;
   noteMatchSnippet?: string;
 };
 
@@ -387,6 +391,7 @@ type RawRow = {
   labels: unknown;
   notes: string | null;
   shared_kind: "family" | "team" | null;
+  sort_name: string;
   total_count: bigint;
 };
 
@@ -416,7 +421,11 @@ export async function listWorkspaceContacts(
         : Prisma.sql`s."updatedAt" DESC, s.id`;
 
   const rows = await db.$queryRaw<RawRow[]>(Prisma.sql`
-    SELECT s.*, count(*) OVER () AS total_count
+    SELECT s.*, count(*) OVER () AS total_count,
+      -- P46-01: the alphabet index letter derives from the SAME primary key the
+      -- list is ordered by (NAME_ORDER, above), so bucket = header = sort. The
+      -- client folds this string to an A–Z letter (or #) in bucketLetter().
+      CASE WHEN s.k_first = '' OR s.k_last = '' THEN coalesce(nullif(s.k_company, ''), s.k_full) ELSE s.k_last END AS sort_name
     FROM (${union}) s
     ${rankJoin}
     ORDER BY ${orderBy}
@@ -444,6 +453,7 @@ export async function listWorkspaceContacts(
         isEmergency: row.isEmergency,
         sharedKind: row.shared_kind,
         labels: row.labels,
+        sortName: row.sort_name,
         ...(snippet ? { noteMatchSnippet: snippet } : {}),
       };
     }),

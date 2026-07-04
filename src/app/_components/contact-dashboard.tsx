@@ -36,6 +36,8 @@ type DashboardContact = {
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
   labels?: unknown; // P31B-06: JSON string[] from Prisma
+  // P46-01: primary sort key (lowercased) — feeds the alphabet scrubber's letter.
+  sortName: string;
   // P38-01: server-computed excerpt, set when the search query matched notes.
   noteMatchSnippet?: string | null;
 };

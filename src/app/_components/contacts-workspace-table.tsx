@@ -16,8 +16,10 @@ import { BulkEditToolbar, type ToolbarBook } from "~/app/_components/bulk-edit-t
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
+import { AlphabetScrubber } from "~/app/_components/contact-list/alphabet-scrubber";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { resolveAvatarSrc } from "~/lib/avatar-src";
+import { bucketLetter } from "~/lib/contact-index";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import {
   CONTACT_LIST_RESTORE_PARAM,
@@ -49,6 +51,9 @@ type WorkspaceContact = {
   sharedKind: "family" | "team" | null;
   // P31B-06: JSON string[] from Prisma (optional — may be absent on older data)
   labels?: unknown;
+  // P46-01: the list's primary sort key (lowercased). bucketLetter() folds it to
+  // an A–Z index letter so the scrubber, section headers, and sort share one key.
+  sortName: string;
   // P38-01: server-computed excerpt, set when the search query matched notes.
   noteMatchSnippet?: string | null;
 };
@@ -109,14 +114,12 @@ const getInitials = (primary: string | null | undefined, fallback?: string | nul
     .toUpperCase();
 };
 
-const getGroupLetter = (contact: WorkspaceContact) => {
-  const fullName = contact.fullName?.trim() ?? "";
-  const company = contact.company?.trim() ?? "";
-  const source = fullName.length > 0 ? fullName : company;
-  const lastToken = source.split(/\s+/).filter(Boolean).pop() ?? "";
-  const first = (lastToken[0] ?? source[0] ?? "#").toUpperCase();
-  return /[A-Z]/.test(first) ? first : "#";
-};
+// P46-01: the section letter now derives from the row's primary sort key via
+// the shared bucketLetter(), so the header a contact sits under always matches
+// where it sorts (and where the scrubber jumps). This replaces the old
+// last-token heuristic, which bucketed diacritic and CJK names under "#" even
+// when they sorted among the Latin letters.
+const getGroupLetter = (contact: WorkspaceContact) => bucketLetter(contact.sortName);
 
 // P33-05: when query is active, show why a contact matched if it's not
 // immediately obvious from the visible name/company/email/phone cells.
@@ -932,6 +935,32 @@ export function ContactsWorkspaceTable({
     setScrollEl(getScrollParent(listRef.current));
   }, []);
 
+  // P46-01: the alphabet scrubber is a touch affordance — it ships on the mobile
+  // list only (desktop uses the scrollbar). Tracks the same 1023px breakpoint the
+  // list uses to switch to stacked rows.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const apply = () => setIsMobile(mql.matches);
+    apply();
+    mql.addEventListener("change", apply);
+    return () => mql.removeEventListener("change", apply);
+  }, []);
+
+  // P46-01: the scrubber's "long enough to need it" gate compares content height
+  // to the viewport, so the viewport height must be reactive — a rotation or
+  // keyboard resize re-evaluates whether the rail earns its place.
+  const [scrollViewportH, setScrollViewportH] = useState(0);
+  useEffect(() => {
+    if (!scrollEl) return;
+    const update = () => setScrollViewportH(scrollEl.clientHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(scrollEl);
+    return () => ro.disconnect();
+  }, [scrollEl]);
+
   const labelColors = useMemo(
     () => Object.fromEntries(labelRegistry.map((l) => [l.name.toLowerCase(), l.color])),
     [labelRegistry],
@@ -1353,7 +1382,17 @@ export function ContactsWorkspaceTable({
 
   const stickySection = useMemo(() => {
     if (virtualItems.length === 0) return null;
-    const listOffsetTop = listRef.current?.offsetTop ?? 0;
+    // Distance from the scroller's scrollable-content origin to the virtual list.
+    // `offsetTop` is unreliable here: the scroll container is position:static, so
+    // the list's offsetParent is an ancestor *above* the scroll area, making
+    // offsetTop include the fixed header/banner and shifting section detection an
+    // extra ~section early (P46-01 surfaced this via the rail's current-letter).
+    // Measure the gap directly against the scroller instead.
+    const listEl = listRef.current;
+    const listOffsetTop =
+      listEl && scrollEl
+        ? listEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop
+        : (listEl?.offsetTop ?? 0);
     const offset = Math.max(0, (scrollEl?.scrollTop ?? 0) - listOffsetTop + 2);
     let topIndex = virtualItems[0]!.index;
     for (const item of virtualItems) {
@@ -1366,6 +1405,57 @@ export function ContactsWorkspaceTable({
     }
     return null;
   }, [flatRows, scrollEl?.scrollTop, virtualItems]);
+
+  // P46-01 — alphabet scrubber wiring.
+  //
+  // The rail is a map of the present letters and it derives entirely from the
+  // grouped rows the list already builds, so bucket = header = rail by
+  // construction. Favourites are not indexed (grouping runs over `rest`).
+  const scrubberSections = useMemo(
+    () => (groups ? groups.map(([letter, bucket]) => ({ letter, count: bucket.length })) : []),
+    [groups],
+  );
+  // First flat-row index for each present letter — the jump target for that letter.
+  const letterRowIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    flatRows.forEach((row, index) => {
+      if (row.type === "group-header" && !row.favorites && !map.has(row.label)) {
+        map.set(row.label, index);
+      }
+    });
+    return map;
+  }, [flatRows]);
+  const scrollToLetter = useCallback(
+    (letter: string, { smooth }: { smooth: boolean }) => {
+      const index = letterRowIndex.get(letter);
+      if (index === undefined) return;
+      // NOTE: @tanstack/react-virtual silently drops `behavior: "smooth"` when
+      // dynamic measurement (measureElement, above) is active. For the eased tap
+      // jump we therefore scroll the viewport natively to the row's offset; for
+      // instant drag-scrub (and reduced motion) we use scrollToIndex, which
+      // self-corrects the offset as rows measure.
+      const offset = smooth ? virtualizer.getOffsetForIndex(index, "start")?.[0] : undefined;
+      if (offset !== undefined && scrollEl) {
+        scrollEl.scrollTo({ top: offset, behavior: "smooth" });
+      } else {
+        virtualizer.scrollToIndex(index, { align: "start" });
+      }
+    },
+    [letterRowIndex, scrollEl, virtualizer],
+  );
+  // The passive "where am I" letter — the current section, unless it's Favourites.
+  const activeScrubLetter =
+    stickySection && !stickySection.favorites ? stickySection.label : null;
+  // Show conditions (all must hold): mobile, sorted-by-name & not searching
+  // (i.e. the list is grouped), long enough to need it (> ~2 screens), and at
+  // least 4 present letters. Any false → the rail is not rendered (no lingering
+  // gesture zone), and it re-evaluates when any input changes.
+  const showScrubber =
+    isMobile &&
+    groups !== null &&
+    scrubberSections.length >= 4 &&
+    scrollViewportH > 0 &&
+    virtualizer.getTotalSize() > 2 * scrollViewportH;
 
   const restoredScrollRef = useRef(false);
   const restoreTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
@@ -1581,6 +1671,17 @@ export function ContactsWorkspaceTable({
           );
         })}
       </div>
+
+      {/* P46-01: alphabet scrubber — mobile fast-scroll index rail. Fixed to the
+          scroll viewport's right edge; only mounted when it earns its place. */}
+      {showScrubber ? (
+        <AlphabetScrubber
+          sections={scrubberSections}
+          activeLetter={activeScrubLetter}
+          viewportEl={scrollEl}
+          onJump={scrollToLetter}
+        />
+      ) : null}
 
       {/* Undo toast — mobile only, appears above the bottom nav after swipe-archive */}
       {undoContactId ? (
