@@ -2,47 +2,25 @@
 
 // P40-08: one-time, dismissible "your contacts now live in books" banner for
 // existing users after the multi-book migration (design brief P40-DB01 §7).
-// New accounts (booksNative) never render this; gating happens on the server.
+// New accounts (booksNative) never render this; gating happens on the server
+// via a fresh DB read, so once dismissed the server simply stops emitting the
+// banner (no flash). This component only handles the optimistic in-place hide
+// on click plus persisting the dismissal.
 
-import { useEffect, useState, useTransition } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useTransition } from "react";
 
 import { dismissBooksExplainer } from "~/app/actions/contact-books";
-
-// Belt-and-suspenders: the DB write + JWT re-mint is the source of truth, but a
-// localStorage flag hides the banner instantly on this device even if the token
-// hasn't propagated yet (or update() failed). Read in an effect, not in render,
-// to keep SSR/hydration in agreement.
-const DISMISSED_KEY = "kontax:books-explainer-dismissed";
 
 export function BooksMigrationExplainer() {
   const [dismissed, setDismissed] = useState(false);
   const [, startTransition] = useTransition();
-  const { update } = useSession();
-
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(DISMISSED_KEY)) setDismissed(true);
-    } catch {
-      // localStorage unavailable (private mode / SSR) — fall back to server gate.
-    }
-  }, []);
-
   if (dismissed) return null;
 
   const dismiss = () => {
-    setDismissed(true); // optimistic — the server call persists it for next load
-    try {
-      localStorage.setItem(DISMISSED_KEY, new Date().toISOString());
-    } catch {
-      // Non-critical: the server write below is still the source of truth.
-    }
+    setDismissed(true); // optimistic — hides instantly; the server call persists it
     startTransition(async () => {
       try {
         await dismissBooksExplainer();
-        // Preferences live in the JWT; re-mint the session token from the DB so
-        // the dismissal survives a page refresh (not just this render).
-        await update();
       } catch {
         // Non-critical: if it fails the banner simply shows again next load.
       }

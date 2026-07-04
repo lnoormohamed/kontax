@@ -85,6 +85,9 @@ export async function dismissBooksExplainer(): Promise<void> {
   await updatePreferences(userId, {
     booksExplainerDismissedAt: new Date().toISOString(),
   });
+  // Bust the router cache so a soft nav back to /contacts re-reads the dismissal
+  // (the page gates the banner on a fresh DB read of this preference).
+  revalidatePath("/contacts");
 }
 
 /** Make a book the contact's primary/home book (moves the primary membership). */

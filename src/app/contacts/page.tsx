@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { SessionProvider } from "next-auth/react";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { BooksMigrationExplainer } from "~/app/_components/books-migration-explainer";
@@ -31,6 +30,7 @@ import {
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
+import { getPreferences } from "~/server/preferences";
 import { db } from "~/server/db";
 import { getLabels } from "~/app/actions/labels";
 import { DEFAULT_PREFERENCES } from "~/lib/preferences";
@@ -137,6 +137,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   if (!session?.user?.id) redirect("/login?next=/contacts");
 
   const prefs = session.user.preferences ?? DEFAULT_PREFERENCES;
+
+  // P40-08: gate the one-time migration banner on a FRESH DB read, not the JWT.
+  // Preferences in the session token only refresh on sign-in, so a JWT-based
+  // gate keeps rendering the banner server-side after dismissal and the client
+  // has to hide it post-hydration (a flash). Reading the dismissal fresh means
+  // the server simply never emits the banner once dismissed — no flash. Only the
+  // pre-migration cohort can ever see it, so new (booksNative) accounts skip the read.
+  const showBooksExplainer = prefs.booksNative
+    ? false
+    : !(await getPreferences(session.user.id)).booksExplainerDismissedAt;
 
   const [query, selectedTab, selectedFilter, selectedSort, selectedView, selectedHealth] = await Promise.all([
     getQueryValue(searchParams),
@@ -490,14 +500,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       <ConnectionBanner readOnly={!planSummary.lifecyclePolicy.canWrite} />
 
       {/* P40-08: one-time books migration explainer — existing users only.
-          Wrapped in SessionProvider so the banner can call useSession().update()
-          on dismiss — preferences live in the JWT and would otherwise stay stale
-          until re-login, making the banner reappear on refresh. */}
-      {!prefs.booksNative && !prefs.booksExplainerDismissedAt ? (
-        <SessionProvider session={session}>
-          <BooksMigrationExplainer />
-        </SessionProvider>
-      ) : null}
+          Gated server-side on a fresh DB read (see showBooksExplainer above). */}
+      {showBooksExplainer ? <BooksMigrationExplainer /> : null}
 
       <ContactDashboard
         activeContacts={activeList.rows}
