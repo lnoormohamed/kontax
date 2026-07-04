@@ -70,6 +70,40 @@ Symptom this fixes: uploaded avatars don't display (broken image / initials only
 3. **Only if `MINIO_PUBLIC_URL`'s origin ≠ `https://media.getkontax.com`:** set `NEXT_PUBLIC_MEDIA_HOST` to that origin **in the build environment**, then rebuild. The CSP `img-src` (next.config.js + middleware.ts) picks it up automatically — no manual CSP edit.
 4. Verify: open a contact with a photo → the `<img src>` should be the direct media URL, **not** `/api/image-proxy?...`.
 
+#### Per-environment media host (decided 2026-07-04)
+
+Each environment needs a media host the **browser** can reach over HTTPS. A
+private-network MinIO origin (e.g. `http://10.0.0.144:9000`) works for
+server-side upload/storage but **never loads in a browser** — and the image
+proxy refuses private IPs (SSRF), so there is no fallback either.
+
+| | Prod | Staging |
+|---|---|---|
+| Public media host | `https://media.getkontax.com` | `https://media-staging.getkontax.com`¹ (own subdomain fronting the staging MinIO) |
+| `MINIO_PUBLIC_URL` | `https://media.getkontax.com/kontax-uploads` | `https://media-staging.getkontax.com/kontax-uploads` |
+| `NEXT_PUBLIC_MEDIA_HOST` | not needed (legacy match) | `https://media-staging.getkontax.com` (build-time) |
+| Existing URL rewrite | none (empty DB pre-launch) | rewrite the baked `http://10.0.0.144:9000` URLs (below) |
+
+¹ Exact subdomain is an infra choice — whatever you point at the staging MinIO
+via Cloudflare/Traefik. The reverse proxy must preserve the
+`/kontax-uploads/avatars/…` path so object keys resolve unchanged.
+
+**Rewriting baked staging avatar URLs** (after the subdomain is live and
+`MINIO_PUBLIC_URL` updated) — `scripts/rewrite-avatar-host.mjs`, dry-run first:
+
+```
+# dry-run (default, mutates nothing)
+node --env-file-if-exists=.env --env-file-if-exists=.env.local \
+  scripts/rewrite-avatar-host.mjs \
+  --from http://10.0.0.144:9000/kontax-uploads \
+  --to   https://media-staging.getkontax.com/kontax-uploads
+# apply
+… --commit
+```
+
+Objects don't move — only the URL base changes — so the new host must front the
+**same** MinIO/bucket. Idempotent; safe to re-run.
+
 ---
 
 ## Email (Amazon SES)
