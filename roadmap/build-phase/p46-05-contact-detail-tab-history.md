@@ -1,7 +1,26 @@
 # P46-05 — Contact detail tabs: Back returns to the list
 
-Status: Not started · Priority: P1 · Depends: —
+Status: **Already resolved by `afba2bc` (2026-07-04)** — real-device pass outstanding · Priority: P1 · Depends: —
 Phase: [Phase 46](phase-46-alphabet-scrubber.md)
+
+> **Resolved before this ticket built out.** Commit `afba2bc` — "Fix
+> back-to-list navigation losing scroll position on mobile" (2026-07-04) —
+> implemented exactly this fix. Audited 2026-07-04: **all five** contact-detail
+> `?tab=` navigations use `<Link replace>` so tab switches never stack history
+> between the list and Back —
+> desktop tab bar (`page.tsx:1163`), desktop header + quick Share
+> (`page.tsx:832,1072`), mobile tab bar (`mobile-contact-detail.tsx:560`),
+> mobile more-menu Share (`:510`). Back is a real `router.back()` when the
+> contact was opened from the list (`handleBack` + `cameFromContactList`,
+> `mobile-contact-detail.tsx:180`), landing on the list URL + saved scroll;
+> deep links fall back to `href="/contacts"`. The commit message explicitly
+> notes this "makes one iOS edge-swipe return to the list instead of stepping
+> through previously visited tabs."
+>
+> **No code change needed.** The only outstanding item is this ticket's own
+> acceptance line — the **real-device pass** (iOS Safari edge-swipe + Android
+> Chrome), which preview can't emulate. A local browser repro was attempted
+> but blocked by auth friction on the shared staging DB, not by the fix.
 
 > User report: the contact detail **tabs** (Details / Sharing / History) are
 > treated like pages — hitting Back steps through tabs instead of returning to
