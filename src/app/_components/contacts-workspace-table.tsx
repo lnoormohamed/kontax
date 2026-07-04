@@ -19,7 +19,7 @@ import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { AlphabetScrubber } from "~/app/_components/contact-list/alphabet-scrubber";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { resolveAvatarSrc } from "~/lib/avatar-src";
-import { bucketLetter } from "~/lib/contact-index";
+import { bucketLetter, compareBucketLetters } from "~/lib/contact-index";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 import {
   CONTACT_LIST_RESTORE_PARAM,
@@ -1186,7 +1186,7 @@ export function ContactsWorkspaceTable({
       bucket.push(contact);
       map.set(letter, bucket);
     }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+    return [...map.entries()].sort(([a], [b]) => compareBucketLetters(a, b));
   }, [groupByLetter, isSearching, rest]);
 
   // Flatten groups + favorites into a single array for the virtualizer.

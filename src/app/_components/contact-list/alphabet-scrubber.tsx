@@ -30,7 +30,8 @@ interface AlphabetScrubberProps {
 const HIT_WIDTH = 28; // touch strip — wider than the 22px visual for a comfortable target
 const INSET = 6; // track inset from the top/bottom of the scroll area
 const PAD = 8; // rail's own vertical padding (matches .kx-scrub padding)
-const MIN_CELL = 15; // each rendered letter reserves ≥15px of track before decimation
+const LETTER_CELL = 15; // vertical space a readable letter reserves on the track
+const DOT_CELL = 9; // vertical space a decimation dot reserves (smaller than a letter)
 const EDGE_GAP = 2; // rail sits 2px from the viewport's right edge
 
 export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }: AlphabetScrubberProps) {
@@ -67,27 +68,39 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
     };
   }, [viewportEl, measure]);
 
-  // Decimation: the whole present-letter set must fit the track. Each rendered
-  // cell needs ≥ MIN_CELL of height, so at most floor(track / MIN_CELL) letters
-  // can show. When there are more, sample that many evenly (first & last always
-  // kept) — the dropped letters stay reachable because the drag maps
-  // proportionally across ALL sections, and the bubble snaps to the real letter.
+  // Decimation: the whole present-letter set must fit the track. When it can't,
+  // show a sampled subset of letters (each ≥ LETTER_CELL tall so it stays a
+  // readable target) with a faint dot between sampled letters that skip over
+  // others — the P46-DB01 "A · C · E … Y · #" rail. First and last are always
+  // kept (so `#`, which sorts last, always shows), and the dropped letters stay
+  // reachable because the drag maps proportionally across ALL sections and the
+  // bubble snaps to the nearest real letter.
   const trackH = box ? Math.max(0, box.height - PAD * 2) : 0;
-  const maxCells = trackH > 0 ? Math.max(4, Math.floor(trackH / MIN_CELL)) : sections.length;
-  const display =
-    sections.length <= maxCells
-      ? sections
+  // Letters chosen so L letters + (L-1) dots fit the track.
+  const maxLetters =
+    trackH > 0
+      ? Math.max(4, Math.floor((trackH + DOT_CELL) / (LETTER_CELL + DOT_CELL)))
+      : sections.length;
+  const cells: Array<{ kind: "letter"; section: ScrubberSection } | { kind: "dot" }> =
+    sections.length <= maxLetters
+      ? sections.map((section) => ({ kind: "letter", section }))
       : (() => {
-          const picked: typeof sections = [];
+          const picked: number[] = [];
           const seen = new Set<number>();
-          for (let k = 0; k < maxCells; k++) {
-            const idx = Math.round((k * (sections.length - 1)) / (maxCells - 1));
+          for (let k = 0; k < maxLetters; k++) {
+            const idx = Math.round((k * (sections.length - 1)) / (maxLetters - 1));
             if (!seen.has(idx)) {
               seen.add(idx);
-              picked.push(sections[idx]!);
+              picked.push(idx);
             }
           }
-          return picked;
+          const out: Array<{ kind: "letter"; section: ScrubberSection } | { kind: "dot" }> = [];
+          picked.forEach((idx, i) => {
+            out.push({ kind: "letter", section: sections[idx]! });
+            // A dot marks the presence of letters skipped between this one and the next.
+            if (i < picked.length - 1 && picked[i + 1]! > idx + 1) out.push({ kind: "dot" });
+          });
+          return out;
         })();
 
   // Map a pointer Y to the nearest present section — proportional across the
@@ -195,7 +208,15 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
         onPointerCancel={endScrub}
         style={{ top: box.top, height: box.height, right: box.right, width: HIT_WIDTH }}
       >
-        {display.map((s) => {
+        {cells.map((cell, i) => {
+          if (cell.kind === "dot") {
+            return (
+              <span key={`dot-${i}`} aria-hidden="true" className="kx-scrub-dot">
+                ·
+              </span>
+            );
+          }
+          const s = cell.section;
           const isActive = active ? s.letter === active : activeLetter === s.letter;
           const noun = s.count === 1 ? "contact" : "contacts";
           const label =

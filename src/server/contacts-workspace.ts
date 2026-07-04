@@ -286,6 +286,10 @@ const SORT_KEY_COLUMNS = Prisma.sql`
 
 const NAME_ORDER = Prisma.sql`
   s."isFavorite" DESC,
+  -- P46-01: names that don't start with a letter (digits, symbols, unmapped
+  -- scripts — the "#" bucket) sort LAST, matching the alphabet rail's #-at-the-
+  -- end convention so those contacts land at the bottom of the list, not the top.
+  ((CASE WHEN k_first = '' OR k_last = '' THEN coalesce(nullif(k_company, ''), k_full) ELSE k_last END) !~ '^[[:alpha:]]'),
   CASE WHEN k_first = '' OR k_last = '' THEN coalesce(nullif(k_company, ''), k_full) ELSE k_last END,
   CASE WHEN k_first = '' OR k_last = '' THEN coalesce(nullif(k_company, ''), k_full) ELSE k_first END,
   k_company,

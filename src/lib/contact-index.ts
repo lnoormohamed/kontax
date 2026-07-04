@@ -54,3 +54,15 @@ export function bucketLetter(sortName: string | null | undefined): string {
   const first = folded.replace(/^[^\p{L}\p{N}]+/u, "")[0] ?? "";
   return /[a-z]/.test(first) ? first.toUpperCase() : "#";
 }
+
+/**
+ * Order index letters for the rail and section headers: A–Z first, then the
+ * "#" bucket (numbers, symbols, unmapped scripts) LAST — the phone-book
+ * convention (iOS-style), matching the P46-DB01 design where the rail ends on
+ * `#`. The list's group order and the rail derive from this, so `#` contacts
+ * appear at the bottom of the list too, not the top.
+ */
+export function compareBucketLetters(a: string, b: string): number {
+  const rank = (letter: string) => (letter === "#" ? 1 : 0);
+  return rank(a) - rank(b) || a.localeCompare(b);
+}

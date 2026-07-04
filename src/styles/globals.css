@@ -127,7 +127,7 @@ html[data-motion="off"] *::after {
 .kx-scrub-letter.is-current { color: #17352e; font-weight: 700; }
 .kx-scrub.is-active .kx-scrub-letter.is-current { transform: scale(1.35); }
 .kx-scrub-dot {
-  height: 15px;
+  height: 9px;
   display: grid;
   place-items: center;
   color: #aeb4ac;
