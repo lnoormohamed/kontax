@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { BooksMigrationExplainer } from "~/app/_components/books-migration-explainer";
 import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
 import { BottomNav } from "~/app/_components/bottom-nav";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
@@ -486,6 +487,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
       {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
       <ConnectionBanner readOnly={!planSummary.lifecyclePolicy.canWrite} />
+
+      {/* P40-08: one-time books migration explainer — existing users only */}
+      {!prefs.booksNative && !prefs.booksExplainerDismissedAt ? (
+        <BooksMigrationExplainer />
+      ) : null}
 
       <ContactDashboard
         activeContacts={activeList.rows}

@@ -482,22 +482,22 @@ export function MobileFilterButton({
                 })}
               </div>
 
+              {/* Books — primary axis, above My Lists (mirrors desktop, P40-DB01 §8) */}
+              {personalBooks.length > 0 && (
+                <>
+                  <SheetSection title="Books" />
+                  {personalBooks.map((b) => (
+                    <SheetRow key={b.id} icon={<FolderIcon />} name={b.name} count={b.count} active={activeBook === b.id} onClick={() => applyBook(b.id)} />
+                  ))}
+                </>
+              )}
+
               {/* My Lists */}
               {savedFilters.length > 0 && (
                 <>
                   <SheetSection title="My Lists" />
                   {savedFilters.map((l) => (
                     <SheetRow key={l.id} icon={<ListIcon />} name={l.name} onClick={() => applyList(l.filterState)} />
-                  ))}
-                </>
-              )}
-
-              {/* Books */}
-              {personalBooks.filter((b) => !b.isDefault).length > 0 && (
-                <>
-                  <SheetSection title="Books" />
-                  {personalBooks.filter((b) => !b.isDefault).map((b) => (
-                    <SheetRow key={b.id} icon={<FolderIcon />} name={b.name} count={b.count} active={activeBook === b.id} onClick={() => applyBook(b.id)} />
                   ))}
                 </>
               )}

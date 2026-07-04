@@ -1,5 +1,4 @@
-import type { Prisma } from "../../generated/prisma";
-import { db } from "~/server/db";
+import type { Prisma, PrismaClient } from "../../generated/prisma";
 
 /**
  * P40-06 — ContactBookMembership write helpers (dual-write + membership edits).
@@ -19,7 +18,9 @@ import { db } from "~/server/db";
  * same transaction that writes `Contact.bookId`.
  */
 
-type Client = Prisma.TransactionClient | typeof db;
+// Type-only client union — importing the `db` instance here would pull the
+// Prisma runtime into the pure unit tests. Every caller passes a client/tx.
+type Client = Prisma.TransactionClient | PrismaClient;
 
 /**
  * Make `addressBookId` the contact's primary ("home") book membership: upsert

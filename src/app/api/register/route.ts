@@ -57,6 +57,8 @@ export async function POST(request: NextRequest) {
       email: parsedBody.data.email,
       name: parsedBody.data.name,
       password: passwordHash,
+      // P40-08: born into the books model — the migration explainer never shows.
+      preferences: { booksNative: true },
     },
     select: { id: true },
   });

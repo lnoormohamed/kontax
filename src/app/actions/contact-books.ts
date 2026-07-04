@@ -9,6 +9,7 @@ import {
   setPrimaryMembership,
 } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
+import { updatePreferences } from "~/server/preferences";
 
 /**
  * P40-08 — server actions behind the contact-detail "Books" block. Each action
@@ -73,6 +74,17 @@ export async function removeContactFromBook(input: {
   });
   revalidatePath(`/contacts/${input.contactId}`);
   revalidatePath("/contacts");
+}
+
+/**
+ * P40-08: dismiss the one-time "your contacts now live in books" explainer.
+ * Persists the timestamp in preferences so it never shows this user again.
+ */
+export async function dismissBooksExplainer(): Promise<void> {
+  const userId = await requireUserId();
+  await updatePreferences(userId, {
+    booksExplainerDismissedAt: new Date().toISOString(),
+  });
 }
 
 /** Make a book the contact's primary/home book (moves the primary membership). */

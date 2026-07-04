@@ -9,6 +9,12 @@ export type UserPreferences = {
   // value per key, applied only where it makes sense — not per-device buckets.
   rowLabels?: "hover" | "always" | "off"; // applies on desktop (hover: hover)
   motion?: "system" | "on" | "off"; // applies on both device classes
+  // P40-08 — one-time state flags for the multi-book rollout (not user-facing
+  // settings). booksNative=true marks accounts born into the books model (seeded
+  // Personal+Work at signup) so the migration explainer never shows them;
+  // booksExplainerDismissedAt records when an existing user dismissed it.
+  booksNative?: boolean;
+  booksExplainerDismissedAt?: string | null;
 };
 
 export const DEFAULT_PREFERENCES: Required<UserPreferences> = {
@@ -19,4 +25,6 @@ export const DEFAULT_PREFERENCES: Required<UserPreferences> = {
   weekStartsOn: 1,
   rowLabels: "hover",
   motion: "system",
+  booksNative: false,
+  booksExplainerDismissedAt: null,
 };

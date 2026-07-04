@@ -14,6 +14,7 @@ import {
 } from "~/app/_components/contact-inline-editor";
 import { MobileContactDetail } from "~/app/_components/mobile-contact-detail";
 import { ContactSharing } from "~/app/_components/contact-sharing";
+import { ContactBooksBlock } from "~/app/_components/contact-books-block";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { ContactExportButton } from "~/app/_components/contact-export-button";
@@ -34,6 +35,7 @@ import { addContactToFamilyBook } from "~/app/actions/family";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { listMemberships } from "~/server/contact-book-membership";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
@@ -462,6 +464,31 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
        (lastFamilyEvent.actor === "FAMILY_MEMBER" ? "a family member" : "you"))
     : null;
   const lastEditedAt = lastFamilyEvent ? formatDate(lastFamilyEvent.createdAt, dateFormat) : null;
+
+  // P40-08: the contact-detail "Books" block — which personal books this contact
+  // lives in, plus the user's books for "Add to book". Personal contacts only
+  // (shared/team contacts live in GroupContact, not personal books) and only on
+  // the details tab.
+  const isPersonalContact = !isSharedContact && !teamContext;
+  const [contactMemberships, userBooksForBlock] =
+    detailTab === "details" && isPersonalContact
+      ? await Promise.all([
+          listMemberships(db, contact.id),
+          db.addressBook.findMany({
+            where: { userId: session.user.id, archivedAt: null },
+            orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+            select: { id: true, name: true },
+          }),
+        ])
+      : [[] as Awaited<ReturnType<typeof listMemberships>>, [] as { id: string; name: string }[]];
+  const bookNameById = new Map(userBooksForBlock.map((b) => [b.id, b.name]));
+  const booksBlockMemberships = contactMemberships
+    .filter((m) => bookNameById.has(m.addressBookId))
+    .map((m) => ({
+      bookId: m.addressBookId,
+      name: bookNameById.get(m.addressBookId)!,
+      isPrimary: m.isPrimary,
+    }));
 
   // Shared books — only needed on the sharing tab.
   const sharedBooks = await (detailTab === "sharing"
@@ -971,6 +998,17 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#8b938c"} sz="sm" />
               ))}
             </div>
+
+            {isPersonalContact && booksBlockMemberships.length > 0 ? (
+              <>
+                <div className="my-5 h-px bg-[#edf0ea]" />
+                <ContactBooksBlock
+                  contactId={contact.id}
+                  memberships={booksBlockMemberships}
+                  books={userBooksForBlock}
+                />
+              </>
+            ) : null}
 
             <div className="my-5 h-px bg-[#edf0ea]" />
 

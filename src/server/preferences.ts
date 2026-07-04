@@ -9,6 +9,8 @@ const VALID_KEYS = new Set<keyof UserPreferences>([
   "weekStartsOn",
   "rowLabels",
   "motion",
+  "booksNative",
+  "booksExplainerDismissedAt",
 ]);
 
 export async function getPreferences(userId: string): Promise<Required<UserPreferences>> {
