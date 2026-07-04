@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { getUserDefaultBook } from "~/server/address-books";
+import { movePrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { corsHeaders } from "~/lib/api-cors";
@@ -75,12 +77,21 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const patch = mapUpdateInputToDb(parsed.data);
     const updatedFields = Object.keys(parsed.data);
 
+    // P40-06: if the book is changing, resolve a concrete target (null → default)
+    // and dual-write the primary membership so the contact never loses its book.
+    let movedBookId: string | null = null;
+    if ("bookId" in patch) {
+      movedBookId = (patch.bookId as string | null) ?? (await getUserDefaultBook(userId)).id;
+      patch.bookId = movedBookId;
+    }
+
     const updated = await db.$transaction(async (tx) => {
       const contact = await tx.contact.update({
         where: { id },
         data: patch,
         select: API_CONTACT_SELECT,
       });
+      if (movedBookId) await movePrimaryMembership(tx, id, movedBookId);
       await emitEvent(tx, {
         userId,
         contactId: id,

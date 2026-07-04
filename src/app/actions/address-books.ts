@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { auth } from "~/server/auth";
+import { movePrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
 
 // P28-03: personal address-book management. The default book is immutable
@@ -179,14 +180,26 @@ export async function moveContactsToBook(input: {
   });
   if (!target) throw new Error("That book is unavailable.");
 
-  await db.contact.updateMany({
-    where: { id: { in: input.contactIds }, userId },
-    data: {
-      bookId: target.id,
-      lastMutatedBy: "MANUAL",
-      lastMutatedByDetail: null,
-      syncVersion: { increment: 1 },
-    },
+  await db.$transaction(async (tx) => {
+    // Restrict to the caller's own contacts before we touch memberships.
+    const owned = await tx.contact.findMany({
+      where: { id: { in: input.contactIds }, userId },
+      select: { id: true },
+    });
+    await tx.contact.updateMany({
+      where: { id: { in: owned.map((c) => c.id) }, userId },
+      data: {
+        bookId: target.id,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
+        syncVersion: { increment: 1 },
+      },
+    });
+    // P40-06: dual-write — move each contact's primary membership to the target
+    // book (drops the previous home membership, keeps any extra memberships).
+    for (const { id } of owned) {
+      await movePrimaryMembership(tx, id, target.id);
+    }
   });
   revalidatePath("/contacts");
   revalidatePath("/settings/books");

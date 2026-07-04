@@ -330,10 +330,20 @@ const commonPredicates = (
 
 const privateBranch = (args: BranchArgs): Prisma.Sql => {
   const { scope, archived } = args.params;
+  // P40-06 read cutover: filter by ContactBookMembership (a contact can live in
+  // several books). The `OR c."bookId" = …` clause is the soak deprecation shim
+  // — it keeps the legacy single-book rows visible until the membership backfill
+  // is guaranteed complete everywhere and dual-write has fully rolled out; it is
+  // removed with Contact.bookId in the post-soak cleanup phase (decision §10.1).
   const bookFilter = scope.personalBookId
-    ? scope.personalBookIsDefault
-      ? Prisma.sql`(c."bookId" = ${scope.personalBookId} OR c."bookId" IS NULL)`
-      : Prisma.sql`c."bookId" = ${scope.personalBookId}`
+    ? Prisma.sql`(
+        EXISTS (
+          SELECT 1 FROM "ContactBookMembership" m
+          WHERE m."contactId" = c.id AND m."addressBookId" = ${scope.personalBookId}
+        )
+        OR c."bookId" = ${scope.personalBookId}
+        ${scope.personalBookIsDefault ? Prisma.sql`OR c."bookId" IS NULL` : Prisma.empty}
+      )`
     : Prisma.sql`true`;
   return Prisma.sql`
     SELECT ${ROW_COLUMNS}, ${args.params.includeNotes ? Prisma.sql`c.notes` : Prisma.sql`NULL::text`} AS notes,

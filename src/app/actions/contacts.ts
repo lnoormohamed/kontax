@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
+import { setPrimaryMembership } from "~/server/contact-book-membership";
 import {
   bulkAcceptHighConfidenceForUser,
   mergeContactsForUser,
@@ -606,6 +607,10 @@ export const createContact = async (formData: FormData) => {
           addedByUserId: userId,
         },
       });
+    } else if (defaultBook) {
+      // P40-06: dual-write the membership alongside Contact.bookId (personal
+      // contacts only; shared contacts live in GroupContact, not a personal book).
+      await setPrimaryMembership(tx, contact.id, defaultBook.id);
     }
     await emitEvent(tx, {
       userId,

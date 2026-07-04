@@ -183,10 +183,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         orderBy: [{ isDefault: "desc" }, { name: "asc" }],
         select: { id: true, name: true, slug: true, isDefault: true },
       }),
-      // Non-archived contact counts per book (null bookId rolls into the default book).
-      db.contact.groupBy({
-        by: ["bookId"],
-        where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } },
+      // P40-06: per-book counts from membership (matches the membership-based
+      // list; a multi-book contact counts in each of its books). Former null-book
+      // contacts were backfilled into their default book's membership.
+      db.contactBookMembership.groupBy({
+        by: ["addressBookId"],
+        where: {
+          addressBook: { userId: session.user.id },
+          contact: { archivedAt: null, groupContacts: { none: {} } },
+        },
         _count: { _all: true },
       }),
       // P31B-04: label registry for the sidebar Labels section (also feeds the
@@ -214,16 +219,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   ];
   const hasShared = sharedBooks.length > 0;
 
-  // P28-03: personal books with non-archived counts (null bookId → default book).
-  const nullBookCount = personalBookCounts.find((c) => c.bookId === null)?._count._all ?? 0;
+  // P40-06: personal books with non-archived counts, keyed by membership book.
   const personalBooks = personalBooksRaw.map((b) => ({
     id: b.id,
     name: b.name,
     slug: b.slug,
     isDefault: b.isDefault,
-    count:
-      (personalBookCounts.find((c) => c.bookId === b.id)?._count._all ?? 0) +
-      (b.isDefault ? nullBookCount : 0),
+    count: personalBookCounts.find((c) => c.addressBookId === b.id)?._count._all ?? 0,
   }));
 
   const bookParam = await getSingleParam(searchParams, "book");

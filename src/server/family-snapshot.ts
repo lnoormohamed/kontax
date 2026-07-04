@@ -1,4 +1,5 @@
 import type { Prisma } from "../../generated/prisma";
+import { setPrimaryMembership } from "~/server/contact-book-membership";
 
 type Tx = Prisma.TransactionClient;
 
@@ -87,7 +88,7 @@ export async function snapshotFamilyBookForUser(
   });
 
   for (const { contact } of shared) {
-    await tx.contact.create({
+    const copy = await tx.contact.create({
       data: {
         userId: args.targetUserId,
         bookId: personalBook.id,
@@ -121,7 +122,10 @@ export async function snapshotFamilyBookForUser(
         sourceDetail: `${args.groupName} (kept copy)`,
         lastMutatedBy: "MANUAL",
       },
+      select: { id: true },
     });
+    // P40-06: dual-write the primary membership for the kept personal copy.
+    await setPrimaryMembership(tx, copy.id, personalBook.id);
   }
 
   return personalBook.id;

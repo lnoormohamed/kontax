@@ -265,7 +265,7 @@ export async function commitKontaxImport(
     // Mirror the CSV commit route: one CONTACT_IMPORTED event per contact.
     const importedContacts = await db.contact.findMany({
       where: { userId, importJobId: job.id },
-      select: { id: true },
+      select: { id: true, bookId: true },
     });
     if (importedContacts.length > 0) {
       await db.activityEvent.createMany({
@@ -278,6 +278,21 @@ export async function commitKontaxImport(
           payload: { importJobId: job.id, sourceFileName },
         })),
       });
+      // P40-06: dual-write primary memberships for imported personal contacts
+      // (each is new with a single book, so its membership is primary).
+      const withBook = importedContacts.filter(
+        (c): c is { id: string; bookId: string } => c.bookId !== null,
+      );
+      if (withBook.length > 0) {
+        await db.contactBookMembership.createMany({
+          data: withBook.map((c) => ({
+            contactId: c.id,
+            addressBookId: c.bookId,
+            isPrimary: true,
+          })),
+          skipDuplicates: true,
+        });
+      }
     }
 
     await db.importJob.update({

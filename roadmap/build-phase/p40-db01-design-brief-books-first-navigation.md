@@ -1,5 +1,11 @@
 # P40-DB01 — Design Brief: Books-First Navigation & Multi-Membership Surfaces
 
+> **Status: Brief delivered (2026-07-04)** →
+> [roadmap/design-briefs/p40-db01-books-first-navigation.md](../design-briefs/p40-db01-books-first-navigation.md).
+> The three open model decisions are landed there: remove-from-last-book = **block**;
+> multi-membership indicators = **detail-only (v1)**; default books = **Personal + Work,
+> renameable**.
+
 ## Purpose
 
 Specify the visual design and interactions for the Phase 40 multi-book model:

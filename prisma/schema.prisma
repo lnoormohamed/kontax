@@ -540,7 +540,11 @@ model ContactBookMembership {
   addressBook AddressBook @relation(fields: [addressBookId], references: [id], onDelete: Cascade)
 
   @@unique([contactId, addressBookId])
-  @@index([addressBookId])
+  // P40-06: the read cutover filters the contacts list by book via
+  // `EXISTS (… m.addressBookId = $book AND m.contactId = c.id)`. The composite
+  // (addressBookId, contactId) makes that an index-only semi-join, preserving
+  // the P38 list query plan. Superset of the old single-column addressBookId index.
+  @@index([addressBookId, contactId])
   @@index([contactId])
 }
 
