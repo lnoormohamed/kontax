@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import { setScrubbing } from "~/app/_components/contact-list/scrub-signal";
+
 // P46-01 — Alphabet scrubber (the phone-book fast-scroll index rail).
 //
 // A secondary affordance that duplicates scrolling: tap a letter to jump, drag
@@ -33,6 +35,7 @@ const PAD = 8; // rail's own vertical padding (matches .kx-scrub padding)
 const LETTER_CELL = 15; // vertical space a readable letter reserves on the track
 const DOT_CELL = 9; // vertical space a decimation dot reserves (smaller than a letter)
 const EDGE_GAP = 2; // rail sits 2px from the viewport's right edge
+const FAB_GAP = 8; // P46-DB04 §3·C — track ends this far above the add-contact FAB
 
 export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }: AlphabetScrubberProps) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -47,9 +50,29 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
   const measure = useCallback(() => {
     if (!viewportEl) return;
     const rect = viewportEl.getBoundingClientRect();
+    const top = rect.top + INSET;
+    // P46-DB04 §3·C — the add-contact FAB shares this bottom-right corner. When
+    // it's on screen, end the track FAB_GAP above it so the last letter never
+    // sits under the button and stays tappable. Measured on the same pass as the
+    // viewport (resize / orientation), not per scroll frame. The FAB fades +
+    // goes pointer-inert during a scrub (scrub-signal), so the shortened rest
+    // track is the only geometry change — no jitter on scroll or scrub start.
+    let bottom = rect.bottom - INSET;
+    const fab = document.querySelector<HTMLElement>("[data-mobile-fab]");
+    if (fab) {
+      // The FAB is in the DOM but `display:none` between 768–1023px (its
+      // `md:hidden` cutoff is 768px, while the rail shows up to 1023px). A
+      // hidden element measures as a zero-rect — guard on a real box so we
+      // don't clamp the track to nothing when there's no FAB actually on screen.
+      const fabRect = fab.getBoundingClientRect();
+      if (fabRect.width > 0 && fabRect.height > 0) {
+        const fabTop = fabRect.top - FAB_GAP;
+        if (fabTop < bottom) bottom = fabTop;
+      }
+    }
     setBox({
-      top: rect.top + INSET,
-      height: Math.max(0, rect.height - INSET * 2),
+      top,
+      height: Math.max(0, bottom - top),
       right: Math.max(EDGE_GAP, window.innerWidth - rect.right + EDGE_GAP),
     });
   }, [viewportEl]);
@@ -131,6 +154,7 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
       // Show the bubble immediately; the jump waits for a move (drag) or the
       // release (tap) so a plain tap jumps once, on release.
       setScrub(hit);
+      setScrubbing(true); // §3·C — fade the add-contact FAB out of the way
     },
     [sectionAtY],
   );
@@ -160,6 +184,7 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
       // A press with no cross-letter movement is a tap → jump to that letter.
       if (!movedRef.current && scrub) onJump(scrub.letter);
       setScrub(null);
+      setScrubbing(false); // §3·C — restore the FAB
     },
     [onJump, scrub],
   );
@@ -179,8 +204,12 @@ export function AlphabetScrubber({ sections, activeLetter, viewportEl, onJump }:
   );
 
   useEffect(() => {
-    // Safety: if the rail unmounts mid-drag, drop any lingering scrub visuals.
-    return () => setScrub(null);
+    // Safety: if the rail unmounts mid-drag, drop any lingering scrub visuals
+    // and un-stick the FAB fade.
+    return () => {
+      setScrub(null);
+      setScrubbing(false);
+    };
   }, []);
 
   if (!box || sections.length === 0) return null;
