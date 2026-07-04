@@ -1,34 +1,36 @@
 # P44-05 — Photos in conflict review & merge surfaces
 
-Status: Partially built (conflict surface + auto-resolve done; two follow-ups
-deferred — see below) · Priority: P2 · Depends: [P44-03](p44-03-inbound-photo-sync.md)
+Status: Built (typecheck-verified; not exercised live) · Priority: P2 · Depends: [P44-03](p44-03-inbound-photo-sync.md)
 Phase: [Phase 44](phase-44-photo-sync.md)
 
-> **Built 2026-07-04 (typecheck-verified; not exercised live):**
+> **Built 2026-07-04 (typecheck-verified; not exercised live — flag-gated):**
 > - Identical-after-normalization **auto-resolves silently** in the reconcile
 >   core (`contact-photo-sync.ts`) — both sides changed to the same image →
 >   no conflict, one remote fetch in the conflict case only. Covered by
 >   `npm run qa:phase44:photo-decision`.
-> - The sync **conflict review** shows the photo **side-by-side as thumbnails**
->   with a broken-image fallback (both the compare grid and the manual-merge
->   picker). `avatarUrl` now rides in the conflict snapshots
->   (`sync-conflict-snapshot.ts`) and `KEEP_REMOTE` applies the chosen photo
->   (`buildContactWriteDataFromRemoteSnapshot`, guarded so pre-P44-05 conflicts
->   are untouched). Merge already carries the recency-default photo onto the
->   survivor.
+> - **Sync conflict review** shows the photo **side-by-side as thumbnails**
+>   (compare grid + manual-merge picker, broken-image fallback). `avatarUrl`
+>   rides in the conflict snapshots (`sync-conflict-snapshot.ts`); `KEEP_REMOTE`
+>   applies the chosen photo (`buildContactWriteDataFromRemoteSnapshot`, guarded
+>   so pre-P44-05 conflicts are untouched).
+> - **Photo-only conflict recording** from the photo pass
+>   (`sync-photo-pass.ts` → `recordPhotoConflict`): stages the remote photo to a
+>   renderable MinIO URL, records a `SyncConflict` whose two snapshots differ
+>   only in `avatarUrl` (so resolve never wipes other fields), and sets an
+>   "acknowledged" shadow in the same tx so it can't re-record. `resolveSyncConflict`
+>   gained a photo branch that **reseeds `photoShadow`** per the pick (KEEP_REMOTE
+>   applies remote + settles; KEEP_LOCAL clears the local half → next pass
+>   pushes). The provider write lands on the next photo pass. Manual-merge is
+>   hidden for photo-only conflicts.
+> - **Merge review** offers a **photo pick** (side-by-side thumbnails) when both
+>   contacts have different photos; `avatarUrl` is now a first-class
+>   `MergeFieldChoices` field threaded through the merge action. Unpicked → the
+>   existing recency default.
 >
-> **Deferred (documented, not built):**
-> 1. **Interactive photo pick in the *merge* review** — `ConflictCard` is
->    text-oriented; needs an image variant + `avatarUrl` threaded through
->    `MergeFieldChoices`/the merge action. The survivor still gets the
->    recency-default photo today.
-> 2. **Photo-*only* conflict recording from the (flag-gated) photo pass** — the
->    pass currently tallies+logs a both-different photo conflict but writes
->    nothing. Recording one safely needs the resolve action to re-push on
->    `KEEP_LOCAL` and **reseed `photoShadow`**, else the conflict re-appears each
->    cycle. Not wired without live verification; auto-resolve already covers the
->    common both-same case, and the deferred path is a no-write no-loop skip
->    (safe, no data loss).
+> **Not verified live** (flag off, dead staging Google token) — exercised end to
+> end in [P44-06](p44-06-photo-sync-qa-matrix.md). Note: for photo-only conflicts
+> `MANUAL_MERGE` maps to KEEP_LOCAL (a single image has no field-merge), which is
+> why the manual-merge button is hidden for them.
 
 ## Scope
 

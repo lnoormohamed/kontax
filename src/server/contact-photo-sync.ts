@@ -309,8 +309,26 @@ export type PhotoReconcileInput = {
   deleteRemote: () => Promise<void>;
 };
 
+/**
+ * P44-05: everything the pass needs to record a photo conflict + let the resolve
+ * action reseed the shadow so the conflict settles instead of re-appearing.
+ */
+export type ConflictPhotoInfo = {
+  /** Staged, renderable MinIO URL of the remote photo (null if staging failed). */
+  remoteAvatarUrl: string | null;
+  remoteSignal: string | null;
+  remoteCanonicalHash: string | null;
+  /** sha256 of the remote photo normalized to our canonical form. */
+  remoteLocalPhotoHash: string | null;
+  localPhotoHash: string | null;
+  localAvatarUrl: string | null;
+  signalKind: PhotoSignalKind;
+};
+
 export type PhotoReconcileResult = {
   action: PhotoAction;
+  /** Set on a genuine (non-auto-resolved) conflict when we could stage the remote. */
+  conflictPhoto?: ConflictPhotoInfo;
   /** New avatarUrl when it changed (pull → url, pull-delete → null). undefined = unchanged. */
   avatarUrl?: string | null;
   /** New shadow to persist (null = clear the shadow). undefined = leave shadow untouched. */
@@ -356,10 +374,11 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
         return NOOP("noop");
 
       case "conflict": {
-        // P44-05: both sides changed to the SAME image after normalization →
-        // auto-resolve silently (no conflict). Only meaningful when both sides
-        // still have a photo (changed×changed); delete-vs-change is a real
-        // conflict. Costs one remote fetch, in the conflict case only.
+        // One remote fetch serves both jobs (conflict case only):
+        //   1. Auto-resolve when both sides changed to the SAME image after
+        //      normalization (changed×changed only) — no conflict.
+        //   2. Otherwise stage the remote photo to MinIO so the conflict review
+        //      can render it, and return the seed data the resolve action needs.
         if (local === "changed" && remoteState === "changed" && canonicalLocal) {
           const raw = await input.loadRemoteBytes();
           const remoteNorm = raw ? await normalizeContactPhoto(raw) : null;
@@ -379,6 +398,21 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
               conflict: false,
             };
           }
+          const stagedUrl = remoteNorm ? await storeContactPhoto(contactId, remoteNorm) : null;
+          return {
+            action,
+            activity: null,
+            conflict: true,
+            conflictPhoto: {
+              remoteAvatarUrl: stagedUrl,
+              remoteSignal: remote.signal,
+              remoteCanonicalHash: raw ? hashBytes(raw) : null,
+              remoteLocalPhotoHash: remoteNorm?.sha256 ?? null,
+              localPhotoHash: canonicalLocal.sha256,
+              localAvatarUrl: avatarUrl,
+              signalKind,
+            },
+          };
         }
         return { action, activity: null, conflict: true };
       }

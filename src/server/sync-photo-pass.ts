@@ -10,12 +10,14 @@ import { Prisma, type PrismaClient } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
 import {
   reconcileContactPhoto,
+  type ConflictPhotoInfo,
   type PhotoShadow,
   type PhotoSignalKind,
   type PushSeed,
   type RemotePhotoState,
   type SyncCapability,
 } from "~/server/contact-photo-sync";
+import { buildLocalConflictSnapshot, contactConflictSelect } from "~/server/sync-conflict-snapshot";
 
 export type PhotoPassLink = {
   linkId: string;
@@ -80,7 +82,16 @@ export async function runPhotoPass(
 
     if (result.conflict) {
       tally.conflicts += 1;
-      continue; // P44-05 owns the conflict surface; nothing written here
+      // P44-05: record a reviewable photo conflict (with a staged, renderable
+      // remote thumbnail) when we have the staged data. Setting an "acknowledged"
+      // shadow in the same transaction stops it re-recording every cycle — the
+      // resolve action reseeds the shadow to enact the user's choice.
+      if (result.conflictPhoto) {
+        await recordPhotoConflict(db, ctx, link, result.conflictPhoto).catch((error) => {
+          console.warn(`[Kontax] photo conflict record failed for ${link.contactId}`, error);
+        });
+      }
+      continue;
     }
     if (result.action === "noop") continue;
 
@@ -138,4 +149,73 @@ export async function runPhotoPass(
   }
 
   return tally;
+}
+
+/**
+ * Record a photo-only conflict as a reviewable SyncConflict. Both snapshots are
+ * full contact snapshots differing only in `avatarUrl`, so the existing resolve
+ * paths never wipe other fields; a namespaced `__photo` block carries the seed
+ * data the resolve action uses to reseed the shadow. In the same transaction we
+ * set an "acknowledged" shadow (both sides read as settled) so the conflict is
+ * not re-recorded on the next pass — the resolve action reseeds to enact the
+ * choice. Deduped by an existing OPEN conflict on the link.
+ */
+async function recordPhotoConflict(
+  db: PrismaClient,
+  ctx: { userId: string; syncAccountId: string },
+  link: PhotoPassLink,
+  info: ConflictPhotoInfo,
+): Promise<void> {
+  const contact = await db.contact.findUnique({
+    where: { id: link.contactId },
+    select: contactConflictSelect,
+  });
+  if (!contact) return;
+
+  await db.$transaction(async (tx) => {
+    const existing = await tx.syncConflict.findFirst({
+      where: { syncContactLinkId: link.linkId, status: "OPEN" },
+      select: { id: true },
+    });
+    if (!existing) {
+      const base = buildLocalConflictSnapshot(contact);
+      const localSnapshot = { ...base, __photoConflict: true };
+      const remoteSnapshot = {
+        ...base,
+        avatarUrl: info.remoteAvatarUrl,
+        __photo: {
+          signalKind: info.signalKind,
+          remoteSignal: info.remoteSignal,
+          remoteCanonicalHash: info.remoteCanonicalHash,
+          remoteLocalPhotoHash: info.remoteLocalPhotoHash,
+          remoteAvatarUrl: info.remoteAvatarUrl,
+        },
+      };
+      await tx.syncConflict.create({
+        data: {
+          syncAccountId: ctx.syncAccountId,
+          syncContactLinkId: link.linkId,
+          contactId: link.contactId,
+          conflictType: "LOCAL_REMOTE_MUTATION",
+          status: "OPEN",
+          localSnapshot: localSnapshot as Prisma.InputJsonValue,
+          remoteSnapshot: remoteSnapshot as Prisma.InputJsonValue,
+        },
+      });
+    }
+    // Acknowledged shadow: both sides read "same" next pass → no re-record.
+    const ackShadow: PhotoShadow = {
+      signalKind: info.signalKind,
+      remoteSignal: info.remoteSignal,
+      remoteCanonicalHash: info.remoteCanonicalHash,
+      localAvatarUrl: info.localAvatarUrl,
+      localPhotoHash: info.localPhotoHash,
+      lastSyncedRemoteAt: null,
+      lastPushRejected: false,
+    };
+    await tx.syncContactLink.update({
+      where: { id: link.linkId },
+      data: { photoShadow: ackShadow as unknown as Prisma.InputJsonValue },
+    });
+  });
 }

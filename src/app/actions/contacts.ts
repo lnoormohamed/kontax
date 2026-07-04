@@ -98,6 +98,7 @@ const mergeContactSchema = z.object({
   phoneChoice: z.enum(["primary", "secondary"]).optional(),
   companyChoice: z.enum(["primary", "secondary"]).optional(),
   notesChoice: z.enum(["primary", "secondary", "combine"]).optional(),
+  avatarUrlChoice: z.enum(["primary", "secondary"]).optional(), // P44-05
 });
 
 const getRequiredUserId = async () => {
@@ -517,6 +518,7 @@ const parseMergeContactInput = (formData: FormData) => {
     phoneChoice: getOptionalString(formData, "phoneChoice"),
     companyChoice: getOptionalString(formData, "companyChoice"),
     notesChoice: getOptionalString(formData, "notesChoice"),
+    avatarUrlChoice: getOptionalString(formData, "avatarUrlChoice"),
   });
 
   if (!parsed.success) {
@@ -1313,6 +1315,7 @@ export const mergeContacts = async (formData: FormData) => {
       phone: input.phoneChoice,
       company: input.companyChoice,
       notes: input.notesChoice,
+      avatarUrl: input.avatarUrlChoice,
     },
   });
 

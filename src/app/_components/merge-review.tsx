@@ -22,6 +22,7 @@ export type MergeReviewContact = {
   website: string | null;
   birthday: string | null;
   notes: string | null;
+  avatarUrl?: string | null; // P44-05: photo pick when both differ
   // P36-DB05: provenance metadata shown on the survivor cards.
   source?: string | null;
   book?: string | null;
@@ -1533,6 +1534,11 @@ export function MergeReview({
   const notesB = trim(contactB.notes);
   const notesStatus = classify(notesA, notesB);
 
+  // P44-05: offer a photo pick only when both contacts have a *different* photo.
+  const photoA = trim(contactA.avatarUrl);
+  const photoB = trim(contactB.avatarUrl);
+  const photoConflict = Boolean(photoA && photoB && photoA !== photoB);
+
   const scalarConflicts = scalarRows.filter((r) => r.status === "conflict");
   const autoFilledRows = scalarRows.filter((r) => r.status === "auto").map((r) => ({
     label: r.label,
@@ -1602,7 +1608,7 @@ export function MergeReview({
       />
 
       {/* Conflict section */}
-      {scalarConflicts.length > 0 || notesStatus === "conflict" ? (
+      {scalarConflicts.length > 0 || notesStatus === "conflict" || photoConflict ? (
         <div style={{ display: "grid", gap: 11 }}>
           <h2
             style={{
@@ -1680,6 +1686,62 @@ export function MergeReview({
               valueB={notesB}
             />
           )}
+          {photoConflict && (
+            <div style={{ border: `1px solid ${C.line}`, borderRadius: 12, padding: 14 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: C.mute,
+                  marginBottom: 10,
+                }}
+              >
+                Photo
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {(
+                  [
+                    ["A", labelA, photoA],
+                    ["B", labelB, photoB],
+                  ] as const
+                ).map(([k, lbl, url]) => {
+                  const on = choices.avatarUrl === k;
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => setChoices((prev) => ({ ...prev, avatarUrl: k }))}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "12px 10px",
+                        borderRadius: 10,
+                        cursor: "pointer",
+                        border: on ? `2px solid ${C.blue}` : `1px solid ${C.line}`,
+                        background: on ? "rgba(65,88,244,0.08)" : "#fff",
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: 600, color: on ? C.blue : C.mute }}>
+                        {lbl}
+                      </span>
+                      <img
+                        src={url}
+                        alt={`${lbl} photo`}
+                        style={{ width: 72, height: 72, borderRadius: 10, objectFit: "cover", border: `1px solid ${C.line2}` }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <Card style={{ padding: "20px 22px" }}>
@@ -1726,6 +1788,9 @@ export function MergeReview({
         )}
         {notesStatus === "conflict" && choices.notes ? (
           <input name="notesChoice" type="hidden" value={toPS(choices.notes)} />
+        ) : null}
+        {photoConflict && choices.avatarUrl ? (
+          <input name="avatarUrlChoice" type="hidden" value={toPS(choices.avatarUrl)} />
         ) : null}
         <MergeBar
           isPending={isPending}

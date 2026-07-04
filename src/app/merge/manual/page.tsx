@@ -45,6 +45,7 @@ const toReviewContact = (c: {
   website: string | null;
   birthday: string | null;
   notes: string | null;
+  avatarUrl: string | null;
   sourceType: string;
   labels: unknown;
   updatedAt: Date;
@@ -60,6 +61,7 @@ const toReviewContact = (c: {
   website: c.website,
   birthday: c.birthday,
   notes: c.notes,
+  avatarUrl: c.avatarUrl,
   ...survivorMetaFor(c),
 });
 
@@ -106,6 +108,7 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
         website: true,
         birthday: true,
         notes: true,
+        avatarUrl: true,
         archivedAt: true,
         updatedAt: true,
         sourceType: true,

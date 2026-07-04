@@ -520,6 +520,11 @@ function ConflictRow({
   const [open, setOpen] = useState(false);
   const [manual, setManual] = useState(false);
   const [picks, setPicks] = useState<Array<"local" | "remote">>(cf.comparisonRows.map(() => "local"));
+  // P44-05: a photo-only conflict has just the one photo row. "Manual merge" is
+  // meaningless for a single image (Keep local / Keep remote cover it) and the
+  // resolve action maps a photo MANUAL_MERGE to keep-local, so hide it.
+  const isPhotoOnly =
+    cf.comparisonRows.length === 1 && cf.comparisonRows[0]?.kind === "photo";
 
   const Outcome = ({
     children,
@@ -666,9 +671,11 @@ function ConflictRow({
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <Outcome strategy="KEEP_LOCAL">Keep local</Outcome>
                 <Outcome strategy="KEEP_REMOTE">Keep remote</Outcome>
-                <ActionBtn variant="primary" onClick={() => setManual(true)}>
-                  Manual merge →
-                </ActionBtn>
+                {!isPhotoOnly && (
+                  <ActionBtn variant="primary" onClick={() => setManual(true)}>
+                    Manual merge →
+                  </ActionBtn>
+                )}
               </div>
             </>
           ) : (

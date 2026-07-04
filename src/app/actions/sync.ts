@@ -1723,7 +1723,56 @@ export const resolveSyncConflict = async (formData: FormData) => {
 
   const resolvedAt = new Date();
 
-  if (input.resolutionStrategy === "KEEP_LOCAL") {
+  // P44-05: a photo-only conflict resolves by reseeding the link's photoShadow,
+  // not by the field-apply/push paths below (those assume a field snapshot). The
+  // provider write happens on the next photo pass: KEEP_REMOTE applies the
+  // staged remote photo locally + settles the shadow → no-op next pass;
+  // KEEP_LOCAL clears the local shadow half so the next pass pushes local.
+  // MANUAL_MERGE has no field-level meaning for a single image → treated as
+  // KEEP_LOCAL.
+  const photoLocalSnap = isRecord(conflict.localSnapshot) ? conflict.localSnapshot : null;
+  const isPhotoConflict = photoLocalSnap?.__photoConflict === true;
+  if (isPhotoConflict && conflict.syncContactLinkId) {
+    const remoteSnap = isRecord(conflict.remoteSnapshot) ? conflict.remoteSnapshot : null;
+    const photo = remoteSnap && isRecord(remoteSnap.__photo) ? remoteSnap.__photo : null;
+    const str = (v: unknown) => (typeof v === "string" ? v : null);
+    const signalKind =
+      photo?.signalKind === "resourceIdentifier" ? "resourceIdentifier" : "contentHash";
+    const keepRemote = input.resolutionStrategy === "KEEP_REMOTE";
+    const remoteAvatarUrl = str(photo?.remoteAvatarUrl);
+    const reseed = keepRemote
+      ? {
+          signalKind,
+          remoteSignal: str(photo?.remoteSignal),
+          remoteCanonicalHash: str(photo?.remoteCanonicalHash),
+          localAvatarUrl: remoteAvatarUrl,
+          localPhotoHash: str(photo?.remoteLocalPhotoHash),
+          lastSyncedRemoteAt: null,
+          lastPushRejected: false,
+        }
+      : {
+          // Local wins → local reads "changed" next pass (null shadow half).
+          signalKind,
+          remoteSignal: str(photo?.remoteSignal),
+          remoteCanonicalHash: str(photo?.remoteCanonicalHash),
+          localAvatarUrl: null,
+          localPhotoHash: null,
+          lastSyncedRemoteAt: null,
+          lastPushRejected: false,
+        };
+    await db.$transaction(async (tx) => {
+      if (keepRemote && conflict.contactId && remoteAvatarUrl) {
+        await tx.contact.update({
+          where: { id: conflict.contactId },
+          data: { avatarUrl: remoteAvatarUrl },
+        });
+      }
+      await tx.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId! },
+        data: { photoShadow: reseed as unknown as Prisma.InputJsonValue },
+      });
+    });
+  } else if (input.resolutionStrategy === "KEEP_LOCAL") {
     if (
       !conflict.contact ||
       !syncAccount.addressBookUrl ||
@@ -1768,7 +1817,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "KEEP_REMOTE") {
+  if (!isPhotoConflict && input.resolutionStrategy === "KEEP_REMOTE") {
     if (!conflict.contactId) {
       throw new Error(
         "This conflict cannot keep the remote version because the local contact is missing.",
@@ -1811,7 +1860,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "DUPLICATE_LOCAL") {
+  if (!isPhotoConflict && input.resolutionStrategy === "DUPLICATE_LOCAL") {
     if (!conflict.contact) {
       throw new Error(
         "This conflict cannot duplicate the local contact because the current record is missing.",
@@ -1881,7 +1930,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "ARCHIVE_LOCAL") {
+  if (!isPhotoConflict && input.resolutionStrategy === "ARCHIVE_LOCAL") {
     if (!conflict.contactId) {
       throw new Error(
         "This conflict cannot archive the local contact because it is missing.",
@@ -1910,7 +1959,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "MANUAL_MERGE") {
+  if (!isPhotoConflict && input.resolutionStrategy === "MANUAL_MERGE") {
     if (
       !conflict.contactId ||
       !conflict.contact ||
