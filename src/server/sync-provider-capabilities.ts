@@ -4,6 +4,7 @@ import type {
   ContactValueEntryInput,
   PortableContactInput,
 } from "./contact-portability";
+import { normalizePhoneExactKey } from "~/lib/phone-normalization";
 import { resolveCardDavProviderIdentity } from "./sync-provider-identity";
 
 export type SyncProviderCapabilityProfileId =
@@ -507,6 +508,55 @@ const normalizeValueEntries = (
       ),
     );
 
+// Phone values arrive formatted differently per provider — kontax stores them
+// space-stripped ("+447799720622") while CardDAV round-trips the spaces intact
+// ("+44 7799 720622"). Compared verbatim, those two representations of the SAME
+// number make the supported-field shadows unequal, which manufactures a
+// LOCAL_REMOTE_MUTATION conflict on every sync (self-perpetuating, since the
+// conflict never advances lastSyncedAt/etag). Canonicalise to an E.164 key so
+// only genuine number differences count. Shadow-only: never touches stored data
+// or the pushed vCard.
+const canonicalizePhone = (value: string | null | undefined): string | null => {
+  const trimmed = normalizeString(value);
+  if (trimmed == null) {
+    return null;
+  }
+  const exactKey = normalizePhoneExactKey(trimmed);
+  // Parseable → E.164 key. Otherwise strip common formatting punctuation so two
+  // representations of the same UNparseable number still collapse together
+  // (falls back to the trimmed original if that leaves nothing).
+  return exactKey || trimmed.replace(/[\s().\-]/g, "") || trimmed;
+};
+
+const normalizePhoneArray = (values: string[] | null | undefined) =>
+  [...(values ?? [])]
+    .map((value) => canonicalizePhone(value))
+    .filter((value): value is string => value != null)
+    .sort((left, right) => left.localeCompare(right));
+
+const normalizePhoneEntries = (
+  values: ContactValueEntryInput[] | null | undefined,
+) =>
+  [...(values ?? [])]
+    .flatMap((entry) => {
+      const value = canonicalizePhone(entry.value);
+      if (!value) {
+        return [];
+      }
+      return [
+        {
+          label: normalizeString(entry.label) ?? "Other",
+          value,
+          isPrimary: entry.isPrimary === true,
+        },
+      ];
+    })
+    .sort((left, right) =>
+      `${left.label} ${left.value} ${left.isPrimary ? 1 : 0}`.localeCompare(
+        `${right.label} ${right.value} ${right.isPrimary ? 1 : 0}`,
+      ),
+    );
+
 const normalizePostalAddresses = (
   values: PortableContactInput["postalAddresses"],
 ) =>
@@ -606,9 +656,9 @@ export const buildProviderSupportedContactShadow = (
     email: normalizeString(projected.email),
     emailAddresses: normalizeStringArray(projected.emailAddresses),
     emailEntries: normalizeValueEntries(projected.emailEntries),
-    phone: normalizeString(projected.phone),
-    phoneNumbers: normalizeStringArray(projected.phoneNumbers),
-    phoneEntries: normalizeValueEntries(projected.phoneEntries),
+    phone: canonicalizePhone(projected.phone),
+    phoneNumbers: normalizePhoneArray(projected.phoneNumbers),
+    phoneEntries: normalizePhoneEntries(projected.phoneEntries),
     company: normalizeString(projected.company),
     department: normalizeString(projected.department),
     jobTitle: normalizeString(projected.jobTitle),
