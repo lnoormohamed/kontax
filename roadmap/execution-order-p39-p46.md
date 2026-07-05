@@ -108,6 +108,12 @@ Added 2026-07-05 (brand/marketing brief; independent of all the above):
     social media assets brief (LinkedIn/X/Facebook/Instagram: profile + banner
     + featured images, slogans + bios). Extends brand-assets.md; no app code
     (external-platform uploads). P2.
+20e2. [P46-DB07](build-phase/p46-db07-design-brief-settings-ia-redesign.md) —
+    settings IA redesign brief (both breakpoints; verified inventory: two
+    disagreeing navs — Preferences/Books/Developer unreachable on mobile,
+    Shared-with-me unreachable on desktop; presets split from import/export;
+    #plan-billing anchor; 14 smells total). One nav definition, one depth
+    rule, regrouped. Supersedes 06-settings.md's IA. P1.
 20f. [P46-DB06](build-phase/p46-db06-design-brief-mobile-consistency-audit.md) —
     mobile UI consistency audit (mobile-only): one header system, one back
     contract, one banner stack across every screen; fixes the 3 header-less

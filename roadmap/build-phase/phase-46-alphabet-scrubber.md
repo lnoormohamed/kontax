@@ -50,6 +50,7 @@ and make detail-tab navigation behave.
 | [P46-07](p46-07-mobile-contact-list-row-polish.md) | Mobile contact-list row polish (contingent) | P3 | P46-DB04 |
 | [P46-DB05](p46-db05-design-brief-social-media-assets.md) | Design brief: social media assets (LinkedIn/X/Facebook/Instagram) | P2 | — |
 | [P46-DB06](p46-db06-design-brief-mobile-consistency-audit.md) | Design brief: mobile UI consistency audit + Overview removal (mobile-only) | P1 | — |
+| [P46-DB07](p46-db07-design-brief-settings-ia-redesign.md) | Design brief: settings IA redesign (both breakpoints) | P1 | — |
 | [P46-08](p46-08-mobile-chrome-conformance-pass.md) | Mobile chrome conformance pass (backs, missing headers, Overview removal) | P1 | P46-DB06 |
 | [P46-09](p46-09-mobile-header-unification-banner-stack.md) | Mobile header primitive unification + banner stack | P1 | P46-08 |
 | [P46-10](p46-10-contact-health-people-prompt.md) | Contact-health "needs attention" prompt in People | P2 | P46-08 |
