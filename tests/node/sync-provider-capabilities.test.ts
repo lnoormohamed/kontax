@@ -51,6 +51,32 @@ test("iCloud keeps significant dates in the supported contact shadow", () => {
   assert.equal(shadow.significantDates?.[0]?.label, "Anniversary");
 });
 
+test("phone formatting differences do not manufacture supported-field drift", () => {
+  const profile = resolveSyncProviderCapabilityProfile({
+    provider: "CARDDAV",
+    baseUrl: "https://carddav.fastmail.com/dav/addressbooks/user/x/Default",
+  });
+  const withPhone = (raw: string): PortableContactInput => ({
+    ...contactFixture,
+    phone: raw,
+    phoneNumbers: [raw],
+    phoneEntries: [{ label: "phone", value: raw, isPrimary: true }],
+  });
+
+  // kontax stores space-stripped; CardDAV round-trips the spaces — same number.
+  const local = buildProviderSupportedContactShadow(withPhone("+447799720622"), profile);
+  const remote = buildProviderSupportedContactShadow(withPhone("+44 7799 720622"), profile);
+  assert.equal(providerSupportedShadowsEqual(local, remote), true);
+
+  // A national-format local vs international-format remote of the same number.
+  const localNational = buildProviderSupportedContactShadow(withPhone("07799720622"), profile);
+  assert.equal(providerSupportedShadowsEqual(localNational, remote), true);
+
+  // A genuinely different number must still register as drift.
+  const other = buildProviderSupportedContactShadow(withPhone("+44 7700 900123"), profile);
+  assert.equal(providerSupportedShadowsEqual(local, other), false);
+});
+
 test("generic-safe roundtrips supported fields without turning unsupported dates into drift", () => {
   const profile = resolveSyncProviderCapabilityProfile({
     provider: "CARDDAV",
