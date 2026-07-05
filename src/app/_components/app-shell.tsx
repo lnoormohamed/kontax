@@ -1,12 +1,10 @@
 import Link from "next/link";
 
-import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { AppBannerStack } from "~/app/_components/app-banner-stack";
 import { BottomNav } from "~/app/_components/bottom-nav";
-import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
-import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
-import { MobileSecondaryHeader } from "~/app/_components/mobile-header";
+import { OfflineChip } from "~/app/_components/connection-banner";
+import { MobileHeader } from "~/app/_components/mobile-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
-import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchDropdown } from "~/app/_components/search-dropdown";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -97,9 +95,10 @@ export async function AppShell({
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
-      {/* mobile secondary header — back + title */}
+      {/* mobile detail header — labelled back + title (P46-DB06 A1) */}
       {mobileTitle && (
-        <MobileSecondaryHeader
+        <MobileHeader
+          variant="detail"
           title={mobileTitle}
           backHref={mobileBackHref}
           backLabel={mobileBackLabel}
@@ -136,19 +135,13 @@ export async function AppShell({
         </div>
       </header>
 
-      {/* P18-04: soft nudge for unverified accounts */}
-      {session && !session.user.emailVerified && (
-        <EmailVerificationBanner email={account.email} />
-      )}
-
-      {/* P19-DB02 §2: pinned grace / trial billing banner */}
-      {session?.user?.id ? <BillingBannerSlot userId={session.user.id} /> : null}
-
-      {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
-      {session?.user?.id ? <SecurityAlertBannerSlot userId={session.user.id} /> : null}
-
-      {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
-      <ConnectionBanner readOnly={readOnly} />
+      {/* P46-DB06 A3: the shared ordered banner stack (no local copies) */}
+      <AppBannerStack
+        userId={session?.user?.id}
+        email={account.email}
+        emailVerified={!!session?.user?.emailVerified}
+        readOnly={readOnly}
+      />
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}

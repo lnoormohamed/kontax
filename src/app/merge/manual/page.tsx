@@ -163,6 +163,7 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
         archived,
         duplicates: openDuplicates,
       }}
+      mobileTitle="Manual merge"
     >
       <div
         style={{

@@ -33,7 +33,7 @@ export function DowngradeModal({ current, target, onConfirm, onClose }: Props) {
         padding: 24,
         background: "rgba(20,30,25,.4)",
       }}
-      onClick={onClose}
+      // P46-DB06 A5: modals dismiss on explicit action only — no backdrop-tap.
     >
       <style>{`@keyframes prRise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }`}</style>
       <div

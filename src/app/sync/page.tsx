@@ -3,8 +3,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
-import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
-import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
+import { AppBannerStack } from "~/app/_components/app-banner-stack";
+import { OfflineChip } from "~/app/_components/connection-banner";
+import { MobileHeader } from "~/app/_components/mobile-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { SearchInput } from "~/app/_components/search-input";
@@ -727,12 +728,16 @@ export default async function SyncPage({ searchParams }: PageProps) {
         </div>
       </header>
 
-      {/* ── Mobile header — "Sync" title, shown only on mobile (P24B-01) ── */}
-      <MobilePlainHeader title="Sync" bell={<NotificationBellSlot userId={userId} />} />
+      {/* ── Mobile header — Section variant: title + bell (P46-DB06 A1) ── */}
+      <MobileHeader variant="section" title="Sync" bell={<NotificationBellSlot userId={userId} />} />
 
-      {/* P42-DB01: single banner slot — replaces the mobile sync screen's
-          hard-coded read-only/offline either/or with the fixed priority rule. */}
-      <ConnectionBanner
+      {/* P46-DB06 A3: the shared ordered banner stack — /sync previously
+          mounted only the connection banner and missed email-verify / billing /
+          security. */}
+      <AppBannerStack
+        userId={userId}
+        email={session.user.email ?? ""}
+        emailVerified={!!session.user.emailVerified}
         readOnly={!planSummary.lifecyclePolicy.canWrite}
         readOnlyVariant={planSummary.lifecyclePolicy.label === "Grace" ? "grace" : "locked"}
       />

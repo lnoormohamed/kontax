@@ -309,7 +309,8 @@ export function LabelsManageModal({
 
   return createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(29,40,35,0.5)" }} />
+      {/* P46-DB06 A5: modals dismiss on explicit action only — no backdrop-tap. */}
+      <div aria-hidden style={{ position: "absolute", inset: 0, background: "rgba(29,40,35,0.5)" }} />
       <div
         role="dialog"
         aria-modal="true"

@@ -70,7 +70,7 @@ export function PlanComparisonModal({
         background: "rgba(20,30,25,.4)",
         animation: "prFade .16s ease-out",
       }}
-      onClick={onClose}
+      // P46-DB06 A5: modals dismiss on explicit action only — no backdrop-tap.
     >
       <style>{`
         @keyframes prFade { from { opacity: 0 } to { opacity: 1 } }

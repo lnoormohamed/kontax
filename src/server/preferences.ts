@@ -11,6 +11,7 @@ const VALID_KEYS = new Set<keyof UserPreferences>([
   "motion",
   "booksNative",
   "booksExplainerDismissedAt",
+  "healthPromptDismissedCount",
 ]);
 
 export async function getPreferences(userId: string): Promise<Required<UserPreferences>> {

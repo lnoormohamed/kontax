@@ -75,8 +75,10 @@ export function ConfirmDialog({
         paddingBottom: "calc(24px + env(safe-area-inset-bottom))",
       }}
     >
+      {/* P46-DB06 A5: modals dismiss on EXPLICIT action only — no backdrop-tap
+          (that affordance belongs to sheets and dropdowns). */}
       <div
-        onClick={busy ? undefined : onClose}
+        aria-hidden
         className="cd-scrim"
         style={{ position: "absolute", inset: 0, background: "rgba(20,28,24,0.42)" }}
       />

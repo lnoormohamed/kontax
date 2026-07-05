@@ -19,6 +19,17 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
   // be capped to fit on-screen instead of overflowing above the viewport.
   const [visibleHeight, setVisibleHeight] = useState(0);
   const [mounted, setMounted] = useState(false);
+  // P46-11 / DB06 A5: real swipe-down-to-dismiss (grabber + header zone only —
+  // the scrollable content keeps its scroll gesture).
+  const [dragY, setDragY] = useState(0);
+  const dragRef = useRef<{ startY: number; startT: number; active: boolean }>({
+    startY: 0,
+    startT: 0,
+    active: false,
+  });
+  // Motion pref: the P43 root gate (globals.css html[data-motion] rules)
+  // already zeroes these inline transition durations under reduce/off and
+  // honours the user's explicit "on" override — no per-component check.
   const contentRef = useRef<HTMLDivElement>(null);
   const viewportFrameRef = useRef<number | null>(null);
   const viewportStateRef = useRef({ keyboardOffset: 0, visibleHeight: 0 });
@@ -93,6 +104,31 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
 
   const keyboardUp = keyboardOffset > 0 && visibleHeight > 0;
 
+  // Swipe-down handlers — bound to the grabber + header zone. Downward-only;
+  // > 80px displacement (or a fast flick) dismisses, else the sheet springs
+  // back. Disabled while the keyboard owns the layout.
+  const onDragStart = (e: React.PointerEvent) => {
+    if (keyboardUp) return;
+    dragRef.current = { startY: e.clientY, startT: Date.now(), active: true };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    if (!dragRef.current.active) return;
+    setDragY(Math.max(0, e.clientY - dragRef.current.startY));
+  };
+  const onDragEnd = () => {
+    if (!dragRef.current.active) return;
+    const dt = Math.max(1, Date.now() - dragRef.current.startT);
+    const velocity = dragY / dt; // px per ms
+    dragRef.current.active = false;
+    if (dragY > 80 || velocity > 0.5) {
+      setDragY(0);
+      onClose();
+    } else {
+      setDragY(0);
+    }
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -132,18 +168,28 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
           ...(keyboardUp
             ? { top: 0, bottom: "auto" as const, height: `${visibleHeight}px`, borderRadius: 0 }
             : { top: "auto" as const, bottom: 0, maxHeight: "90svh", borderRadius: "20px 20px 0 0" }),
-          transform: mounted ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 280ms cubic-bezier(0.34,1.02,0.64,1), height 150ms ease",
+          transform: mounted ? `translateY(${dragY}px)` : "translateY(100%)",
+          // While a drag is live the transform must track the finger 1:1 —
+          // only spring/slide when not dragging.
+          transition: dragRef.current.active
+            ? "height 150ms ease"
+            : "transform 280ms cubic-bezier(0.34,1.02,0.64,1), height 150ms ease",
         }}
       >
-        {/* Drag handle (visual affordance only) */}
+        {/* Drag handle — swipe-down zone (DB06 A5: grabber + swipe dismiss) */}
         <div
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
           style={{
             display: "flex",
             justifyContent: "center",
             paddingTop: 12,
             paddingBottom: 4,
             flexShrink: 0,
+            touchAction: "none",
+            cursor: "grab",
           }}
         >
           <div
@@ -156,8 +202,12 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
           />
         </div>
 
-        {/* Header */}
+        {/* Header — part of the swipe-down zone */}
         <div
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
           style={{
             display: "flex",
             alignItems: "center",
@@ -165,6 +215,7 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
             padding: "8px 16px 12px",
             flexShrink: 0,
             borderBottom: "1px solid #e9ece7",
+            touchAction: "none",
           }}
         >
           <h2

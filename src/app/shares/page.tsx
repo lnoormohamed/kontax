@@ -81,6 +81,9 @@ export default async function SharesPage() {
     <AppShell
       account={{ name, email: session.user.email ?? "", plan: plan.planLabel }}
       counts={{ people, favorites, archived, duplicates }}
+      mobileTitle="Shared with me"
+      mobileBackHref="/settings"
+      mobileBackLabel="Settings"
     >
       <div className="mx-auto w-full max-w-2xl px-4 py-8 lg:px-0">
         <h1 className="text-2xl font-semibold text-[#1d2823]">Shared with me</h1>
