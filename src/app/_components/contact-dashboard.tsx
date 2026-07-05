@@ -7,6 +7,7 @@ import { LabelFilterBar, MobileLabelFilterBar } from "~/app/_components/label-fi
 import { LabelsSidebar, type SidebarLabel } from "~/app/_components/labels-sidebar";
 import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
 import { MobileActivityFeed } from "~/app/_components/mobile-activity-feed";
+import { MobileHealthPrompt } from "~/app/_components/mobile-health-prompt";
 import { MergeSuggestionList } from "~/app/_components/merge-suggestion-card";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
 import { OnboardingChecklist } from "~/app/_components/onboarding-checklist";
@@ -114,6 +115,8 @@ type ContactDashboardProps = {
   rowLabels?: "hover" | "always" | "off";
   currentHealth: ContactHealthKey | null;
   healthCards: HealthCard[];
+  /** P46-10: mobile "needs attention" prompt (null = don't show). */
+  healthPrompt?: { count: number; href: string } | null;
   visiblePeopleCount: number;
 };
 
@@ -159,6 +162,7 @@ export function ContactDashboard({
   rowLabels,
   currentHealth,
   healthCards,
+  healthPrompt,
   visiblePeopleCount,
 }: ContactDashboardProps) {
   // P26-04: show the first-run checklist only on the default people list —
@@ -735,8 +739,36 @@ export function ContactDashboard({
         ) : null}
 
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
+          {/* P46-DB06 Part B: Overview is a desktop-only surface. The mobile
+              wordmark lands on the list; a deep link to ?tab=overview gets a
+              small fallback instead of the dashboard. */}
           {currentTab === "overview" ? (
-            <div className="grid gap-6 px-4 py-4">
+            <div className="px-4 py-6 lg:hidden">
+              <div className="rounded-2xl border border-[#d8ddd6] bg-white p-5">
+                <p className="text-[15px] font-semibold text-[#1d2823]">Overview lives on desktop</p>
+                <p className="mt-1 text-[13.5px] leading-relaxed text-[#5c655e]">
+                  On your phone, everything here is a tap away: your contacts, duplicates, and
+                  shared items.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href="/contacts"
+                    className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[13.5px] font-semibold text-white"
+                  >
+                    Open contacts
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="rounded-xl border border-[#d8ddd6] px-4 py-2.5 text-[13.5px] font-semibold text-[#1d2823]"
+                  >
+                    Settings
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : null}
+          {currentTab === "overview" ? (
+            <div className="hidden gap-6 px-4 py-4 lg:grid">
               <section className="overflow-hidden rounded-[1.6rem] border border-[#d8ddd6] bg-[linear-gradient(135deg,#f7f8f3_0%,#eef5f0_55%,#f7f4ec_100%)] p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="max-w-2xl">
@@ -849,6 +881,12 @@ export function ContactDashboard({
                 needsExploreRecord={onboarding.needsExploreRecord}
               />
             </div>
+          ) : null}
+          {/* P46-10: health worklist relocated from the removed mobile
+              Overview — dismissible amber prompt above the People list. Hidden
+              while a health queue is active (the queue banner owns the slot). */}
+          {currentTab === "people" && !currentHealthTitle && healthPrompt && !contactsTrulyEmpty ? (
+            <MobileHealthPrompt count={healthPrompt.count} href={healthPrompt.href} />
           ) : null}
           {currentTab === "people" ? (
             contactsTrulyEmpty ? (

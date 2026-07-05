@@ -27,16 +27,16 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 | 3 | **Redis / Valkey** — LXC 143 `redis-rate-limit` | ✅ **live 2026-07-05**: `REDIS_URL` (logical DB 1, existing `requirepass`) set in Coolify via tinker + restart-only deploy; verified end-to-end — hitting `/api/register` produced `rl:registration:ip:*` in DB 1. Shared instance kept (`.30` = passportbase on DB 0, `.97` = 143 itself). ⚠️ **Follow-up found during verify:** the rate-limit key's IP is `192.168.1.124` (NPM) — Traefik doesn't trust NPM's `X-Forwarded-For`, so **all visitors share one bucket**; fix = `forwardedHeaders.trustedIPs=192.168.1.124` on the coolify-proxy entrypoints (affects all Coolify apps; brief proxy restart) | live key observed in DB 1 | P47-03 |
 | 4 | **Cron** — LXC 152 `kontax-cron` | ✅ all 8 jobs + 15-min sync in `/etc/cron.d/kontax` with `APP_URL=https://getkontax.com`; **live probes `sync`, `birthday-reminders`, `reset-api-counters` → 200** (secret matches the app). Remaining: crontab-vs-route reconcile after the staging merge; observe a real sync pull+push | crontab read + curl with crontab secret | P47-04 |
 | 5 | **App container env** — Coolify LXC 122 | ◑ far beyond P34D-era: `KONTAX_DEPLOY_ENV=production`, `KONTAX_SCHEMA_MODE=validate`, `TOTP_ENCRYPTION_KEY`, `CRON_SECRET`, all `MINIO_*`, Google OAuth (prod redirect), SES (`noreply@getkontax.com`, us-east-1), all `STRIPE_*` set. **Missing:** `REDIS_URL`, `MICROSOFT_*` (4), `NEXT_PUBLIC_PRICE_*` (6), `PHOTO_SYNC_ENABLED` + other off-schema vars (see P47-05 table). Extra var present: `SES_TO_EMAIL` (not in env.js) | `docker inspect` env dump (names + non-secret values) | P47-05 |
-| 6 | **Schema apply policy** | ◑ **prepped 2026-07-05, apply staged for merge day** (see §P47-06 apply-day runbook below). Dry-run diff computed against prod: **100% additive** — 1 new enum + 2 enum values, 3 new tables (`ContactBookMembership`, `ContactPrivateField`, `KontaxExportJob`), nullable columns, one `NOT NULL DEFAULT false`, FKs + 7 indexes; **zero drops, zero required-no-default columns**. Artifact: [artifacts/p47-06-prod-schema-diff-2026-07-05.sql](artifacts/p47-06-prod-schema-diff-2026-07-05.sql). ⚠️ **Do NOT apply early**: the validator diffs DB→schema, so extra tables in the DB count as drift — the running main build would crash-loop on its next restart (the P40 incident, in reverse) | `prisma migrate diff --script` from local staging checkout against prod | P47-06 |
+| 6 | **Schema apply** | ✅ **EXECUTED 2026-07-05** with the staging→main merge (`3c917d5`, 52 commits — the P38–P47 feature train). Ran per the apply-day runbook below: fresh snapshot → additive-only diff confirmed ([artifact](artifacts/p47-06-prod-schema-diff-2026-07-05.sql)) → `db push` (49→52 tables) → backfills (`migrate-default-address-books` created 2 books; memberships no-op at 0 contacts; rest skip-empty) → **drift gate exit 0** → auto-deploy on push → new build boots clean in `validate` (`Starting Kontax.`), site 200, `/format/*` artifacts 200, authed /contacts 200, pre-deploy session survived. Note: DB link from the dev machine is flaky (VPN) — scripts may need one retry | full apply + live verification | P47-06 |
 
 ## External services (Workstream B)
 
 | # | Service | Status | Verified by | Ticket |
 |---|---------|--------|-------------|--------|
 | 7 | **Google OAuth** | ◑ `GOOGLE_CLIENT_ID/SECRET` set with prod redirect `https://getkontax.com/api/sync/google/callback`. Unverified: console-side redirect registration, People-API sensitive-scope verification status (2–6 wk pole — confirm submitted) | app env dump | P47-07 |
-| 8 | **Microsoft OAuth** | ⬜ no `MICROSOFT_*` env at all → Outlook connector hidden in prod | app env dump | P47-07 |
+| 8 | **Microsoft OAuth** | **PARKED (user decision 2026-07-05)** — Outlook sync is a post-launch feature, not a launch item. No `MICROSOFT_*` env set → connector correctly hidden in prod. Azure registration moves to a future rollout ticket | app env dump | P47-07 (descoped) |
 | 9 | **Stripe** | ⚠️ **still test mode** (`sk_test_…`); all six price IDs + webhook secret set (test-mode values). `NEXT_PUBLIC_PRICE_*` display strings missing | app env dump (key prefix) | P47-08 |
-| 10 | **SES** | ◑ configured: `EMAIL_FROM=noreply@getkontax.com`, us-east-1, creds set. Unverified: sandbox status for the getkontax.com identity, DKIM/SPF, a live delivery. Note from-domain decided = **getkontax.com** (not vexon.co) | app env dump | P47-09 |
+| 10 | **SES** | ✅ **verified 2026-07-05 via SES API** (SigV4 GetAccount with the app's creds): **ProductionAccessEnabled=true** (out of sandbox), SendingEnabled, 50k/day quota; `getkontax.com` identity VerifiedForSending + **DKIM SUCCESS**; a live app-path send (registration email) went out with no error and shows in the 24 h send count. From-domain = getkontax.com. Optional hardening, non-blocking: no SPF TXT on the root domain and DMARC is `p=none` — DKIM alignment carries DMARC today; consider SPF + custom MAIL FROM + `p=quarantine` later | SES API + live send | P47-09 |
 
 ## Edge, domain & security (Workstream C)
 
@@ -44,8 +44,8 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 |---|------|--------|-------------|--------|
 | 11 | **DNS / edge routing** | ✅ `getkontax.com` 200 publicly. **Public path = Cloudflare → NPM LXC 111 (`192.168.1.124`), NOT Coolify Traefik** (Traefik 503s these hosts — phase doc assumption corrected). `media.getkontax.com` **fixed 2026-07-05**: was 522 (stale A record — hostname missing from cloudflare-ddns LXC 103 `DOMAINS`); added + restarted → record updated → health 200 public. `app.getkontax.com` has no DNS record → canonical origin = `getkontax.com` (ratify in P47-11). ⚠️ pre-existing ddns config debris: missing comma after `blog.lanway.dev` (swallows `next.lahn.uk`), `api.getkontax.com` is a CNAME so its A-record update errors every run | dig, curl, NPM conf, ddns journal | P47-10 |
 | 12 | **TLS** | ✅ `getkontax.com` + `media.getkontax.com` valid via Cloudflare (`*.getkontax.com`, expires 2026-09-12); NPM holds a Let's Encrypt origin cert (`npm-109`) | curl -v handshake | P47-10 |
-| 13 | **URL / host audit** | ⬜ not run (code-side; run against the merge candidate) | — | P47-11 |
-| 14 | **Security headers / CSP** | ✅ live CSP already includes `img-src … https://media.getkontax.com`, plus HSTS/permissions-policy present | curl -I on live origin | P47-11 |
+| 13 | **URL / host audit** | ✅ **run 2026-07-05 against the deployed train**: zero `kontax.vexon.co` / `10.0.0.x` / `192.168.x` / `media-staging` refs in shipped code (`src`, `prisma`, `public`, configs); zero avatar URLs stored in the prod DB (nothing to rewrite); canonical origin ratified = **`getkontax.com`** with `api.getkontax.com` as the REST rewrite host (middleware maps `api./v1/*` → `/api/v1/*`; live probe 401 = working — "purpose TBD" resolved) and `media.` for objects. One cosmetic fix: homepage browser-chrome mockup displayed `app.getkontax.com` → now `getkontax.com` (f7858a9 on staging, SSR-verified; ships next merge) | grep sweep + DB query + live probes | P47-11 |
+| 14 | **Security headers / CSP** | ✅ re-verified on the **new build** 2026-07-05: CSP (`img-src` incl. media host, `upgrade-insecure-requests`), HSTS `max-age=63072000; includeSubDomains; preload`, `X-Frame-Options: DENY`, `nosniff`, referrer-policy, permissions-policy — all present | curl -I on live origin | P47-11 |
 
 ## Verify & cut over (Workstream D)
 
@@ -53,7 +53,7 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 |---|------|--------|-------|--------|
 | 15 | **Backups** | ✅ **built + drilled 2026-07-05**: nightly 02:30 UTC cron on the Proxmox host (`/etc/cron.d/kontax-backup` → `/usr/local/bin/kontax-backup.sh`) dumps `kontax` (`pg_dump -Fc` via `runuser` — NOT `su -`, whose MOTD banner corrupts the stream) + tars the `kontax-uploads` bucket to NAS `/mnt/pve/pve-ugreen/backup/kontax/{db,minio}`, 14-day retention, size sanity check, log at `/var/log/kontax-backup.log`. **Restore drill passed**: dump → scratch DB → 49 tables + user row verified → dropped. Note: no Proxmox-wide vzdump schedule exists (`jobs.cfg` absent) — consider one for 122/129/151/152 separately | first run + restore drill | P47-12 |
 | 16 | **Uptime monitoring** | ◑ Uptime Kuma runs (LXC 131) — confirm it watches `getkontax.com` + `media.` + cron, with alerting | not yet checked in Kuma UI | P47-12 |
-| 17 | **Production smoke test** | ⬜ | after the staging merge + gaps above | P47-13 |
+| 17 | **Production smoke test** | ◑ **scripted pass GREEN 2026-07-05** — full results in [smoke-test-results-p47.md](smoke-test-results-p47.md): auth, contacts CRUD+search via REST v1, avatar plane, P45 archive export → public presigned download → **open-format validator VALID ✓**, public card, API rate limits in Redis, cron re-verified on the new build. **Zero P0 failures.** Remaining for sign-off: manual/device items (2FA, mobile gestures, sharing flow, import wizard, notification visuals) + overnight-cron check | scripted battery on live origin | P47-13 |
 | 18 | **Go-live cutover** | ◑ app already serves prod traffic; "cutover" reduces to: merge staging→main, schema apply (P47-06), redeploy, admin bootstrap (owner account already exists — grant admin), post-swap smoke | — | P47-14 |
 | 19 | **Post-launch review** | ⬜ | — | P47-14 |
 
@@ -82,10 +82,17 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
    before launch). Avatar canonical+thumb public 200; data-export READY →
    public presigned download → valid ZIP. Export row expires via the
    `expire-exports` cron in 48 h — a free natural test of expiry.
-3. **Schema apply for P38–P46** (P47-06) — gates the staging→main deploy; run
-   backfills per ticket.
-4. **Remaining env at merge time**: `MICROSOFT_*`, `NEXT_PUBLIC_PRICE_*` (build
-   env), `PHOTO_SYNC_ENABLED` decision + off-schema vars (P47-05/07).
+3. ~~Schema apply for P38–P46~~ **DONE 2026-07-05** — merged + applied +
+   deployed; see checklist row 6.
+4. ~~Remaining env~~ **RESOLVED 2026-07-05 — nothing left to set**:
+   - `NEXT_PUBLIC_PRICE_*` — **not needed**: the live pricing page renders
+     prices dynamically from the Stripe API (`src/server/stripe-catalog.ts`,
+     currently showing the test products $2.99/$3.99); the only consumer of
+     these vars is `pricing-comparison.tsx`, which is **dead code** (imported
+     nowhere). Prices auto-update when P47-08 flips to live keys.
+   - `MICROSOFT_*` — parked (post-launch feature, user decision 2026-07-05).
+   - `PHOTO_SYNC_ENABLED` absent = **off** (de-facto launch decision; P44-06
+     QA never ran) (P47-05).
 5. Confirm **Uptime Kuma** coverage of app + media + cron (P47-12 residual).
 6. **SES sandbox/DKIM for getkontax.com** + a live send (P47-09).
 7. **Externals last (user decision)**: Stripe live mode (P47-08) + Google
@@ -95,9 +102,10 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
    noise~~ **both fixed 2026-07-05** (comma corrected, `api.` removed from the
    ddns list — it stays a CNAME → apex, so it follows the managed A record for
    free; clean run verified, `next.lahn.uk` updating again). Still open:
-   identify Redis client `.97`, decide `SES_TO_EMAIL` (undocumented var), and
-   note `https://api.getkontax.com/` currently 404s at the app layer (edge path
-   works; decide whether that hostname has a purpose or should be retired).
+   ~~identify Redis client `.97`~~ (= LXC 143 itself), decide `SES_TO_EMAIL`
+   (undocumented var), and ~~api.getkontax.com purpose~~ **resolved**: it's the
+   REST API rewrite host (`middleware.ts` maps `api./v1/*` → `/api/v1/*`;
+   root 404 is expected).
 
 ## P47-06 apply-day runbook (execute with the staging→main deploy)
 

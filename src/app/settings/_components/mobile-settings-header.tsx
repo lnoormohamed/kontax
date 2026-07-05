@@ -1,18 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
-import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import { MobileHeader } from "~/app/_components/mobile-header";
 
-// P24B-02: route-aware mobile settings header (md:hidden).
-// At the settings root → plain "Settings" title. On any sub-page → a back
-// header (‹ chevron → /settings · sub-page title) so users aren't trapped with
-// only the bottom nav to escape. Back target is always the settings list.
+// P46-DB06 A1/A2: route-aware mobile settings header (md:hidden), a thin
+// wrapper over the ONE MobileHeader primitive. Settings root → Section
+// (title + bell). Any sub-page → Detail with a labelled back naming its
+// destination ("Settings"), never icon-only.
 
 const SUBPAGE_TITLES: Record<string, string> = {
-  profile: "Profile",
+  profile: "Public card",
   account: "Account",
   notifications: "Notifications",
   preferences: "Preferences",
@@ -21,6 +19,9 @@ const SUBPAGE_TITLES: Record<string, string> = {
   security: "Security",
   family: "Family",
   teams: "Team management",
+  books: "Books",
+  "import-presets": "Import presets",
+  "export-presets": "Export presets",
 };
 
 export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {
@@ -30,47 +31,17 @@ export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {
   const isRoot = segment === "";
   const title = isRoot ? "Settings" : (SUBPAGE_TITLES[segment] ?? "Settings");
 
-  // Root: the shared plain-title header. Sub-pages: a back header (this stays
-  // local since it needs the route-aware back/title).
   if (isRoot) {
-    return <MobilePlainHeader title="Settings" bell={bell} />;
+    return <MobileHeader variant="section" title="Settings" bell={bell} />;
   }
 
   return (
-    <header
-      className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
-      style={{ height: 52, padding: "0 12px 0 4px", gap: 8 }}
-    >
-      <Link
-        href="/settings"
-        aria-label="Back to Settings"
-        style={{
-          width: 44,
-          height: 44,
-          display: "grid",
-          placeItems: "center",
-          flexShrink: 0,
-          color: "#1d2823",
-          WebkitTapHighlightColor: "transparent",
-        }}
-      >
-        <WorkspaceIcon name="back" size={22} />
-      </Link>
-      <span
-        style={{
-          flex: 1,
-          minWidth: 0,
-          fontSize: 17,
-          fontWeight: 700,
-          color: "#1d2823",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {title}
-      </span>
-      <div style={{ flexShrink: 0 }}>{bell}</div>
-    </header>
+    <MobileHeader
+      variant="detail"
+      title={title}
+      backHref="/settings"
+      backLabel="Settings"
+      action={bell}
+    />
   );
 }

@@ -10,6 +10,20 @@
 >    objects (added 2026-07-04 from user report).
 > 3. **Contact detail navigation** — make the detail *tabs* not behave like
 >    pages so Back returns to the contact list (added 2026-07-04).
+> 4. **Notification aging** — muted/greyed treatment for notifications that are
+>    stale by time (>7 days) or whose event has passed, on desktop + mobile
+>    (added 2026-07-04 from user request).
+> 5. **Mobile contact-list row refresh** — an updated mobile design brief for
+>    the row now that photos + the scrubber exist: image + name + scrubber
+>    (added 2026-07-04 from user request).
+> 6. **Social media assets** — a brand/marketing design brief for the four
+>    social channels (LinkedIn, Twitter/X, Facebook, Instagram): profile
+>    images, banners, featured images, slogans + bios (added 2026-07-05 from
+>    user request).
+> 7. **Mobile UI consistency audit** — a mobile-only design brief aligning nav,
+>    headers, back/directional behaviour, and banners across every screen, plus
+>    removing the mobile Overview and relocating its worthwhile options (added
+>    2026-07-05 from user request; desktop pass deferred to a future brief).
 
 ## Phase status
 Pre-plan
@@ -30,11 +44,22 @@ and make detail-tab navigation behave.
 | [P46-03](p46-03-photo-storage-consolidation.md) | Photo storage consolidation (optimize-on-upload, cleanup) | P1 | P46-DB02 |
 | [P46-04](p46-04-contact-photo-upload-ui.md) | Contact photo upload UI (desktop + mobile) | P2 | P46-DB02, P46-03 |
 | [P46-05](p46-05-contact-detail-tab-history.md) | Contact detail tabs: Back returns to the list | P1 | — |
+| [P46-DB03](p46-db03-design-brief-notification-aging.md) | Design brief: notification aging & event-passed states | P0 | — |
+| [P46-06](p46-06-notification-aging-treatment.md) | Notification aging & event-passed treatment | P2 | P46-DB03 |
+| [P46-DB04](p46-db04-design-brief-mobile-contact-list-refresh.md) | Design brief: mobile contact-list row refresh | P1 | — |
+| [P46-07](p46-07-mobile-contact-list-row-polish.md) | Mobile contact-list row polish (contingent) | P3 | P46-DB04 |
+| [P46-DB05](p46-db05-design-brief-social-media-assets.md) | Design brief: social media assets (LinkedIn/X/Facebook/Instagram) | P2 | — |
+| [P46-DB06](p46-db06-design-brief-mobile-consistency-audit.md) | Design brief: mobile UI consistency audit + Overview removal (mobile-only) | P1 | — |
+| [P46-DB07](p46-db07-design-brief-settings-ia-redesign.md) | Design brief: settings IA redesign (both breakpoints) | P1 | — |
+| [P46-08](p46-08-mobile-chrome-conformance-pass.md) | Mobile chrome conformance pass (backs, missing headers, Overview removal) | P1 | P46-DB06 |
+| [P46-09](p46-09-mobile-header-unification-banner-stack.md) | Mobile header primitive unification + banner stack | P1 | P46-08 |
+| [P46-10](p46-10-contact-health-people-prompt.md) | Contact-health "needs attention" prompt in People | P2 | P46-08 |
+| [P46-11](p46-11-overlay-sheet-taxonomy.md) | Overlay & sheet taxonomy consolidation | P2 | P46-08 |
 
 > Tickets are split into standalone files (linked above); the sections
 > below remain the phase-level overview for the **alphabet scrubber**
-> workstream. The photo and navigation workstreams live entirely in their
-> ticket files.
+> workstream. The photo, navigation, notification-aging, and mobile-row
+> workstreams live entirely in their ticket files.
 
 ## Photo & navigation workstreams (summary)
 
@@ -55,6 +80,43 @@ Verified 2026-07-04 (three read-only investigations of the current code):
 - **Detail tabs vs Back** — tabs already use `<Link replace>`, so this is a
   diagnosis, not an "add replace"; guarantee one Back press exits to the list.
   → [P46-05](p46-05-contact-detail-tab-history.md).
+
+Added 2026-07-04 (two more small workstreams from user requests):
+
+- **Notification aging** — the notification system is **fully built** (bell +
+  360 px desktop dropdown + full-screen mobile overlay, six categories,
+  `relativeTime` → `1w`, fresh/earlier 24 h grouping) but nothing ever *ages*:
+  `Notification` has no `expiresAt`/event date and the feed only filters
+  `dismissedAt: null`. Add a muted treatment for **aged** (>7 day) and
+  **event-passed** notifications, distinct triggers, both surfaces. →
+  [P46-DB03](p46-db03-design-brief-notification-aging.md) (extends the original
+  [P22-DB05](p22-db05-design-brief-notifications.md) brief) + [P46-06](p46-06-notification-aging-treatment.md).
+- **Mobile contact-list row refresh** — the mobile row already renders photo +
+  name + a company/email/phone line and the scrubber is built but documented
+  nowhere; [01-contacts-list.md](../design-briefs/01-contacts-list.md)'s mobile
+  section predates both. Ratify the canonical row (image + name + one optional
+  secondary line + scrubber) and supersede the old brief's mobile section. →
+  [P46-DB04](p46-db04-design-brief-mobile-contact-list-refresh.md) + contingent
+  [P46-07](p46-07-mobile-contact-list-row-polish.md).
+
+Added 2026-07-05 (brand/marketing workstream from user request):
+
+- **Social media assets** — a design brief for the four channels' profile
+  images, banner/cover images, featured/post images, and text (slogans +
+  bios), building on the locked [brand-assets.md](../design-briefs/brand-assets.md)
+  identity and reusing the existing OG card + `avatar.png` master rather than
+  re-specifying them. Marketing deliverable (no app code). →
+  [P46-DB05](p46-db05-design-brief-social-media-assets.md).
+
+- **Mobile UI consistency audit** — verified drift: no single mobile header
+  (4+ variants), **three screens with no header at all** (`/shares`,
+  `/merge-suggestions/[id]`, `/merge/manual`), icon-only settings back, an
+  Activity-tab mid-screen header swap, and two screens that bypass `AppShell`'s
+  banner stack. Also removes the mobile **Overview** (reached via the wordmark →
+  `/contacts?tab=overview`) and relocates its options — Shared-with-me into
+  Settings' Sync & Shared group, contact-health into People, the rest dropped;
+  wordmark re-points to `/contacts`. Largest mobile surface in the phase;
+  mobile-only, desktop deferred. → [P46-DB06](p46-db06-design-brief-mobile-consistency-audit.md).
 
 ## Alphabet scrubber — phase overview
 

@@ -73,7 +73,7 @@ export function ConfirmPasswordModal({
     <div
       className="fixed inset-0 z-[120] grid place-items-center p-4"
       style={{ background: "rgba(20,30,25,0.48)" }}
-      onClick={onClose}
+      // P46-DB06 A5: modals dismiss on explicit action only — no backdrop-tap.
     >
       <div
         className="w-full max-w-[420px] rounded-[1.6rem] bg-white p-6 shadow-[0_24px_60px_rgba(20,30,25,0.28)]"

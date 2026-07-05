@@ -78,7 +78,11 @@ export type WorkspaceRow = {
   noteMatchSnippet?: string;
 };
 
-export type WorkspaceHealthCounts = Record<ContactHealthKey, number>;
+export type WorkspaceHealthCounts = Record<ContactHealthKey, number> & {
+  /** P46-10: distinct contacts matching ANY health predicate (keys overlap,
+      so this is not the sum of the per-key counts). */
+  attention: number;
+};
 
 /** Rows in the first server-rendered window and each scroll-loaded window. */
 export const WORKSPACE_PAGE_SIZE = 300;
@@ -606,19 +610,25 @@ export async function getWorkspaceHealthCounts(
       unlabeled: 0,
       "missing-dates": 0,
       "sync-attention": 0,
+      attention: 0,
     };
   }
 
   // Health predicates reference c.* — wrap the union rows back under alias c.
   const [counts] = await db.$queryRaw<
-    Array<{ mm: bigint; mc: bigint; ul: bigint; md: bigint; sa: bigint }>
+    Array<{ mm: bigint; mc: bigint; ul: bigint; md: bigint; sa: bigint; att: bigint }>
   >(Prisma.sql`
     SELECT
       count(*) FILTER (WHERE ${healthPredicate("missing-methods", now)}) AS mm,
       count(*) FILTER (WHERE ${healthPredicate("missing-context", now)}) AS mc,
       count(*) FILTER (WHERE ${healthPredicate("unlabeled", now)}) AS ul,
       count(*) FILTER (WHERE ${healthPredicate("missing-dates", now)}) AS md,
-      count(*) FILTER (WHERE ${healthPredicate("sync-attention", now)}) AS sa
+      count(*) FILTER (WHERE ${healthPredicate("sync-attention", now)}) AS sa,
+      count(*) FILTER (WHERE (${healthPredicate("missing-methods", now)})
+        OR (${healthPredicate("missing-context", now)})
+        OR (${healthPredicate("unlabeled", now)})
+        OR (${healthPredicate("missing-dates", now)})
+        OR (${healthPredicate("sync-attention", now)})) AS att
     FROM "Contact" c
     WHERE c.id IN (SELECT id FROM (${union}) s)
   `);
@@ -629,5 +639,6 @@ export async function getWorkspaceHealthCounts(
     unlabeled: Number(counts?.ul ?? 0n),
     "missing-dates": Number(counts?.md ?? 0n),
     "sync-attention": Number(counts?.sa ?? 0n),
+    attention: Number(counts?.att ?? 0n),
   };
 }

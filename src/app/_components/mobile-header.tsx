@@ -1,32 +1,62 @@
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 
-import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
 import { MobileSearchButton } from "~/app/_components/mobile-search-button";
-import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
-// ── Home screen header (contacts list) ──────────────────────────────────────
-// Wordmark left · bell + search icon right. Only renders on mobile (< md).
+// ─────────────────────────────────────────────────────────────────────────────
+// P46-DB06 A1 — the ONE mobile header primitive (< md), three variants:
+//
+//   home     wordmark → /contacts · bell · search · filter — the contacts list
+//            only, held across ALL its tabs (no mid-screen swap).
+//   section  title + bell, no back — top-level nav destinations (Sync,
+//            Settings root).
+//   detail   labelled back (naming the destination, canonical blue) + title +
+//            optional action — everything reached into.
+//
+// Contact detail's scroll-hide header stays the one sanctioned Detail
+// exception (mobile-contact-detail.tsx) — documented, not folded in.
+// ─────────────────────────────────────────────────────────────────────────────
 
-interface MobileHomeHeaderProps {
-  userId: string;
-  tab?: string;
-  filterSlot?: React.ReactNode;
+interface HomeVariantProps {
+  variant: "home";
+  /** Pass the bell node in (NotificationBellSlot) — this file stays
+      presentational so client components can import it without dragging the
+      server notification graph into the bundle. */
+  bell?: ReactNode;
+  filterSlot?: ReactNode;
   labelRegistry?: { name: string; color: string }[];
   /** P42-DB01 §3b: compact "Offline" chip shown while account-state owns the banner slot. */
-  statusChip?: React.ReactNode;
+  statusChip?: ReactNode;
 }
 
-export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry, statusChip }: MobileHomeHeaderProps) {
-  // Activity tab → the shared plain-title header (P24B-01).
-  if (tab === "activity") {
-    return (
-      <MobilePlainHeader title="Activity" sticky bell={<NotificationBellSlot userId={userId} />} />
-    );
-  }
+interface SectionVariantProps {
+  variant: "section";
+  title: string;
+  bell?: ReactNode;
+  /** Sticky to the top of a scroll region. */
+  sticky?: boolean;
+}
 
-  // People list → wordmark + bell + search.
+interface DetailVariantProps {
+  variant: "detail";
+  title: string;
+  backHref: string;
+  backLabel?: string;
+  action?: ReactNode;
+}
+
+export type MobileHeaderProps = HomeVariantProps | SectionVariantProps | DetailVariantProps;
+
+export function MobileHeader(props: MobileHeaderProps) {
+  if (props.variant === "home") return <HomeHeader {...props} />;
+  if (props.variant === "section") return <SectionHeader {...props} />;
+  return <DetailHeader {...props} />;
+}
+
+// ── home — wordmark + bell + search (+ filter slot) ─────────────────────────
+
+function HomeHeader({ bell, filterSlot, labelRegistry, statusChip }: HomeVariantProps) {
   return (
     <header
       className="flex md:hidden"
@@ -44,44 +74,34 @@ export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry, statu
       }}
     >
       <Link
-        href="/contacts?tab=overview"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 9,
-          textDecoration: "none",
-        }}
+        href="/contacts"
+        style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}
       >
-          <span
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 8,
-              backgroundColor: "#17352e",
-              color: "#dff0e7",
-              display: "grid",
-              placeItems: "center",
-              fontSize: 16,
-              fontWeight: 700,
-            }}
-          >
-            K
-          </span>
-          <span
-            style={{
-              fontSize: 19,
-              fontWeight: 600,
-              letterSpacing: "-0.018em",
-              color: "#17352e",
-            }}
-          >
-            Kontax
-          </span>
-        </Link>
+        <span
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            backgroundColor: "#17352e",
+            color: "#dff0e7",
+            display: "grid",
+            placeItems: "center",
+            fontSize: 16,
+            fontWeight: 700,
+          }}
+        >
+          K
+        </span>
+        <span
+          style={{ fontSize: 19, fontWeight: 600, letterSpacing: "-0.018em", color: "#17352e" }}
+        >
+          Kontax
+        </span>
+      </Link>
 
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 0 }}>
         {statusChip}
-        <NotificationBellSlot userId={userId} />
+        {bell}
         {filterSlot}
         <Suspense fallback={null}>
           <MobileSearchButton labelRegistry={labelRegistry} />
@@ -91,22 +111,28 @@ export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry, statu
   );
 }
 
-// ── Secondary screen header (back + title + optional action) ─────────────────
-// Used by AppShell pages: contact detail, create, import/export.
+// ── section — title + bell, no back (Sync, Settings root) ───────────────────
 
-interface MobileSecondaryHeaderProps {
-  title: string;
-  backHref: string;
-  backLabel?: string;
-  action?: React.ReactNode;
+function SectionHeader({ title, bell, sticky = false }: SectionVariantProps) {
+  return (
+    <header
+      className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
+      style={{
+        height: 52,
+        padding: "0 16px",
+        gap: 12,
+        ...(sticky ? { position: "sticky", top: 0, zIndex: 40 } : { zIndex: 20 }),
+      }}
+    >
+      <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>{title}</span>
+      {bell ? <div style={{ flexShrink: 0 }}>{bell}</div> : null}
+    </header>
+  );
 }
 
-export function MobileSecondaryHeader({
-  title,
-  backHref,
-  backLabel = "Back",
-  action,
-}: MobileSecondaryHeaderProps) {
+// ── detail — labelled blue back + centered title + optional action ──────────
+
+function DetailHeader({ title, backHref, backLabel = "Back", action }: DetailVariantProps) {
   return (
     <header
       className="flex md:hidden"
@@ -132,9 +158,9 @@ export function MobileSecondaryHeader({
           height: 44,
           padding: "0 8px",
           textDecoration: "none",
-          color: "#5c655e",
+          color: "#4158f4",
           fontSize: 14,
-          fontWeight: 500,
+          fontWeight: 600,
           whiteSpace: "nowrap",
         }}
         aria-label={`Back to ${backLabel}`}

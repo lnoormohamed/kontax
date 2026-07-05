@@ -16,6 +16,7 @@ import {
 } from "~/app/actions/labels";
 import { LabelChip, LabelDot, RecolorSwatches } from "~/app/_components/label-chip";
 import { ConfirmDialog } from "~/app/_components/confirm-dialog";
+import { useSheetDrag } from "~/app/_components/mobile-bottom-sheet";
 import type { SidebarLabel } from "~/app/_components/labels-sidebar";
 import type { SmartList } from "~/app/_components/smart-lists-books";
 import type { PersonalBook } from "~/app/_components/smart-lists-books";
@@ -117,6 +118,8 @@ function MobileEditSheet({
   const [mergeConfirm, setMergeConfirm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [, startTransition] = useTransition();
+  // DB06 A5: shared swipe-down-to-dismiss (grabber + header zone).
+  const drag = useSheetDrag(onClose);
 
   useEffect(() => {
     setName(label.name);
@@ -136,15 +139,15 @@ function MobileEditSheet({
 
   return (
     <div
-      style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, boxShadow: "0 -8px 30px rgba(0,0,0,.18)", zIndex: 10 }}
+      style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, boxShadow: "0 -8px 30px rgba(0,0,0,.18)", zIndex: 10, transform: `translateY(${drag.dragY}px)`, transition: drag.dragging ? "none" : "transform 280ms cubic-bezier(0.34,1.02,0.64,1)" }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* handle */}
-      <div style={{ display: "grid", placeItems: "center", padding: "9px 0 4px" }}>
+      {/* handle — swipe-down zone */}
+      <div {...drag.handlers} style={{ display: "grid", placeItems: "center", padding: "9px 0 4px", ...drag.zoneStyle }}>
         <span style={{ width: 38, height: 5, borderRadius: 3, background: "#d8ddd6" }} />
       </div>
-      {/* header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 16px 14px" }}>
+      {/* header — part of the swipe-down zone */}
+      <div {...drag.handlers} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 16px 14px", ...drag.zoneStyle }}>
         <LabelChip name={label.name} col={label.color} sz="md" />
         <span style={{ fontSize: 12.5, color: "#8b938c" }}>{label.count} contacts tagged</span>
         <button type="button" onClick={onClose} style={{ marginLeft: "auto", width: 32, height: 32, borderRadius: "50%", background: "#f2f4f0", border: "none", display: "grid", placeItems: "center", cursor: "pointer", fontSize: 16, color: "#5c655e" }}>✕</button>
@@ -291,9 +294,9 @@ function MobileManagePanel({
         <button
           type="button"
           onClick={onClose}
-          style={{ display: "flex", alignItems: "center", gap: 4, height: 44, padding: "0 8px", border: "none", background: "transparent", color: "#5c655e", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}
+          style={{ display: "flex", alignItems: "center", gap: 4, height: 44, padding: "0 8px", border: "none", background: "transparent", color: "#4158f4", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5c655e" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6" /></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4158f4" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6" /></svg>
           Back
         </button>
         <span style={{ flex: 1, fontSize: 17, fontWeight: 700, color: "#1d2823", textAlign: "center" }}>Manage labels</span>
@@ -371,8 +374,20 @@ export function MobileFilterButton({
   const [open, setOpen] = useState(false);
   const [showManage, setShowManage] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // DB06 A5: shared swipe-down-to-dismiss on the sheet's grabber + title row.
+  const drag = useSheetDrag(() => setOpen(false));
 
   useEffect(() => setMounted(true), []);
+
+  // Escape closes the sheet (the manage screen layers its own handler above).
+  useEffect(() => {
+    if (!open || showManage) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, showManage]);
 
   const hasActiveFilter =
     activeLabel !== null || activeBook !== null || (currentFilter !== "" && currentFilter !== "all");
@@ -449,13 +464,13 @@ export function MobileFilterButton({
           <div onClick={() => setOpen(false)} style={{ position: "absolute", inset: 0, background: "rgba(20,30,25,.42)" }} />
 
           {/* sheet */}
-          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, height: "90%", display: "flex", flexDirection: "column", boxShadow: "0 -8px 30px rgba(0,0,0,.18)" }}>
-            {/* handle */}
-            <div style={{ display: "grid", placeItems: "center", padding: "9px 0 2px", flexShrink: 0 }}>
+          <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, background: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, height: "90%", display: "flex", flexDirection: "column", boxShadow: "0 -8px 30px rgba(0,0,0,.18)", transform: `translateY(${drag.dragY}px)`, transition: drag.dragging ? "none" : "transform 280ms cubic-bezier(0.34,1.02,0.64,1)" }}>
+            {/* handle — swipe-down zone */}
+            <div {...drag.handlers} style={{ display: "grid", placeItems: "center", padding: "9px 0 2px", flexShrink: 0, ...drag.zoneStyle }}>
               <span style={{ width: 38, height: 5, borderRadius: 3, background: "#d8ddd6" }} />
             </div>
-            {/* title row */}
-            <div style={{ display: "flex", alignItems: "center", padding: "6px 12px 8px 16px", flexShrink: 0 }}>
+            {/* title row — part of the swipe-down zone */}
+            <div {...drag.handlers} style={{ display: "flex", alignItems: "center", padding: "6px 12px 8px 16px", flexShrink: 0, ...drag.zoneStyle }}>
               <span style={{ fontSize: 18, fontWeight: 700, color: "#1d2823", flex: 1 }}>Filter &amp; organize</span>
               <button type="button" onClick={() => setOpen(false)} style={{ width: 32, height: 32, borderRadius: "50%", background: "#f2f4f0", border: "none", display: "grid", placeItems: "center", cursor: "pointer", fontSize: 16, color: "#5c655e" }}>✕</button>
             </div>

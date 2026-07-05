@@ -70,7 +70,7 @@ Status legend: ✅ done · ◑ exists but unverified / not wired · ⬜ not star
 | 3 | **Redis / Valkey** (rate limiting) | LXC 143 `redis-rate-limit` (shared, near-idle) | ◑ instance exists and healthy, but **`REDIS_URL` not set in the app env** → app on the in-memory fallback (not prod-safe: limits reset per restart). Plan: shared instance, Kontax logical DB/prefix, enable auth | P47-03 |
 | 4 | **Cron / scheduler** | LXC 152 `kontax-cron` → `getkontax.com/api/cron/*` | ✅ 8 jobs + 15-min sync installed **and verified live 2026-07-05**: probed endpoints return 200 with the crontab secret (`CRON_SECRET` matches). Remaining: route reconcile after staging merge + observe a real sync pull+push | P47-04 |
 | 5 | **App container env** | Coolify LXC 122 | ◑ far beyond P34D-era (verified 2026-07-05): deploy-env/TOTP/cron/MinIO/Google/SES/Stripe all set. **Missing:** `REDIS_URL`, `MICROSOFT_*`, `NEXT_PUBLIC_PRICE_*`, **plus the off-schema vars `env.js` misses** (`PHOTO_SYNC_ENABLED` launch decision, admin capability overrides, sync/session tuning knobs) | P47-05 |
-| 6 | **Schema apply policy** | Coolify LXC 122 | ◑ **already boots clean in `validate` mode** for the deployed main build (startup log verified). The intentional additive apply of the P38–P46 schema before the staging→main deploy remains open (see the 2026-07-04 P40 incident) | P47-06 |
+| 6 | **Schema apply policy** | Coolify LXC 122 | ✅ **DONE 2026-07-05**: staging merged to main (`3c917d5`), P38–P46 schema applied additively (49→52 tables), backfills run, drift gate exit 0, new build live on `validate` with clean boot | P47-06 |
 
 ### External services (Workstream B)
 
@@ -87,7 +87,7 @@ Status legend: ✅ done · ◑ exists but unverified / not wired · ⬜ not star
 |---|------|----------------|--------|
 | 11 | **DNS / Cloudflare / edge** | ✅ `getkontax.com` live (200); **public path = Cloudflare → NPM LXC 111, not Traefik**. `media.getkontax.com` 522 **fixed 2026-07-05** (hostname was missing from the cloudflare-ddns list → stale A record; now 200 publicly). `app.getkontax.com` has no DNS record → canonical origin = `getkontax.com` (ratify in P47-11) | P47-10 |
 | 12 | **TLS end-to-end** | ✅ `getkontax.com` + `media.getkontax.com` valid (`*.getkontax.com` via Cloudflare, exp 2026-09-12; LE origin cert on NPM); mixed-content sweep still due with P47-13 | P47-10 |
-| 13 | **URL / host audit** | ⬜ no baked `10.0.0.x` / `kontax.vexon.co` URLs; rewrite any staging-baked avatar hosts (`rewrite-avatar-host.mjs`); pick one app origin | P47-11 |
+| 13 | **URL / host audit** | ✅ **run 2026-07-05**: shipped code + prod DB clean of staging/homelab hosts; canonical origin = `getkontax.com` (+ `api.` REST rewrite host, `media.` objects); one cosmetic homepage-mockup fix on staging (f7858a9) | P47-11 |
 | 14 | **Security headers / CSP** | ✅ live CSP already includes `img-src … https://media.getkontax.com`; HSTS + permissions-policy present (verified 2026-07-05); re-verify after staging merge | P47-11 |
 
 ### Verify & cut over (Workstream D)

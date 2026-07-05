@@ -1,17 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { AppBannerStack } from "~/app/_components/app-banner-stack";
 import { BooksMigrationExplainer } from "~/app/_components/books-migration-explainer";
-import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
+import { OfflineChip } from "~/app/_components/connection-banner";
 import { BottomNav } from "~/app/_components/bottom-nav";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
-import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
-import { MobileHomeHeader } from "~/app/_components/mobile-header";
+import { MobileHeader } from "~/app/_components/mobile-header";
 import { MobileCreateFab } from "~/app/_components/mobile-create-fab";
 import { MobileFilterButton } from "~/app/_components/mobile-filter-sheet";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
-import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -138,15 +136,12 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   const prefs = session.user.preferences ?? DEFAULT_PREFERENCES;
 
-  // P40-08: gate the one-time migration banner on a FRESH DB read, not the JWT.
+  // P40-08 + P46-10: dismissals gate on a FRESH DB read, not the JWT.
   // Preferences in the session token only refresh on sign-in, so a JWT-based
-  // gate keeps rendering the banner server-side after dismissal and the client
-  // has to hide it post-hydration (a flash). Reading the dismissal fresh means
-  // the server simply never emits the banner once dismissed — no flash. Only the
-  // pre-migration cohort can ever see it, so new (booksNative) accounts skip the read.
-  const showBooksExplainer = prefs.booksNative
-    ? false
-    : !(await getPreferences(session.user.id)).booksExplainerDismissedAt;
+  // gate keeps rendering a dismissed banner server-side and the client has to
+  // hide it post-hydration (a flash). One fresh read serves both gates.
+  const freshPrefs = await getPreferences(session.user.id);
+  const showBooksExplainer = prefs.booksNative ? false : !freshPrefs.booksExplainerDismissedAt;
 
   const [query, selectedTab, selectedFilter, selectedSort, selectedView, selectedHealth] = await Promise.all([
     getQueryValue(searchParams),
@@ -318,7 +313,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             unlabeled: 0,
             "missing-dates": 0,
             "sync-attention": 0,
-          } satisfies Record<ContactHealthKey, number>),
+            attention: 0,
+          } satisfies Record<ContactHealthKey, number> & { attention: number }),
       // P38-03: all nav/badge counts in one round trip (replaces the former
       // wave of 9 count queries + 2 merge-suggestion counts).
       getWorkspaceCounts(session.user.id, sharedBooks.map((b) => b.id)),
@@ -418,10 +414,10 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
-      {/* mobile home header — wordmark + bell (activity tab shows plain title) */}
-      <MobileHomeHeader
-        userId={session.user.id}
-        tab={selectedTab}
+      {/* mobile home header — one wordmark header across all tabs (P46-DB06 A1) */}
+      <MobileHeader
+        variant="home"
+        bell={<NotificationBellSlot userId={session.user.id} />}
         labelRegistry={sidebarLabels.map((l) => ({ name: l.name, color: l.color }))}
         statusChip={<OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />}
         filterSlot={
@@ -487,17 +483,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         </div>
       </header>
 
-      {!session.user.emailVerified && (
-        <EmailVerificationBanner email={session.user.email ?? ""} />
-      )}
-
-      <BillingBannerSlot userId={session.user.id} />
-
-      {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
-      <SecurityAlertBannerSlot userId={session.user.id} />
-
-      {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
-      <ConnectionBanner readOnly={!planSummary.lifecyclePolicy.canWrite} />
+      {/* P46-DB06 A3: the shared ordered banner stack (no local copies) */}
+      <AppBannerStack
+        userId={session.user.id}
+        email={session.user.email ?? ""}
+        emailVerified={!!session.user.emailVerified}
+        readOnly={!planSummary.lifecyclePolicy.canWrite}
+      />
 
       {/* P40-08: one-time books migration explainer — existing users only.
           Gated server-side on a fresh DB read (see showBooksExplainer above). */}
@@ -556,6 +548,18 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         onboarding={onboarding}
         currentHealth={selectedHealth}
         healthCards={healthCards}
+        healthPrompt={
+          // P46-10: distinct attention count; show when non-zero and different
+          // from the dismissed snapshot; link to the largest health bucket.
+          (() => {
+            if (healthCounts.attention === 0) return null;
+            if (healthCounts.attention === freshPrefs.healthPromptDismissedCount) return null;
+            const target = healthCards
+              .filter((c) => c.key !== "duplicate-risk" && c.count > 0)
+              .sort((a, b) => b.count - a.count)[0];
+            return target ? { count: healthCounts.attention, href: target.href } : null;
+          })()
+        }
         visiblePeopleCount={activeList.totalCount}
       />
 

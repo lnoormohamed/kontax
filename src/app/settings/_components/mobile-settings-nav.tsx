@@ -166,6 +166,8 @@ export function MobileSettingsNav({
       {/* Navigation sections */}
       <GroupCard>
         <NavRow icon="sync" label="Sync connections" detail={syncActive > 0 ? `${syncActive} active` : undefined} href="/sync" />
+        {/* P46-DB06 Part B: Shared-with-me relocated here from the removed mobile Overview. */}
+        <NavRow icon="arrowDownLeft" label="Shared with me" href="/shares" />
         {familyEntry && (() => {
           const { text, color } = familyEntryDetail(familyEntry);
           const href = familyEntry.kind === "nogroup" ? "/settings#plan-billing" : "/settings/family";

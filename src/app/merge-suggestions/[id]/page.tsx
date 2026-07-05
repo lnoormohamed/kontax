@@ -124,6 +124,7 @@ export default async function MergeSuggestionReviewPage({ params }: PageProps) {
         archived,
         duplicates: openDuplicates,
       }}
+      mobileTitle="Duplicate review"
     >
       <div
         className="mx-auto grid w-full content-start gap-[18px] px-7 pb-28 pt-8"

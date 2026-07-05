@@ -15,6 +15,10 @@ export type UserPreferences = {
   // booksExplainerDismissedAt records when an existing user dismissed it.
   booksNative?: boolean;
   booksExplainerDismissedAt?: string | null;
+  // P46-10 — mobile "needs attention" health prompt dismissal. Stores the
+  // distinct-contact attention count at dismissal time; the prompt re-appears
+  // when the live count differs (changed either direction), never at zero.
+  healthPromptDismissedCount?: number | null;
 };
 
 export const DEFAULT_PREFERENCES: Required<UserPreferences> = {
@@ -27,4 +31,5 @@ export const DEFAULT_PREFERENCES: Required<UserPreferences> = {
   motion: "system",
   booksNative: false,
   booksExplainerDismissedAt: null,
+  healthPromptDismissedCount: null,
 };
