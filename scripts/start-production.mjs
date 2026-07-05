@@ -42,7 +42,67 @@ if (!requestedMode && inferredProduction) {
 
 if (schemaMode === "push") {
   console.log("[startup] Applying prisma db push before boot.");
-  run("npx", ["prisma", "db", "push", "--skip-generate"]);
+  const push = spawnSync("npx", ["prisma", "db", "push", "--skip-generate"], {
+    stdio: "inherit",
+    env: process.env,
+  });
+  if (push.status !== 0) {
+    // `prisma db push` (without --accept-data-loss) refuses ALL changes the
+    // moment ANY would be destructive. On a SHARED staging DB the usual trigger
+    // is another deploy/session having added objects the committed schema does
+    // not define yet (e.g. a seeded lookup table): harmless to run against, but
+    // db push wants to DROP them, aborts, and — because a non-zero exit kills
+    // the container — crash-loops the whole site into an outage.
+    //
+    // Dropping is NOT a safe recovery (--accept-data-loss could wipe another
+    // session's data). Instead decide whether it is safe to boot as-is: it is
+    // IFF the live DB already satisfies the committed schema, i.e. the only
+    // pending changes are destructive (removing extra objects the app never
+    // references). If the schema needs objects the DB LACKS, the app would
+    // break at runtime — fail hard so the deploy is fixed, not silently broken.
+    console.warn(
+      "[startup] prisma db push was refused (destructive drift on the live DB). Assessing whether the DB already satisfies the committed schema…",
+    );
+    const diff = spawnSync(
+      "npx",
+      [
+        "prisma",
+        "migrate",
+        "diff",
+        "--from-url",
+        process.env.DATABASE_URL ?? "",
+        "--to-schema-datamodel",
+        "prisma/schema.prisma",
+        "--script",
+      ],
+      { encoding: "utf8", env: { ...process.env, PRISMA_HIDE_UPDATE_MESSAGE: "1" } },
+    );
+    if (diff.status !== 0 || typeof diff.stdout !== "string") {
+      console.error(
+        "[startup] Could not assess schema drift (prisma migrate diff failed); refusing to boot.",
+      );
+      if (diff.stderr) console.error(diff.stderr);
+      process.exit(push.status ?? 1);
+    }
+    // The diff transforms the live DB INTO the committed schema: DROP steps =
+    // objects the DB has but the schema doesn't (safe to leave); CREATE/ADD
+    // steps = objects the schema needs but the DB lacks (app-breaking).
+    const needsAdditive =
+      /CREATE\s+(TABLE|TYPE|SEQUENCE|(UNIQUE\s+)?INDEX)|ADD\s+(COLUMN|CONSTRAINT)|ADD\s+VALUE/i.test(
+        diff.stdout,
+      );
+    if (needsAdditive) {
+      console.error(
+        "[startup] The live DB is MISSING objects the committed schema requires — booting would break the app. Reconcile schema/DB before deploying. Pending changes:",
+      );
+      console.error(diff.stdout);
+      process.exit(push.status ?? 1);
+    }
+    console.warn(
+      "[startup] Live DB already satisfies the committed schema; the refused changes are destructive-only (extra objects the schema doesn't define). Booting as-is and leaving them untouched. Pending drops:",
+    );
+    console.warn(diff.stdout.trim() || "(none reported)");
+  }
 } else if (schemaMode === "validate") {
   console.log("[startup] Validating live schema before boot.");
   run("node", ["scripts/check-schema-drift.mjs"]);
