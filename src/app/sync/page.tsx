@@ -14,8 +14,6 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
-import { getUserFamilyMembership } from "~/server/family-access";
-import { getUserTeamMembership } from "~/server/team-access";
 import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
 import { summarizeProjection } from "~/lib/projection-preview";
 import {
@@ -204,11 +202,9 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, projectionBooks, rawAccounts, rawPastAccounts] =
+  const [planSummary, incomingShares, syncErrorCount, labels, projectionBooks, rawAccounts, rawPastAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
-      getUserFamilyMembership(userId),
-      getUserTeamMembership(userId),
       db.contactShare.count({
         where: {
           recipientUserId: userId,
@@ -675,13 +671,6 @@ export default async function SyncPage({ searchParams }: PageProps) {
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
-  const shared: Array<{ id: "family" | "teams"; label: string; icon: string }> = [];
-  if (familyMembership || planSummary.plan === "FAMILY") {
-    shared.push({ id: "family", label: "Family management", icon: "users" });
-  }
-  if (teamMembership || planSummary.plan === "TEAMS") {
-    shared.push({ id: "teams", label: "Team management", icon: "team" });
-  }
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#f6f7f4]" style={{ fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif" }}>
@@ -748,7 +737,6 @@ export default async function SyncPage({ searchParams }: PageProps) {
         <div className="hidden lg:flex">
           <SettingsSidebar
             account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
-            shared={shared}
           />
         </div>
 

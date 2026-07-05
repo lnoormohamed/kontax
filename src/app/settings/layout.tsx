@@ -13,8 +13,6 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { getUserPlanSummary } from "~/server/billing";
-import { getUserFamilyMembership } from "~/server/family-access";
-import { getUserTeamMembership } from "~/server/team-access";
 
 const getInitials = (value: string) =>
   value
@@ -34,11 +32,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   }
   const userId = session.user.id;
 
-  const [planSummary, familyMembership, teamMembership] = await Promise.all([
-    getUserPlanSummary(userId),
-    getUserFamilyMembership(userId),
-    getUserTeamMembership(userId),
-  ]);
+  const planSummary = await getUserPlanSummary(userId);
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
@@ -47,16 +41,6 @@ export default async function SettingsLayout({ children }: { children: React.Rea
     db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
   ]);
 
-  // Show Family/Team entries when the user belongs to one (owner or member) or
-  // is on the matching plan (so a plan owner who hasn't created the group yet
-  // can still reach the setup flow). Otherwise a single muted upsell row.
-  const shared: Array<{ id: "family" | "teams"; label: string; icon: string }> = [];
-  if (familyMembership || planSummary.plan === "FAMILY") {
-    shared.push({ id: "family", label: "Family management", icon: "users" });
-  }
-  if (teamMembership || planSummary.plan === "TEAMS") {
-    shared.push({ id: "teams", label: "Team management", icon: "team" });
-  }
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
@@ -94,7 +78,6 @@ export default async function SettingsLayout({ children }: { children: React.Rea
         <div className="hidden lg:flex">
           <SettingsSidebar
             account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
-            shared={shared}
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f6f7f4]">

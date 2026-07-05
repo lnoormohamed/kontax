@@ -5,13 +5,16 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import { isSettingsNavActive, SETTINGS_NAV } from "~/lib/settings-nav";
 
-type SharedEntry = { id: "family" | "teams"; label: string; icon: string };
+// P46-12 / DB07 §5a — the desktop settings sidebar: the shared SETTINGS_NAV
+// config rendered with quiet eyebrow dividers. Same entry set as the mobile
+// index by construction (the completeness invariant). The old hand-maintained
+// SECTIONS / shared-entries / "Jump to" structures are gone — Merge review
+// leaves settings (DB07 T6), import/export is reached via Data & sync.
 
 type SettingsSidebarProps = {
   account: { name: string; email: string; plan: string };
-  /** Family/Team entries the user actually belongs to (owner or member). */
-  shared: SharedEntry[];
 };
 
 const getInitials = (value: string) =>
@@ -23,63 +26,17 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
-const SECTIONS = [
-  { href: "/settings", icon: "briefcase", label: "Plan & billing" },
-  { href: "/settings/account", icon: "person", label: "Account" },
-  { href: "/settings/books", icon: "layoutList", label: "Books" },
-  { href: "/settings/profile/card", icon: "qr", label: "Public card" },
-  { href: "/settings/preferences", icon: "gear", label: "Preferences" },
-  { href: "/settings/notifications", icon: "bell", label: "Notifications" },
-  { href: "/settings/devices", icon: "phone", label: "Devices & app passwords" },
-  { href: "/settings/developer", icon: "code", label: "Developer" },
-  { href: "/sync", icon: "sync", label: "Sync connections" },
-  { href: "/settings/security", icon: "emergency", label: "Security & session" },
-] as const;
-
-const JUMP_LINKS = [
-  { href: "/import-export", icon: "upload", label: "Import & export" },
-  { href: "/merge/manual", icon: "merge", label: "Merge review" },
-] as const;
-
-export function SettingsSidebar({ account, shared }: SettingsSidebarProps) {
+export function SettingsSidebar({ account }: SettingsSidebarProps) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const isActive = (href: string) => {
-    if (href === "/settings") return pathname === "/settings";
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
-  const sharedActive = pathname.startsWith("/settings/family") || pathname.startsWith("/settings/teams");
-
   const eyebrow = (label: string) => (
-    <div className="mt-4 mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b938c]">
+    <div
+      className="mt-4 mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b938c]"
+      key={`eyebrow-${label}`}
+    >
       {label}
     </div>
-  );
-
-  const navButton = (
-    href: string,
-    icon: string,
-    label: string,
-    active: boolean,
-    opts?: { muted?: boolean; badge?: string },
-  ) => (
-    <Link
-      className={`flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium transition ${
-        active ? "bg-[#e7efe9] text-[#17352e]" : "text-[#5c655e] hover:bg-[#f2f4f0]"
-      }`}
-      href={href}
-      key={href}
-      onClick={() => setDrawerOpen(false)}
-    >
-      <WorkspaceIcon name={icon} size={18} />
-      <span className={`flex-1 ${opts?.muted ? "text-[#8b938c]" : ""}`}>{label}</span>
-      {opts?.badge ? (
-        <span className="rounded-full bg-[#f2f4f0] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-[#8b938c]">
-          {opts.badge}
-        </span>
-      ) : null}
-    </Link>
   );
 
   const body = (
@@ -101,33 +58,29 @@ export function SettingsSidebar({ account, shared }: SettingsSidebarProps) {
         </span>
       </Link>
 
-      {eyebrow("Account")}
-      {SECTIONS.map((s) => navButton(s.href, s.icon, s.label, isActive(s.href)))}
-
-      {eyebrow("Shared")}
-      {shared.length > 0
-        ? shared.map((s) =>
-            navButton(`/settings/${s.id}`, s.icon, s.label, isActive(`/settings/${s.id}`)),
-          )
-        : navButton("/settings/family", "users", "Family & teams", sharedActive, {
-            muted: true,
-            badge: "Plan",
-          })}
-
-      <div className="mt-auto border-t border-[#e9ece7] pt-2">
-        {eyebrow("Jump to")}
-        {JUMP_LINKS.map((l) => (
-          <Link
-            className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
-            href={l.href}
-            key={l.label}
-            onClick={() => setDrawerOpen(false)}
-          >
-            <WorkspaceIcon name={l.icon} size={15} />
-            <span className="flex-1">{l.label}</span>
-          </Link>
-        ))}
-      </div>
+      {SETTINGS_NAV.map((entry) => {
+        const active = isSettingsNavActive(entry.route, pathname);
+        return (
+          <span key={entry.id} className="contents">
+            {entry.divider ? eyebrow(entry.divider) : null}
+            <Link
+              className={`flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium transition ${
+                active ? "bg-[#e7efe9] text-[#17352e]" : "text-[#5c655e] hover:bg-[#f2f4f0]"
+              }`}
+              href={entry.route}
+              onClick={() => setDrawerOpen(false)}
+            >
+              <WorkspaceIcon name={entry.icon} size={18} />
+              <span className="flex-1">{entry.label}</span>
+              {entry.gate === "pro" ? (
+                <span className="rounded-full bg-[#edf0fe] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-[#4158f4]">
+                  Pro
+                </span>
+              ) : null}
+            </Link>
+          </span>
+        );
+      })}
     </>
   );
 

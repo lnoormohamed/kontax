@@ -16,9 +16,7 @@ import { PortalReturnedBanner } from "~/app/settings/_components/portal-returned
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { getBillingSurface } from "~/server/billing-surface";
-import { getUserFamilyMembership } from "~/server/family-access";
 import { syncStripeBillingState } from "~/server/stripe-handlers";
-import { getUserTeamMembership } from "~/server/team-access";
 import { db } from "~/server/db";
 
 const PLAN_SUMMARY: Record<string, string> = {
@@ -51,7 +49,7 @@ export default async function SettingsPlanPage({
   }
 
   const planSummary = await getUserPlanSummary(userId);
-  const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo, familyMembership, teamMembership, familyGroup, teamGroup] = await Promise.all([
+  const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo] = await Promise.all([
     getBillingSurface(userId),
     db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
     db.contactShare.count({
@@ -72,16 +70,6 @@ export default async function SettingsPlanPage({
       },
     }),
     db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true, password: true } }),
-    getUserFamilyMembership(userId),
-    getUserTeamMembership(userId),
-    db.group.findFirst({
-      where: { members: { some: { userId, inviteStatus: "ACCEPTED" } }, type: "FAMILY" },
-      select: { maxMembers: true, _count: { select: { members: true } } },
-    }),
-    db.group.findFirst({
-      where: { members: { some: { userId, inviteStatus: "ACCEPTED" } }, type: "TEAM" },
-      select: { name: true, _count: { select: { members: true } } },
-    }),
   ]);
 
   const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
@@ -101,40 +89,13 @@ export default async function SettingsPlanPage({
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
-  // Derive separate family/team entry states for the mobile nav (P24B-DB15 §00).
-  const isNeedsAttention =
-    planSummary.lifecyclePolicy.label === "Grace" ||
-    planSummary.lifecyclePolicy.label === "Locked";
-
-  const showFamily = !!(familyMembership || planSummary.plan === "FAMILY");
-  const showTeams = !!(teamMembership || planSummary.plan === "TEAMS");
-
-  const familyEntry = showFamily
-    ? isNeedsAttention
-      ? { kind: "needsAttention" as const }
-      : familyGroup
-        ? { kind: "family" as const, memberCount: familyGroup._count.members, limit: familyGroup.maxMembers }
-        : { kind: "nogroup" as const }
-    : null;
-
-  const teamEntry = showTeams
-    ? isNeedsAttention
-      ? { kind: "needsAttention" as const }
-      : teamGroup
-        ? { kind: "teams" as const, teamName: teamGroup.name, memberCount: teamGroup._count.members }
-        : { kind: "nogroup" as const }
-    : null;
-
   return (
     <>
-      {/* Mobile settings nav — full-screen nav list, hidden on desktop */}
+      {/* Mobile settings index — the shared SETTINGS_NAV as a card list (P46-12) */}
       <MobileSettingsNav
         email={session.user.email ?? ""}
-        familyEntry={familyEntry}
-        teamEntry={teamEntry}
         name={userLabel}
         plan={planSummary.planLabel}
-        syncActive={syncConnections}
       />
 
       {/* Billing content — P24B-12a keeps plan/billing usable on mobile too. */}

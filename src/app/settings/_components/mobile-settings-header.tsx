@@ -22,6 +22,8 @@ const SUBPAGE_TITLES: Record<string, string> = {
   books: "Books",
   "import-presets": "Import presets",
   "export-presets": "Export presets",
+  data: "Data & sync",
+  sharing: "Sharing & groups",
 };
 
 export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {
