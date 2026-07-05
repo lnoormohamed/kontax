@@ -45,6 +45,20 @@ const TRANSLIT_RANGES = [
   [0xac00, 0xd7a3], // Hangul syllables
 ];
 
+// Characters the transliteration package renders as empty or bare punctuation
+// (glottal stops / silent letters) but that are common name-initial letters —
+// without these, every Arabic "Al-…" name (الكيلاني) and Hebrew aleph name
+// (אברהם) stays in the "#" bucket. Conventional romanized initial instead.
+const OVERRIDES = {
+  "ا": "a", // ا arabic alef (ال… names)
+  "أ": "a", // أ alef + hamza above (أحمد)
+  "إ": "i", // إ alef + hamza below (إبراهيم)
+  "ٱ": "a", // ٱ alef wasla
+  "ى": "a", // ى alef maqsura
+  "א": "a", // א hebrew aleph (אברהם)
+  "ע": "a", // ע hebrew ayin (עומר)
+};
+
 // Fold a romanization to lowercase ASCII letters; null when nothing usable
 // remains (the char then stays out of the table and folds to "#" as before).
 function foldRoman(value) {
@@ -75,7 +89,7 @@ function buildRows() {
   for (const [start, end] of TRANSLIT_RANGES) {
     for (let cp = start; cp <= end; cp++) {
       const ch = String.fromCodePoint(cp);
-      const roman = foldRoman(transliterate(ch));
+      const roman = OVERRIDES[ch] ?? foldRoman(transliterate(ch));
       if (roman) rows.push({ ch, roman });
     }
   }
