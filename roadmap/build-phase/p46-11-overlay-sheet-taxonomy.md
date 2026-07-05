@@ -1,6 +1,20 @@
 # P46-11 — Overlay & sheet taxonomy consolidation (mobile)
 
-Status: **Core built & preview-verified (2026-07-05) — consolidation remainder below** · Priority: P2 · Depends: P46-08
+Status: **Built & preview-verified (2026-07-05) — only the real-device touch pass remains (phase QA)** · Priority: P2 · Depends: P46-08
+
+> **Consolidation completed (second pass):**
+> - Swipe-down-to-dismiss extracted to a shared `useSheetDrag` hook in
+>   `mobile-bottom-sheet.tsx` — the ONE implementation, consumed by the
+>   primitive **and** the filter sheet's bespoke chrome (main sheet + label
+>   edit sub-sheet). Filter-sheet swipe + Escape verified live.
+> - Manage-labels overlay back recolored to contract blue.
+> - **Audited, no changes needed:** `more-menu`/`user-menu` (anchored,
+>   outside-tap + Escape — Type-3 conform); `SortMenu` is desktop-only (the
+>   mobile design has no sort surface — sort defaults to Name A–Z; if a mobile
+>   sort is ever added it must be a bottom sheet per A5). Full conversion of
+>   the filter sheet's layout onto `MobileBottomSheet` was deliberately NOT
+>   done — its 90%-height + nested manage/edit layers are sound; sharing the
+>   gesture/dismiss contract was the goal, not identical markup.
 
 > **Delivered & verified:**
 > - `MobileBottomSheet` primitive: **real swipe-down-to-dismiss** (grabber +
