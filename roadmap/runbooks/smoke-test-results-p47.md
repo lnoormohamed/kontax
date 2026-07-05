@@ -15,7 +15,7 @@ user, contact, avatar, and export jobs were created and destroyed on prod.
 |------|--------|----------|
 | **Auth — register** | ✅ PASS | `/api/register` 201-path (`{"ok":true}`); rate limiter fired 429 correctly when the shared bucket was hot |
 | **Auth — login (credentials)** | ✅ PASS | csrf → `/api/auth/callback/credentials` 302 + session cookie; `/api/auth/session` returns the user; session survived a deploy |
-| **Auth — password-reset email delivers** | ⏸ DEFERRED | Reset is a server action; `/forgot-password` page 200. Actual SES delivery is the deferred P47-09 item (identity/sandbox unverified) |
+| **Auth — email delivery (SES)** | ✅ PASS | SES API: ProductionAccessEnabled=true, getkontax.com DKIM SUCCESS; live registration email sent through the app path with no error, visible in the 24 h send counter. (Inbox receipt spot-check: verification mail to li+p47ses@… — probe account since deleted) |
 | **Auth — 2FA (TOTP)** | 🖐 MANUAL | Needs an authenticator app; `TOTP_ENCRYPTION_KEY` is set. → Li |
 | **Contacts — CRUD (REST v1)** | ✅ PASS | POST create → GET 200 → PUT update (`company` persisted) → DELETE 204, via `api.getkontax.com/v1/contacts` (rewrite host working end-to-end) |
 | **Contacts — search** | ✅ PASS | `/api/contacts/search?q=smoke` returned the contact with updated fields (FTS trigger live) |

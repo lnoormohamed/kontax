@@ -36,7 +36,7 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 | 7 | **Google OAuth** | ◑ `GOOGLE_CLIENT_ID/SECRET` set with prod redirect `https://getkontax.com/api/sync/google/callback`. Unverified: console-side redirect registration, People-API sensitive-scope verification status (2–6 wk pole — confirm submitted) | app env dump | P47-07 |
 | 8 | **Microsoft OAuth** | **PARKED (user decision 2026-07-05)** — Outlook sync is a post-launch feature, not a launch item. No `MICROSOFT_*` env set → connector correctly hidden in prod. Azure registration moves to a future rollout ticket | app env dump | P47-07 (descoped) |
 | 9 | **Stripe** | ⚠️ **still test mode** (`sk_test_…`); all six price IDs + webhook secret set (test-mode values). `NEXT_PUBLIC_PRICE_*` display strings missing | app env dump (key prefix) | P47-08 |
-| 10 | **SES** | ◑ configured: `EMAIL_FROM=noreply@getkontax.com`, us-east-1, creds set. Unverified: sandbox status for the getkontax.com identity, DKIM/SPF, a live delivery. Note from-domain decided = **getkontax.com** (not vexon.co) | app env dump | P47-09 |
+| 10 | **SES** | ✅ **verified 2026-07-05 via SES API** (SigV4 GetAccount with the app's creds): **ProductionAccessEnabled=true** (out of sandbox), SendingEnabled, 50k/day quota; `getkontax.com` identity VerifiedForSending + **DKIM SUCCESS**; a live app-path send (registration email) went out with no error and shows in the 24 h send count. From-domain = getkontax.com. Optional hardening, non-blocking: no SPF TXT on the root domain and DMARC is `p=none` — DKIM alignment carries DMARC today; consider SPF + custom MAIL FROM + `p=quarantine` later | SES API + live send | P47-09 |
 
 ## Edge, domain & security (Workstream C)
 
