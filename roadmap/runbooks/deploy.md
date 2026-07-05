@@ -27,6 +27,7 @@ Default behavior:
 
 - when `KONTAX_SCHEMA_MODE` is set, that value wins
 - otherwise `KONTAX_DEPLOY_ENV=production` defaults to `validate`
+- otherwise `NODE_ENV=production` with no `KONTAX_DEPLOY_ENV` also defaults to `validate`
 - all other environments default to `push`
 
 ---
@@ -70,17 +71,21 @@ Default behavior:
 
 **Symptom:** Container exits immediately after starting. Coolify restarts it and it exits again. Logs show the schema validation step reporting drift.
 
-**Cause:** The app is running in `validate` mode and the live database does not yet match `prisma/schema.prisma`.
+**Cause:** The app is running in `validate` mode and the live database does not yet match `prisma/schema.prisma`. Note the mode is `validate` even on **staging** when `KONTAX_DEPLOY_ENV` is *unset* — an unset value under `NODE_ENV=production` infers `validate` for safety, so a staging app with no `KONTAX_DEPLOY_ENV` will crash-loop on additive drift instead of pushing it.
 
 **Recovery:**
 1. Open Coolify logs to confirm this is a validation failure rather than an app crash.
-2. Apply the intended schema change manually:
-   - additive-safe: `npm run db:push`
+2. Apply the intended schema change manually against the target DB (point `DATABASE_URL` at it — e.g. staging `10.0.0.200`, prod `192.168.1.193`):
+   - additive-safe: `npm run db:push` (verify the diff is `[+] Added`-only first with `npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code`)
    - data migration: run SQL/backfill first, then apply the schema
-3. Redeploy or restart the app so validation passes.
+3. Redeploy or restart the app so validation passes (confirm locally with `node scripts/check-schema-drift.mjs` → exit 0).
 4. If you need to unblock immediately, revert the schema change and redeploy the previous app build.
 
+> **Prevention:** set `KONTAX_DEPLOY_ENV=staging` on the staging app (→ `push` mode auto-applies additive schema) and `KONTAX_DEPLOY_ENV=production` on prod (→ `validate` + intentional apply). Leaving it unset is what forces a staging app into validate mode.
+
 > **Never** run `prisma db push --accept-data-loss` in production. It silently drops columns or tables.
+
+> **Incident 2026-07-04 (P40):** staging (`10.0.0.200`) crash-looped after the P40 multi-book schema landed — `KONTAX_DEPLOY_ENV` was unset → validate mode → additive drift (new `ContactBookMembership` / `ContactPrivateField` tables + `sharingPolicy` / `minimumSharingPolicy` / `destinationBookId` columns). Resolved by applying `npm run db:push` (all additive, no data-loss flag) then restart.
 
 ### Push-mode startup failure
 
@@ -117,7 +122,7 @@ Default behavior:
 | `AUTH_SECRET` | Yes | NextAuth secret — generate with `npx auth secret` |
 | `APP_URL` | Yes | Public origin, e.g. `https://kontax.vexon.co` |
 | `CRON_SECRET` | Yes | LXC cron authenticates with this |
-| `KONTAX_DEPLOY_ENV` | Recommended | Set to `production` in prod so startup defaults to schema validation |
+| `KONTAX_DEPLOY_ENV` | **Set on every app** | `production` in prod (→ `validate`), `staging` on staging (→ `push`). Leaving it unset under `NODE_ENV=production` forces `validate` and crash-loops staging on additive drift |
 | `KONTAX_SCHEMA_MODE` | Optional | Explicitly force `push`, `validate`, or `skip` |
 
 See [env-secrets.md](env-secrets.md) for the full variable inventory.

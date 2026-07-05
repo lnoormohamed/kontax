@@ -2,7 +2,9 @@
 // Base URL when created: https://api.getkontax.com/v1
 import { type NextRequest, NextResponse } from "next/server";
 
+import { getUserDefaultBook } from "~/server/address-books";
 import { assertCanCreateContacts } from "~/server/billing";
+import { setPrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { corsHeaders } from "~/lib/api-cors";
@@ -29,7 +31,8 @@ export async function GET(req: NextRequest) {
       where: {
         userId,
         ...(archived ? { NOT: { archivedAt: null } } : { archivedAt: null }),
-        ...(bookId ? { bookId } : {}),
+        // P40-06: filter by membership (a contact can live in several books).
+        ...(bookId ? { bookMemberships: { some: { addressBookId: bookId } } } : {}),
         ...(q
           ? {
               OR: [
@@ -109,8 +112,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // P40-06: every personal contact lives in a book. A null bookId historically
+    // meant "the default book"; make that explicit so the membership read cutover
+    // shows the contact, and dual-write the primary membership.
+    const bookId = data.bookId ?? (await getUserDefaultBook(userId)).id;
+    data.bookId = bookId;
+
     const contact = await db.$transaction(async (tx) => {
       const created = await tx.contact.create({ data, select: API_CONTACT_SELECT });
+      await setPrimaryMembership(tx, created.id, bookId);
       await emitEvent(tx, {
         userId,
         contactId: created.id,

@@ -14,9 +14,11 @@ interface MobileHomeHeaderProps {
   tab?: string;
   filterSlot?: React.ReactNode;
   labelRegistry?: { name: string; color: string }[];
+  /** P42-DB01 §3b: compact "Offline" chip shown while account-state owns the banner slot. */
+  statusChip?: React.ReactNode;
 }
 
-export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry }: MobileHomeHeaderProps) {
+export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry, statusChip }: MobileHomeHeaderProps) {
   // Activity tab → the shared plain-title header (P24B-01).
   if (tab === "activity") {
     return (
@@ -78,6 +80,7 @@ export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry }: Mob
         </Link>
 
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 0 }}>
+        {statusChip}
         <NotificationBellSlot userId={userId} />
         {filterSlot}
         <Suspense fallback={null}>

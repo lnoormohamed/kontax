@@ -67,9 +67,13 @@ export default async function BooksSettingsPage() {
         archivedAt: true,
       },
     }),
-    db.contact.groupBy({
-      by: ["bookId"],
-      where: { userId, groupContacts: { none: {} } },
+    // P40-06: per-book counts from membership (matches the membership-based list).
+    db.contactBookMembership.groupBy({
+      by: ["addressBookId"],
+      where: {
+        addressBook: { userId },
+        contact: { groupContacts: { none: {} } },
+      },
       _count: { _all: true },
     }),
     getUserFamilyMembership(userId),
@@ -114,13 +118,9 @@ export default async function BooksSettingsPage() {
     }),
   ]);
 
-  const defaultBookId = personalBooks.find((book) => book.isDefault)?.id ?? null;
-  const nullBookCount = personalBookCounts.find((row) => row.bookId === null)?._count._all ?? 0;
   const personalBooksWithCounts = personalBooks.map((book) => ({
     ...book,
-    count:
-      (personalBookCounts.find((row) => row.bookId === book.id)?._count._all ?? 0) +
-      (book.id === defaultBookId ? nullBookCount : 0),
+    count: personalBookCounts.find((row) => row.addressBookId === book.id)?._count._all ?? 0,
   }));
 
   const accessibleTeamBookIds = new Set((await getAccessibleTeamBooks(userId)).map((book) => book.id));

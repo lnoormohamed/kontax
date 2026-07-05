@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useOffline } from "~/app/_components/connectivity";
+import { useIsScrubbing } from "~/app/_components/contact-list/scrub-signal";
 import { MobileContactSheet } from "~/app/_components/mobile-contact-sheet";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -17,6 +19,13 @@ interface MobileCreateFabProps {
 
 export function MobileCreateFab({ canWrite, show = true, atLimit = false }: MobileCreateFabProps) {
   const [open, setOpen] = useState(false);
+  // P42-DB01 §5a: creating a contact is a write — the FAB disables (not hides)
+  // while offline; the banner above explains why.
+  const offline = useOffline();
+  // P46-DB04 §3·C: the FAB and the alphabet scrubber share the bottom-right
+  // corner. While a scrub is running, fade the FAB and make it pointer-inert so
+  // a scrub that reaches the bottom edge can't accidentally trigger it.
+  const scrubbing = useIsScrubbing();
 
   if (!canWrite || !show || atLimit) return null;
 
@@ -25,7 +34,10 @@ export function MobileCreateFab({ canWrite, show = true, atLimit = false }: Mobi
       {/* Floating "+" button — mobile only */}
       <button
         aria-label="Create new contact"
+        aria-disabled={offline}
         className="grid md:hidden"
+        data-mobile-fab
+        disabled={offline}
         onClick={() => setOpen(true)}
         style={{
           position: "fixed",
@@ -37,7 +49,10 @@ export function MobileCreateFab({ canWrite, show = true, atLimit = false }: Mobi
           backgroundColor: "#17352e",
           color: "#fff",
           border: "none",
-          cursor: "pointer",
+          cursor: offline ? "default" : "pointer",
+          opacity: scrubbing ? 0.35 : offline ? 0.5 : 1,
+          pointerEvents: scrubbing ? "none" : undefined,
+          transition: "opacity 0.12s ease",
           placeItems: "center",
           zIndex: 35,
           boxShadow: "0 6px 18px rgba(23,53,46,0.3), 0 2px 5px rgba(0,0,0,0.12)",

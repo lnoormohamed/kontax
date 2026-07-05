@@ -92,6 +92,7 @@ export type MergeFieldChoices = {
   phone?: Extract<MergeFieldChoice, "primary" | "secondary">;
   company?: Extract<MergeFieldChoice, "primary" | "secondary">;
   notes?: MergeFieldChoice;
+  avatarUrl?: Extract<MergeFieldChoice, "primary" | "secondary">; // P44-05
 };
 
 export type MergeSuggestionPreview = {
@@ -1139,6 +1140,12 @@ export const buildMergedContactPreview = (
       secondaryContact: normalizedSecondary,
       allowCombine: true,
     }),
+    avatarUrl: getDefaultFieldChoice({
+      primaryValue: normalizedPrimary.avatarUrl,
+      secondaryValue: normalizedSecondary.avatarUrl,
+      primaryContact: normalizedPrimary,
+      secondaryContact: normalizedSecondary,
+    }) as "primary" | "secondary",
   };
 
   const resolvedChoices: Required<MergeFieldChoices> = {
@@ -1147,6 +1154,7 @@ export const buildMergedContactPreview = (
     phone: fieldChoices.phone ?? defaultChoices.phone,
     company: fieldChoices.company ?? defaultChoices.company,
     notes: fieldChoices.notes ?? defaultChoices.notes,
+    avatarUrl: fieldChoices.avatarUrl ?? defaultChoices.avatarUrl,
   };
 
   const mergedContact = {
@@ -1327,12 +1335,7 @@ export const buildMergedContactPreview = (
       pickFieldValue({
         primaryValue: normalizedPrimary.avatarUrl,
         secondaryValue: normalizedSecondary.avatarUrl,
-        choice: getDefaultFieldChoice({
-          primaryValue: normalizedPrimary.avatarUrl,
-          secondaryValue: normalizedSecondary.avatarUrl,
-          primaryContact: normalizedPrimary,
-          secondaryContact: normalizedSecondary,
-        }),
+        choice: resolvedChoices.avatarUrl, // P44-05: honour the user's photo pick
       }) ?? null,
     isFavorite: [normalizedPrimary.isFavorite, normalizedSecondary.isFavorite].some(Boolean),
     labels: mergeUniqueStrings(normalizedPrimary.labels, normalizedSecondary.labels),

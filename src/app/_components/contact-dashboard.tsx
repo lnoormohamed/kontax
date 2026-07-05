@@ -36,6 +36,8 @@ type DashboardContact = {
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
   labels?: unknown; // P31B-06: JSON string[] from Prisma
+  // P46-01: primary sort key (lowercased) — feeds the alphabet scrubber's letter.
+  sortName: string;
   // P38-01: server-computed excerpt, set when the search query matched notes.
   noteMatchSnippet?: string | null;
 };
@@ -108,6 +110,8 @@ type ContactDashboardProps = {
   recentMerges: RecentMerge[];
   onboarding: OnboardingChecklistData;
   nameDisplayOrder?: "first-last" | "last-first";
+  // P43-01: "Labels on rows" saved value; resolved per-device in the table.
+  rowLabels?: "hover" | "always" | "off";
   currentHealth: ContactHealthKey | null;
   healthCards: HealthCard[];
   visiblePeopleCount: number;
@@ -152,6 +156,7 @@ export function ContactDashboard({
   incomingShares,
   onboarding,
   nameDisplayOrder,
+  rowLabels,
   currentHealth,
   healthCards,
   visiblePeopleCount,
@@ -896,6 +901,7 @@ export function ContactDashboard({
                 groupByLetter={groupByLetter}
                 mode="active"
                 nameDisplayOrder={nameDisplayOrder}
+                rowLabels={rowLabels}
                 query={query}
                 viewMode={viewMode}
                 books={personalBooks}
@@ -916,6 +922,7 @@ export function ContactDashboard({
               groupByLetter={groupByLetter}
               mode="archived"
               nameDisplayOrder={nameDisplayOrder}
+              rowLabels={rowLabels}
               query={query}
               viewMode={viewMode}
               books={personalBooks}

@@ -39,6 +39,16 @@ export type AppPassword = $Result.DefaultSelection<Prisma.$AppPasswordPayload>
  */
 export type Contact = $Result.DefaultSelection<Prisma.$ContactPayload>
 /**
+ * Model ContactBookMembership
+ * 
+ */
+export type ContactBookMembership = $Result.DefaultSelection<Prisma.$ContactBookMembershipPayload>
+/**
+ * Model ContactPrivateField
+ * 
+ */
+export type ContactPrivateField = $Result.DefaultSelection<Prisma.$ContactPrivateFieldPayload>
+/**
  * Model SubscriptionCustomer
  * 
  */
@@ -58,6 +68,11 @@ export type ImportJob = $Result.DefaultSelection<Prisma.$ImportJobPayload>
  * 
  */
 export type ExportJob = $Result.DefaultSelection<Prisma.$ExportJobPayload>
+/**
+ * Model KontaxExportJob
+ * 
+ */
+export type KontaxExportJob = $Result.DefaultSelection<Prisma.$KontaxExportJobPayload>
 /**
  * Model MergeSuggestion
  * 
@@ -438,6 +453,14 @@ export const ContactExportFormat: {
 export type ContactExportFormat = (typeof ContactExportFormat)[keyof typeof ContactExportFormat]
 
 
+export const KontaxExportKind: {
+  DOCUMENT: 'DOCUMENT',
+  ARCHIVE: 'ARCHIVE'
+};
+
+export type KontaxExportKind = (typeof KontaxExportKind)[keyof typeof KontaxExportKind]
+
+
 export const ImportSourceProfile: {
   GENERIC: 'GENERIC',
   GOOGLE: 'GOOGLE',
@@ -530,7 +553,9 @@ export const SyncJobStatus: {
   RUNNING: 'RUNNING',
   SUCCEEDED: 'SUCCEEDED',
   PARTIAL: 'PARTIAL',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED',
+  HALTED: 'HALTED'
 };
 
 export type SyncJobStatus = (typeof SyncJobStatus)[keyof typeof SyncJobStatus]
@@ -765,6 +790,10 @@ export const ContactImportFormat: typeof $Enums.ContactImportFormat
 export type ContactExportFormat = $Enums.ContactExportFormat
 
 export const ContactExportFormat: typeof $Enums.ContactExportFormat
+
+export type KontaxExportKind = $Enums.KontaxExportKind
+
+export const KontaxExportKind: typeof $Enums.KontaxExportKind
 
 export type ImportSourceProfile = $Enums.ImportSourceProfile
 
@@ -1027,6 +1056,26 @@ export class PrismaClient<
   get contact(): Prisma.ContactDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.contactBookMembership`: Exposes CRUD operations for the **ContactBookMembership** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContactBookMemberships
+    * const contactBookMemberships = await prisma.contactBookMembership.findMany()
+    * ```
+    */
+  get contactBookMembership(): Prisma.ContactBookMembershipDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.contactPrivateField`: Exposes CRUD operations for the **ContactPrivateField** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContactPrivateFields
+    * const contactPrivateFields = await prisma.contactPrivateField.findMany()
+    * ```
+    */
+  get contactPrivateField(): Prisma.ContactPrivateFieldDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.subscriptionCustomer`: Exposes CRUD operations for the **SubscriptionCustomer** model.
     * Example usage:
     * ```ts
@@ -1065,6 +1114,16 @@ export class PrismaClient<
     * ```
     */
   get exportJob(): Prisma.ExportJobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.kontaxExportJob`: Exposes CRUD operations for the **KontaxExportJob** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more KontaxExportJobs
+    * const kontaxExportJobs = await prisma.kontaxExportJob.findMany()
+    * ```
+    */
+  get kontaxExportJob(): Prisma.KontaxExportJobDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.mergeSuggestion`: Exposes CRUD operations for the **MergeSuggestion** model.
@@ -1911,10 +1970,13 @@ export namespace Prisma {
     UserOnboardingState: 'UserOnboardingState',
     AppPassword: 'AppPassword',
     Contact: 'Contact',
+    ContactBookMembership: 'ContactBookMembership',
+    ContactPrivateField: 'ContactPrivateField',
     SubscriptionCustomer: 'SubscriptionCustomer',
     Subscription: 'Subscription',
     ImportJob: 'ImportJob',
     ExportJob: 'ExportJob',
+    KontaxExportJob: 'KontaxExportJob',
     MergeSuggestion: 'MergeSuggestion',
     MergeDecision: 'MergeDecision',
     MergeDismissal: 'MergeDismissal',
@@ -1973,7 +2035,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "contactBookMembership" | "contactPrivateField" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "kontaxExportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2347,6 +2409,154 @@ export namespace Prisma {
           }
         }
       }
+      ContactBookMembership: {
+        payload: Prisma.$ContactBookMembershipPayload<ExtArgs>
+        fields: Prisma.ContactBookMembershipFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContactBookMembershipFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContactBookMembershipFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>
+          }
+          findFirst: {
+            args: Prisma.ContactBookMembershipFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContactBookMembershipFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>
+          }
+          findMany: {
+            args: Prisma.ContactBookMembershipFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>[]
+          }
+          create: {
+            args: Prisma.ContactBookMembershipCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>
+          }
+          createMany: {
+            args: Prisma.ContactBookMembershipCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ContactBookMembershipCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>[]
+          }
+          delete: {
+            args: Prisma.ContactBookMembershipDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>
+          }
+          update: {
+            args: Prisma.ContactBookMembershipUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>
+          }
+          deleteMany: {
+            args: Prisma.ContactBookMembershipDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContactBookMembershipUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ContactBookMembershipUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>[]
+          }
+          upsert: {
+            args: Prisma.ContactBookMembershipUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactBookMembershipPayload>
+          }
+          aggregate: {
+            args: Prisma.ContactBookMembershipAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContactBookMembership>
+          }
+          groupBy: {
+            args: Prisma.ContactBookMembershipGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContactBookMembershipGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContactBookMembershipCountArgs<ExtArgs>
+            result: $Utils.Optional<ContactBookMembershipCountAggregateOutputType> | number
+          }
+        }
+      }
+      ContactPrivateField: {
+        payload: Prisma.$ContactPrivateFieldPayload<ExtArgs>
+        fields: Prisma.ContactPrivateFieldFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContactPrivateFieldFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContactPrivateFieldFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>
+          }
+          findFirst: {
+            args: Prisma.ContactPrivateFieldFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContactPrivateFieldFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>
+          }
+          findMany: {
+            args: Prisma.ContactPrivateFieldFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>[]
+          }
+          create: {
+            args: Prisma.ContactPrivateFieldCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>
+          }
+          createMany: {
+            args: Prisma.ContactPrivateFieldCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ContactPrivateFieldCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>[]
+          }
+          delete: {
+            args: Prisma.ContactPrivateFieldDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>
+          }
+          update: {
+            args: Prisma.ContactPrivateFieldUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>
+          }
+          deleteMany: {
+            args: Prisma.ContactPrivateFieldDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContactPrivateFieldUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ContactPrivateFieldUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>[]
+          }
+          upsert: {
+            args: Prisma.ContactPrivateFieldUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactPrivateFieldPayload>
+          }
+          aggregate: {
+            args: Prisma.ContactPrivateFieldAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContactPrivateField>
+          }
+          groupBy: {
+            args: Prisma.ContactPrivateFieldGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContactPrivateFieldGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContactPrivateFieldCountArgs<ExtArgs>
+            result: $Utils.Optional<ContactPrivateFieldCountAggregateOutputType> | number
+          }
+        }
+      }
       SubscriptionCustomer: {
         payload: Prisma.$SubscriptionCustomerPayload<ExtArgs>
         fields: Prisma.SubscriptionCustomerFieldRefs
@@ -2640,6 +2850,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ExportJobCountArgs<ExtArgs>
             result: $Utils.Optional<ExportJobCountAggregateOutputType> | number
+          }
+        }
+      }
+      KontaxExportJob: {
+        payload: Prisma.$KontaxExportJobPayload<ExtArgs>
+        fields: Prisma.KontaxExportJobFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.KontaxExportJobFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.KontaxExportJobFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          findFirst: {
+            args: Prisma.KontaxExportJobFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.KontaxExportJobFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          findMany: {
+            args: Prisma.KontaxExportJobFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>[]
+          }
+          create: {
+            args: Prisma.KontaxExportJobCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          createMany: {
+            args: Prisma.KontaxExportJobCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.KontaxExportJobCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>[]
+          }
+          delete: {
+            args: Prisma.KontaxExportJobDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          update: {
+            args: Prisma.KontaxExportJobUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          deleteMany: {
+            args: Prisma.KontaxExportJobDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.KontaxExportJobUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.KontaxExportJobUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>[]
+          }
+          upsert: {
+            args: Prisma.KontaxExportJobUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$KontaxExportJobPayload>
+          }
+          aggregate: {
+            args: Prisma.KontaxExportJobAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateKontaxExportJob>
+          }
+          groupBy: {
+            args: Prisma.KontaxExportJobGroupByArgs<ExtArgs>
+            result: $Utils.Optional<KontaxExportJobGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.KontaxExportJobCountArgs<ExtArgs>
+            result: $Utils.Optional<KontaxExportJobCountAggregateOutputType> | number
           }
         }
       }
@@ -5704,10 +5988,13 @@ export namespace Prisma {
     userOnboardingState?: UserOnboardingStateOmit
     appPassword?: AppPasswordOmit
     contact?: ContactOmit
+    contactBookMembership?: ContactBookMembershipOmit
+    contactPrivateField?: ContactPrivateFieldOmit
     subscriptionCustomer?: SubscriptionCustomerOmit
     subscription?: SubscriptionOmit
     importJob?: ImportJobOmit
     exportJob?: ExportJobOmit
+    kontaxExportJob?: KontaxExportJobOmit
     mergeSuggestion?: MergeSuggestionOmit
     mergeDecision?: MergeDecisionOmit
     mergeDismissal?: MergeDismissalOmit
@@ -5832,6 +6119,7 @@ export namespace Prisma {
     contacts: number
     importJobs: number
     exportJobs: number
+    kontaxExportJobs: number
     mergeSuggestions: number
     mergeDecisions: number
     dismissals: number
@@ -5858,6 +6146,7 @@ export namespace Prisma {
     dataExportJobs: number
     apiTokens: number
     labels: number
+    contactPrivateFields: number
     failedLoginAttempts: number
     supportNotesAuthored: number
     supportCasesCreated: number
@@ -5874,6 +6163,7 @@ export namespace Prisma {
     contacts?: boolean | UserCountOutputTypeCountContactsArgs
     importJobs?: boolean | UserCountOutputTypeCountImportJobsArgs
     exportJobs?: boolean | UserCountOutputTypeCountExportJobsArgs
+    kontaxExportJobs?: boolean | UserCountOutputTypeCountKontaxExportJobsArgs
     mergeSuggestions?: boolean | UserCountOutputTypeCountMergeSuggestionsArgs
     mergeDecisions?: boolean | UserCountOutputTypeCountMergeDecisionsArgs
     dismissals?: boolean | UserCountOutputTypeCountDismissalsArgs
@@ -5900,6 +6190,7 @@ export namespace Prisma {
     dataExportJobs?: boolean | UserCountOutputTypeCountDataExportJobsArgs
     apiTokens?: boolean | UserCountOutputTypeCountApiTokensArgs
     labels?: boolean | UserCountOutputTypeCountLabelsArgs
+    contactPrivateFields?: boolean | UserCountOutputTypeCountContactPrivateFieldsArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
     supportNotesAuthored?: boolean | UserCountOutputTypeCountSupportNotesAuthoredArgs
     supportCasesCreated?: boolean | UserCountOutputTypeCountSupportCasesCreatedArgs
@@ -5948,6 +6239,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ExportJobWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountKontaxExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KontaxExportJobWhereInput
   }
 
   /**
@@ -6135,6 +6433,13 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountContactPrivateFieldsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactPrivateFieldWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountFailedLoginAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FailedLoginAttemptWhereInput
   }
@@ -6242,6 +6547,8 @@ export namespace Prisma {
     sharesFromContact: number
     sharesAsRecipientCopy: number
     groupContacts: number
+    bookMemberships: number
+    privateFields: number
     birthdayReminderStates: number
     mergedChildren: number
   }
@@ -6257,6 +6564,8 @@ export namespace Prisma {
     sharesFromContact?: boolean | ContactCountOutputTypeCountSharesFromContactArgs
     sharesAsRecipientCopy?: boolean | ContactCountOutputTypeCountSharesAsRecipientCopyArgs
     groupContacts?: boolean | ContactCountOutputTypeCountGroupContactsArgs
+    bookMemberships?: boolean | ContactCountOutputTypeCountBookMembershipsArgs
+    privateFields?: boolean | ContactCountOutputTypeCountPrivateFieldsArgs
     birthdayReminderStates?: boolean | ContactCountOutputTypeCountBirthdayReminderStatesArgs
     mergedChildren?: boolean | ContactCountOutputTypeCountMergedChildrenArgs
   }
@@ -6340,6 +6649,20 @@ export namespace Prisma {
    */
   export type ContactCountOutputTypeCountGroupContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GroupContactWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountBookMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactBookMembershipWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountPrivateFieldsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactPrivateFieldWhereInput
   }
 
   /**
@@ -6692,10 +7015,14 @@ export namespace Prisma {
 
   export type AddressBookCountOutputType = {
     contacts: number
+    contactMemberships: number
+    syncDestinations: number
   }
 
   export type AddressBookCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contacts?: boolean | AddressBookCountOutputTypeCountContactsArgs
+    contactMemberships?: boolean | AddressBookCountOutputTypeCountContactMembershipsArgs
+    syncDestinations?: boolean | AddressBookCountOutputTypeCountSyncDestinationsArgs
   }
 
   // Custom InputTypes
@@ -6714,6 +7041,20 @@ export namespace Prisma {
    */
   export type AddressBookCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ContactWhereInput
+  }
+
+  /**
+   * AddressBookCountOutputType without action
+   */
+  export type AddressBookCountOutputTypeCountContactMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactBookMembershipWhereInput
+  }
+
+  /**
+   * AddressBookCountOutputType without action
+   */
+  export type AddressBookCountOutputTypeCountSyncDestinationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncAccountWhereInput
   }
 
 
@@ -6745,6 +7086,37 @@ export namespace Prisma {
    */
   export type LabelCountOutputTypeCountSyncAccountSettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SyncAccountSettingsWhereInput
+  }
+
+
+  /**
+   * Count Type ContactShareCountOutputType
+   */
+
+  export type ContactShareCountOutputType = {
+    notifications: number
+  }
+
+  export type ContactShareCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    notifications?: boolean | ContactShareCountOutputTypeCountNotificationsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ContactShareCountOutputType without action
+   */
+  export type ContactShareCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShareCountOutputType
+     */
+    select?: ContactShareCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ContactShareCountOutputType without action
+   */
+  export type ContactShareCountOutputTypeCountNotificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NotificationWhereInput
   }
 
 
@@ -7212,6 +7584,7 @@ export namespace Prisma {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
+    kontaxExportJobs?: boolean | User$kontaxExportJobsArgs<ExtArgs>
     mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
     mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
     dismissals?: boolean | User$dismissalsArgs<ExtArgs>
@@ -7240,6 +7613,7 @@ export namespace Prisma {
     dataExportJobs?: boolean | User$dataExportJobsArgs<ExtArgs>
     apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
     labels?: boolean | User$labelsArgs<ExtArgs>
+    contactPrivateFields?: boolean | User$contactPrivateFieldsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     supportNotesAuthored?: boolean | User$supportNotesAuthoredArgs<ExtArgs>
@@ -7355,6 +7729,7 @@ export namespace Prisma {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
+    kontaxExportJobs?: boolean | User$kontaxExportJobsArgs<ExtArgs>
     mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
     mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
     dismissals?: boolean | User$dismissalsArgs<ExtArgs>
@@ -7383,6 +7758,7 @@ export namespace Prisma {
     dataExportJobs?: boolean | User$dataExportJobsArgs<ExtArgs>
     apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
     labels?: boolean | User$labelsArgs<ExtArgs>
+    contactPrivateFields?: boolean | User$contactPrivateFieldsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     supportNotesAuthored?: boolean | User$supportNotesAuthoredArgs<ExtArgs>
@@ -7405,6 +7781,7 @@ export namespace Prisma {
       contacts: Prisma.$ContactPayload<ExtArgs>[]
       importJobs: Prisma.$ImportJobPayload<ExtArgs>[]
       exportJobs: Prisma.$ExportJobPayload<ExtArgs>[]
+      kontaxExportJobs: Prisma.$KontaxExportJobPayload<ExtArgs>[]
       mergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
       mergeDecisions: Prisma.$MergeDecisionPayload<ExtArgs>[]
       dismissals: Prisma.$MergeDismissalPayload<ExtArgs>[]
@@ -7433,6 +7810,7 @@ export namespace Prisma {
       dataExportJobs: Prisma.$DataExportJobPayload<ExtArgs>[]
       apiTokens: Prisma.$ApiTokenPayload<ExtArgs>[]
       labels: Prisma.$LabelPayload<ExtArgs>[]
+      contactPrivateFields: Prisma.$ContactPrivateFieldPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
       onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
       supportNotesAuthored: Prisma.$AdminSupportNotePayload<ExtArgs>[]
@@ -7872,6 +8250,7 @@ export namespace Prisma {
     contacts<T extends User$contactsArgs<ExtArgs> = {}>(args?: Subset<T, User$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importJobs<T extends User$importJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$importJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     exportJobs<T extends User$exportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    kontaxExportJobs<T extends User$kontaxExportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$kontaxExportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergeSuggestions<T extends User$mergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergeDecisions<T extends User$mergeDecisionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dismissals<T extends User$dismissalsArgs<ExtArgs> = {}>(args?: Subset<T, User$dismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7900,6 +8279,7 @@ export namespace Prisma {
     dataExportJobs<T extends User$dataExportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$dataExportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     apiTokens<T extends User$apiTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$apiTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     labels<T extends User$labelsArgs<ExtArgs> = {}>(args?: Subset<T, User$labelsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    contactPrivateFields<T extends User$contactPrivateFieldsArgs<ExtArgs> = {}>(args?: Subset<T, User$contactPrivateFieldsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     supportNotesAuthored<T extends User$supportNotesAuthoredArgs<ExtArgs> = {}>(args?: Subset<T, User$supportNotesAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminSupportNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8449,6 +8829,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ExportJobScalarFieldEnum | ExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * User.kontaxExportJobs
+   */
+  export type User$kontaxExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    where?: KontaxExportJobWhereInput
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    cursor?: KontaxExportJobWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
   }
 
   /**
@@ -9111,6 +9515,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LabelScalarFieldEnum | LabelScalarFieldEnum[]
+  }
+
+  /**
+   * User.contactPrivateFields
+   */
+  export type User$contactPrivateFieldsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    where?: ContactPrivateFieldWhereInput
+    orderBy?: ContactPrivateFieldOrderByWithRelationInput | ContactPrivateFieldOrderByWithRelationInput[]
+    cursor?: ContactPrivateFieldWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactPrivateFieldScalarFieldEnum | ContactPrivateFieldScalarFieldEnum[]
   }
 
   /**
@@ -13171,6 +13599,8 @@ export namespace Prisma {
     sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
     sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
     groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
+    bookMemberships?: boolean | Contact$bookMembershipsArgs<ExtArgs>
+    privateFields?: boolean | Contact$privateFieldsArgs<ExtArgs>
     birthdayReminderStates?: boolean | Contact$birthdayReminderStatesArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
@@ -13356,6 +13786,8 @@ export namespace Prisma {
     sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
     sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
     groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
+    bookMemberships?: boolean | Contact$bookMembershipsArgs<ExtArgs>
+    privateFields?: boolean | Contact$privateFieldsArgs<ExtArgs>
     birthdayReminderStates?: boolean | Contact$birthdayReminderStatesArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
@@ -13390,6 +13822,8 @@ export namespace Prisma {
       sharesFromContact: Prisma.$ContactSharePayload<ExtArgs>[]
       sharesAsRecipientCopy: Prisma.$ContactSharePayload<ExtArgs>[]
       groupContacts: Prisma.$GroupContactPayload<ExtArgs>[]
+      bookMemberships: Prisma.$ContactBookMembershipPayload<ExtArgs>[]
+      privateFields: Prisma.$ContactPrivateFieldPayload<ExtArgs>[]
       birthdayReminderStates: Prisma.$BirthdayReminderStatePayload<ExtArgs>[]
       mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
       mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
@@ -13851,6 +14285,8 @@ export namespace Prisma {
     sharesFromContact<T extends Contact$sharesFromContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesFromContactArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sharesAsRecipientCopy<T extends Contact$sharesAsRecipientCopyArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesAsRecipientCopyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     groupContacts<T extends Contact$groupContactsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$groupContactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    bookMemberships<T extends Contact$bookMembershipsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$bookMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    privateFields<T extends Contact$privateFieldsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$privateFieldsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     birthdayReminderStates<T extends Contact$birthdayReminderStatesArgs<ExtArgs> = {}>(args?: Subset<T, Contact$birthdayReminderStatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14588,6 +15024,54 @@ export namespace Prisma {
   }
 
   /**
+   * Contact.bookMemberships
+   */
+  export type Contact$bookMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    where?: ContactBookMembershipWhereInput
+    orderBy?: ContactBookMembershipOrderByWithRelationInput | ContactBookMembershipOrderByWithRelationInput[]
+    cursor?: ContactBookMembershipWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactBookMembershipScalarFieldEnum | ContactBookMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.privateFields
+   */
+  export type Contact$privateFieldsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    where?: ContactPrivateFieldWhereInput
+    orderBy?: ContactPrivateFieldOrderByWithRelationInput | ContactPrivateFieldOrderByWithRelationInput[]
+    cursor?: ContactPrivateFieldWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactPrivateFieldScalarFieldEnum | ContactPrivateFieldScalarFieldEnum[]
+  }
+
+  /**
    * Contact.birthdayReminderStates
    */
   export type Contact$birthdayReminderStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14689,6 +15173,2220 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ContactInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ContactBookMembership
+   */
+
+  export type AggregateContactBookMembership = {
+    _count: ContactBookMembershipCountAggregateOutputType | null
+    _min: ContactBookMembershipMinAggregateOutputType | null
+    _max: ContactBookMembershipMaxAggregateOutputType | null
+  }
+
+  export type ContactBookMembershipMinAggregateOutputType = {
+    id: string | null
+    contactId: string | null
+    addressBookId: string | null
+    isPrimary: boolean | null
+    createdAt: Date | null
+  }
+
+  export type ContactBookMembershipMaxAggregateOutputType = {
+    id: string | null
+    contactId: string | null
+    addressBookId: string | null
+    isPrimary: boolean | null
+    createdAt: Date | null
+  }
+
+  export type ContactBookMembershipCountAggregateOutputType = {
+    id: number
+    contactId: number
+    addressBookId: number
+    isPrimary: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ContactBookMembershipMinAggregateInputType = {
+    id?: true
+    contactId?: true
+    addressBookId?: true
+    isPrimary?: true
+    createdAt?: true
+  }
+
+  export type ContactBookMembershipMaxAggregateInputType = {
+    id?: true
+    contactId?: true
+    addressBookId?: true
+    isPrimary?: true
+    createdAt?: true
+  }
+
+  export type ContactBookMembershipCountAggregateInputType = {
+    id?: true
+    contactId?: true
+    addressBookId?: true
+    isPrimary?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ContactBookMembershipAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactBookMembership to aggregate.
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactBookMemberships to fetch.
+     */
+    orderBy?: ContactBookMembershipOrderByWithRelationInput | ContactBookMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContactBookMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactBookMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactBookMemberships.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ContactBookMemberships
+    **/
+    _count?: true | ContactBookMembershipCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContactBookMembershipMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContactBookMembershipMaxAggregateInputType
+  }
+
+  export type GetContactBookMembershipAggregateType<T extends ContactBookMembershipAggregateArgs> = {
+        [P in keyof T & keyof AggregateContactBookMembership]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContactBookMembership[P]>
+      : GetScalarType<T[P], AggregateContactBookMembership[P]>
+  }
+
+
+
+
+  export type ContactBookMembershipGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactBookMembershipWhereInput
+    orderBy?: ContactBookMembershipOrderByWithAggregationInput | ContactBookMembershipOrderByWithAggregationInput[]
+    by: ContactBookMembershipScalarFieldEnum[] | ContactBookMembershipScalarFieldEnum
+    having?: ContactBookMembershipScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContactBookMembershipCountAggregateInputType | true
+    _min?: ContactBookMembershipMinAggregateInputType
+    _max?: ContactBookMembershipMaxAggregateInputType
+  }
+
+  export type ContactBookMembershipGroupByOutputType = {
+    id: string
+    contactId: string
+    addressBookId: string
+    isPrimary: boolean
+    createdAt: Date
+    _count: ContactBookMembershipCountAggregateOutputType | null
+    _min: ContactBookMembershipMinAggregateOutputType | null
+    _max: ContactBookMembershipMaxAggregateOutputType | null
+  }
+
+  type GetContactBookMembershipGroupByPayload<T extends ContactBookMembershipGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContactBookMembershipGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContactBookMembershipGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContactBookMembershipGroupByOutputType[P]>
+            : GetScalarType<T[P], ContactBookMembershipGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContactBookMembershipSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactId?: boolean
+    addressBookId?: boolean
+    isPrimary?: boolean
+    createdAt?: boolean
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    addressBook?: boolean | AddressBookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactBookMembership"]>
+
+  export type ContactBookMembershipSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactId?: boolean
+    addressBookId?: boolean
+    isPrimary?: boolean
+    createdAt?: boolean
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    addressBook?: boolean | AddressBookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactBookMembership"]>
+
+  export type ContactBookMembershipSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactId?: boolean
+    addressBookId?: boolean
+    isPrimary?: boolean
+    createdAt?: boolean
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    addressBook?: boolean | AddressBookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactBookMembership"]>
+
+  export type ContactBookMembershipSelectScalar = {
+    id?: boolean
+    contactId?: boolean
+    addressBookId?: boolean
+    isPrimary?: boolean
+    createdAt?: boolean
+  }
+
+  export type ContactBookMembershipOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "contactId" | "addressBookId" | "isPrimary" | "createdAt", ExtArgs["result"]["contactBookMembership"]>
+  export type ContactBookMembershipInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    addressBook?: boolean | AddressBookDefaultArgs<ExtArgs>
+  }
+  export type ContactBookMembershipIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    addressBook?: boolean | AddressBookDefaultArgs<ExtArgs>
+  }
+  export type ContactBookMembershipIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    addressBook?: boolean | AddressBookDefaultArgs<ExtArgs>
+  }
+
+  export type $ContactBookMembershipPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ContactBookMembership"
+    objects: {
+      contact: Prisma.$ContactPayload<ExtArgs>
+      addressBook: Prisma.$AddressBookPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      contactId: string
+      addressBookId: string
+      isPrimary: boolean
+      createdAt: Date
+    }, ExtArgs["result"]["contactBookMembership"]>
+    composites: {}
+  }
+
+  type ContactBookMembershipGetPayload<S extends boolean | null | undefined | ContactBookMembershipDefaultArgs> = $Result.GetResult<Prisma.$ContactBookMembershipPayload, S>
+
+  type ContactBookMembershipCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ContactBookMembershipFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ContactBookMembershipCountAggregateInputType | true
+    }
+
+  export interface ContactBookMembershipDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ContactBookMembership'], meta: { name: 'ContactBookMembership' } }
+    /**
+     * Find zero or one ContactBookMembership that matches the filter.
+     * @param {ContactBookMembershipFindUniqueArgs} args - Arguments to find a ContactBookMembership
+     * @example
+     * // Get one ContactBookMembership
+     * const contactBookMembership = await prisma.contactBookMembership.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContactBookMembershipFindUniqueArgs>(args: SelectSubset<T, ContactBookMembershipFindUniqueArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ContactBookMembership that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ContactBookMembershipFindUniqueOrThrowArgs} args - Arguments to find a ContactBookMembership
+     * @example
+     * // Get one ContactBookMembership
+     * const contactBookMembership = await prisma.contactBookMembership.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContactBookMembershipFindUniqueOrThrowArgs>(args: SelectSubset<T, ContactBookMembershipFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactBookMembership that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipFindFirstArgs} args - Arguments to find a ContactBookMembership
+     * @example
+     * // Get one ContactBookMembership
+     * const contactBookMembership = await prisma.contactBookMembership.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContactBookMembershipFindFirstArgs>(args?: SelectSubset<T, ContactBookMembershipFindFirstArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactBookMembership that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipFindFirstOrThrowArgs} args - Arguments to find a ContactBookMembership
+     * @example
+     * // Get one ContactBookMembership
+     * const contactBookMembership = await prisma.contactBookMembership.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContactBookMembershipFindFirstOrThrowArgs>(args?: SelectSubset<T, ContactBookMembershipFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ContactBookMemberships that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ContactBookMemberships
+     * const contactBookMemberships = await prisma.contactBookMembership.findMany()
+     * 
+     * // Get first 10 ContactBookMemberships
+     * const contactBookMemberships = await prisma.contactBookMembership.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contactBookMembershipWithIdOnly = await prisma.contactBookMembership.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContactBookMembershipFindManyArgs>(args?: SelectSubset<T, ContactBookMembershipFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ContactBookMembership.
+     * @param {ContactBookMembershipCreateArgs} args - Arguments to create a ContactBookMembership.
+     * @example
+     * // Create one ContactBookMembership
+     * const ContactBookMembership = await prisma.contactBookMembership.create({
+     *   data: {
+     *     // ... data to create a ContactBookMembership
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContactBookMembershipCreateArgs>(args: SelectSubset<T, ContactBookMembershipCreateArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ContactBookMemberships.
+     * @param {ContactBookMembershipCreateManyArgs} args - Arguments to create many ContactBookMemberships.
+     * @example
+     * // Create many ContactBookMemberships
+     * const contactBookMembership = await prisma.contactBookMembership.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContactBookMembershipCreateManyArgs>(args?: SelectSubset<T, ContactBookMembershipCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ContactBookMemberships and returns the data saved in the database.
+     * @param {ContactBookMembershipCreateManyAndReturnArgs} args - Arguments to create many ContactBookMemberships.
+     * @example
+     * // Create many ContactBookMemberships
+     * const contactBookMembership = await prisma.contactBookMembership.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ContactBookMemberships and only return the `id`
+     * const contactBookMembershipWithIdOnly = await prisma.contactBookMembership.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ContactBookMembershipCreateManyAndReturnArgs>(args?: SelectSubset<T, ContactBookMembershipCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ContactBookMembership.
+     * @param {ContactBookMembershipDeleteArgs} args - Arguments to delete one ContactBookMembership.
+     * @example
+     * // Delete one ContactBookMembership
+     * const ContactBookMembership = await prisma.contactBookMembership.delete({
+     *   where: {
+     *     // ... filter to delete one ContactBookMembership
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContactBookMembershipDeleteArgs>(args: SelectSubset<T, ContactBookMembershipDeleteArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ContactBookMembership.
+     * @param {ContactBookMembershipUpdateArgs} args - Arguments to update one ContactBookMembership.
+     * @example
+     * // Update one ContactBookMembership
+     * const contactBookMembership = await prisma.contactBookMembership.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContactBookMembershipUpdateArgs>(args: SelectSubset<T, ContactBookMembershipUpdateArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ContactBookMemberships.
+     * @param {ContactBookMembershipDeleteManyArgs} args - Arguments to filter ContactBookMemberships to delete.
+     * @example
+     * // Delete a few ContactBookMemberships
+     * const { count } = await prisma.contactBookMembership.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContactBookMembershipDeleteManyArgs>(args?: SelectSubset<T, ContactBookMembershipDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactBookMemberships.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ContactBookMemberships
+     * const contactBookMembership = await prisma.contactBookMembership.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContactBookMembershipUpdateManyArgs>(args: SelectSubset<T, ContactBookMembershipUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactBookMemberships and returns the data updated in the database.
+     * @param {ContactBookMembershipUpdateManyAndReturnArgs} args - Arguments to update many ContactBookMemberships.
+     * @example
+     * // Update many ContactBookMemberships
+     * const contactBookMembership = await prisma.contactBookMembership.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ContactBookMemberships and only return the `id`
+     * const contactBookMembershipWithIdOnly = await prisma.contactBookMembership.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ContactBookMembershipUpdateManyAndReturnArgs>(args: SelectSubset<T, ContactBookMembershipUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ContactBookMembership.
+     * @param {ContactBookMembershipUpsertArgs} args - Arguments to update or create a ContactBookMembership.
+     * @example
+     * // Update or create a ContactBookMembership
+     * const contactBookMembership = await prisma.contactBookMembership.upsert({
+     *   create: {
+     *     // ... data to create a ContactBookMembership
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ContactBookMembership we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContactBookMembershipUpsertArgs>(args: SelectSubset<T, ContactBookMembershipUpsertArgs<ExtArgs>>): Prisma__ContactBookMembershipClient<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ContactBookMemberships.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipCountArgs} args - Arguments to filter ContactBookMemberships to count.
+     * @example
+     * // Count the number of ContactBookMemberships
+     * const count = await prisma.contactBookMembership.count({
+     *   where: {
+     *     // ... the filter for the ContactBookMemberships we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContactBookMembershipCountArgs>(
+      args?: Subset<T, ContactBookMembershipCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContactBookMembershipCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ContactBookMembership.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContactBookMembershipAggregateArgs>(args: Subset<T, ContactBookMembershipAggregateArgs>): Prisma.PrismaPromise<GetContactBookMembershipAggregateType<T>>
+
+    /**
+     * Group by ContactBookMembership.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactBookMembershipGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContactBookMembershipGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContactBookMembershipGroupByArgs['orderBy'] }
+        : { orderBy?: ContactBookMembershipGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContactBookMembershipGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContactBookMembershipGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ContactBookMembership model
+   */
+  readonly fields: ContactBookMembershipFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ContactBookMembership.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContactBookMembershipClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    contact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    addressBook<T extends AddressBookDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AddressBookDefaultArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ContactBookMembership model
+   */
+  interface ContactBookMembershipFieldRefs {
+    readonly id: FieldRef<"ContactBookMembership", 'String'>
+    readonly contactId: FieldRef<"ContactBookMembership", 'String'>
+    readonly addressBookId: FieldRef<"ContactBookMembership", 'String'>
+    readonly isPrimary: FieldRef<"ContactBookMembership", 'Boolean'>
+    readonly createdAt: FieldRef<"ContactBookMembership", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ContactBookMembership findUnique
+   */
+  export type ContactBookMembershipFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactBookMembership to fetch.
+     */
+    where: ContactBookMembershipWhereUniqueInput
+  }
+
+  /**
+   * ContactBookMembership findUniqueOrThrow
+   */
+  export type ContactBookMembershipFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactBookMembership to fetch.
+     */
+    where: ContactBookMembershipWhereUniqueInput
+  }
+
+  /**
+   * ContactBookMembership findFirst
+   */
+  export type ContactBookMembershipFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactBookMembership to fetch.
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactBookMemberships to fetch.
+     */
+    orderBy?: ContactBookMembershipOrderByWithRelationInput | ContactBookMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactBookMemberships.
+     */
+    cursor?: ContactBookMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactBookMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactBookMemberships.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactBookMemberships.
+     */
+    distinct?: ContactBookMembershipScalarFieldEnum | ContactBookMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * ContactBookMembership findFirstOrThrow
+   */
+  export type ContactBookMembershipFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactBookMembership to fetch.
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactBookMemberships to fetch.
+     */
+    orderBy?: ContactBookMembershipOrderByWithRelationInput | ContactBookMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactBookMemberships.
+     */
+    cursor?: ContactBookMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactBookMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactBookMemberships.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactBookMemberships.
+     */
+    distinct?: ContactBookMembershipScalarFieldEnum | ContactBookMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * ContactBookMembership findMany
+   */
+  export type ContactBookMembershipFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactBookMemberships to fetch.
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactBookMemberships to fetch.
+     */
+    orderBy?: ContactBookMembershipOrderByWithRelationInput | ContactBookMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ContactBookMemberships.
+     */
+    cursor?: ContactBookMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactBookMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactBookMemberships.
+     */
+    skip?: number
+    distinct?: ContactBookMembershipScalarFieldEnum | ContactBookMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * ContactBookMembership create
+   */
+  export type ContactBookMembershipCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ContactBookMembership.
+     */
+    data: XOR<ContactBookMembershipCreateInput, ContactBookMembershipUncheckedCreateInput>
+  }
+
+  /**
+   * ContactBookMembership createMany
+   */
+  export type ContactBookMembershipCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ContactBookMemberships.
+     */
+    data: ContactBookMembershipCreateManyInput | ContactBookMembershipCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ContactBookMembership createManyAndReturn
+   */
+  export type ContactBookMembershipCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * The data used to create many ContactBookMemberships.
+     */
+    data: ContactBookMembershipCreateManyInput | ContactBookMembershipCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ContactBookMembership update
+   */
+  export type ContactBookMembershipUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ContactBookMembership.
+     */
+    data: XOR<ContactBookMembershipUpdateInput, ContactBookMembershipUncheckedUpdateInput>
+    /**
+     * Choose, which ContactBookMembership to update.
+     */
+    where: ContactBookMembershipWhereUniqueInput
+  }
+
+  /**
+   * ContactBookMembership updateMany
+   */
+  export type ContactBookMembershipUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ContactBookMemberships.
+     */
+    data: XOR<ContactBookMembershipUpdateManyMutationInput, ContactBookMembershipUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactBookMemberships to update
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * Limit how many ContactBookMemberships to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactBookMembership updateManyAndReturn
+   */
+  export type ContactBookMembershipUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * The data used to update ContactBookMemberships.
+     */
+    data: XOR<ContactBookMembershipUpdateManyMutationInput, ContactBookMembershipUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactBookMemberships to update
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * Limit how many ContactBookMemberships to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ContactBookMembership upsert
+   */
+  export type ContactBookMembershipUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ContactBookMembership to update in case it exists.
+     */
+    where: ContactBookMembershipWhereUniqueInput
+    /**
+     * In case the ContactBookMembership found by the `where` argument doesn't exist, create a new ContactBookMembership with this data.
+     */
+    create: XOR<ContactBookMembershipCreateInput, ContactBookMembershipUncheckedCreateInput>
+    /**
+     * In case the ContactBookMembership was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContactBookMembershipUpdateInput, ContactBookMembershipUncheckedUpdateInput>
+  }
+
+  /**
+   * ContactBookMembership delete
+   */
+  export type ContactBookMembershipDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    /**
+     * Filter which ContactBookMembership to delete.
+     */
+    where: ContactBookMembershipWhereUniqueInput
+  }
+
+  /**
+   * ContactBookMembership deleteMany
+   */
+  export type ContactBookMembershipDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactBookMemberships to delete
+     */
+    where?: ContactBookMembershipWhereInput
+    /**
+     * Limit how many ContactBookMemberships to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactBookMembership without action
+   */
+  export type ContactBookMembershipDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ContactPrivateField
+   */
+
+  export type AggregateContactPrivateField = {
+    _count: ContactPrivateFieldCountAggregateOutputType | null
+    _avg: ContactPrivateFieldAvgAggregateOutputType | null
+    _sum: ContactPrivateFieldSumAggregateOutputType | null
+    _min: ContactPrivateFieldMinAggregateOutputType | null
+    _max: ContactPrivateFieldMaxAggregateOutputType | null
+  }
+
+  export type ContactPrivateFieldAvgAggregateOutputType = {
+    position: number | null
+  }
+
+  export type ContactPrivateFieldSumAggregateOutputType = {
+    position: number | null
+  }
+
+  export type ContactPrivateFieldMinAggregateOutputType = {
+    id: string | null
+    contactId: string | null
+    userId: string | null
+    fieldType: string | null
+    label: string | null
+    position: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactPrivateFieldMaxAggregateOutputType = {
+    id: string | null
+    contactId: string | null
+    userId: string | null
+    fieldType: string | null
+    label: string | null
+    position: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactPrivateFieldCountAggregateOutputType = {
+    id: number
+    contactId: number
+    userId: number
+    fieldType: number
+    label: number
+    value: number
+    position: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ContactPrivateFieldAvgAggregateInputType = {
+    position?: true
+  }
+
+  export type ContactPrivateFieldSumAggregateInputType = {
+    position?: true
+  }
+
+  export type ContactPrivateFieldMinAggregateInputType = {
+    id?: true
+    contactId?: true
+    userId?: true
+    fieldType?: true
+    label?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactPrivateFieldMaxAggregateInputType = {
+    id?: true
+    contactId?: true
+    userId?: true
+    fieldType?: true
+    label?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactPrivateFieldCountAggregateInputType = {
+    id?: true
+    contactId?: true
+    userId?: true
+    fieldType?: true
+    label?: true
+    value?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ContactPrivateFieldAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactPrivateField to aggregate.
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactPrivateFields to fetch.
+     */
+    orderBy?: ContactPrivateFieldOrderByWithRelationInput | ContactPrivateFieldOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContactPrivateFieldWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactPrivateFields from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactPrivateFields.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ContactPrivateFields
+    **/
+    _count?: true | ContactPrivateFieldCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ContactPrivateFieldAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ContactPrivateFieldSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContactPrivateFieldMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContactPrivateFieldMaxAggregateInputType
+  }
+
+  export type GetContactPrivateFieldAggregateType<T extends ContactPrivateFieldAggregateArgs> = {
+        [P in keyof T & keyof AggregateContactPrivateField]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContactPrivateField[P]>
+      : GetScalarType<T[P], AggregateContactPrivateField[P]>
+  }
+
+
+
+
+  export type ContactPrivateFieldGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactPrivateFieldWhereInput
+    orderBy?: ContactPrivateFieldOrderByWithAggregationInput | ContactPrivateFieldOrderByWithAggregationInput[]
+    by: ContactPrivateFieldScalarFieldEnum[] | ContactPrivateFieldScalarFieldEnum
+    having?: ContactPrivateFieldScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContactPrivateFieldCountAggregateInputType | true
+    _avg?: ContactPrivateFieldAvgAggregateInputType
+    _sum?: ContactPrivateFieldSumAggregateInputType
+    _min?: ContactPrivateFieldMinAggregateInputType
+    _max?: ContactPrivateFieldMaxAggregateInputType
+  }
+
+  export type ContactPrivateFieldGroupByOutputType = {
+    id: string
+    contactId: string
+    userId: string
+    fieldType: string
+    label: string | null
+    value: JsonValue
+    position: number
+    createdAt: Date
+    updatedAt: Date
+    _count: ContactPrivateFieldCountAggregateOutputType | null
+    _avg: ContactPrivateFieldAvgAggregateOutputType | null
+    _sum: ContactPrivateFieldSumAggregateOutputType | null
+    _min: ContactPrivateFieldMinAggregateOutputType | null
+    _max: ContactPrivateFieldMaxAggregateOutputType | null
+  }
+
+  type GetContactPrivateFieldGroupByPayload<T extends ContactPrivateFieldGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContactPrivateFieldGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContactPrivateFieldGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContactPrivateFieldGroupByOutputType[P]>
+            : GetScalarType<T[P], ContactPrivateFieldGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContactPrivateFieldSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactId?: boolean
+    userId?: boolean
+    fieldType?: boolean
+    label?: boolean
+    value?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactPrivateField"]>
+
+  export type ContactPrivateFieldSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactId?: boolean
+    userId?: boolean
+    fieldType?: boolean
+    label?: boolean
+    value?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactPrivateField"]>
+
+  export type ContactPrivateFieldSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contactId?: boolean
+    userId?: boolean
+    fieldType?: boolean
+    label?: boolean
+    value?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contactPrivateField"]>
+
+  export type ContactPrivateFieldSelectScalar = {
+    id?: boolean
+    contactId?: boolean
+    userId?: boolean
+    fieldType?: boolean
+    label?: boolean
+    value?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ContactPrivateFieldOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "contactId" | "userId" | "fieldType" | "label" | "value" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["contactPrivateField"]>
+  export type ContactPrivateFieldInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ContactPrivateFieldIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ContactPrivateFieldIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ContactPrivateFieldPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ContactPrivateField"
+    objects: {
+      contact: Prisma.$ContactPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      contactId: string
+      userId: string
+      fieldType: string
+      label: string | null
+      value: Prisma.JsonValue
+      position: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["contactPrivateField"]>
+    composites: {}
+  }
+
+  type ContactPrivateFieldGetPayload<S extends boolean | null | undefined | ContactPrivateFieldDefaultArgs> = $Result.GetResult<Prisma.$ContactPrivateFieldPayload, S>
+
+  type ContactPrivateFieldCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ContactPrivateFieldFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ContactPrivateFieldCountAggregateInputType | true
+    }
+
+  export interface ContactPrivateFieldDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ContactPrivateField'], meta: { name: 'ContactPrivateField' } }
+    /**
+     * Find zero or one ContactPrivateField that matches the filter.
+     * @param {ContactPrivateFieldFindUniqueArgs} args - Arguments to find a ContactPrivateField
+     * @example
+     * // Get one ContactPrivateField
+     * const contactPrivateField = await prisma.contactPrivateField.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContactPrivateFieldFindUniqueArgs>(args: SelectSubset<T, ContactPrivateFieldFindUniqueArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ContactPrivateField that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ContactPrivateFieldFindUniqueOrThrowArgs} args - Arguments to find a ContactPrivateField
+     * @example
+     * // Get one ContactPrivateField
+     * const contactPrivateField = await prisma.contactPrivateField.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContactPrivateFieldFindUniqueOrThrowArgs>(args: SelectSubset<T, ContactPrivateFieldFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactPrivateField that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldFindFirstArgs} args - Arguments to find a ContactPrivateField
+     * @example
+     * // Get one ContactPrivateField
+     * const contactPrivateField = await prisma.contactPrivateField.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContactPrivateFieldFindFirstArgs>(args?: SelectSubset<T, ContactPrivateFieldFindFirstArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactPrivateField that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldFindFirstOrThrowArgs} args - Arguments to find a ContactPrivateField
+     * @example
+     * // Get one ContactPrivateField
+     * const contactPrivateField = await prisma.contactPrivateField.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContactPrivateFieldFindFirstOrThrowArgs>(args?: SelectSubset<T, ContactPrivateFieldFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ContactPrivateFields that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ContactPrivateFields
+     * const contactPrivateFields = await prisma.contactPrivateField.findMany()
+     * 
+     * // Get first 10 ContactPrivateFields
+     * const contactPrivateFields = await prisma.contactPrivateField.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contactPrivateFieldWithIdOnly = await prisma.contactPrivateField.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContactPrivateFieldFindManyArgs>(args?: SelectSubset<T, ContactPrivateFieldFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ContactPrivateField.
+     * @param {ContactPrivateFieldCreateArgs} args - Arguments to create a ContactPrivateField.
+     * @example
+     * // Create one ContactPrivateField
+     * const ContactPrivateField = await prisma.contactPrivateField.create({
+     *   data: {
+     *     // ... data to create a ContactPrivateField
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContactPrivateFieldCreateArgs>(args: SelectSubset<T, ContactPrivateFieldCreateArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ContactPrivateFields.
+     * @param {ContactPrivateFieldCreateManyArgs} args - Arguments to create many ContactPrivateFields.
+     * @example
+     * // Create many ContactPrivateFields
+     * const contactPrivateField = await prisma.contactPrivateField.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContactPrivateFieldCreateManyArgs>(args?: SelectSubset<T, ContactPrivateFieldCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ContactPrivateFields and returns the data saved in the database.
+     * @param {ContactPrivateFieldCreateManyAndReturnArgs} args - Arguments to create many ContactPrivateFields.
+     * @example
+     * // Create many ContactPrivateFields
+     * const contactPrivateField = await prisma.contactPrivateField.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ContactPrivateFields and only return the `id`
+     * const contactPrivateFieldWithIdOnly = await prisma.contactPrivateField.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ContactPrivateFieldCreateManyAndReturnArgs>(args?: SelectSubset<T, ContactPrivateFieldCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ContactPrivateField.
+     * @param {ContactPrivateFieldDeleteArgs} args - Arguments to delete one ContactPrivateField.
+     * @example
+     * // Delete one ContactPrivateField
+     * const ContactPrivateField = await prisma.contactPrivateField.delete({
+     *   where: {
+     *     // ... filter to delete one ContactPrivateField
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContactPrivateFieldDeleteArgs>(args: SelectSubset<T, ContactPrivateFieldDeleteArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ContactPrivateField.
+     * @param {ContactPrivateFieldUpdateArgs} args - Arguments to update one ContactPrivateField.
+     * @example
+     * // Update one ContactPrivateField
+     * const contactPrivateField = await prisma.contactPrivateField.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContactPrivateFieldUpdateArgs>(args: SelectSubset<T, ContactPrivateFieldUpdateArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ContactPrivateFields.
+     * @param {ContactPrivateFieldDeleteManyArgs} args - Arguments to filter ContactPrivateFields to delete.
+     * @example
+     * // Delete a few ContactPrivateFields
+     * const { count } = await prisma.contactPrivateField.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContactPrivateFieldDeleteManyArgs>(args?: SelectSubset<T, ContactPrivateFieldDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactPrivateFields.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ContactPrivateFields
+     * const contactPrivateField = await prisma.contactPrivateField.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContactPrivateFieldUpdateManyArgs>(args: SelectSubset<T, ContactPrivateFieldUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactPrivateFields and returns the data updated in the database.
+     * @param {ContactPrivateFieldUpdateManyAndReturnArgs} args - Arguments to update many ContactPrivateFields.
+     * @example
+     * // Update many ContactPrivateFields
+     * const contactPrivateField = await prisma.contactPrivateField.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ContactPrivateFields and only return the `id`
+     * const contactPrivateFieldWithIdOnly = await prisma.contactPrivateField.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ContactPrivateFieldUpdateManyAndReturnArgs>(args: SelectSubset<T, ContactPrivateFieldUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ContactPrivateField.
+     * @param {ContactPrivateFieldUpsertArgs} args - Arguments to update or create a ContactPrivateField.
+     * @example
+     * // Update or create a ContactPrivateField
+     * const contactPrivateField = await prisma.contactPrivateField.upsert({
+     *   create: {
+     *     // ... data to create a ContactPrivateField
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ContactPrivateField we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContactPrivateFieldUpsertArgs>(args: SelectSubset<T, ContactPrivateFieldUpsertArgs<ExtArgs>>): Prisma__ContactPrivateFieldClient<$Result.GetResult<Prisma.$ContactPrivateFieldPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ContactPrivateFields.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldCountArgs} args - Arguments to filter ContactPrivateFields to count.
+     * @example
+     * // Count the number of ContactPrivateFields
+     * const count = await prisma.contactPrivateField.count({
+     *   where: {
+     *     // ... the filter for the ContactPrivateFields we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContactPrivateFieldCountArgs>(
+      args?: Subset<T, ContactPrivateFieldCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContactPrivateFieldCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ContactPrivateField.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContactPrivateFieldAggregateArgs>(args: Subset<T, ContactPrivateFieldAggregateArgs>): Prisma.PrismaPromise<GetContactPrivateFieldAggregateType<T>>
+
+    /**
+     * Group by ContactPrivateField.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactPrivateFieldGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContactPrivateFieldGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContactPrivateFieldGroupByArgs['orderBy'] }
+        : { orderBy?: ContactPrivateFieldGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContactPrivateFieldGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContactPrivateFieldGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ContactPrivateField model
+   */
+  readonly fields: ContactPrivateFieldFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ContactPrivateField.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContactPrivateFieldClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    contact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ContactPrivateField model
+   */
+  interface ContactPrivateFieldFieldRefs {
+    readonly id: FieldRef<"ContactPrivateField", 'String'>
+    readonly contactId: FieldRef<"ContactPrivateField", 'String'>
+    readonly userId: FieldRef<"ContactPrivateField", 'String'>
+    readonly fieldType: FieldRef<"ContactPrivateField", 'String'>
+    readonly label: FieldRef<"ContactPrivateField", 'String'>
+    readonly value: FieldRef<"ContactPrivateField", 'Json'>
+    readonly position: FieldRef<"ContactPrivateField", 'Int'>
+    readonly createdAt: FieldRef<"ContactPrivateField", 'DateTime'>
+    readonly updatedAt: FieldRef<"ContactPrivateField", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ContactPrivateField findUnique
+   */
+  export type ContactPrivateFieldFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactPrivateField to fetch.
+     */
+    where: ContactPrivateFieldWhereUniqueInput
+  }
+
+  /**
+   * ContactPrivateField findUniqueOrThrow
+   */
+  export type ContactPrivateFieldFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactPrivateField to fetch.
+     */
+    where: ContactPrivateFieldWhereUniqueInput
+  }
+
+  /**
+   * ContactPrivateField findFirst
+   */
+  export type ContactPrivateFieldFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactPrivateField to fetch.
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactPrivateFields to fetch.
+     */
+    orderBy?: ContactPrivateFieldOrderByWithRelationInput | ContactPrivateFieldOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactPrivateFields.
+     */
+    cursor?: ContactPrivateFieldWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactPrivateFields from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactPrivateFields.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactPrivateFields.
+     */
+    distinct?: ContactPrivateFieldScalarFieldEnum | ContactPrivateFieldScalarFieldEnum[]
+  }
+
+  /**
+   * ContactPrivateField findFirstOrThrow
+   */
+  export type ContactPrivateFieldFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactPrivateField to fetch.
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactPrivateFields to fetch.
+     */
+    orderBy?: ContactPrivateFieldOrderByWithRelationInput | ContactPrivateFieldOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactPrivateFields.
+     */
+    cursor?: ContactPrivateFieldWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactPrivateFields from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactPrivateFields.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactPrivateFields.
+     */
+    distinct?: ContactPrivateFieldScalarFieldEnum | ContactPrivateFieldScalarFieldEnum[]
+  }
+
+  /**
+   * ContactPrivateField findMany
+   */
+  export type ContactPrivateFieldFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactPrivateFields to fetch.
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactPrivateFields to fetch.
+     */
+    orderBy?: ContactPrivateFieldOrderByWithRelationInput | ContactPrivateFieldOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ContactPrivateFields.
+     */
+    cursor?: ContactPrivateFieldWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactPrivateFields from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactPrivateFields.
+     */
+    skip?: number
+    distinct?: ContactPrivateFieldScalarFieldEnum | ContactPrivateFieldScalarFieldEnum[]
+  }
+
+  /**
+   * ContactPrivateField create
+   */
+  export type ContactPrivateFieldCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ContactPrivateField.
+     */
+    data: XOR<ContactPrivateFieldCreateInput, ContactPrivateFieldUncheckedCreateInput>
+  }
+
+  /**
+   * ContactPrivateField createMany
+   */
+  export type ContactPrivateFieldCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ContactPrivateFields.
+     */
+    data: ContactPrivateFieldCreateManyInput | ContactPrivateFieldCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ContactPrivateField createManyAndReturn
+   */
+  export type ContactPrivateFieldCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * The data used to create many ContactPrivateFields.
+     */
+    data: ContactPrivateFieldCreateManyInput | ContactPrivateFieldCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ContactPrivateField update
+   */
+  export type ContactPrivateFieldUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ContactPrivateField.
+     */
+    data: XOR<ContactPrivateFieldUpdateInput, ContactPrivateFieldUncheckedUpdateInput>
+    /**
+     * Choose, which ContactPrivateField to update.
+     */
+    where: ContactPrivateFieldWhereUniqueInput
+  }
+
+  /**
+   * ContactPrivateField updateMany
+   */
+  export type ContactPrivateFieldUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ContactPrivateFields.
+     */
+    data: XOR<ContactPrivateFieldUpdateManyMutationInput, ContactPrivateFieldUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactPrivateFields to update
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * Limit how many ContactPrivateFields to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactPrivateField updateManyAndReturn
+   */
+  export type ContactPrivateFieldUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * The data used to update ContactPrivateFields.
+     */
+    data: XOR<ContactPrivateFieldUpdateManyMutationInput, ContactPrivateFieldUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactPrivateFields to update
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * Limit how many ContactPrivateFields to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ContactPrivateField upsert
+   */
+  export type ContactPrivateFieldUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ContactPrivateField to update in case it exists.
+     */
+    where: ContactPrivateFieldWhereUniqueInput
+    /**
+     * In case the ContactPrivateField found by the `where` argument doesn't exist, create a new ContactPrivateField with this data.
+     */
+    create: XOR<ContactPrivateFieldCreateInput, ContactPrivateFieldUncheckedCreateInput>
+    /**
+     * In case the ContactPrivateField was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContactPrivateFieldUpdateInput, ContactPrivateFieldUncheckedUpdateInput>
+  }
+
+  /**
+   * ContactPrivateField delete
+   */
+  export type ContactPrivateFieldDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
+    /**
+     * Filter which ContactPrivateField to delete.
+     */
+    where: ContactPrivateFieldWhereUniqueInput
+  }
+
+  /**
+   * ContactPrivateField deleteMany
+   */
+  export type ContactPrivateFieldDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactPrivateFields to delete
+     */
+    where?: ContactPrivateFieldWhereInput
+    /**
+     * Limit how many ContactPrivateFields to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactPrivateField without action
+   */
+  export type ContactPrivateFieldDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactPrivateField
+     */
+    select?: ContactPrivateFieldSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactPrivateField
+     */
+    omit?: ContactPrivateFieldOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactPrivateFieldInclude<ExtArgs> | null
   }
 
 
@@ -19997,6 +22695,1331 @@ export namespace Prisma {
 
 
   /**
+   * Model KontaxExportJob
+   */
+
+  export type AggregateKontaxExportJob = {
+    _count: KontaxExportJobCountAggregateOutputType | null
+    _avg: KontaxExportJobAvgAggregateOutputType | null
+    _sum: KontaxExportJobSumAggregateOutputType | null
+    _min: KontaxExportJobMinAggregateOutputType | null
+    _max: KontaxExportJobMaxAggregateOutputType | null
+  }
+
+  export type KontaxExportJobAvgAggregateOutputType = {
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    fileSizeBytes: number | null
+  }
+
+  export type KontaxExportJobSumAggregateOutputType = {
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    fileSizeBytes: number | null
+  }
+
+  export type KontaxExportJobMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    kind: $Enums.KontaxExportKind | null
+    status: $Enums.ImportExportJobStatus | null
+    includeArchived: boolean | null
+    includePhotos: boolean | null
+    includeVcardFallback: boolean | null
+    bookId: string | null
+    filterQuery: string | null
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    expiresAt: Date | null
+    errorSummary: string | null
+    createdAt: Date | null
+    startedAt: Date | null
+    completedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type KontaxExportJobMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    kind: $Enums.KontaxExportKind | null
+    status: $Enums.ImportExportJobStatus | null
+    includeArchived: boolean | null
+    includePhotos: boolean | null
+    includeVcardFallback: boolean | null
+    bookId: string | null
+    filterQuery: string | null
+    totalCount: number | null
+    progressCount: number | null
+    photoCount: number | null
+    exportedCount: number | null
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    expiresAt: Date | null
+    errorSummary: string | null
+    createdAt: Date | null
+    startedAt: Date | null
+    completedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type KontaxExportJobCountAggregateOutputType = {
+    id: number
+    userId: number
+    kind: number
+    status: number
+    includeArchived: number
+    includePhotos: number
+    includeVcardFallback: number
+    contactIds: number
+    bookId: number
+    filterQuery: number
+    totalCount: number
+    progressCount: number
+    photoCount: number
+    exportedCount: number
+    downloadUrl: number
+    fileSizeBytes: number
+    expiresAt: number
+    errorSummary: number
+    createdAt: number
+    startedAt: number
+    completedAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type KontaxExportJobAvgAggregateInputType = {
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    fileSizeBytes?: true
+  }
+
+  export type KontaxExportJobSumAggregateInputType = {
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    fileSizeBytes?: true
+  }
+
+  export type KontaxExportJobMinAggregateInputType = {
+    id?: true
+    userId?: true
+    kind?: true
+    status?: true
+    includeArchived?: true
+    includePhotos?: true
+    includeVcardFallback?: true
+    bookId?: true
+    filterQuery?: true
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    expiresAt?: true
+    errorSummary?: true
+    createdAt?: true
+    startedAt?: true
+    completedAt?: true
+    updatedAt?: true
+  }
+
+  export type KontaxExportJobMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    kind?: true
+    status?: true
+    includeArchived?: true
+    includePhotos?: true
+    includeVcardFallback?: true
+    bookId?: true
+    filterQuery?: true
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    expiresAt?: true
+    errorSummary?: true
+    createdAt?: true
+    startedAt?: true
+    completedAt?: true
+    updatedAt?: true
+  }
+
+  export type KontaxExportJobCountAggregateInputType = {
+    id?: true
+    userId?: true
+    kind?: true
+    status?: true
+    includeArchived?: true
+    includePhotos?: true
+    includeVcardFallback?: true
+    contactIds?: true
+    bookId?: true
+    filterQuery?: true
+    totalCount?: true
+    progressCount?: true
+    photoCount?: true
+    exportedCount?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    expiresAt?: true
+    errorSummary?: true
+    createdAt?: true
+    startedAt?: true
+    completedAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type KontaxExportJobAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KontaxExportJob to aggregate.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned KontaxExportJobs
+    **/
+    _count?: true | KontaxExportJobCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: KontaxExportJobAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: KontaxExportJobSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: KontaxExportJobMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: KontaxExportJobMaxAggregateInputType
+  }
+
+  export type GetKontaxExportJobAggregateType<T extends KontaxExportJobAggregateArgs> = {
+        [P in keyof T & keyof AggregateKontaxExportJob]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateKontaxExportJob[P]>
+      : GetScalarType<T[P], AggregateKontaxExportJob[P]>
+  }
+
+
+
+
+  export type KontaxExportJobGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: KontaxExportJobWhereInput
+    orderBy?: KontaxExportJobOrderByWithAggregationInput | KontaxExportJobOrderByWithAggregationInput[]
+    by: KontaxExportJobScalarFieldEnum[] | KontaxExportJobScalarFieldEnum
+    having?: KontaxExportJobScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: KontaxExportJobCountAggregateInputType | true
+    _avg?: KontaxExportJobAvgAggregateInputType
+    _sum?: KontaxExportJobSumAggregateInputType
+    _min?: KontaxExportJobMinAggregateInputType
+    _max?: KontaxExportJobMaxAggregateInputType
+  }
+
+  export type KontaxExportJobGroupByOutputType = {
+    id: string
+    userId: string
+    kind: $Enums.KontaxExportKind
+    status: $Enums.ImportExportJobStatus
+    includeArchived: boolean
+    includePhotos: boolean
+    includeVcardFallback: boolean
+    contactIds: JsonValue | null
+    bookId: string | null
+    filterQuery: string | null
+    totalCount: number | null
+    progressCount: number
+    photoCount: number
+    exportedCount: number
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    expiresAt: Date | null
+    errorSummary: string | null
+    createdAt: Date
+    startedAt: Date | null
+    completedAt: Date | null
+    updatedAt: Date
+    _count: KontaxExportJobCountAggregateOutputType | null
+    _avg: KontaxExportJobAvgAggregateOutputType | null
+    _sum: KontaxExportJobSumAggregateOutputType | null
+    _min: KontaxExportJobMinAggregateOutputType | null
+    _max: KontaxExportJobMaxAggregateOutputType | null
+  }
+
+  type GetKontaxExportJobGroupByPayload<T extends KontaxExportJobGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<KontaxExportJobGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof KontaxExportJobGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], KontaxExportJobGroupByOutputType[P]>
+            : GetScalarType<T[P], KontaxExportJobGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type KontaxExportJobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kontaxExportJob"]>
+
+  export type KontaxExportJobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kontaxExportJob"]>
+
+  export type KontaxExportJobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["kontaxExportJob"]>
+
+  export type KontaxExportJobSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    kind?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: boolean
+    bookId?: boolean
+    filterQuery?: boolean
+    totalCount?: boolean
+    progressCount?: boolean
+    photoCount?: boolean
+    exportedCount?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    expiresAt?: boolean
+    errorSummary?: boolean
+    createdAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type KontaxExportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "kind" | "status" | "includeArchived" | "includePhotos" | "includeVcardFallback" | "contactIds" | "bookId" | "filterQuery" | "totalCount" | "progressCount" | "photoCount" | "exportedCount" | "downloadUrl" | "fileSizeBytes" | "expiresAt" | "errorSummary" | "createdAt" | "startedAt" | "completedAt" | "updatedAt", ExtArgs["result"]["kontaxExportJob"]>
+  export type KontaxExportJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type KontaxExportJobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type KontaxExportJobIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $KontaxExportJobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "KontaxExportJob"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      kind: $Enums.KontaxExportKind
+      status: $Enums.ImportExportJobStatus
+      includeArchived: boolean
+      includePhotos: boolean
+      includeVcardFallback: boolean
+      contactIds: Prisma.JsonValue | null
+      bookId: string | null
+      filterQuery: string | null
+      totalCount: number | null
+      progressCount: number
+      photoCount: number
+      exportedCount: number
+      downloadUrl: string | null
+      fileSizeBytes: number | null
+      expiresAt: Date | null
+      errorSummary: string | null
+      createdAt: Date
+      startedAt: Date | null
+      completedAt: Date | null
+      updatedAt: Date
+    }, ExtArgs["result"]["kontaxExportJob"]>
+    composites: {}
+  }
+
+  type KontaxExportJobGetPayload<S extends boolean | null | undefined | KontaxExportJobDefaultArgs> = $Result.GetResult<Prisma.$KontaxExportJobPayload, S>
+
+  type KontaxExportJobCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<KontaxExportJobFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: KontaxExportJobCountAggregateInputType | true
+    }
+
+  export interface KontaxExportJobDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['KontaxExportJob'], meta: { name: 'KontaxExportJob' } }
+    /**
+     * Find zero or one KontaxExportJob that matches the filter.
+     * @param {KontaxExportJobFindUniqueArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends KontaxExportJobFindUniqueArgs>(args: SelectSubset<T, KontaxExportJobFindUniqueArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one KontaxExportJob that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {KontaxExportJobFindUniqueOrThrowArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends KontaxExportJobFindUniqueOrThrowArgs>(args: SelectSubset<T, KontaxExportJobFindUniqueOrThrowArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KontaxExportJob that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobFindFirstArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends KontaxExportJobFindFirstArgs>(args?: SelectSubset<T, KontaxExportJobFindFirstArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first KontaxExportJob that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobFindFirstOrThrowArgs} args - Arguments to find a KontaxExportJob
+     * @example
+     * // Get one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends KontaxExportJobFindFirstOrThrowArgs>(args?: SelectSubset<T, KontaxExportJobFindFirstOrThrowArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more KontaxExportJobs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all KontaxExportJobs
+     * const kontaxExportJobs = await prisma.kontaxExportJob.findMany()
+     * 
+     * // Get first 10 KontaxExportJobs
+     * const kontaxExportJobs = await prisma.kontaxExportJob.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const kontaxExportJobWithIdOnly = await prisma.kontaxExportJob.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends KontaxExportJobFindManyArgs>(args?: SelectSubset<T, KontaxExportJobFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a KontaxExportJob.
+     * @param {KontaxExportJobCreateArgs} args - Arguments to create a KontaxExportJob.
+     * @example
+     * // Create one KontaxExportJob
+     * const KontaxExportJob = await prisma.kontaxExportJob.create({
+     *   data: {
+     *     // ... data to create a KontaxExportJob
+     *   }
+     * })
+     * 
+     */
+    create<T extends KontaxExportJobCreateArgs>(args: SelectSubset<T, KontaxExportJobCreateArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many KontaxExportJobs.
+     * @param {KontaxExportJobCreateManyArgs} args - Arguments to create many KontaxExportJobs.
+     * @example
+     * // Create many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends KontaxExportJobCreateManyArgs>(args?: SelectSubset<T, KontaxExportJobCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many KontaxExportJobs and returns the data saved in the database.
+     * @param {KontaxExportJobCreateManyAndReturnArgs} args - Arguments to create many KontaxExportJobs.
+     * @example
+     * // Create many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many KontaxExportJobs and only return the `id`
+     * const kontaxExportJobWithIdOnly = await prisma.kontaxExportJob.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends KontaxExportJobCreateManyAndReturnArgs>(args?: SelectSubset<T, KontaxExportJobCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a KontaxExportJob.
+     * @param {KontaxExportJobDeleteArgs} args - Arguments to delete one KontaxExportJob.
+     * @example
+     * // Delete one KontaxExportJob
+     * const KontaxExportJob = await prisma.kontaxExportJob.delete({
+     *   where: {
+     *     // ... filter to delete one KontaxExportJob
+     *   }
+     * })
+     * 
+     */
+    delete<T extends KontaxExportJobDeleteArgs>(args: SelectSubset<T, KontaxExportJobDeleteArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one KontaxExportJob.
+     * @param {KontaxExportJobUpdateArgs} args - Arguments to update one KontaxExportJob.
+     * @example
+     * // Update one KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends KontaxExportJobUpdateArgs>(args: SelectSubset<T, KontaxExportJobUpdateArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more KontaxExportJobs.
+     * @param {KontaxExportJobDeleteManyArgs} args - Arguments to filter KontaxExportJobs to delete.
+     * @example
+     * // Delete a few KontaxExportJobs
+     * const { count } = await prisma.kontaxExportJob.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends KontaxExportJobDeleteManyArgs>(args?: SelectSubset<T, KontaxExportJobDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KontaxExportJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends KontaxExportJobUpdateManyArgs>(args: SelectSubset<T, KontaxExportJobUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more KontaxExportJobs and returns the data updated in the database.
+     * @param {KontaxExportJobUpdateManyAndReturnArgs} args - Arguments to update many KontaxExportJobs.
+     * @example
+     * // Update many KontaxExportJobs
+     * const kontaxExportJob = await prisma.kontaxExportJob.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more KontaxExportJobs and only return the `id`
+     * const kontaxExportJobWithIdOnly = await prisma.kontaxExportJob.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends KontaxExportJobUpdateManyAndReturnArgs>(args: SelectSubset<T, KontaxExportJobUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one KontaxExportJob.
+     * @param {KontaxExportJobUpsertArgs} args - Arguments to update or create a KontaxExportJob.
+     * @example
+     * // Update or create a KontaxExportJob
+     * const kontaxExportJob = await prisma.kontaxExportJob.upsert({
+     *   create: {
+     *     // ... data to create a KontaxExportJob
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the KontaxExportJob we want to update
+     *   }
+     * })
+     */
+    upsert<T extends KontaxExportJobUpsertArgs>(args: SelectSubset<T, KontaxExportJobUpsertArgs<ExtArgs>>): Prisma__KontaxExportJobClient<$Result.GetResult<Prisma.$KontaxExportJobPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of KontaxExportJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobCountArgs} args - Arguments to filter KontaxExportJobs to count.
+     * @example
+     * // Count the number of KontaxExportJobs
+     * const count = await prisma.kontaxExportJob.count({
+     *   where: {
+     *     // ... the filter for the KontaxExportJobs we want to count
+     *   }
+     * })
+    **/
+    count<T extends KontaxExportJobCountArgs>(
+      args?: Subset<T, KontaxExportJobCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], KontaxExportJobCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a KontaxExportJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends KontaxExportJobAggregateArgs>(args: Subset<T, KontaxExportJobAggregateArgs>): Prisma.PrismaPromise<GetKontaxExportJobAggregateType<T>>
+
+    /**
+     * Group by KontaxExportJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {KontaxExportJobGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends KontaxExportJobGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: KontaxExportJobGroupByArgs['orderBy'] }
+        : { orderBy?: KontaxExportJobGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, KontaxExportJobGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetKontaxExportJobGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the KontaxExportJob model
+   */
+  readonly fields: KontaxExportJobFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for KontaxExportJob.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__KontaxExportJobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the KontaxExportJob model
+   */
+  interface KontaxExportJobFieldRefs {
+    readonly id: FieldRef<"KontaxExportJob", 'String'>
+    readonly userId: FieldRef<"KontaxExportJob", 'String'>
+    readonly kind: FieldRef<"KontaxExportJob", 'KontaxExportKind'>
+    readonly status: FieldRef<"KontaxExportJob", 'ImportExportJobStatus'>
+    readonly includeArchived: FieldRef<"KontaxExportJob", 'Boolean'>
+    readonly includePhotos: FieldRef<"KontaxExportJob", 'Boolean'>
+    readonly includeVcardFallback: FieldRef<"KontaxExportJob", 'Boolean'>
+    readonly contactIds: FieldRef<"KontaxExportJob", 'Json'>
+    readonly bookId: FieldRef<"KontaxExportJob", 'String'>
+    readonly filterQuery: FieldRef<"KontaxExportJob", 'String'>
+    readonly totalCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly progressCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly photoCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly exportedCount: FieldRef<"KontaxExportJob", 'Int'>
+    readonly downloadUrl: FieldRef<"KontaxExportJob", 'String'>
+    readonly fileSizeBytes: FieldRef<"KontaxExportJob", 'Int'>
+    readonly expiresAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly errorSummary: FieldRef<"KontaxExportJob", 'String'>
+    readonly createdAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly startedAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly completedAt: FieldRef<"KontaxExportJob", 'DateTime'>
+    readonly updatedAt: FieldRef<"KontaxExportJob", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * KontaxExportJob findUnique
+   */
+  export type KontaxExportJobFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob findUniqueOrThrow
+   */
+  export type KontaxExportJobFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob findFirst
+   */
+  export type KontaxExportJobFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KontaxExportJobs.
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KontaxExportJobs.
+     */
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * KontaxExportJob findFirstOrThrow
+   */
+  export type KontaxExportJobFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJob to fetch.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for KontaxExportJobs.
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of KontaxExportJobs.
+     */
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * KontaxExportJob findMany
+   */
+  export type KontaxExportJobFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which KontaxExportJobs to fetch.
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of KontaxExportJobs to fetch.
+     */
+    orderBy?: KontaxExportJobOrderByWithRelationInput | KontaxExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing KontaxExportJobs.
+     */
+    cursor?: KontaxExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` KontaxExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` KontaxExportJobs.
+     */
+    skip?: number
+    distinct?: KontaxExportJobScalarFieldEnum | KontaxExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * KontaxExportJob create
+   */
+  export type KontaxExportJobCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * The data needed to create a KontaxExportJob.
+     */
+    data: XOR<KontaxExportJobCreateInput, KontaxExportJobUncheckedCreateInput>
+  }
+
+  /**
+   * KontaxExportJob createMany
+   */
+  export type KontaxExportJobCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many KontaxExportJobs.
+     */
+    data: KontaxExportJobCreateManyInput | KontaxExportJobCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * KontaxExportJob createManyAndReturn
+   */
+  export type KontaxExportJobCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * The data used to create many KontaxExportJobs.
+     */
+    data: KontaxExportJobCreateManyInput | KontaxExportJobCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * KontaxExportJob update
+   */
+  export type KontaxExportJobUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * The data needed to update a KontaxExportJob.
+     */
+    data: XOR<KontaxExportJobUpdateInput, KontaxExportJobUncheckedUpdateInput>
+    /**
+     * Choose, which KontaxExportJob to update.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob updateMany
+   */
+  export type KontaxExportJobUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update KontaxExportJobs.
+     */
+    data: XOR<KontaxExportJobUpdateManyMutationInput, KontaxExportJobUncheckedUpdateManyInput>
+    /**
+     * Filter which KontaxExportJobs to update
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * Limit how many KontaxExportJobs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * KontaxExportJob updateManyAndReturn
+   */
+  export type KontaxExportJobUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * The data used to update KontaxExportJobs.
+     */
+    data: XOR<KontaxExportJobUpdateManyMutationInput, KontaxExportJobUncheckedUpdateManyInput>
+    /**
+     * Filter which KontaxExportJobs to update
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * Limit how many KontaxExportJobs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * KontaxExportJob upsert
+   */
+  export type KontaxExportJobUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * The filter to search for the KontaxExportJob to update in case it exists.
+     */
+    where: KontaxExportJobWhereUniqueInput
+    /**
+     * In case the KontaxExportJob found by the `where` argument doesn't exist, create a new KontaxExportJob with this data.
+     */
+    create: XOR<KontaxExportJobCreateInput, KontaxExportJobUncheckedCreateInput>
+    /**
+     * In case the KontaxExportJob was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<KontaxExportJobUpdateInput, KontaxExportJobUncheckedUpdateInput>
+  }
+
+  /**
+   * KontaxExportJob delete
+   */
+  export type KontaxExportJobDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+    /**
+     * Filter which KontaxExportJob to delete.
+     */
+    where: KontaxExportJobWhereUniqueInput
+  }
+
+  /**
+   * KontaxExportJob deleteMany
+   */
+  export type KontaxExportJobDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which KontaxExportJobs to delete
+     */
+    where?: KontaxExportJobWhereInput
+    /**
+     * Limit how many KontaxExportJobs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * KontaxExportJob without action
+   */
+  export type KontaxExportJobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the KontaxExportJob
+     */
+    select?: KontaxExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the KontaxExportJob
+     */
+    omit?: KontaxExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: KontaxExportJobInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model MergeSuggestion
    */
 
@@ -23548,8 +27571,11 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    deletionHoldAt: Date | null
+    deletionGuardBypassOnce: boolean | null
     retiredAt: Date | null
     retiredReason: string | null
+    destinationBookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -23586,8 +27612,11 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    deletionHoldAt: Date | null
+    deletionGuardBypassOnce: boolean | null
     retiredAt: Date | null
     retiredReason: string | null
+    destinationBookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -23625,8 +27654,12 @@ export namespace Prisma {
     booksDiscoveredAt: number
     setupCompletedAt: number
     disconnectedAt: number
+    deletionHold: number
+    deletionHoldAt: number
+    deletionGuardBypassOnce: number
     retiredAt: number
     retiredReason: number
+    destinationBookId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -23673,8 +27706,11 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    deletionHoldAt?: true
+    deletionGuardBypassOnce?: true
     retiredAt?: true
     retiredReason?: true
+    destinationBookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -23711,8 +27747,11 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    deletionHoldAt?: true
+    deletionGuardBypassOnce?: true
     retiredAt?: true
     retiredReason?: true
+    destinationBookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -23750,8 +27789,12 @@ export namespace Prisma {
     booksDiscoveredAt?: true
     setupCompletedAt?: true
     disconnectedAt?: true
+    deletionHold?: true
+    deletionHoldAt?: true
+    deletionGuardBypassOnce?: true
     retiredAt?: true
     retiredReason?: true
+    destinationBookId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -23876,8 +27919,12 @@ export namespace Prisma {
     booksDiscoveredAt: Date | null
     setupCompletedAt: Date | null
     disconnectedAt: Date | null
+    deletionHold: JsonValue | null
+    deletionHoldAt: Date | null
+    deletionGuardBypassOnce: boolean
     retiredAt: Date | null
     retiredReason: string | null
+    destinationBookId: string | null
     createdAt: Date
     updatedAt: Date
     _count: SyncAccountCountAggregateOutputType | null
@@ -23934,11 +27981,16 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
+    destinationBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    destinationBook?: boolean | SyncAccount$destinationBookArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
     replacementChildren?: boolean | SyncAccount$replacementChildrenArgs<ExtArgs>
     replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
@@ -23984,11 +28036,16 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
+    destinationBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    destinationBook?: boolean | SyncAccount$destinationBookArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
     replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccount"]>
@@ -24026,11 +28083,16 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
+    destinationBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    destinationBook?: boolean | SyncAccount$destinationBookArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
     replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccount"]>
@@ -24068,15 +28130,20 @@ export namespace Prisma {
     booksDiscoveredAt?: boolean
     setupCompletedAt?: boolean
     disconnectedAt?: boolean
+    deletionHold?: boolean
+    deletionHoldAt?: boolean
+    deletionGuardBypassOnce?: boolean
     retiredAt?: boolean
     retiredReason?: boolean
+    destinationBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "connectionId" | "replacesSyncAccountId" | "replacedBySyncAccountId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "disconnectedAt" | "retiredAt" | "retiredReason" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "connectionId" | "replacesSyncAccountId" | "replacedBySyncAccountId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "disconnectedAt" | "deletionHold" | "deletionHoldAt" | "deletionGuardBypassOnce" | "retiredAt" | "retiredReason" | "destinationBookId" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
   export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    destinationBook?: boolean | SyncAccount$destinationBookArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
     replacementChildren?: boolean | SyncAccount$replacementChildrenArgs<ExtArgs>
     replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
@@ -24090,11 +28157,13 @@ export namespace Prisma {
   }
   export type SyncAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    destinationBook?: boolean | SyncAccount$destinationBookArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
     replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }
   export type SyncAccountIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    destinationBook?: boolean | SyncAccount$destinationBookArgs<ExtArgs>
     replacesSyncAccount?: boolean | SyncAccount$replacesSyncAccountArgs<ExtArgs>
     replacedBySyncAccount?: boolean | SyncAccount$replacedBySyncAccountArgs<ExtArgs>
   }
@@ -24103,6 +28172,7 @@ export namespace Prisma {
     name: "SyncAccount"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      destinationBook: Prisma.$AddressBookPayload<ExtArgs> | null
       replacesSyncAccount: Prisma.$SyncAccountPayload<ExtArgs> | null
       replacementChildren: Prisma.$SyncAccountPayload<ExtArgs>[]
       replacedBySyncAccount: Prisma.$SyncAccountPayload<ExtArgs> | null
@@ -24146,8 +28216,12 @@ export namespace Prisma {
       booksDiscoveredAt: Date | null
       setupCompletedAt: Date | null
       disconnectedAt: Date | null
+      deletionHold: Prisma.JsonValue | null
+      deletionHoldAt: Date | null
+      deletionGuardBypassOnce: boolean
       retiredAt: Date | null
       retiredReason: string | null
+      destinationBookId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["syncAccount"]>
@@ -24545,6 +28619,7 @@ export namespace Prisma {
   export interface Prisma__SyncAccountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    destinationBook<T extends SyncAccount$destinationBookArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$destinationBookArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     replacesSyncAccount<T extends SyncAccount$replacesSyncAccountArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacesSyncAccountArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     replacementChildren<T extends SyncAccount$replacementChildrenArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacementChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     replacedBySyncAccount<T extends SyncAccount$replacedBySyncAccountArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$replacedBySyncAccountArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -24615,8 +28690,12 @@ export namespace Prisma {
     readonly booksDiscoveredAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly setupCompletedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly disconnectedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly deletionHold: FieldRef<"SyncAccount", 'Json'>
+    readonly deletionHoldAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly deletionGuardBypassOnce: FieldRef<"SyncAccount", 'Boolean'>
     readonly retiredAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly retiredReason: FieldRef<"SyncAccount", 'String'>
+    readonly destinationBookId: FieldRef<"SyncAccount", 'String'>
     readonly createdAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly updatedAt: FieldRef<"SyncAccount", 'DateTime'>
   }
@@ -25015,6 +29094,25 @@ export namespace Prisma {
   }
 
   /**
+   * SyncAccount.destinationBook
+   */
+  export type SyncAccount$destinationBookArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    where?: AddressBookWhereInput
+  }
+
+  /**
    * SyncAccount.replacesSyncAccount
    */
   export type SyncAccount$replacesSyncAccountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -25270,7 +29368,11 @@ export namespace Prisma {
     notifyOnFailure: boolean | null
     syncWindowStart: number | null
     syncWindowEnd: number | null
+    syncWindowTimezone: string | null
     maxAttemptsBeforePause: number | null
+    fieldPrecedence: string | null
+    autolinkCaveatDismissedAt: Date | null
+    conflictOverride: string | null
     lastModifiedAt: Date | null
     createdAt: Date | null
   }
@@ -25288,7 +29390,11 @@ export namespace Prisma {
     notifyOnFailure: boolean | null
     syncWindowStart: number | null
     syncWindowEnd: number | null
+    syncWindowTimezone: string | null
     maxAttemptsBeforePause: number | null
+    fieldPrecedence: string | null
+    autolinkCaveatDismissedAt: Date | null
+    conflictOverride: string | null
     lastModifiedAt: Date | null
     createdAt: Date | null
   }
@@ -25307,9 +29413,14 @@ export namespace Prisma {
     notifyOnFailure: number
     syncWindowStart: number
     syncWindowEnd: number
+    syncWindowTimezone: number
     excludedFields: number
     exportLabelFilter: number
     maxAttemptsBeforePause: number
+    projectionBookIds: number
+    fieldPrecedence: number
+    autolinkCaveatDismissedAt: number
+    conflictOverride: number
     lastModifiedAt: number
     createdAt: number
     _all: number
@@ -25345,7 +29456,11 @@ export namespace Prisma {
     notifyOnFailure?: true
     syncWindowStart?: true
     syncWindowEnd?: true
+    syncWindowTimezone?: true
     maxAttemptsBeforePause?: true
+    fieldPrecedence?: true
+    autolinkCaveatDismissedAt?: true
+    conflictOverride?: true
     lastModifiedAt?: true
     createdAt?: true
   }
@@ -25363,7 +29478,11 @@ export namespace Prisma {
     notifyOnFailure?: true
     syncWindowStart?: true
     syncWindowEnd?: true
+    syncWindowTimezone?: true
     maxAttemptsBeforePause?: true
+    fieldPrecedence?: true
+    autolinkCaveatDismissedAt?: true
+    conflictOverride?: true
     lastModifiedAt?: true
     createdAt?: true
   }
@@ -25382,9 +29501,14 @@ export namespace Prisma {
     notifyOnFailure?: true
     syncWindowStart?: true
     syncWindowEnd?: true
+    syncWindowTimezone?: true
     excludedFields?: true
     exportLabelFilter?: true
     maxAttemptsBeforePause?: true
+    projectionBookIds?: true
+    fieldPrecedence?: true
+    autolinkCaveatDismissedAt?: true
+    conflictOverride?: true
     lastModifiedAt?: true
     createdAt?: true
     _all?: true
@@ -25490,9 +29614,14 @@ export namespace Prisma {
     notifyOnFailure: boolean
     syncWindowStart: number | null
     syncWindowEnd: number | null
+    syncWindowTimezone: string | null
     excludedFields: string[]
     exportLabelFilter: string[]
     maxAttemptsBeforePause: number | null
+    projectionBookIds: string[]
+    fieldPrecedence: string | null
+    autolinkCaveatDismissedAt: Date | null
+    conflictOverride: string | null
     lastModifiedAt: Date
     createdAt: Date
     _count: SyncAccountSettingsCountAggregateOutputType | null
@@ -25530,9 +29659,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
@@ -25553,9 +29687,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
@@ -25576,9 +29715,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
@@ -25599,14 +29743,19 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: boolean
     syncWindowEnd?: boolean
+    syncWindowTimezone?: boolean
     excludedFields?: boolean
     exportLabelFilter?: boolean
     maxAttemptsBeforePause?: boolean
+    projectionBookIds?: boolean
+    fieldPrecedence?: boolean
+    autolinkCaveatDismissedAt?: boolean
+    conflictOverride?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
   }
 
-  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
+  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "capabilityProfileOverride" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "syncWindowTimezone" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "projectionBookIds" | "fieldPrecedence" | "autolinkCaveatDismissedAt" | "conflictOverride" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
   export type SyncAccountSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
     importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
@@ -25640,9 +29789,14 @@ export namespace Prisma {
       notifyOnFailure: boolean
       syncWindowStart: number | null
       syncWindowEnd: number | null
+      syncWindowTimezone: string | null
       excludedFields: string[]
       exportLabelFilter: string[]
       maxAttemptsBeforePause: number | null
+      projectionBookIds: string[]
+      fieldPrecedence: string | null
+      autolinkCaveatDismissedAt: Date | null
+      conflictOverride: string | null
       lastModifiedAt: Date
       createdAt: Date
     }, ExtArgs["result"]["syncAccountSettings"]>
@@ -26083,9 +30237,14 @@ export namespace Prisma {
     readonly notifyOnFailure: FieldRef<"SyncAccountSettings", 'Boolean'>
     readonly syncWindowStart: FieldRef<"SyncAccountSettings", 'Int'>
     readonly syncWindowEnd: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly syncWindowTimezone: FieldRef<"SyncAccountSettings", 'String'>
     readonly excludedFields: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly exportLabelFilter: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly maxAttemptsBeforePause: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly projectionBookIds: FieldRef<"SyncAccountSettings", 'String[]'>
+    readonly fieldPrecedence: FieldRef<"SyncAccountSettings", 'String'>
+    readonly autolinkCaveatDismissedAt: FieldRef<"SyncAccountSettings", 'DateTime'>
+    readonly conflictOverride: FieldRef<"SyncAccountSettings", 'String'>
     readonly lastModifiedAt: FieldRef<"SyncAccountSettings", 'DateTime'>
     readonly createdAt: FieldRef<"SyncAccountSettings", 'DateTime'>
   }
@@ -27569,6 +31728,7 @@ export namespace Prisma {
     remoteETag: number
     capabilityProfileId: number
     supportedFieldShadow: number
+    photoShadow: number
     lastSyncedAt: number
     tombstonedAt: number
     remoteDeletedAt: number
@@ -27623,6 +31783,7 @@ export namespace Prisma {
     remoteETag?: true
     capabilityProfileId?: true
     supportedFieldShadow?: true
+    photoShadow?: true
     lastSyncedAt?: true
     tombstonedAt?: true
     remoteDeletedAt?: true
@@ -27714,6 +31875,7 @@ export namespace Prisma {
     remoteETag: string | null
     capabilityProfileId: string | null
     supportedFieldShadow: JsonValue | null
+    photoShadow: JsonValue | null
     lastSyncedAt: Date | null
     tombstonedAt: Date | null
     remoteDeletedAt: Date | null
@@ -27749,6 +31911,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -27771,6 +31934,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -27791,6 +31955,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -27811,6 +31976,7 @@ export namespace Prisma {
     remoteETag?: boolean
     capabilityProfileId?: boolean
     supportedFieldShadow?: boolean
+    photoShadow?: boolean
     lastSyncedAt?: boolean
     tombstonedAt?: boolean
     remoteDeletedAt?: boolean
@@ -27820,7 +31986,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SyncContactLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "contactId" | "remoteHref" | "remoteUid" | "remoteETag" | "capabilityProfileId" | "supportedFieldShadow" | "lastSyncedAt" | "tombstonedAt" | "remoteDeletedAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncContactLink"]>
+  export type SyncContactLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "contactId" | "remoteHref" | "remoteUid" | "remoteETag" | "capabilityProfileId" | "supportedFieldShadow" | "photoShadow" | "lastSyncedAt" | "tombstonedAt" | "remoteDeletedAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncContactLink"]>
   export type SyncContactLinkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
     contact?: boolean | ContactDefaultArgs<ExtArgs>
@@ -27852,6 +32018,7 @@ export namespace Prisma {
       remoteETag: string | null
       capabilityProfileId: string | null
       supportedFieldShadow: Prisma.JsonValue | null
+      photoShadow: Prisma.JsonValue | null
       lastSyncedAt: Date | null
       tombstonedAt: Date | null
       remoteDeletedAt: Date | null
@@ -28293,6 +32460,7 @@ export namespace Prisma {
     readonly remoteETag: FieldRef<"SyncContactLink", 'String'>
     readonly capabilityProfileId: FieldRef<"SyncContactLink", 'String'>
     readonly supportedFieldShadow: FieldRef<"SyncContactLink", 'Json'>
+    readonly photoShadow: FieldRef<"SyncContactLink", 'Json'>
     readonly lastSyncedAt: FieldRef<"SyncContactLink", 'DateTime'>
     readonly tombstonedAt: FieldRef<"SyncContactLink", 'DateTime'>
     readonly remoteDeletedAt: FieldRef<"SyncContactLink", 'DateTime'>
@@ -44247,6 +48415,7 @@ export namespace Prisma {
     canEdit: number
     canManageBilling: number
     addressBookPermissions: number
+    sharingPolicy: number
     inviteToken: number
     inviteExpiresAt: number
     invitedAt: number
@@ -44301,6 +48470,7 @@ export namespace Prisma {
     canEdit?: true
     canManageBilling?: true
     addressBookPermissions?: true
+    sharingPolicy?: true
     inviteToken?: true
     inviteExpiresAt?: true
     invitedAt?: true
@@ -44392,6 +48562,7 @@ export namespace Prisma {
     canEdit: boolean
     canManageBilling: boolean
     addressBookPermissions: JsonValue | null
+    sharingPolicy: JsonValue | null
     inviteToken: string | null
     inviteExpiresAt: Date | null
     invitedAt: Date
@@ -44427,6 +48598,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: boolean
+    sharingPolicy?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -44447,6 +48619,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: boolean
+    sharingPolicy?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -44467,6 +48640,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: boolean
+    sharingPolicy?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -44487,6 +48661,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: boolean
+    sharingPolicy?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -44495,7 +48670,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "canManageBilling" | "addressBookPermissions" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
+  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "canManageBilling" | "addressBookPermissions" | "sharingPolicy" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
   export type GroupMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | GroupMember$userArgs<ExtArgs>
@@ -44525,6 +48700,7 @@ export namespace Prisma {
       canEdit: boolean
       canManageBilling: boolean
       addressBookPermissions: Prisma.JsonValue | null
+      sharingPolicy: Prisma.JsonValue | null
       inviteToken: string | null
       inviteExpiresAt: Date | null
       invitedAt: Date
@@ -44965,6 +49141,7 @@ export namespace Prisma {
     readonly canEdit: FieldRef<"GroupMember", 'Boolean'>
     readonly canManageBilling: FieldRef<"GroupMember", 'Boolean'>
     readonly addressBookPermissions: FieldRef<"GroupMember", 'Json'>
+    readonly sharingPolicy: FieldRef<"GroupMember", 'Json'>
     readonly inviteToken: FieldRef<"GroupMember", 'String'>
     readonly inviteExpiresAt: FieldRef<"GroupMember", 'DateTime'>
     readonly invitedAt: FieldRef<"GroupMember", 'DateTime'>
@@ -45444,6 +49621,7 @@ export namespace Prisma {
     name: number
     description: number
     isDefault: number
+    minimumSharingPolicy: number
     archivedAt: number
     dissolvedToBookId: number
     createdAt: number
@@ -45482,6 +49660,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isDefault?: true
+    minimumSharingPolicy?: true
     archivedAt?: true
     dissolvedToBookId?: true
     createdAt?: true
@@ -45567,6 +49746,7 @@ export namespace Prisma {
     name: string
     description: string | null
     isDefault: boolean
+    minimumSharingPolicy: JsonValue | null
     archivedAt: Date | null
     dissolvedToBookId: string | null
     createdAt: Date
@@ -45596,6 +49776,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    minimumSharingPolicy?: boolean
     archivedAt?: boolean
     dissolvedToBookId?: boolean
     createdAt?: boolean
@@ -45612,6 +49793,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    minimumSharingPolicy?: boolean
     archivedAt?: boolean
     dissolvedToBookId?: boolean
     createdAt?: boolean
@@ -45625,6 +49807,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    minimumSharingPolicy?: boolean
     archivedAt?: boolean
     dissolvedToBookId?: boolean
     createdAt?: boolean
@@ -45638,13 +49821,14 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    minimumSharingPolicy?: boolean
     archivedAt?: boolean
     dissolvedToBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "archivedAt" | "dissolvedToBookId" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
+  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "minimumSharingPolicy" | "archivedAt" | "dissolvedToBookId" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
   export type GroupAddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     contacts?: boolean | GroupAddressBook$contactsArgs<ExtArgs>
@@ -45671,6 +49855,7 @@ export namespace Prisma {
       name: string
       description: string | null
       isDefault: boolean
+      minimumSharingPolicy: Prisma.JsonValue | null
       archivedAt: Date | null
       dissolvedToBookId: string | null
       createdAt: Date
@@ -46106,6 +50291,7 @@ export namespace Prisma {
     readonly name: FieldRef<"GroupAddressBook", 'String'>
     readonly description: FieldRef<"GroupAddressBook", 'String'>
     readonly isDefault: FieldRef<"GroupAddressBook", 'Boolean'>
+    readonly minimumSharingPolicy: FieldRef<"GroupAddressBook", 'Json'>
     readonly archivedAt: FieldRef<"GroupAddressBook", 'DateTime'>
     readonly dissolvedToBookId: FieldRef<"GroupAddressBook", 'String'>
     readonly createdAt: FieldRef<"GroupAddressBook", 'DateTime'>
@@ -46790,6 +50976,8 @@ export namespace Prisma {
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     contacts?: boolean | AddressBook$contactsArgs<ExtArgs>
+    contactMemberships?: boolean | AddressBook$contactMembershipsArgs<ExtArgs>
+    syncDestinations?: boolean | AddressBook$syncDestinationsArgs<ExtArgs>
     _count?: boolean | AddressBookCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["addressBook"]>
 
@@ -46844,6 +51032,8 @@ export namespace Prisma {
   export type AddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     contacts?: boolean | AddressBook$contactsArgs<ExtArgs>
+    contactMemberships?: boolean | AddressBook$contactMembershipsArgs<ExtArgs>
+    syncDestinations?: boolean | AddressBook$syncDestinationsArgs<ExtArgs>
     _count?: boolean | AddressBookCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AddressBookIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -46858,6 +51048,8 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       contacts: Prisma.$ContactPayload<ExtArgs>[]
+      contactMemberships: Prisma.$ContactBookMembershipPayload<ExtArgs>[]
+      syncDestinations: Prisma.$SyncAccountPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -47268,6 +51460,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     contacts<T extends AddressBook$contactsArgs<ExtArgs> = {}>(args?: Subset<T, AddressBook$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    contactMemberships<T extends AddressBook$contactMembershipsArgs<ExtArgs> = {}>(args?: Subset<T, AddressBook$contactMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactBookMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    syncDestinations<T extends AddressBook$syncDestinationsArgs<ExtArgs> = {}>(args?: Subset<T, AddressBook$syncDestinationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -47726,6 +51920,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ContactScalarFieldEnum | ContactScalarFieldEnum[]
+  }
+
+  /**
+   * AddressBook.contactMemberships
+   */
+  export type AddressBook$contactMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactBookMembership
+     */
+    select?: ContactBookMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactBookMembership
+     */
+    omit?: ContactBookMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactBookMembershipInclude<ExtArgs> | null
+    where?: ContactBookMembershipWhereInput
+    orderBy?: ContactBookMembershipOrderByWithRelationInput | ContactBookMembershipOrderByWithRelationInput[]
+    cursor?: ContactBookMembershipWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactBookMembershipScalarFieldEnum | ContactBookMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * AddressBook.syncDestinations
+   */
+  export type AddressBook$syncDestinationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
+    orderBy?: SyncAccountOrderByWithRelationInput | SyncAccountOrderByWithRelationInput[]
+    cursor?: SyncAccountWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncAccountScalarFieldEnum | SyncAccountScalarFieldEnum[]
   }
 
   /**
@@ -52519,6 +56761,8 @@ export namespace Prisma {
     contact?: boolean | ContactShare$contactArgs<ExtArgs>
     recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
     recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+    notifications?: boolean | ContactShare$notificationsArgs<ExtArgs>
+    _count?: boolean | ContactShareCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["contactShare"]>
 
   export type ContactShareSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -52601,6 +56845,8 @@ export namespace Prisma {
     contact?: boolean | ContactShare$contactArgs<ExtArgs>
     recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
     recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+    notifications?: boolean | ContactShare$notificationsArgs<ExtArgs>
+    _count?: boolean | ContactShareCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ContactShareIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -52622,6 +56868,7 @@ export namespace Prisma {
       contact: Prisma.$ContactPayload<ExtArgs> | null
       recipientUser: Prisma.$UserPayload<ExtArgs> | null
       recipientContact: Prisma.$ContactPayload<ExtArgs> | null
+      notifications: Prisma.$NotificationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -53041,6 +57288,7 @@ export namespace Prisma {
     contact<T extends ContactShare$contactArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$contactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     recipientUser<T extends ContactShare$recipientUserArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$recipientUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     recipientContact<T extends ContactShare$recipientContactArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$recipientContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    notifications<T extends ContactShare$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -53539,6 +57787,30 @@ export namespace Prisma {
      */
     include?: ContactInclude<ExtArgs> | null
     where?: ContactWhereInput
+  }
+
+  /**
+   * ContactShare.notifications
+   */
+  export type ContactShare$notificationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Notification
+     */
+    select?: NotificationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Notification
+     */
+    omit?: NotificationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NotificationInclude<ExtArgs> | null
+    where?: NotificationWhereInput
+    orderBy?: NotificationOrderByWithRelationInput | NotificationOrderByWithRelationInput[]
+    cursor?: NotificationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
   }
 
   /**
@@ -54577,7 +58849,10 @@ export namespace Prisma {
     actionUrl: string | null
     securityAlertId: string | null
     adminBroadcastId: string | null
+    contactShareId: string | null
     createdAt: Date | null
+    eventAt: Date | null
+    expiresAt: Date | null
   }
 
   export type NotificationMaxAggregateOutputType = {
@@ -54592,7 +58867,10 @@ export namespace Prisma {
     actionUrl: string | null
     securityAlertId: string | null
     adminBroadcastId: string | null
+    contactShareId: string | null
     createdAt: Date | null
+    eventAt: Date | null
+    expiresAt: Date | null
   }
 
   export type NotificationCountAggregateOutputType = {
@@ -54607,7 +58885,10 @@ export namespace Prisma {
     actionUrl: number
     securityAlertId: number
     adminBroadcastId: number
+    contactShareId: number
     createdAt: number
+    eventAt: number
+    expiresAt: number
     _all: number
   }
 
@@ -54624,7 +58905,10 @@ export namespace Prisma {
     actionUrl?: true
     securityAlertId?: true
     adminBroadcastId?: true
+    contactShareId?: true
     createdAt?: true
+    eventAt?: true
+    expiresAt?: true
   }
 
   export type NotificationMaxAggregateInputType = {
@@ -54639,7 +58923,10 @@ export namespace Prisma {
     actionUrl?: true
     securityAlertId?: true
     adminBroadcastId?: true
+    contactShareId?: true
     createdAt?: true
+    eventAt?: true
+    expiresAt?: true
   }
 
   export type NotificationCountAggregateInputType = {
@@ -54654,7 +58941,10 @@ export namespace Prisma {
     actionUrl?: true
     securityAlertId?: true
     adminBroadcastId?: true
+    contactShareId?: true
     createdAt?: true
+    eventAt?: true
+    expiresAt?: true
     _all?: true
   }
 
@@ -54742,7 +59032,10 @@ export namespace Prisma {
     actionUrl: string | null
     securityAlertId: string | null
     adminBroadcastId: string | null
+    contactShareId: string | null
     createdAt: Date
+    eventAt: Date | null
+    expiresAt: Date | null
     _count: NotificationCountAggregateOutputType | null
     _min: NotificationMinAggregateOutputType | null
     _max: NotificationMaxAggregateOutputType | null
@@ -54774,10 +59067,14 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -54792,10 +59089,14 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -54810,10 +59111,14 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }, ExtArgs["result"]["notification"]>
 
   export type NotificationSelectScalar = {
@@ -54828,24 +59133,30 @@ export namespace Prisma {
     actionUrl?: boolean
     securityAlertId?: boolean
     adminBroadcastId?: boolean
+    contactShareId?: boolean
     createdAt?: boolean
+    eventAt?: boolean
+    expiresAt?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "title" | "body" | "read" | "readAt" | "dismissedAt" | "actionUrl" | "securityAlertId" | "adminBroadcastId" | "createdAt", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "category" | "title" | "body" | "read" | "readAt" | "dismissedAt" | "actionUrl" | "securityAlertId" | "adminBroadcastId" | "contactShareId" | "createdAt" | "eventAt" | "expiresAt", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }
   export type NotificationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }
   export type NotificationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     securityAlert?: boolean | Notification$securityAlertArgs<ExtArgs>
     adminBroadcast?: boolean | Notification$adminBroadcastArgs<ExtArgs>
+    contactShare?: boolean | Notification$contactShareArgs<ExtArgs>
   }
 
   export type $NotificationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -54854,6 +59165,7 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       securityAlert: Prisma.$SecurityAlertPayload<ExtArgs> | null
       adminBroadcast: Prisma.$AdminBroadcastPayload<ExtArgs> | null
+      contactShare: Prisma.$ContactSharePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -54867,7 +59179,10 @@ export namespace Prisma {
       actionUrl: string | null
       securityAlertId: string | null
       adminBroadcastId: string | null
+      contactShareId: string | null
       createdAt: Date
+      eventAt: Date | null
+      expiresAt: Date | null
     }, ExtArgs["result"]["notification"]>
     composites: {}
   }
@@ -55265,6 +59580,7 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     securityAlert<T extends Notification$securityAlertArgs<ExtArgs> = {}>(args?: Subset<T, Notification$securityAlertArgs<ExtArgs>>): Prisma__SecurityAlertClient<$Result.GetResult<Prisma.$SecurityAlertPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     adminBroadcast<T extends Notification$adminBroadcastArgs<ExtArgs> = {}>(args?: Subset<T, Notification$adminBroadcastArgs<ExtArgs>>): Prisma__AdminBroadcastClient<$Result.GetResult<Prisma.$AdminBroadcastPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    contactShare<T extends Notification$contactShareArgs<ExtArgs> = {}>(args?: Subset<T, Notification$contactShareArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -55305,7 +59621,10 @@ export namespace Prisma {
     readonly actionUrl: FieldRef<"Notification", 'String'>
     readonly securityAlertId: FieldRef<"Notification", 'String'>
     readonly adminBroadcastId: FieldRef<"Notification", 'String'>
+    readonly contactShareId: FieldRef<"Notification", 'String'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
+    readonly eventAt: FieldRef<"Notification", 'DateTime'>
+    readonly expiresAt: FieldRef<"Notification", 'DateTime'>
   }
     
 
@@ -55737,6 +60056,25 @@ export namespace Prisma {
      */
     include?: AdminBroadcastInclude<ExtArgs> | null
     where?: AdminBroadcastWhereInput
+  }
+
+  /**
+   * Notification.contactShare
+   */
+  export type Notification$contactShareArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    where?: ContactShareWhereInput
   }
 
   /**
@@ -67264,6 +71602,32 @@ export namespace Prisma {
   export type ContactScalarFieldEnum = (typeof ContactScalarFieldEnum)[keyof typeof ContactScalarFieldEnum]
 
 
+  export const ContactBookMembershipScalarFieldEnum: {
+    id: 'id',
+    contactId: 'contactId',
+    addressBookId: 'addressBookId',
+    isPrimary: 'isPrimary',
+    createdAt: 'createdAt'
+  };
+
+  export type ContactBookMembershipScalarFieldEnum = (typeof ContactBookMembershipScalarFieldEnum)[keyof typeof ContactBookMembershipScalarFieldEnum]
+
+
+  export const ContactPrivateFieldScalarFieldEnum: {
+    id: 'id',
+    contactId: 'contactId',
+    userId: 'userId',
+    fieldType: 'fieldType',
+    label: 'label',
+    value: 'value',
+    position: 'position',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ContactPrivateFieldScalarFieldEnum = (typeof ContactPrivateFieldScalarFieldEnum)[keyof typeof ContactPrivateFieldScalarFieldEnum]
+
+
   export const SubscriptionCustomerScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -67364,6 +71728,34 @@ export namespace Prisma {
   export type ExportJobScalarFieldEnum = (typeof ExportJobScalarFieldEnum)[keyof typeof ExportJobScalarFieldEnum]
 
 
+  export const KontaxExportJobScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    kind: 'kind',
+    status: 'status',
+    includeArchived: 'includeArchived',
+    includePhotos: 'includePhotos',
+    includeVcardFallback: 'includeVcardFallback',
+    contactIds: 'contactIds',
+    bookId: 'bookId',
+    filterQuery: 'filterQuery',
+    totalCount: 'totalCount',
+    progressCount: 'progressCount',
+    photoCount: 'photoCount',
+    exportedCount: 'exportedCount',
+    downloadUrl: 'downloadUrl',
+    fileSizeBytes: 'fileSizeBytes',
+    expiresAt: 'expiresAt',
+    errorSummary: 'errorSummary',
+    createdAt: 'createdAt',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type KontaxExportJobScalarFieldEnum = (typeof KontaxExportJobScalarFieldEnum)[keyof typeof KontaxExportJobScalarFieldEnum]
+
+
   export const MergeSuggestionScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -67448,8 +71840,12 @@ export namespace Prisma {
     booksDiscoveredAt: 'booksDiscoveredAt',
     setupCompletedAt: 'setupCompletedAt',
     disconnectedAt: 'disconnectedAt',
+    deletionHold: 'deletionHold',
+    deletionHoldAt: 'deletionHoldAt',
+    deletionGuardBypassOnce: 'deletionGuardBypassOnce',
     retiredAt: 'retiredAt',
     retiredReason: 'retiredReason',
+    destinationBookId: 'destinationBookId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -67471,9 +71867,14 @@ export namespace Prisma {
     notifyOnFailure: 'notifyOnFailure',
     syncWindowStart: 'syncWindowStart',
     syncWindowEnd: 'syncWindowEnd',
+    syncWindowTimezone: 'syncWindowTimezone',
     excludedFields: 'excludedFields',
     exportLabelFilter: 'exportLabelFilter',
     maxAttemptsBeforePause: 'maxAttemptsBeforePause',
+    projectionBookIds: 'projectionBookIds',
+    fieldPrecedence: 'fieldPrecedence',
+    autolinkCaveatDismissedAt: 'autolinkCaveatDismissedAt',
+    conflictOverride: 'conflictOverride',
     lastModifiedAt: 'lastModifiedAt',
     createdAt: 'createdAt'
   };
@@ -67501,6 +71902,7 @@ export namespace Prisma {
     remoteETag: 'remoteETag',
     capabilityProfileId: 'capabilityProfileId',
     supportedFieldShadow: 'supportedFieldShadow',
+    photoShadow: 'photoShadow',
     lastSyncedAt: 'lastSyncedAt',
     tombstonedAt: 'tombstonedAt',
     remoteDeletedAt: 'remoteDeletedAt',
@@ -67761,6 +72163,7 @@ export namespace Prisma {
     canEdit: 'canEdit',
     canManageBilling: 'canManageBilling',
     addressBookPermissions: 'addressBookPermissions',
+    sharingPolicy: 'sharingPolicy',
     inviteToken: 'inviteToken',
     inviteExpiresAt: 'inviteExpiresAt',
     invitedAt: 'invitedAt',
@@ -67778,6 +72181,7 @@ export namespace Prisma {
     name: 'name',
     description: 'description',
     isDefault: 'isDefault',
+    minimumSharingPolicy: 'minimumSharingPolicy',
     archivedAt: 'archivedAt',
     dissolvedToBookId: 'dissolvedToBookId',
     createdAt: 'createdAt',
@@ -67905,7 +72309,10 @@ export namespace Prisma {
     actionUrl: 'actionUrl',
     securityAlertId: 'securityAlertId',
     adminBroadcastId: 'adminBroadcastId',
-    createdAt: 'createdAt'
+    contactShareId: 'contactShareId',
+    createdAt: 'createdAt',
+    eventAt: 'eventAt',
+    expiresAt: 'expiresAt'
   };
 
   export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
@@ -68341,6 +72748,20 @@ export namespace Prisma {
    * Reference to a field of type 'ContactExportFormat[]'
    */
   export type ListEnumContactExportFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContactExportFormat[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'KontaxExportKind'
+   */
+  export type EnumKontaxExportKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KontaxExportKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'KontaxExportKind[]'
+   */
+  export type ListEnumKontaxExportKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KontaxExportKind[]'>
     
 
 
@@ -68818,6 +73239,7 @@ export namespace Prisma {
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
+    kontaxExportJobs?: KontaxExportJobListRelationFilter
     mergeSuggestions?: MergeSuggestionListRelationFilter
     mergeDecisions?: MergeDecisionListRelationFilter
     dismissals?: MergeDismissalListRelationFilter
@@ -68846,6 +73268,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobListRelationFilter
     apiTokens?: ApiTokenListRelationFilter
     labels?: LabelListRelationFilter
+    contactPrivateFields?: ContactPrivateFieldListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
     supportNotesAuthored?: AdminSupportNoteListRelationFilter
@@ -68892,6 +73315,7 @@ export namespace Prisma {
     contacts?: ContactOrderByRelationAggregateInput
     importJobs?: ImportJobOrderByRelationAggregateInput
     exportJobs?: ExportJobOrderByRelationAggregateInput
+    kontaxExportJobs?: KontaxExportJobOrderByRelationAggregateInput
     mergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
     mergeDecisions?: MergeDecisionOrderByRelationAggregateInput
     dismissals?: MergeDismissalOrderByRelationAggregateInput
@@ -68920,6 +73344,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobOrderByRelationAggregateInput
     apiTokens?: ApiTokenOrderByRelationAggregateInput
     labels?: LabelOrderByRelationAggregateInput
+    contactPrivateFields?: ContactPrivateFieldOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
     onboardingState?: UserOnboardingStateOrderByWithRelationInput
     supportNotesAuthored?: AdminSupportNoteOrderByRelationAggregateInput
@@ -68969,6 +73394,7 @@ export namespace Prisma {
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
+    kontaxExportJobs?: KontaxExportJobListRelationFilter
     mergeSuggestions?: MergeSuggestionListRelationFilter
     mergeDecisions?: MergeDecisionListRelationFilter
     dismissals?: MergeDismissalListRelationFilter
@@ -68997,6 +73423,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobListRelationFilter
     apiTokens?: ApiTokenListRelationFilter
     labels?: LabelListRelationFilter
+    contactPrivateFields?: ContactPrivateFieldListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
     supportNotesAuthored?: AdminSupportNoteListRelationFilter
@@ -69344,6 +73771,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareListRelationFilter
     sharesAsRecipientCopy?: ContactShareListRelationFilter
     groupContacts?: GroupContactListRelationFilter
+    bookMemberships?: ContactBookMembershipListRelationFilter
+    privateFields?: ContactPrivateFieldListRelationFilter
     birthdayReminderStates?: BirthdayReminderStateListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
@@ -69412,6 +73841,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareOrderByRelationAggregateInput
     sharesAsRecipientCopy?: ContactShareOrderByRelationAggregateInput
     groupContacts?: GroupContactOrderByRelationAggregateInput
+    bookMemberships?: ContactBookMembershipOrderByRelationAggregateInput
+    privateFields?: ContactPrivateFieldOrderByRelationAggregateInput
     birthdayReminderStates?: BirthdayReminderStateOrderByRelationAggregateInput
     mergedIntoContact?: ContactOrderByWithRelationInput
     mergedChildren?: ContactOrderByRelationAggregateInput
@@ -69484,6 +73915,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareListRelationFilter
     sharesAsRecipientCopy?: ContactShareListRelationFilter
     groupContacts?: GroupContactListRelationFilter
+    bookMemberships?: ContactBookMembershipListRelationFilter
+    privateFields?: ContactPrivateFieldListRelationFilter
     birthdayReminderStates?: BirthdayReminderStateListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
@@ -69600,6 +74033,145 @@ export namespace Prisma {
     bookId?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
+  }
+
+  export type ContactBookMembershipWhereInput = {
+    AND?: ContactBookMembershipWhereInput | ContactBookMembershipWhereInput[]
+    OR?: ContactBookMembershipWhereInput[]
+    NOT?: ContactBookMembershipWhereInput | ContactBookMembershipWhereInput[]
+    id?: StringFilter<"ContactBookMembership"> | string
+    contactId?: StringFilter<"ContactBookMembership"> | string
+    addressBookId?: StringFilter<"ContactBookMembership"> | string
+    isPrimary?: BoolFilter<"ContactBookMembership"> | boolean
+    createdAt?: DateTimeFilter<"ContactBookMembership"> | Date | string
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    addressBook?: XOR<AddressBookScalarRelationFilter, AddressBookWhereInput>
+  }
+
+  export type ContactBookMembershipOrderByWithRelationInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    addressBookId?: SortOrder
+    isPrimary?: SortOrder
+    createdAt?: SortOrder
+    contact?: ContactOrderByWithRelationInput
+    addressBook?: AddressBookOrderByWithRelationInput
+  }
+
+  export type ContactBookMembershipWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    contactId_addressBookId?: ContactBookMembershipContactIdAddressBookIdCompoundUniqueInput
+    AND?: ContactBookMembershipWhereInput | ContactBookMembershipWhereInput[]
+    OR?: ContactBookMembershipWhereInput[]
+    NOT?: ContactBookMembershipWhereInput | ContactBookMembershipWhereInput[]
+    contactId?: StringFilter<"ContactBookMembership"> | string
+    addressBookId?: StringFilter<"ContactBookMembership"> | string
+    isPrimary?: BoolFilter<"ContactBookMembership"> | boolean
+    createdAt?: DateTimeFilter<"ContactBookMembership"> | Date | string
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    addressBook?: XOR<AddressBookScalarRelationFilter, AddressBookWhereInput>
+  }, "id" | "contactId_addressBookId">
+
+  export type ContactBookMembershipOrderByWithAggregationInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    addressBookId?: SortOrder
+    isPrimary?: SortOrder
+    createdAt?: SortOrder
+    _count?: ContactBookMembershipCountOrderByAggregateInput
+    _max?: ContactBookMembershipMaxOrderByAggregateInput
+    _min?: ContactBookMembershipMinOrderByAggregateInput
+  }
+
+  export type ContactBookMembershipScalarWhereWithAggregatesInput = {
+    AND?: ContactBookMembershipScalarWhereWithAggregatesInput | ContactBookMembershipScalarWhereWithAggregatesInput[]
+    OR?: ContactBookMembershipScalarWhereWithAggregatesInput[]
+    NOT?: ContactBookMembershipScalarWhereWithAggregatesInput | ContactBookMembershipScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ContactBookMembership"> | string
+    contactId?: StringWithAggregatesFilter<"ContactBookMembership"> | string
+    addressBookId?: StringWithAggregatesFilter<"ContactBookMembership"> | string
+    isPrimary?: BoolWithAggregatesFilter<"ContactBookMembership"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"ContactBookMembership"> | Date | string
+  }
+
+  export type ContactPrivateFieldWhereInput = {
+    AND?: ContactPrivateFieldWhereInput | ContactPrivateFieldWhereInput[]
+    OR?: ContactPrivateFieldWhereInput[]
+    NOT?: ContactPrivateFieldWhereInput | ContactPrivateFieldWhereInput[]
+    id?: StringFilter<"ContactPrivateField"> | string
+    contactId?: StringFilter<"ContactPrivateField"> | string
+    userId?: StringFilter<"ContactPrivateField"> | string
+    fieldType?: StringFilter<"ContactPrivateField"> | string
+    label?: StringNullableFilter<"ContactPrivateField"> | string | null
+    value?: JsonFilter<"ContactPrivateField">
+    position?: IntFilter<"ContactPrivateField"> | number
+    createdAt?: DateTimeFilter<"ContactPrivateField"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactPrivateField"> | Date | string
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ContactPrivateFieldOrderByWithRelationInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    userId?: SortOrder
+    fieldType?: SortOrder
+    label?: SortOrderInput | SortOrder
+    value?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    contact?: ContactOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ContactPrivateFieldWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ContactPrivateFieldWhereInput | ContactPrivateFieldWhereInput[]
+    OR?: ContactPrivateFieldWhereInput[]
+    NOT?: ContactPrivateFieldWhereInput | ContactPrivateFieldWhereInput[]
+    contactId?: StringFilter<"ContactPrivateField"> | string
+    userId?: StringFilter<"ContactPrivateField"> | string
+    fieldType?: StringFilter<"ContactPrivateField"> | string
+    label?: StringNullableFilter<"ContactPrivateField"> | string | null
+    value?: JsonFilter<"ContactPrivateField">
+    position?: IntFilter<"ContactPrivateField"> | number
+    createdAt?: DateTimeFilter<"ContactPrivateField"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactPrivateField"> | Date | string
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type ContactPrivateFieldOrderByWithAggregationInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    userId?: SortOrder
+    fieldType?: SortOrder
+    label?: SortOrderInput | SortOrder
+    value?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ContactPrivateFieldCountOrderByAggregateInput
+    _avg?: ContactPrivateFieldAvgOrderByAggregateInput
+    _max?: ContactPrivateFieldMaxOrderByAggregateInput
+    _min?: ContactPrivateFieldMinOrderByAggregateInput
+    _sum?: ContactPrivateFieldSumOrderByAggregateInput
+  }
+
+  export type ContactPrivateFieldScalarWhereWithAggregatesInput = {
+    AND?: ContactPrivateFieldScalarWhereWithAggregatesInput | ContactPrivateFieldScalarWhereWithAggregatesInput[]
+    OR?: ContactPrivateFieldScalarWhereWithAggregatesInput[]
+    NOT?: ContactPrivateFieldScalarWhereWithAggregatesInput | ContactPrivateFieldScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ContactPrivateField"> | string
+    contactId?: StringWithAggregatesFilter<"ContactPrivateField"> | string
+    userId?: StringWithAggregatesFilter<"ContactPrivateField"> | string
+    fieldType?: StringWithAggregatesFilter<"ContactPrivateField"> | string
+    label?: StringNullableWithAggregatesFilter<"ContactPrivateField"> | string | null
+    value?: JsonWithAggregatesFilter<"ContactPrivateField">
+    position?: IntWithAggregatesFilter<"ContactPrivateField"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"ContactPrivateField"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ContactPrivateField"> | Date | string
   }
 
   export type SubscriptionCustomerWhereInput = {
@@ -70128,6 +74700,148 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"ExportJob"> | Date | string
   }
 
+  export type KontaxExportJobWhereInput = {
+    AND?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    OR?: KontaxExportJobWhereInput[]
+    NOT?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    id?: StringFilter<"KontaxExportJob"> | string
+    userId?: StringFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableFilter<"KontaxExportJob">
+    bookId?: StringNullableFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntFilter<"KontaxExportJob"> | number
+    photoCount?: IntFilter<"KontaxExportJob"> | number
+    exportedCount?: IntFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type KontaxExportJobOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    contactIds?: SortOrderInput | SortOrder
+    bookId?: SortOrderInput | SortOrder
+    filterQuery?: SortOrderInput | SortOrder
+    totalCount?: SortOrderInput | SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrderInput | SortOrder
+    fileSizeBytes?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    errorSummary?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type KontaxExportJobWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    OR?: KontaxExportJobWhereInput[]
+    NOT?: KontaxExportJobWhereInput | KontaxExportJobWhereInput[]
+    userId?: StringFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableFilter<"KontaxExportJob">
+    bookId?: StringNullableFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntFilter<"KontaxExportJob"> | number
+    photoCount?: IntFilter<"KontaxExportJob"> | number
+    exportedCount?: IntFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type KontaxExportJobOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    contactIds?: SortOrderInput | SortOrder
+    bookId?: SortOrderInput | SortOrder
+    filterQuery?: SortOrderInput | SortOrder
+    totalCount?: SortOrderInput | SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrderInput | SortOrder
+    fileSizeBytes?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    errorSummary?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: KontaxExportJobCountOrderByAggregateInput
+    _avg?: KontaxExportJobAvgOrderByAggregateInput
+    _max?: KontaxExportJobMaxOrderByAggregateInput
+    _min?: KontaxExportJobMinOrderByAggregateInput
+    _sum?: KontaxExportJobSumOrderByAggregateInput
+  }
+
+  export type KontaxExportJobScalarWhereWithAggregatesInput = {
+    AND?: KontaxExportJobScalarWhereWithAggregatesInput | KontaxExportJobScalarWhereWithAggregatesInput[]
+    OR?: KontaxExportJobScalarWhereWithAggregatesInput[]
+    NOT?: KontaxExportJobScalarWhereWithAggregatesInput | KontaxExportJobScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"KontaxExportJob"> | string
+    userId?: StringWithAggregatesFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindWithAggregatesFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusWithAggregatesFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolWithAggregatesFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolWithAggregatesFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolWithAggregatesFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableWithAggregatesFilter<"KontaxExportJob">
+    bookId?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableWithAggregatesFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntWithAggregatesFilter<"KontaxExportJob"> | number
+    photoCount?: IntWithAggregatesFilter<"KontaxExportJob"> | number
+    exportedCount?: IntWithAggregatesFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableWithAggregatesFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableWithAggregatesFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableWithAggregatesFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"KontaxExportJob"> | Date | string
+  }
+
   export type MergeSuggestionWhereInput = {
     AND?: MergeSuggestionWhereInput | MergeSuggestionWhereInput[]
     OR?: MergeSuggestionWhereInput[]
@@ -70441,11 +75155,16 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
+    destinationBookId?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    destinationBook?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
     replacesSyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
     replacementChildren?: SyncAccountListRelationFilter
     replacedBySyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
@@ -70490,11 +75209,16 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrderInput | SortOrder
     setupCompletedAt?: SortOrderInput | SortOrder
     disconnectedAt?: SortOrderInput | SortOrder
+    deletionHold?: SortOrderInput | SortOrder
+    deletionHoldAt?: SortOrderInput | SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrderInput | SortOrder
     retiredReason?: SortOrderInput | SortOrder
+    destinationBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    destinationBook?: AddressBookOrderByWithRelationInput
     replacesSyncAccount?: SyncAccountOrderByWithRelationInput
     replacementChildren?: SyncAccountOrderByRelationAggregateInput
     replacedBySyncAccount?: SyncAccountOrderByWithRelationInput
@@ -70543,11 +75267,16 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
+    destinationBookId?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    destinationBook?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
     replacesSyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
     replacementChildren?: SyncAccountListRelationFilter
     replacedBySyncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
@@ -70592,8 +75321,12 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrderInput | SortOrder
     setupCompletedAt?: SortOrderInput | SortOrder
     disconnectedAt?: SortOrderInput | SortOrder
+    deletionHold?: SortOrderInput | SortOrder
+    deletionHoldAt?: SortOrderInput | SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrderInput | SortOrder
     retiredReason?: SortOrderInput | SortOrder
+    destinationBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SyncAccountCountOrderByAggregateInput
@@ -70639,8 +75372,12 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableWithAggregatesFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolWithAggregatesFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    destinationBookId?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
   }
@@ -70662,9 +75399,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
@@ -70685,9 +75427,14 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrderInput | SortOrder
     syncWindowEnd?: SortOrderInput | SortOrder
+    syncWindowTimezone?: SortOrderInput | SortOrder
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrderInput | SortOrder
+    projectionBookIds?: SortOrder
+    fieldPrecedence?: SortOrderInput | SortOrder
+    autolinkCaveatDismissedAt?: SortOrderInput | SortOrder
+    conflictOverride?: SortOrderInput | SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
     syncAccount?: SyncAccountOrderByWithRelationInput
@@ -70711,9 +75458,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
@@ -70734,9 +75486,14 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrderInput | SortOrder
     syncWindowEnd?: SortOrderInput | SortOrder
+    syncWindowTimezone?: SortOrderInput | SortOrder
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrderInput | SortOrder
+    projectionBookIds?: SortOrder
+    fieldPrecedence?: SortOrderInput | SortOrder
+    autolinkCaveatDismissedAt?: SortOrderInput | SortOrder
+    conflictOverride?: SortOrderInput | SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
     _count?: SyncAccountSettingsCountOrderByAggregateInput
@@ -70763,9 +75520,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolWithAggregatesFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
   }
@@ -70835,6 +75597,7 @@ export namespace Prisma {
     remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableFilter<"SyncContactLink">
+    photoShadow?: JsonNullableFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
@@ -70856,6 +75619,7 @@ export namespace Prisma {
     remoteETag?: SortOrderInput | SortOrder
     capabilityProfileId?: SortOrderInput | SortOrder
     supportedFieldShadow?: SortOrderInput | SortOrder
+    photoShadow?: SortOrderInput | SortOrder
     lastSyncedAt?: SortOrderInput | SortOrder
     tombstonedAt?: SortOrderInput | SortOrder
     remoteDeletedAt?: SortOrderInput | SortOrder
@@ -70883,6 +75647,7 @@ export namespace Prisma {
     remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableFilter<"SyncContactLink">
+    photoShadow?: JsonNullableFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
@@ -70904,6 +75669,7 @@ export namespace Prisma {
     remoteETag?: SortOrderInput | SortOrder
     capabilityProfileId?: SortOrderInput | SortOrder
     supportedFieldShadow?: SortOrderInput | SortOrder
+    photoShadow?: SortOrderInput | SortOrder
     lastSyncedAt?: SortOrderInput | SortOrder
     tombstonedAt?: SortOrderInput | SortOrder
     remoteDeletedAt?: SortOrderInput | SortOrder
@@ -70928,6 +75694,7 @@ export namespace Prisma {
     remoteETag?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableWithAggregatesFilter<"SyncContactLink">
+    photoShadow?: JsonNullableWithAggregatesFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
@@ -72185,6 +76952,7 @@ export namespace Prisma {
     canEdit?: BoolFilter<"GroupMember"> | boolean
     canManageBilling?: BoolFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableFilter<"GroupMember">
+    sharingPolicy?: JsonNullableFilter<"GroupMember">
     inviteToken?: StringNullableFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
@@ -72205,6 +76973,7 @@ export namespace Prisma {
     canEdit?: SortOrder
     canManageBilling?: SortOrder
     addressBookPermissions?: SortOrderInput | SortOrder
+    sharingPolicy?: SortOrderInput | SortOrder
     inviteToken?: SortOrderInput | SortOrder
     inviteExpiresAt?: SortOrderInput | SortOrder
     invitedAt?: SortOrder
@@ -72231,6 +77000,7 @@ export namespace Prisma {
     canEdit?: BoolFilter<"GroupMember"> | boolean
     canManageBilling?: BoolFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableFilter<"GroupMember">
+    sharingPolicy?: JsonNullableFilter<"GroupMember">
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
     invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
@@ -72250,6 +77020,7 @@ export namespace Prisma {
     canEdit?: SortOrder
     canManageBilling?: SortOrder
     addressBookPermissions?: SortOrderInput | SortOrder
+    sharingPolicy?: SortOrderInput | SortOrder
     inviteToken?: SortOrderInput | SortOrder
     inviteExpiresAt?: SortOrderInput | SortOrder
     invitedAt?: SortOrder
@@ -72274,6 +77045,7 @@ export namespace Prisma {
     canEdit?: BoolWithAggregatesFilter<"GroupMember"> | boolean
     canManageBilling?: BoolWithAggregatesFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableWithAggregatesFilter<"GroupMember">
+    sharingPolicy?: JsonNullableWithAggregatesFilter<"GroupMember">
     inviteToken?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableWithAggregatesFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeWithAggregatesFilter<"GroupMember"> | Date | string
@@ -72291,6 +77063,7 @@ export namespace Prisma {
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
+    minimumSharingPolicy?: JsonNullableFilter<"GroupAddressBook">
     archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
     dissolvedToBookId?: StringNullableFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
@@ -72306,6 +77079,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
+    minimumSharingPolicy?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     dissolvedToBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -72324,6 +77098,7 @@ export namespace Prisma {
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
+    minimumSharingPolicy?: JsonNullableFilter<"GroupAddressBook">
     archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
     dissolvedToBookId?: StringNullableFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
@@ -72339,6 +77114,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
+    minimumSharingPolicy?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     dissolvedToBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -72357,6 +77133,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"GroupAddressBook"> | string
     description?: StringNullableWithAggregatesFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolWithAggregatesFilter<"GroupAddressBook"> | boolean
+    minimumSharingPolicy?: JsonNullableWithAggregatesFilter<"GroupAddressBook">
     archivedAt?: DateTimeNullableWithAggregatesFilter<"GroupAddressBook"> | Date | string | null
     dissolvedToBookId?: StringNullableWithAggregatesFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
@@ -72381,6 +77158,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     contacts?: ContactListRelationFilter
+    contactMemberships?: ContactBookMembershipListRelationFilter
+    syncDestinations?: SyncAccountListRelationFilter
   }
 
   export type AddressBookOrderByWithRelationInput = {
@@ -72398,6 +77177,8 @@ export namespace Prisma {
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
     contacts?: ContactOrderByRelationAggregateInput
+    contactMemberships?: ContactBookMembershipOrderByRelationAggregateInput
+    syncDestinations?: SyncAccountOrderByRelationAggregateInput
   }
 
   export type AddressBookWhereUniqueInput = Prisma.AtLeast<{
@@ -72419,6 +77200,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     contacts?: ContactListRelationFilter
+    contactMemberships?: ContactBookMembershipListRelationFilter
+    syncDestinations?: SyncAccountListRelationFilter
   }, "id" | "userId_slug">
 
   export type AddressBookOrderByWithAggregationInput = {
@@ -72762,6 +77545,7 @@ export namespace Prisma {
     contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     recipientUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     recipientContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    notifications?: NotificationListRelationFilter
   }
 
   export type ContactShareOrderByWithRelationInput = {
@@ -72788,6 +77572,7 @@ export namespace Prisma {
     contact?: ContactOrderByWithRelationInput
     recipientUser?: UserOrderByWithRelationInput
     recipientContact?: ContactOrderByWithRelationInput
+    notifications?: NotificationOrderByRelationAggregateInput
   }
 
   export type ContactShareWhereUniqueInput = Prisma.AtLeast<{
@@ -72817,6 +77602,7 @@ export namespace Prisma {
     contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     recipientUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     recipientContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    notifications?: NotificationListRelationFilter
   }, "id" | "token">
 
   export type ContactShareOrderByWithAggregationInput = {
@@ -72938,10 +77724,14 @@ export namespace Prisma {
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
+    contactShareId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     securityAlert?: XOR<SecurityAlertNullableScalarRelationFilter, SecurityAlertWhereInput> | null
     adminBroadcast?: XOR<AdminBroadcastNullableScalarRelationFilter, AdminBroadcastWhereInput> | null
+    contactShare?: XOR<ContactShareNullableScalarRelationFilter, ContactShareWhereInput> | null
   }
 
   export type NotificationOrderByWithRelationInput = {
@@ -72956,10 +77746,14 @@ export namespace Prisma {
     actionUrl?: SortOrderInput | SortOrder
     securityAlertId?: SortOrderInput | SortOrder
     adminBroadcastId?: SortOrderInput | SortOrder
+    contactShareId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
     securityAlert?: SecurityAlertOrderByWithRelationInput
     adminBroadcast?: AdminBroadcastOrderByWithRelationInput
+    contactShare?: ContactShareOrderByWithRelationInput
   }
 
   export type NotificationWhereUniqueInput = Prisma.AtLeast<{
@@ -72977,10 +77771,14 @@ export namespace Prisma {
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
+    contactShareId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     securityAlert?: XOR<SecurityAlertNullableScalarRelationFilter, SecurityAlertWhereInput> | null
     adminBroadcast?: XOR<AdminBroadcastNullableScalarRelationFilter, AdminBroadcastWhereInput> | null
+    contactShare?: XOR<ContactShareNullableScalarRelationFilter, ContactShareWhereInput> | null
   }, "id">
 
   export type NotificationOrderByWithAggregationInput = {
@@ -72995,7 +77793,10 @@ export namespace Prisma {
     actionUrl?: SortOrderInput | SortOrder
     securityAlertId?: SortOrderInput | SortOrder
     adminBroadcastId?: SortOrderInput | SortOrder
+    contactShareId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     _count?: NotificationCountOrderByAggregateInput
     _max?: NotificationMaxOrderByAggregateInput
     _min?: NotificationMinOrderByAggregateInput
@@ -73016,7 +77817,10 @@ export namespace Prisma {
     actionUrl?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     securityAlertId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
+    contactShareId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableWithAggregatesFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"Notification"> | Date | string | null
   }
 
   export type AdminBroadcastWhereInput = {
@@ -73826,6 +78630,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -73854,6 +78659,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -73900,6 +78706,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -73928,6 +78735,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -73974,6 +78782,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -74002,6 +78811,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -74048,6 +78858,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -74076,6 +78887,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -74453,6 +79265,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -74519,6 +79333,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -74581,6 +79397,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -74647,6 +79465,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -74799,6 +79619,142 @@ export namespace Prisma {
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactBookMembershipCreateInput = {
+    id?: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+    contact: ContactCreateNestedOneWithoutBookMembershipsInput
+    addressBook: AddressBookCreateNestedOneWithoutContactMembershipsInput
+  }
+
+  export type ContactBookMembershipUncheckedCreateInput = {
+    id?: string
+    contactId: string
+    addressBookId: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactBookMembershipUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutBookMembershipsNestedInput
+    addressBook?: AddressBookUpdateOneRequiredWithoutContactMembershipsNestedInput
+  }
+
+  export type ContactBookMembershipUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactBookMembershipCreateManyInput = {
+    id?: string
+    contactId: string
+    addressBookId: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactBookMembershipUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactBookMembershipUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldCreateInput = {
+    id?: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contact: ContactCreateNestedOneWithoutPrivateFieldsInput
+    user: UserCreateNestedOneWithoutContactPrivateFieldsInput
+  }
+
+  export type ContactPrivateFieldUncheckedCreateInput = {
+    id?: string
+    contactId: string
+    userId: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactPrivateFieldUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutPrivateFieldsNestedInput
+    user?: UserUpdateOneRequiredWithoutContactPrivateFieldsNestedInput
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldCreateManyInput = {
+    id?: string
+    contactId: string
+    userId: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactPrivateFieldUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -75424,6 +80380,180 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type KontaxExportJobCreateInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutKontaxExportJobsInput
+  }
+
+  export type KontaxExportJobUncheckedCreateInput = {
+    id?: string
+    userId: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutKontaxExportJobsNestedInput
+  }
+
+  export type KontaxExportJobUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobCreateManyInput = {
+    id?: string
+    userId: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MergeSuggestionCreateInput = {
     id?: string
     pairKey: string
@@ -75744,11 +80874,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -75793,8 +80927,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -75836,11 +80974,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -75885,8 +81027,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -75931,8 +81077,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -75967,6 +81117,9 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -76006,8 +81159,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -76024,9 +81181,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
@@ -76047,9 +81209,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -76066,9 +81233,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
@@ -76089,9 +81261,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -76110,9 +81287,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -76129,9 +81311,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -76150,9 +81337,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -76220,6 +81412,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -76241,6 +81434,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -76258,6 +81452,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -76279,6 +81474,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -76298,6 +81494,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -76314,6 +81511,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -76332,6 +81530,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -77747,6 +82946,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -77767,6 +82967,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -77783,6 +82984,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77803,6 +83005,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77821,6 +83024,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -77837,6 +83041,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77855,6 +83060,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77868,6 +83074,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -77883,6 +83090,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -77896,6 +83104,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77911,6 +83120,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77925,6 +83135,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -77936,6 +83147,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77948,6 +83160,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77968,6 +83181,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAddressBooksInput
     contacts?: ContactCreateNestedManyWithoutBookInput
+    contactMemberships?: ContactBookMembershipCreateNestedManyWithoutAddressBookInput
+    syncDestinations?: SyncAccountCreateNestedManyWithoutDestinationBookInput
   }
 
   export type AddressBookUncheckedCreateInput = {
@@ -77984,6 +83199,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutBookInput
+    contactMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutAddressBookInput
+    syncDestinations?: SyncAccountUncheckedCreateNestedManyWithoutDestinationBookInput
   }
 
   export type AddressBookUpdateInput = {
@@ -78000,6 +83217,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAddressBooksNestedInput
     contacts?: ContactUpdateManyWithoutBookNestedInput
+    contactMemberships?: ContactBookMembershipUpdateManyWithoutAddressBookNestedInput
+    syncDestinations?: SyncAccountUpdateManyWithoutDestinationBookNestedInput
   }
 
   export type AddressBookUncheckedUpdateInput = {
@@ -78016,6 +83235,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutBookNestedInput
+    contactMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutAddressBookNestedInput
+    syncDestinations?: SyncAccountUncheckedUpdateManyWithoutDestinationBookNestedInput
   }
 
   export type AddressBookCreateManyInput = {
@@ -78359,6 +83580,7 @@ export namespace Prisma {
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateInput = {
@@ -78381,6 +83603,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUpdateInput = {
@@ -78403,6 +83626,7 @@ export namespace Prisma {
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateInput = {
@@ -78425,6 +83649,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareCreateManyInput = {
@@ -78555,9 +83780,12 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     user: UserCreateNestedOneWithoutNotificationsInput
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
     adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateInput = {
@@ -78572,7 +83800,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateInput = {
@@ -78585,9 +83816,12 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
     adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateInput = {
@@ -78602,7 +83836,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationCreateManyInput = {
@@ -78617,7 +83854,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateManyMutationInput = {
@@ -78630,6 +83870,8 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyInput = {
@@ -78644,7 +83886,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AdminBroadcastCreateInput = {
@@ -79611,6 +84856,12 @@ export namespace Prisma {
     none?: ExportJobWhereInput
   }
 
+  export type KontaxExportJobListRelationFilter = {
+    every?: KontaxExportJobWhereInput
+    some?: KontaxExportJobWhereInput
+    none?: KontaxExportJobWhereInput
+  }
+
   export type MergeSuggestionListRelationFilter = {
     every?: MergeSuggestionWhereInput
     some?: MergeSuggestionWhereInput
@@ -79771,6 +85022,12 @@ export namespace Prisma {
     none?: LabelWhereInput
   }
 
+  export type ContactPrivateFieldListRelationFilter = {
+    every?: ContactPrivateFieldWhereInput
+    some?: ContactPrivateFieldWhereInput
+    none?: ContactPrivateFieldWhereInput
+  }
+
   export type FailedLoginAttemptListRelationFilter = {
     every?: FailedLoginAttemptWhereInput
     some?: FailedLoginAttemptWhereInput
@@ -79824,6 +85081,10 @@ export namespace Prisma {
   }
 
   export type ExportJobOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type KontaxExportJobOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -79924,6 +85185,10 @@ export namespace Prisma {
   }
 
   export type LabelOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ContactPrivateFieldOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -80337,6 +85602,12 @@ export namespace Prisma {
     none?: GroupContactWhereInput
   }
 
+  export type ContactBookMembershipListRelationFilter = {
+    every?: ContactBookMembershipWhereInput
+    some?: ContactBookMembershipWhereInput
+    none?: ContactBookMembershipWhereInput
+  }
+
   export type ContactNullableScalarRelationFilter = {
     is?: ContactWhereInput | null
     isNot?: ContactWhereInput | null
@@ -80352,6 +85623,10 @@ export namespace Prisma {
   }
 
   export type GroupContactOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ContactBookMembershipOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -80528,6 +85803,136 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSourceTypeFilter<$PrismaModel>
     _max?: NestedEnumSourceTypeFilter<$PrismaModel>
+  }
+
+  export type ContactScalarRelationFilter = {
+    is?: ContactWhereInput
+    isNot?: ContactWhereInput
+  }
+
+  export type AddressBookScalarRelationFilter = {
+    is?: AddressBookWhereInput
+    isNot?: AddressBookWhereInput
+  }
+
+  export type ContactBookMembershipContactIdAddressBookIdCompoundUniqueInput = {
+    contactId: string
+    addressBookId: string
+  }
+
+  export type ContactBookMembershipCountOrderByAggregateInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    addressBookId?: SortOrder
+    isPrimary?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ContactBookMembershipMaxOrderByAggregateInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    addressBookId?: SortOrder
+    isPrimary?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ContactBookMembershipMinOrderByAggregateInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    addressBookId?: SortOrder
+    isPrimary?: SortOrder
+    createdAt?: SortOrder
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type ContactPrivateFieldCountOrderByAggregateInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    userId?: SortOrder
+    fieldType?: SortOrder
+    label?: SortOrder
+    value?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactPrivateFieldAvgOrderByAggregateInput = {
+    position?: SortOrder
+  }
+
+  export type ContactPrivateFieldMaxOrderByAggregateInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    userId?: SortOrder
+    fieldType?: SortOrder
+    label?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactPrivateFieldMinOrderByAggregateInput = {
+    id?: SortOrder
+    contactId?: SortOrder
+    userId?: SortOrder
+    fieldType?: SortOrder
+    label?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactPrivateFieldSumOrderByAggregateInput = {
+    position?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumBillingProviderFilter<$PrismaModel = never> = {
@@ -81005,6 +86410,112 @@ export namespace Prisma {
     _max?: NestedEnumContactExportFormatFilter<$PrismaModel>
   }
 
+  export type EnumKontaxExportKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindFilter<$PrismaModel> | $Enums.KontaxExportKind
+  }
+
+  export type KontaxExportJobCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    contactIds?: SortOrder
+    bookId?: SortOrder
+    filterQuery?: SortOrder
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    expiresAt?: SortOrder
+    errorSummary?: SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KontaxExportJobAvgOrderByAggregateInput = {
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    fileSizeBytes?: SortOrder
+  }
+
+  export type KontaxExportJobMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    bookId?: SortOrder
+    filterQuery?: SortOrder
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    expiresAt?: SortOrder
+    errorSummary?: SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KontaxExportJobMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    includePhotos?: SortOrder
+    includeVcardFallback?: SortOrder
+    bookId?: SortOrder
+    filterQuery?: SortOrder
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    expiresAt?: SortOrder
+    errorSummary?: SortOrder
+    createdAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type KontaxExportJobSumOrderByAggregateInput = {
+    totalCount?: SortOrder
+    progressCount?: SortOrder
+    photoCount?: SortOrder
+    exportedCount?: SortOrder
+    fileSizeBytes?: SortOrder
+  }
+
+  export type EnumKontaxExportKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindWithAggregatesFilter<$PrismaModel> | $Enums.KontaxExportKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+    _max?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+  }
+
   export type EnumMergeSuggestionStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
@@ -81017,34 +86528,6 @@ export namespace Prisma {
     in?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
     notIn?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
     not?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel> | $Enums.MergeSuggestionConfidence
-  }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type ContactScalarRelationFilter = {
-    is?: ContactWhereInput
-    isNot?: ContactWhereInput
   }
 
   export type MergeSuggestionUserIdPairKeyCompoundUniqueInput = {
@@ -81131,32 +86614,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
     _max?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumMergeDecisionStatusFilter<$PrismaModel = never> = {
@@ -81339,8 +86796,12 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    deletionHold?: SortOrder
+    deletionHoldAt?: SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrder
     retiredReason?: SortOrder
+    destinationBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -81381,8 +86842,11 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    deletionHoldAt?: SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrder
     retiredReason?: SortOrder
+    destinationBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -81419,8 +86883,11 @@ export namespace Prisma {
     booksDiscoveredAt?: SortOrder
     setupCompletedAt?: SortOrder
     disconnectedAt?: SortOrder
+    deletionHoldAt?: SortOrder
+    deletionGuardBypassOnce?: SortOrder
     retiredAt?: SortOrder
     retiredReason?: SortOrder
+    destinationBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -81498,9 +86965,14 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrder
     syncWindowEnd?: SortOrder
+    syncWindowTimezone?: SortOrder
     excludedFields?: SortOrder
     exportLabelFilter?: SortOrder
     maxAttemptsBeforePause?: SortOrder
+    projectionBookIds?: SortOrder
+    fieldPrecedence?: SortOrder
+    autolinkCaveatDismissedAt?: SortOrder
+    conflictOverride?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -81526,7 +86998,11 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrder
     syncWindowEnd?: SortOrder
+    syncWindowTimezone?: SortOrder
     maxAttemptsBeforePause?: SortOrder
+    fieldPrecedence?: SortOrder
+    autolinkCaveatDismissedAt?: SortOrder
+    conflictOverride?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -81544,7 +87020,11 @@ export namespace Prisma {
     notifyOnFailure?: SortOrder
     syncWindowStart?: SortOrder
     syncWindowEnd?: SortOrder
+    syncWindowTimezone?: SortOrder
     maxAttemptsBeforePause?: SortOrder
+    fieldPrecedence?: SortOrder
+    autolinkCaveatDismissedAt?: SortOrder
+    conflictOverride?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -81620,6 +87100,7 @@ export namespace Prisma {
     remoteETag?: SortOrder
     capabilityProfileId?: SortOrder
     supportedFieldShadow?: SortOrder
+    photoShadow?: SortOrder
     lastSyncedAt?: SortOrder
     tombstonedAt?: SortOrder
     remoteDeletedAt?: SortOrder
@@ -82629,6 +88110,7 @@ export namespace Prisma {
     canEdit?: SortOrder
     canManageBilling?: SortOrder
     addressBookPermissions?: SortOrder
+    sharingPolicy?: SortOrder
     inviteToken?: SortOrder
     inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
@@ -82697,6 +88179,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    minimumSharingPolicy?: SortOrder
     archivedAt?: SortOrder
     dissolvedToBookId?: SortOrder
     createdAt?: SortOrder
@@ -83085,6 +88568,11 @@ export namespace Prisma {
     isNot?: AdminBroadcastWhereInput | null
   }
 
+  export type ContactShareNullableScalarRelationFilter = {
+    is?: ContactShareWhereInput | null
+    isNot?: ContactShareWhereInput | null
+  }
+
   export type NotificationCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -83097,7 +88585,10 @@ export namespace Prisma {
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
     adminBroadcastId?: SortOrder
+    contactShareId?: SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type NotificationMaxOrderByAggregateInput = {
@@ -83112,7 +88603,10 @@ export namespace Prisma {
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
     adminBroadcastId?: SortOrder
+    contactShareId?: SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type NotificationMinOrderByAggregateInput = {
@@ -83127,7 +88621,10 @@ export namespace Prisma {
     actionUrl?: SortOrder
     securityAlertId?: SortOrder
     adminBroadcastId?: SortOrder
+    contactShareId?: SortOrder
     createdAt?: SortOrder
+    eventAt?: SortOrder
+    expiresAt?: SortOrder
   }
 
   export type EnumNotificationCategoryWithAggregatesFilter<$PrismaModel = never> = {
@@ -83641,6 +89138,13 @@ export namespace Prisma {
     connect?: ExportJobWhereUniqueInput | ExportJobWhereUniqueInput[]
   }
 
+  export type KontaxExportJobCreateNestedManyWithoutUserInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+  }
+
   export type MergeSuggestionCreateNestedManyWithoutUserInput = {
     create?: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput> | MergeSuggestionCreateWithoutUserInput[] | MergeSuggestionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: MergeSuggestionCreateOrConnectWithoutUserInput | MergeSuggestionCreateOrConnectWithoutUserInput[]
@@ -83835,6 +89339,13 @@ export namespace Prisma {
     connect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
   }
 
+  export type ContactPrivateFieldCreateNestedManyWithoutUserInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutUserInput, ContactPrivateFieldUncheckedCreateWithoutUserInput> | ContactPrivateFieldCreateWithoutUserInput[] | ContactPrivateFieldUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutUserInput | ContactPrivateFieldCreateOrConnectWithoutUserInput[]
+    createMany?: ContactPrivateFieldCreateManyUserInputEnvelope
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+  }
+
   export type FailedLoginAttemptCreateNestedManyWithoutUserInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -83930,6 +89441,13 @@ export namespace Prisma {
     connectOrCreate?: ExportJobCreateOrConnectWithoutUserInput | ExportJobCreateOrConnectWithoutUserInput[]
     createMany?: ExportJobCreateManyUserInputEnvelope
     connect?: ExportJobWhereUniqueInput | ExportJobWhereUniqueInput[]
+  }
+
+  export type KontaxExportJobUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
   }
 
   export type MergeSuggestionUncheckedCreateNestedManyWithoutUserInput = {
@@ -84126,6 +89644,13 @@ export namespace Prisma {
     connect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
   }
 
+  export type ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutUserInput, ContactPrivateFieldUncheckedCreateWithoutUserInput> | ContactPrivateFieldCreateWithoutUserInput[] | ContactPrivateFieldUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutUserInput | ContactPrivateFieldCreateOrConnectWithoutUserInput[]
+    createMany?: ContactPrivateFieldCreateManyUserInputEnvelope
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+  }
+
   export type FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -84289,6 +89814,20 @@ export namespace Prisma {
     update?: ExportJobUpdateWithWhereUniqueWithoutUserInput | ExportJobUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ExportJobUpdateManyWithWhereWithoutUserInput | ExportJobUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ExportJobScalarWhereInput | ExportJobScalarWhereInput[]
+  }
+
+  export type KontaxExportJobUpdateManyWithoutUserNestedInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    upsert?: KontaxExportJobUpsertWithWhereUniqueWithoutUserInput | KontaxExportJobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    set?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    disconnect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    delete?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    update?: KontaxExportJobUpdateWithWhereUniqueWithoutUserInput | KontaxExportJobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: KontaxExportJobUpdateManyWithWhereWithoutUserInput | KontaxExportJobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
   }
 
   export type MergeSuggestionUpdateManyWithoutUserNestedInput = {
@@ -84675,6 +90214,20 @@ export namespace Prisma {
     deleteMany?: LabelScalarWhereInput | LabelScalarWhereInput[]
   }
 
+  export type ContactPrivateFieldUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutUserInput, ContactPrivateFieldUncheckedCreateWithoutUserInput> | ContactPrivateFieldCreateWithoutUserInput[] | ContactPrivateFieldUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutUserInput | ContactPrivateFieldCreateOrConnectWithoutUserInput[]
+    upsert?: ContactPrivateFieldUpsertWithWhereUniqueWithoutUserInput | ContactPrivateFieldUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ContactPrivateFieldCreateManyUserInputEnvelope
+    set?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    disconnect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    delete?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    update?: ContactPrivateFieldUpdateWithWhereUniqueWithoutUserInput | ContactPrivateFieldUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ContactPrivateFieldUpdateManyWithWhereWithoutUserInput | ContactPrivateFieldUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ContactPrivateFieldScalarWhereInput | ContactPrivateFieldScalarWhereInput[]
+  }
+
   export type FailedLoginAttemptUpdateManyWithoutUserNestedInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -84865,6 +90418,20 @@ export namespace Prisma {
     update?: ExportJobUpdateWithWhereUniqueWithoutUserInput | ExportJobUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ExportJobUpdateManyWithWhereWithoutUserInput | ExportJobUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ExportJobScalarWhereInput | ExportJobScalarWhereInput[]
+  }
+
+  export type KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput> | KontaxExportJobCreateWithoutUserInput[] | KontaxExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: KontaxExportJobCreateOrConnectWithoutUserInput | KontaxExportJobCreateOrConnectWithoutUserInput[]
+    upsert?: KontaxExportJobUpsertWithWhereUniqueWithoutUserInput | KontaxExportJobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: KontaxExportJobCreateManyUserInputEnvelope
+    set?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    disconnect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    delete?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    connect?: KontaxExportJobWhereUniqueInput | KontaxExportJobWhereUniqueInput[]
+    update?: KontaxExportJobUpdateWithWhereUniqueWithoutUserInput | KontaxExportJobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: KontaxExportJobUpdateManyWithWhereWithoutUserInput | KontaxExportJobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
   }
 
   export type MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput = {
@@ -85251,6 +90818,20 @@ export namespace Prisma {
     deleteMany?: LabelScalarWhereInput | LabelScalarWhereInput[]
   }
 
+  export type ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutUserInput, ContactPrivateFieldUncheckedCreateWithoutUserInput> | ContactPrivateFieldCreateWithoutUserInput[] | ContactPrivateFieldUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutUserInput | ContactPrivateFieldCreateOrConnectWithoutUserInput[]
+    upsert?: ContactPrivateFieldUpsertWithWhereUniqueWithoutUserInput | ContactPrivateFieldUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ContactPrivateFieldCreateManyUserInputEnvelope
+    set?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    disconnect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    delete?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    update?: ContactPrivateFieldUpdateWithWhereUniqueWithoutUserInput | ContactPrivateFieldUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ContactPrivateFieldUpdateManyWithWhereWithoutUserInput | ContactPrivateFieldUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ContactPrivateFieldScalarWhereInput | ContactPrivateFieldScalarWhereInput[]
+  }
+
   export type FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -85553,6 +91134,20 @@ export namespace Prisma {
     connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
   }
 
+  export type ContactBookMembershipCreateNestedManyWithoutContactInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutContactInput, ContactBookMembershipUncheckedCreateWithoutContactInput> | ContactBookMembershipCreateWithoutContactInput[] | ContactBookMembershipUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutContactInput | ContactBookMembershipCreateOrConnectWithoutContactInput[]
+    createMany?: ContactBookMembershipCreateManyContactInputEnvelope
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+  }
+
+  export type ContactPrivateFieldCreateNestedManyWithoutContactInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutContactInput, ContactPrivateFieldUncheckedCreateWithoutContactInput> | ContactPrivateFieldCreateWithoutContactInput[] | ContactPrivateFieldUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutContactInput | ContactPrivateFieldCreateOrConnectWithoutContactInput[]
+    createMany?: ContactPrivateFieldCreateManyContactInputEnvelope
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+  }
+
   export type BirthdayReminderStateCreateNestedManyWithoutContactInput = {
     create?: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput> | BirthdayReminderStateCreateWithoutContactInput[] | BirthdayReminderStateUncheckedCreateWithoutContactInput[]
     connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutContactInput | BirthdayReminderStateCreateOrConnectWithoutContactInput[]
@@ -85647,6 +91242,20 @@ export namespace Prisma {
     connectOrCreate?: GroupContactCreateOrConnectWithoutContactInput | GroupContactCreateOrConnectWithoutContactInput[]
     createMany?: GroupContactCreateManyContactInputEnvelope
     connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+  }
+
+  export type ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutContactInput, ContactBookMembershipUncheckedCreateWithoutContactInput> | ContactBookMembershipCreateWithoutContactInput[] | ContactBookMembershipUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutContactInput | ContactBookMembershipCreateOrConnectWithoutContactInput[]
+    createMany?: ContactBookMembershipCreateManyContactInputEnvelope
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+  }
+
+  export type ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutContactInput, ContactPrivateFieldUncheckedCreateWithoutContactInput> | ContactPrivateFieldCreateWithoutContactInput[] | ContactPrivateFieldUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutContactInput | ContactPrivateFieldCreateOrConnectWithoutContactInput[]
+    createMany?: ContactPrivateFieldCreateManyContactInputEnvelope
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
   }
 
   export type BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput = {
@@ -85831,6 +91440,34 @@ export namespace Prisma {
     update?: GroupContactUpdateWithWhereUniqueWithoutContactInput | GroupContactUpdateWithWhereUniqueWithoutContactInput[]
     updateMany?: GroupContactUpdateManyWithWhereWithoutContactInput | GroupContactUpdateManyWithWhereWithoutContactInput[]
     deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+  }
+
+  export type ContactBookMembershipUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutContactInput, ContactBookMembershipUncheckedCreateWithoutContactInput> | ContactBookMembershipCreateWithoutContactInput[] | ContactBookMembershipUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutContactInput | ContactBookMembershipCreateOrConnectWithoutContactInput[]
+    upsert?: ContactBookMembershipUpsertWithWhereUniqueWithoutContactInput | ContactBookMembershipUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ContactBookMembershipCreateManyContactInputEnvelope
+    set?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    disconnect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    delete?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    update?: ContactBookMembershipUpdateWithWhereUniqueWithoutContactInput | ContactBookMembershipUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ContactBookMembershipUpdateManyWithWhereWithoutContactInput | ContactBookMembershipUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ContactBookMembershipScalarWhereInput | ContactBookMembershipScalarWhereInput[]
+  }
+
+  export type ContactPrivateFieldUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutContactInput, ContactPrivateFieldUncheckedCreateWithoutContactInput> | ContactPrivateFieldCreateWithoutContactInput[] | ContactPrivateFieldUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutContactInput | ContactPrivateFieldCreateOrConnectWithoutContactInput[]
+    upsert?: ContactPrivateFieldUpsertWithWhereUniqueWithoutContactInput | ContactPrivateFieldUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ContactPrivateFieldCreateManyContactInputEnvelope
+    set?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    disconnect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    delete?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    update?: ContactPrivateFieldUpdateWithWhereUniqueWithoutContactInput | ContactPrivateFieldUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ContactPrivateFieldUpdateManyWithWhereWithoutContactInput | ContactPrivateFieldUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ContactPrivateFieldScalarWhereInput | ContactPrivateFieldScalarWhereInput[]
   }
 
   export type BirthdayReminderStateUpdateManyWithoutContactNestedInput = {
@@ -86021,6 +91658,34 @@ export namespace Prisma {
     deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
   }
 
+  export type ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutContactInput, ContactBookMembershipUncheckedCreateWithoutContactInput> | ContactBookMembershipCreateWithoutContactInput[] | ContactBookMembershipUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutContactInput | ContactBookMembershipCreateOrConnectWithoutContactInput[]
+    upsert?: ContactBookMembershipUpsertWithWhereUniqueWithoutContactInput | ContactBookMembershipUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ContactBookMembershipCreateManyContactInputEnvelope
+    set?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    disconnect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    delete?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    update?: ContactBookMembershipUpdateWithWhereUniqueWithoutContactInput | ContactBookMembershipUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ContactBookMembershipUpdateManyWithWhereWithoutContactInput | ContactBookMembershipUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ContactBookMembershipScalarWhereInput | ContactBookMembershipScalarWhereInput[]
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ContactPrivateFieldCreateWithoutContactInput, ContactPrivateFieldUncheckedCreateWithoutContactInput> | ContactPrivateFieldCreateWithoutContactInput[] | ContactPrivateFieldUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactPrivateFieldCreateOrConnectWithoutContactInput | ContactPrivateFieldCreateOrConnectWithoutContactInput[]
+    upsert?: ContactPrivateFieldUpsertWithWhereUniqueWithoutContactInput | ContactPrivateFieldUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ContactPrivateFieldCreateManyContactInputEnvelope
+    set?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    disconnect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    delete?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    connect?: ContactPrivateFieldWhereUniqueInput | ContactPrivateFieldWhereUniqueInput[]
+    update?: ContactPrivateFieldUpdateWithWhereUniqueWithoutContactInput | ContactPrivateFieldUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ContactPrivateFieldUpdateManyWithWhereWithoutContactInput | ContactPrivateFieldUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ContactPrivateFieldScalarWhereInput | ContactPrivateFieldScalarWhereInput[]
+  }
+
   export type BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput = {
     create?: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput> | BirthdayReminderStateCreateWithoutContactInput[] | BirthdayReminderStateUncheckedCreateWithoutContactInput[]
     connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutContactInput | BirthdayReminderStateCreateOrConnectWithoutContactInput[]
@@ -86047,6 +91712,62 @@ export namespace Prisma {
     update?: ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput | ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput[]
     updateMany?: ContactUpdateManyWithWhereWithoutMergedIntoContactInput | ContactUpdateManyWithWhereWithoutMergedIntoContactInput[]
     deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type ContactCreateNestedOneWithoutBookMembershipsInput = {
+    create?: XOR<ContactCreateWithoutBookMembershipsInput, ContactUncheckedCreateWithoutBookMembershipsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutBookMembershipsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type AddressBookCreateNestedOneWithoutContactMembershipsInput = {
+    create?: XOR<AddressBookCreateWithoutContactMembershipsInput, AddressBookUncheckedCreateWithoutContactMembershipsInput>
+    connectOrCreate?: AddressBookCreateOrConnectWithoutContactMembershipsInput
+    connect?: AddressBookWhereUniqueInput
+  }
+
+  export type ContactUpdateOneRequiredWithoutBookMembershipsNestedInput = {
+    create?: XOR<ContactCreateWithoutBookMembershipsInput, ContactUncheckedCreateWithoutBookMembershipsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutBookMembershipsInput
+    upsert?: ContactUpsertWithoutBookMembershipsInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutBookMembershipsInput, ContactUpdateWithoutBookMembershipsInput>, ContactUncheckedUpdateWithoutBookMembershipsInput>
+  }
+
+  export type AddressBookUpdateOneRequiredWithoutContactMembershipsNestedInput = {
+    create?: XOR<AddressBookCreateWithoutContactMembershipsInput, AddressBookUncheckedCreateWithoutContactMembershipsInput>
+    connectOrCreate?: AddressBookCreateOrConnectWithoutContactMembershipsInput
+    upsert?: AddressBookUpsertWithoutContactMembershipsInput
+    connect?: AddressBookWhereUniqueInput
+    update?: XOR<XOR<AddressBookUpdateToOneWithWhereWithoutContactMembershipsInput, AddressBookUpdateWithoutContactMembershipsInput>, AddressBookUncheckedUpdateWithoutContactMembershipsInput>
+  }
+
+  export type ContactCreateNestedOneWithoutPrivateFieldsInput = {
+    create?: XOR<ContactCreateWithoutPrivateFieldsInput, ContactUncheckedCreateWithoutPrivateFieldsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutPrivateFieldsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutContactPrivateFieldsInput = {
+    create?: XOR<UserCreateWithoutContactPrivateFieldsInput, UserUncheckedCreateWithoutContactPrivateFieldsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactPrivateFieldsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactUpdateOneRequiredWithoutPrivateFieldsNestedInput = {
+    create?: XOR<ContactCreateWithoutPrivateFieldsInput, ContactUncheckedCreateWithoutPrivateFieldsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutPrivateFieldsInput
+    upsert?: ContactUpsertWithoutPrivateFieldsInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutPrivateFieldsInput, ContactUpdateWithoutPrivateFieldsInput>, ContactUncheckedUpdateWithoutPrivateFieldsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutContactPrivateFieldsNestedInput = {
+    create?: XOR<UserCreateWithoutContactPrivateFieldsInput, UserUncheckedCreateWithoutContactPrivateFieldsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactPrivateFieldsInput
+    upsert?: UserUpsertWithoutContactPrivateFieldsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutContactPrivateFieldsInput, UserUpdateWithoutContactPrivateFieldsInput>, UserUncheckedUpdateWithoutContactPrivateFieldsInput>
   }
 
   export type UserCreateNestedOneWithoutSubscriptionCustomerInput = {
@@ -86313,6 +92034,24 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutExportJobsInput, UserUpdateWithoutExportJobsInput>, UserUncheckedUpdateWithoutExportJobsInput>
   }
 
+  export type UserCreateNestedOneWithoutKontaxExportJobsInput = {
+    create?: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKontaxExportJobsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumKontaxExportKindFieldUpdateOperationsInput = {
+    set?: $Enums.KontaxExportKind
+  }
+
+  export type UserUpdateOneRequiredWithoutKontaxExportJobsNestedInput = {
+    create?: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutKontaxExportJobsInput
+    upsert?: UserUpsertWithoutKontaxExportJobsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutKontaxExportJobsInput, UserUpdateWithoutKontaxExportJobsInput>, UserUncheckedUpdateWithoutKontaxExportJobsInput>
+  }
+
   export type UserCreateNestedOneWithoutMergeSuggestionsInput = {
     create?: XOR<UserCreateWithoutMergeSuggestionsInput, UserUncheckedCreateWithoutMergeSuggestionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutMergeSuggestionsInput
@@ -86485,6 +92224,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type AddressBookCreateNestedOneWithoutSyncDestinationsInput = {
+    create?: XOR<AddressBookCreateWithoutSyncDestinationsInput, AddressBookUncheckedCreateWithoutSyncDestinationsInput>
+    connectOrCreate?: AddressBookCreateOrConnectWithoutSyncDestinationsInput
+    connect?: AddressBookWhereUniqueInput
+  }
+
   export type SyncAccountCreateNestedOneWithoutReplacementChildrenInput = {
     create?: XOR<SyncAccountCreateWithoutReplacementChildrenInput, SyncAccountUncheckedCreateWithoutReplacementChildrenInput>
     connectOrCreate?: SyncAccountCreateOrConnectWithoutReplacementChildrenInput
@@ -86609,6 +92354,16 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSyncAccountsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSyncAccountsInput, UserUpdateWithoutSyncAccountsInput>, UserUncheckedUpdateWithoutSyncAccountsInput>
+  }
+
+  export type AddressBookUpdateOneWithoutSyncDestinationsNestedInput = {
+    create?: XOR<AddressBookCreateWithoutSyncDestinationsInput, AddressBookUncheckedCreateWithoutSyncDestinationsInput>
+    connectOrCreate?: AddressBookCreateOrConnectWithoutSyncDestinationsInput
+    upsert?: AddressBookUpsertWithoutSyncDestinationsInput
+    disconnect?: AddressBookWhereInput | boolean
+    delete?: AddressBookWhereInput | boolean
+    connect?: AddressBookWhereUniqueInput
+    update?: XOR<XOR<AddressBookUpdateToOneWithWhereWithoutSyncDestinationsInput, AddressBookUpdateWithoutSyncDestinationsInput>, AddressBookUncheckedUpdateWithoutSyncDestinationsInput>
   }
 
   export type SyncAccountUpdateOneWithoutReplacementChildrenNestedInput = {
@@ -86823,6 +92578,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type SyncAccountSettingsCreateprojectionBookIdsInput = {
+    set: string[]
+  }
+
   export type SyncAccountCreateNestedOneWithoutSettingsInput = {
     create?: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
     connectOrCreate?: SyncAccountCreateOrConnectWithoutSettingsInput
@@ -86850,6 +92609,11 @@ export namespace Prisma {
   }
 
   export type SyncAccountSettingsUpdateexportLabelFilterInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type SyncAccountSettingsUpdateprojectionBookIdsInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -87693,11 +93457,39 @@ export namespace Prisma {
     connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
   }
 
+  export type ContactBookMembershipCreateNestedManyWithoutAddressBookInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutAddressBookInput, ContactBookMembershipUncheckedCreateWithoutAddressBookInput> | ContactBookMembershipCreateWithoutAddressBookInput[] | ContactBookMembershipUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutAddressBookInput | ContactBookMembershipCreateOrConnectWithoutAddressBookInput[]
+    createMany?: ContactBookMembershipCreateManyAddressBookInputEnvelope
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+  }
+
+  export type SyncAccountCreateNestedManyWithoutDestinationBookInput = {
+    create?: XOR<SyncAccountCreateWithoutDestinationBookInput, SyncAccountUncheckedCreateWithoutDestinationBookInput> | SyncAccountCreateWithoutDestinationBookInput[] | SyncAccountUncheckedCreateWithoutDestinationBookInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutDestinationBookInput | SyncAccountCreateOrConnectWithoutDestinationBookInput[]
+    createMany?: SyncAccountCreateManyDestinationBookInputEnvelope
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+  }
+
   export type ContactUncheckedCreateNestedManyWithoutBookInput = {
     create?: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput> | ContactCreateWithoutBookInput[] | ContactUncheckedCreateWithoutBookInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
     createMany?: ContactCreateManyBookInputEnvelope
     connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type ContactBookMembershipUncheckedCreateNestedManyWithoutAddressBookInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutAddressBookInput, ContactBookMembershipUncheckedCreateWithoutAddressBookInput> | ContactBookMembershipCreateWithoutAddressBookInput[] | ContactBookMembershipUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutAddressBookInput | ContactBookMembershipCreateOrConnectWithoutAddressBookInput[]
+    createMany?: ContactBookMembershipCreateManyAddressBookInputEnvelope
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+  }
+
+  export type SyncAccountUncheckedCreateNestedManyWithoutDestinationBookInput = {
+    create?: XOR<SyncAccountCreateWithoutDestinationBookInput, SyncAccountUncheckedCreateWithoutDestinationBookInput> | SyncAccountCreateWithoutDestinationBookInput[] | SyncAccountUncheckedCreateWithoutDestinationBookInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutDestinationBookInput | SyncAccountCreateOrConnectWithoutDestinationBookInput[]
+    createMany?: SyncAccountCreateManyDestinationBookInputEnvelope
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
   }
 
   export type AddressBookUpdatesourceBookIdsInput = {
@@ -87727,6 +93519,34 @@ export namespace Prisma {
     deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
   }
 
+  export type ContactBookMembershipUpdateManyWithoutAddressBookNestedInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutAddressBookInput, ContactBookMembershipUncheckedCreateWithoutAddressBookInput> | ContactBookMembershipCreateWithoutAddressBookInput[] | ContactBookMembershipUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutAddressBookInput | ContactBookMembershipCreateOrConnectWithoutAddressBookInput[]
+    upsert?: ContactBookMembershipUpsertWithWhereUniqueWithoutAddressBookInput | ContactBookMembershipUpsertWithWhereUniqueWithoutAddressBookInput[]
+    createMany?: ContactBookMembershipCreateManyAddressBookInputEnvelope
+    set?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    disconnect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    delete?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    update?: ContactBookMembershipUpdateWithWhereUniqueWithoutAddressBookInput | ContactBookMembershipUpdateWithWhereUniqueWithoutAddressBookInput[]
+    updateMany?: ContactBookMembershipUpdateManyWithWhereWithoutAddressBookInput | ContactBookMembershipUpdateManyWithWhereWithoutAddressBookInput[]
+    deleteMany?: ContactBookMembershipScalarWhereInput | ContactBookMembershipScalarWhereInput[]
+  }
+
+  export type SyncAccountUpdateManyWithoutDestinationBookNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutDestinationBookInput, SyncAccountUncheckedCreateWithoutDestinationBookInput> | SyncAccountCreateWithoutDestinationBookInput[] | SyncAccountUncheckedCreateWithoutDestinationBookInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutDestinationBookInput | SyncAccountCreateOrConnectWithoutDestinationBookInput[]
+    upsert?: SyncAccountUpsertWithWhereUniqueWithoutDestinationBookInput | SyncAccountUpsertWithWhereUniqueWithoutDestinationBookInput[]
+    createMany?: SyncAccountCreateManyDestinationBookInputEnvelope
+    set?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    disconnect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    delete?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    update?: SyncAccountUpdateWithWhereUniqueWithoutDestinationBookInput | SyncAccountUpdateWithWhereUniqueWithoutDestinationBookInput[]
+    updateMany?: SyncAccountUpdateManyWithWhereWithoutDestinationBookInput | SyncAccountUpdateManyWithWhereWithoutDestinationBookInput[]
+    deleteMany?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
+  }
+
   export type ContactUncheckedUpdateManyWithoutBookNestedInput = {
     create?: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput> | ContactCreateWithoutBookInput[] | ContactUncheckedCreateWithoutBookInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
@@ -87739,6 +93559,34 @@ export namespace Prisma {
     update?: ContactUpdateWithWhereUniqueWithoutBookInput | ContactUpdateWithWhereUniqueWithoutBookInput[]
     updateMany?: ContactUpdateManyWithWhereWithoutBookInput | ContactUpdateManyWithWhereWithoutBookInput[]
     deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type ContactBookMembershipUncheckedUpdateManyWithoutAddressBookNestedInput = {
+    create?: XOR<ContactBookMembershipCreateWithoutAddressBookInput, ContactBookMembershipUncheckedCreateWithoutAddressBookInput> | ContactBookMembershipCreateWithoutAddressBookInput[] | ContactBookMembershipUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: ContactBookMembershipCreateOrConnectWithoutAddressBookInput | ContactBookMembershipCreateOrConnectWithoutAddressBookInput[]
+    upsert?: ContactBookMembershipUpsertWithWhereUniqueWithoutAddressBookInput | ContactBookMembershipUpsertWithWhereUniqueWithoutAddressBookInput[]
+    createMany?: ContactBookMembershipCreateManyAddressBookInputEnvelope
+    set?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    disconnect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    delete?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    connect?: ContactBookMembershipWhereUniqueInput | ContactBookMembershipWhereUniqueInput[]
+    update?: ContactBookMembershipUpdateWithWhereUniqueWithoutAddressBookInput | ContactBookMembershipUpdateWithWhereUniqueWithoutAddressBookInput[]
+    updateMany?: ContactBookMembershipUpdateManyWithWhereWithoutAddressBookInput | ContactBookMembershipUpdateManyWithWhereWithoutAddressBookInput[]
+    deleteMany?: ContactBookMembershipScalarWhereInput | ContactBookMembershipScalarWhereInput[]
+  }
+
+  export type SyncAccountUncheckedUpdateManyWithoutDestinationBookNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutDestinationBookInput, SyncAccountUncheckedCreateWithoutDestinationBookInput> | SyncAccountCreateWithoutDestinationBookInput[] | SyncAccountUncheckedCreateWithoutDestinationBookInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutDestinationBookInput | SyncAccountCreateOrConnectWithoutDestinationBookInput[]
+    upsert?: SyncAccountUpsertWithWhereUniqueWithoutDestinationBookInput | SyncAccountUpsertWithWhereUniqueWithoutDestinationBookInput[]
+    createMany?: SyncAccountCreateManyDestinationBookInputEnvelope
+    set?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    disconnect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    delete?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    update?: SyncAccountUpdateWithWhereUniqueWithoutDestinationBookInput | SyncAccountUpdateWithWhereUniqueWithoutDestinationBookInput[]
+    updateMany?: SyncAccountUpdateManyWithWhereWithoutDestinationBookInput | SyncAccountUpdateManyWithWhereWithoutDestinationBookInput[]
+    deleteMany?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSavedFiltersInput = {
@@ -87905,6 +93753,20 @@ export namespace Prisma {
     connect?: ContactWhereUniqueInput
   }
 
+  export type NotificationCreateNestedManyWithoutContactShareInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type NotificationUncheckedCreateNestedManyWithoutContactShareInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
   export type EnumShareTypeFieldUpdateOperationsInput = {
     set?: $Enums.ShareType
   }
@@ -87951,6 +93813,34 @@ export namespace Prisma {
     update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSharesAsRecipientCopyInput, ContactUpdateWithoutSharesAsRecipientCopyInput>, ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput>
   }
 
+  export type NotificationUpdateManyWithoutContactShareNestedInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutContactShareInput | NotificationUpsertWithWhereUniqueWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutContactShareInput | NotificationUpdateWithWhereUniqueWithoutContactShareInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutContactShareInput | NotificationUpdateManyWithWhereWithoutContactShareInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutContactShareNestedInput = {
+    create?: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput> | NotificationCreateWithoutContactShareInput[] | NotificationUncheckedCreateWithoutContactShareInput[]
+    connectOrCreate?: NotificationCreateOrConnectWithoutContactShareInput | NotificationCreateOrConnectWithoutContactShareInput[]
+    upsert?: NotificationUpsertWithWhereUniqueWithoutContactShareInput | NotificationUpsertWithWhereUniqueWithoutContactShareInput[]
+    createMany?: NotificationCreateManyContactShareInputEnvelope
+    set?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    disconnect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    delete?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+    update?: NotificationUpdateWithWhereUniqueWithoutContactShareInput | NotificationUpdateWithWhereUniqueWithoutContactShareInput[]
+    updateMany?: NotificationUpdateManyWithWhereWithoutContactShareInput | NotificationUpdateManyWithWhereWithoutContactShareInput[]
+    deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutNotificationsInput = {
     create?: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
     connectOrCreate?: UserCreateOrConnectWithoutNotificationsInput
@@ -87967,6 +93857,12 @@ export namespace Prisma {
     create?: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
     connectOrCreate?: AdminBroadcastCreateOrConnectWithoutNotificationsInput
     connect?: AdminBroadcastWhereUniqueInput
+  }
+
+  export type ContactShareCreateNestedOneWithoutNotificationsInput = {
+    create?: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: ContactShareCreateOrConnectWithoutNotificationsInput
+    connect?: ContactShareWhereUniqueInput
   }
 
   export type EnumNotificationCategoryFieldUpdateOperationsInput = {
@@ -87999,6 +93895,16 @@ export namespace Prisma {
     delete?: AdminBroadcastWhereInput | boolean
     connect?: AdminBroadcastWhereUniqueInput
     update?: XOR<XOR<AdminBroadcastUpdateToOneWithWhereWithoutNotificationsInput, AdminBroadcastUpdateWithoutNotificationsInput>, AdminBroadcastUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type ContactShareUpdateOneWithoutNotificationsNestedInput = {
+    create?: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+    connectOrCreate?: ContactShareCreateOrConnectWithoutNotificationsInput
+    upsert?: ContactShareUpsertWithoutNotificationsInput
+    disconnect?: ContactShareWhereInput | boolean
+    delete?: ContactShareWhereInput | boolean
+    connect?: ContactShareWhereUniqueInput
+    update?: XOR<XOR<ContactShareUpdateToOneWithWhereWithoutNotificationsInput, ContactShareUpdateWithoutNotificationsInput>, ContactShareUncheckedUpdateWithoutNotificationsInput>
   }
 
   export type UserCreateNestedOneWithoutBroadcastsCreatedInput = {
@@ -88578,6 +94484,29 @@ export namespace Prisma {
     _min?: NestedEnumSourceTypeFilter<$PrismaModel>
     _max?: NestedEnumSourceTypeFilter<$PrismaModel>
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedEnumBillingProviderFilter<$PrismaModel = never> = {
     equals?: $Enums.BillingProvider | EnumBillingProviderFieldRefInput<$PrismaModel>
@@ -88715,6 +94644,23 @@ export namespace Prisma {
     _max?: NestedEnumContactExportFormatFilter<$PrismaModel>
   }
 
+  export type NestedEnumKontaxExportKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindFilter<$PrismaModel> | $Enums.KontaxExportKind
+  }
+
+  export type NestedEnumKontaxExportKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.KontaxExportKind | EnumKontaxExportKindFieldRefInput<$PrismaModel>
+    in?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.KontaxExportKind[] | ListEnumKontaxExportKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumKontaxExportKindWithAggregatesFilter<$PrismaModel> | $Enums.KontaxExportKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+    _max?: NestedEnumKontaxExportKindFilter<$PrismaModel>
+  }
+
   export type NestedEnumMergeSuggestionStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
@@ -88747,29 +94693,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
     _max?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
-  }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumMergeDecisionStatusFilter<$PrismaModel = never> = {
@@ -89337,6 +95260,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -89402,6 +95327,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -89513,6 +95440,64 @@ export namespace Prisma {
 
   export type ExportJobCreateManyUserInputEnvelope = {
     data: ExportJobCreateManyUserInput | ExportJobCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type KontaxExportJobCreateWithoutUserInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobUncheckedCreateWithoutUserInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type KontaxExportJobCreateOrConnectWithoutUserInput = {
+    where: KontaxExportJobWhereUniqueInput
+    create: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput>
+  }
+
+  export type KontaxExportJobCreateManyUserInputEnvelope = {
+    data: KontaxExportJobCreateManyUserInput | KontaxExportJobCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -89656,10 +95641,14 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -89703,8 +95692,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -89923,6 +95916,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -89941,6 +95935,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -89978,6 +95973,7 @@ export namespace Prisma {
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutOwnerInput = {
@@ -89999,6 +95995,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutOwnerInput = {
@@ -90030,6 +96027,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutRecipientUserInput = {
@@ -90051,6 +96049,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutRecipientUserInput = {
@@ -90192,6 +96191,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutBookInput
+    contactMemberships?: ContactBookMembershipCreateNestedManyWithoutAddressBookInput
+    syncDestinations?: SyncAccountCreateNestedManyWithoutDestinationBookInput
   }
 
   export type AddressBookUncheckedCreateWithoutUserInput = {
@@ -90207,6 +96208,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutBookInput
+    contactMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutAddressBookInput
+    syncDestinations?: SyncAccountUncheckedCreateNestedManyWithoutDestinationBookInput
   }
 
   export type AddressBookCreateOrConnectWithoutUserInput = {
@@ -90291,8 +96294,11 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
     adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutUserInput = {
@@ -90306,7 +96312,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationCreateOrConnectWithoutUserInput = {
@@ -90591,6 +96600,38 @@ export namespace Prisma {
 
   export type LabelCreateManyUserInputEnvelope = {
     data: LabelCreateManyUserInput | LabelCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactPrivateFieldCreateWithoutUserInput = {
+    id?: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contact: ContactCreateNestedOneWithoutPrivateFieldsInput
+  }
+
+  export type ContactPrivateFieldUncheckedCreateWithoutUserInput = {
+    id?: string
+    contactId: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactPrivateFieldCreateOrConnectWithoutUserInput = {
+    where: ContactPrivateFieldWhereUniqueInput
+    create: XOR<ContactPrivateFieldCreateWithoutUserInput, ContactPrivateFieldUncheckedCreateWithoutUserInput>
+  }
+
+  export type ContactPrivateFieldCreateManyUserInputEnvelope = {
+    data: ContactPrivateFieldCreateManyUserInput | ContactPrivateFieldCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -91157,6 +97198,50 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ExportJob"> | Date | string
   }
 
+  export type KontaxExportJobUpsertWithWhereUniqueWithoutUserInput = {
+    where: KontaxExportJobWhereUniqueInput
+    update: XOR<KontaxExportJobUpdateWithoutUserInput, KontaxExportJobUncheckedUpdateWithoutUserInput>
+    create: XOR<KontaxExportJobCreateWithoutUserInput, KontaxExportJobUncheckedCreateWithoutUserInput>
+  }
+
+  export type KontaxExportJobUpdateWithWhereUniqueWithoutUserInput = {
+    where: KontaxExportJobWhereUniqueInput
+    data: XOR<KontaxExportJobUpdateWithoutUserInput, KontaxExportJobUncheckedUpdateWithoutUserInput>
+  }
+
+  export type KontaxExportJobUpdateManyWithWhereWithoutUserInput = {
+    where: KontaxExportJobScalarWhereInput
+    data: XOR<KontaxExportJobUpdateManyMutationInput, KontaxExportJobUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type KontaxExportJobScalarWhereInput = {
+    AND?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
+    OR?: KontaxExportJobScalarWhereInput[]
+    NOT?: KontaxExportJobScalarWhereInput | KontaxExportJobScalarWhereInput[]
+    id?: StringFilter<"KontaxExportJob"> | string
+    userId?: StringFilter<"KontaxExportJob"> | string
+    kind?: EnumKontaxExportKindFilter<"KontaxExportJob"> | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFilter<"KontaxExportJob"> | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFilter<"KontaxExportJob"> | boolean
+    includePhotos?: BoolFilter<"KontaxExportJob"> | boolean
+    includeVcardFallback?: BoolFilter<"KontaxExportJob"> | boolean
+    contactIds?: JsonNullableFilter<"KontaxExportJob">
+    bookId?: StringNullableFilter<"KontaxExportJob"> | string | null
+    filterQuery?: StringNullableFilter<"KontaxExportJob"> | string | null
+    totalCount?: IntNullableFilter<"KontaxExportJob"> | number | null
+    progressCount?: IntFilter<"KontaxExportJob"> | number
+    photoCount?: IntFilter<"KontaxExportJob"> | number
+    exportedCount?: IntFilter<"KontaxExportJob"> | number
+    downloadUrl?: StringNullableFilter<"KontaxExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"KontaxExportJob"> | number | null
+    expiresAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    errorSummary?: StringNullableFilter<"KontaxExportJob"> | string | null
+    createdAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"KontaxExportJob"> | Date | string | null
+    updatedAt?: DateTimeFilter<"KontaxExportJob"> | Date | string
+  }
+
   export type MergeSuggestionUpsertWithWhereUniqueWithoutUserInput = {
     where: MergeSuggestionWhereUniqueInput
     update: XOR<MergeSuggestionUpdateWithoutUserInput, MergeSuggestionUncheckedUpdateWithoutUserInput>
@@ -91308,8 +97393,12 @@ export namespace Prisma {
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     disconnectedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionHold?: JsonNullableFilter<"SyncAccount">
+    deletionHoldAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    deletionGuardBypassOnce?: BoolFilter<"SyncAccount"> | boolean
     retiredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     retiredReason?: StringNullableFilter<"SyncAccount"> | string | null
+    destinationBookId?: StringNullableFilter<"SyncAccount"> | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
   }
@@ -91495,6 +97584,7 @@ export namespace Prisma {
     canEdit?: BoolFilter<"GroupMember"> | boolean
     canManageBilling?: BoolFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableFilter<"GroupMember">
+    sharingPolicy?: JsonNullableFilter<"GroupMember">
     inviteToken?: StringNullableFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
@@ -91804,7 +97894,10 @@ export namespace Prisma {
     actionUrl?: StringNullableFilter<"Notification"> | string | null
     securityAlertId?: StringNullableFilter<"Notification"> | string | null
     adminBroadcastId?: StringNullableFilter<"Notification"> | string | null
+    contactShareId?: StringNullableFilter<"Notification"> | string | null
     createdAt?: DateTimeFilter<"Notification"> | Date | string
+    eventAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Notification"> | Date | string | null
   }
 
   export type SecurityAlertUpsertWithWhereUniqueWithoutUserInput = {
@@ -92081,6 +98174,37 @@ export namespace Prisma {
     position?: IntFilter<"Label"> | number
     createdAt?: DateTimeFilter<"Label"> | Date | string
     updatedAt?: DateTimeFilter<"Label"> | Date | string
+  }
+
+  export type ContactPrivateFieldUpsertWithWhereUniqueWithoutUserInput = {
+    where: ContactPrivateFieldWhereUniqueInput
+    update: XOR<ContactPrivateFieldUpdateWithoutUserInput, ContactPrivateFieldUncheckedUpdateWithoutUserInput>
+    create: XOR<ContactPrivateFieldCreateWithoutUserInput, ContactPrivateFieldUncheckedCreateWithoutUserInput>
+  }
+
+  export type ContactPrivateFieldUpdateWithWhereUniqueWithoutUserInput = {
+    where: ContactPrivateFieldWhereUniqueInput
+    data: XOR<ContactPrivateFieldUpdateWithoutUserInput, ContactPrivateFieldUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ContactPrivateFieldUpdateManyWithWhereWithoutUserInput = {
+    where: ContactPrivateFieldScalarWhereInput
+    data: XOR<ContactPrivateFieldUpdateManyMutationInput, ContactPrivateFieldUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ContactPrivateFieldScalarWhereInput = {
+    AND?: ContactPrivateFieldScalarWhereInput | ContactPrivateFieldScalarWhereInput[]
+    OR?: ContactPrivateFieldScalarWhereInput[]
+    NOT?: ContactPrivateFieldScalarWhereInput | ContactPrivateFieldScalarWhereInput[]
+    id?: StringFilter<"ContactPrivateField"> | string
+    contactId?: StringFilter<"ContactPrivateField"> | string
+    userId?: StringFilter<"ContactPrivateField"> | string
+    fieldType?: StringFilter<"ContactPrivateField"> | string
+    label?: StringNullableFilter<"ContactPrivateField"> | string | null
+    value?: JsonFilter<"ContactPrivateField">
+    position?: IntFilter<"ContactPrivateField"> | number
+    createdAt?: DateTimeFilter<"ContactPrivateField"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactPrivateField"> | Date | string
   }
 
   export type FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput = {
@@ -92372,6 +98496,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -92400,6 +98525,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -92445,6 +98571,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -92473,6 +98600,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -92534,6 +98662,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -92562,6 +98691,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -92607,6 +98737,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -92635,6 +98766,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -92680,6 +98812,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -92708,6 +98841,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
@@ -92753,6 +98887,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -92781,6 +98916,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
@@ -92842,6 +98978,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -92870,6 +99007,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
@@ -92915,6 +99053,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -92943,6 +99082,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
@@ -92987,6 +99127,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -93015,6 +99156,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -93060,6 +99202,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -93088,6 +99231,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -93203,6 +99347,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -93231,6 +99376,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -93276,6 +99422,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -93304,6 +99451,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -93391,6 +99539,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -93419,6 +99568,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -93464,6 +99614,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -93492,6 +99643,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -93715,6 +99867,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -93734,6 +99887,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -93857,6 +100011,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
     recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutContactInput = {
@@ -93878,6 +100033,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutContactInput = {
@@ -93909,6 +100065,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
     recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    notifications?: NotificationCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareUncheckedCreateWithoutRecipientContactInput = {
@@ -93930,6 +100087,7 @@ export namespace Prisma {
     maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    notifications?: NotificationUncheckedCreateNestedManyWithoutContactShareInput
   }
 
   export type ContactShareCreateOrConnectWithoutRecipientContactInput = {
@@ -93965,6 +100123,62 @@ export namespace Prisma {
 
   export type GroupContactCreateManyContactInputEnvelope = {
     data: GroupContactCreateManyContactInput | GroupContactCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactBookMembershipCreateWithoutContactInput = {
+    id?: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+    addressBook: AddressBookCreateNestedOneWithoutContactMembershipsInput
+  }
+
+  export type ContactBookMembershipUncheckedCreateWithoutContactInput = {
+    id?: string
+    addressBookId: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactBookMembershipCreateOrConnectWithoutContactInput = {
+    where: ContactBookMembershipWhereUniqueInput
+    create: XOR<ContactBookMembershipCreateWithoutContactInput, ContactBookMembershipUncheckedCreateWithoutContactInput>
+  }
+
+  export type ContactBookMembershipCreateManyContactInputEnvelope = {
+    data: ContactBookMembershipCreateManyContactInput | ContactBookMembershipCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactPrivateFieldCreateWithoutContactInput = {
+    id?: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactPrivateFieldsInput
+  }
+
+  export type ContactPrivateFieldUncheckedCreateWithoutContactInput = {
+    id?: string
+    userId: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactPrivateFieldCreateOrConnectWithoutContactInput = {
+    where: ContactPrivateFieldWhereUniqueInput
+    create: XOR<ContactPrivateFieldCreateWithoutContactInput, ContactPrivateFieldUncheckedCreateWithoutContactInput>
+  }
+
+  export type ContactPrivateFieldCreateManyContactInputEnvelope = {
+    data: ContactPrivateFieldCreateManyContactInput | ContactPrivateFieldCreateManyContactInput[]
     skipDuplicates?: boolean
   }
 
@@ -94052,6 +100266,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -94117,6 +100333,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
   }
 
@@ -94183,6 +100401,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -94247,6 +100467,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -94274,6 +100496,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAddressBooksInput
+    contactMemberships?: ContactBookMembershipCreateNestedManyWithoutAddressBookInput
+    syncDestinations?: SyncAccountCreateNestedManyWithoutDestinationBookInput
   }
 
   export type AddressBookUncheckedCreateWithoutContactsInput = {
@@ -94289,6 +100513,8 @@ export namespace Prisma {
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    contactMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutAddressBookInput
+    syncDestinations?: SyncAccountUncheckedCreateNestedManyWithoutDestinationBookInput
   }
 
   export type AddressBookCreateOrConnectWithoutContactsInput = {
@@ -94340,6 +100566,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -94368,6 +100595,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -94413,6 +100641,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -94441,6 +100670,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -94606,6 +100836,7 @@ export namespace Prisma {
     remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
     capabilityProfileId?: StringNullableFilter<"SyncContactLink"> | string | null
     supportedFieldShadow?: JsonNullableFilter<"SyncContactLink">
+    photoShadow?: JsonNullableFilter<"SyncContactLink">
     lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
     remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
@@ -94707,6 +100938,49 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"GroupContact"> | Date | string
   }
 
+  export type ContactBookMembershipUpsertWithWhereUniqueWithoutContactInput = {
+    where: ContactBookMembershipWhereUniqueInput
+    update: XOR<ContactBookMembershipUpdateWithoutContactInput, ContactBookMembershipUncheckedUpdateWithoutContactInput>
+    create: XOR<ContactBookMembershipCreateWithoutContactInput, ContactBookMembershipUncheckedCreateWithoutContactInput>
+  }
+
+  export type ContactBookMembershipUpdateWithWhereUniqueWithoutContactInput = {
+    where: ContactBookMembershipWhereUniqueInput
+    data: XOR<ContactBookMembershipUpdateWithoutContactInput, ContactBookMembershipUncheckedUpdateWithoutContactInput>
+  }
+
+  export type ContactBookMembershipUpdateManyWithWhereWithoutContactInput = {
+    where: ContactBookMembershipScalarWhereInput
+    data: XOR<ContactBookMembershipUpdateManyMutationInput, ContactBookMembershipUncheckedUpdateManyWithoutContactInput>
+  }
+
+  export type ContactBookMembershipScalarWhereInput = {
+    AND?: ContactBookMembershipScalarWhereInput | ContactBookMembershipScalarWhereInput[]
+    OR?: ContactBookMembershipScalarWhereInput[]
+    NOT?: ContactBookMembershipScalarWhereInput | ContactBookMembershipScalarWhereInput[]
+    id?: StringFilter<"ContactBookMembership"> | string
+    contactId?: StringFilter<"ContactBookMembership"> | string
+    addressBookId?: StringFilter<"ContactBookMembership"> | string
+    isPrimary?: BoolFilter<"ContactBookMembership"> | boolean
+    createdAt?: DateTimeFilter<"ContactBookMembership"> | Date | string
+  }
+
+  export type ContactPrivateFieldUpsertWithWhereUniqueWithoutContactInput = {
+    where: ContactPrivateFieldWhereUniqueInput
+    update: XOR<ContactPrivateFieldUpdateWithoutContactInput, ContactPrivateFieldUncheckedUpdateWithoutContactInput>
+    create: XOR<ContactPrivateFieldCreateWithoutContactInput, ContactPrivateFieldUncheckedCreateWithoutContactInput>
+  }
+
+  export type ContactPrivateFieldUpdateWithWhereUniqueWithoutContactInput = {
+    where: ContactPrivateFieldWhereUniqueInput
+    data: XOR<ContactPrivateFieldUpdateWithoutContactInput, ContactPrivateFieldUncheckedUpdateWithoutContactInput>
+  }
+
+  export type ContactPrivateFieldUpdateManyWithWhereWithoutContactInput = {
+    where: ContactPrivateFieldScalarWhereInput
+    data: XOR<ContactPrivateFieldUpdateManyMutationInput, ContactPrivateFieldUncheckedUpdateManyWithoutContactInput>
+  }
+
   export type BirthdayReminderStateUpsertWithWhereUniqueWithoutContactInput = {
     where: BirthdayReminderStateWhereUniqueInput
     update: XOR<BirthdayReminderStateUpdateWithoutContactInput, BirthdayReminderStateUncheckedUpdateWithoutContactInput>
@@ -94792,6 +101066,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -94857,6 +101133,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
   }
 
@@ -94900,6 +101178,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAddressBooksNestedInput
+    contactMemberships?: ContactBookMembershipUpdateManyWithoutAddressBookNestedInput
+    syncDestinations?: SyncAccountUpdateManyWithoutDestinationBookNestedInput
   }
 
   export type AddressBookUncheckedUpdateWithoutContactsInput = {
@@ -94915,6 +101195,960 @@ export namespace Prisma {
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contactMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutAddressBookNestedInput
+    syncDestinations?: SyncAccountUncheckedUpdateManyWithoutDestinationBookNestedInput
+  }
+
+  export type ContactCreateWithoutBookMembershipsInput = {
+    id?: string
+    reminderLeadDaysOverride?: number | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
+  }
+
+  export type ContactUncheckedCreateWithoutBookMembershipsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    bookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutBookMembershipsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutBookMembershipsInput, ContactUncheckedCreateWithoutBookMembershipsInput>
+  }
+
+  export type AddressBookCreateWithoutContactMembershipsInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAddressBooksInput
+    contacts?: ContactCreateNestedManyWithoutBookInput
+    syncDestinations?: SyncAccountCreateNestedManyWithoutDestinationBookInput
+  }
+
+  export type AddressBookUncheckedCreateWithoutContactMembershipsInput = {
+    id?: string
+    userId: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutBookInput
+    syncDestinations?: SyncAccountUncheckedCreateNestedManyWithoutDestinationBookInput
+  }
+
+  export type AddressBookCreateOrConnectWithoutContactMembershipsInput = {
+    where: AddressBookWhereUniqueInput
+    create: XOR<AddressBookCreateWithoutContactMembershipsInput, AddressBookUncheckedCreateWithoutContactMembershipsInput>
+  }
+
+  export type ContactUpsertWithoutBookMembershipsInput = {
+    update: XOR<ContactUpdateWithoutBookMembershipsInput, ContactUncheckedUpdateWithoutBookMembershipsInput>
+    create: XOR<ContactCreateWithoutBookMembershipsInput, ContactUncheckedCreateWithoutBookMembershipsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutBookMembershipsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutBookMembershipsInput, ContactUncheckedUpdateWithoutBookMembershipsInput>
+  }
+
+  export type ContactUpdateWithoutBookMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutBookMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type AddressBookUpsertWithoutContactMembershipsInput = {
+    update: XOR<AddressBookUpdateWithoutContactMembershipsInput, AddressBookUncheckedUpdateWithoutContactMembershipsInput>
+    create: XOR<AddressBookCreateWithoutContactMembershipsInput, AddressBookUncheckedCreateWithoutContactMembershipsInput>
+    where?: AddressBookWhereInput
+  }
+
+  export type AddressBookUpdateToOneWithWhereWithoutContactMembershipsInput = {
+    where?: AddressBookWhereInput
+    data: XOR<AddressBookUpdateWithoutContactMembershipsInput, AddressBookUncheckedUpdateWithoutContactMembershipsInput>
+  }
+
+  export type AddressBookUpdateWithoutContactMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAddressBooksNestedInput
+    contacts?: ContactUpdateManyWithoutBookNestedInput
+    syncDestinations?: SyncAccountUpdateManyWithoutDestinationBookNestedInput
+  }
+
+  export type AddressBookUncheckedUpdateWithoutContactMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutBookNestedInput
+    syncDestinations?: SyncAccountUncheckedUpdateManyWithoutDestinationBookNestedInput
+  }
+
+  export type ContactCreateWithoutPrivateFieldsInput = {
+    id?: string
+    reminderLeadDaysOverride?: number | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
+  }
+
+  export type ContactUncheckedCreateWithoutPrivateFieldsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    bookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutPrivateFieldsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutPrivateFieldsInput, ContactUncheckedCreateWithoutPrivateFieldsInput>
+  }
+
+  export type UserCreateWithoutContactPrivateFieldsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutContactPrivateFieldsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutContactPrivateFieldsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutContactPrivateFieldsInput, UserUncheckedCreateWithoutContactPrivateFieldsInput>
+  }
+
+  export type ContactUpsertWithoutPrivateFieldsInput = {
+    update: XOR<ContactUpdateWithoutPrivateFieldsInput, ContactUncheckedUpdateWithoutPrivateFieldsInput>
+    create: XOR<ContactCreateWithoutPrivateFieldsInput, ContactUncheckedCreateWithoutPrivateFieldsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutPrivateFieldsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutPrivateFieldsInput, ContactUncheckedUpdateWithoutPrivateFieldsInput>
+  }
+
+  export type ContactUpdateWithoutPrivateFieldsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutPrivateFieldsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type UserUpsertWithoutContactPrivateFieldsInput = {
+    update: XOR<UserUpdateWithoutContactPrivateFieldsInput, UserUncheckedUpdateWithoutContactPrivateFieldsInput>
+    create: XOR<UserCreateWithoutContactPrivateFieldsInput, UserUncheckedCreateWithoutContactPrivateFieldsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutContactPrivateFieldsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutContactPrivateFieldsInput, UserUncheckedUpdateWithoutContactPrivateFieldsInput>
+  }
+
+  export type UserUpdateWithoutContactPrivateFieldsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutContactPrivateFieldsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSubscriptionCustomerInput = {
@@ -94951,6 +102185,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -94978,6 +102213,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -95024,6 +102260,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -95051,6 +102288,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -95240,6 +102478,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -95267,6 +102506,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -95313,6 +102553,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -95340,6 +102581,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -95453,6 +102695,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -95480,6 +102723,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -95526,6 +102770,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -95553,6 +102798,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -95737,6 +102983,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -95764,6 +103011,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -95810,6 +103058,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -95837,6 +103086,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -95982,6 +103232,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -96010,6 +103261,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -96055,6 +103307,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -96083,6 +103336,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -96157,6 +103411,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -96222,6 +103478,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -96280,6 +103538,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -96308,6 +103567,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -96353,6 +103613,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -96381,6 +103642,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -96442,6 +103704,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -96470,6 +103733,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -96515,6 +103779,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -96543,6 +103808,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -96604,6 +103870,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -96632,6 +103899,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -96677,6 +103945,7 @@ export namespace Prisma {
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -96705,6 +103974,323 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUncheckedUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutKontaxExportJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutKontaxExportJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
+    supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
+    supportCasesAssigned?: AdminSupportCaseUncheckedCreateNestedManyWithoutAssigneeInput
+    supportCasesTargeted?: AdminSupportCaseUncheckedCreateNestedManyWithoutTargetUserInput
+    broadcastsCreated?: AdminBroadcastUncheckedCreateNestedManyWithoutCreatorInput
+    broadcastsSent?: AdminBroadcastUncheckedCreateNestedManyWithoutSenderInput
+    broadcastsRetracted?: AdminBroadcastUncheckedCreateNestedManyWithoutRetractorInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutKontaxExportJobsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+  }
+
+  export type UserUpsertWithoutKontaxExportJobsInput = {
+    update: XOR<UserUpdateWithoutKontaxExportJobsInput, UserUncheckedUpdateWithoutKontaxExportJobsInput>
+    create: XOR<UserCreateWithoutKontaxExportJobsInput, UserUncheckedCreateWithoutKontaxExportJobsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutKontaxExportJobsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutKontaxExportJobsInput, UserUncheckedUpdateWithoutKontaxExportJobsInput>
+  }
+
+  export type UserUpdateWithoutKontaxExportJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
+    supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
+    supportCasesAssigned?: AdminSupportCaseUpdateManyWithoutAssigneeNestedInput
+    supportCasesTargeted?: AdminSupportCaseUpdateManyWithoutTargetUserNestedInput
+    broadcastsCreated?: AdminBroadcastUpdateManyWithoutCreatorNestedInput
+    broadcastsSent?: AdminBroadcastUpdateManyWithoutSenderNestedInput
+    broadcastsRetracted?: AdminBroadcastUpdateManyWithoutRetractorNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutKontaxExportJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -96751,6 +104337,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
@@ -96778,6 +104365,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -96824,6 +104412,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
@@ -96851,6 +104440,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -96925,6 +104515,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -96990,6 +104582,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -97056,6 +104650,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -97121,6 +104717,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -97213,6 +104811,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
@@ -97240,6 +104839,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -97286,6 +104886,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
@@ -97313,6 +104914,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -97393,6 +104995,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -97458,6 +105062,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -97530,6 +105136,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -97595,6 +105203,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -97692,6 +105302,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
@@ -97719,6 +105330,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -97765,6 +105377,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
@@ -97792,6 +105405,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -97903,6 +105517,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
@@ -97930,6 +105545,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -97976,6 +105592,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
@@ -98003,6 +105620,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -98049,6 +105667,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
@@ -98076,6 +105695,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -98122,6 +105742,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
@@ -98149,6 +105770,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -98223,6 +105845,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -98288,6 +105912,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -98354,6 +105980,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -98419,6 +106047,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -98473,6 +106103,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
@@ -98500,6 +106131,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -98546,6 +106178,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
@@ -98573,6 +106206,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -98653,6 +106287,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -98718,6 +106354,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -98790,6 +106428,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -98855,6 +106495,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -98893,6 +106535,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -98920,6 +106563,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -98966,6 +106610,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -98993,6 +106638,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -99008,6 +106654,45 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
+  }
+
+  export type AddressBookCreateWithoutSyncDestinationsInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAddressBooksInput
+    contacts?: ContactCreateNestedManyWithoutBookInput
+    contactMemberships?: ContactBookMembershipCreateNestedManyWithoutAddressBookInput
+  }
+
+  export type AddressBookUncheckedCreateWithoutSyncDestinationsInput = {
+    id?: string
+    userId: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutBookInput
+    contactMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutAddressBookInput
+  }
+
+  export type AddressBookCreateOrConnectWithoutSyncDestinationsInput = {
+    where: AddressBookWhereUniqueInput
+    create: XOR<AddressBookCreateWithoutSyncDestinationsInput, AddressBookUncheckedCreateWithoutSyncDestinationsInput>
   }
 
   export type SyncAccountCreateWithoutReplacementChildrenInput = {
@@ -99040,11 +106725,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
     replacedAccounts?: SyncAccountCreateNestedManyWithoutReplacedBySyncAccountInput
@@ -99088,8 +106777,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacedAccounts?: SyncAccountUncheckedCreateNestedManyWithoutReplacedBySyncAccountInput
@@ -99135,11 +106828,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
     replacedAccounts?: SyncAccountCreateNestedManyWithoutReplacedBySyncAccountInput
@@ -99182,8 +106879,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -99235,11 +106936,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -99283,8 +106988,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -99330,11 +107039,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedAccounts?: SyncAccountCreateNestedManyWithoutReplacedBySyncAccountInput
@@ -99377,8 +107090,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -99407,6 +107124,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -99426,6 +107144,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -99603,9 +107322,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     importLabel?: LabelCreateNestedOneWithoutSyncAccountSettingsInput
@@ -99624,9 +107348,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -99681,6 +107410,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -99708,6 +107438,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -99754,6 +107485,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -99781,6 +107513,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -99791,6 +107524,51 @@ export namespace Prisma {
     broadcastsSent?: AdminBroadcastUncheckedUpdateManyWithoutSenderNestedInput
     broadcastsRetracted?: AdminBroadcastUncheckedUpdateManyWithoutRetractorNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type AddressBookUpsertWithoutSyncDestinationsInput = {
+    update: XOR<AddressBookUpdateWithoutSyncDestinationsInput, AddressBookUncheckedUpdateWithoutSyncDestinationsInput>
+    create: XOR<AddressBookCreateWithoutSyncDestinationsInput, AddressBookUncheckedCreateWithoutSyncDestinationsInput>
+    where?: AddressBookWhereInput
+  }
+
+  export type AddressBookUpdateToOneWithWhereWithoutSyncDestinationsInput = {
+    where?: AddressBookWhereInput
+    data: XOR<AddressBookUpdateWithoutSyncDestinationsInput, AddressBookUncheckedUpdateWithoutSyncDestinationsInput>
+  }
+
+  export type AddressBookUpdateWithoutSyncDestinationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAddressBooksNestedInput
+    contacts?: ContactUpdateManyWithoutBookNestedInput
+    contactMemberships?: ContactBookMembershipUpdateManyWithoutAddressBookNestedInput
+  }
+
+  export type AddressBookUncheckedUpdateWithoutSyncDestinationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutBookNestedInput
+    contactMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutAddressBookNestedInput
   }
 
   export type SyncAccountUpsertWithoutReplacementChildrenInput = {
@@ -99834,11 +107612,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
     replacedAccounts?: SyncAccountUpdateManyWithoutReplacedBySyncAccountNestedInput
@@ -99882,8 +107664,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacedAccounts?: SyncAccountUncheckedUpdateManyWithoutReplacedBySyncAccountNestedInput
@@ -99951,11 +107737,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -99999,8 +107789,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -100159,9 +107953,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     importLabel?: LabelUpdateOneWithoutSyncAccountSettingsNestedInput
@@ -100180,9 +107979,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -100217,11 +108021,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -100265,8 +108073,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -100348,11 +108160,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -100396,8 +108212,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -100469,11 +108289,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -100517,8 +108341,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -100591,6 +108419,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -100656,6 +108486,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -100760,11 +108592,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -100808,8 +108644,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -100888,6 +108728,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -100953,6 +108795,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -101003,11 +108847,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -101051,8 +108899,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -101109,11 +108961,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -101157,8 +109013,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -101199,11 +109059,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -101247,8 +109111,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -101271,6 +109139,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -101291,6 +109160,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -101362,6 +109232,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -101427,6 +109299,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -101504,11 +109378,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -101552,8 +109430,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -101582,6 +109464,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101602,6 +109485,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -101679,6 +109563,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -101744,6 +109630,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -101815,6 +109703,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -101842,6 +109731,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -101888,6 +109778,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -101915,6 +109806,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -101977,6 +109869,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102004,6 +109897,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -102050,6 +109944,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102077,6 +109972,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -102123,6 +110019,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -102150,6 +110047,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -102196,6 +110094,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -102223,6 +110122,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -102285,6 +110185,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102312,6 +110213,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -102358,6 +110260,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102385,6 +110288,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -102431,6 +110335,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -102458,6 +110363,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -102504,6 +110410,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -102531,6 +110438,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -102593,6 +110501,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102620,6 +110529,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -102666,6 +110576,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -102693,6 +110604,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -102739,6 +110651,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -102766,6 +110679,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -102812,6 +110726,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -102839,6 +110754,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -102901,6 +110817,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -102928,6 +110845,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -102974,6 +110892,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -103001,6 +110920,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -103047,6 +110967,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -103074,6 +110995,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -103120,6 +111042,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -103147,6 +111070,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -103221,6 +111145,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -103286,6 +111212,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -103340,6 +111268,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -103367,6 +111296,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -103413,6 +111343,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -103440,6 +111371,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -103520,6 +111452,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -103585,6 +111519,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -103623,6 +111559,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -103650,6 +111587,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -103696,6 +111634,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -103723,6 +111662,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -103785,6 +111725,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -103812,6 +111753,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -103858,6 +111800,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -103885,6 +111828,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -103931,6 +111875,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -103959,6 +111904,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
@@ -104004,6 +111950,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104032,6 +111979,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
@@ -104093,6 +112041,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -104121,6 +112070,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
@@ -104166,6 +112116,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -104194,6 +112145,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
@@ -104239,6 +112191,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104267,6 +112220,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -104312,6 +112266,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104340,6 +112295,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -104390,6 +112346,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104418,6 +112375,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -104463,6 +112421,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104491,6 +112450,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -104541,6 +112501,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -104569,6 +112530,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -104614,6 +112576,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -104642,6 +112605,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -104703,6 +112667,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -104731,6 +112696,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -104776,6 +112742,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -104804,6 +112771,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -104860,6 +112828,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -104888,6 +112857,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -104933,6 +112903,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -104961,6 +112932,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -105017,6 +112989,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -105045,6 +113018,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -105090,6 +113064,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -105118,6 +113093,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -105163,6 +113139,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -105190,6 +113167,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -105236,6 +113214,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -105263,6 +113242,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -105474,6 +113454,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -105492,6 +113473,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -105515,6 +113497,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -105528,6 +113511,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -105661,6 +113645,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -105688,6 +113673,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -105734,6 +113720,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -105761,6 +113748,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -105946,6 +113934,7 @@ export namespace Prisma {
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
+    minimumSharingPolicy?: JsonNullableFilter<"GroupAddressBook">
     archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
     dissolvedToBookId?: StringNullableFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
@@ -106192,6 +114181,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -106219,6 +114209,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -106265,6 +114256,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -106292,6 +114284,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -106405,6 +114398,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -106432,6 +114426,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -106478,6 +114473,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -106505,6 +114501,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -106731,6 +114728,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -106758,6 +114756,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -106804,6 +114803,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -106831,6 +114831,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -106906,6 +114907,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -106970,6 +114973,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -106981,6 +114986,138 @@ export namespace Prisma {
 
   export type ContactCreateManyBookInputEnvelope = {
     data: ContactCreateManyBookInput | ContactCreateManyBookInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactBookMembershipCreateWithoutAddressBookInput = {
+    id?: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+    contact: ContactCreateNestedOneWithoutBookMembershipsInput
+  }
+
+  export type ContactBookMembershipUncheckedCreateWithoutAddressBookInput = {
+    id?: string
+    contactId: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactBookMembershipCreateOrConnectWithoutAddressBookInput = {
+    where: ContactBookMembershipWhereUniqueInput
+    create: XOR<ContactBookMembershipCreateWithoutAddressBookInput, ContactBookMembershipUncheckedCreateWithoutAddressBookInput>
+  }
+
+  export type ContactBookMembershipCreateManyAddressBookInputEnvelope = {
+    data: ContactBookMembershipCreateManyAddressBookInput | ContactBookMembershipCreateManyAddressBookInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncAccountCreateWithoutDestinationBookInput = {
+    id?: string
+    connectionId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
+    replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
+    replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
+    replacedAccounts?: SyncAccountCreateNestedManyWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutDestinationBookInput = {
+    id?: string
+    userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
+    replacedAccounts?: SyncAccountUncheckedCreateNestedManyWithoutReplacedBySyncAccountInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutDestinationBookInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutDestinationBookInput, SyncAccountUncheckedCreateWithoutDestinationBookInput>
+  }
+
+  export type SyncAccountCreateManyDestinationBookInputEnvelope = {
+    data: SyncAccountCreateManyDestinationBookInput | SyncAccountCreateManyDestinationBookInput[]
     skipDuplicates?: boolean
   }
 
@@ -107029,6 +115166,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -107056,6 +115194,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -107102,6 +115241,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -107129,6 +115269,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -107155,6 +115296,38 @@ export namespace Prisma {
   export type ContactUpdateManyWithWhereWithoutBookInput = {
     where: ContactScalarWhereInput
     data: XOR<ContactUpdateManyMutationInput, ContactUncheckedUpdateManyWithoutBookInput>
+  }
+
+  export type ContactBookMembershipUpsertWithWhereUniqueWithoutAddressBookInput = {
+    where: ContactBookMembershipWhereUniqueInput
+    update: XOR<ContactBookMembershipUpdateWithoutAddressBookInput, ContactBookMembershipUncheckedUpdateWithoutAddressBookInput>
+    create: XOR<ContactBookMembershipCreateWithoutAddressBookInput, ContactBookMembershipUncheckedCreateWithoutAddressBookInput>
+  }
+
+  export type ContactBookMembershipUpdateWithWhereUniqueWithoutAddressBookInput = {
+    where: ContactBookMembershipWhereUniqueInput
+    data: XOR<ContactBookMembershipUpdateWithoutAddressBookInput, ContactBookMembershipUncheckedUpdateWithoutAddressBookInput>
+  }
+
+  export type ContactBookMembershipUpdateManyWithWhereWithoutAddressBookInput = {
+    where: ContactBookMembershipScalarWhereInput
+    data: XOR<ContactBookMembershipUpdateManyMutationInput, ContactBookMembershipUncheckedUpdateManyWithoutAddressBookInput>
+  }
+
+  export type SyncAccountUpsertWithWhereUniqueWithoutDestinationBookInput = {
+    where: SyncAccountWhereUniqueInput
+    update: XOR<SyncAccountUpdateWithoutDestinationBookInput, SyncAccountUncheckedUpdateWithoutDestinationBookInput>
+    create: XOR<SyncAccountCreateWithoutDestinationBookInput, SyncAccountUncheckedCreateWithoutDestinationBookInput>
+  }
+
+  export type SyncAccountUpdateWithWhereUniqueWithoutDestinationBookInput = {
+    where: SyncAccountWhereUniqueInput
+    data: XOR<SyncAccountUpdateWithoutDestinationBookInput, SyncAccountUncheckedUpdateWithoutDestinationBookInput>
+  }
+
+  export type SyncAccountUpdateManyWithWhereWithoutDestinationBookInput = {
+    where: SyncAccountScalarWhereInput
+    data: XOR<SyncAccountUpdateManyMutationInput, SyncAccountUncheckedUpdateManyWithoutDestinationBookInput>
   }
 
   export type UserCreateWithoutSavedFiltersInput = {
@@ -107191,6 +115364,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -107218,6 +115392,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -107264,6 +115439,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -107291,6 +115467,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -107353,6 +115530,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -107380,6 +115558,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -107426,6 +115605,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -107453,6 +115633,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -107499,6 +115680,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -107526,6 +115708,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -107572,6 +115755,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -107599,6 +115783,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -107628,9 +115813,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
@@ -107649,9 +115839,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -107711,6 +115906,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -107738,6 +115934,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -107784,6 +115981,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -107811,6 +116009,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -107856,9 +116055,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
     syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
     syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowTimezone?: StringNullableFilter<"SyncAccountSettings"> | string | null
     excludedFields?: StringNullableListFilter<"SyncAccountSettings">
     exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
     maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    projectionBookIds?: StringNullableListFilter<"SyncAccountSettings">
+    fieldPrecedence?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    autolinkCaveatDismissedAt?: DateTimeNullableFilter<"SyncAccountSettings"> | Date | string | null
+    conflictOverride?: StringNullableFilter<"SyncAccountSettings"> | string | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
   }
@@ -107938,11 +116142,15 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
+    destinationBook?: AddressBookCreateNestedOneWithoutSyncDestinationsInput
     replacesSyncAccount?: SyncAccountCreateNestedOneWithoutReplacementChildrenInput
     replacementChildren?: SyncAccountCreateNestedManyWithoutReplacesSyncAccountInput
     replacedBySyncAccount?: SyncAccountCreateNestedOneWithoutReplacedAccountsInput
@@ -107986,8 +116194,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     replacementChildren?: SyncAccountUncheckedCreateNestedManyWithoutReplacesSyncAccountInput
@@ -108008,6 +116220,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -108022,6 +116235,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -108126,11 +116340,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -108174,8 +116392,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -108202,6 +116424,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -108216,6 +116439,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -108228,6 +116452,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -108242,6 +116467,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -108311,6 +116537,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -108376,6 +116604,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -108401,6 +116631,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -108415,6 +116646,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -108490,6 +116722,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -108555,6 +116789,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -108593,6 +116829,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -108620,6 +116857,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -108666,6 +116904,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -108693,6 +116932,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -108767,6 +117007,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -108832,6 +117074,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -108875,6 +117119,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -108902,6 +117147,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -108948,6 +117194,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -108975,6 +117222,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -109049,6 +117297,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
@@ -109114,6 +117364,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -109121,6 +117373,50 @@ export namespace Prisma {
   export type ContactCreateOrConnectWithoutSharesAsRecipientCopyInput = {
     where: ContactWhereUniqueInput
     create: XOR<ContactCreateWithoutSharesAsRecipientCopyInput, ContactUncheckedCreateWithoutSharesAsRecipientCopyInput>
+  }
+
+  export type NotificationCreateWithoutContactShareInput = {
+    id?: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
+    user: UserCreateNestedOneWithoutNotificationsInput
+    securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+    adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+  }
+
+  export type NotificationUncheckedCreateWithoutContactShareInput = {
+    id?: string
+    userId: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    securityAlertId?: string | null
+    adminBroadcastId?: string | null
+    createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
+  }
+
+  export type NotificationCreateOrConnectWithoutContactShareInput = {
+    where: NotificationWhereUniqueInput
+    create: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput>
+  }
+
+  export type NotificationCreateManyContactShareInputEnvelope = {
+    data: NotificationCreateManyContactShareInput | NotificationCreateManyContactShareInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutContactSharesOwnedInput = {
@@ -109168,6 +117464,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -109195,6 +117492,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -109241,6 +117539,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -109268,6 +117567,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -109348,6 +117648,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -109413,6 +117715,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -109462,6 +117766,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -109489,6 +117794,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -109535,6 +117841,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -109562,6 +117869,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -109642,6 +117950,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -109707,8 +118017,26 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type NotificationUpsertWithWhereUniqueWithoutContactShareInput = {
+    where: NotificationWhereUniqueInput
+    update: XOR<NotificationUpdateWithoutContactShareInput, NotificationUncheckedUpdateWithoutContactShareInput>
+    create: XOR<NotificationCreateWithoutContactShareInput, NotificationUncheckedCreateWithoutContactShareInput>
+  }
+
+  export type NotificationUpdateWithWhereUniqueWithoutContactShareInput = {
+    where: NotificationWhereUniqueInput
+    data: XOR<NotificationUpdateWithoutContactShareInput, NotificationUncheckedUpdateWithoutContactShareInput>
+  }
+
+  export type NotificationUpdateManyWithWhereWithoutContactShareInput = {
+    where: NotificationScalarWhereInput
+    data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutContactShareInput>
   }
 
   export type UserCreateWithoutNotificationsInput = {
@@ -109745,6 +118073,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -109772,6 +118101,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -109818,6 +118148,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -109845,6 +118176,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -109936,6 +118268,55 @@ export namespace Prisma {
     create: XOR<AdminBroadcastCreateWithoutNotificationsInput, AdminBroadcastUncheckedCreateWithoutNotificationsInput>
   }
 
+  export type ContactShareCreateWithoutNotificationsInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    downloadCount?: number
+    maxDownloads?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutContactSharesOwnedInput
+    contact?: ContactCreateNestedOneWithoutSharesFromContactInput
+    recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+  }
+
+  export type ContactShareUncheckedCreateWithoutNotificationsInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    downloadCount?: number
+    maxDownloads?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateOrConnectWithoutNotificationsInput = {
+    where: ContactShareWhereUniqueInput
+    create: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+  }
+
   export type UserUpsertWithoutNotificationsInput = {
     update: XOR<UserUpdateWithoutNotificationsInput, UserUncheckedUpdateWithoutNotificationsInput>
     create: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
@@ -109981,6 +118362,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -110008,6 +118390,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -110054,6 +118437,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -110081,6 +118465,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -110179,6 +118564,61 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ContactShareUpsertWithoutNotificationsInput = {
+    update: XOR<ContactShareUpdateWithoutNotificationsInput, ContactShareUncheckedUpdateWithoutNotificationsInput>
+    create: XOR<ContactShareCreateWithoutNotificationsInput, ContactShareUncheckedCreateWithoutNotificationsInput>
+    where?: ContactShareWhereInput
+  }
+
+  export type ContactShareUpdateToOneWithWhereWithoutNotificationsInput = {
+    where?: ContactShareWhereInput
+    data: XOR<ContactShareUpdateWithoutNotificationsInput, ContactShareUncheckedUpdateWithoutNotificationsInput>
+  }
+
+  export type ContactShareUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
+    contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
+    recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateWithoutNotificationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateWithoutBroadcastsCreatedInput = {
     id?: string
     name?: string | null
@@ -110213,6 +118653,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110241,6 +118682,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -110286,6 +118728,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110314,6 +118757,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -110364,6 +118808,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110392,6 +118837,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -110437,6 +118883,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110465,6 +118912,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -110515,6 +118963,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -110543,6 +118992,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -110588,6 +119038,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -110616,6 +119067,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -110642,8 +119094,11 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     user: UserCreateNestedOneWithoutNotificationsInput
     securityAlert?: SecurityAlertCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutAdminBroadcastInput = {
@@ -110657,7 +119112,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationCreateOrConnectWithoutAdminBroadcastInput = {
@@ -110715,6 +119173,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -110743,6 +119202,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -110788,6 +119248,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -110816,6 +119277,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -110872,6 +119334,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -110900,6 +119363,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -110945,6 +119409,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -110973,6 +119438,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -111029,6 +119495,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111057,6 +119524,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -111102,6 +119570,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111130,6 +119599,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -111191,6 +119661,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -111218,6 +119689,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -111264,6 +119736,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -111291,6 +119764,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -111318,8 +119792,11 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
     user: UserCreateNestedOneWithoutNotificationsInput
     adminBroadcast?: AdminBroadcastCreateNestedOneWithoutNotificationsInput
+    contactShare?: ContactShareCreateNestedOneWithoutNotificationsInput
   }
 
   export type NotificationUncheckedCreateWithoutSecurityAlertInput = {
@@ -111333,7 +119810,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationCreateOrConnectWithoutSecurityAlertInput = {
@@ -111391,6 +119871,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111418,6 +119899,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -111464,6 +119946,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111491,6 +119974,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -111553,6 +120037,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -111580,6 +120065,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -111626,6 +120112,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -111653,6 +120140,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -111715,6 +120203,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -111742,6 +120231,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -111788,6 +120278,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -111815,6 +120306,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -111861,6 +120353,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -111889,6 +120382,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
     supportCasesCreated?: AdminSupportCaseCreateNestedManyWithoutCreatorInput
@@ -111934,6 +120428,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -111962,6 +120457,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
     supportCasesCreated?: AdminSupportCaseUncheckedCreateNestedManyWithoutCreatorInput
@@ -112023,6 +120519,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -112051,6 +120548,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
     supportCasesCreated?: AdminSupportCaseUpdateManyWithoutCreatorNestedInput
@@ -112096,6 +120594,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -112124,6 +120623,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
     supportCasesCreated?: AdminSupportCaseUncheckedUpdateManyWithoutCreatorNestedInput
@@ -112169,6 +120669,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -112196,6 +120697,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -112242,6 +120744,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -112269,6 +120772,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -112344,6 +120848,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -112409,6 +120915,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    bookMemberships?: ContactBookMembershipUncheckedCreateNestedManyWithoutContactInput
+    privateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -112462,6 +120970,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -112489,6 +120998,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -112535,6 +121045,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -112562,6 +121073,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -112643,6 +121155,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -112708,6 +121222,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -112745,6 +121261,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -112772,6 +121289,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -112818,6 +121336,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -112845,6 +121364,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -112907,6 +121427,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -112934,6 +121455,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -112980,6 +121502,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113007,6 +121530,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -113053,6 +121577,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113080,6 +121605,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -113126,6 +121652,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -113153,6 +121680,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -113215,6 +121743,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -113242,6 +121771,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -113288,6 +121818,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113315,6 +121846,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -113361,6 +121893,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113388,6 +121921,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -113434,6 +121968,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -113461,6 +121996,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -113523,6 +122059,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -113550,6 +122087,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -113596,6 +122134,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113623,6 +122162,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -113669,6 +122209,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -113696,6 +122237,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -113742,6 +122284,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -113769,6 +122312,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -113831,6 +122375,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -113858,6 +122403,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -113904,6 +122450,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -113931,6 +122478,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -113977,6 +122525,7 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
@@ -114004,6 +122553,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     labels?: LabelCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteCreateNestedManyWithoutAuthorInput
@@ -114050,6 +122600,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    kontaxExportJobs?: KontaxExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
@@ -114077,6 +122628,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     supportNotesAuthored?: AdminSupportNoteUncheckedCreateNestedManyWithoutAuthorInput
@@ -114139,6 +122691,7 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
@@ -114166,6 +122719,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     labels?: LabelUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUpdateManyWithoutAuthorNestedInput
@@ -114212,6 +122766,7 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    kontaxExportJobs?: KontaxExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
@@ -114239,6 +122794,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    contactPrivateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     supportNotesAuthored?: AdminSupportNoteUncheckedUpdateManyWithoutAuthorNestedInput
@@ -114351,6 +122907,30 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type KontaxExportJobCreateManyUserInput = {
+    id?: string
+    kind?: $Enums.KontaxExportKind
+    status?: $Enums.ImportExportJobStatus
+    includeArchived?: boolean
+    includePhotos?: boolean
+    includeVcardFallback?: boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: string | null
+    filterQuery?: string | null
+    totalCount?: number | null
+    progressCount?: number
+    photoCount?: number
+    exportedCount?: number
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    expiresAt?: Date | string | null
+    errorSummary?: string | null
+    createdAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
   export type MergeSuggestionCreateManyUserInput = {
     id?: string
     leftContactId: string
@@ -114422,8 +123002,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -114496,6 +123080,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -114630,7 +123215,10 @@ export namespace Prisma {
     actionUrl?: string | null
     securityAlertId?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type SecurityAlertCreateManyUserInput = {
@@ -114709,6 +123297,17 @@ export namespace Prisma {
     id?: string
     name: string
     color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactPrivateFieldCreateManyUserInput = {
+    id?: string
+    contactId: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
     position?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -114933,6 +123532,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -114998,6 +123599,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -115172,6 +123775,78 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type KontaxExportJobUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type KontaxExportJobUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumKontaxExportKindFieldUpdateOperationsInput | $Enums.KontaxExportKind
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    includePhotos?: BoolFieldUpdateOperationsInput | boolean
+    includeVcardFallback?: BoolFieldUpdateOperationsInput | boolean
+    contactIds?: NullableJsonNullValueInput | InputJsonValue
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    totalCount?: NullableIntFieldUpdateOperationsInput | number | null
+    progressCount?: IntFieldUpdateOperationsInput | number
+    photoCount?: IntFieldUpdateOperationsInput | number
+    exportedCount?: IntFieldUpdateOperationsInput | number
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MergeSuggestionUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     pairKey?: StringFieldUpdateOperationsInput | string
@@ -115321,10 +123996,14 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
@@ -115368,8 +124047,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -115413,8 +124096,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -115618,6 +124305,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -115636,6 +124324,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -115653,6 +124342,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -115680,6 +124370,7 @@ export namespace Prisma {
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutOwnerInput = {
@@ -115701,6 +124392,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutOwnerInput = {
@@ -115743,6 +124435,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutRecipientUserInput = {
@@ -115764,6 +124457,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutRecipientUserInput = {
@@ -115914,6 +124608,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutBookNestedInput
+    contactMemberships?: ContactBookMembershipUpdateManyWithoutAddressBookNestedInput
+    syncDestinations?: SyncAccountUpdateManyWithoutDestinationBookNestedInput
   }
 
   export type AddressBookUncheckedUpdateWithoutUserInput = {
@@ -115929,6 +124625,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutBookNestedInput
+    contactMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutAddressBookNestedInput
+    syncDestinations?: SyncAccountUncheckedUpdateManyWithoutDestinationBookNestedInput
   }
 
   export type AddressBookUncheckedUpdateManyWithoutUserInput = {
@@ -116018,8 +124716,11 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
     adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutUserInput = {
@@ -116033,7 +124734,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyWithoutUserInput = {
@@ -116047,7 +124751,10 @@ export namespace Prisma {
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SecurityAlertUpdateWithoutUserInput = {
@@ -116292,6 +124999,39 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutPrivateFieldsNestedInput
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
     position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116839,6 +125579,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -116926,6 +125667,24 @@ export namespace Prisma {
     id?: string
     groupAddressBookId: string
     addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactBookMembershipCreateManyContactInput = {
+    id?: string
+    addressBookId: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactPrivateFieldCreateManyContactInput = {
+    id?: string
+    userId: string
+    fieldType: string
+    label?: string | null
+    value: JsonNullValueInput | InputJsonValue
+    position?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -117150,6 +125909,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -117169,6 +125929,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -117187,6 +125948,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -117311,6 +126073,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
     recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutContactInput = {
@@ -117332,6 +126095,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutContactInput = {
@@ -117374,6 +126138,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
     recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    notifications?: NotificationUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateWithoutRecipientContactInput = {
@@ -117395,6 +126160,7 @@ export namespace Prisma {
     maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notifications?: NotificationUncheckedUpdateManyWithoutContactShareNestedInput
   }
 
   export type ContactShareUncheckedUpdateManyWithoutRecipientContactInput = {
@@ -117438,6 +126204,60 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     groupAddressBookId?: StringFieldUpdateOperationsInput | string
     addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactBookMembershipUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    addressBook?: AddressBookUpdateOneRequiredWithoutContactMembershipsNestedInput
+  }
+
+  export type ContactBookMembershipUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactBookMembershipUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactPrivateFieldsNestedInput
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactPrivateFieldUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    fieldType?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    value?: JsonNullValueInput | InputJsonValue
+    position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -117524,6 +126344,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -117588,6 +126410,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -117961,6 +126785,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -118026,6 +126852,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -118169,8 +126997,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -118207,8 +127039,12 @@ export namespace Prisma {
     booksDiscoveredAt?: Date | string | null
     setupCompletedAt?: Date | string | null
     disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
     retiredAt?: Date | string | null
     retiredReason?: string | null
+    destinationBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -118221,6 +127057,7 @@ export namespace Prisma {
     remoteETag?: string | null
     capabilityProfileId?: string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: Date | string | null
     tombstonedAt?: Date | string | null
     remoteDeletedAt?: Date | string | null
@@ -118312,11 +127149,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
     replacedAccounts?: SyncAccountUpdateManyWithoutReplacedBySyncAccountNestedInput
@@ -118359,8 +127200,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -118404,8 +127249,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -118440,11 +127289,15 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    destinationBook?: AddressBookUpdateOneWithoutSyncDestinationsNestedInput
     replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
     replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
     replacedAccounts?: SyncAccountUpdateManyWithoutReplacedBySyncAccountNestedInput
@@ -118487,8 +127340,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
@@ -118532,8 +127389,12 @@ export namespace Prisma {
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
     retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    destinationBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -118545,6 +127406,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -118564,6 +127426,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -118582,6 +127445,7 @@ export namespace Prisma {
     remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
     capabilityProfileId?: NullableStringFieldUpdateOperationsInput | string | null
     supportedFieldShadow?: NullableJsonNullValueInput | InputJsonValue
+    photoShadow?: NullableJsonNullValueInput | InputJsonValue
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -118879,6 +127743,7 @@ export namespace Prisma {
     canEdit?: boolean
     canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -118892,6 +127757,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: Date | string | null
     dissolvedToBookId?: string | null
     createdAt?: Date | string
@@ -119038,6 +127904,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119056,6 +127923,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119073,6 +127941,7 @@ export namespace Prisma {
     canEdit?: BoolFieldUpdateOperationsInput | boolean
     canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
+    sharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119086,6 +127955,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119099,6 +127969,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119112,6 +127983,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    minimumSharingPolicy?: NullableJsonNullValueInput | InputJsonValue
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -119308,6 +128180,55 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ContactBookMembershipCreateManyAddressBookInput = {
+    id?: string
+    contactId: string
+    isPrimary?: boolean
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountCreateManyDestinationBookInput = {
+    id?: string
+    userId: string
+    connectionId?: string | null
+    replacesSyncAccountId?: string | null
+    replacedBySyncAccountId?: string | null
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
+    disconnectedAt?: Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: Date | string | null
+    deletionGuardBypassOnce?: boolean
+    retiredAt?: Date | string | null
+    retiredReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ContactUpdateWithoutBookInput = {
     id?: StringFieldUpdateOperationsInput | string
     reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
@@ -119366,6 +128287,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
@@ -119430,6 +128353,8 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    bookMemberships?: ContactBookMembershipUncheckedUpdateManyWithoutContactNestedInput
+    privateFields?: ContactPrivateFieldUncheckedUpdateManyWithoutContactNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -119485,6 +128410,167 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ContactBookMembershipUpdateWithoutAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutBookMembershipsNestedInput
+  }
+
+  export type ContactBookMembershipUncheckedUpdateWithoutAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactBookMembershipUncheckedUpdateManyWithoutAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountUpdateWithoutDestinationBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    replacesSyncAccount?: SyncAccountUpdateOneWithoutReplacementChildrenNestedInput
+    replacementChildren?: SyncAccountUpdateManyWithoutReplacesSyncAccountNestedInput
+    replacedBySyncAccount?: SyncAccountUpdateOneWithoutReplacedAccountsNestedInput
+    replacedAccounts?: SyncAccountUpdateManyWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutDestinationBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    replacementChildren?: SyncAccountUncheckedUpdateManyWithoutReplacesSyncAccountNestedInput
+    replacedAccounts?: SyncAccountUncheckedUpdateManyWithoutReplacedBySyncAccountNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateManyWithoutDestinationBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    connectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacesSyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    replacedBySyncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    disconnectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionHold?: NullableJsonNullValueInput | InputJsonValue
+    deletionHoldAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletionGuardBypassOnce?: BoolFieldUpdateOperationsInput | boolean
+    retiredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    retiredReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SyncAccountSettingsCreateManyImportLabelInput = {
     id?: string
     syncAccountId: string
@@ -119498,9 +128584,14 @@ export namespace Prisma {
     notifyOnFailure?: boolean
     syncWindowStart?: number | null
     syncWindowEnd?: number | null
+    syncWindowTimezone?: string | null
     excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: number | null
+    projectionBookIds?: SyncAccountSettingsCreateprojectionBookIdsInput | string[]
+    fieldPrecedence?: string | null
+    autolinkCaveatDismissedAt?: Date | string | null
+    conflictOverride?: string | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -119517,9 +128608,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
@@ -119538,9 +128634,14 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -119558,11 +128659,84 @@ export namespace Prisma {
     notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
     syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
     syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowTimezone?: NullableStringFieldUpdateOperationsInput | string | null
     excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
     exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
     maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    projectionBookIds?: SyncAccountSettingsUpdateprojectionBookIdsInput | string[]
+    fieldPrecedence?: NullableStringFieldUpdateOperationsInput | string | null
+    autolinkCaveatDismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    conflictOverride?: NullableStringFieldUpdateOperationsInput | string | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NotificationCreateManyContactShareInput = {
+    id?: string
+    userId: string
+    category: $Enums.NotificationCategory
+    title: string
+    body: string
+    read?: boolean
+    readAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    actionUrl?: string | null
+    securityAlertId?: string | null
+    adminBroadcastId?: string | null
+    createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
+  }
+
+  export type NotificationUpdateWithoutContactShareInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
+    securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+    adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+  }
+
+  export type NotificationUncheckedUpdateWithoutContactShareInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type NotificationUncheckedUpdateManyWithoutContactShareInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    category?: EnumNotificationCategoryFieldUpdateOperationsInput | $Enums.NotificationCategory
+    title?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    read?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationCreateManyAdminBroadcastInput = {
@@ -119576,7 +128750,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     securityAlertId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateWithoutAdminBroadcastInput = {
@@ -119589,8 +128766,11 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     securityAlert?: SecurityAlertUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutAdminBroadcastInput = {
@@ -119604,7 +128784,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyWithoutAdminBroadcastInput = {
@@ -119618,7 +128801,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     securityAlertId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationCreateManySecurityAlertInput = {
@@ -119632,7 +128818,10 @@ export namespace Prisma {
     dismissedAt?: Date | string | null
     actionUrl?: string | null
     adminBroadcastId?: string | null
+    contactShareId?: string | null
     createdAt?: Date | string
+    eventAt?: Date | string | null
+    expiresAt?: Date | string | null
   }
 
   export type NotificationUpdateWithoutSecurityAlertInput = {
@@ -119645,8 +128834,11 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutNotificationsNestedInput
     adminBroadcast?: AdminBroadcastUpdateOneWithoutNotificationsNestedInput
+    contactShare?: ContactShareUpdateOneWithoutNotificationsNestedInput
   }
 
   export type NotificationUncheckedUpdateWithoutSecurityAlertInput = {
@@ -119660,7 +128852,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type NotificationUncheckedUpdateManyWithoutSecurityAlertInput = {
@@ -119674,7 +128869,10 @@ export namespace Prisma {
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actionUrl?: NullableStringFieldUpdateOperationsInput | string | null
     adminBroadcastId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactShareId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

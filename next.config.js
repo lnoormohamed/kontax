@@ -9,6 +9,27 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+// P46-02: avatars are served directly from the configured media host. Keep the
+// legacy `media.getkontax.com` literal and add the deploy's own media host
+// (`NEXT_PUBLIC_MEDIA_HOST`, e.g. a staging MinIO origin) so Kontax-hosted
+// avatars aren't CSP-blocked — must stay in sync with the img-src in
+// src/middleware.ts and the host match in src/lib/avatar-src.ts.
+const mediaHostOrigin = (() => {
+  try {
+    return process.env.NEXT_PUBLIC_MEDIA_HOST
+      ? new URL(process.env.NEXT_PUBLIC_MEDIA_HOST).origin
+      : null;
+  } catch {
+    return null;
+  }
+})();
+const imgSrc = [
+  "img-src 'self' data: blob: https://media.getkontax.com",
+  mediaHostOrigin && mediaHostOrigin !== "https://media.getkontax.com" ? mediaHostOrigin : "",
+]
+  .filter(Boolean)
+  .join(" ");
+
 const securityHeaders = [
   // Prevent MIME-type sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -28,8 +49,8 @@ const securityHeaders = [
       // Next.js requires unsafe-inline for inline hydration scripts
       "script-src 'self' 'unsafe-inline' https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      // Avatars served from MinIO via media subdomain; data:/blob: for image processing
-      "img-src 'self' data: blob: https://media.getkontax.com",
+      // Avatars served from MinIO via the configured media host (P46-02); data:/blob: for image processing
+      imgSrc,
       "font-src 'self'",
       "connect-src 'self' https://api.stripe.com https://checkout.stripe.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com",
@@ -43,6 +64,9 @@ const securityHeaders = [
 
 /** @type {import("next").NextConfig} */
 const config = {
+  // Allow parallel dev + prod-verification servers in the same checkout
+  // (each Claude/terminal session sets its own NEXT_DIST_DIR).
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   eslint: {
     ignoreDuringBuilds: true,
   },

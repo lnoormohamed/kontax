@@ -48,6 +48,7 @@ const toReviewContact = (c: {
   website: string | null;
   birthday: string | null;
   notes: string | null;
+  avatarUrl: string | null;
   sourceType: string;
   labels: unknown;
   updatedAt: Date;
@@ -63,6 +64,7 @@ const toReviewContact = (c: {
   website: c.website,
   birthday: c.birthday,
   notes: c.notes,
+  avatarUrl: c.avatarUrl,
   ...survivorMetaFor(c),
 });
 

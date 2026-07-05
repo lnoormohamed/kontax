@@ -32,6 +32,7 @@ Each runbook covers one subsystem: when to use it, normal state, failure modes, 
 | [sync-ops.md](sync-ops.md) | Sync engine operations — CardDAV auth failures, OAuth token expiry, stuck jobs, forced re-sync, `syncVersion` drift |
 | [import-export-jobs.md](import-export-jobs.md) | Import/export jobs — import pipeline phases, stuck exports, MinIO blob expiry, large file handling |
 | [incident.md](incident.md) | Incident basics — severity definitions, first-response checklist, common patterns, postmortem template |
+| [p40-book-memberships-backfill.md](p40-book-memberships-backfill.md) | P40 multi-book migration — `ContactBookMembership` backfill ordering, verification queries, rollback |
 
 ---
 

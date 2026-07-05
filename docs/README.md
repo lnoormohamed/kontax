@@ -19,6 +19,8 @@ These docs capture the *concepts* and *decisions* that span tickets and phases.
 | [session-continuity.md](session-continuity.md) | How Kontax maintains session continuity across tab, page-reload, and back-navigation — especially on mobile PWA where the OS kills background tabs. |
 | [session-expiry-recovery.md](session-expiry-recovery.md) | The controlled session-expiry UX: how expired sessions are detected, the redirect/intercept flow, and the step-up auth model for sensitive actions (P31). |
 | [mobile-session-model.md](mobile-session-model.md) | The mobile PWA session model: how sessions survive background kills, the `visibilitychange` heartbeat, and the offline-then-online recovery path. |
+| [ux-ui-audit-report-template.md](ux-ui-audit-report-template.md) | Reusable report structure for UX/UI audits across marketing, auth, onboarding, and signed-in flows. |
+| [ux-ui-audit-tracker-template.md](ux-ui-audit-tracker-template.md) | Lightweight tracker for audit coverage, findings, linked tickets, and verification status. |
 
 ---
 

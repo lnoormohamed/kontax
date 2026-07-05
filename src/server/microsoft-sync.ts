@@ -32,10 +32,18 @@ import {
 import type { ValueEntry } from "~/server/sync-contact-mapping";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
+  buildDeletionHoldPayload,
+  DeletionThresholdError,
+  exceedsDeletionThreshold,
+} from "~/server/sync-deletion-guard";
+import { stripExcludedPortableFields } from "~/server/sync-field-exclusions";
+import { buildExportLabelFilterWhere } from "~/server/sync-settings";
+import {
   addImportBatch,
   applyRemoteToContact,
   emptyImportBatch,
   type ImportBatchSummary,
+  type ImportDeletionGuard,
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
@@ -155,6 +163,12 @@ export type MicrosoftImportAccount = MicrosoftSyncAccount & {
   conflictPolicy: ConflictPolicy;
   // Drives the push phase: only TWO_WAY / EXPORT_ONLY accounts push local edits.
   syncDirection: SyncDirection;
+  // P39-02: deletion-safety guard shared across the run's import batches.
+  deletionGuard?: ImportDeletionGuard;
+  // P39-03: normalized field-exclusion tokens (see sync-field-exclusions.ts).
+  excludedFields?: Set<string>;
+  // P39-04: label ids gating NEW outbound pushes (empty/omitted = push all).
+  exportLabelFilter?: string[];
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -176,6 +190,8 @@ const toEngineAccount = (account: MicrosoftImportAccount): ImportEngineAccount =
   capabilityProfile: resolveSyncProviderCapabilityProfile({ provider: "MICROSOFT" }),
   sourceType: "SYNC_MICROSOFT",
   providerName: "Outlook",
+  deletionGuard: account.deletionGuard,
+  excludedFields: account.excludedFields,
 });
 
 const MICROSOFT_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
@@ -421,6 +437,10 @@ export const pushMicrosoftContact = async (
   contact: MicrosoftPushContact,
 ): Promise<MicrosoftPushResult> => {
   const accessToken = await getMicrosoftAccessToken(account);
+  // P39-03: Graph PATCH only touches keys present in the body — stripping the
+  // excluded fields (mapper drops null/undefined keys) leaves Outlook's own
+  // values for them untouched.
+  contact = stripExcludedPortableFields(contact, account.excludedFields ?? new Set<string>());
   const body = JSON.stringify(mapKontaxContactToGraph(contact));
 
   const patched = await graphPatchContact(accessToken, link.remoteUid, link.remoteETag ?? "*", body);
@@ -650,6 +670,11 @@ const createMicrosoftContactRemote = async (
   contact: PushContactRow,
 ): Promise<boolean> => {
   const accessToken = await getMicrosoftAccessToken(account);
+  // P39-03: excluded fields never reach a freshly-created remote contact.
+  const pushSource = stripExcludedPortableFields(
+    buildMicrosoftPushContact(contact),
+    account.excludedFields ?? new Set<string>(),
+  );
   const res = await fetch(`${GRAPH_BASE}/me/contacts`, {
     method: "POST",
     headers: {
@@ -657,7 +682,7 @@ const createMicrosoftContactRemote = async (
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify(mapKontaxContactToGraph(buildMicrosoftPushContact(contact))),
+    body: JSON.stringify(mapKontaxContactToGraph(pushSource)),
   });
   if (!res.ok) {
     throw normaliseMicrosoftError({ statusCode: res.status, message: await res.text().catch(() => "") });
@@ -672,9 +697,7 @@ const createMicrosoftContactRemote = async (
       remoteUid: created.id,
       remoteETag: created["@odata.etag"] ?? null,
       capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
-      supportedFieldShadow: buildMicrosoftPushShadow(
-        buildMicrosoftPushContact(contact),
-      ) as Prisma.InputJsonValue,
+      supportedFieldShadow: buildMicrosoftPushShadow(pushSource) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
     },
   });
@@ -776,7 +799,13 @@ export const pushLocalChangesToMicrosoft = async (
     }
   }
 
-  // 2) CREATES — user-created local contacts not yet on Outlook.
+  // 2) CREATES — user-created local contacts not yet on Outlook. P39-04: the
+  //    export label filter gates these new pushes only — linked contacts keep
+  //    syncing regardless of labels.
+  const exportLabelWhere = await buildExportLabelFilterWhere(
+    account.userId,
+    account.exportLabelFilter ?? [],
+  );
   const unlinked = await db.contact.findMany({
     where: {
       userId: account.userId,
@@ -784,6 +813,7 @@ export const pushLocalChangesToMicrosoft = async (
       syncTombstoneAt: null,
       lastMutatedBy: "MANUAL",
       syncLinks: { none: { syncAccountId: account.id } },
+      ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
     },
     select: pushContactSelect,
   });
@@ -802,8 +832,35 @@ export const pushLocalChangesToMicrosoft = async (
       remoteDeletedAt: null,
       contact: { OR: [{ archivedAt: { not: null } }, { syncTombstoneAt: { not: null } }] },
     },
-    select: { id: true, remoteUid: true },
+    select: {
+      id: true,
+      remoteUid: true,
+      contact: { select: { id: true, fullName: true, book: { select: { name: true } } } },
+    },
   });
+
+  // P39-02: deletion-safety threshold — the outbound delete list is known in
+  // full before any remote delete runs, so the guard aborts before the first.
+  if (account.deletionGuard) {
+    const guard = account.deletionGuard;
+    guard.candidates.push(
+      ...removedLinks
+        .filter((link) => link.remoteUid)
+        .map((link) => ({
+          linkId: link.id,
+          contactId: link.contact?.id ?? "",
+          name: link.contact?.fullName ?? "Unknown contact",
+          bookName: link.contact?.book?.name ?? "Personal",
+          bookDetail: link.contact?.book ? null : "default",
+          direction: "outbound" as const,
+        })),
+    );
+    const outboundCount = guard.candidates.filter((c) => c.direction === "outbound").length;
+    if (exceedsDeletionThreshold({ inbound: 0, outbound: outboundCount }, guard.threshold)) {
+      throw new DeletionThresholdError(buildDeletionHoldPayload(guard.candidates, guard.threshold));
+    }
+  }
+
   for (const link of removedLinks) {
     if (!link.remoteUid) continue;
     await deleteMicrosoftContactRemote(account, { id: link.id, remoteUid: link.remoteUid });

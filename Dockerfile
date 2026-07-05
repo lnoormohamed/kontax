@@ -38,5 +38,6 @@ EXPOSE 3000
 
 # Startup policy is environment-aware:
 # - non-prod can keep `KONTAX_SCHEMA_MODE=push`
-# - production should use `KONTAX_DEPLOY_ENV=production` (defaults to validate)
+# - production should use `KONTAX_DEPLOY_ENV=production` (and NODE_ENV=production
+#   also defaults to validate if KONTAX_DEPLOY_ENV is missing)
 CMD ["node", "scripts/start-production.mjs"]

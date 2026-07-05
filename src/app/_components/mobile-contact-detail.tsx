@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { resolveAvatarSrc } from "~/lib/avatar-src";
+import { useRouter } from "next/navigation";
+import { cameFromContactList } from "~/lib/contact-list-scroll";
 import { useEffect, useRef, useState } from "react";
 
+import { ContactHeroAvatar } from "~/app/_components/contact-hero-avatar";
+import { MobileContactExport } from "~/app/_components/contact-export-button";
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
 import { LabelChip } from "~/app/_components/label-chip";
 import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
@@ -62,18 +65,22 @@ export function MobileContactDetail({
   archiveOrRestoreAction,
   children,
 }: MobileContactDetailProps) {
+  const router = useRouter();
   // Inline-edit machinery is retained for the dormant read view; editing now
   // happens in the bottom sheet (P24B-DB19), so mode stays "read" on mobile.
   const { mode, saving, cancel, save } = useContactEdit();
   const editing = mode === "edit";
   const [moreOpen, setMoreOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [heroVisible, setHeroVisible] = useState(true);
   const heroVisibleRef = useRef(true);
   const scrollFrameRef = useRef<number | null>(null);
   const viewportFrameRef = useRef<number | null>(null);
+  const HERO_HIDE_THRESHOLD = 96;
+  const HERO_SHOW_THRESHOLD = 48;
 
   // Walk up the DOM once to find the nearest scroll container
   const findScrollContainer = () => {
@@ -86,13 +93,16 @@ export function MobileContactDetail({
     return null;
   };
 
-  // Show/hide compact header based on scroll position (scrollTop > 80px threshold)
+  // Show/hide compact header with hysteresis so iPhone inertial scrolling
+  // doesn't flicker at a single threshold and make the detail view feel jumpy.
   useEffect(() => {
     const container = findScrollContainer();
     const scrollTarget = container ?? window;
     const updateHeroVisibility = () => {
       const top = container ? container.scrollTop : window.scrollY;
-      const next = top < 80;
+      const next = heroVisibleRef.current
+        ? top < HERO_HIDE_THRESHOLD
+        : top < HERO_SHOW_THRESHOLD;
       if (heroVisibleRef.current !== next) {
         heroVisibleRef.current = next;
         setHeroVisible(next);
@@ -163,6 +173,16 @@ export function MobileContactDetail({
   const showCompactHeader = !heroVisible || editing;
   const tabBarTop = showCompactHeader ? 52 : 0;
 
+  // When the list opened this contact, "back" must be a real history back so
+  // the list URL (filters, search, restoreContact marker) and Next's cached
+  // page state survive — pushing a bare backHref resets the list to the top.
+  // Deep links (no list state) keep the plain href navigation.
+  const handleBack = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!cameFromContactList(contactId)) return;
+    event.preventDefault();
+    router.back();
+  };
+
   return (
     <div ref={containerRef}>
       {/* Fixed compact header — appears when hero scrolls off screen or when editing */}
@@ -176,11 +196,14 @@ export function MobileContactDetail({
           zIndex: 40,
           backgroundColor: editing ? "#f3f5ff" : "#ffffff",
           borderBottom: `1px solid ${editing ? "rgba(65,88,244,0.28)" : "#d8ddd6"}`,
-          display: showCompactHeader ? "flex" : "none",
+          display: "flex",
           alignItems: "center",
           padding: "0 4px",
           gap: 4,
-          transition: "background-color 200ms ease",
+          opacity: showCompactHeader ? 1 : 0,
+          pointerEvents: showCompactHeader ? "auto" : "none",
+          transform: showCompactHeader ? "translateY(0)" : "translateY(-100%)",
+          transition: "opacity 160ms ease, transform 160ms ease, background-color 200ms ease",
         }}
       >
         {editing ? (
@@ -223,6 +246,7 @@ export function MobileContactDetail({
           <Link
             aria-label={`Back to ${backHref === "/contacts" ? "Contacts" : "back"}`}
             href={backHref}
+            onClick={handleBack}
             style={{
               display: "flex",
               alignItems: "center",
@@ -324,18 +348,25 @@ export function MobileContactDetail({
           transition: "background-color 200ms ease",
         }}
       >
-        {/* In-hero nav row — only visible when compact header is hidden */}
-        {!showCompactHeader && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 20,
-            }}
-          >
+        {/* In-hero nav row — fades out when the compact header takes over.
+            Kept mounted so hero height is constant: unmounting it shrank the
+            page ~64px right at the hide threshold, which dropped scrollTop
+            below the show threshold and made the header oscillate on iPhone
+            for contacts whose content barely scrolls. */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 20,
+            opacity: showCompactHeader ? 0 : 1,
+            pointerEvents: showCompactHeader ? "none" : "auto",
+            transition: "opacity 160ms ease",
+          }}
+        >
             <Link
               href={backHref}
+              onClick={handleBack}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -373,22 +404,19 @@ export function MobileContactDetail({
             ) : !isEditable ? (
               <ReadOnlyChip />
             ) : null}
-          </div>
-        )}
+        </div>
 
         {/* Avatar + name */}
         <div style={{ textAlign: "center" }}>
           {avatarUrl ? (
-            <img
+            <ContactHeroAvatar
               alt={contactName}
-              src={resolveAvatarSrc(avatarUrl) ?? avatarUrl}
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                objectFit: "cover",
-                display: "inline-block",
-              }}
+              avatarUrl={avatarUrl}
+              bg={avatarBg}
+              fg={avatarFg}
+              initials={initials}
+              size={80}
+              style={{ borderRadius: "50%" }}
             />
           ) : (
             <div
@@ -469,7 +497,7 @@ export function MobileContactDetail({
         </div>
       </div>
 
-      {/* More actions sheet — Favourite · Archive · Share */}
+      {/* More actions sheet — Favourite · Share · Export · Archive */}
       <MobileBottomSheet isOpen={moreOpen} onClose={() => setMoreOpen(false)} title={contactName}>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <form action={toggleFavoriteAction} onSubmit={() => setMoreOpen(false)}>
@@ -479,10 +507,21 @@ export function MobileContactDetail({
               <span style={moreLabelStyle}>{isFavorite ? "Remove from favourites" : "Add to favourites"}</span>
             </button>
           </form>
-          <Link href={`/contacts/${contactId}?tab=sharing`} prefetch={false} onClick={() => setMoreOpen(false)} style={moreRowStyle}>
+          <Link href={`/contacts/${contactId}?tab=sharing`} prefetch={false} replace onClick={() => setMoreOpen(false)} style={moreRowStyle}>
             <WorkspaceIcon name="share" size={20} className="text-[#5c655e]" />
             <span style={moreLabelStyle}>Share</span>
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setMoreOpen(false);
+              setExportOpen(true);
+            }}
+            style={moreRowStyle}
+          >
+            <WorkspaceIcon name="download" size={20} className="text-[#5c655e]" />
+            <span style={moreLabelStyle}>Export</span>
+          </button>
           <form action={archiveOrRestoreAction} onSubmit={() => setMoreOpen(false)}>
             <input name="contactId" type="hidden" value={contactId} />
             <button type="submit" style={{ ...moreRowStyle, color: isArchived ? "#1d2823" : "#b5472f" }}>
@@ -492,6 +531,14 @@ export function MobileContactDetail({
           </form>
         </div>
       </MobileBottomSheet>
+
+      {/* Export sheet (P45-DB01) — format picker + share-sheet handoff */}
+      <MobileContactExport
+        contactId={contactId}
+        contactName={contactName}
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+      />
 
       {/* Sticky tab bar */}
       <div
@@ -504,7 +551,6 @@ export function MobileContactDetail({
           display: "flex",
           overflowX: "auto",
           scrollbarWidth: "none",
-          transition: "top 150ms ease",
           WebkitOverflowScrolling: "touch",
         }}
       >
@@ -513,6 +559,7 @@ export function MobileContactDetail({
             key={key}
             href={`/contacts/${contactId}?tab=${key}`}
             prefetch={false}
+            replace
             style={{
               display: "flex",
               alignItems: "center",

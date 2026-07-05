@@ -72,6 +72,9 @@ export function ProfileSection({
     setUploading(true);
     const formData = new FormData();
     formData.set("avatar", f);
+    // P46-03: supersede the prior object so replacing the photo doesn't orphan it.
+    const prev = pendingAvatarUrl ?? photo;
+    if (prev) formData.set("prevUrl", prev);
     fetch("/api/upload/avatar", { method: "POST", body: formData })
       .then((r) => r.json() as Promise<{ url?: string; error?: string }>)
       .then((data) => {

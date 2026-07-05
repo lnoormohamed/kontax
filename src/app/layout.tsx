@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata, type Viewport } from "next";
 
 import { ImpersonationBanner } from "~/app/_components/impersonation-banner";
+import { MotionPreference } from "~/app/_components/motion-preference";
 import { PwaRegister } from "~/app/_components/pwa-register";
 import { WebVitalsReporter } from "~/app/_components/web-vitals-reporter";
 import { SITE_URL } from "~/lib/site-url";
@@ -59,6 +60,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <WebVitalsReporter />
+        <MotionPreference />
         <ImpersonationBanner />
         {children}
         <PwaRegister />

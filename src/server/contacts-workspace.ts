@@ -71,6 +71,10 @@ export type WorkspaceRow = {
   isEmergency: boolean;
   sharedKind: "family" | "team" | null;
   labels: unknown;
+  // P46-01: the list's primary sort key, lowercased (phoneticLastName ??
+  // lastName, else company/full). The alphabet scrubber folds this to an index
+  // letter so the rail, section headers, and sort share one key.
+  sortName: string;
   noteMatchSnippet?: string;
 };
 
@@ -282,6 +286,10 @@ const SORT_KEY_COLUMNS = Prisma.sql`
 
 const NAME_ORDER = Prisma.sql`
   s."isFavorite" DESC,
+  -- P46-01: names that don't start with a letter (digits, symbols, unmapped
+  -- scripts — the "#" bucket) sort LAST, matching the alphabet rail's #-at-the-
+  -- end convention so those contacts land at the bottom of the list, not the top.
+  ((CASE WHEN k_first = '' OR k_last = '' THEN coalesce(nullif(k_company, ''), k_full) ELSE k_last END) !~ '^[[:alpha:]]'),
   CASE WHEN k_first = '' OR k_last = '' THEN coalesce(nullif(k_company, ''), k_full) ELSE k_last END,
   CASE WHEN k_first = '' OR k_last = '' THEN coalesce(nullif(k_company, ''), k_full) ELSE k_first END,
   k_company,
@@ -326,10 +334,20 @@ const commonPredicates = (
 
 const privateBranch = (args: BranchArgs): Prisma.Sql => {
   const { scope, archived } = args.params;
+  // P40-06 read cutover: filter by ContactBookMembership (a contact can live in
+  // several books). The `OR c."bookId" = …` clause is the soak deprecation shim
+  // — it keeps the legacy single-book rows visible until the membership backfill
+  // is guaranteed complete everywhere and dual-write has fully rolled out; it is
+  // removed with Contact.bookId in the post-soak cleanup phase (decision §10.1).
   const bookFilter = scope.personalBookId
-    ? scope.personalBookIsDefault
-      ? Prisma.sql`(c."bookId" = ${scope.personalBookId} OR c."bookId" IS NULL)`
-      : Prisma.sql`c."bookId" = ${scope.personalBookId}`
+    ? Prisma.sql`(
+        EXISTS (
+          SELECT 1 FROM "ContactBookMembership" m
+          WHERE m."contactId" = c.id AND m."addressBookId" = ${scope.personalBookId}
+        )
+        OR c."bookId" = ${scope.personalBookId}
+        ${scope.personalBookIsDefault ? Prisma.sql`OR c."bookId" IS NULL` : Prisma.empty}
+      )`
     : Prisma.sql`true`;
   return Prisma.sql`
     SELECT ${ROW_COLUMNS}, ${args.params.includeNotes ? Prisma.sql`c.notes` : Prisma.sql`NULL::text`} AS notes,
@@ -387,6 +405,7 @@ type RawRow = {
   labels: unknown;
   notes: string | null;
   shared_kind: "family" | "team" | null;
+  sort_name: string;
   total_count: bigint;
 };
 
@@ -416,7 +435,11 @@ export async function listWorkspaceContacts(
         : Prisma.sql`s."updatedAt" DESC, s.id`;
 
   const rows = await db.$queryRaw<RawRow[]>(Prisma.sql`
-    SELECT s.*, count(*) OVER () AS total_count
+    SELECT s.*, count(*) OVER () AS total_count,
+      -- P46-01: the alphabet index letter derives from the SAME primary key the
+      -- list is ordered by (NAME_ORDER, above), so bucket = header = sort. The
+      -- client folds this string to an A–Z letter (or #) in bucketLetter().
+      CASE WHEN s.k_first = '' OR s.k_last = '' THEN coalesce(nullif(s.k_company, ''), s.k_full) ELSE s.k_last END AS sort_name
     FROM (${union}) s
     ${rankJoin}
     ORDER BY ${orderBy}
@@ -444,6 +467,7 @@ export async function listWorkspaceContacts(
         isEmergency: row.isEmergency,
         sharedKind: row.shared_kind,
         labels: row.labels,
+        sortName: row.sort_name,
         ...(snippet ? { noteMatchSnippet: snippet } : {}),
       };
     }),

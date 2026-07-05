@@ -235,6 +235,26 @@ exports.Prisma.ContactScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContactBookMembershipScalarFieldEnum = {
+  id: 'id',
+  contactId: 'contactId',
+  addressBookId: 'addressBookId',
+  isPrimary: 'isPrimary',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ContactPrivateFieldScalarFieldEnum = {
+  id: 'id',
+  contactId: 'contactId',
+  userId: 'userId',
+  fieldType: 'fieldType',
+  label: 'label',
+  value: 'value',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SubscriptionCustomerScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -323,6 +343,31 @@ exports.Prisma.ExportJobScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.KontaxExportJobScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  status: 'status',
+  includeArchived: 'includeArchived',
+  includePhotos: 'includePhotos',
+  includeVcardFallback: 'includeVcardFallback',
+  contactIds: 'contactIds',
+  bookId: 'bookId',
+  filterQuery: 'filterQuery',
+  totalCount: 'totalCount',
+  progressCount: 'progressCount',
+  photoCount: 'photoCount',
+  exportedCount: 'exportedCount',
+  downloadUrl: 'downloadUrl',
+  fileSizeBytes: 'fileSizeBytes',
+  expiresAt: 'expiresAt',
+  errorSummary: 'errorSummary',
+  createdAt: 'createdAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.MergeSuggestionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -398,8 +443,12 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   booksDiscoveredAt: 'booksDiscoveredAt',
   setupCompletedAt: 'setupCompletedAt',
   disconnectedAt: 'disconnectedAt',
+  deletionHold: 'deletionHold',
+  deletionHoldAt: 'deletionHoldAt',
+  deletionGuardBypassOnce: 'deletionGuardBypassOnce',
   retiredAt: 'retiredAt',
   retiredReason: 'retiredReason',
+  destinationBookId: 'destinationBookId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -418,9 +467,14 @@ exports.Prisma.SyncAccountSettingsScalarFieldEnum = {
   notifyOnFailure: 'notifyOnFailure',
   syncWindowStart: 'syncWindowStart',
   syncWindowEnd: 'syncWindowEnd',
+  syncWindowTimezone: 'syncWindowTimezone',
   excludedFields: 'excludedFields',
   exportLabelFilter: 'exportLabelFilter',
   maxAttemptsBeforePause: 'maxAttemptsBeforePause',
+  projectionBookIds: 'projectionBookIds',
+  fieldPrecedence: 'fieldPrecedence',
+  autolinkCaveatDismissedAt: 'autolinkCaveatDismissedAt',
+  conflictOverride: 'conflictOverride',
   lastModifiedAt: 'lastModifiedAt',
   createdAt: 'createdAt'
 };
@@ -442,6 +496,7 @@ exports.Prisma.SyncContactLinkScalarFieldEnum = {
   remoteETag: 'remoteETag',
   capabilityProfileId: 'capabilityProfileId',
   supportedFieldShadow: 'supportedFieldShadow',
+  photoShadow: 'photoShadow',
   lastSyncedAt: 'lastSyncedAt',
   tombstonedAt: 'tombstonedAt',
   remoteDeletedAt: 'remoteDeletedAt',
@@ -660,6 +715,7 @@ exports.Prisma.GroupMemberScalarFieldEnum = {
   canEdit: 'canEdit',
   canManageBilling: 'canManageBilling',
   addressBookPermissions: 'addressBookPermissions',
+  sharingPolicy: 'sharingPolicy',
   inviteToken: 'inviteToken',
   inviteExpiresAt: 'inviteExpiresAt',
   invitedAt: 'invitedAt',
@@ -674,6 +730,7 @@ exports.Prisma.GroupAddressBookScalarFieldEnum = {
   name: 'name',
   description: 'description',
   isDefault: 'isDefault',
+  minimumSharingPolicy: 'minimumSharingPolicy',
   archivedAt: 'archivedAt',
   dissolvedToBookId: 'dissolvedToBookId',
   createdAt: 'createdAt',
@@ -777,7 +834,10 @@ exports.Prisma.NotificationScalarFieldEnum = {
   actionUrl: 'actionUrl',
   securityAlertId: 'securityAlertId',
   adminBroadcastId: 'adminBroadcastId',
-  createdAt: 'createdAt'
+  contactShareId: 'contactShareId',
+  createdAt: 'createdAt',
+  eventAt: 'eventAt',
+  expiresAt: 'expiresAt'
 };
 
 exports.Prisma.AdminBroadcastScalarFieldEnum = {
@@ -1008,6 +1068,11 @@ exports.ContactExportFormat = exports.$Enums.ContactExportFormat = {
   VCARD_4: 'VCARD_4'
 };
 
+exports.KontaxExportKind = exports.$Enums.KontaxExportKind = {
+  DOCUMENT: 'DOCUMENT',
+  ARCHIVE: 'ARCHIVE'
+};
+
 exports.MergeSuggestionStatus = exports.$Enums.MergeSuggestionStatus = {
   OPEN: 'OPEN',
   DISMISSED: 'DISMISSED',
@@ -1059,7 +1124,9 @@ exports.SyncJobStatus = exports.$Enums.SyncJobStatus = {
   RUNNING: 'RUNNING',
   SUCCEEDED: 'SUCCEEDED',
   PARTIAL: 'PARTIAL',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED',
+  HALTED: 'HALTED'
 };
 
 exports.SyncJobTrigger = exports.$Enums.SyncJobTrigger = {
@@ -1234,10 +1301,13 @@ exports.Prisma.ModelName = {
   UserOnboardingState: 'UserOnboardingState',
   AppPassword: 'AppPassword',
   Contact: 'Contact',
+  ContactBookMembership: 'ContactBookMembership',
+  ContactPrivateField: 'ContactPrivateField',
   SubscriptionCustomer: 'SubscriptionCustomer',
   Subscription: 'Subscription',
   ImportJob: 'ImportJob',
   ExportJob: 'ExportJob',
+  KontaxExportJob: 'KontaxExportJob',
   MergeSuggestion: 'MergeSuggestion',
   MergeDecision: 'MergeDecision',
   MergeDismissal: 'MergeDismissal',

@@ -1,0 +1,21 @@
+{
+  "fullName": "Photo Fixture Person",
+  "firstName": "Photo",
+  "lastName": "Fixture",
+  "email": "photo.fixture@kontax-seed.test",
+  "emailEntries": [
+    { "label": "Work", "value": "photo.fixture@kontax-seed.test", "isPrimary": true }
+  ],
+  "phone": "+44 7700 900202",
+  "phoneEntries": [
+    { "label": "Mobile", "value": "+44 7700 900202", "isPrimary": true }
+  ],
+  "company": "Kontax QA",
+  "jobTitle": "Image Regression Fixture",
+  "avatarUrl": "https://images.kontax-seed.test/photo-fixture-person.png",
+  "website": "https://kontax-seed.test/photo-fixture",
+  "websiteEntries": [
+    { "label": "Portfolio", "value": "https://kontax-seed.test/photo-fixture", "isPrimary": true }
+  ],
+  "notes": "Image-heavy fixture contact used for contact-photo QA across list, detail, mobile, and public-card surfaces."
+}

@@ -43,3 +43,111 @@
 /* P33-02: search result row hover/active states */
 .se-row { transition: background 0.08s; cursor: pointer; }
 .se-row:hover { background: #f2f4f0; }
+
+/* P42-DB01: connection banner enter — slide-down + fade per toast conventions */
+@keyframes cxBannerIn   { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes cxBannerFade { from { opacity: 0; } to { opacity: 1; } }
+.cx-banner { animation: cxBannerIn 0.18s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="on"]) .cx-banner { animation: cxBannerFade 0.18s ease-out; }
+}
+
+/* ── P43-01: Animations & transitions preference ───────────────────────────────
+   One knob, three values, resolved at the root via a data-motion attribute set
+   by <MotionPreference>:
+     • "system" (default) → no attribute; the native prefers-reduced-motion
+       query below is in charge.
+     • "on"     → data-motion="on"; opts back in even when the OS asks for
+       reduced motion (the reduced-motion rule is scoped :not([data-motion="on"])).
+     • "off"    → data-motion="off"; zeroes transition/animation durations
+       globally, the same end-state reduced motion produces.
+   Slide entrances degrade to their visible end-state (no opacity:0 traps). */
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  transition-duration: 0.001ms !important;
+  transition-delay: 0s !important;
+  animation-duration: 0.001ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="on"]) *,
+  html:not([data-motion="on"]) *::before,
+  html:not([data-motion="on"]) *::after {
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── P46-01: Alphabet scrubber (fast-scroll index rail) ─────────────────────────
+   Mobile phone-book index on the right edge of the contacts list. Tokens mirror
+   the P46-DB01 spec (scrubber.css). Positioned `fixed` by the component to the
+   scroll viewport's right edge; resting it is deliberately quiet, and touching
+   it brings it to full strength for the gesture. */
+.kx-scrub {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 8px 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0.72;
+  transition: opacity 0.12s ease;
+}
+.kx-scrub.is-active { opacity: 1; }
+.kx-scrub-letter {
+  height: 15px;
+  width: 16px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #8b938c;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.09s ease, color 0.09s ease;
+}
+.kx-scrub.is-active .kx-scrub-letter { color: #5c655e; }
+.kx-scrub-letter.is-current { color: #17352e; font-weight: 700; }
+.kx-scrub.is-active .kx-scrub-letter.is-current { transform: scale(1.35); }
+.kx-scrub-dot {
+  height: 9px;
+  display: grid;
+  place-items: center;
+  color: #aeb4ac;
+  font-size: 9px;
+  line-height: 1;
+}
+.kx-scrub-bubble {
+  position: fixed;
+  z-index: 31;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px 16px 4px 16px;
+  background: #17352e;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(23, 53, 46, 0.34);
+  pointer-events: none;
+  animation: kxBubbleIn 0.12s ease-out;
+}
+@keyframes kxBubbleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: none; } }

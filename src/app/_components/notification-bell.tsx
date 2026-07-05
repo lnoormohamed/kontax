@@ -14,7 +14,10 @@ import {
 } from "~/app/actions/notifications";
 import {
   CATEGORY_TILE,
+  deriveAging,
+  deriveEventAffix,
   type NotificationCategory,
+  type ShareOutcome,
   relativeTime,
 } from "~/app/_components/notification-categories";
 import type { SecurityAlertView } from "~/app/_components/security-alert-drawer";
@@ -34,14 +37,26 @@ export type FeedItem = {
   actionUrl: string | null;
   securityAlertId: string | null;
   createdAt: string;
+  // P46-DB03: null on rows whose source has no dated event → aged-only.
+  eventAt: string | null;
+  expiresAt: string | null;
+  // P46-DB03 (D3): server-resolved SHARING invite truth.
+  entityPassed: boolean;
+  shareOutcome: ShareOutcome | null;
 };
 
-function CategoryTile({ category }: { category: NotificationCategory }) {
+function CategoryTile({ category, muted }: { category: NotificationCategory; muted?: boolean }) {
   const tile = CATEGORY_TILE[category] ?? CATEGORY_TILE.PRODUCT_UPDATES;
   return (
     <span
       className="grid h-8 w-8 flex-none place-items-center rounded-lg"
-      style={{ background: tile.bg, color: tile.fg }}
+      // P46-DB03 (D1): desaturate the tile so the row reads as past — killing the
+      // category color is what makes a live notification stop "popping".
+      style={{
+        background: tile.bg,
+        color: tile.fg,
+        ...(muted ? { filter: "grayscale(1) opacity(0.55)" } : null),
+      }}
     >
       <WorkspaceIcon name={tile.icon} size={16} strokeWidth={1.9} />
     </span>
@@ -135,6 +150,10 @@ export function NotificationBell({
 
   const openRow = async (n: FeedItem) => {
     setItems((xs) => xs.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+    // P46-DB03 (D3): an event-passed row whose target is gone (e.g. an expired
+    // invite) has its deep-link disabled — mark read but don't navigate into a
+    // dead end.
+    const affix = deriveEventAffix(n, deriveAging(n, referenceNow));
     if (n.category === "SECURITY" && n.securityAlertId) {
       setLoadingSecurityId(n.id);
       void markNotificationReadAction(n.id).then(() => router.refresh());
@@ -142,7 +161,7 @@ export function NotificationBell({
       setLoadingSecurityId(null);
       setOpen(false);
       if (a) setAlert(a);
-    } else if (n.actionUrl) {
+    } else if (n.actionUrl && !affix?.disableAction) {
       void markNotificationReadAction(n.id);
       setOpen(false);
       router.push(n.actionUrl);
@@ -168,62 +187,97 @@ export function NotificationBell({
   };
 
   const renderRows = (rows: FeedItem[]) =>
-    rows.map((n) => (
-      <div
-        className="group relative flex min-h-[72px] cursor-pointer items-start gap-3 border-b border-[#f2f4f0] py-3 pl-4 pr-3.5 transition hover:bg-[#fbfcfa] data-[unread=true]:bg-[#f9faf8] data-[unread=true]:hover:bg-[#f4f6f2] max-md:min-h-[76px] max-md:border-[#e9ece7] max-md:bg-white max-md:px-4 max-md:py-3.5 max-md:data-[unread=true]:bg-[#f8faf7]"
-        data-unread={!n.read}
-        key={n.id}
-        onClick={() => openRow(n)}
-      >
-        {!n.read && (
-          <span className="absolute left-1.5 top-1/2 h-[5px] w-[5px] -translate-y-1/2 rounded-full bg-[#4158f4] max-md:left-auto max-md:right-4 max-md:top-4 max-md:h-2 max-md:w-2 max-md:translate-y-0" />
-        )}
-        <CategoryTile category={n.category} />
-        <div className="min-w-0 flex-1">
-          <div
-            className={`truncate text-[13px] text-[#1d2823] max-md:text-[14.5px] ${
-              n.read ? "font-semibold" : "font-bold max-md:font-semibold"
-            }`}
-          >
-            {n.title}
+    rows.map((n) => {
+      // P46-DB03: two independent triggers → one muted register. Per-element mute
+      // (not a row-wide opacity), so the unread dot and the dismiss × stay crisp.
+      const aging = deriveAging(n, referenceNow);
+      const affix = deriveEventAffix(n, aging);
+      const muted = aging.muted;
+      const showOpen = Boolean(n.actionUrl) && !affix?.disableAction;
+      return (
+        <div
+          className="group relative flex min-h-[72px] cursor-pointer items-start gap-3 border-b border-[#f2f4f0] py-3 pl-4 pr-3.5 transition hover:bg-[#fbfcfa] data-[unread=true]:bg-[#f9faf8] data-[unread=true]:hover:bg-[#f4f6f2] max-md:min-h-[76px] max-md:border-[#e9ece7] max-md:bg-white max-md:px-4 max-md:py-3.5 max-md:data-[unread=true]:bg-[#f8faf7]"
+          data-unread={!n.read}
+          key={n.id}
+          onClick={() => openRow(n)}
+        >
+          {!n.read && (
+            // D1: age softens but never clears unread — the dot stays full #4158f4.
+            <span className="absolute left-1.5 top-1/2 h-[5px] w-[5px] -translate-y-1/2 rounded-full bg-[#4158f4] max-md:left-auto max-md:right-4 max-md:top-4 max-md:h-2 max-md:w-2 max-md:translate-y-0" />
+          )}
+          <CategoryTile category={n.category} muted={muted} />
+          <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 items-center">
+              <span
+                className={`truncate text-[13px] max-md:text-[14.5px] ${
+                  muted
+                    ? "font-medium text-[#5c655e]"
+                    : `text-[#1d2823] ${n.read ? "font-semibold" : "font-bold max-md:font-semibold"}`
+                }`}
+              >
+                {n.title}
+              </span>
+              {affix ? (
+                // D6: flex-none reserves the affix width first, so a long title
+                // truncates *around* the tag instead of pushing it off-row.
+                <span
+                  className={`ml-[7px] inline-flex h-[17px] flex-none items-center rounded-[5px] px-[7px] text-[9.5px] font-bold uppercase leading-none tracking-[0.05em] ${
+                    affix.disableAction ? "bg-[#f3e1da] text-[#7a2e1a]" : "bg-[#f2f4f0] text-[#8b938c]"
+                  }`}
+                >
+                  {affix.label}
+                </span>
+              ) : null}
+            </div>
+            <div
+              className={`mt-0.5 line-clamp-2 text-[12px] leading-[1.4] max-md:mt-1 max-md:text-[13px] ${
+                muted ? "text-[#aeb4ac] max-md:text-[#aeb4ac]" : "text-[#5c655e] max-md:text-[#8b938c]"
+              }`}
+            >
+              {n.body}
+            </div>
+            <div
+              className={`mt-1 hidden items-center gap-1.5 text-[11.5px] font-medium max-md:flex ${
+                muted ? "text-[#aeb4ac]" : "text-[#8b938c]"
+              }`}
+            >
+              <span suppressHydrationWarning>{relativeTime(n.createdAt, referenceNow)}</span>
+              {n.category === "SECURITY" ? (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>Security review</span>
+                </>
+              ) : showOpen ? (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>Open</span>
+                </>
+              ) : null}
+            </div>
           </div>
-          <div className="mt-0.5 line-clamp-2 text-[12px] leading-[1.4] text-[#5c655e] max-md:mt-1 max-md:text-[13px] max-md:text-[#8b938c]">
-            {n.body}
+          <div className="flex flex-none flex-col items-end gap-1.5 max-md:hidden">
+            <span
+              className={`text-[11px] tabular-nums ${muted ? "text-[#aeb4ac]" : "text-[#8b938c]"}`}
+              suppressHydrationWarning
+            >
+              {relativeTime(n.createdAt, referenceNow)}
+            </span>
+            <button
+              aria-label="Dismiss"
+              className="grid h-5 w-5 place-items-center rounded-md text-[#8b938c] opacity-0 transition hover:bg-black/5 group-hover:opacity-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                dismiss(n.id);
+              }}
+              type="button"
+            >
+              <WorkspaceIcon name="x" size={13} strokeWidth={2} />
+            </button>
           </div>
-          <div className="mt-1 hidden items-center gap-1.5 text-[11.5px] font-medium text-[#8b938c] max-md:flex">
-            <span suppressHydrationWarning>{relativeTime(n.createdAt, referenceNow)}</span>
-            {n.category === "SECURITY" ? (
-              <>
-                <span aria-hidden>·</span>
-                <span>Security review</span>
-              </>
-            ) : n.actionUrl ? (
-              <>
-                <span aria-hidden>·</span>
-                <span>Open</span>
-              </>
-            ) : null}
-          </div>
+          <WorkspaceIcon name="chevronRight" size={15} strokeWidth={2} className="mt-1 hidden flex-none text-[#aeb4ac] max-md:block" />
         </div>
-        <div className="flex flex-none flex-col items-end gap-1.5 max-md:hidden">
-          <span className="text-[11px] text-[#8b938c] tabular-nums" suppressHydrationWarning>
-            {relativeTime(n.createdAt, referenceNow)}
-          </span>
-          <button
-            aria-label="Dismiss"
-            className="grid h-5 w-5 place-items-center rounded-md text-[#8b938c] opacity-0 transition hover:bg-black/5 group-hover:opacity-100"
-            onClick={(e) => {
-              e.stopPropagation();
-              dismiss(n.id);
-            }}
-            type="button"
-          >
-            <WorkspaceIcon name="x" size={13} strokeWidth={2} />
-          </button>
-        </div>
-        <WorkspaceIcon name="chevronRight" size={15} strokeWidth={2} className="mt-1 hidden flex-none text-[#aeb4ac] max-md:block" />
-      </div>
-    ));
+      );
+    });
 
   return (
     <div className="relative" ref={wrapRef}>
@@ -250,19 +304,22 @@ export function NotificationBell({
           className="absolute right-[-4px] top-[50px] z-[65] flex max-h-[480px] w-[360px] flex-col overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white shadow-[0_8px_32px_rgba(29,40,35,0.12)] max-md:fixed max-md:inset-0 max-md:top-0 max-md:z-[100] max-md:h-[100dvh] max-md:max-h-none max-md:w-screen max-md:rounded-none max-md:border-0"
           role="dialog"
         >
-          <div className="flex h-11 flex-none items-center gap-2.5 border-b border-[#f2f4f0] px-3.5 max-md:h-[52px] max-md:border-[#d8ddd6] max-md:bg-white max-md:px-3">
-            <span className="text-[14px] font-bold text-[#1d2823] max-md:text-[19px] max-md:font-bold">Notifications</span>
+          <div className="flex h-11 flex-none items-center gap-2.5 border-b border-[#f2f4f0] px-3.5 max-md:h-[52px] max-md:gap-[11px] max-md:border-[#e9ece7] max-md:bg-white max-md:px-4">
+            {/* P46-DB03 D6·B: mobile full-screen overlay leads with a back button
+                (.pwa-head/.sx — wash-filled 30px square, left-aligned) that
+                dismisses the overlay. The desktop dropdown has no back affordance. */}
             <button
-              aria-label="Close"
-              className="ml-auto grid h-[44px] w-[44px] place-items-center rounded-xl text-[#3a4540] hover:bg-[#f2f4f0] md:hidden"
+              aria-label="Back"
+              className="hidden h-[30px] w-[30px] flex-none place-items-center rounded-lg bg-[#f2f4f0] text-[#5c655e] transition hover:bg-[#e9ece7] max-md:grid"
               onClick={() => setOpen(false)}
               type="button"
             >
-              <WorkspaceIcon name="x" size={18} />
+              <WorkspaceIcon name="arrowLeft" size={18} strokeWidth={2} />
             </button>
+            <span className="text-[14px] font-bold text-[#1d2823] max-md:text-[17px]">Notifications</span>
             {unread > 0 && (
               <button
-                className="ml-auto p-1 text-[13px] font-medium text-[#4158f4] hover:underline max-md:ml-0 max-md:text-[13.5px] max-md:font-semibold"
+                className="ml-auto p-1 text-[13px] font-medium text-[#4158f4] hover:underline max-md:text-[13px] max-md:font-semibold"
                 disabled={isPending}
                 onClick={markAll}
                 type="button"

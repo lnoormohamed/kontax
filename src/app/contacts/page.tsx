@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { BooksMigrationExplainer } from "~/app/_components/books-migration-explainer";
+import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
 import { BottomNav } from "~/app/_components/bottom-nav";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
@@ -28,6 +30,7 @@ import {
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
+import { getPreferences } from "~/server/preferences";
 import { db } from "~/server/db";
 import { getLabels } from "~/app/actions/labels";
 import { DEFAULT_PREFERENCES } from "~/lib/preferences";
@@ -135,6 +138,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   const prefs = session.user.preferences ?? DEFAULT_PREFERENCES;
 
+  // P40-08: gate the one-time migration banner on a FRESH DB read, not the JWT.
+  // Preferences in the session token only refresh on sign-in, so a JWT-based
+  // gate keeps rendering the banner server-side after dismissal and the client
+  // has to hide it post-hydration (a flash). Reading the dismissal fresh means
+  // the server simply never emits the banner once dismissed — no flash. Only the
+  // pre-migration cohort can ever see it, so new (booksNative) accounts skip the read.
+  const showBooksExplainer = prefs.booksNative
+    ? false
+    : !(await getPreferences(session.user.id)).booksExplainerDismissedAt;
+
   const [query, selectedTab, selectedFilter, selectedSort, selectedView, selectedHealth] = await Promise.all([
     getQueryValue(searchParams),
     getSelectedTab(searchParams),
@@ -182,10 +195,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         orderBy: [{ isDefault: "desc" }, { name: "asc" }],
         select: { id: true, name: true, slug: true, isDefault: true },
       }),
-      // Non-archived contact counts per book (null bookId rolls into the default book).
-      db.contact.groupBy({
-        by: ["bookId"],
-        where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } },
+      // P40-06: per-book counts from membership (matches the membership-based
+      // list; a multi-book contact counts in each of its books). Former null-book
+      // contacts were backfilled into their default book's membership.
+      db.contactBookMembership.groupBy({
+        by: ["addressBookId"],
+        where: {
+          addressBook: { userId: session.user.id },
+          contact: { archivedAt: null, groupContacts: { none: {} } },
+        },
         _count: { _all: true },
       }),
       // P31B-04: label registry for the sidebar Labels section (also feeds the
@@ -213,16 +231,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   ];
   const hasShared = sharedBooks.length > 0;
 
-  // P28-03: personal books with non-archived counts (null bookId → default book).
-  const nullBookCount = personalBookCounts.find((c) => c.bookId === null)?._count._all ?? 0;
+  // P40-06: personal books with non-archived counts, keyed by membership book.
   const personalBooks = personalBooksRaw.map((b) => ({
     id: b.id,
     name: b.name,
     slug: b.slug,
     isDefault: b.isDefault,
-    count:
-      (personalBookCounts.find((c) => c.bookId === b.id)?._count._all ?? 0) +
-      (b.isDefault ? nullBookCount : 0),
+    count: personalBookCounts.find((c) => c.addressBookId === b.id)?._count._all ?? 0,
   }));
 
   const bookParam = await getSingleParam(searchParams, "book");
@@ -408,6 +423,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         userId={session.user.id}
         tab={selectedTab}
         labelRegistry={sidebarLabels.map((l) => ({ name: l.name, color: l.color }))}
+        statusChip={<OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />}
         filterSlot={
           selectedTab === "overview" ? null : (
             <MobileFilterButton
@@ -451,6 +467,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           />
 
           <div className="flex shrink-0 items-center gap-2.5">
+            {/* P42-DB01 §3b: offline persists as a chip while account-state owns the slot */}
+            <OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />
             <Link
               className={`inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition ${
                 planSummary.lifecyclePolicy.canWrite
@@ -478,6 +496,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
       <SecurityAlertBannerSlot userId={session.user.id} />
 
+      {/* P42-DB01: single banner slot — account-state ▸ connectivity ▸ flash ▸ update */}
+      <ConnectionBanner readOnly={!planSummary.lifecyclePolicy.canWrite} />
+
+      {/* P40-08: one-time books migration explainer — existing users only.
+          Gated server-side on a fresh DB read (see showBooksExplainer above). */}
+      {showBooksExplainer ? <BooksMigrationExplainer /> : null}
+
       <ContactDashboard
         activeContacts={activeList.rows}
         archivedContacts={archivedList.rows}
@@ -487,6 +512,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         currentSort={selectedSort}
         currentTab={selectedTab}
         nameDisplayOrder={prefs.nameDisplayOrder}
+        rowLabels={prefs.rowLabels}
         mergeSuggestions={mergeSuggestions}
         mergeSuggestionsRefreshed={mergeSuggestionsRefreshed}
         planSummary={{

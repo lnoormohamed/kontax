@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://getkontax.com/schemas/kontax-contact.v1.schema.json",
+  "title": "Kontax Contact Export Document (JSContact Card + getkontax.com extensions), format major 1",
+  "description": "See docs/contact-export-format-spec.md for the normative prose. This schema validates one contact document (the bare .json serialization, or one entry under contacts/ in an archive).",
+  "type": "object",
+  "required": ["@type", "version", "uid", "created", "updated", "getkontax.com:formatVersion", "getkontax.com:exportedAt"],
+  "properties": {
+    "@type": { "const": "Card" },
+    "version": { "const": "1.0" },
+    "uid": { "type": "string", "format": "uuid" },
+    "created": { "type": "string", "format": "date-time" },
+    "updated": { "type": "string", "format": "date-time" },
+    "prodId": { "type": "string" },
+
+    "getkontax.com:formatVersion": { "type": "string", "pattern": "^1\\.[0-9]+$" },
+    "getkontax.com:exportedAt": { "type": "string", "format": "date-time" },
+
+    "name": {
+      "type": "object",
+      "properties": {
+        "full": { "type": "string" },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "value"],
+            "properties": {
+              "kind": {
+                "enum": ["title", "given", "given2", "surname", "credential", "generation", "separator"]
+              },
+              "value": { "type": "string" },
+              "phonetic": { "type": "string" },
+              "getkontax.com:phoneticRaw": { "type": "string" }
+            }
+          }
+        },
+        "phoneticSystem": { "enum": ["ipa", "jyut", "piny"] },
+        "phoneticScript": { "type": "string" }
+      }
+    },
+
+    "nicknames": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name"],
+        "properties": { "name": { "type": "string" } }
+      }
+    },
+
+    "organizations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "units": { "type": "array", "items": { "type": "string" } },
+          "getkontax.com:phoneticCompany": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "titles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "organizationId": { "type": "string" }
+        }
+      }
+    },
+
+    "emails": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["address"],
+        "properties": {
+          "address": { "type": "string", "format": "email" },
+          "label": { "type": "string" },
+          "contexts": { "type": "object", "additionalProperties": { "const": true } },
+          "pref": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+
+    "phones": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["number"],
+        "properties": {
+          "number": { "type": "string" },
+          "label": { "type": "string" },
+          "features": { "type": "object", "additionalProperties": { "const": true } },
+          "pref": { "type": "integer", "minimum": 1 },
+          "getkontax.com:e164": { "type": "string" },
+          "getkontax.com:countryCode": { "type": "string" }
+        }
+      }
+    },
+
+    "links": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["uri"],
+        "properties": {
+          "uri": { "type": "string", "format": "uri" },
+          "label": { "type": "string" }
+        }
+      }
+    },
+
+    "addresses": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "contexts": { "type": "object", "additionalProperties": { "const": true } },
+          "pref": { "type": "integer", "minimum": 1 },
+          "getkontax.com:label": { "type": "string" },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "value"],
+              "properties": {
+                "kind": { "enum": ["name", "number", "locality", "region", "postcode", "country", "direction", "building", "floor", "apartment", "room", "postOfficeBox"] },
+                "value": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "anniversaries": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["date"],
+        "properties": {
+          "kind": { "type": "string" },
+          "getkontax.com:label": { "type": "string" },
+          "getkontax.com:isPrimary": { "type": "boolean" },
+          "date": {
+            "oneOf": [
+              { "type": "string", "format": "date-time" },
+              {
+                "type": "object",
+                "required": ["@type"],
+                "properties": {
+                  "@type": { "const": "PartialDate" },
+                  "year": { "type": "integer" },
+                  "month": { "type": "integer", "minimum": 1, "maximum": 12 },
+                  "day": { "type": "integer", "minimum": 1, "maximum": 31 },
+                  "calendarScale": { "type": "string" }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+
+    "getkontax.com:relatedPeople": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "string" }
+        }
+      }
+    },
+
+    "keywords": { "type": "object", "additionalProperties": { "const": true } },
+
+    "getkontax.com:labels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "color": { "type": "string" },
+          "position": { "type": "integer" }
+        }
+      }
+    },
+
+    "getkontax.com:books": { "type": "array", "items": { "type": "string" } },
+
+    "getkontax.com:customFields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "string" }
+        }
+      }
+    },
+
+    "notes": { "type": "string" },
+    "getkontax.com:favorite": { "type": "boolean" },
+    "getkontax.com:emergency": { "type": "boolean" },
+
+    "media": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["kind", "uri"],
+        "properties": {
+          "kind": { "const": "photo" },
+          "uri": { "type": "string", "format": "uri-reference" },
+          "mediaType": { "type": "string" },
+          "getkontax.com:sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "getkontax.com:width": { "type": "integer" },
+          "getkontax.com:height": { "type": "integer" }
+        }
+      }
+    },
+
+    "getkontax.com:source": {
+      "type": "object",
+      "properties": {
+        "origin": { "type": "string" },
+        "originDetail": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -312,7 +312,40 @@ export function SmartListsBooks({ lists, books }: { lists: SmartList[]; books: P
 
   return (
     <>
-      {/* My Lists */}
+      {/* P40-08: Books-first — the primary navigation axis sits above My Lists
+          and Labels (source doc §8 / P40-DB01 §1). */}
+      <div className="mt-3">
+        <SectionHeader label="Books" action="+ New book" onAction={() => setShowNewBook(true)} />
+        {books.map((book) => (
+          <Row
+            key={book.id}
+            icon={<BookIcon active={activeBookId === book.id} />}
+            name={book.name}
+            count={book.count}
+            active={activeBookId === book.id}
+            href={`/contacts?tab=people&filter=all&book=${book.id}`}
+            renaming={renamingId === book.id}
+            onRenameCancel={() => setRenamingId(null)}
+            onRenameSubmit={(value) => {
+              setRenamingId(null);
+              if (value.trim() && value.trim() !== book.name) {
+                run(() => renameAddressBook({ id: book.id, name: value }));
+              }
+            }}
+            menu={
+              book.isDefault
+                ? []
+                : [
+                    { label: "Rename", onClick: () => setRenamingId(book.id) },
+                    { label: "Manage", onClick: () => setManageBook(book) },
+                    { label: "Archive", onClick: () => setArchiveBook(book), destructive: true },
+                  ]
+            }
+          />
+        ))}
+      </div>
+
+      {/* My Lists (below Books per P40-DB01 §1) */}
       <div className="mt-3">
         <SectionHeader label="My Lists" action="+ New list" onAction={() => setShowSaveList(true)} />
         {lists.length === 0 ? (
@@ -345,38 +378,6 @@ export function SmartListsBooks({ lists, books }: { lists: SmartList[]; books: P
             );
           })
         )}
-      </div>
-
-      {/* Books (personal) */}
-      <div className="mt-3">
-        <SectionHeader label="Books" action="+ New book" onAction={() => setShowNewBook(true)} />
-        {books.map((book) => (
-          <Row
-            key={book.id}
-            icon={<BookIcon active={activeBookId === book.id} />}
-            name={book.name}
-            count={book.count}
-            active={activeBookId === book.id}
-            href={`/contacts?tab=people&filter=all&book=${book.id}`}
-            renaming={renamingId === book.id}
-            onRenameCancel={() => setRenamingId(null)}
-            onRenameSubmit={(value) => {
-              setRenamingId(null);
-              if (value.trim() && value.trim() !== book.name) {
-                run(() => renameAddressBook({ id: book.id, name: value }));
-              }
-            }}
-            menu={
-              book.isDefault
-                ? []
-                : [
-                    { label: "Rename", onClick: () => setRenamingId(book.id) },
-                    { label: "Manage", onClick: () => setManageBook(book) },
-                    { label: "Archive", onClick: () => setArchiveBook(book), destructive: true },
-                  ]
-            }
-          />
-        ))}
       </div>
 
       {/* Save-as-list modal */}

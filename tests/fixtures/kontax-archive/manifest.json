@@ -1,0 +1,42 @@
+{
+  "@type": "getkontax.com:Archive",
+  "getkontax.com:formatVersion": "1.0",
+  "getkontax.com:exportedAt": "2026-07-04T14:30:00.000Z",
+  "exporter": "kontax/1.0",
+  "counts": {
+    "contacts": 2,
+    "photos": 1
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "entries": [
+      {
+        "path": "contacts/0001.json",
+        "sha256": "5ac45694343f5eec88c8b146574a2f731fff60824793e6bf1a03a2fcd79823b5",
+        "bytes": 1825
+      },
+      {
+        "path": "contacts/0002.json",
+        "sha256": "80dc1ee7d892a7d156a674f74436cb1226adab4ca8e0915b0cc7c46f7cd9b84b",
+        "bytes": 952
+      },
+      {
+        "path": "media/a4dd28db6e6d3fc0d43cdbef1e8ef161b353ce67d27e81d400f796bc77045ae6.png",
+        "sha256": "a4dd28db6e6d3fc0d43cdbef1e8ef161b353ce67d27e81d400f796bc77045ae6",
+        "bytes": 70
+      },
+      {
+        "path": "vcards/contacts.vcf",
+        "sha256": "c9859faf0476cc1b909ea114f633ff9e7a624471ca0896cacd04ef0e8d28b67f",
+        "bytes": 60
+      }
+    ]
+  },
+  "getkontax.com:labels": {
+    "l1": {
+      "name": "Clients",
+      "color": "#4158f4",
+      "position": 0
+    }
+  }
+}

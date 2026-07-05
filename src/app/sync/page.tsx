@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
+import { ConnectionBanner, OfflineChip } from "~/app/_components/connection-banner";
 import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
@@ -15,6 +16,7 @@ import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getUserTeamMembership } from "~/server/team-access";
 import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
+import { summarizeProjection } from "~/lib/projection-preview";
 import {
   getConsecutiveFailureStreak,
   getSyncAccountOperationalHealth,
@@ -121,7 +123,7 @@ const getSnapshotText = (snapshot: unknown, key: string): string => {
 const buildConflictRows = (
   local: unknown,
   remote: unknown,
-): Array<{ label: string; local: string; remote: string }> => {
+): Array<{ label: string; local: string; remote: string; kind: "text" | "photo" }> => {
   const fields: Array<[string, string]> = [
     ["Full name", "fullName"],
     ["Emails", "emailAddresses"],
@@ -132,13 +134,23 @@ const buildConflictRows = (
     ["Birthday", "birthday"],
     ["Notes", "notes"],
   ];
-  return fields
+  const textRows = fields
     .map(([label, key]) => ({
       label,
       local: getSnapshotText(local, key),
       remote: getSnapshotText(remote, key),
+      kind: "text" as const,
     }))
     .filter((r) => r.local !== "—" || r.remote !== "—");
+  // P44-05: photo row — the values are image URLs, rendered as side-by-side
+  // thumbnails by the review UI rather than as text.
+  const localPhoto = getSnapshotText(local, "avatarUrl");
+  const remotePhoto = getSnapshotText(remote, "avatarUrl");
+  const photoRows =
+    localPhoto !== "—" || remotePhoto !== "—"
+      ? [{ label: "Photo", local: localPhoto, remote: remotePhoto, kind: "photo" as const }]
+      : [];
+  return [...textRows, ...photoRows];
 };
 
 // ── page ──────────────────────────────────────────────────────────────────────
@@ -191,7 +203,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, rawAccounts, rawPastAccounts] =
+  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, projectionBooks, rawAccounts, rawPastAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
       getUserFamilyMembership(userId),
@@ -210,6 +222,16 @@ export default async function SyncPage({ searchParams }: PageProps) {
         where: { userId },
         orderBy: { position: "asc" },
         select: { id: true, name: true, color: true },
+      }),
+      // P41-DB01: the user's personal books power the projection-scope picker and
+      // the book-first rail grouping. Default (home) book first, then by name.
+      // Archived books are included so a connection still pointing at one resolves
+      // to the "misconfigured" state (with its name); they're filtered out of the
+      // selectable picker below.
+      db.addressBook.findMany({
+        where: { userId },
+        orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+        select: { id: true, name: true, slug: true, isDefault: true, archivedAt: true },
       }),
       db.syncAccount.findMany({
         // Historical rows are preserved for reconnect/support flows but stay off
@@ -259,9 +281,15 @@ export default async function SyncPage({ searchParams }: PageProps) {
               notifyOnFailure: true,
               syncWindowStart: true,
               syncWindowEnd: true,
+              syncWindowTimezone: true,
               excludedFields: true,
               exportLabelFilter: true,
               maxAttemptsBeforePause: true,
+              // P41-DB01 projection config.
+              projectionBookIds: true,
+              fieldPrecedence: true,
+              autolinkCaveatDismissedAt: true,
+              conflictOverride: true,
             },
           },
           replacesSyncAccount: {
@@ -317,9 +345,15 @@ export default async function SyncPage({ searchParams }: PageProps) {
               notifyOnFailure: true,
               syncWindowStart: true,
               syncWindowEnd: true,
+              syncWindowTimezone: true,
               excludedFields: true,
               exportLabelFilter: true,
               maxAttemptsBeforePause: true,
+              // P41-DB01 projection config.
+              projectionBookIds: true,
+              fieldPrecedence: true,
+              autolinkCaveatDismissedAt: true,
+              conflictOverride: true,
             },
           },
           replacesSyncAccount: {
@@ -331,6 +365,14 @@ export default async function SyncPage({ searchParams }: PageProps) {
         },
       }),
     ]);
+
+  // P41-DB01: resolve projection book ids → display data. `books` is the user's
+  // non-archived personal books; the account may still reference a book id that
+  // was deleted (the "misconfigured" row state).
+  const bookById = new Map(projectionBooks.map((b) => [b.id, b]));
+  // Selectable books for the projection picker exclude archived ones.
+  const selectableBooks = projectionBooks.filter((b) => b.archivedAt == null);
+  const hasBookModel = selectableBooks.length > 0;
 
   const serialiseSyncAccount = (acct: (typeof rawAccounts)[number]): SyncAccountData => {
     const capabilityProfile = resolveSyncProviderCapabilityProfile({
@@ -387,6 +429,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
       diagnosticsWarnings.push(
         "Kontax paused this connection because the manual conflict queue is full.",
       );
+    } else if (
+      acct.status === "PAUSED" &&
+      acct.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED"
+    ) {
+      diagnosticsWarnings.push(
+        "Kontax paused this connection before committing deletions that exceeded your safety limit. Review and resume from the connection detail.",
+      );
     } else if (health === "paused_for_safety") {
       diagnosticsWarnings.push(
         "Kontax paused this connection after repeated failures so it does not keep retrying unattended.",
@@ -420,7 +469,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
           ? "ok"
           : j.status === "QUEUED" || j.status === "RUNNING"
             ? "pending"
-            : "fail",
+            : j.status === "SKIPPED"
+              ? "skipped"
+              : j.status === "HALTED"
+                ? "halted"
+                : "fail",
       error: j.errorSummary ?? null,
     }));
 
@@ -431,6 +484,48 @@ export default async function SyncPage({ searchParams }: PageProps) {
       date: cf.detectedAt.toISOString(),
       comparisonRows: buildConflictRows(cf.localSnapshot, cf.remoteSnapshot),
     }));
+
+    // ── P41-DB01: resolve this connection's projection view ──────────────────
+    // The projected set is the explicit projectionBookIds if configured, else it
+    // falls back to the single destination book. Empty on both = V1-only.
+    const rawProjectionIds = acct.settings?.projectionBookIds ?? [];
+    const destinationId = acct.destinationBookId ?? null;
+    const destinationBook = destinationId ? bookById.get(destinationId) ?? null : null;
+    // Misconfigured = the destination book exists but was archived out from under
+    // the connection (the FK is SetNull on delete, so an id that still resolves to
+    // an archived book is the real "book was removed" case).
+    const destinationBookMissing =
+      destinationId != null && (destinationBook == null || destinationBook.archivedAt != null);
+
+    const projectedIds = rawProjectionIds.length > 0
+      ? rawProjectionIds
+      : destinationId
+        ? [destinationId]
+        : [];
+    const projectedBooks = projectedIds
+      .map((id) => bookById.get(id))
+      .filter((b): b is NonNullable<typeof b> => b != null && b.archivedAt == null);
+    const projectionBookNames = projectedBooks.map((b) => b.name);
+    const projectionBookSlugs = projectedBooks.map((b) => b.slug);
+    const fieldPrecedence = (acct.settings?.fieldPrecedence ?? null) as
+      | "work"
+      | "personal"
+      | null;
+
+    const projectionRowState: SyncAccountData["projectionRowState"] = destinationBookMissing
+      ? "misconfigured"
+      : projectedBooks.length === 0
+        ? "v1-only"
+        : projectedBooks.length > 1
+          ? "multi-book"
+          : "single-book";
+
+    const projectionSummary = summarizeProjection({
+      bookNames: projectionBookNames,
+      precedence: fieldPrecedence,
+      v1Only: projectionRowState === "v1-only",
+      exportOnly: (acct.settings?.syncDirection ?? acct.syncDirection) === "EXPORT_ONLY",
+    });
 
     // P27-07: OAuth providers (Google/Microsoft) show a connected email + token
     // status instead of a server URL + credentials form.
@@ -475,12 +570,26 @@ export default async function SyncPage({ searchParams }: PageProps) {
       ),
       syncFrequencyMinutes: acct.settings?.syncFrequencyMinutes ?? null,
       bookAllowlist: acct.settings?.bookAllowlist ?? [],
+      // P41-DB01 projection config (resolved).
+      destinationBookId: destinationId,
+      destinationBookName: destinationBook && destinationBook.archivedAt == null ? destinationBook.name : null,
+      destinationBookMissingName: destinationBookMissing ? destinationBook?.name ?? "this book" : null,
+      projectionBookIds: projectedIds,
+      projectionBookNames,
+      projectionBookSlugs,
+      projectionSharedBook: projectedBooks.some((b) => "shared" in b && (b as { shared?: boolean }).shared === true),
+      fieldPrecedence,
+      autolinkCaveatDismissed: acct.settings?.autolinkCaveatDismissedAt != null,
+      conflictOverride: (acct.settings?.conflictOverride ?? null) as SyncAccountData["conflictOverride"],
+      projectionRowState,
+      projectionSummary,
       // P36 advanced settings (fall back to column defaults when no row exists).
       importLabelId: acct.settings?.importLabelId ?? null,
       maxDeletionsThreshold: acct.settings?.maxDeletionsThreshold ?? null,
       notifyOnFailure: acct.settings?.notifyOnFailure ?? true,
       syncWindowStart: acct.settings?.syncWindowStart ?? null,
       syncWindowEnd: acct.settings?.syncWindowEnd ?? null,
+      syncWindowTimezone: acct.settings?.syncWindowTimezone ?? null,
       excludedFields: acct.settings?.excludedFields ?? [],
       exportLabelFilter: acct.settings?.exportLabelFilter ?? [],
       maxAttemptsBeforePause: acct.settings?.maxAttemptsBeforePause ?? null,
@@ -528,6 +637,16 @@ export default async function SyncPage({ searchParams }: PageProps) {
       // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
       conflictQueueFull:
         acct.status === "PAUSED" && acct.lastErrorCode === "SYNC_CONFLICT_QUEUE_FULL",
+      // P39-02: deletion-safety hold summary for the paused-for-review surface.
+      // The review card fetches the full breakdown via getDeletionHoldReview.
+      deletionHoldTotal:
+        acct.status === "PAUSED" && acct.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED"
+          ? ((acct.deletionHold as { total?: number } | null)?.total ?? null)
+          : null,
+      deletionHoldThreshold:
+        acct.status === "PAUSED" && acct.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED"
+          ? ((acct.deletionHold as { threshold?: number } | null)?.threshold ?? null)
+          : null,
       // P27-08: duplicates found by the most recently *completed* import (0 hides
       // the banner). Pick by latest completedAt, not list order (a job can finish
       // out of creation order).
@@ -544,6 +663,14 @@ export default async function SyncPage({ searchParams }: PageProps) {
   // Serialise to plain data for client component
   const accounts: SyncAccountData[] = rawAccounts.map(serialiseSyncAccount);
   const pastAccounts: SyncAccountData[] = rawPastAccounts.map(serialiseSyncAccount);
+
+  // P41-DB01: selectable books for the projection-scope picker + rail grouping.
+  const bookOptions = selectableBooks.map((b) => ({
+    id: b.id,
+    name: b.name,
+    slug: b.slug,
+    isDefault: b.isDefault,
+  }));
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
@@ -570,6 +697,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
           <SearchInput filter="all" initialQuery="" sort="name" tab="people" view="compact" />
 
           <div className="flex shrink-0 items-center gap-2.5">
+            {/* P42-DB01 §3b: offline persists as a chip while account-state owns the slot */}
+            <OfflineChip readOnly={!planSummary.lifecyclePolicy.canWrite} />
             <Link
               className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#4158f4] px-4 text-sm font-semibold text-white transition hover:bg-[#3248db]"
               href="/contacts/new"
@@ -601,6 +730,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
       {/* ── Mobile header — "Sync" title, shown only on mobile (P24B-01) ── */}
       <MobilePlainHeader title="Sync" bell={<NotificationBellSlot userId={userId} />} />
 
+      {/* P42-DB01: single banner slot — replaces the mobile sync screen's
+          hard-coded read-only/offline either/or with the fixed priority rule. */}
+      <ConnectionBanner
+        readOnly={!planSummary.lifecyclePolicy.canWrite}
+        readOnlyVariant={planSummary.lifecyclePolicy.label === "Grace" ? "grace" : "locked"}
+      />
+
       {/* ── three-rail body ── */}
       <div className="flex min-h-0 flex-1">
         {/* Rail 1: Settings sidebar — hidden on mobile and tablet */}
@@ -615,11 +751,12 @@ export default async function SyncPage({ searchParams }: PageProps) {
             a connection/add takes over via SyncPageClient. */}
         <MobileSyncScreen
           accounts={accounts}
+          books={bookOptions}
+          hasBookModel={hasBookModel}
           hidden={mobileClientActive}
           cardDavEnabled={planSummary.entitlements.cardDavSyncEnabled}
           syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
           canWrite={planSummary.lifecyclePolicy.canWrite}
-          lifecycleLabel={planSummary.lifecyclePolicy.label}
           planLabel={planSummary.planLabel}
           upgradeableAtCap={planSummary.plan === "FREE"}
         />
@@ -638,6 +775,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
             accounts={accounts}
             pastAccounts={pastAccounts}
             labels={labels}
+            books={bookOptions}
+            hasBookModel={hasBookModel}
             initialAccountId={initialAccountId}
             initialAdd={addParam}
             flash={flashMsg}

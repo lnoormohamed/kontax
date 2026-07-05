@@ -17,10 +17,17 @@ import {
   confirmSyncSettingsPassword,
   createSyncAccount,
   disconnectSyncAccount,
+  getDeletionHoldReview,
   pauseSyncAccount,
   queueSyncJob,
   resolveSyncConflict,
+  resumeSyncAllowDeletions,
+  resumeSyncWithoutDeletions,
 } from "~/app/actions/sync";
+import type { DeletionHoldReview } from "~/server/sync-deletion-resume";
+import { ConfirmDialog } from "~/app/_components/confirm-dialog";
+import { OfflineWriteNote } from "~/app/_components/connection-banner";
+import { useOffline } from "~/app/_components/connectivity";
 import { HelpTooltip } from "~/app/_components/help-tooltip";
 import { SyncTimestamp } from "./sync-timestamp";
 
@@ -39,7 +46,9 @@ export type SyncJobRow = {
   pushedAdded: number;
   pushedModified: number;
   pushedDeleted: number;
-  status: "ok" | "fail" | "pending";
+  // P39-01/02: "skipped" = held by the sync window; "halted" = stopped before
+  // commit by the deletion-safety threshold.
+  status: "ok" | "fail" | "pending" | "skipped" | "halted";
   error: string | null;
 };
 
@@ -47,6 +56,8 @@ export type ConflictComparisonRow = {
   label: string;
   local: string;
   remote: string;
+  // P44-05: "photo" rows carry image URLs rendered as side-by-side thumbnails.
+  kind?: "text" | "photo";
 };
 
 export type SyncConflictData = {
@@ -56,6 +67,21 @@ export type SyncConflictData = {
   date: string;
   comparisonRows: ConflictComparisonRow[];
 };
+
+// P44-05: a conflict "Photo" row cell — thumbnail with a broken-image fallback.
+function ConflictPhotoCell({ url, alt }: { url: string; alt: string }) {
+  if (!url || url === "—") return <span style={{ fontSize: 12, color: T.mute }}>None</span>;
+  return (
+    <img
+      src={url}
+      alt={alt}
+      style={{ width: 56, height: 56, borderRadius: 8, objectFit: "cover", border: `1px solid ${T.line2}` }}
+      onError={(e) => {
+        e.currentTarget.style.display = "none";
+      }}
+    />
+  );
+}
 
 export type SyncFieldSupportRow = {
   key:
@@ -102,12 +128,31 @@ export type SyncAccountData = {
   // P23-01 convention: null = platform default (60 min), 0 = manual only.
   syncFrequencyMinutes: number | null;
   bookAllowlist: string[];
+  // ── P41-DB01 projection config (resolved for display) ──────────────────────
+  destinationBookId: string | null;
+  // Resolved name of the inbound-landing book, or null if unset. When the book
+  // was deleted out from under the connection, this is null and
+  // destinationBookMissing is true (the "misconfigured" row state).
+  destinationBookName: string | null;
+  destinationBookMissingName: string | null;
+  // Books this connection projects OUT, resolved to display names + slugs.
+  projectionBookIds: string[];
+  projectionBookNames: string[];
+  projectionBookSlugs: string[];
+  projectionSharedBook: boolean;
+  fieldPrecedence: "work" | "personal" | null;
+  autolinkCaveatDismissed: boolean;
+  conflictOverride: "account_default" | "remote_wins" | "queue_review" | null;
+  projectionRowState: ProjectionRowState;
+  projectionSummary: string;
   // P36 advanced settings.
   importLabelId: string | null;
   maxDeletionsThreshold: number | null;
   notifyOnFailure: boolean;
   syncWindowStart: number | null;
   syncWindowEnd: number | null;
+  // P39-01: IANA zone the window hours live in; null = legacy stored-as-UTC.
+  syncWindowTimezone: string | null;
   excludedFields: string[];
   exportLabelFilter: string[];
   // null = platform default (5); 0 = never auto-pause.
@@ -143,6 +188,10 @@ export type SyncAccountData = {
   consecutiveFailures: number;
   // P23-05: account auto-paused because the manual conflict queue is full.
   conflictQueueFull: boolean;
+  // P39-02: open deletion-safety hold (null when none) — drives the
+  // paused-for-review surface. Full breakdown loads via getDeletionHoldReview.
+  deletionHoldTotal: number | null;
+  deletionHoldThreshold: number | null;
   // P27-08: potential duplicates found by the most recent completed import.
   duplicatesDetected: number;
   jobs: SyncJobRow[];
@@ -155,6 +204,20 @@ export type LabelOption = {
   name: string;
   color: string;
 };
+
+// P41-DB01: a user's personal book, for the projection-scope picker + rail
+// grouping. `slug` maps to the projection-preview sample (personal/work);
+// `shared` marks a shared/group book (renders the SHARED tag).
+export type BookOption = {
+  id: string;
+  name: string;
+  slug: string;
+  isDefault: boolean;
+  shared?: boolean;
+};
+
+// P41-DB01 Surface 7: connection-row projection states a build must handle.
+export type ProjectionRowState = "single-book" | "multi-book" | "v1-only" | "misconfigured";
 
 // ── Health model (maps DB health → design visual state) ──────────────────────
 type VisualHealth =
@@ -199,7 +262,8 @@ const HEALTH_LIST_COLOR: Record<VisualHealth, string> = {
   auth: T.red,
   retired: T.mute,
   paused: T.mute,
-  safety: T.mute,
+  // P39-DB01: protective pauses read amber in the rail, not muted.
+  safety: T.amber,
   never: T.mute,
   syncing: T.sgreen,
 };
@@ -211,7 +275,7 @@ const HEALTH_LIST_TEXT: Record<VisualHealth, (a: SyncAccountData) => string> = {
   auth: () => "Auth error",
   retired: () => "Retired",
   paused: () => "Paused",
-  safety: () => "Paused",
+  safety: (a) => (a.deletionHoldTotal != null ? "Paused · needs review" : "Auto-paused"),
   never: () => "Never synced",
   syncing: () => "Syncing…",
 };
@@ -252,9 +316,11 @@ const HEALTH_DETAIL: Record<VisualHealth, (a: SyncAccountData) => string> = {
   retired: () => "This connection is no longer active.",
   paused: () => "Sync is paused. Click Resume to continue syncing.",
   safety: (a) =>
-    a.conflictQueueFull
-      ? "Auto-paused because the manual conflict queue is full. Resolve the open conflicts, then Resume."
-      : "Auto-paused after repeated failures. Fix the issue, then Resume.",
+    a.deletionHoldTotal != null
+      ? "Auto-paused before committing deletions. Review what would have been removed, then resume."
+      : a.conflictQueueFull
+        ? "Auto-paused because the manual conflict queue is full. Resolve the open conflicts, then Resume."
+        : "Auto-paused after repeated failures. Fix the issue, then Resume.",
   never: () => "This account has not synced yet. Click Sync now to start.",
   syncing: () => "Sync in progress…",
 };
@@ -389,12 +455,17 @@ function ActionBtn({
   onClick,
 }: {
   children: ReactNode;
-  variant?: "primary" | "ghost";
+  // P39-02: "solid-danger" is the destructive primary ("Resume and allow
+  // deletions") — solid red per P39-DB01 §1a.
+  variant?: "primary" | "ghost" | "solid-danger";
   danger?: boolean;
   disabled?: boolean;
   type?: "button" | "submit";
   onClick?: () => void;
 }) {
+  const solid = variant === "primary" || variant === "solid-danger";
+  const solidBg = variant === "primary" ? T.blue : T.red;
+  const solidHover = variant === "primary" ? "#3347d8" : "#9c3c27";
   const base: React.CSSProperties = {
     height: 34,
     padding: "0 14px",
@@ -408,9 +479,9 @@ function ActionBtn({
     cursor: disabled ? "default" : "pointer",
     opacity: disabled ? 0.55 : 1,
     transition: "background .15s ease",
-    border: variant === "primary" ? "none" : `1px solid ${T.line}`,
-    background: variant === "primary" ? T.blue : "#fff",
-    color: variant === "primary" ? "#fff" : danger ? T.red : T.ink,
+    border: solid ? "none" : `1px solid ${T.line}`,
+    background: solid ? solidBg : "#fff",
+    color: solid ? "#fff" : danger ? T.red : T.ink,
   };
   return (
     <button
@@ -420,11 +491,10 @@ function ActionBtn({
       style={base}
       onMouseEnter={(e) => {
         if (disabled) return;
-        e.currentTarget.style.background =
-          variant === "primary" ? "#3347d8" : danger ? T.redWash : T.wash;
+        e.currentTarget.style.background = solid ? solidHover : danger ? T.redWash : T.wash;
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = variant === "primary" ? T.blue : "#fff";
+        e.currentTarget.style.background = solid ? solidBg : "#fff";
       }}
     >
       {children}
@@ -450,6 +520,11 @@ function ConflictRow({
   const [open, setOpen] = useState(false);
   const [manual, setManual] = useState(false);
   const [picks, setPicks] = useState<Array<"local" | "remote">>(cf.comparisonRows.map(() => "local"));
+  // P44-05: a photo-only conflict has just the one photo row. "Manual merge" is
+  // meaningless for a single image (Keep local / Keep remote cover it) and the
+  // resolve action maps a photo MANUAL_MERGE to keep-local, so hide it.
+  const isPhotoOnly =
+    cf.comparisonRows.length === 1 && cf.comparisonRows[0]?.kind === "photo";
 
   const Outcome = ({
     children,
@@ -576,7 +651,7 @@ function ConflictRow({
                         background: "rgba(65,88,244,0.05)",
                       }}
                     >
-                      {r.local}
+                      {r.kind === "photo" ? <ConflictPhotoCell url={r.local} alt="Local photo" /> : r.local}
                     </span>
                     <span
                       className="sy-cmp-remote"
@@ -588,7 +663,7 @@ function ConflictRow({
                         borderLeft: `1px solid ${T.line2}`,
                       }}
                     >
-                      {r.remote}
+                      {r.kind === "photo" ? <ConflictPhotoCell url={r.remote} alt="Remote photo" /> : r.remote}
                     </span>
                   </div>
                 ))}
@@ -596,9 +671,11 @@ function ConflictRow({
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <Outcome strategy="KEEP_LOCAL">Keep local</Outcome>
                 <Outcome strategy="KEEP_REMOTE">Keep remote</Outcome>
-                <ActionBtn variant="primary" onClick={() => setManual(true)}>
-                  Manual merge →
-                </ActionBtn>
+                {!isPhotoOnly && (
+                  <ActionBtn variant="primary" onClick={() => setManual(true)}>
+                    Manual merge →
+                  </ActionBtn>
+                )}
               </div>
             </>
           ) : (
@@ -657,7 +734,7 @@ function ConflictRow({
                               {lbl}
                             </span>
                             <span style={{ display: "block", fontSize: 13, color: T.ink }}>
-                              {val}
+                              {r.kind === "photo" ? <ConflictPhotoCell url={val} alt={lbl} /> : val}
                             </span>
                           </button>
                         );
@@ -699,10 +776,14 @@ function HistoryTable({
   jobs,
   isSyncing,
   remoteLabel,
+  deletionHoldOpen = false,
 }: {
   jobs: SyncJobRow[];
   isSyncing: boolean;
   remoteLabel: string;
+  // P39-02: while the hold is open the HALTED row reads "Paused for review";
+  // after either resume path settles it, the same row reads "Resolved".
+  deletionHoldOpen?: boolean;
 }) {
   const [showAll, setShowAll] = useState(false);
   const [errId, setErrId] = useState<string | null>(null);
@@ -712,6 +793,12 @@ function HistoryTable({
     ok: { label: "Healthy", color: T.sgreen, bg: T.sgreenWash },
     pending: { label: "Queued", color: T.mute, bg: T.wash },
     fail: { label: "Needs review", color: T.red, bg: T.redWash },
+    // P39-01: window deferral — configured behaviour, muted, never alarming.
+    skipped: { label: "Skipped", color: T.mute, bg: T.wash },
+    // P39-02: amber while under review, muted once resolved.
+    halted: deletionHoldOpen
+      ? { label: "Paused for review", color: "#7a5a1a", bg: "#f6edd9" }
+      : { label: "Resolved", color: T.mute, bg: T.wash },
   } as const;
   // Order by the time actually shown (`when` is the completed/started/created
   // ISO timestamp). The server orders by createdAt, which can differ from
@@ -937,6 +1024,20 @@ function HistoryTable({
                       </span>
                     </span>
                   </span>
+                ) : j.status === "skipped" || j.status === "halted" ? (
+                  <span
+                    style={{
+                      fontFamily: '"Geist Mono", ui-monospace, monospace',
+                      color: T.ink2,
+                      fontSize: 12,
+                    }}
+                  >
+                    {j.error ??
+                      (j.status === "skipped"
+                        ? "Skipped — outside sync window"
+                        : "Halted before commit")}
+                    {j.status === "halted" && !deletionHoldOpen ? " · resolved" : ""}
+                  </span>
                 ) : (
                   <span style={{ color: T.mute, fontSize: 12 }}>No completed change summary</span>
                 )}
@@ -1007,6 +1108,24 @@ function HistoryTable({
                     </svg>
                     <span className="sy-status-label" style={{ display: "none" }}>
                       {statusMeta.pending.label}
+                    </span>
+                  </span>
+                ) : j.status === "skipped" || j.status === "halted" ? (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 7,
+                      borderRadius: 999,
+                      background: statusMeta[j.status].bg,
+                      color: statusMeta[j.status].color,
+                      padding: "4px 9px",
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                    }}
+                  >
+                    <span className="sy-status-label" style={{ display: "inline" }}>
+                      {statusMeta[j.status].label}
                     </span>
                   </span>
                 ) : (
@@ -1189,6 +1308,448 @@ function DuplicatesBanner({ count }: { count: number }) {
       >
         Review suggestions →
       </Link>
+    </div>
+  );
+}
+
+// ── P41-DB01 Surface 7: misconfigured projection (destination book removed) ───
+function ProjectionMisconfiguredBanner({ bookName, onFix }: { bookName: string; onFix: () => void }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "center",
+        background: T.redWash,
+        border: `1px solid #e8c6ba`,
+        borderRadius: 12,
+        padding: "13px 16px",
+        marginBottom: 22,
+      }}
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.red} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+        <path d="M12 3l9 16H3z" />
+        <path d="M12 10v4" />
+        <path d="M12 17h.01" />
+      </svg>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: T.red }}>Projection paused</div>
+        <div style={{ fontSize: 13, color: T.ink2, marginTop: 2, lineHeight: 1.5 }}>
+          Its destination book “{bookName}” was removed. Pick a new book to resume projecting.
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onFix}
+        style={{ border: `1px solid ${T.line}`, background: "#fff", color: T.ink, fontSize: 13, fontWeight: 600, borderRadius: 8, padding: "7px 14px", cursor: "pointer", flexShrink: 0 }}
+      >
+        Fix
+      </button>
+    </div>
+  );
+}
+
+// ── P39-DB01 shared bits: amber = protective pause (shield, never a triangle) ─
+const AMBER = { bg: "#f6edd9", border: "#e8d8b0", ink: "#7a5a1a", ink2: "#8a6a2a" } as const;
+
+function ShieldIcon({ size = 20, stroke = AMBER.ink }: { size?: number; stroke?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={stroke}
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flexShrink: 0, marginTop: 1 }}
+    >
+      <path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  );
+}
+
+// P39-05 / P39-DB01 §3a: retry sensitivity tripped. Amber protective banner —
+// visually distinct from NEEDS_REAUTH (red + key). The account's
+// lastErrorMessage carries the failure count + last error.
+function RetryAutoPauseBanner({ account }: { account: SyncAccountData }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+        background: AMBER.bg,
+        border: `1px solid ${AMBER.border}`,
+        borderRadius: 12,
+        padding: "14px 16px",
+        marginBottom: 22,
+      }}
+    >
+      <ShieldIcon />
+      <div>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: AMBER.ink }}>
+          Auto-paused after {account.consecutiveFailures} consecutive failure
+          {account.consecutiveFailures === 1 ? "" : "s"}
+        </div>
+        <div style={{ fontSize: 13, color: AMBER.ink2, marginTop: 3, lineHeight: 1.5, maxWidth: 460 }}>
+          {account.lastErrorMessage ??
+            "Kontax stopped retrying to avoid hammering the server. Fix the issue, then resume."}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// P39-01: is the current wall-clock hour outside the account's sync window?
+// Mirrors the runner's evaluation: hours live in syncWindowTimezone; legacy
+// rows without a zone keep their stored-as-UTC semantics.
+const isOutsideSyncWindowNow = (account: SyncAccountData): boolean => {
+  const { syncWindowStart: start, syncWindowEnd: end, syncWindowTimezone: tz } = account;
+  if (start == null || end == null || start === end) return false;
+  let hour: number;
+  try {
+    hour = Number.parseInt(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: tz ?? "UTC",
+        hour: "numeric",
+        hourCycle: "h23",
+      }).format(new Date()),
+      10,
+    );
+  } catch {
+    hour = new Date().getUTCHours();
+  }
+  const inside = start < end ? hour >= start && hour < end : hour >= start || hour < end;
+  return !inside;
+};
+
+const formatWindowHour = (h: number) => `${String(h).padStart(2, "0")}:00`;
+
+// P39-01 / P39-DB01 §2a: neutral info banner — configured behaviour, no alarm.
+function WindowDeferralBanner({ account }: { account: SyncAccountData }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+        background: "#f8faf8",
+        border: `1px solid ${T.line2}`,
+        borderRadius: 12,
+        padding: "14px 16px",
+        marginBottom: 22,
+      }}
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={T.ink2}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ flexShrink: 0, marginTop: 1 }}
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7.5V12l3 2" />
+      </svg>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>
+          Next sync at {formatWindowHour(account.syncWindowStart ?? 0)}
+        </div>
+        <div style={{ fontSize: 13, color: T.ink2, marginTop: 3, lineHeight: 1.5 }}>
+          Outside your sync window ({formatWindowHour(account.syncWindowStart ?? 0)}–
+          {formatWindowHour(account.syncWindowEnd ?? 0)}). Scheduled runs are held until the
+          window opens.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── P39-02 / P39-DB01 §1: deletion-safety pause — banner + review + actions ──
+function DeletionPausePanel({
+  account,
+  setToast,
+  onResumed,
+  onAdjustThreshold,
+}: {
+  account: SyncAccountData;
+  setToast: (msg: string) => void;
+  onResumed: () => void;
+  onAdjustThreshold: () => void;
+}) {
+  const total = account.deletionHoldTotal ?? 0;
+  const limit = account.deletionHoldThreshold ?? account.maxDeletionsThreshold ?? 0;
+  const [review, setReview] = useState<DeletionHoldReview | null>(null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState<null | "allow" | "skip">(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fd = new FormData();
+    fd.set("syncAccountId", account.id);
+    getDeletionHoldReview(fd)
+      .then((result) => {
+        if (cancelled) return;
+        if (result.ok) setReview(result.review);
+        else setReviewError(result.error);
+      })
+      .catch(() => {
+        if (!cancelled) setReviewError("Could not load the deletion review.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [account.id]);
+
+  const reconciled = review?.remaining === 0;
+
+  const resume = async (mode: "allow" | "skip") => {
+    setBusy(mode);
+    try {
+      const fd = new FormData();
+      fd.set("syncAccountId", account.id);
+      const result =
+        mode === "allow"
+          ? await resumeSyncAllowDeletions(fd)
+          : await resumeSyncWithoutDeletions(fd);
+      if (result.ok) {
+        setToast(mode === "allow" ? "Sync resumed — deletions applied" : "Sync resumed");
+        onResumed();
+      } else {
+        setToast(result.error);
+      }
+    } finally {
+      setBusy(null);
+      setConfirming(false);
+    }
+  };
+
+  return (
+    <div style={{ marginBottom: 22 }}>
+      {/* banner — amber, shield: a safety rail working, not an error */}
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "flex-start",
+          background: AMBER.bg,
+          border: `1px solid ${AMBER.border}`,
+          borderRadius: 12,
+          padding: "14px 16px",
+        }}
+      >
+        <ShieldIcon />
+        <div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: AMBER.ink }}>
+            Sync paused: this sync would have deleted {total} contact{total === 1 ? "" : "s"}
+          </div>
+          <div style={{ fontSize: 13, color: AMBER.ink2, marginTop: 3, lineHeight: 1.5, maxWidth: 460 }}>
+            Your deletion-safety limit is {limit}. Nothing was deleted. Review the changes
+            below, then choose how to resume.
+          </div>
+        </div>
+      </div>
+
+      {/* review card */}
+      <div
+        style={{
+          border: `1px solid ${T.line2}`,
+          borderRadius: 12,
+          overflow: "hidden",
+          marginTop: 16,
+          maxWidth: 560,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "12px 14px",
+            background: T.wash,
+            borderBottom: `1px solid ${T.line2}`,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: T.mute,
+            }}
+          >
+            Would have been deleted
+          </span>
+          <span
+            style={{
+              fontFamily: '"Geist Mono", ui-monospace, monospace',
+              fontSize: 12,
+              fontWeight: 700,
+              color: reconciled ? T.sgreenText : T.amber,
+            }}
+          >
+            {review == null && !reviewError
+              ? ""
+              : reconciled
+                ? "0 remaining"
+                : `${total} contact${total === 1 ? "" : "s"}`}
+          </span>
+        </div>
+
+        {review == null && !reviewError ? (
+          /* loading */
+          <div
+            style={{
+              padding: "22px 14px",
+              display: "flex",
+              alignItems: "center",
+              gap: 9,
+              color: T.mute,
+              fontSize: 13,
+            }}
+          >
+            <Spinner size={14} color={T.mute} /> Loading what would have been removed…
+          </div>
+        ) : reviewError ? (
+          <div style={{ padding: "18px 14px", color: T.mute, fontSize: 13 }}>{reviewError}</div>
+        ) : reconciled ? (
+          /* empty — already reconciled on a later sync */
+          <div style={{ padding: "18px 14px", display: "flex", alignItems: "flex-start", gap: 10 }}>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={T.sgreen}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginTop: 1, flexShrink: 0 }}
+            >
+              <path d="M5 12.5l4 4 10-10" />
+            </svg>
+            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.5 }}>
+              These deletions were already reconciled on a later sync. Nothing is pending —
+              you can resume safely.
+            </div>
+          </div>
+        ) : (
+          <>
+            {review?.byBook.map((book) => (
+              <div
+                key={`${book.name}-${book.detail ?? ""}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  padding: "11px 14px",
+                  borderTop: `1px solid ${T.line2}`,
+                  fontSize: 13,
+                }}
+              >
+                <span style={{ color: T.ink, fontWeight: 500 }}>
+                  {book.name}
+                  {book.detail && (
+                    <small style={{ color: T.mute, fontWeight: 400, marginLeft: 7 }}>
+                      {book.detail}
+                    </small>
+                  )}
+                </span>
+                <span
+                  style={{
+                    fontFamily: '"Geist Mono", ui-monospace, monospace',
+                    fontSize: 12.5,
+                    color: T.red,
+                    fontWeight: 600,
+                  }}
+                >
+                  −{book.count}
+                </span>
+              </div>
+            ))}
+            {/* >50 items: counts-by-book with a capped preview note (§1d) */}
+            {total > 50 && (
+              <div
+                style={{
+                  padding: "11px 14px",
+                  borderTop: `1px solid ${T.line2}`,
+                  fontSize: 12,
+                  color: T.mute,
+                }}
+              >
+                Showing counts by book. Per-contact preview is capped at the first 50 —{" "}
+                <a
+                  href={`/api/sync/deletion-hold-export?syncAccountId=${account.id}`}
+                  style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}
+                >
+                  export the full list
+                </a>
+                .
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* actions — safe default is blue; destructive path confirms (§1f).
+          Mobile stacks full-width with the safe default on top (§1e). */}
+      <div className="sy-deletion-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
+        {!reconciled && (
+          <span className="sy-da-danger" style={{ display: "inline-flex" }}>
+            <ActionBtn
+              variant="solid-danger"
+              onClick={() => setConfirming(true)}
+              disabled={busy != null || review == null}
+            >
+              Resume and allow deletions
+            </ActionBtn>
+          </span>
+        )}
+        <span className="sy-da-primary" style={{ display: "inline-flex" }}>
+          <ActionBtn
+            variant="primary"
+            onClick={() => resume("skip")}
+            disabled={busy != null}
+          >
+            {busy === "skip" ? (
+              <>
+                <Spinner size={13} color="#fff" /> Resuming…
+              </>
+            ) : reconciled ? (
+              "Resume"
+            ) : (
+              "Resume without deleting"
+            )}
+          </ActionBtn>
+        </span>
+        <span className="sy-da-ghost" style={{ display: "inline-flex" }}>
+          <ActionBtn onClick={onAdjustThreshold} disabled={busy != null}>
+            Adjust threshold
+          </ActionBtn>
+        </span>
+      </div>
+
+      <ConfirmDialog
+        open={confirming}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void resume("allow")}
+        title={`Allow ${total} deletion${total === 1 ? "" : "s"}?`}
+        body={`Resuming will delete ${total} contact${total === 1 ? "" : "s"} across ${review?.byBook.length ?? 1} book${(review?.byBook.length ?? 1) === 1 ? "" : "s"} to match the remote. This can't be undone from here.`}
+        confirmLabel={`Delete ${total} & resume`}
+        cancelLabel="Keep paused"
+        destructive
+        busy={busy === "allow"}
+      />
     </div>
   );
 }
@@ -1804,6 +2365,9 @@ function AccountHeader({
   reauthEmail?: string | null;
 }) {
   const [copiedUrl, setCopiedUrl] = useState(false);
+  // P42-DB01 Surface 2c: manual sync is a write to the server queue — gate it
+  // on connectivity. Scheduled syncs resume server-side by themselves.
+  const offline = useOffline();
   const isPaused = account.status === "PAUSED";
   const isRetired = account.status === "RETIRED";
   const dir = DIR_BADGE[account.direction];
@@ -1812,6 +2376,11 @@ function AccountHeader({
   const connectPath =
     account.provider === "GOOGLE" ? "/api/sync/google/connect" : "/api/sync/microsoft/connect";
   const needsReauth = isOAuth && account.status === "NEEDS_REAUTH";
+  // P39-01: a configured sync window changes the Sync-now affordance copy.
+  const hasSyncWindow =
+    account.syncWindowStart != null &&
+    account.syncWindowEnd != null &&
+    account.syncWindowStart !== account.syncWindowEnd;
 
   const handleCopyUrl = async () => {
     try {
@@ -1994,6 +2563,16 @@ function AccountHeader({
           <span style={{ color: T.ink, fontWeight: 500 }}>{account.lastSyncedAtRelative}</span>
         </div>
       )}
+      {/* P39-01: scheduled runs held outside the sync window — configured
+          behaviour, neutral info banner (P39-DB01 §2a). */}
+      {account.status === "ACTIVE" &&
+        vHealth !== "syncing" &&
+        account.syncFrequencyMinutes !== 0 &&
+        isOutsideSyncWindowNow(account) && (
+          <div style={{ marginTop: 14, maxWidth: 560 }}>
+            <WindowDeferralBanner account={account} />
+          </div>
+        )}
       <div
         style={{
           marginTop: 16,
@@ -2053,11 +2632,16 @@ function AccountHeader({
       {/* action buttons */}
       {!isRetired ? (
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-        {/* sync now */}
-        <form action={queueSyncJob}>
+        {/* sync now — bypasses the sync window by design (P39-01) */}
+        <form
+          action={queueSyncJob}
+          title={
+            hasSyncWindow ? "Runs immediately — bypasses your sync window" : undefined
+          }
+        >
           <input type="hidden" name="syncAccountId" value={account.id} />
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <ActionBtn variant="primary" type="submit" disabled={isSyncing || isPaused}>
+          <ActionBtn variant="primary" type="submit" disabled={isSyncing || isPaused || offline}>
             {isSyncing ? (
               <>
                 <Spinner size={13} color="#fff" /> Syncing…
@@ -2068,12 +2652,15 @@ function AccountHeader({
           </ActionBtn>
         </form>
 
-        {/* pause / resume */}
-        <form action={isPaused ? activateSyncAccount : pauseSyncAccount}>
-          <input type="hidden" name="syncAccountId" value={account.id} />
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <ActionBtn type="submit">{isPaused ? "Resume" : "Pause"}</ActionBtn>
-        </form>
+        {/* pause / resume — hidden while a deletion hold is open: the review
+            surface (P39-DB01 §1) owns the resume decision there. */}
+        {account.deletionHoldTotal == null && (
+          <form action={isPaused ? activateSyncAccount : pauseSyncAccount}>
+            <input type="hidden" name="syncAccountId" value={account.id} />
+            <input type="hidden" name="redirectTo" value={redirectTo} />
+            <ActionBtn type="submit">{isPaused ? "Resume" : "Pause"}</ActionBtn>
+          </form>
+        )}
 
         {/* settings — opens the sync settings panel in the detail zone */}
         <ActionBtn onClick={onSettings}>Settings</ActionBtn>
@@ -2097,6 +2684,21 @@ function AccountHeader({
         </ActionBtn>
       </div>
       ) : null}
+      {/* P42-DB01 Surface 2c: honest offline note — scheduled sync genuinely
+          resumes on its own, so the copy can promise it. */}
+      {!isRetired && offline ? (
+        <OfflineWriteNote
+          title="Can’t sync while offline."
+          body="Scheduled and manual syncs resume automatically when you’re back online."
+          style={{ marginTop: 12, maxWidth: 560 }}
+        />
+      ) : null}
+      {/* P39-01 §2b: no hover on touch — the tooltip becomes an inline caption */}
+      {!isRetired && hasSyncWindow && !isPaused && (
+        <div className="sy-window-caption" style={{ display: "none", fontSize: 12, color: T.mute, marginTop: 8, lineHeight: 1.45 }}>
+          &ldquo;Sync now&rdquo; runs immediately — it bypasses your sync window.
+        </div>
+      )}
     </div>
   );
 }
@@ -3143,6 +3745,11 @@ export type SyncPageClientProps = {
   pastAccounts: SyncAccountData[];
   // P36: the user's labels, for the auto-label and export-filter pickers.
   labels: LabelOption[];
+  // P41-DB01: the user's personal books, for the projection-scope picker + rail.
+  books: BookOption[];
+  // P41-DB01 §7B: false when the account predates the P40 book model — projection
+  // sections stay hidden until the account is migrated.
+  hasBookModel: boolean;
   initialAccountId: string | null;
   // open the add-account form on mount (mobile deep-link from MobileSyncScreen)
   initialAdd?: boolean;
@@ -3153,7 +3760,7 @@ export type SyncPageClientProps = {
   upgradeableAtCap: boolean;
 };
 
-export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookModel, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
   const allAccounts = [...accounts, ...pastAccounts];
   // P36-DB02: a freshly-connected account awaiting setup wins the initial selection
   // so its first-run setup panel opens immediately.
@@ -3163,6 +3770,26 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
   );
   const [view, setView] = useState<"detail" | "add">(initialAdd ? "add" : "detail");
   const [editing, setEditing] = useState(false);
+  // P41-DB01 Surface 1: the rail groups by destination book first; a persisted
+  // toggle restores the P35 provider grouping losslessly. Default is book. The
+  // choice sticks per device via localStorage.
+  const [groupMode, setGroupMode] = useState<"book" | "provider">("book");
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("kontax:sync:groupMode");
+      if (saved === "book" || saved === "provider") setGroupMode(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const changeGroupMode = (mode: "book" | "provider") => {
+    setGroupMode(mode);
+    try {
+      window.localStorage.setItem("kontax:sync:groupMode", mode);
+    } catch {
+      /* ignore */
+    }
+  };
   // On mobile we deep-link straight into a connection or the add form, so the
   // detail pane should be active from the start in those cases.
   // syncingId reserved for future optimistic in-progress indicator
@@ -3204,7 +3831,29 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
 
   const selectedAccount = allAccounts.find((a) => a.id === selectedId) ?? accounts[0] ?? pastAccounts[0] ?? null;
 
+  // P39-06: dirty guard for the settings panel. The panel reports its dirty
+  // state (ref — no re-render needed); any navigation that would leave a dirty
+  // panel parks itself in `pendingLeave` and shows "Discard unsaved settings?"
+  // instead of navigating. Keep editing = drop the pending action.
+  const settingsDirtyRef = useRef(false);
+  const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null);
+  const guardSettingsLeave = (navigate: () => void) => {
+    if (settingsOpen && settingsDirtyRef.current) {
+      setPendingLeave(() => navigate);
+      return;
+    }
+    navigate();
+  };
+
   const selectAccount = (id: string) => {
+    // Re-selecting the already-open account is not a leave.
+    if (settingsOpen && id !== selectedId) {
+      guardSettingsLeave(() => doSelectAccount(id));
+      return;
+    }
+    doSelectAccount(id);
+  };
+  const doSelectAccount = (id: string) => {
     const target = allAccounts.find((a) => a.id === id);
     setSelectedId(id);
     setView("detail");
@@ -3212,27 +3861,38 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
     // Selecting a still-pending connection re-opens its first-run setup.
     setFirstRun(!!target?.needsSetup);
     setSettingsOpen(!!target?.needsSetup);
+    settingsDirtyRef.current = false;
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
   // Gear icon / [Settings] button — select the account and open the settings panel
   // (normal edit mode, not first-run).
   const openSettings = (id: string) => {
+    if (settingsOpen && id !== selectedId) {
+      guardSettingsLeave(() => doOpenSettings(id));
+      return;
+    }
+    doOpenSettings(id);
+  };
+  const doOpenSettings = (id: string) => {
     setSelectedId(id);
     setView("detail");
     setEditing(false);
     setFirstRun(false);
     setSettingsOpen(true);
+    settingsDirtyRef.current = false;
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
-  const openAdd = () => {
-    setView("add");
-    setEditing(false);
-    setSettingsOpen(false);
-    setFirstRun(false);
-    if (detailRef.current) detailRef.current.scrollTop = 0;
-  };
+  const openAdd = () =>
+    guardSettingsLeave(() => {
+      setView("add");
+      setEditing(false);
+      setSettingsOpen(false);
+      setFirstRun(false);
+      settingsDirtyRef.current = false;
+      if (detailRef.current) detailRef.current.scrollTop = 0;
+    });
 
   // Build the redirect URL that preserves selected account
   const redirectTo = selectedAccount
@@ -3272,15 +3932,26 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           key={selectedAccount.id}
           account={selectedAccount}
           labels={labels}
+          books={books}
+          hasBookModel={hasBookModel}
+          // P41-DB01 §4A: the iOS auto-link caveat fires on a second same-provider
+          // account on the same device (the two-iCloud "John" case).
+          showAutolinkCaveat={
+            accounts.filter((a) => a.provider === selectedAccount.provider).length >= 2
+          }
           freqProGated={upgradeableAtCap}
           firstRun={firstRun}
           onClose={() => {
             setSettingsOpen(false);
             setFirstRun(false);
+            settingsDirtyRef.current = false;
           }}
           onSaved={() => router.refresh()}
           setToast={setToast}
           onNeedElevation={(retry) => setReauthRetry(() => retry)}
+          onDirtyChange={(dirty) => {
+            settingsDirtyRef.current = dirty;
+          }}
         />
       );
 
@@ -3297,6 +3968,11 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           ? vHealth === "auth" && <ReauthBanner onFix={() => setEditing(true)} />
           : <OAuthErrorBanner account={selectedAccount} reauthEmail={reauthEmail} />}
         {selectedAccount.conflictQueueFull && <AutoPauseBanner />}
+        {/* P39-05: retry-sensitivity trip — amber protective banner, distinct
+            from NEEDS_REAUTH (red + key above). */}
+        {selectedAccount.lastErrorCode === "SYNC_AUTO_PAUSED" && (
+          <RetryAutoPauseBanner account={selectedAccount} />
+        )}
         {selectedAccount.duplicatesDetected > 0 && (
           <DuplicatesBanner count={selectedAccount.duplicatesDetected} />
         )}
@@ -3304,6 +3980,14 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           <CapabilityNote
             title={selectedAccount.capabilityNoteTitle}
             body={selectedAccount.capabilityNoteBody}
+          />
+        )}
+        {/* P41-DB01 Surface 7: destination book was archived → projection paused,
+            never silently re-routed. Fix opens the projection scope (2A). */}
+        {hasBookModel && selectedAccount.projectionRowState === "misconfigured" && (
+          <ProjectionMisconfiguredBanner
+            bookName={selectedAccount.destinationBookMissingName ?? "this book"}
+            onFix={() => openSettings(selectedAccount.id)}
           />
         )}
         <AccountHeader
@@ -3327,8 +4011,19 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
             });
           }}
         />
+        {/* P39-02: deletion-safety pause takeover — banner + review + resume
+            actions (P39-DB01 §1). */}
+        {selectedAccount.deletionHoldTotal != null && (
+          <DeletionPausePanel
+            account={selectedAccount}
+            setToast={setToast}
+            onResumed={() => router.refresh()}
+            onAdjustThreshold={() => openSettings(selectedAccount.id)}
+          />
+        )}
         <SyncDiagnosticsPanel account={selectedAccount} />
         <HistoryTable
+          deletionHoldOpen={selectedAccount.deletionHoldTotal != null}
           jobs={selectedAccount.jobs}
           isSyncing={syncingId === selectedAccount.id}
           remoteLabel={
@@ -3459,6 +4154,15 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           .sy-cmp-remote { border-left: none !important; border-top: 1px solid ${T.line2}; }
           .sy-overlay { place-items: end stretch; padding: 0; }
           .sy-modal { max-width: none; border-radius: 20px 20px 0 0; animation: sy-up .22s ease-out; }
+          /* P39-DB01 §1e: deletion-pause actions stack full-width, safe default on top */
+          .sy-deletion-actions { flex-direction: column; }
+          .sy-deletion-actions > span { width: 100%; }
+          .sy-deletion-actions > span > button { width: 100% !important; height: 48px !important; justify-content: center !important; border-radius: 12px !important; font-size: 15px !important; }
+          .sy-da-primary { order: 1; }
+          .sy-da-danger { order: 2; }
+          .sy-da-ghost { order: 3; }
+          /* P39-DB01 §2b: the Sync-now tooltip becomes an inline caption on touch */
+          .sy-window-caption { display: block !important; }
         }
       `}</style>
 
@@ -3491,22 +4195,86 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           Sync accounts
         </div>
 
-        {/* P35: group accounts by provider; show group labels when multiple providers */}
+        {/* P41-DB01 Surface 1: Book / Provider grouping toggle (persisted). */}
+        {hasBookModel && accounts.length > 0 ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", padding: "0 12px 12px" }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: T.mute }}>
+              Group by
+            </span>
+            <div style={{ display: "inline-flex", background: T.wash, borderRadius: 8, padding: 2, gap: 2 }}>
+              {(["book", "provider"] as const).map((m) => {
+                const on = groupMode === m;
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => changeGroupMode(m)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "4px 9px",
+                      borderRadius: 6,
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      background: on ? "#fff" : "transparent",
+                      color: on ? T.ink : T.mute,
+                      boxShadow: on ? "0 1px 2px rgba(20,30,25,0.08)" : "none",
+                    }}
+                  >
+                    {m === "book" ? "Book" : "Provider"}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {/* P41-DB01 Surface 1 / P35: group by destination book (default) or by
+            provider. Book-first sections are the books a connection lands in; the
+            provider view restores the P35 groups losslessly. */}
         {(() => {
-          type Group = { key: string; label: string; items: SyncAccountData[] };
+          type Group = { key: string; label: string; items: SyncAccountData[]; sort: number };
           const GROUP_ORDER: Record<string, number> = { GOOGLE: 0, MICROSOFT: 1, CARDDAV: 2 };
           const GROUP_LABEL: Record<string, string> = { GOOGLE: "Google", MICROSOFT: "Microsoft", CARDDAV: "CardDAV" };
+          const bookOrder = new Map(books.map((b, i) => [b.id, i]));
           const grouped: Group[] = [];
-          accounts.forEach((a) => {
-            let g = grouped.find((x) => x.key === a.provider);
+          const useBook = groupMode === "book" && hasBookModel;
+
+          const put = (key: string, label: string, sort: number, a: SyncAccountData) => {
+            let g = grouped.find((x) => x.key === key);
             if (!g) {
-              g = { key: a.provider, label: GROUP_LABEL[a.provider] ?? a.provider, items: [] };
+              g = { key, label, items: [], sort };
               grouped.push(g);
             }
             g.items.push(a);
+          };
+
+          accounts.forEach((a) => {
+            if (useBook) {
+              // V1-only / misconfigured connections sit under a neutral "All
+              // contacts" group (never invented into a book).
+              if (a.projectionRowState === "v1-only" || a.projectionRowState === "misconfigured") {
+                put("__all__", "All contacts", 9000, a);
+                return;
+              }
+              const key = [...a.projectionBookIds].sort().join("+") || "__all__";
+              const label = a.projectionBookNames.join(" + ") || "All contacts";
+              // Single-book sorts by its book order; multi-book after all single
+              // books; shared last handled by book order.
+              const sort =
+                a.projectionRowState === "multi-book"
+                  ? 1000 + Math.min(...a.projectionBookIds.map((id) => bookOrder.get(id) ?? 500))
+                  : bookOrder.get(a.projectionBookIds[0] ?? "") ?? 500;
+              put(key, label, sort, a);
+            } else {
+              put(a.provider, GROUP_LABEL[a.provider] ?? a.provider, GROUP_ORDER[a.provider] ?? 9, a);
+            }
           });
-          grouped.sort((a, b) => (GROUP_ORDER[a.key] ?? 9) - (GROUP_ORDER[b.key] ?? 9));
-          const showGroupLabels = grouped.length > 1;
+          grouped.sort((a, b) => a.sort - b.sort);
+          const showGroupLabels = grouped.length > 1 || useBook;
           return (
         <div style={{ display: "grid", gap: 2 }}>
           {grouped.map((g) => (
@@ -3519,6 +4287,12 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
               {g.items.map((a) => {
             const vH = getVisualHealth(a, syncingId);
             const sel = view === "detail" && selectedId === a.id;
+            // P39-DB01 §1b/3b: a protective pause washes the rail row amber and
+            // shows an unread count badge until the user reviews/resumes it.
+            const needsReview =
+              a.lastErrorCode === "DELETION_THRESHOLD_EXCEEDED" ||
+              a.lastErrorCode === "SYNC_AUTO_PAUSED";
+            const idleBg = needsReview ? "#f6edd9" : "transparent";
             // OAuth accounts always show the connected email so the user can
             // identify which account is which regardless of health state.
             return (
@@ -3536,7 +4310,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
                     border: "none",
                     borderLeft: `3px solid ${sel ? T.green : "transparent"}`,
                     borderRadius: sel ? "0 10px 10px 0" : 10,
-                    background: sel ? T.sgreenWash : "transparent",
+                    background: sel ? T.sgreenWash : idleBg,
                     cursor: "pointer",
                     textAlign: "left",
                     transition: "background .13s ease",
@@ -3545,7 +4319,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
                     if (!sel) e.currentTarget.style.background = T.wash;
                   }}
                   onMouseLeave={(e) => {
-                    if (!sel) e.currentTarget.style.background = "transparent";
+                    if (!sel) e.currentTarget.style.background = idleBg;
                   }}
                 >
                   <span style={{ flexShrink: 0 }}>
@@ -3569,16 +4343,48 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
                       style={{
                         display: "block",
                         fontSize: 12,
-                        color: HEALTH_LIST_COLOR[vH],
+                        color:
+                          groupMode === "book" && a.projectionRowState === "misconfigured"
+                            ? T.red
+                            : HEALTH_LIST_COLOR[vH],
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {getAccountRailSubtitle(a, vH)}
+                      {/* P41-DB01: in book view the row restates its projection
+                          ("→ Work"); provider view keeps the health subtitle. */}
+                      {groupMode === "book" && hasBookModel
+                        ? a.projectionRowState === "misconfigured"
+                          ? "Projection paused — book removed"
+                          : a.projectionRowState === "v1-only"
+                            ? "No destination book"
+                            : `→ ${a.projectionBookNames.join(", ")}`
+                        : getAccountRailSubtitle(a, vH)}
                     </span>
                   </span>
-                  <Dot color={HEALTH_DOT[vH]} pulse={vH === "syncing"} />
+                  {needsReview ? (
+                    <span
+                      style={{
+                        minWidth: 18,
+                        height: 18,
+                        padding: "0 5px",
+                        borderRadius: 999,
+                        background: T.red,
+                        color: "#fff",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      1
+                    </span>
+                  ) : (
+                    <Dot color={HEALTH_DOT[vH]} pulse={vH === "syncing"} />
+                  )}
                 </button>
                 {/* P23-02: gear — opens this account's settings drawer */}
                 <button
@@ -3851,6 +4657,24 @@ export function SyncPageClient({ accounts, pastAccounts, labels, initialAccountI
           onCancel={() => setReauthRetry(null)}
         />
       )}
+
+      {/* P39-06: leaving a dirty settings panel via the rail / gear / add —
+          same dirty guard the panel uses for its own close. */}
+      <ConfirmDialog
+        open={pendingLeave != null}
+        onClose={() => setPendingLeave(null)}
+        onConfirm={() => {
+          const navigate = pendingLeave;
+          setPendingLeave(null);
+          settingsDirtyRef.current = false;
+          navigate?.();
+        }}
+        title="Discard unsaved settings?"
+        body="You've changed sync settings for this connection. If you leave now, your changes won't be saved."
+        confirmLabel="Discard changes"
+        cancelLabel="Keep editing"
+        destructive
+      />
 
       {/* Disconnect confirmation modal */}
       {disconnectTarget && (

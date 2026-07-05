@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
+import { setPrimaryMembership } from "~/server/contact-book-membership";
 import {
   bulkAcceptHighConfidenceForUser,
   mergeContactsForUser,
@@ -16,8 +17,13 @@ import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
 import { editableContactWhere, getUserFamilyMembership } from "~/server/family-access";
 import { detectBulkContactDelete } from "~/server/notifications";
+import {
+  deleteContactPhoto,
+  internalizeExternalAvatar,
+} from "~/server/contact-photo-sync";
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { canEditTeamBook } from "~/server/team-access";
+import { isKontaxHosted } from "~/lib/avatar-src";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { buildNormalizedPhoneEntries } from "~/lib/phone-normalization";
@@ -97,6 +103,7 @@ const mergeContactSchema = z.object({
   phoneChoice: z.enum(["primary", "secondary"]).optional(),
   companyChoice: z.enum(["primary", "secondary"]).optional(),
   notesChoice: z.enum(["primary", "secondary", "combine"]).optional(),
+  avatarUrlChoice: z.enum(["primary", "secondary"]).optional(), // P44-05
 });
 
 const getRequiredUserId = async () => {
@@ -476,6 +483,19 @@ const contactDisplayName = (c: {
   return composed.length > 0 ? composed : "Unnamed contact";
 };
 
+// P46-03: best-effort removal of the Kontax-hosted photo objects behind deleted
+// contacts. Guards against aliasing — a live-share recipient copy or another
+// contact can reference the same avatarUrl — by only deleting objects no
+// surviving Contact row still points at. External (pasted, not-yet-internalized)
+// URLs are never delete-attempted. Runs after the delete has committed.
+const cleanupDeletedContactPhotos = async (avatarUrls: (string | null | undefined)[]) => {
+  const hosted = [...new Set(avatarUrls.filter((u): u is string => Boolean(u) && isKontaxHosted(u)))];
+  for (const url of hosted) {
+    const stillReferenced = await db.contact.count({ where: { avatarUrl: url } });
+    if (stillReferenced === 0) void deleteContactPhoto(url);
+  }
+};
+
 // P22-10: set (or clear) the per-contact reminder lead-time override. Empty /
 // "default" clears it so the contact falls back to User.reminderLeadDays.
 export const setContactReminderOverride = async (formData: FormData) => {
@@ -516,6 +536,7 @@ const parseMergeContactInput = (formData: FormData) => {
     phoneChoice: getOptionalString(formData, "phoneChoice"),
     companyChoice: getOptionalString(formData, "companyChoice"),
     notesChoice: getOptionalString(formData, "notesChoice"),
+    avatarUrlChoice: getOptionalString(formData, "avatarUrlChoice"),
   });
 
   if (!parsed.success) {
@@ -584,6 +605,14 @@ export const createContact = async (formData: FormData) => {
   const { sourceType: cardSourceType, sourceCardUsername, ...contactFields } = input;
   const isCardImport = cardSourceType === "CARD_IMPORT" && !!sourceCardUsername;
 
+  // P46-03: a pasted external avatar URL is fetched, normalized, and stored as a
+  // Kontax-hosted object on save (best-effort — on failure we keep the URL and
+  // it renders through the proxy). Key under the contact's nominal owner.
+  if (contactFields.avatarUrl && !isKontaxHosted(contactFields.avatarUrl)) {
+    const internal = await internalizeExternalAvatar(bookTarget?.ownerId ?? userId, contactFields.avatarUrl);
+    if (internal) contactFields.avatarUrl = internal;
+  }
+
   const createdContact = await db.$transaction(async (tx) => {
     const contact = await tx.contact.create({
       data: {
@@ -606,6 +635,10 @@ export const createContact = async (formData: FormData) => {
           addedByUserId: userId,
         },
       });
+    } else if (defaultBook) {
+      // P40-06: dual-write the membership alongside Contact.bookId (personal
+      // contacts only; shared contacts live in GroupContact, not a personal book).
+      await setPrimaryMembership(tx, contact.id, defaultBook.id);
     }
     await emitEvent(tx, {
       userId,
@@ -648,6 +681,13 @@ export const updateContact = async (formData: FormData) => {
     throw new Error("You don't have edit access to this contact.");
   }
 
+  // P46-03: internalize a newly-pasted external avatar URL before the write.
+  if (input.avatarUrl && !isKontaxHosted(input.avatarUrl)) {
+    const internal = await internalizeExternalAvatar(userId, input.avatarUrl);
+    if (internal) input.avatarUrl = internal;
+  }
+
+  let priorAvatarUrl: string | null = null;
   await db.$transaction(async (tx) => {
     const before = await tx.contact.findFirst({
       where: editableContactWhere(userId, contactId),
@@ -658,6 +698,7 @@ export const updateContact = async (formData: FormData) => {
         "Unable to update this contact. It may have been removed or you may not have permission to edit it.",
       );
     }
+    priorAvatarUrl = before.avatarUrl;
 
     const after = await tx.contact.update({
       where: { id: before.id },
@@ -685,6 +726,20 @@ export const updateContact = async (formData: FormData) => {
     }
 
   });
+
+  // P46-03: drop the superseded photo object after a genuine replace (a new
+  // avatarUrl was written and differs from the prior one). Never fires on an
+  // unchanged/omitted avatar — Prisma leaves it, so the DB never points at a
+  // deleted object. Aliasing is not a concern here: a replace only supersedes
+  // this contact's own object.
+  if (
+    input.avatarUrl &&
+    priorAvatarUrl &&
+    priorAvatarUrl !== input.avatarUrl &&
+    isKontaxHosted(priorAvatarUrl)
+  ) {
+    void deleteContactPhoto(priorAvatarUrl);
+  }
 
   // Live sharing (P12-04/08): push this edit to active live recipient copies —
   // after commit, so a recipient-side failure can't roll back the owner's edit.
@@ -1216,14 +1271,19 @@ export const deleteContactsBulk = async (formData: FormData) => {
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
+  const deletedAvatarUrls: (string | null)[] = [];
   const removedNames = await db.$transaction(async (tx) => {
     const affected = await tx.contact.findMany({
       where: { id: { in: contactIds }, userId },
-      select: { id: true, fullName: true, firstName: true, lastName: true, email: true, phone: true },
+      select: {
+        id: true, fullName: true, firstName: true, lastName: true, email: true, phone: true,
+        avatarUrl: true,
+      },
     });
     if (affected.length === 0) {
       return [] as string[];
     }
+    deletedAvatarUrls.push(...affected.map((c) => c.avatarUrl));
     await tx.contact.deleteMany({
       where: { id: { in: affected.map((c) => c.id) }, userId },
     });
@@ -1246,6 +1306,9 @@ export const deleteContactsBulk = async (formData: FormData) => {
   // P22-DB05: raise a "bulk contact delete" security alert past the threshold.
   await detectBulkContactDelete(userId, removedNames.length, removedNames);
 
+  // P46-03: reclaim the deleted contacts' photo objects (aliasing-guarded).
+  await cleanupDeletedContactPhotos(deletedAvatarUrls);
+
   revalidateContactViews();
 
   if (redirectTo) {
@@ -1258,11 +1321,16 @@ export const permanentlyDeleteContact = async (formData: FormData) => {
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
+  let deletedAvatarUrl: string | null = null;
   await db.$transaction(async (tx) => {
     const contact = await tx.contact.findFirst({
       where: { id: contactId, userId },
-      select: { fullName: true, firstName: true, lastName: true, email: true, phone: true },
+      select: {
+        fullName: true, firstName: true, lastName: true, email: true, phone: true,
+        avatarUrl: true,
+      },
     });
+    deletedAvatarUrl = contact?.avatarUrl ?? null;
     const result = await tx.contact.deleteMany({
       where: { id: contactId, userId },
     });
@@ -1283,6 +1351,9 @@ export const permanentlyDeleteContact = async (formData: FormData) => {
       });
     }
   });
+
+  // P46-03: reclaim the deleted contact's photo object (aliasing-guarded).
+  await cleanupDeletedContactPhotos([deletedAvatarUrl]);
 
   revalidateContactViews(contactId);
 
@@ -1308,6 +1379,7 @@ export const mergeContacts = async (formData: FormData) => {
       phone: input.phoneChoice,
       company: input.companyChoice,
       notes: input.notesChoice,
+      avatarUrl: input.avatarUrlChoice,
     },
   });
 

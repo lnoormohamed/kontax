@@ -22,6 +22,7 @@ const RESULT_SELECT = {
   phoneEntries: true,
   labels: true,
   notes: true,
+  avatarUrl: true,
 } as const;
 
 export type MatchField = "name" | "company" | "email" | "phone" | "label" | "notes";
@@ -33,6 +34,7 @@ export type SearchResult = {
   email: string | null;
   phone: string | null;
   labels: string[];
+  avatarUrl: string | null;
   matchField: MatchField;
   snippet: string | null;
   matchAlt: boolean; // true when the phone match was on a secondary number
@@ -241,6 +243,7 @@ export async function GET(request: Request) {
       email: c.email,
       phone: c.phone,
       labels: safeLabels(c.labels),
+      avatarUrl: c.avatarUrl,
       matchField,
       snippet,
       matchAlt,

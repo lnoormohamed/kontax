@@ -1,24 +1,56 @@
-import type { Prisma } from "../../generated/prisma";
+import { Prisma } from "../../generated/prisma";
 import {
   type CardDavContactCard,
+  type CardDavRawPhoto,
   CardDavPreflightError,
   deleteCardDavContact,
   fetchCardDavAddressBookCards,
   fetchCardDavAddressBookIndex,
+  fetchCardDavPhotoBytes,
   pushCardDavContact,
 } from "~/server/carddav";
 import type { PortableContactInput } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
-import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
-import { createNotification } from "~/server/notifications";
+import { PHOTO_SYNC_ENABLED } from "~/lib/photo-sync-flags";
 import {
-  AUTO_PAUSE_FAILURE_STREAK,
+  hashBytes,
+  parsePhotoShadow,
+  type PhotoSignalKind,
+  type PushSeed,
+  type RemotePhotoState,
+} from "~/server/contact-photo-sync";
+import { runPhotoPass, type PhotoPassLink } from "~/server/sync-photo-pass";
+import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
+import {
   CONFLICT_QUEUE_FULL_CODE,
+  DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE,
   MANUAL_CONFLICT_QUEUE_LIMIT,
+  SYNC_AUTO_PAUSED_CODE,
   getConsecutiveFailureStreak,
   getSyncErrorSupportBucket,
 } from "~/server/sync-health";
+import {
+  buildDeletionHoldPayload,
+  DELETION_THRESHOLD_EXCEEDED_CODE,
+  type DeletionHoldPayload,
+  DeletionThresholdError,
+  exceedsDeletionThreshold,
+} from "~/server/sync-deletion-guard";
+import type { ImportDeletionGuard } from "~/server/sync-import-engine";
+import {
+  notifySyncAutoPause,
+  notifySyncDeletionPause,
+  notifySyncNeedsReauth,
+} from "~/server/sync-enforcement-notifications";
+import {
+  isPhotoExcluded,
+  mergeExcludedFieldsFromRemote,
+  normalizeExcludedFields,
+  omitExcludedContactWriteData,
+  stripExcludedPortableFields,
+} from "~/server/sync-field-exclusions";
+import { isWithinSyncWindow, SYNC_WINDOW_DEFERRED_CODE } from "~/server/sync-window";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
@@ -34,6 +66,7 @@ import {
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
 import {
+  buildExportLabelFilterWhere,
   DEFAULT_SYNC_FREQUENCY_MINUTES,
   getEffectiveSyncAccountSettings,
   isManualSyncFrequency,
@@ -385,6 +418,15 @@ const markJobFailed = async ({
 }) => {
   const now = new Date();
   const baseFailureStatus = getFailureStatus(accountStatus, errorCode);
+  // P39-05: retry sensitivity — the per-connection maxAttemptsBeforePause
+  // replaces the hardcoded platform streak. 0 = never auto-pause.
+  const settingsRow = await db.syncAccountSettings.findUnique({
+    where: { syncAccountId },
+    select: { maxAttemptsBeforePause: true, notifyOnFailure: true },
+  });
+  const pauseThreshold =
+    settingsRow?.maxAttemptsBeforePause ?? DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE;
+  const notifyOnFailure = settingsRow?.notifyOnFailure ?? true;
   const recentJobs = await db.syncJob.findMany({
     where: {
       syncAccountId,
@@ -393,7 +435,9 @@ const markJobFailed = async ({
       },
     },
     orderBy: [{ createdAt: "desc" }],
-    take: AUTO_PAUSE_FAILURE_STREAK - 1,
+    // SKIPPED/HALTED rows are ignored by the streak; over-fetch so the window
+    // still spans enough FAILED rows to reach the threshold.
+    take: Math.max(pauseThreshold - 1, 0) + 10,
     select: {
       status: true,
       errorCode: true,
@@ -412,11 +456,21 @@ const markJobFailed = async ({
   const supportBucket = getSyncErrorSupportBucket(errorCode);
   const shouldAutoPause =
     baseFailureStatus === "ERROR" &&
-    failureStreak >= AUTO_PAUSE_FAILURE_STREAK &&
+    pauseThreshold > 0 &&
+    failureStreak >= pauseThreshold &&
     supportBucket !== "authentication";
   const finalStatus = shouldAutoPause ? "PAUSED" : baseFailureStatus;
-  const finalErrorSummary = shouldAutoPause
-    ? `${errorSummary} Kontax paused this sync account after ${failureStreak} consecutive ${supportBucket} failures so it does not keep retrying unattended.`
+  // P39-DB01 §3a: the tripping run's history row carries the attempt counter;
+  // earlier attempts carry theirs from their own markJobFailed pass.
+  const attemptSuffix =
+    pauseThreshold > 0 && supportBucket !== "authentication"
+      ? shouldAutoPause
+        ? ` · attempt ${failureStreak} of ${pauseThreshold}`
+        : ` · attempt ${failureStreak}`
+      : "";
+  const jobErrorSummary = `${errorSummary}${attemptSuffix}`;
+  const accountErrorSummary = shouldAutoPause
+    ? `Auto-paused after ${failureStreak} consecutive failures. Kontax stopped retrying to avoid hammering the server. Last error: ${errorCode}.`
     : errorSummary;
 
   await db.$transaction([
@@ -431,7 +485,7 @@ const markJobFailed = async ({
             ? createRetrySchedule(attemptCount + 1)
             : null,
         errorCode,
-        errorSummary: finalErrorSummary,
+        errorSummary: jobErrorSummary,
       },
     }),
     db.syncAccount.update({
@@ -439,36 +493,121 @@ const markJobFailed = async ({
       data: {
         status: finalStatus,
         lastErrorAt: now,
-        lastErrorCode: errorCode,
-        lastErrorMessage: finalErrorSummary,
+        // P39-05: a retry-sensitivity trip is marked by its own account code so
+        // health classifies it paused_for_safety; the underlying error stays on
+        // the tripping SyncJob row and in the message text.
+        lastErrorCode: shouldAutoPause ? SYNC_AUTO_PAUSED_CODE : errorCode,
+        lastErrorMessage: accountErrorSummary,
       },
     }),
   ]);
 
-  // P22-DB05: notify on the transition into an attention-needed state (re-auth
-  // required or auto-paused) — not on every transient retry.
+  // P22-DB05 / P39-05: notify on the transition into an attention-needed state
+  // (re-auth required or auto-paused) — not on every transient retry. The
+  // per-connection notifyOnFailure setting gates the pause path; re-auth
+  // always notifies (P39-DB01 §4).
   if (
     (finalStatus === "NEEDS_REAUTH" || finalStatus === "PAUSED") &&
     accountStatus !== finalStatus
   ) {
     const account = await db.syncAccount.findUnique({
       where: { id: syncAccountId },
-      select: { userId: true, provider: true },
+      select: { userId: true, provider: true, label: true },
     });
     if (account) {
-      const needsReauth = finalStatus === "NEEDS_REAUTH";
-      await createNotification({
-        userId: account.userId,
-        category: "SYNC_STATUS",
-        title: `Sync error — ${account.provider}`,
-        body: needsReauth
-          ? "Re-authentication is required to keep this account in sync."
-          : "Kontax paused this sync account after repeated failures. Review it to resume syncing.",
-        actionUrl: "/sync",
-      });
+      if (finalStatus === "NEEDS_REAUTH") {
+        await notifySyncNeedsReauth({
+          userId: account.userId,
+          syncAccountId,
+          accountLabel: account.label,
+          reason:
+            account.provider === "CARDDAV"
+              ? "your app password was rejected"
+              : "your authorisation has expired or been revoked",
+        });
+      } else {
+        await notifySyncAutoPause({
+          userId: account.userId,
+          syncAccountId,
+          accountLabel: account.label,
+          failureCount: failureStreak,
+          lastError: errorCode,
+          notifyOnFailure,
+        });
+      }
     }
   }
 };
+
+// P39-02: a run aborted before commit by the deletion-safety threshold. Not a
+// failure — the job row goes to HALTED and the account parks in a protective
+// PAUSED state carrying the hold payload the review surface renders.
+const markJobHalted = async ({
+  jobId,
+  syncAccountId,
+  userId,
+  accountLabel,
+  hold,
+}: {
+  jobId: string;
+  syncAccountId: string;
+  userId: string;
+  accountLabel: string;
+  hold: DeletionHoldPayload;
+}) => {
+  const now = new Date();
+  const settingsRow = await db.syncAccountSettings.findUnique({
+    where: { syncAccountId },
+    select: { notifyOnFailure: true },
+  });
+  const notifyOnFailure = settingsRow?.notifyOnFailure ?? true;
+
+  await db.$transaction([
+    db.syncJob.update({
+      where: { id: jobId },
+      data: {
+        status: "HALTED",
+        completedAt: now,
+        leaseExpiresAt: null,
+        nextRetryAt: null,
+        errorCode: DELETION_THRESHOLD_EXCEEDED_CODE,
+        errorSummary: `Halted before commit · ${hold.total} pending removal${hold.total !== 1 ? "s" : ""}`,
+      },
+    }),
+    db.syncAccount.update({
+      where: { id: syncAccountId },
+      data: {
+        status: "PAUSED",
+        lastErrorAt: now,
+        lastErrorCode: DELETION_THRESHOLD_EXCEEDED_CODE,
+        lastErrorMessage: `Sync paused: this sync would have deleted ${hold.total} contact${hold.total === 1 ? "" : "s"} (your limit is ${hold.threshold}). Nothing was deleted.`,
+        deletionHold: hold,
+        deletionHoldAt: now,
+      },
+    }),
+  ]);
+
+  await notifySyncDeletionPause({
+    userId,
+    syncAccountId,
+    accountLabel,
+    wouldDelete: hold.total,
+    limit: hold.threshold,
+    notifyOnFailure,
+    occurredAt: now,
+  });
+};
+
+// P39-02: per-run deletion-guard context for a connector. undefined when the
+// threshold is disabled or the account's one-shot bypass is set ("Resume and
+// allow deletions" — the run may commit the held deletions once).
+const buildDeletionGuardContext = (
+  job: { syncAccount: { deletionGuardBypassOnce: boolean } },
+  threshold: number | null,
+): ImportDeletionGuard | undefined =>
+  threshold != null && !job.syncAccount.deletionGuardBypassOnce
+    ? { threshold, candidates: [] }
+    : undefined;
 
 // P27-08: best-effort post-import dedup. Never throws — the sync job has
 // already succeeded; a dedup failure must not flip it to failed.
@@ -489,7 +628,11 @@ const runPostImportDedupSafely = async (
 // effective frequency. Skips manual-only accounts and accounts that already have
 // a QUEUED/RUNNING job (so ticks don't pile up). The cron route runs the queue
 // afterwards. Returns counts for observability.
-export const enqueueDueSyncJobs = async (): Promise<{ enqueued: number; skipped: number }> => {
+export const enqueueDueSyncJobs = async (): Promise<{
+  enqueued: number;
+  skipped: number;
+  deferred: number;
+}> => {
   const now = Date.now();
   const accounts = await db.syncAccount.findMany({
     // P36-DB02: skip accounts awaiting initial setup (setupCompletedAt null) — the
@@ -509,6 +652,7 @@ export const enqueueDueSyncJobs = async (): Promise<{ enqueued: number; skipped:
 
   let enqueued = 0;
   let skipped = 0;
+  let deferred = 0;
 
   for (const account of accounts) {
     // Already has a pending job — don't stack another.
@@ -531,6 +675,46 @@ export const enqueueDueSyncJobs = async (): Promise<{ enqueued: number; skipped:
       continue;
     }
 
+    // P39-01: hold scheduled runs outside the account's sync window, evaluated
+    // on the user's wall clock (IANA zone; legacy rows without a zone keep
+    // their stored-as-UTC semantics). Manual "Sync now" never passes through
+    // here, so it bypasses the window by construction. One SKIPPED history row
+    // per frequency period records the deferral without spamming every tick.
+    if (
+      !isWithinSyncWindow({
+        now: new Date(now),
+        windowStart: settings.syncWindowStart,
+        windowEnd: settings.syncWindowEnd,
+        timezone: settings.syncWindowTimezone,
+      })
+    ) {
+      const recentSkip = await db.syncJob.findFirst({
+        where: {
+          syncAccountId: account.id,
+          status: "SKIPPED",
+          createdAt: { gte: new Date(now - freqMinutes * 60_000) },
+        },
+        select: { id: true },
+      });
+      if (!recentSkip) {
+        const windowLabel = `${String(settings.syncWindowStart).padStart(2, "0")}:00–${String(settings.syncWindowEnd).padStart(2, "0")}:00`;
+        await db.syncJob.create({
+          data: {
+            syncAccountId: account.id,
+            status: "SKIPPED",
+            trigger: "SCHEDULED",
+            syncDirection: account.syncDirection,
+            completedAt: new Date(now),
+            errorCode: SYNC_WINDOW_DEFERRED_CODE,
+            errorSummary: `Skipped — outside sync window (${windowLabel})`,
+            idempotencyKey: `${account.id}:window-skip:${now}`,
+          },
+        });
+      }
+      deferred += 1;
+      continue;
+    }
+
     await db.syncJob.create({
       data: {
         syncAccountId: account.id,
@@ -546,7 +730,7 @@ export const enqueueDueSyncJobs = async (): Promise<{ enqueued: number; skipped:
     enqueued += 1;
   }
 
-  return { enqueued, skipped };
+  return { enqueued, skipped, deferred };
 };
 
 export const runQueuedSyncJobs = async ({
@@ -579,6 +763,8 @@ export const runQueuedSyncJobs = async ({
           lastSyncCursor: true,
           credentialReference: true,
           credentialRevokedAt: true,
+          // P39-02: one-shot deletion-guard bypass set by "Resume and allow".
+          deletionGuardBypassOnce: true,
           settings: {
             select: {
               capabilityProfileOverride: true,
@@ -604,6 +790,8 @@ export const runQueuedSyncJobs = async ({
     partial: 0,
     failed: 0,
     skipped: 0,
+    // P39-02: runs aborted before commit by the deletion-safety threshold.
+    halted: 0,
   };
 
   // P27-01/04: shared bookkeeping for OAuth provider jobs (Google, Microsoft).
@@ -626,7 +814,7 @@ export const runQueuedSyncJobs = async ({
     job: (typeof queuedJobs)[number],
     run: () => Promise<OAuthSyncResult>,
     toErrorCode: (error: unknown) => string,
-  ): Promise<"succeeded" | "partial" | "failed"> => {
+  ): Promise<"succeeded" | "partial" | "failed" | "halted"> => {
     if (!job.syncAccount.credentialReference || job.syncAccount.credentialRevokedAt) {
       await markJobFailed({
         jobId: job.id,
@@ -673,6 +861,12 @@ export const runQueuedSyncJobs = async ({
             status: result.queueFull ? "PAUSED" : "ACTIVE",
             lastSucceededAt: now,
             lastSyncedAt: now,
+            // P39-02: a completed run settles any deletion hold — either the
+            // one-shot bypass just committed the deletions, or a resume path
+            // already reconciled them.
+            deletionHold: Prisma.DbNull,
+            deletionHoldAt: null,
+            deletionGuardBypassOnce: false,
             lastErrorAt: result.queueFull || hasConflicts ? now : null,
             lastErrorCode: result.queueFull
               ? CONFLICT_QUEUE_FULL_CODE
@@ -689,6 +883,17 @@ export const runQueuedSyncJobs = async ({
       ]);
       return hasConflicts ? "partial" : "succeeded";
     } catch (error) {
+      // P39-02: a deletion-threshold trip is a protective halt, not a failure.
+      if (error instanceof DeletionThresholdError) {
+        await markJobHalted({
+          jobId: job.id,
+          syncAccountId: job.syncAccountId,
+          userId: job.syncAccount.userId,
+          accountLabel: job.syncAccount.label,
+          hold: error.hold,
+        });
+        return "halted";
+      }
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
@@ -794,6 +999,9 @@ export const runQueuedSyncJobs = async ({
             lastSyncCursor: job.syncAccount.lastSyncCursor,
             conflictPolicy: settings.conflictPolicy,
             syncDirection: job.syncAccount.syncDirection,
+            deletionGuard: buildDeletionGuardContext(job, settings.maxDeletionsThreshold),
+            excludedFields: normalizeExcludedFields(settings.excludedFields),
+            exportLabelFilter: settings.exportLabelFilter,
           }),
         (error) => (error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED"),
       );
@@ -818,6 +1026,9 @@ export const runQueuedSyncJobs = async ({
             lastSyncCursor: job.syncAccount.lastSyncCursor,
             conflictPolicy: settings.conflictPolicy,
             syncDirection: job.syncAccount.syncDirection,
+            deletionGuard: buildDeletionGuardContext(job, settings.maxDeletionsThreshold),
+            excludedFields: normalizeExcludedFields(settings.excludedFields),
+            exportLabelFilter: settings.exportLabelFilter,
           }),
         (error) => (error instanceof MicrosoftSyncError ? error.code : "MICROSOFT_SYNC_FAILED"),
       );
@@ -928,6 +1139,11 @@ export const runQueuedSyncJobs = async ({
 
     try {
       const now = new Date();
+      // P39-03: excluded fields are stripped from both shadow sides (so a
+      // change confined to them never syncs), omitted from inbound writes, and
+      // grafted from the remote card into outbound vCard PUTs so the remote's
+      // own values survive un-scrubbed.
+      const excludedFields = normalizeExcludedFields(settings.excludedFields);
       const capabilityProfile = resolveSyncProviderCapabilityProfile({
         provider: job.syncAccount.provider,
         baseUrl: job.syncAccount.baseUrl,
@@ -949,6 +1165,8 @@ export const runQueuedSyncJobs = async ({
           username: decryptedCredentials.username,
           password: decryptedCredentials.password,
         },
+        // P44-03: decode PHOTO only when photo sync is on (avoids the b64 cost).
+        includePhoto: PHOTO_SYNC_ENABLED,
       });
 
       const remoteUids = remoteEntries.map((entry) => entry.uid);
@@ -979,6 +1197,7 @@ export const runQueuedSyncJobs = async ({
           remoteETag: true,
           capabilityProfileId: true,
           supportedFieldShadow: true,
+          photoShadow: true,
           lastSyncedAt: true,
           contactId: true,
           contact: {
@@ -988,6 +1207,9 @@ export const runQueuedSyncJobs = async ({
               syncVersion: true,
               updatedAt: true,
               archivedAt: true,
+              avatarUrl: true,
+              // P39-02: book grouping for the deletion-hold review card.
+              book: { select: { name: true } },
               fullName: true,
               firstName: true,
               middleName: true,
@@ -1061,11 +1283,18 @@ export const runQueuedSyncJobs = async ({
         remoteHref: string;
         remoteUid: string;
         contact: SyncPushContactRow;
+        // P39-03: the remote card's current values, grafted back into the
+        // pushed vCard for excluded fields.
+        remotePortable: PortableContactInput | null;
         capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
       const localDeleteCandidates: Array<{
         linkId: string;
         remoteHref: string;
+        contactId: string;
+        contactName: string;
+        bookName: string;
+        bookDetail: string | null;
       }> = [];
       const metadataRefreshCandidates: Array<{
         linkId: string;
@@ -1085,6 +1314,12 @@ export const runQueuedSyncJobs = async ({
         remoteSnapshot: unknown;
         strategy: "KEEP_REMOTE" | "KEEP_LOCAL";
       }> = [];
+      // P39-04: the export label filter gates NEW outbound pushes only —
+      // already-linked contacts keep syncing and are never deleted for
+      // losing the label.
+      const exportLabelWhere = canWrite
+        ? await buildExportLabelFilterWhere(job.syncAccount.userId, settings.exportLabelFilter)
+        : null;
       const localCreateCandidates: SyncPushContactRow[] =
         canWrite
           ? await db.contact.findMany({
@@ -1094,6 +1329,7 @@ export const runQueuedSyncJobs = async ({
                 syncTombstoneAt: null,
                 lastMutatedBy: "MANUAL",
                 syncLinks: { none: { syncAccountId: job.syncAccountId } },
+                ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
               },
               select: cardDavPushContactSelect,
             })
@@ -1114,12 +1350,12 @@ export const runQueuedSyncJobs = async ({
           link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
         const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
         const localSupportedShadow = buildProviderSupportedContactShadow(
-          contactToPortable(link.contact),
+          stripExcludedPortableFields(contactToPortable(link.contact), excludedFields),
           capabilityProfile,
         );
         const remoteSupportedShadow = remoteCard
           ? buildProviderSupportedContactShadow(
-              cardDavCardToPortable(remoteCard),
+              stripExcludedPortableFields(cardDavCardToPortable(remoteCard), excludedFields),
               capabilityProfile,
             )
           : null;
@@ -1154,7 +1390,14 @@ export const runQueuedSyncJobs = async ({
 
         if (localChanged && link.contact.archivedAt) {
           if (canWrite && link.remoteHref) {
-            localDeleteCandidates.push({ linkId: link.id, remoteHref: link.remoteHref });
+            localDeleteCandidates.push({
+              linkId: link.id,
+              remoteHref: link.remoteHref,
+              contactId: link.contact.id,
+              contactName: link.contact.fullName,
+              bookName: link.contact.book?.name ?? "Personal",
+              bookDetail: link.contact.book ? null : "default",
+            });
           } else {
             deferredLocalChangesCount += 1;
           }
@@ -1225,6 +1468,7 @@ export const runQueuedSyncJobs = async ({
               remoteHref: link.remoteHref,
               remoteUid: remoteUid ?? link.remoteHref,
               contact: link.contact,
+              remotePortable: remoteCard ? cardDavCardToPortable(remoteCard) : null,
               capabilityDiagnostics: buildProviderCapabilityDiagnostics(
                 contactToPortable(link.contact),
                 capabilityProfile,
@@ -1262,6 +1506,33 @@ export const runQueuedSyncJobs = async ({
         }
       }
 
+      // P39-02: deletion-safety threshold — the outbound delete list is fully
+      // known after classification and nothing has been written yet (remote or
+      // local), so the guard halts here before any commit. CardDAV inbound
+      // remote deletions surface as DELETE_CONFLICT rows, never auto-applied
+      // deletes, so only the outbound direction counts for this provider.
+      if (
+        !job.syncAccount.deletionGuardBypassOnce &&
+        exceedsDeletionThreshold(
+          { inbound: 0, outbound: localDeleteCandidates.length },
+          settings.maxDeletionsThreshold,
+        )
+      ) {
+        throw new DeletionThresholdError(
+          buildDeletionHoldPayload(
+            localDeleteCandidates.map((candidate) => ({
+              linkId: candidate.linkId,
+              contactId: candidate.contactId,
+              name: candidate.contactName,
+              bookName: candidate.bookName,
+              bookDetail: candidate.bookDetail,
+              direction: "outbound" as const,
+            })),
+            settings.maxDeletionsThreshold!,
+          ),
+        );
+      }
+
       // Execute outbound writes to CardDAV (outside the DB transaction — network I/O).
       const pushedLinks: Array<{ linkId: string; newETag: string | null; newHref: string }> = [];
       const createdLinks: Array<{
@@ -1275,6 +1546,22 @@ export const runQueuedSyncJobs = async ({
       }> = [];
       const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = [];
 
+      // P44-04: a full-card PUT with no PHOTO line would wipe the remote photo
+      // (and cascade into deleting the local one on the next photo pass). While
+      // photo sync is on, carry the remote card's current photo through every
+      // field-push; the dedicated photo pass (below) is what changes it.
+      const cardPhotoToBase64 = async (
+        photo: CardDavRawPhoto | null | undefined,
+      ): Promise<string | null> => {
+        if (!PHOTO_SYNC_ENABLED || !photo) return null;
+        if (photo.kind === "inline") return photo.base64.replace(/\s+/g, "");
+        const bytes = await fetchCardDavPhotoBytes(photo.uri, {
+          username: decryptedCredentials.username,
+          password: decryptedCredentials.password,
+        });
+        return bytes ? bytes.toString("base64") : null;
+      };
+
       for (const candidate of localPushCandidates) {
         try {
           const result = await pushCardDavContact({
@@ -1284,9 +1571,16 @@ export const runQueuedSyncJobs = async ({
               password: decryptedCredentials.password,
             },
             remoteUid: candidate.remoteUid,
-            contact: contactToPortable(candidate.contact),
+            // P39-03: the full-card PUT carries the remote's own values for
+            // excluded fields — local edits to them never propagate.
+            contact: mergeExcludedFieldsFromRemote(
+              contactToPortable(candidate.contact),
+              candidate.remotePortable,
+              excludedFields,
+            ),
             capabilityProfile,
             hrefOverride: candidate.remoteHref || undefined,
+            photoBase64: await cardPhotoToBase64(remoteCardByUid.get(candidate.remoteUid)?.photo),
           });
           pushedLinks.push({ linkId: candidate.linkId, newETag: result.etag, newHref: result.href });
         } catch (err) {
@@ -1304,7 +1598,8 @@ export const runQueuedSyncJobs = async ({
               password: decryptedCredentials.password,
             },
             remoteUid: contact.syncUid,
-            contact: contactToPortable(contact),
+            // P39-03: excluded fields never reach a freshly-created remote card.
+            contact: stripExcludedPortableFields(contactToPortable(contact), excludedFields),
             capabilityProfile,
           });
           createdLinks.push({
@@ -1313,7 +1608,7 @@ export const runQueuedSyncJobs = async ({
             remoteHref: result.href,
             remoteETag: result.etag,
             supportedFieldShadow: buildProviderSupportedContactShadow(
-              contactToPortable(contact),
+              stripExcludedPortableFields(contactToPortable(contact), excludedFields),
               capabilityProfile,
             ),
             lastSyncedAt: contact.updatedAt,
@@ -1365,7 +1660,10 @@ export const runQueuedSyncJobs = async ({
               supportedFieldShadow:
                 remoteCardByUid.has(entry.uid)
                   ? (buildProviderSupportedContactShadow(
-                      cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                      stripExcludedPortableFields(
+                        cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                        excludedFields,
+                      ),
                       capabilityProfile,
                     ) as Prisma.InputJsonValue)
                   : undefined,
@@ -1379,7 +1677,10 @@ export const runQueuedSyncJobs = async ({
               supportedFieldShadow:
                 remoteCardByUid.has(entry.uid)
                   ? (buildProviderSupportedContactShadow(
-                      cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                      stripExcludedPortableFields(
+                        cardDavCardToPortable(remoteCardByUid.get(entry.uid)!),
+                        excludedFields,
+                      ),
                       capabilityProfile,
                     ) as Prisma.InputJsonValue)
                   : undefined,
@@ -1426,8 +1727,9 @@ export const runQueuedSyncJobs = async ({
         }
 
         for (const card of unmatchedCards) {
+          // P39-03: excluded fields are dropped from the imported contact.
           const createdContact = await tx.contact.create({
-            data: {
+            data: omitExcludedContactWriteData({
               userId: scopeUserId,
               syncUid: card.uid,
               fullName: card.fullName,
@@ -1460,7 +1762,7 @@ export const runQueuedSyncJobs = async ({
               sourceDetail: scopeLabel,
               lastMutatedBy: "SYNC_CARDDAV",
               lastMutatedByDetail: scopeLabel,
-            },
+            }, excludedFields),
             select: {
               id: true,
               updatedAt: true,
@@ -1536,9 +1838,13 @@ export const runQueuedSyncJobs = async ({
               id: remoteApply.contactId,
             },
             data: {
-              ...buildContactWriteDataFromRemoteSnapshot(
-                remoteApply.remoteSnapshot,
-                capabilityProfile,
+              // P39-03: excluded remote fields never overwrite local values.
+              ...omitExcludedContactWriteData(
+                buildContactWriteDataFromRemoteSnapshot(
+                  remoteApply.remoteSnapshot,
+                  capabilityProfile,
+                ),
+                excludedFields,
               ),
               lastMutatedBy: "SYNC_CARDDAV",
               lastMutatedByDetail: job.syncAccount.label,
@@ -1557,7 +1863,10 @@ export const runQueuedSyncJobs = async ({
                 remoteETag: remoteApply.remoteETag,
                 capabilityProfileId: capabilityProfile.id,
                 supportedFieldShadow: buildProviderSupportedContactShadow(
-                  cardDavCardToPortable(remoteApply.remoteSnapshot as CardDavContactCard),
+                  stripExcludedPortableFields(
+                    cardDavCardToPortable(remoteApply.remoteSnapshot as CardDavContactCard),
+                    excludedFields,
+                  ),
                   capabilityProfile,
                 ) as Prisma.InputJsonValue,
                 remoteDeletedAt: null,
@@ -1627,7 +1936,10 @@ export const runQueuedSyncJobs = async ({
               ...(pushedLink
                 ? {
                     supportedFieldShadow: buildProviderSupportedContactShadow(
-                      contactToPortable(pushedLink.contact),
+                      stripExcludedPortableFields(
+                        contactToPortable(pushedLink.contact),
+                        excludedFields,
+                      ),
                       capabilityProfile,
                     ) as Prisma.InputJsonValue,
                   }
@@ -1776,6 +2088,10 @@ export const runQueuedSyncJobs = async ({
             lastSyncCursor: String(remoteEntries.length),
             lastSyncedAt: now,
             lastSucceededAt: now,
+            // P39-02: a completed run settles any deletion hold.
+            deletionHold: Prisma.DbNull,
+            deletionHoldAt: null,
+            deletionGuardBypassOnce: false,
             lastErrorAt: queueFull || conflictEntries.length > 0 ? now : null,
             lastErrorCode: queueFull
               ? CONFLICT_QUEUE_FULL_CODE
@@ -1789,7 +2105,125 @@ export const runQueuedSyncJobs = async ({
                 : null,
           },
         });
+      },
+      // A large book issues hundreds of sequential writes in this commit
+      // (link upserts, metadata refreshes, bulk first imports) — the Prisma
+      // interactive-transaction default of 5s aborts mid-commit on big books
+      // or high-latency links. P39-08 surfaced this on a ~1k-contact book.
+      // SYNC_COMMIT_TX_TIMEOUT_MS overrides for high-latency DB links (e.g.
+      // the QA harness running over VPN against the staging DB).
+      {
+        maxWait: 15_000,
+        timeout: Number(process.env.SYNC_COMMIT_TX_TIMEOUT_MS ?? "") || 120_000,
       });
+
+      // P44-03/04: contact photo pass. Runs after the field commit (so contacts
+      // and links exist) and outside any DB transaction (it does network I/O).
+      // Only reconciles contacts still present remotely — remote deletions are
+      // handled by the conflict path above, not here.
+      if (PHOTO_SYNC_ENABLED) {
+        try {
+          const photoExcluded = isPhotoExcluded(settings.excludedFields);
+          // EXPORT_ONLY is rejected earlier for CardDAV, so inbound is always
+          // permitted here; outbound follows canWrite (false for IMPORT_ONLY).
+          const cap = {
+            canPull: !photoExcluded,
+            canPush: !photoExcluded && canWrite,
+          };
+          const creds = {
+            username: decryptedCredentials.username,
+            password: decryptedCredentials.password,
+          };
+          const abUrl: string = job.syncAccount.addressBookUrl;
+          const photoLinks: PhotoPassLink[] = [];
+          for (const link of existingLinks) {
+            if (!link.remoteUid) continue;
+            const uid: string = link.remoteUid;
+            const card = remoteCardByUid.get(uid);
+            if (!card) continue; // not present remotely → deletion path owns it
+            const photo = card.photo ?? null;
+
+            let remote: RemotePhotoState;
+            let signalKind: PhotoSignalKind;
+            let loadRemoteBytes: () => Promise<Buffer | null>;
+            if (!photo) {
+              remote = { hasPhoto: false, signal: null };
+              signalKind = "contentHash";
+              loadRemoteBytes = async () => null;
+            } else if (photo.kind === "inline") {
+              const bytes = Buffer.from(photo.base64.replace(/\s+/g, ""), "base64");
+              remote = { hasPhoto: bytes.length > 0, signal: bytes.length > 0 ? hashBytes(bytes) : null };
+              signalKind = "contentHash";
+              loadRemoteBytes = async () => bytes;
+            } else {
+              remote = { hasPhoto: true, signal: photo.uri };
+              signalKind = "resourceIdentifier";
+              loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds);
+            }
+
+            const pushCardWithPhoto = async (photoBase64: string | null): Promise<string | null> => {
+              const res = await pushCardDavContact({
+                addressBookUrl: abUrl,
+                credentials: creds,
+                remoteUid: uid,
+                contact: mergeExcludedFieldsFromRemote(
+                  contactToPortable(link.contact),
+                  cardDavCardToPortable(card),
+                  excludedFields,
+                ),
+                capabilityProfile,
+                hrefOverride: link.remoteHref || undefined,
+                photoBase64,
+              });
+              return res.etag;
+            };
+
+            photoLinks.push({
+              linkId: link.id,
+              contactId: link.contactId,
+              avatarUrl: link.contact.avatarUrl ?? null,
+              shadow: parsePhotoShadow(link.photoShadow),
+              signalKind,
+              remote,
+              loadRemoteBytes,
+              pushCanonical: async (b64): Promise<PushSeed> => {
+                const decoded = Buffer.from(b64, "base64");
+                const etag = await pushCardWithPhoto(b64);
+                // CardDAV is byte-stable (P44-01) → the canonical remote copy is
+                // exactly what we pushed; no read-back round trip needed.
+                return { remoteSignal: hashBytes(decoded), remoteCanonicalHash: hashBytes(decoded), remoteETag: etag };
+              },
+              deleteRemote: async () => {
+                await pushCardWithPhoto(null);
+              },
+            });
+          }
+
+          const tally = await runPhotoPass(
+            db,
+            {
+              userId: job.syncAccount.userId,
+              syncAccountId: job.syncAccountId,
+              syncAccountLabel: job.syncAccount.label,
+            },
+            cap,
+            photoLinks,
+          );
+          const inbound = tally.pulled + tally.deletedLocal;
+          const outbound = tally.pushed + tally.deletedRemote;
+          if (inbound + outbound > 0) {
+            await db.syncJob.update({
+              where: { id: job.id },
+              data: {
+                updatedCount: { increment: inbound },
+                pushedUpdatedCount: { increment: outbound },
+              },
+            });
+          }
+        } catch (error) {
+          console.warn(`[Kontax] CardDAV photo pass failed for account ${job.syncAccountId}`, error);
+        }
+      }
 
       if (conflictEntries.length > 0) {
         summary.partial += 1;
@@ -1797,6 +2231,19 @@ export const runQueuedSyncJobs = async ({
         summary.succeeded += 1;
       }
     } catch (error) {
+      // P39-02: a deletion-threshold trip is a protective halt, not a failure.
+      if (error instanceof DeletionThresholdError) {
+        await markJobHalted({
+          jobId: job.id,
+          syncAccountId: job.syncAccountId,
+          userId: job.syncAccount.userId,
+          accountLabel: job.syncAccount.label,
+          hold: error.hold,
+        });
+        summary.halted += 1;
+        continue;
+      }
+
       const errorCode =
         error instanceof CardDavPreflightError ? error.code : "CARDDAV_SYNC_FAILED";
       const errorSummary =

@@ -1,0 +1,37 @@
+{
+  "name": "kontax-contact-format",
+  "version": "1.0.0",
+  "description": "Kontax Contact Export Format — spec, JSON Schemas, and a zero-dependency reference validator for the open contact-interchange format (JSContact/RFC 9553 + getkontax.com extensions).",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getkontax/contact-format"
+  },
+  "bin": {
+    "kontax-validate": "bin/validate.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "validate:examples": "node bin/validate.mjs examples/daniel-cho.json && node bin/validate.mjs examples/example-archive.zip"
+  },
+  "files": [
+    "bin/",
+    "schemas/",
+    "examples/",
+    "spec.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "contacts",
+    "jscontact",
+    "rfc9553",
+    "vcard",
+    "export",
+    "interchange",
+    "kontax"
+  ]
+}

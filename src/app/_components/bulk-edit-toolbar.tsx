@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 
 import { ConfirmDialog } from "~/app/_components/confirm-dialog";
+import { OfflineWriteNote } from "~/app/_components/connection-banner";
+import { useOffline } from "~/app/_components/connectivity";
 import { archiveContactsBulk, deleteContactsBulk, favoriteContactsBulk, restoreContactsBulk } from "~/app/actions/contacts";
 import { addLabelBulk, mergeContactsBulk, removeLabelBulk, setCompanyBulk } from "~/app/actions/bulk-edit";
 import { moveContactsToBook } from "~/app/actions/address-books";
@@ -128,10 +130,34 @@ export function BulkEditToolbar({
   const [mergeOpen, setMergeOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [labelSearch, setLabelSearch] = useState("");
+  // P45-DB01: inline confirmation after kicking off a Kontax Archive export.
+  const [archiveSent, setArchiveSent] = useState(false);
   const [labelOverrides, setLabelOverrides] = useState<Record<string, boolean>>({});
   const [companyText, setCompanyText] = useState("");
 
   const count = selectedIds.length;
+
+  // P42-DB01 Surface 2b: bulk actions need a connection. The whole action
+  // toolbar disables while offline; the selection itself is preserved. Open
+  // popovers close so a disabled action can't be half-finished.
+  const offline = useOffline();
+  useEffect(() => {
+    if (offline) setOpen(null);
+  }, [offline]);
+
+  // Reset the archive confirmation when the More menu closes.
+  useEffect(() => {
+    if (open !== "more") setArchiveSent(false);
+  }, [open]);
+
+  const exportKontaxArchive = () => {
+    void fetch("/api/exports/kontax", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ includePhotos: true, includeVcardFallback: false, ids: selectedIds }),
+    }).catch(() => undefined);
+    setArchiveSent(true);
+  };
 
   // Per-label membership across the selection → tri-state. Reset overrides when
   // the selection changes so the manager reflects the new set.
@@ -249,7 +275,15 @@ export function BulkEditToolbar({
     <>
       {mounted
         ? createPortal(
-            <div className="pointer-events-none fixed inset-x-0 bottom-[88px] z-40 flex justify-center px-3 md:bottom-6">
+            <div className="pointer-events-none fixed inset-x-0 bottom-[88px] z-40 flex flex-col items-center gap-2 px-3 md:bottom-6">
+        {offline ? (
+          <div className="pointer-events-auto w-full max-w-[430px]">
+            <OfflineWriteNote
+              title="Bulk actions need a connection."
+              body="Your selection is kept — reconnect and try again."
+            />
+          </div>
+        ) : null}
         <div
           className="pointer-events-auto flex h-14 max-w-[calc(100vw-24px)] items-center gap-2 rounded-[14px] px-3 text-white shadow-[0_14px_36px_rgba(20,30,25,0.34)] md:gap-2 md:px-5"
           style={{ background: "#1d2823" }}
@@ -268,6 +302,13 @@ export function BulkEditToolbar({
           </span>
           <div className="mx-1 h-6 w-px bg-white/15" />
 
+          {/* P42-DB01: the whole action set disables while offline; X (clear
+              selection) stays live — it's local, not a write. */}
+          <div
+            aria-disabled={offline}
+            className="flex items-center gap-1"
+            style={offline ? { pointerEvents: "none", opacity: 0.45 } : undefined}
+          >
           {mode === "active" ? (
             <div className="flex items-center gap-1">
               {/* Move to book */}
@@ -415,6 +456,15 @@ export function BulkEditToolbar({
                 >
                   Export as CSV
                 </a>
+                {archiveSent ? (
+                  <div className="flex min-h-9 items-center gap-2 rounded-[7px] px-2.5 py-1.5 text-[12.5px] font-medium leading-[1.4] text-[#1f8a5b]">
+                    Preparing archive — we’ll notify you when it’s ready.
+                  </div>
+                ) : (
+                  <button type="button" className={popItem} onClick={exportKontaxArchive}>
+                    Export as Kontax Archive
+                  </button>
+                )}
                 <button
                   type="button"
                   className={popItem}
@@ -438,6 +488,7 @@ export function BulkEditToolbar({
                 </button>
               </Pop>
             ) : null}
+          </div>
           </div>
         </div>
             </div>,

@@ -38,18 +38,28 @@ export function parseContactDate(dateStr: string): { month: number; day: number 
 }
 
 /**
- * Days until the next annual occurrence of MM-DD from `today` (0 = today). If the
- * date already passed this year, returns days until next year's occurrence. Uses
- * UTC throughout and never mutates `today`.
+ * UTC millis of the next annual occurrence of MM-DD on/after `today`
+ * (at start-of-day UTC). If the date already passed this year, returns next
+ * year's. Never mutates `today`.
  */
-export function daysUntilAnnual(month: number, day: number, today: Date): number {
+export function nextAnnualOccurrenceUtc(month: number, day: number, today: Date): number {
   const startOfToday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
   const thisYear = new Date(startOfToday).getUTCFullYear();
   let occurrence = Date.UTC(thisYear, month - 1, day);
   if (occurrence < startOfToday) {
     occurrence = Date.UTC(thisYear + 1, month - 1, day);
   }
-  return Math.round((occurrence - startOfToday) / 86_400_000);
+  return occurrence;
+}
+
+/**
+ * Days until the next annual occurrence of MM-DD from `today` (0 = today). If the
+ * date already passed this year, returns days until next year's occurrence. Uses
+ * UTC throughout and never mutates `today`.
+ */
+export function daysUntilAnnual(month: number, day: number, today: Date): number {
+  const startOfToday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  return Math.round((nextAnnualOccurrenceUtc(month, day, today) - startOfToday) / 86_400_000);
 }
 
 const monthDayLabel = (month: number, day: number) =>
@@ -133,12 +143,18 @@ export async function runBirthdayReminders(userId: string, now = new Date()): Pr
       if (existing?.lastSentYear === currentYear) continue;
 
       const when = daysUntil === 0 ? "Today" : daysUntil === 1 ? "Tomorrow" : `In ${daysUntil} days`;
+      // P46-DB03 (D5·R): event-passed = the day *after* the date. Store eventAt as
+      // the start of the following day so the reminder reads live on the day
+      // itself and only flips to "Passed" once the date is fully behind us. The
+      // link stays live (contact still resolves — D3 "keep live").
+      const eventAt = new Date(nextAnnualOccurrenceUtc(parsed.month, parsed.day, now) + 86_400_000);
       await createNotification({
         userId,
         category: "REMINDERS",
         title: `${name}'s ${label} is coming up`,
         body: `${when} — ${monthDayLabel(parsed.month, parsed.day)}`,
         actionUrl: `/contacts/${contact.id}`,
+        eventAt,
       });
 
       await db.birthdayReminderState.upsert({

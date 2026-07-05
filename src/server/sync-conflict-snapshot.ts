@@ -34,6 +34,7 @@ export const contactConflictSelect = Prisma.validator<Prisma.ContactSelect>()({
   address: true,
   postalAddresses: true,
   notes: true,
+  avatarUrl: true, // P44-05: photo shown side-by-side in the conflict review
 });
 
 export type ContactConflictSnapshotInput = {
@@ -59,6 +60,7 @@ export type ContactConflictSnapshotInput = {
   address: string | null;
   postalAddresses: unknown;
   notes: string | null;
+  avatarUrl?: string | null;
 };
 
 export const buildLocalConflictSnapshot = (contact: ContactConflictSnapshotInput) => ({
@@ -84,4 +86,5 @@ export const buildLocalConflictSnapshot = (contact: ContactConflictSnapshotInput
   address: contact.address,
   postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
   notes: contact.notes,
+  avatarUrl: contact.avatarUrl ?? null,
 });

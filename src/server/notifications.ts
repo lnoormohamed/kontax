@@ -2,6 +2,11 @@ import { cache } from "react";
 
 import type { DigestCadence, NotificationCategory, Prisma } from "../../generated/prisma";
 
+import {
+  resolveShareInviteOutcome,
+  type ShareOutcome,
+} from "~/app/_components/notification-categories";
+
 import SuspiciousActivity from "~/emails/suspicious-activity";
 import { db } from "~/server/db";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
@@ -107,6 +112,11 @@ export async function createNotification(params: {
   actionUrl?: string | null;
   securityAlertId?: string | null;
   adminBroadcastId?: string | null;
+  contactShareId?: string | null;
+  // P46-DB03 (D5): the emitting source sets the real event moment / deadline so
+  // the row can render event-passed once it's behind us. Null → aged-only.
+  eventAt?: Date | null;
+  expiresAt?: Date | null;
 }): Promise<boolean> {
   try {
     const pref = PREF_COLUMNS[params.category];
@@ -123,6 +133,9 @@ export async function createNotification(params: {
         actionUrl: params.actionUrl ?? null,
         securityAlertId: params.securityAlertId ?? null,
         adminBroadcastId: params.adminBroadcastId ?? null,
+        contactShareId: params.contactShareId ?? null,
+        eventAt: params.eventAt ?? null,
+        expiresAt: params.expiresAt ?? null,
       },
     });
     return true;
@@ -141,6 +154,14 @@ export type FeedNotification = {
   actionUrl: string | null;
   securityAlertId: string | null;
   createdAt: Date;
+  // P46-DB03: null on rows whose source has no dated event → aged-only.
+  eventAt: Date | null;
+  expiresAt: Date | null;
+  // P46-DB03 (D3): read-time entity truth for SHARING rows. `entityPassed` forces
+  // the muted/event-passed register regardless of the (possibly null) date hint;
+  // `shareOutcome` drives the affix + whether the deep-link is disabled/repointed.
+  entityPassed: boolean;
+  shareOutcome: ShareOutcome | null;
 };
 
 /** Non-dismissed feed rows, newest first, for the dropdown. */
@@ -150,7 +171,7 @@ export const getNotificationFeed = cache(async (
   userId: string,
   limit = FEED_LIMIT,
 ): Promise<FeedNotification[]> => {
-  return db.notification.findMany({
+  const rows = await db.notification.findMany({
     where: { userId, dismissedAt: null },
     orderBy: { createdAt: "desc" },
     take: limit,
@@ -163,7 +184,44 @@ export const getNotificationFeed = cache(async (
       actionUrl: true,
       securityAlertId: true,
       createdAt: true,
+      eventAt: true,
+      expiresAt: true,
+      contactShareId: true,
     },
+  });
+
+  // P46-DB03 (D3): resolve the linked invite's live/expired/accepted state for
+  // every SHARING row in one batched query, then fold it into each row.
+  const shareIds = rows.flatMap((r) =>
+    r.category === "SHARING" && r.contactShareId ? [r.contactShareId] : [],
+  );
+  const shares = shareIds.length
+    ? await db.contactShare.findMany({
+        where: { id: { in: shareIds } },
+        select: { id: true, status: true, recipientContactId: true, expiresAt: true },
+      })
+    : [];
+  const shareById = new Map(shares.map((s) => [s.id, s]));
+  const now = Date.now();
+
+  return rows.map(({ contactShareId, ...r }) => {
+    let entityPassed = false;
+    let shareOutcome: ShareOutcome | null = null;
+    let actionUrl = r.actionUrl;
+
+    if (r.category === "SHARING" && contactShareId) {
+      const share = shareById.get(contactShareId);
+      if (share) {
+        const resolved = resolveShareInviteOutcome(share, now);
+        if (resolved.outcome !== "live") {
+          entityPassed = true;
+          shareOutcome = resolved.outcome;
+          if (resolved.actionUrl) actionUrl = resolved.actionUrl;
+        }
+      }
+    }
+
+    return { ...r, actionUrl, entityPassed, shareOutcome };
   });
 });
 

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { resolveAvatarSrc } from "~/lib/avatar-src";
 
 import { AppShell } from "~/app/_components/app-shell";
+import { ContactHeroAvatar } from "~/app/_components/contact-hero-avatar";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactFamilyPanel } from "~/app/_components/contact-family-panel";
 import { ContactReminderOverride } from "~/app/_components/contact-reminder-override";
@@ -14,8 +14,10 @@ import {
 } from "~/app/_components/contact-inline-editor";
 import { MobileContactDetail } from "~/app/_components/mobile-contact-detail";
 import { ContactSharing } from "~/app/_components/contact-sharing";
+import { ContactBooksBlock } from "~/app/_components/contact-books-block";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
+import { ContactExportButton } from "~/app/_components/contact-export-button";
 import { MoreMenu } from "~/app/_components/more-menu";
 import { MergeWithButton } from "~/app/_components/merge-picker-button";
 import { LabelChip } from "~/app/_components/label-chip";
@@ -33,6 +35,7 @@ import { addContactToFamilyBook } from "~/app/actions/family";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { listMemberships } from "~/server/contact-book-membership";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
@@ -462,6 +465,31 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     : null;
   const lastEditedAt = lastFamilyEvent ? formatDate(lastFamilyEvent.createdAt, dateFormat) : null;
 
+  // P40-08: the contact-detail "Books" block — which personal books this contact
+  // lives in, plus the user's books for "Add to book". Personal contacts only
+  // (shared/team contacts live in GroupContact, not personal books) and only on
+  // the details tab.
+  const isPersonalContact = !isSharedContact && !teamContext;
+  const [contactMemberships, userBooksForBlock] =
+    detailTab === "details" && isPersonalContact
+      ? await Promise.all([
+          listMemberships(db, contact.id),
+          db.addressBook.findMany({
+            where: { userId: session.user.id, archivedAt: null },
+            orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+            select: { id: true, name: true },
+          }),
+        ])
+      : [[] as Awaited<ReturnType<typeof listMemberships>>, [] as { id: string; name: string }[]];
+  const bookNameById = new Map(userBooksForBlock.map((b) => [b.id, b.name]));
+  const booksBlockMemberships = contactMemberships
+    .filter((m) => bookNameById.has(m.addressBookId))
+    .map((m) => ({
+      bookId: m.addressBookId,
+      name: bookNameById.get(m.addressBookId)!,
+      isPrimary: m.isPrimary,
+    }));
+
   // Shared books — only needed on the sharing tab.
   const sharedBooks = await (detailTab === "sharing"
     ? db.group.findMany({
@@ -802,10 +830,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <Link
               className="flex h-[34px] items-center gap-1.5 rounded-[8px] border border-transparent px-3 text-[13px] font-semibold text-[#5c655e] transition hover:border-[#d8ddd6] hover:bg-[#f2f4f0]"
               href={`/contacts/${contact.id}?tab=sharing`}
+              replace
             >
               <WorkspaceIcon name="share" size={16} />
               Share
             </Link>
+            <ContactExportButton contactId={contact.id} contactName={contact.fullName} />
             <form action={contact.archivedAt ? restoreContact : archiveContact}>
               <input name="contactId" type="hidden" value={contact.id} />
               <button
@@ -882,10 +912,13 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   style={contact.avatarUrl ? undefined : { background: avatarBg, color: avatarFg }}
                 >
                   {contact.avatarUrl ? (
-                    <img
+                    <ContactHeroAvatar
                       alt={contact.fullName || contact.company || "Contact photo"}
-                      className="h-full w-full object-cover"
-                      src={resolveAvatarSrc(contact.avatarUrl) ?? contact.avatarUrl}
+                      avatarUrl={contact.avatarUrl}
+                      bg={avatarBg}
+                      className="h-full w-full"
+                      fg={avatarFg}
+                      initials={avatarInitials}
                     />
                   ) : avatarInitials ? (
                     avatarInitials
@@ -969,6 +1002,17 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               ))}
             </div>
 
+            {isPersonalContact && booksBlockMemberships.length > 0 ? (
+              <>
+                <div className="my-5 h-px bg-[#edf0ea]" />
+                <ContactBooksBlock
+                  contactId={contact.id}
+                  memberships={booksBlockMemberships}
+                  books={userBooksForBlock}
+                />
+              </>
+            ) : null}
+
             <div className="my-5 h-px bg-[#edf0ea]" />
 
             {/* quick actions — borderless icon buttons, hover fills surface */}
@@ -1026,6 +1070,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 aria-label="Share"
                 className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
                 href={`/contacts/${contact.id}?tab=sharing`}
+                replace
                 title="Share"
               >
                 <WorkspaceIcon name="share" size={17} />
@@ -1117,6 +1162,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               }`}
               href={`/contacts/${contact.id}?tab=${key}`}
               key={key}
+              replace
             >
               <WorkspaceIcon name={icon} size={16} />
               {label}

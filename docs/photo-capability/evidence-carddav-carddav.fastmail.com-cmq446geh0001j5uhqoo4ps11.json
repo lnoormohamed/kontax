@@ -1,0 +1,380 @@
+{
+  "harness": "phase44-photo-roundtrip",
+  "version": 1,
+  "account": {
+    "id": "cmq446geh0001j5uhqoo4ps11",
+    "provider": "CARDDAV",
+    "label": "Fastmail Personal",
+    "baseUrl": "https://carddav.fastmail.com",
+    "addressBookUrl": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default",
+    "userEmail": "li@linoormohamed.com"
+  },
+  "providerKey": "carddav-carddav.fastmail.com",
+  "vcardFlavor": 3,
+  "referenceImages": [
+    {
+      "id": "jpeg-100",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 100,
+      "height": 75,
+      "byteLength": 1423,
+      "sha256": "4f1edc8542f703cb4511b7606b099d452faf828e61d4e638f1c3e24bc5c85089",
+      "exifMarker": "kontax-p44 jpeg-100"
+    },
+    {
+      "id": "jpeg-512",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 512,
+      "height": 384,
+      "byteLength": 1829,
+      "sha256": "f68c81e622791e22bf243531f1e101fdafe222aa63d29314547a5ab690499ac5",
+      "exifMarker": "kontax-p44 jpeg-512"
+    },
+    {
+      "id": "jpeg-1024",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 1024,
+      "height": 768,
+      "byteLength": 5487,
+      "sha256": "f595bd95a63b248c140facf523bd8f6d88eda64b0bae7b162fd75dc7808437b0",
+      "exifMarker": "kontax-p44 jpeg-1024"
+    },
+    {
+      "id": "jpeg-2048",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 2048,
+      "height": 1536,
+      "byteLength": 19583,
+      "sha256": "71f7247d9bd5762080f79b51c1347571454eef66befdbe9dbd3d6f9c2a81d12a",
+      "exifMarker": "kontax-p44 jpeg-2048"
+    },
+    {
+      "id": "png-512",
+      "format": "png",
+      "mime": "image/png",
+      "vcardType": "PNG",
+      "width": 512,
+      "height": 384,
+      "byteLength": 6428,
+      "sha256": "706891e888e7013e0459d3482a71a6890a32e846585f96eaeb5d64b4c3f97d72",
+      "exifMarker": "kontax-p44 png-512"
+    },
+    {
+      "id": "webp-512",
+      "format": "webp",
+      "mime": "image/webp",
+      "vcardType": "WEBP",
+      "width": 512,
+      "height": 384,
+      "byteLength": 948,
+      "sha256": "62d4964b1968480ac2b723333668c66cfc932409f8bace5ca651808bddefe654",
+      "exifMarker": "kontax-p44 webp-512"
+    },
+    {
+      "id": "jpeg-large",
+      "format": "jpeg",
+      "mime": "image/jpeg",
+      "vcardType": "JPEG",
+      "width": 2448,
+      "height": 1836,
+      "byteLength": 3268251,
+      "sha256": "ad7bea33493c708ce3aa36060b00e8b6c2ab6540ccdf875920ac759e61916b5d",
+      "exifMarker": "kontax-p44 jpeg-large"
+    }
+  ],
+  "push": {
+    "at": "2026-07-02T16:18:05.692Z",
+    "results": [
+      {
+        "imageId": "jpeg-100",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-100",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-100.vcf",
+          "etag": "\"daf56651efd8dec00ec72d8fdd1b332981a12a95\""
+        }
+      },
+      {
+        "imageId": "jpeg-512",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-512",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-512.vcf",
+          "etag": "\"5807ff0cb1f650ba69c8f258c0ab596b4a2f9511\""
+        }
+      },
+      {
+        "imageId": "jpeg-1024",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-1024",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-1024.vcf",
+          "etag": "\"7a6c5bb28fce787ba02c68adaac9e3f25f412caf\""
+        }
+      },
+      {
+        "imageId": "jpeg-2048",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-2048",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-2048.vcf",
+          "etag": "\"df070ea5957bab4084a9da9d16d0c6b60916667d\""
+        }
+      },
+      {
+        "imageId": "png-512",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-png-512",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-png-512.vcf",
+          "etag": "\"761a33ae5b048def47ab85bed588fa038b3f19f6\""
+        }
+      },
+      {
+        "imageId": "webp-512",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-webp-512",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-webp-512.vcf",
+          "etag": "\"50a9e3aa405f46ad57b1c97f25e5a55bcef79ecc\""
+        }
+      },
+      {
+        "imageId": "jpeg-large",
+        "ok": true,
+        "httpStatus": 201,
+        "error": null,
+        "remote": {
+          "uid": "kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-large",
+          "href": "https://carddav.fastmail.com/dav/addressbooks/user/lan@lnoormohamed.com/Default/kontax-p44-photoqa-cmq446geh0001j5uhqoo4ps11-jpeg-large.vcf",
+          "etag": "\"881deac1d0532fa6cd77fab500bb668e1f6c1086\""
+        }
+      }
+    ]
+  },
+  "pulls": [
+    {
+      "label": "initial",
+      "at": "2026-07-02T16:18:20.216Z",
+      "results": [
+        {
+          "imageId": "jpeg-100",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "4f1edc8542f703cb4511b7606b099d452faf828e61d4e638f1c3e24bc5c85089",
+            "byteLength": 1423,
+            "width": 100,
+            "height": 75,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"daf56651efd8dec00ec72d8fdd1b332981a12a95\"",
+            "photoRawSha256": "21de07fd50d3b032211ef1ce53c3fba99f3477ddf285879d14b983817f743488",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/jpeg",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        },
+        {
+          "imageId": "jpeg-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "f68c81e622791e22bf243531f1e101fdafe222aa63d29314547a5ab690499ac5",
+            "byteLength": 1829,
+            "width": 512,
+            "height": 384,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"5807ff0cb1f650ba69c8f258c0ab596b4a2f9511\"",
+            "photoRawSha256": "9a59bbbf8f627b6b13715153e621d1d897f961dc0fde34f18750b682e27adc6a",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/jpeg",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        },
+        {
+          "imageId": "jpeg-1024",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "f595bd95a63b248c140facf523bd8f6d88eda64b0bae7b162fd75dc7808437b0",
+            "byteLength": 5487,
+            "width": 1024,
+            "height": 768,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"7a6c5bb28fce787ba02c68adaac9e3f25f412caf\"",
+            "photoRawSha256": "21b06e506cb9486b971d7ea2251166461e2cacbe0b25b970bb166621c8d93bc0",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/jpeg",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        },
+        {
+          "imageId": "jpeg-2048",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "71f7247d9bd5762080f79b51c1347571454eef66befdbe9dbd3d6f9c2a81d12a",
+            "byteLength": 19583,
+            "width": 2048,
+            "height": 1536,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"df070ea5957bab4084a9da9d16d0c6b60916667d\"",
+            "photoRawSha256": "8443075e424e35d71e017e9d90229e167b665d159095af1bd0b472f93a6cb0eb",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/jpeg",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        },
+        {
+          "imageId": "png-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "706891e888e7013e0459d3482a71a6890a32e846585f96eaeb5d64b4c3f97d72",
+            "byteLength": 6428,
+            "width": 512,
+            "height": 384,
+            "format": "png",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"761a33ae5b048def47ab85bed588fa038b3f19f6\"",
+            "photoRawSha256": "6ae97529bb51d81ce3eb3a0610a3e7d43860aebe5e488f62c93da3cf0573aac6",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/png",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        },
+        {
+          "imageId": "webp-512",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "62d4964b1968480ac2b723333668c66cfc932409f8bace5ca651808bddefe654",
+            "byteLength": 948,
+            "width": 512,
+            "height": 384,
+            "format": "webp",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"50a9e3aa405f46ad57b1c97f25e5a55bcef79ecc\"",
+            "photoRawSha256": "b549f70f78f6913b69b0c33755b9de4cb9074161c29cbaaabc44cb587e3a070b",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/webp",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        },
+        {
+          "imageId": "jpeg-large",
+          "found": true,
+          "error": null,
+          "photo": {
+            "sha256": "ad7bea33493c708ce3aa36060b00e8b6c2ab6540ccdf875920ac759e61916b5d",
+            "byteLength": 3268251,
+            "width": 2448,
+            "height": 1836,
+            "format": "jpeg",
+            "exifMarkerSurvived": true
+          },
+          "matchesPushedBytes": true,
+          "matchesPreviousPull": null,
+          "identifier": {
+            "etag": "\"881deac1d0532fa6cd77fab500bb668e1f6c1086\"",
+            "photoRawSha256": "ea3c4f9ee1553a91633b945139f40a2f316902c9908d17765ed0a64a792305b2",
+            "photoUri": null
+          },
+          "identifierStableWithinRun": true,
+          "extra": {
+            "returnedVCardVersion": "3.0",
+            "photoKind": "inline-b64",
+            "photoMime": "image/jpeg",
+            "uriFetchStatus": null,
+            "uriFetchAuthed": null
+          }
+        }
+      ]
+    }
+  ],
+  "cleanup": null
+}

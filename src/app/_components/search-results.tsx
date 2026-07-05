@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 
 import type { MatchField, SearchResult } from "~/app/api/contacts/search/route";
+import { ContactHeroAvatar } from "~/app/_components/contact-hero-avatar";
 import { LabelChip } from "~/app/_components/label-chip";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -173,9 +174,24 @@ function getInitials(primary: string | null | undefined, fallback?: string | nul
     .toUpperCase();
 }
 
-function ContactAvatar({ fullName, company, size }: { fullName: string | null | undefined; company?: string | null; size: number }) {
+function ContactAvatar({ fullName, company, size, avatarUrl }: { fullName: string | null | undefined; company?: string | null; size: number; avatarUrl?: string | null }) {
   const [bg, fg] = tintForName(fullName, company);
   const initials = getInitials(fullName, company);
+  // P46-02: show the contact photo (thumb → canonical → initials fallback), the
+  // same chain as the list rows and detail hero. Search used to be initials-only.
+  if (avatarUrl) {
+    return (
+      <ContactHeroAvatar
+        avatarUrl={avatarUrl}
+        alt={fullName?.trim() || company?.trim() || "Contact photo"}
+        initials={initials}
+        bg={bg}
+        fg={fg}
+        size={size}
+        style={{ borderRadius: "50%", fontSize: size * 0.36, fontWeight: 600, flexShrink: 0 }}
+      />
+    );
+  }
   return (
     <span
       style={{
@@ -351,7 +367,7 @@ export function SearchResultRow({ result, q, active, onOpen, onHover, mob, label
       onMouseLeave={undefined}
       className={`se-row${active ? " se-row--active" : ""}`}
     >
-      <ContactAvatar fullName={result.name} company={result.company} size={mob ? 44 : 40} />
+      <ContactAvatar fullName={result.name} company={result.company} size={mob ? 44 : 40} avatarUrl={result.avatarUrl} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{
@@ -439,7 +455,10 @@ export function SearchResultsList({
   return (
     <div>
       {sections.map((s) => {
-        const cap = s.field === "name" ? NAME_CAP : GROUP_CAP;
+        // Mobile search is a full-screen, scrollable overlay — show every result
+        // instead of capping to a "+N more" expander (that cap keeps the compact
+        // desktop dropdown short). P46.
+        const cap = mob ? Infinity : s.field === "name" ? NAME_CAP : GROUP_CAP;
         const isExpanded = expanded[s.field];
         const shown = isExpanded ? s.rows : s.rows.slice(0, cap);
         const hidden = s.rows.length - shown.length;

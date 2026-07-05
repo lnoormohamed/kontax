@@ -376,8 +376,16 @@ const buildContactWriteDataFromRemoteSnapshot = (
     ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
     : [];
 
+  // P44-05: only touch avatarUrl when the snapshot carries it (newer conflicts);
+  // pre-P44-05 snapshots omit it → the local photo is left untouched.
+  const avatarPatch =
+    "avatarUrl" in snapshot
+      ? { avatarUrl: typeof snapshot.avatarUrl === "string" ? snapshot.avatarUrl : null }
+      : {};
+
   const writeData = {
     fullName,
+    ...avatarPatch,
     firstName: typeof snapshot.firstName === "string" ? snapshot.firstName : null,
     middleName: typeof snapshot.middleName === "string" ? snapshot.middleName : null,
     lastName: typeof snapshot.lastName === "string" ? snapshot.lastName : null,
@@ -947,6 +955,39 @@ export const activateSyncAccount = async (formData: FormData) => {
   // internal sub-request and bounces the user to /login (see queueSyncJob).
   // Re-render in place; revalidate reflects the new ACTIVE status.
   revalidateSyncViews();
+};
+
+// ── P39-02: deletion-safety hold review + the two resume paths ───────────────
+// Thin auth/revalidate wrappers — the flows live in
+// src/server/sync-deletion-resume.ts so the P39-08 QA harness can exercise
+// the exact product code paths headlessly.
+
+/** Review payload for the paused-for-deletions surface (P39-DB01 §1a/1d). */
+export const getDeletionHoldReview = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const syncAccountId = parseSyncAccountId(formData);
+  const { getDeletionHoldReviewCore } = await import("~/server/sync-deletion-resume");
+  return getDeletionHoldReviewCore(userId, syncAccountId);
+};
+
+/** "Resume without deleting" (P39-DB01 §1c). */
+export const resumeSyncWithoutDeletions = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const syncAccountId = parseSyncAccountId(formData);
+  const { resumeSyncWithoutDeletionsCore } = await import("~/server/sync-deletion-resume");
+  const result = await resumeSyncWithoutDeletionsCore(userId, syncAccountId);
+  revalidateSyncViews();
+  return result;
+};
+
+/** "Resume and allow deletions" (P39-DB01 §1f, post-confirm). */
+export const resumeSyncAllowDeletions = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const syncAccountId = parseSyncAccountId(formData);
+  const { resumeSyncAllowDeletionsCore } = await import("~/server/sync-deletion-resume");
+  const result = await resumeSyncAllowDeletionsCore(userId, syncAccountId);
+  revalidateSyncViews();
+  return result;
 };
 
 export type SyncReconnectMatch = {
@@ -1682,7 +1723,56 @@ export const resolveSyncConflict = async (formData: FormData) => {
 
   const resolvedAt = new Date();
 
-  if (input.resolutionStrategy === "KEEP_LOCAL") {
+  // P44-05: a photo-only conflict resolves by reseeding the link's photoShadow,
+  // not by the field-apply/push paths below (those assume a field snapshot). The
+  // provider write happens on the next photo pass: KEEP_REMOTE applies the
+  // staged remote photo locally + settles the shadow → no-op next pass;
+  // KEEP_LOCAL clears the local shadow half so the next pass pushes local.
+  // MANUAL_MERGE has no field-level meaning for a single image → treated as
+  // KEEP_LOCAL.
+  const photoLocalSnap = isRecord(conflict.localSnapshot) ? conflict.localSnapshot : null;
+  const isPhotoConflict = photoLocalSnap?.__photoConflict === true;
+  if (isPhotoConflict && conflict.syncContactLinkId) {
+    const remoteSnap = isRecord(conflict.remoteSnapshot) ? conflict.remoteSnapshot : null;
+    const photo = remoteSnap && isRecord(remoteSnap.__photo) ? remoteSnap.__photo : null;
+    const str = (v: unknown) => (typeof v === "string" ? v : null);
+    const signalKind =
+      photo?.signalKind === "resourceIdentifier" ? "resourceIdentifier" : "contentHash";
+    const keepRemote = input.resolutionStrategy === "KEEP_REMOTE";
+    const remoteAvatarUrl = str(photo?.remoteAvatarUrl);
+    const reseed = keepRemote
+      ? {
+          signalKind,
+          remoteSignal: str(photo?.remoteSignal),
+          remoteCanonicalHash: str(photo?.remoteCanonicalHash),
+          localAvatarUrl: remoteAvatarUrl,
+          localPhotoHash: str(photo?.remoteLocalPhotoHash),
+          lastSyncedRemoteAt: null,
+          lastPushRejected: false,
+        }
+      : {
+          // Local wins → local reads "changed" next pass (null shadow half).
+          signalKind,
+          remoteSignal: str(photo?.remoteSignal),
+          remoteCanonicalHash: str(photo?.remoteCanonicalHash),
+          localAvatarUrl: null,
+          localPhotoHash: null,
+          lastSyncedRemoteAt: null,
+          lastPushRejected: false,
+        };
+    await db.$transaction(async (tx) => {
+      if (keepRemote && conflict.contactId && remoteAvatarUrl) {
+        await tx.contact.update({
+          where: { id: conflict.contactId },
+          data: { avatarUrl: remoteAvatarUrl },
+        });
+      }
+      await tx.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId! },
+        data: { photoShadow: reseed as unknown as Prisma.InputJsonValue },
+      });
+    });
+  } else if (input.resolutionStrategy === "KEEP_LOCAL") {
     if (
       !conflict.contact ||
       !syncAccount.addressBookUrl ||
@@ -1727,7 +1817,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "KEEP_REMOTE") {
+  if (!isPhotoConflict && input.resolutionStrategy === "KEEP_REMOTE") {
     if (!conflict.contactId) {
       throw new Error(
         "This conflict cannot keep the remote version because the local contact is missing.",
@@ -1770,7 +1860,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "DUPLICATE_LOCAL") {
+  if (!isPhotoConflict && input.resolutionStrategy === "DUPLICATE_LOCAL") {
     if (!conflict.contact) {
       throw new Error(
         "This conflict cannot duplicate the local contact because the current record is missing.",
@@ -1840,7 +1930,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "ARCHIVE_LOCAL") {
+  if (!isPhotoConflict && input.resolutionStrategy === "ARCHIVE_LOCAL") {
     if (!conflict.contactId) {
       throw new Error(
         "This conflict cannot archive the local contact because it is missing.",
@@ -1869,7 +1959,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
     }
   }
 
-  if (input.resolutionStrategy === "MANUAL_MERGE") {
+  if (!isPhotoConflict && input.resolutionStrategy === "MANUAL_MERGE") {
     if (
       !conflict.contactId ||
       !conflict.contact ||
@@ -2149,10 +2239,21 @@ const updateSyncAccountSettingsSchema = z.object({
   // Sync window: local hour 0–23, or null for no restriction. Both or neither.
   syncWindowStart: z.number().int().min(0).max(23).nullable().optional(),
   syncWindowEnd: z.number().int().min(0).max(23).nullable().optional(),
+  // P39-01: IANA timezone the window hours are expressed in. The client sends
+  // Intl.DateTimeFormat().resolvedOptions().timeZone alongside window changes so
+  // the runner evaluates the window on the user's wall clock across DST.
+  syncWindowTimezone: z.string().min(1).max(64).nullable().optional(),
   excludedFields: z.array(z.string().min(1)).max(32).optional(),
   exportLabelFilter: z.array(z.string().min(1)).max(64).optional(),
   // 0 = never auto-pause; null = platform default (5).
   maxAttemptsBeforePause: z.number().int().min(0).max(100).nullable().optional(),
+  // P41-DB01 projection config. destinationBookId lives on SyncAccount; the rest
+  // on SyncAccountSettings. All book ids are validated to belong to the user.
+  destinationBookId: z.string().min(1).nullable().optional(),
+  projectionBookIds: z.array(z.string().min(1)).max(64).optional(),
+  fieldPrecedence: z.enum(["work", "personal"]).nullable().optional(),
+  // Surface 5B — persisted but only consumed when projectionRouting is enabled.
+  conflictOverride: z.enum(["account_default", "remote_wins", "queue_review"]).nullable().optional(),
 });
 
 export type UpdateSyncAccountSettingsInput = z.infer<typeof updateSyncAccountSettingsSchema>;
@@ -2182,9 +2283,14 @@ export const updateSyncAccountSettings = async (
     notifyOnFailure,
     syncWindowStart,
     syncWindowEnd,
+    syncWindowTimezone,
     excludedFields,
     exportLabelFilter,
     maxAttemptsBeforePause,
+    destinationBookId,
+    projectionBookIds,
+    fieldPrecedence,
+    conflictOverride,
   } = parsed.data;
 
   // A sync window needs both bounds or neither — reject a half-open range.
@@ -2226,6 +2332,7 @@ export const updateSyncAccountSettings = async (
           notifyOnFailure: true,
           syncWindowStart: true,
           syncWindowEnd: true,
+          syncWindowTimezone: true,
           excludedFields: true,
           exportLabelFilter: true,
           maxAttemptsBeforePause: true,
@@ -2250,6 +2357,23 @@ export const updateSyncAccountSettings = async (
 
   if (capabilityProfileOverride !== undefined && account.provider !== "CARDDAV") {
     return { ok: false, error: "Only CardDAV connections can override provider capabilities." };
+  }
+
+  // P41-DB01: every projected / destination book id must belong to this user and
+  // still exist (not archived). Guards against stale ids and cross-user writes.
+  const referencedBookIds = [
+    ...(destinationBookId ? [destinationBookId] : []),
+    ...(projectionBookIds ?? []),
+  ];
+  if (referencedBookIds.length > 0) {
+    const owned = await db.addressBook.findMany({
+      where: { id: { in: referencedBookIds }, userId, archivedAt: null },
+      select: { id: true },
+    });
+    const ownedIds = new Set(owned.map((b) => b.id));
+    if (referencedBookIds.some((id) => !ownedIds.has(id))) {
+      return { ok: false, error: "One of the selected books could not be found." };
+    }
   }
 
   // P23-04: a change to a pulling direction (TWO_WAY / IMPORT_ONLY) may need to
@@ -2282,9 +2406,14 @@ export const updateSyncAccountSettings = async (
     ...(notifyOnFailure !== undefined ? { notifyOnFailure } : {}),
     ...(syncWindowStart !== undefined ? { syncWindowStart } : {}),
     ...(syncWindowEnd !== undefined ? { syncWindowEnd } : {}),
+    ...(syncWindowTimezone !== undefined ? { syncWindowTimezone } : {}),
     ...(excludedFields !== undefined ? { excludedFields } : {}),
     ...(exportLabelFilter !== undefined ? { exportLabelFilter } : {}),
     ...(maxAttemptsBeforePause !== undefined ? { maxAttemptsBeforePause } : {}),
+    // P41-DB01 projection config (destinationBookId is on SyncAccount, below).
+    ...(projectionBookIds !== undefined ? { projectionBookIds } : {}),
+    ...(fieldPrecedence !== undefined ? { fieldPrecedence } : {}),
+    ...(conflictOverride !== undefined ? { conflictOverride } : {}),
   };
 
   await db.$transaction(async (tx) => {
@@ -2301,6 +2430,15 @@ export const updateSyncAccountSettings = async (
       await tx.syncAccount.update({
         where: { id: syncAccountId },
         data: { syncDirection },
+      });
+    }
+
+    // P41-DB01: destinationBookId lives on SyncAccount (the inbound-landing book).
+    // undefined = untouched; null = clear back to the primary-book default.
+    if (destinationBookId !== undefined) {
+      await tx.syncAccount.update({
+        where: { id: syncAccountId },
+        data: { destinationBookId },
       });
     }
 
@@ -2440,6 +2578,7 @@ export const updateSyncAccountSettings = async (
   diffScalar("notifyOnFailure", prev?.notifyOnFailure, notifyOnFailure);
   diffScalar("syncWindowStart", prev?.syncWindowStart, syncWindowStart);
   diffScalar("syncWindowEnd", prev?.syncWindowEnd, syncWindowEnd);
+  diffScalar("syncWindowTimezone", prev?.syncWindowTimezone, syncWindowTimezone);
   diffScalar("maxAttemptsBeforePause", prev?.maxAttemptsBeforePause, maxAttemptsBeforePause);
   diffArray("excludedFields", prev?.excludedFields, excludedFields);
   diffArray("exportLabelFilter", prev?.exportLabelFilter, exportLabelFilter);
@@ -2486,9 +2625,14 @@ export const completeSyncSetup = async (
     notifyOnFailure,
     syncWindowStart,
     syncWindowEnd,
+    syncWindowTimezone,
     excludedFields,
     exportLabelFilter,
     maxAttemptsBeforePause,
+    destinationBookId,
+    projectionBookIds,
+    fieldPrecedence,
+    conflictOverride,
   } = parsed.data;
 
   if ((syncWindowStart == null) !== (syncWindowEnd == null)) {
@@ -2533,6 +2677,22 @@ export const completeSyncSetup = async (
     return { ok: false, error: "Only CardDAV connections can override provider capabilities." };
   }
 
+  // P41-DB01: validate any projected / destination book id belongs to this user.
+  const setupBookIds = [
+    ...(destinationBookId ? [destinationBookId] : []),
+    ...(projectionBookIds ?? []),
+  ];
+  if (setupBookIds.length > 0) {
+    const owned = await db.addressBook.findMany({
+      where: { id: { in: setupBookIds }, userId, archivedAt: null },
+      select: { id: true },
+    });
+    const ownedIds = new Set(owned.map((b) => b.id));
+    if (setupBookIds.some((id) => !ownedIds.has(id))) {
+      return { ok: false, error: "One of the selected books could not be found." };
+    }
+  }
+
   const settingsPatch = {
     ...(syncDirection ? { syncDirection } : {}),
     ...(conflictPolicy ? { conflictPolicy } : {}),
@@ -2543,9 +2703,13 @@ export const completeSyncSetup = async (
     ...(notifyOnFailure !== undefined ? { notifyOnFailure } : {}),
     ...(syncWindowStart !== undefined ? { syncWindowStart } : {}),
     ...(syncWindowEnd !== undefined ? { syncWindowEnd } : {}),
+    ...(syncWindowTimezone !== undefined ? { syncWindowTimezone } : {}),
     ...(excludedFields !== undefined ? { excludedFields } : {}),
     ...(exportLabelFilter !== undefined ? { exportLabelFilter } : {}),
     ...(maxAttemptsBeforePause !== undefined ? { maxAttemptsBeforePause } : {}),
+    ...(projectionBookIds !== undefined ? { projectionBookIds } : {}),
+    ...(fieldPrecedence !== undefined ? { fieldPrecedence } : {}),
+    ...(conflictOverride !== undefined ? { conflictOverride } : {}),
   };
 
   const now = new Date();
@@ -2561,7 +2725,11 @@ export const completeSyncSetup = async (
     });
     await tx.syncAccount.update({
       where: { id: syncAccountId },
-      data: { setupCompletedAt: now, ...(syncDirection ? { syncDirection } : {}) },
+      data: {
+        setupCompletedAt: now,
+        ...(syncDirection ? { syncDirection } : {}),
+        ...(destinationBookId !== undefined ? { destinationBookId } : {}),
+      },
     });
     // Queue the held first sync. EXPORT_ONLY has nothing to pull and isn't runnable
     // in the live slice yet, so skip it (mirrors updateSyncAccountSettings).
@@ -2590,6 +2758,47 @@ export const completeSyncSetup = async (
       syncAccountId,
       changes: [{ field: "setupCompletedAt", before: null, after: now.toISOString() }],
     },
+  });
+
+  revalidateSyncViews();
+  return { ok: true };
+};
+
+// P41-DB01 §4A: dismiss the "two iCloud accounts may merge on the device" caveat
+// for this connection. Shown once per (device, provider); dismissal persists so
+// it never re-nags. Not an elevated setting — it's a UI acknowledgement.
+const dismissProjectionAutolinkCaveatSchema = z.object({
+  syncAccountId: z.string().min(1, "Sync account id is required."),
+});
+
+export const dismissProjectionAutolinkCaveat = async (
+  input: z.infer<typeof dismissProjectionAutolinkCaveatSchema>,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  let userId: string;
+  try {
+    userId = await getRequiredUserId();
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+  }
+
+  const parsed = dismissProjectionAutolinkCaveatSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid request." };
+  }
+  const { syncAccountId } = parsed.data;
+
+  const account = await db.syncAccount.findFirst({
+    where: currentSyncAccountWhere(userId, syncAccountId),
+    select: { id: true },
+  });
+  if (!account) {
+    return { ok: false, error: "Sync account not found." };
+  }
+
+  await db.syncAccountSettings.upsert({
+    where: { syncAccountId },
+    create: { syncAccountId, autolinkCaveatDismissedAt: new Date() },
+    update: { autolinkCaveatDismissedAt: new Date() },
   });
 
   revalidateSyncViews();

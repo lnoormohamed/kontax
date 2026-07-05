@@ -16,15 +16,29 @@ import { BulkEditToolbar, type ToolbarBook } from "~/app/_components/bulk-edit-t
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
+import { AlphabetScrubber } from "~/app/_components/contact-list/alphabet-scrubber";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { resolveAvatarSrc } from "~/lib/avatar-src";
+import { bucketLetter, compareBucketLetters } from "~/lib/contact-index";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
+import {
+  CONTACT_LIST_RESTORE_PARAM,
+  CONTACT_LIST_SCROLL_KEY,
+  CONTACT_LIST_SCROLL_MAX_AGE,
+} from "~/lib/contact-list-scroll";
 import { getDisplayName } from "~/lib/display-name";
+import { useResolvedRowLabels, type ResolvedRowLabels } from "~/lib/interface-preferences";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   loadWorkspaceContactsPage,
   type WorkspaceListRequest,
 } from "~/app/actions/workspace-list";
+
+// Module-scoped so it survives the list unmount/remount cycle of an in-app
+// back navigation (a component ref would reset). Flipped true the first time
+// the list's scroll-restore effect runs in this document session — used to
+// scope the mobile "reload" guard to the *initial* load only (see below).
+let listRestoreInitialLoadHandled = false;
 
 // P38-01: lean row shape — only what a row renders. Full contact data (notes,
 // sync state, phonetic fields, dates) stays server-side in contacts/page.tsx.
@@ -43,6 +57,9 @@ type WorkspaceContact = {
   sharedKind: "family" | "team" | null;
   // P31B-06: JSON string[] from Prisma (optional — may be absent on older data)
   labels?: unknown;
+  // P46-01: the list's primary sort key (lowercased). bucketLetter() folds it to
+  // an A–Z index letter so the scrubber, section headers, and sort share one key.
+  sortName: string;
   // P38-01: server-computed excerpt, set when the search query matched notes.
   noteMatchSnippet?: string | null;
 };
@@ -61,6 +78,8 @@ type ContactsWorkspaceTableProps = {
   groupByLetter: boolean;
   query: string;
   nameDisplayOrder?: "first-last" | "last-first";
+  // P43-01: saved "Labels on rows" value; resolved per-device inside the table.
+  rowLabels?: "hover" | "always" | "off";
   // P28-04: bulk-edit toolbar data.
   books: ToolbarBook[];
   labelSuggestions: string[];
@@ -101,14 +120,12 @@ const getInitials = (primary: string | null | undefined, fallback?: string | nul
     .toUpperCase();
 };
 
-const getGroupLetter = (contact: WorkspaceContact) => {
-  const fullName = contact.fullName?.trim() ?? "";
-  const company = contact.company?.trim() ?? "";
-  const source = fullName.length > 0 ? fullName : company;
-  const lastToken = source.split(/\s+/).filter(Boolean).pop() ?? "";
-  const first = (lastToken[0] ?? source[0] ?? "#").toUpperCase();
-  return /[A-Z]/.test(first) ? first : "#";
-};
+// P46-01: the section letter now derives from the row's primary sort key via
+// the shared bucketLetter(), so the header a contact sits under always matches
+// where it sorts (and where the scrubber jumps). This replaces the old
+// last-token heuristic, which bucketed diacritic and CJK names under "#" even
+// when they sorted among the Latin letters.
+const getGroupLetter = (contact: WorkspaceContact) => bucketLetter(contact.sortName);
 
 // P33-05: when query is active, show why a contact matched if it's not
 // immediately obvious from the visible name/company/email/phone cells.
@@ -271,7 +288,10 @@ function RowActions({
       </Link>
       <button
         aria-label="More actions"
-        className={`grid ${triggerClassName} lg:hidden lg:group-hover:grid`}
+        // P46-DB04 §1·A — the mobile row's right edge is star + swipe gestures,
+        // no kebab. Hidden below lg; on desktop it still appears on row hover.
+        // Archive / Delete permanently remain on the contact's detail screen.
+        className={`hidden ${triggerClassName} lg:group-hover:grid`}
         onClick={(event) => {
           event.stopPropagation();
           setMenuOpen((open) => !open);
@@ -368,16 +388,48 @@ const parseLabels = (raw: unknown): string[] => {
   return raw.filter((v): v is string => typeof v === "string");
 };
 
+// P43-01 "Labels on rows: always" — full chips inline on every row, with a +N
+// roll-up past a small cap so long lists don't wrap the name column.
+const ALWAYS_INLINE_CAP = 3;
+const AlwaysRowChips = memo(function AlwaysRowChips({
+  labels,
+  labelColors,
+}: {
+  labels: string[];
+  labelColors: Record<string, string>;
+}) {
+  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
+  const shown = labels.slice(0, ALWAYS_INLINE_CAP);
+  const overflow = labels.length - shown.length;
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, flexShrink: 1, minWidth: 0, flexWrap: "nowrap", overflow: "hidden" }}>
+      {shown.map((name, i) => (
+        <LabelChip key={`${name}-${i}`} name={name} col={col(name)} sz="sm" />
+      ))}
+      {overflow > 0 && (
+        <span style={{ color: "#8b938c", fontSize: 11, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>
+          +{overflow}
+        </span>
+      )}
+    </span>
+  );
+});
+
 // Compact list labels: dot cluster + optional +N overflow, matching the
 // compact contact-row treatment from the handoff and browser screenshots.
+// P43-01: `mode` decides the treatment — "hover" (default, dot cluster with a
+// hover overlay of full chips), "always" (full chips inline). "off" is handled
+// by the caller, which skips rendering this element entirely.
 const RowLabelChips = memo(function RowLabelChips({
   labels,
   labelColors,
   isMobile,
+  mode = "hover",
 }: {
   labels: string[];
   labelColors: Record<string, string>;
   isMobile?: boolean;
+  mode?: ResolvedRowLabels;
 }) {
   const [overflowOpen, setOverflowOpen] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
@@ -447,6 +499,12 @@ const RowLabelChips = memo(function RowLabelChips({
 
   if (labels.length === 0) return null;
 
+  // "Always" renders full chips inline; the hover overlay machinery above is
+  // inert in this mode (no mouse-enter handlers wired below).
+  if (mode === "always") {
+    return <AlwaysRowChips labels={labels} labelColors={labelColors} />;
+  }
+
   return (
     <span
       ref={anchorRef}
@@ -505,6 +563,7 @@ const ContactRow = memo(function ContactRow({
   selected,
   focused,
   labelColors,
+  rowLabels,
   nameDisplayOrder,
   onToggleSelect,
   onArchived,
@@ -518,6 +577,8 @@ const ContactRow = memo(function ContactRow({
   selected: boolean;
   focused: boolean;
   labelColors: Record<string, string>;
+  // P43-01: device-resolved "Labels on rows" mode for this table.
+  rowLabels: ResolvedRowLabels;
   nameDisplayOrder?: "first-last" | "last-first";
   onToggleSelect: (id: string, shiftKey: boolean) => void;
   onArchived: (contactId: string) => void;
@@ -583,7 +644,12 @@ const ContactRow = memo(function ContactRow({
     </span>
   );
 
-  const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
+  // P46-DB04 §1·B — the stacked (mobile/cozy) row shows ONE secondary line:
+  // company → email → phone, first non-empty. (Previously it concatenated all
+  // three with "·", which over-stuffed the row.) The desktop compact grid keeps
+  // its own company/email/phone columns below and is unaffected.
+  const primaryDetail = [contact.company, contact.email, contact.phone].find((value) => value?.trim());
+  const meta = primaryDetail ? [primaryDetail] : [];
   const contactLabels = parseLabels(contact.labels);
   const matchSnippet = inferMatchSnippet(contact, query);
   const mobileContext = [
@@ -618,7 +684,7 @@ const ContactRow = memo(function ContactRow({
             ? meta.map((value, index) => (
                 <span key={index}>
                   {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
-                  <Highlight query={query} text={value!} />
+                  <Highlight query={query} text={value} />
                 </span>
               ))
             : "No details yet"}
@@ -666,14 +732,16 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
-          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} labelColors={labelColors} isMobile />}
+          {rowLabels !== "off" && contactLabels.length > 0 && (
+            <RowLabelChips labels={contactLabels} labelColors={labelColors} mode={rowLabels} isMobile />
+          )}
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
           {meta.length > 0
             ? meta.map((value, index) => (
                 <span key={index}>
                   {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
-                  <Highlight query={query} text={value!} />
+                  <Highlight query={query} text={value} />
                 </span>
               ))
             : "No details yet"}
@@ -744,7 +812,9 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
-          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} labelColors={labelColors} />}
+          {rowLabels !== "off" && contactLabels.length > 0 && (
+            <RowLabelChips labels={contactLabels} labelColors={labelColors} mode={rowLabels} />
+          )}
         </div>
         <div className="truncate text-[13px] text-[#5c655e]">
           <Cell query={query} value={contact.company} />
@@ -815,9 +885,6 @@ type VRow =
 
 const FAVE_H = 28; // Favourites header — same height as letter headers
 const LETTER_H = 28; // Alphabetical letter headers per design spec
-const CONTACT_LIST_SCROLL_KEY = "kontax:contacts:list-scroll";
-const CONTACT_LIST_SCROLL_MAX_AGE = 10 * 60 * 1000;
-const CONTACT_LIST_RESTORE_PARAM = "restoreContact";
 
 const getScrollParent = (node: HTMLElement | null) => {
   let el: Element | null = node?.parentElement ?? null;
@@ -849,12 +916,16 @@ export function ContactsWorkspaceTable({
   groupByLetter,
   query,
   nameDisplayOrder,
+  rowLabels,
   books,
   labelSuggestions,
   smartLists,
   labelRegistry,
 }: ContactsWorkspaceTableProps) {
   const router = useRouter();
+  // P43-01: resolve the desktop-only "Labels on rows" knob once per table (a
+  // context/hook read here, never per row) so the virtualized rows stay cheap.
+  const resolvedRowLabels = useResolvedRowLabels(rowLabels);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   // Anchor for shift-click range selection — the last row toggled without shift.
   const selectionAnchorRef = useRef<string | null>(null);
@@ -877,6 +948,32 @@ export function ContactsWorkspaceTable({
   useEffect(() => {
     setScrollEl(getScrollParent(listRef.current));
   }, []);
+
+  // P46-01: the alphabet scrubber is a touch affordance — it ships on the mobile
+  // list only (desktop uses the scrollbar). Tracks the same 1023px breakpoint the
+  // list uses to switch to stacked rows.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const apply = () => setIsMobile(mql.matches);
+    apply();
+    mql.addEventListener("change", apply);
+    return () => mql.removeEventListener("change", apply);
+  }, []);
+
+  // P46-01: the scrubber's "long enough to need it" gate compares content height
+  // to the viewport, so the viewport height must be reactive — a rotation or
+  // keyboard resize re-evaluates whether the rail earns its place.
+  const [scrollViewportH, setScrollViewportH] = useState(0);
+  useEffect(() => {
+    if (!scrollEl) return;
+    const update = () => setScrollViewportH(scrollEl.clientHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(scrollEl);
+    return () => ro.disconnect();
+  }, [scrollEl]);
 
   const labelColors = useMemo(
     () => Object.fromEntries(labelRegistry.map((l) => [l.name.toLowerCase(), l.color])),
@@ -994,6 +1091,23 @@ export function ContactsWorkspaceTable({
     url.searchParams.set(CONTACT_LIST_RESTORE_PARAM, contactId);
     window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
 
+    // How far down the scroll viewport the tapped row currently sits. On mobile
+    // the restore anchors this row to the viewport top and then nudges it back
+    // down by this offset, reproducing the exact position the list was in —
+    // which a raw scrollTop can't, because rows with a label sub-line are
+    // taller than the virtualiser's estimate and shift the pixel mapping once
+    // re-measured.
+    let contactOffset: number | null = null;
+    if (activeScrollEl) {
+      const rowEl = activeScrollEl
+        .querySelector(`a[href="/contacts/${contactId}"]`)
+        ?.closest<HTMLElement>("[data-index]");
+      if (rowEl) {
+        contactOffset =
+          rowEl.getBoundingClientRect().top - activeScrollEl.getBoundingClientRect().top;
+      }
+    }
+
     sessionStorage.setItem(
       CONTACT_LIST_SCROLL_KEY,
       JSON.stringify({
@@ -1001,6 +1115,7 @@ export function ContactsWorkspaceTable({
         key: scrollMemoryKey,
         contactId,
         scrollTop: activeScrollEl?.scrollTop ?? null,
+        contactOffset,
         windowY: window.scrollY,
       }),
     );
@@ -1085,7 +1200,7 @@ export function ContactsWorkspaceTable({
       bucket.push(contact);
       map.set(letter, bucket);
     }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+    return [...map.entries()].sort(([a], [b]) => compareBucketLetters(a, b));
   }, [groupByLetter, isSearching, rest]);
 
   // Flatten groups + favorites into a single array for the virtualizer.
@@ -1137,7 +1252,13 @@ export function ContactsWorkspaceTable({
     [orderedVisibleIds],
   );
 
-  const rowH = viewMode === "cozy" ? 60 : 52;
+  // P46-DB04 §D4 — cozy is the canonical mobile row (40px avatar, name + one
+  // secondary line). The density toggle isn't reachable on mobile, so below
+  // 1024px we always render cozy; desktop keeps its selected mode (compact grid
+  // by default). Explicit density choices still apply on desktop.
+  const effectiveViewMode = isMobile ? "cozy" : viewMode;
+
+  const rowH = effectiveViewMode === "cozy" ? 60 : 52;
 
   const virtualizer = useVirtualizer({
     count: flatRows.length,
@@ -1281,7 +1402,17 @@ export function ContactsWorkspaceTable({
 
   const stickySection = useMemo(() => {
     if (virtualItems.length === 0) return null;
-    const listOffsetTop = listRef.current?.offsetTop ?? 0;
+    // Distance from the scroller's scrollable-content origin to the virtual list.
+    // `offsetTop` is unreliable here: the scroll container is position:static, so
+    // the list's offsetParent is an ancestor *above* the scroll area, making
+    // offsetTop include the fixed header/banner and shifting section detection an
+    // extra ~section early (P46-01 surfaced this via the rail's current-letter).
+    // Measure the gap directly against the scroller instead.
+    const listEl = listRef.current;
+    const listOffsetTop =
+      listEl && scrollEl
+        ? listEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop
+        : (listEl?.offsetTop ?? 0);
     const offset = Math.max(0, (scrollEl?.scrollTop ?? 0) - listOffsetTop + 2);
     let topIndex = virtualItems[0]!.index;
     for (const item of virtualItems) {
@@ -1293,7 +1424,61 @@ export function ContactsWorkspaceTable({
       if (row?.type === "group-header") return row;
     }
     return null;
-  }, [flatRows, scrollEl?.scrollTop, virtualItems]);
+    // virtualItems changes on every scroll frame, so the memo recomputes then and
+    // reads the current scrollEl.scrollTop inside.
+  }, [flatRows, scrollEl, virtualItems]);
+
+  // P46-01 — alphabet scrubber wiring.
+  //
+  // The rail is a map of the present letters and it derives entirely from the
+  // grouped rows the list already builds, so bucket = header = rail by
+  // construction. Favourites are not indexed (grouping runs over `rest`).
+  const scrubberSections = useMemo(
+    () => (groups ? groups.map(([letter, bucket]) => ({ letter, count: bucket.length })) : []),
+    [groups],
+  );
+  // First flat-row index for each present letter — the jump target for that letter.
+  const letterRowIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    flatRows.forEach((row, index) => {
+      if (row.type === "group-header" && !row.favorites && !map.has(row.label)) {
+        map.set(row.label, index);
+      }
+    });
+    return map;
+  }, [flatRows]);
+  const scrollToLetter = useCallback(
+    (letter: string) => {
+      const index = letterRowIndex.get(letter);
+      if (index === undefined) return;
+      // Jumps are instant (like a native phone-book index). We can't use a smooth
+      // scroll here: @tanstack/react-virtual drops behavior:"smooth" under dynamic
+      // measurement, and a native smooth scrollTo to a precomputed offset stalls
+      // mid-list because rows re-measure and shift the target as it travels.
+      // scrollToIndex self-corrects the offset as rows measure, so it lands true.
+      virtualizer.scrollToIndex(index, { align: "start" });
+    },
+    [letterRowIndex, virtualizer],
+  );
+  // The passive "where am I" letter — the current section, unless it's Favourites.
+  const activeScrubLetter =
+    stickySection && !stickySection.favorites ? stickySection.label : null;
+  // The rail must map the WHOLE list, not just the windows loaded so far — or it
+  // grows letter-by-letter as you scroll and drops the late letters (W–Z) that
+  // live in unloaded tail windows. So when a long, name-sorted mobile list is in
+  // view we eagerly pull the remaining windows, and only show the rail once the
+  // full set is loaded (`!hasMore`) — it appears complete instead of filling in.
+  const railListEligible =
+    isMobile &&
+    groups !== null &&
+    scrollViewportH > 0 &&
+    virtualizer.getTotalSize() > 2 * scrollViewportH;
+
+  useEffect(() => {
+    if (railListEligible && hasMore && !loadingMore) loadMore();
+  }, [railListEligible, hasMore, loadingMore, loadMore]);
+
+  const showScrubber = railListEligible && !hasMore && scrubberSections.length >= 4;
 
   const restoredScrollRef = useRef(false);
   const restoreTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
@@ -1303,7 +1488,14 @@ export function ContactsWorkspaceTable({
 
     const isMobileViewport = window.matchMedia("(max-width: 1023px)").matches;
     const navigationEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    if (isMobileViewport && navigationEntry?.type === "reload") {
+    // `navigationEntry.type` reflects the *document* load and never changes for
+    // the SPA session, so guarding on it alone permanently disabled restore
+    // after any refresh — every subsequent in-app back landed at the top. Scope
+    // the guard to the genuine initial load; later back-navigations restore
+    // normally regardless of how the document was first loaded.
+    const isInitialSessionLoad = !listRestoreInitialLoadHandled;
+    listRestoreInitialLoadHandled = true;
+    if (isMobileViewport && navigationEntry?.type === "reload" && isInitialSessionLoad) {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       clearRestoreContactParam();
       restoredScrollRef.current = true;
@@ -1322,6 +1514,7 @@ export function ContactsWorkspaceTable({
             createdAt?: number;
             contactId?: string;
             scrollTop?: number | null;
+            contactOffset?: number | null;
             windowY?: number;
           }
         : {
@@ -1329,6 +1522,7 @@ export function ContactsWorkspaceTable({
             createdAt: Date.now(),
             contactId: restoreContactId,
             scrollTop: null,
+            contactOffset: null,
             windowY: undefined,
           };
 
@@ -1353,7 +1547,24 @@ export function ContactsWorkspaceTable({
         if (isMobileViewport && saved.contactId) {
           const index = flatRows.findIndex((row) => row.type === "contact" && row.contact.id === saved.contactId);
           if (index >= 0) {
-            virtualizer.scrollToIndex(index, { align: "center" });
+            if (scrollEl && typeof saved.contactOffset === "number") {
+              // The raw scrollTop above lands us close; now nudge by the row's
+              // real on-screen delta so the tapped contact sits exactly where
+              // it did when tapped. Anchoring to the measured row (not a pixel)
+              // absorbs the height drift from taller label rows above it, and
+              // the browser clamps scrollTop so near-bottom rows stay put. If
+              // the row isn't rendered yet this pass, the raw scrollTop stands
+              // and a later timer pass corrects it.
+              const rowEl = scrollEl.querySelector<HTMLElement>(`[data-index="${index}"]`);
+              if (rowEl) {
+                const cur = rowEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top;
+                scrollEl.scrollTop += cur - saved.contactOffset;
+              }
+            } else {
+              // Deep link with no saved offset — centre on the contact so it's
+              // at least on screen.
+              virtualizer.scrollToIndex(index, { align: "center" });
+            }
           }
         }
       };
@@ -1481,14 +1692,26 @@ export function ContactsWorkspaceTable({
                   query={query}
                   selected={selectedSet.has(row.contact.id)}
                   focused={focusedId === row.contact.id}
-                  viewMode={viewMode}
+                  viewMode={effectiveViewMode}
                   labelColors={labelColors}
+                  rowLabels={resolvedRowLabels}
                 />
               )}
             </div>
           );
         })}
       </div>
+
+      {/* P46-01: alphabet scrubber — mobile fast-scroll index rail. Fixed to the
+          scroll viewport's right edge; only mounted when it earns its place. */}
+      {showScrubber ? (
+        <AlphabetScrubber
+          sections={scrubberSections}
+          activeLetter={activeScrubLetter}
+          viewportEl={scrollEl}
+          onJump={scrollToLetter}
+        />
+      ) : null}
 
       {/* Undo toast — mobile only, appears above the bottom nav after swipe-archive */}
       {undoContactId ? (

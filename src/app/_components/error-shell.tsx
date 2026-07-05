@@ -7,6 +7,102 @@ import {
   isRecoverableChunkError,
 } from "./chunk-error-recovery";
 
+// P42-01 §3: connectivity blips must not read as app errors. Match only
+// network-failure signatures (fetch TypeErrors / offline at render time) —
+// genuine app errors keep the full error shell below.
+const CONNECTIVITY_MESSAGE =
+  /failed to fetch|load failed|networkerror|fetch failed|network request failed/i;
+
+function isConnectivityError(error: Error): boolean {
+  if (typeof navigator !== "undefined" && !navigator.onLine) return true;
+  return error instanceof TypeError && CONNECTIVITY_MESSAGE.test(error.message ?? "");
+}
+
+/**
+ * Calm connectivity fallback — same amber family and voice as the P42-DB01
+ * banner. Retries via `reset()` the moment the connection returns; nothing
+ * about it suggests the app is broken.
+ */
+function ConnectivityShell({ reset, root }: { reset: () => void; root: boolean }) {
+  useEffect(() => {
+    const retry = () => reset();
+    window.addEventListener("online", retry);
+    return () => window.removeEventListener("online", retry);
+  }, [reset]);
+
+  const content = (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100dvh",
+        padding: "24px",
+        background: "#f6f7f4",
+        textAlign: "center",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      }}
+    >
+      <div
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 16,
+          background: "#17352e",
+          display: "grid",
+          placeItems: "center",
+          margin: "0 auto 20px",
+        }}
+      >
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 8.5C5 6 8.5 4.6 12 4.6" />
+          <path d="M5.5 12c1.3-1 2.9-1.6 4.5-1.8" />
+          <path d="M9 15.5c.9-.5 2-.8 3-.8" />
+          <path d="M12 19h.01" />
+          <path d="M2 2l20 20" />
+        </svg>
+      </div>
+
+      <h1 style={{ fontSize: 21, fontWeight: 700, color: "#1d2823", margin: "0 0 8px", letterSpacing: "-0.01em" }}>
+        You&rsquo;re offline
+      </h1>
+      <p style={{ fontSize: 14, color: "#5c655e", lineHeight: 1.55, maxWidth: 340, margin: "0 auto 24px" }}>
+        This page needs a connection to load. Your contacts are safe &mdash; we&rsquo;ll retry
+        automatically as soon as you&rsquo;re back online.
+      </p>
+
+      <button
+        onClick={reset}
+        style={{
+          height: 44,
+          padding: "0 24px",
+          borderRadius: 12,
+          background: "#17352e",
+          color: "#fff",
+          fontSize: 14,
+          fontWeight: 700,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Try again
+      </button>
+    </div>
+  );
+
+  if (root) {
+    return (
+      <html lang="en">
+        <body style={{ margin: 0 }}>{content}</body>
+      </html>
+    );
+  }
+  return content;
+}
+
 export function ErrorShell({
   error,
   reset,
@@ -17,6 +113,9 @@ export function ErrorShell({
   root?: boolean;
 }) {
   const isChunkError = isRecoverableChunkError(error);
+  // P42-01 §3: a chunk error takes precedence (it has its own recovery); after
+  // that, connectivity failures get the calm offline fallback, not the shell.
+  const isOfflineError = !isChunkError && isConnectivityError(error);
   const [autoRecovering, setAutoRecovering] = useState(false);
 
   useEffect(() => {
@@ -38,6 +137,10 @@ export function ErrorShell({
       cancelled = true;
     };
   }, [isChunkError]);
+
+  if (isOfflineError) {
+    return <ConnectivityShell reset={reset} root={root} />;
+  }
 
   const content = (
     <div

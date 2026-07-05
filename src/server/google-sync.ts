@@ -10,7 +10,10 @@ import { auth as googleAuth, people, type people_v1 } from "@googleapis/people";
 import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
 import { emitEvent } from "~/lib/activity";
+import { PHOTO_SYNC_ENABLED } from "~/lib/photo-sync-flags";
 import { db } from "~/server/db";
+import { parsePhotoShadow, type PushSeed } from "~/server/contact-photo-sync";
+import { runPhotoPass, type PhotoPassLink, type PhotoPassTally } from "~/server/sync-photo-pass";
 import {
   parseContactDateEntries,
   parseContactPostalAddresses,
@@ -24,10 +27,21 @@ import {
 import type { ValueEntry } from "~/server/sync-contact-mapping";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
+  buildDeletionHoldPayload,
+  DeletionThresholdError,
+  exceedsDeletionThreshold,
+} from "~/server/sync-deletion-guard";
+import {
+  googleUpdateFieldsFor,
+  stripExcludedPortableFields,
+} from "~/server/sync-field-exclusions";
+import { buildExportLabelFilterWhere } from "~/server/sync-settings";
+import {
   addImportBatch,
   applyRemoteToContact,
   emptyImportBatch,
   type ImportBatchSummary,
+  type ImportDeletionGuard,
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
@@ -113,6 +127,13 @@ export type GoogleImportAccount = GoogleSyncAccount & {
   conflictPolicy: ConflictPolicy;
   // Drives the push phase: only TWO_WAY / EXPORT_ONLY accounts push local edits.
   syncDirection: SyncDirection;
+  // P39-02: deletion-safety guard shared across the run's import batches and
+  // the push-delete phase. Omitted = threshold disabled or bypassed once.
+  deletionGuard?: ImportDeletionGuard;
+  // P39-03: normalized field-exclusion tokens (see sync-field-exclusions.ts).
+  excludedFields?: Set<string>;
+  // P39-04: label ids gating NEW outbound pushes (empty/omitted = push all).
+  exportLabelFilter?: string[];
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -135,6 +156,8 @@ const toEngineAccount = (account: GoogleImportAccount): ImportEngineAccount => (
   capabilityProfile: resolveSyncProviderCapabilityProfile({ provider: "GOOGLE" }),
   sourceType: "SYNC_GOOGLE",
   providerName: "Google",
+  deletionGuard: account.deletionGuard,
+  excludedFields: account.excludedFields,
 });
 
 const GOOGLE_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
@@ -372,6 +395,13 @@ export const pushGoogleContact = async (
   const { client } = await getGoogleClientForAccount(account);
   const peopleApi = people({ version: "v1", auth: client });
 
+  // P39-03: excluded fields are stripped from the body AND withheld from the
+  // update mask — Google keeps its current values for withheld families
+  // instead of clearing them.
+  const exclusions = account.excludedFields ?? new Set<string>();
+  contact = stripExcludedPortableFields(contact, exclusions);
+  const updatePersonFields = googleUpdateFieldsFor(GOOGLE_UPDATE_PERSON_FIELDS, exclusions);
+
   const body = mapContactToGooglePerson(contact);
   // Google requires the current etag in the body for optimistic concurrency.
   body.etag = link.remoteETag ?? undefined;
@@ -379,7 +409,7 @@ export const pushGoogleContact = async (
   try {
     const res = await peopleApi.people.updateContact({
       resourceName: link.remoteUid,
-      updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
+      updatePersonFields,
       requestBody: body,
     });
     const localShadow = buildGooglePushShadow(contact);
@@ -442,7 +472,7 @@ export const pushGoogleContact = async (
     retryBody.etag = latestEtag ?? undefined;
     const res = await peopleApi.people.updateContact({
       resourceName: link.remoteUid,
-      updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
+      updatePersonFields,
       requestBody: retryBody,
     });
     const localShadow = buildGooglePushShadow(contact);
@@ -622,9 +652,14 @@ const createGoogleContactRemote = async (
   const { client } = await getGoogleClientForAccount(account);
   const peopleApi = people({ version: "v1", auth: client });
   let created: people_v1.Schema$Person;
+  // P39-03: excluded fields never reach a freshly-created remote contact.
+  const pushSource = stripExcludedPortableFields(
+    buildGooglePushContact(contact),
+    account.excludedFields ?? new Set<string>(),
+  );
   try {
     const res = await peopleApi.people.createContact({
-      requestBody: mapContactToGooglePerson(buildGooglePushContact(contact)),
+      requestBody: mapContactToGooglePerson(pushSource),
     });
     created = res.data;
   } catch (error) {
@@ -639,9 +674,7 @@ const createGoogleContactRemote = async (
       remoteUid: created.resourceName,
       remoteETag: created.etag ?? null,
       capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
-      supportedFieldShadow: buildGooglePushShadow(
-        buildGooglePushContact(contact),
-      ) as Prisma.InputJsonValue,
+      supportedFieldShadow: buildGooglePushShadow(pushSource) as Prisma.InputJsonValue,
       lastSyncedAt: new Date(),
     },
   });
@@ -751,7 +784,12 @@ export const pushLocalChangesToGoogle = async (
 
   // 2) CREATES — user-created local contacts not yet on Google. Restricted to
   //    MANUAL contacts so we don't propagate contacts imported from other
-  //    sources into Google.
+  //    sources into Google. P39-04: the export label filter gates these new
+  //    pushes only — linked contacts keep syncing regardless of labels.
+  const exportLabelWhere = await buildExportLabelFilterWhere(
+    account.userId,
+    account.exportLabelFilter ?? [],
+  );
   const unlinked = await db.contact.findMany({
     where: {
       userId: account.userId,
@@ -759,6 +797,7 @@ export const pushLocalChangesToGoogle = async (
       syncTombstoneAt: null,
       lastMutatedBy: "MANUAL",
       syncLinks: { none: { syncAccountId: account.id } },
+      ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
     },
     select: pushContactSelect,
   });
@@ -779,8 +818,35 @@ export const pushLocalChangesToGoogle = async (
       remoteDeletedAt: null,
       contact: { OR: [{ archivedAt: { not: null } }, { syncTombstoneAt: { not: null } }] },
     },
-    select: { id: true, remoteUid: true },
+    select: {
+      id: true,
+      remoteUid: true,
+      contact: { select: { id: true, fullName: true, book: { select: { name: true } } } },
+    },
   });
+
+  // P39-02: deletion-safety threshold — the outbound delete list is known in
+  // full before any remote delete runs, so the guard aborts before the first.
+  if (account.deletionGuard) {
+    const guard = account.deletionGuard;
+    guard.candidates.push(
+      ...removedLinks
+        .filter((link) => link.remoteUid)
+        .map((link) => ({
+          linkId: link.id,
+          contactId: link.contact?.id ?? "",
+          name: link.contact?.fullName ?? "Unknown contact",
+          bookName: link.contact?.book?.name ?? "Personal",
+          bookDetail: link.contact?.book ? null : "default",
+          direction: "outbound" as const,
+        })),
+    );
+    const outbound = guard.candidates.filter((c) => c.direction === "outbound").length;
+    if (exceedsDeletionThreshold({ inbound: 0, outbound }, guard.threshold)) {
+      throw new DeletionThresholdError(buildDeletionHoldPayload(guard.candidates, guard.threshold));
+    }
+  }
+
   for (const link of removedLinks) {
     if (!link.remoteUid) continue;
     await deleteGoogleContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
@@ -818,18 +884,86 @@ export const runGoogleSync = async (
         queueFull: await isConflictQueueFull(account.id),
       };
 
+  // P44-03/04: photo pass (flag-gated). Failures never fail the sync.
+  const photoTally = PHOTO_SYNC_ENABLED
+    ? await runGooglePhotoPass(account, { inbound, outbound })
+    : { pulled: 0, pushed: 0, deletedLocal: 0, deletedRemote: 0, conflicts: 0 };
+
   return {
     created: importSummary.created,
-    updated: importSummary.updated,
+    updated: importSummary.updated + photoTally.pulled + photoTally.deletedLocal,
     deleted: importSummary.deleted,
     conflicts: importSummary.conflicts + push.conflicts,
     // A push that opened a MANUAL conflict may have filled the queue.
     queueFull:
       push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,
     pushedCreated: push.created,
-    pushedUpdated: push.updated,
+    pushedUpdated: push.updated + photoTally.pushed + photoTally.deletedRemote,
     pushedDeleted: push.deleted,
   };
+};
+
+/**
+ * P44-03/04 Google photo pass: reconcile every linked contact's photo via the
+ * dedicated photo endpoint (getBatchGet to read, updateContactPhoto to write —
+ * no full-contact PUT, so no field-wipe hazard). See docs/adr/0001.
+ */
+const runGooglePhotoPass = async (
+  account: GoogleImportAccount,
+  dir: { inbound: boolean; outbound: boolean },
+): Promise<PhotoPassTally> => {
+  const photoExcluded = account.excludedFields?.has("PHOTO") ?? false;
+  const cap = { canPull: dir.inbound && !photoExcluded, canPush: dir.outbound && !photoExcluded };
+  if (!cap.canPull && !cap.canPush) {
+    return { pulled: 0, pushed: 0, deletedLocal: 0, deletedRemote: 0, conflicts: 0 };
+  }
+
+  const links = await db.syncContactLink.findMany({
+    where: { syncAccountId: account.id, remoteUid: { not: null }, tombstonedAt: null },
+    select: {
+      id: true,
+      remoteUid: true,
+      contactId: true,
+      photoShadow: true,
+      contact: { select: { avatarUrl: true } },
+    },
+  });
+  if (links.length === 0) {
+    return { pulled: 0, pushed: 0, deletedLocal: 0, deletedRemote: 0, conflicts: 0 };
+  }
+
+  const resourceNames = links.map((l) => l.remoteUid).filter((u): u is string => u != null);
+  const remotePhotos = await fetchGoogleRemotePhotos(account, resourceNames);
+
+  const passLinks: PhotoPassLink[] = links
+    .filter((l): l is typeof l & { remoteUid: string } => l.remoteUid != null)
+    .map((link) => {
+      const rn = link.remoteUid;
+      const remote = remotePhotos.get(rn) ?? { hasPhoto: false, url: null, signal: null };
+      return {
+        linkId: link.id,
+        contactId: link.contactId,
+        avatarUrl: link.contact.avatarUrl ?? null,
+        shadow: parsePhotoShadow(link.photoShadow),
+        signalKind: "resourceIdentifier" as const,
+        remote: { hasPhoto: remote.hasPhoto, signal: remote.signal },
+        loadRemoteBytes: async () => (remote.url ? fetchGooglePhotoBytes(remote.url) : null),
+        pushCanonical: async (b64: string): Promise<PushSeed> => {
+          const res = await pushGooglePhoto(account, rn, b64);
+          return { remoteSignal: res.signal, remoteCanonicalHash: null, remoteETag: res.etag };
+        },
+        deleteRemote: async () => {
+          await deleteGooglePhoto(account, rn);
+        },
+      };
+    });
+
+  return runPhotoPass(
+    db,
+    { userId: account.userId, syncAccountId: account.id, syncAccountLabel: account.label },
+    cap,
+    passLinks,
+  );
 };
 
 // ── Disconnect (token revocation) — used by P27-07 ───────────────────────────
@@ -849,4 +983,96 @@ export const revokeGoogleToken = async (account: GoogleSyncAccount): Promise<voi
   } catch {
     // Best-effort: a revoked/expired token may already be invalid at Google.
   }
+};
+
+// ── P44-03/04 photo transport ────────────────────────────────────────────────
+// Google keeps photos on a dedicated endpoint, not a contact field (which is
+// why GOOGLE_PERSON_FIELDS omits them). The change-detection signal is the
+// photo resource URL with its volatile size suffix (=sNN) stripped — stable on
+// no-op re-pull per P44-01. `=s0` returns the full original for storage.
+export type GoogleRemotePhoto = { hasPhoto: boolean; url: string | null; signal: string | null };
+
+const GOOGLE_PHOTO_PERSON_FIELDS = "photos,metadata";
+const stripGooglePhotoSize = (url: string): string => url.replace(/=s\d+(-c)?$/i, "");
+const googlePhotoFullUrl = (url: string): string => `${stripGooglePhotoSize(url)}=s0`;
+
+/**
+ * Batch-fetch remote photo state for up to any number of contacts (People API
+ * getBatchGet caps at 200 resource names per call). Returns a map keyed by
+ * resource name; contacts with only Google's default silhouette map to
+ * `hasPhoto: false`.
+ */
+export const fetchGoogleRemotePhotos = async (
+  account: GoogleSyncAccount,
+  resourceNames: string[],
+): Promise<Map<string, GoogleRemotePhoto>> => {
+  const out = new Map<string, GoogleRemotePhoto>();
+  if (resourceNames.length === 0) return out;
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  for (let i = 0; i < resourceNames.length; i += 200) {
+    const chunk = resourceNames.slice(i, i + 200);
+    const res = await peopleApi.people.getBatchGet({
+      resourceNames: chunk,
+      personFields: GOOGLE_PHOTO_PERSON_FIELDS,
+    });
+    for (const r of res.data.responses ?? []) {
+      const rn = r.requestedResourceName ?? r.person?.resourceName ?? null;
+      if (!rn) continue;
+      const photo = (r.person?.photos ?? []).find((p) => !p.default) ?? null;
+      const url = photo?.url ?? null;
+      out.set(
+        rn,
+        url
+          ? { hasPhoto: true, url, signal: stripGooglePhotoSize(url) }
+          : { hasPhoto: false, url: null, signal: null },
+      );
+    }
+  }
+  return out;
+};
+
+/** Fetch the full-resolution bytes behind a People API photo URL. */
+export const fetchGooglePhotoBytes = async (url: string): Promise<Buffer | null> => {
+  try {
+    const res = await fetch(googlePhotoFullUrl(url));
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Upload a canonical JPEG as the contact's photo. Returns the new person etag
+ * and the new photo signal (resource URL, size-suffix stripped) read back from
+ * the response — this is the shadow seed that suppresses the next-pull echo.
+ */
+export const pushGooglePhoto = async (
+  account: GoogleSyncAccount,
+  resourceName: string,
+  base64Jpeg: string,
+): Promise<{ etag: string | null; signal: string | null }> => {
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  const res = await peopleApi.people.updateContactPhoto({
+    resourceName,
+    requestBody: { photoBytes: base64Jpeg, personFields: GOOGLE_PHOTO_PERSON_FIELDS },
+  });
+  const url = (res.data.person?.photos ?? []).find((p) => !p.default)?.url ?? null;
+  return { etag: res.data.person?.etag ?? null, signal: url ? stripGooglePhotoSize(url) : null };
+};
+
+/** Remove the contact's photo. Returns the new person etag. */
+export const deleteGooglePhoto = async (
+  account: GoogleSyncAccount,
+  resourceName: string,
+): Promise<{ etag: string | null }> => {
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  const res = await peopleApi.people.deleteContactPhoto({
+    resourceName,
+    personFields: GOOGLE_PHOTO_PERSON_FIELDS,
+  });
+  return { etag: res.data.person?.etag ?? null };
 };

@@ -34,6 +34,15 @@ export const getEffectiveSyncAccountSettings = async (
   bookAllowlist: string[];
   syncFrequencyMinutes: number | null;
   requireReauthToEdit: boolean;
+  // P39 enforcement inputs (all optional in the P36 panel).
+  maxDeletionsThreshold: number | null;
+  notifyOnFailure: boolean;
+  syncWindowStart: number | null;
+  syncWindowEnd: number | null;
+  syncWindowTimezone: string | null;
+  maxAttemptsBeforePause: number | null;
+  excludedFields: string[];
+  exportLabelFilter: string[];
 }> => {
   const settings = await db.syncAccountSettings.findUnique({
     where: { syncAccountId },
@@ -47,7 +56,43 @@ export const getEffectiveSyncAccountSettings = async (
       settings?.syncFrequencyMinutes ?? SYNC_SETTINGS_DEFAULTS.syncFrequencyMinutes,
     requireReauthToEdit:
       settings?.requireReauthToEdit ?? SYNC_SETTINGS_DEFAULTS.requireReauthToEdit,
+    maxDeletionsThreshold: settings?.maxDeletionsThreshold ?? null,
+    notifyOnFailure: settings?.notifyOnFailure ?? true,
+    syncWindowStart: settings?.syncWindowStart ?? null,
+    syncWindowEnd: settings?.syncWindowEnd ?? null,
+    syncWindowTimezone: settings?.syncWindowTimezone ?? null,
+    maxAttemptsBeforePause: settings?.maxAttemptsBeforePause ?? null,
+    excludedFields: settings?.excludedFields ?? [],
+    exportLabelFilter: settings?.exportLabelFilter ?? [],
   };
+};
+
+/**
+ * P39-04: Prisma where-fragment restricting outbound CREATE candidates to
+ * contacts carrying at least one of the connection's export-filter labels.
+ * The filter stores Label ids but Contact.labels holds label *names* (the
+ * P31B registry maps between them), so the ids resolve to names first.
+ *
+ * Returns null when the filter is empty (= push all). Labels deleted since
+ * the filter was saved drop out; if every selected label is gone the filter
+ * matches nothing — "only these labels" with none left means no new pushes,
+ * not all of them.
+ *
+ * New pushes only, per the P36 brief: contacts already linked to the remote
+ * keep syncing and are never deleted for losing the label.
+ */
+export const buildExportLabelFilterWhere = async (
+  userId: string,
+  exportLabelFilter: string[],
+): Promise<Prisma.ContactWhereInput | null> => {
+  if (exportLabelFilter.length === 0) return null;
+
+  const labels = await db.label.findMany({
+    where: { id: { in: exportLabelFilter }, userId },
+    select: { name: true },
+  });
+
+  return { OR: labels.map((label) => ({ labels: { array_contains: label.name } })) };
 };
 
 /**

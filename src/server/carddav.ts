@@ -78,11 +78,29 @@ export type CardDavContactCard = CardDavAddressBookEntry & {
     poBox?: string;
   }>;
   notes: string | null;
+  // P44-03: present only when the card carried a PHOTO and photo extraction was
+  // requested (parse option). Absent/undefined otherwise.
+  photo?: CardDavRawPhoto | null;
 };
 
 export type CardDavPushResult = {
   href: string;
   etag: string | null;
+};
+
+// P44-03: a contact card's PHOTO as it arrived from the provider. Inline b64 is
+// decoded lazily by the photo pipeline; URI form (iCloud) is fetched with the
+// connection credentials. See docs/adr/0001 §3.3.
+export type CardDavRawPhoto =
+  | { kind: "inline"; mediaType: string | null; base64: string }
+  | { kind: "uri"; mediaType: string | null; uri: string };
+
+const IMAGE_TYPE_BY_TOKEN: Record<string, string> = {
+  JPEG: "image/jpeg",
+  JPG: "image/jpeg",
+  PNG: "image/png",
+  GIF: "image/gif",
+  WEBP: "image/webp",
 };
 
 export class CardDavPreflightError extends Error {
@@ -561,9 +579,56 @@ const parseSignificantDateValue = (
   };
 };
 
+type VCardLine = {
+  group: string | null;
+  name: string;
+  params: Record<string, string[]>;
+  value: string;
+};
+
+// P44-03: pull a PHOTO/LOGO out of the parsed vCard lines. Handles vCard 3.0
+// inline (ENCODING=b), vCard 4.0 data: URIs, and plain URI form (iCloud).
+const extractCardDavPhoto = (lines: VCardLine[]): CardDavRawPhoto | null => {
+  const photo = lines.find((line) => line.name === "PHOTO");
+  if (!photo) return null;
+
+  const paramValues = (key: string): string[] =>
+    Object.entries(photo.params)
+      .filter(([k]) => k.toUpperCase() === key)
+      .flatMap(([, v]) => v);
+
+  const mediaFromType =
+    paramValues("TYPE")
+      .map((t) => {
+        const up = t.toUpperCase();
+        return up.startsWith("IMAGE/") ? up.toLowerCase() : IMAGE_TYPE_BY_TOKEN[up] ?? null;
+      })
+      .find(Boolean) ?? null;
+  const encoding = paramValues("ENCODING").map((v) => v.toUpperCase());
+  const valueParam = paramValues("VALUE").map((v) => v.toUpperCase());
+  const raw = photo.value.trim();
+
+  const dataUri = /^data:([^;,]*)(;base64)?,(.*)$/is.exec(raw);
+  if (dataUri && dataUri[2]) {
+    return { kind: "inline", mediaType: dataUri[1] || mediaFromType, base64: dataUri[3] ?? "" };
+  }
+  if (encoding.includes("B") || encoding.includes("BASE64")) {
+    return { kind: "inline", mediaType: mediaFromType, base64: raw };
+  }
+  if (valueParam.includes("URI") || /^https?:\/\//i.test(raw)) {
+    return { kind: "uri", mediaType: mediaFromType, uri: raw };
+  }
+  // Fallback: a long, base64-shaped value with no explicit encoding.
+  if (raw.length > 64 && /^[A-Za-z0-9+/=\s]+$/.test(raw)) {
+    return { kind: "inline", mediaType: mediaFromType, base64: raw.replace(/\s+/g, "") };
+  }
+  return null;
+};
+
 const parseCardDavContactCard = (
   entry: CardDavAddressBookEntry,
   addressData: string,
+  options?: { includePhoto?: boolean },
 ): CardDavContactCard => {
   const lines = parseVCardLines(addressData);
   const fnLine = lines.find((line) => line.name === "FN");
@@ -703,6 +768,7 @@ const parseCardDavContactCard = (
     postalAddresses,
     addressEntries,
     notes: noteLines.map((line) => line.value).filter(Boolean).join("\n\n") || null,
+    photo: options?.includePhoto ? extractCardDavPhoto(lines) : undefined,
   };
 };
 
@@ -744,9 +810,11 @@ export const fetchCardDavAddressBookIndex = async ({
 export const fetchCardDavAddressBookCards = async ({
   addressBookUrl,
   credentials,
+  includePhoto = false,
 }: {
   addressBookUrl: string;
   credentials: CardDavCredentials;
+  includePhoto?: boolean;
 }): Promise<CardDavContactCard[]> => {
   const normalizedAddressBookUrl = normalizeUrl(addressBookUrl);
   const xml = await davRequest({
@@ -774,9 +842,45 @@ export const fetchCardDavAddressBookCards = async ({
           uid,
         },
         addressData,
+        { includePhoto },
       );
     })
     .filter((item): item is CardDavContactCard => item != null);
+};
+
+/**
+ * P44-03: fetch the bytes behind a URI-form PHOTO (iCloud) using the
+ * connection's CardDAV basic-auth credentials. Returns null on any failure.
+ */
+export const fetchCardDavPhotoBytes = async (
+  uri: string,
+  credentials: CardDavCredentials,
+): Promise<Buffer | null> => {
+  try {
+    const response = await fetch(uri, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${credentials.username}:${credentials.password}`,
+          "utf8",
+        ).toString("base64")}`,
+        "User-Agent": USER_AGENT,
+      },
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    return Buffer.from(await response.arrayBuffer());
+  } catch {
+    return null;
+  }
+};
+
+// P44-04: fold a long value to 75-octet lines with space continuation (RFC 6350
+// §3.2) so a base64 PHOTO body is accepted by strict servers.
+const foldVCardLine = (line: string): string => {
+  if (line.length <= 75) return line;
+  const chunks: string[] = [line.slice(0, 75)];
+  for (let i = 75; i < line.length; i += 74) chunks.push(` ${line.slice(i, i + 74)}`);
+  return chunks.join("\r\n");
 };
 
 const ensureTrailingSlash = (value: string) => (value.endsWith("/") ? value : `${value}/`);
@@ -786,6 +890,7 @@ const buildCardDavContactBody = (
   uid: string,
   addressBookUrl: string,
   capabilityProfile?: SyncProviderCapabilityProfile,
+  photoBase64?: string | null,
 ) => {
   const profile =
     capabilityProfile ??
@@ -794,9 +899,16 @@ const buildCardDavContactBody = (
       addressBookUrl,
     });
   const projected = projectPortableContactForProvider(contact, profile);
+  // P44-04: a vCard PUT replaces the whole card, so the PHOTO line must be
+  // present or the remote photo is wiped. The pipeline passes the canonical
+  // JPEG to push, or the remote's existing bytes to preserve (photo excluded /
+  // no local change). Absent → no PHOTO line (create with no photo).
+  const trailer = photoBase64
+    ? `\r\nUID:${uid}\r\n${foldVCardLine(`PHOTO;ENCODING=b;TYPE=JPEG:${photoBase64}`)}\r\nEND:VCARD`
+    : `\r\nUID:${uid}\r\nEND:VCARD`;
   return contactsToVCard([projected], { flavor: getCardDavVCardFlavor(profile) }).replace(
     /\r\nEND:VCARD$/,
-    `\r\nUID:${uid}\r\nEND:VCARD`,
+    trailer,
   );
 };
 
@@ -807,6 +919,7 @@ export const pushCardDavContact = async ({
   contact,
   capabilityProfile,
   hrefOverride,
+  photoBase64,
 }: {
   addressBookUrl: string;
   credentials: CardDavCredentials;
@@ -814,6 +927,8 @@ export const pushCardDavContact = async ({
   contact: PortableContactInput;
   capabilityProfile?: SyncProviderCapabilityProfile;
   hrefOverride?: string;
+  /** P44-04: base64 JPEG to embed as PHOTO. Omit to leave no photo on the card. */
+  photoBase64?: string | null;
 }): Promise<CardDavPushResult> => {
   const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
   const href = hrefOverride ?? new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
@@ -827,6 +942,7 @@ export const pushCardDavContact = async ({
     uidForBody,
     collectionUrl,
     capabilityProfile,
+    photoBase64,
   );
 
   let response: Response;
