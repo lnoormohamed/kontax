@@ -75,8 +75,8 @@ Straw-man to react to (not the answer):
 - **Account** — profile, email, password, public card
 - **Security** — 2FA, sessions, connected accounts, app passwords, delete
   account (danger zone last)
-- **Preferences** — display, interface, phonetic names, **reminder lead-time
-  moves here** (notification *channels* stay in Notifications)
+- **Preferences** — display, interface, phonetic names (reminder lead-time
+  STAYS on Notifications — rule: a channel and its tuning live together)
 - **Notifications** — category toggles, digest
 - **Data & sync** — sync connections, import & export **with presets
   reunited**, books, devices/CardDAV setup
@@ -85,6 +85,31 @@ Straw-man to react to (not the answer):
 - **Developer** — stays, plan-gated
 Every one of the 14 smells gets resolved by, or explicitly accepted in, the
 chosen grouping.
+
+### 1b. Per-setting relocation map (engineering-proposed 2026-07-05 — ratify or amend)
+Individual settings that are in the wrong place regardless of which grouping
+wins:
+
+| Setting | Today | Proposed | Why |
+| --- | --- | --- | --- |
+| Password change | Account | **Security** | Auth is split (password vs 2FA/sessions); Account = identity, Security = sign-in |
+| Sign-out + session card | bottom of root `#plan-billing` (!) | **Security** (sessions) | Sign-out under billing is the clearest misplacement in the app |
+| Username | Account "Public card" section | **Public card page** | The username *is* the card handle; Account keeps a link row |
+| Data export | Account | **Data & sync** (import/export surface) | P45 built the export system — "download your data" belongs beside it |
+| Group-membership shortcut card | root billing section | **Sharing & groups** | Navigation card, not a billing control |
+| Sync-provider rows in "Connected accounts" | Security | **/sync only** | Security lists sign-in methods; sync status is /sync's — currently duplicated |
+| Merge review | settings nav (desktop "Jump to") | **out of settings** | Contacts-workspace tool, reachable from Duplicates; not a setting |
+
+Judgment calls for the designer:
+- **App passwords**: task-coherence (keep on the connect-a-device page) vs
+  credential taxonomy (Security). Lean: keep the task page; move the
+  *revocation list* to Security beside sessions; cross-link.
+- **Reminder lead-time**: stays with its toggle on Notifications (rule above).
+- **Books "Permission history"**: overlaps the Teams audit log — scope to
+  personal books or become a pointer to the audit surface.
+
+Explicitly fine where they are: phonetic names, display/interface prefs,
+calendar feed (with reminders), product-updates toggle.
 
 ### 2. One depth rule
 Everything is a **subpage** (or a section *of* one); `#plan-billing` dies.
