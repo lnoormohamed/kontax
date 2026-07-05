@@ -46,6 +46,10 @@ boot, not before it. In prod we apply **before** the app swap, on purpose.
    `backfill-avatar-thumbs.mjs`, sync-account lineage/settings). Record which are
    skipped-because-empty vs run.
 4. **Apply schema** — `npm run db:push` in the controlled task (additive-safe).
+   Then seed the static lookup data the schema expects:
+   `npm run seed:sort-romanization` (CharRomanization table, ~35k rows;
+   idempotent — without it non-Latin names (CJK, Arabic, Cyrillic, …) fall back
+   to the `#` bucket in the contact list instead of their romanized letter).
 5. **Confirm drift-free** — `node scripts/check-schema-drift.mjs` against prod →
    **exit 0**.
 6. **Boot** — deploy/restart the app; watch for `Validating live schema before

@@ -10,10 +10,13 @@
 // company / full name, already lowercased and trimmed. Because the phonetic
 // field is preferred there, a CJK name the contact form has auto-filled a
 // reading for (李 → "Li") arrives here as "li" and buckets under L. Names with
-// no phonetic reading sort — and so bucket — by their raw first character,
-// which folds to `#`; that stays consistent with where the list orders them
-// (an honest limitation the phonetic field overrides). A pinyin fallback for
-// un-phoneticised Han is the open follow-up (P46 derivation seam).
+// no phonetic reading that start with a non-Latin character get a romanization
+// prefix at the SQL layer (SORT_KEY_COLUMNS + the seeded CharRomanization
+// table — Han via pinyin, Arabic/Cyrillic/Greek/Hebrew/Hangul/Kana/Indic/…
+// via transliteration): 李晨 arrives as "li李晨" and محمد as "mmhmdمحمد", so
+// each sorts among its romanized letter's names and folds to that letter below
+// because the first glyph is already Latin. Unmapped scripts, digits, and
+// symbols still fold to `#`, consistent with where the list orders them.
 
 // Latin letters whose accents do NOT decompose under Unicode NFD, so a plain
 // combining-mark strip leaves them non-ASCII. Mapped to the base letter they

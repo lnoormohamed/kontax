@@ -43,6 +43,7 @@
     "seed:phase37:uk-ie": "node scripts/seed-phase37-uk-ireland.mjs",
     "seed:phase37:western-europe": "node scripts/seed-phase37-western-europe.mjs",
     "seed:demo": "node scripts/seed-demo-showcase.mjs",
+    "seed:sort-romanization": "node scripts/seed-sort-romanization.mjs",
     "seed:demo:multilingual": "node scripts/seed-multilingual-demo-contacts.mjs",
     "start": "node server.mjs",
     "start:production": "node scripts/start-production.mjs",

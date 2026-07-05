@@ -34,6 +34,11 @@ export type UserOnboardingState = $Result.DefaultSelection<Prisma.$UserOnboardin
  */
 export type AppPassword = $Result.DefaultSelection<Prisma.$AppPasswordPayload>
 /**
+ * Model CharRomanization
+ * 
+ */
+export type CharRomanization = $Result.DefaultSelection<Prisma.$CharRomanizationPayload>
+/**
  * Model Contact
  * 
  */
@@ -1046,6 +1051,16 @@ export class PrismaClient<
   get appPassword(): Prisma.AppPasswordDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.charRomanization`: Exposes CRUD operations for the **CharRomanization** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CharRomanizations
+    * const charRomanizations = await prisma.charRomanization.findMany()
+    * ```
+    */
+  get charRomanization(): Prisma.CharRomanizationDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.contact`: Exposes CRUD operations for the **Contact** model.
     * Example usage:
     * ```ts
@@ -1969,6 +1984,7 @@ export namespace Prisma {
     PublicCardView: 'PublicCardView',
     UserOnboardingState: 'UserOnboardingState',
     AppPassword: 'AppPassword',
+    CharRomanization: 'CharRomanization',
     Contact: 'Contact',
     ContactBookMembership: 'ContactBookMembership',
     ContactPrivateField: 'ContactPrivateField',
@@ -2035,7 +2051,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "contactBookMembership" | "contactPrivateField" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "kontaxExportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "charRomanization" | "contact" | "contactBookMembership" | "contactPrivateField" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "kontaxExportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "adminSupportNote" | "adminSupportCase" | "featureFlag" | "group" | "sharedBookPermissionAuditEvent" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "adminBroadcast" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2332,6 +2348,80 @@ export namespace Prisma {
           count: {
             args: Prisma.AppPasswordCountArgs<ExtArgs>
             result: $Utils.Optional<AppPasswordCountAggregateOutputType> | number
+          }
+        }
+      }
+      CharRomanization: {
+        payload: Prisma.$CharRomanizationPayload<ExtArgs>
+        fields: Prisma.CharRomanizationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CharRomanizationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CharRomanizationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>
+          }
+          findFirst: {
+            args: Prisma.CharRomanizationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CharRomanizationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>
+          }
+          findMany: {
+            args: Prisma.CharRomanizationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>[]
+          }
+          create: {
+            args: Prisma.CharRomanizationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>
+          }
+          createMany: {
+            args: Prisma.CharRomanizationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CharRomanizationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>[]
+          }
+          delete: {
+            args: Prisma.CharRomanizationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>
+          }
+          update: {
+            args: Prisma.CharRomanizationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>
+          }
+          deleteMany: {
+            args: Prisma.CharRomanizationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CharRomanizationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CharRomanizationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>[]
+          }
+          upsert: {
+            args: Prisma.CharRomanizationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CharRomanizationPayload>
+          }
+          aggregate: {
+            args: Prisma.CharRomanizationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCharRomanization>
+          }
+          groupBy: {
+            args: Prisma.CharRomanizationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CharRomanizationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CharRomanizationCountArgs<ExtArgs>
+            result: $Utils.Optional<CharRomanizationCountAggregateOutputType> | number
           }
         }
       }
@@ -5987,6 +6077,7 @@ export namespace Prisma {
     publicCardView?: PublicCardViewOmit
     userOnboardingState?: UserOnboardingStateOmit
     appPassword?: AppPasswordOmit
+    charRomanization?: CharRomanizationOmit
     contact?: ContactOmit
     contactBookMembership?: ContactBookMembershipOmit
     contactPrivateField?: ContactPrivateFieldOmit
@@ -13074,6 +13165,962 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: AppPasswordInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CharRomanization
+   */
+
+  export type AggregateCharRomanization = {
+    _count: CharRomanizationCountAggregateOutputType | null
+    _min: CharRomanizationMinAggregateOutputType | null
+    _max: CharRomanizationMaxAggregateOutputType | null
+  }
+
+  export type CharRomanizationMinAggregateOutputType = {
+    ch: string | null
+    roman: string | null
+  }
+
+  export type CharRomanizationMaxAggregateOutputType = {
+    ch: string | null
+    roman: string | null
+  }
+
+  export type CharRomanizationCountAggregateOutputType = {
+    ch: number
+    roman: number
+    _all: number
+  }
+
+
+  export type CharRomanizationMinAggregateInputType = {
+    ch?: true
+    roman?: true
+  }
+
+  export type CharRomanizationMaxAggregateInputType = {
+    ch?: true
+    roman?: true
+  }
+
+  export type CharRomanizationCountAggregateInputType = {
+    ch?: true
+    roman?: true
+    _all?: true
+  }
+
+  export type CharRomanizationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CharRomanization to aggregate.
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharRomanizations to fetch.
+     */
+    orderBy?: CharRomanizationOrderByWithRelationInput | CharRomanizationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CharRomanizationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharRomanizations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharRomanizations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CharRomanizations
+    **/
+    _count?: true | CharRomanizationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CharRomanizationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CharRomanizationMaxAggregateInputType
+  }
+
+  export type GetCharRomanizationAggregateType<T extends CharRomanizationAggregateArgs> = {
+        [P in keyof T & keyof AggregateCharRomanization]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCharRomanization[P]>
+      : GetScalarType<T[P], AggregateCharRomanization[P]>
+  }
+
+
+
+
+  export type CharRomanizationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CharRomanizationWhereInput
+    orderBy?: CharRomanizationOrderByWithAggregationInput | CharRomanizationOrderByWithAggregationInput[]
+    by: CharRomanizationScalarFieldEnum[] | CharRomanizationScalarFieldEnum
+    having?: CharRomanizationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CharRomanizationCountAggregateInputType | true
+    _min?: CharRomanizationMinAggregateInputType
+    _max?: CharRomanizationMaxAggregateInputType
+  }
+
+  export type CharRomanizationGroupByOutputType = {
+    ch: string
+    roman: string
+    _count: CharRomanizationCountAggregateOutputType | null
+    _min: CharRomanizationMinAggregateOutputType | null
+    _max: CharRomanizationMaxAggregateOutputType | null
+  }
+
+  type GetCharRomanizationGroupByPayload<T extends CharRomanizationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CharRomanizationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CharRomanizationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CharRomanizationGroupByOutputType[P]>
+            : GetScalarType<T[P], CharRomanizationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CharRomanizationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    ch?: boolean
+    roman?: boolean
+  }, ExtArgs["result"]["charRomanization"]>
+
+  export type CharRomanizationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    ch?: boolean
+    roman?: boolean
+  }, ExtArgs["result"]["charRomanization"]>
+
+  export type CharRomanizationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    ch?: boolean
+    roman?: boolean
+  }, ExtArgs["result"]["charRomanization"]>
+
+  export type CharRomanizationSelectScalar = {
+    ch?: boolean
+    roman?: boolean
+  }
+
+  export type CharRomanizationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"ch" | "roman", ExtArgs["result"]["charRomanization"]>
+
+  export type $CharRomanizationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CharRomanization"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      ch: string
+      roman: string
+    }, ExtArgs["result"]["charRomanization"]>
+    composites: {}
+  }
+
+  type CharRomanizationGetPayload<S extends boolean | null | undefined | CharRomanizationDefaultArgs> = $Result.GetResult<Prisma.$CharRomanizationPayload, S>
+
+  type CharRomanizationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CharRomanizationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CharRomanizationCountAggregateInputType | true
+    }
+
+  export interface CharRomanizationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CharRomanization'], meta: { name: 'CharRomanization' } }
+    /**
+     * Find zero or one CharRomanization that matches the filter.
+     * @param {CharRomanizationFindUniqueArgs} args - Arguments to find a CharRomanization
+     * @example
+     * // Get one CharRomanization
+     * const charRomanization = await prisma.charRomanization.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CharRomanizationFindUniqueArgs>(args: SelectSubset<T, CharRomanizationFindUniqueArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CharRomanization that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CharRomanizationFindUniqueOrThrowArgs} args - Arguments to find a CharRomanization
+     * @example
+     * // Get one CharRomanization
+     * const charRomanization = await prisma.charRomanization.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CharRomanizationFindUniqueOrThrowArgs>(args: SelectSubset<T, CharRomanizationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CharRomanization that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationFindFirstArgs} args - Arguments to find a CharRomanization
+     * @example
+     * // Get one CharRomanization
+     * const charRomanization = await prisma.charRomanization.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CharRomanizationFindFirstArgs>(args?: SelectSubset<T, CharRomanizationFindFirstArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CharRomanization that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationFindFirstOrThrowArgs} args - Arguments to find a CharRomanization
+     * @example
+     * // Get one CharRomanization
+     * const charRomanization = await prisma.charRomanization.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CharRomanizationFindFirstOrThrowArgs>(args?: SelectSubset<T, CharRomanizationFindFirstOrThrowArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CharRomanizations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CharRomanizations
+     * const charRomanizations = await prisma.charRomanization.findMany()
+     * 
+     * // Get first 10 CharRomanizations
+     * const charRomanizations = await prisma.charRomanization.findMany({ take: 10 })
+     * 
+     * // Only select the `ch`
+     * const charRomanizationWithChOnly = await prisma.charRomanization.findMany({ select: { ch: true } })
+     * 
+     */
+    findMany<T extends CharRomanizationFindManyArgs>(args?: SelectSubset<T, CharRomanizationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CharRomanization.
+     * @param {CharRomanizationCreateArgs} args - Arguments to create a CharRomanization.
+     * @example
+     * // Create one CharRomanization
+     * const CharRomanization = await prisma.charRomanization.create({
+     *   data: {
+     *     // ... data to create a CharRomanization
+     *   }
+     * })
+     * 
+     */
+    create<T extends CharRomanizationCreateArgs>(args: SelectSubset<T, CharRomanizationCreateArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CharRomanizations.
+     * @param {CharRomanizationCreateManyArgs} args - Arguments to create many CharRomanizations.
+     * @example
+     * // Create many CharRomanizations
+     * const charRomanization = await prisma.charRomanization.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CharRomanizationCreateManyArgs>(args?: SelectSubset<T, CharRomanizationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CharRomanizations and returns the data saved in the database.
+     * @param {CharRomanizationCreateManyAndReturnArgs} args - Arguments to create many CharRomanizations.
+     * @example
+     * // Create many CharRomanizations
+     * const charRomanization = await prisma.charRomanization.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CharRomanizations and only return the `ch`
+     * const charRomanizationWithChOnly = await prisma.charRomanization.createManyAndReturn({
+     *   select: { ch: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CharRomanizationCreateManyAndReturnArgs>(args?: SelectSubset<T, CharRomanizationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CharRomanization.
+     * @param {CharRomanizationDeleteArgs} args - Arguments to delete one CharRomanization.
+     * @example
+     * // Delete one CharRomanization
+     * const CharRomanization = await prisma.charRomanization.delete({
+     *   where: {
+     *     // ... filter to delete one CharRomanization
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CharRomanizationDeleteArgs>(args: SelectSubset<T, CharRomanizationDeleteArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CharRomanization.
+     * @param {CharRomanizationUpdateArgs} args - Arguments to update one CharRomanization.
+     * @example
+     * // Update one CharRomanization
+     * const charRomanization = await prisma.charRomanization.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CharRomanizationUpdateArgs>(args: SelectSubset<T, CharRomanizationUpdateArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CharRomanizations.
+     * @param {CharRomanizationDeleteManyArgs} args - Arguments to filter CharRomanizations to delete.
+     * @example
+     * // Delete a few CharRomanizations
+     * const { count } = await prisma.charRomanization.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CharRomanizationDeleteManyArgs>(args?: SelectSubset<T, CharRomanizationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CharRomanizations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CharRomanizations
+     * const charRomanization = await prisma.charRomanization.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CharRomanizationUpdateManyArgs>(args: SelectSubset<T, CharRomanizationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CharRomanizations and returns the data updated in the database.
+     * @param {CharRomanizationUpdateManyAndReturnArgs} args - Arguments to update many CharRomanizations.
+     * @example
+     * // Update many CharRomanizations
+     * const charRomanization = await prisma.charRomanization.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CharRomanizations and only return the `ch`
+     * const charRomanizationWithChOnly = await prisma.charRomanization.updateManyAndReturn({
+     *   select: { ch: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CharRomanizationUpdateManyAndReturnArgs>(args: SelectSubset<T, CharRomanizationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CharRomanization.
+     * @param {CharRomanizationUpsertArgs} args - Arguments to update or create a CharRomanization.
+     * @example
+     * // Update or create a CharRomanization
+     * const charRomanization = await prisma.charRomanization.upsert({
+     *   create: {
+     *     // ... data to create a CharRomanization
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CharRomanization we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CharRomanizationUpsertArgs>(args: SelectSubset<T, CharRomanizationUpsertArgs<ExtArgs>>): Prisma__CharRomanizationClient<$Result.GetResult<Prisma.$CharRomanizationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CharRomanizations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationCountArgs} args - Arguments to filter CharRomanizations to count.
+     * @example
+     * // Count the number of CharRomanizations
+     * const count = await prisma.charRomanization.count({
+     *   where: {
+     *     // ... the filter for the CharRomanizations we want to count
+     *   }
+     * })
+    **/
+    count<T extends CharRomanizationCountArgs>(
+      args?: Subset<T, CharRomanizationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CharRomanizationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CharRomanization.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CharRomanizationAggregateArgs>(args: Subset<T, CharRomanizationAggregateArgs>): Prisma.PrismaPromise<GetCharRomanizationAggregateType<T>>
+
+    /**
+     * Group by CharRomanization.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CharRomanizationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CharRomanizationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CharRomanizationGroupByArgs['orderBy'] }
+        : { orderBy?: CharRomanizationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CharRomanizationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCharRomanizationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CharRomanization model
+   */
+  readonly fields: CharRomanizationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CharRomanization.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CharRomanizationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CharRomanization model
+   */
+  interface CharRomanizationFieldRefs {
+    readonly ch: FieldRef<"CharRomanization", 'String'>
+    readonly roman: FieldRef<"CharRomanization", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CharRomanization findUnique
+   */
+  export type CharRomanizationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * Filter, which CharRomanization to fetch.
+     */
+    where: CharRomanizationWhereUniqueInput
+  }
+
+  /**
+   * CharRomanization findUniqueOrThrow
+   */
+  export type CharRomanizationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * Filter, which CharRomanization to fetch.
+     */
+    where: CharRomanizationWhereUniqueInput
+  }
+
+  /**
+   * CharRomanization findFirst
+   */
+  export type CharRomanizationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * Filter, which CharRomanization to fetch.
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharRomanizations to fetch.
+     */
+    orderBy?: CharRomanizationOrderByWithRelationInput | CharRomanizationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CharRomanizations.
+     */
+    cursor?: CharRomanizationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharRomanizations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharRomanizations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CharRomanizations.
+     */
+    distinct?: CharRomanizationScalarFieldEnum | CharRomanizationScalarFieldEnum[]
+  }
+
+  /**
+   * CharRomanization findFirstOrThrow
+   */
+  export type CharRomanizationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * Filter, which CharRomanization to fetch.
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharRomanizations to fetch.
+     */
+    orderBy?: CharRomanizationOrderByWithRelationInput | CharRomanizationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CharRomanizations.
+     */
+    cursor?: CharRomanizationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharRomanizations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharRomanizations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CharRomanizations.
+     */
+    distinct?: CharRomanizationScalarFieldEnum | CharRomanizationScalarFieldEnum[]
+  }
+
+  /**
+   * CharRomanization findMany
+   */
+  export type CharRomanizationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * Filter, which CharRomanizations to fetch.
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CharRomanizations to fetch.
+     */
+    orderBy?: CharRomanizationOrderByWithRelationInput | CharRomanizationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CharRomanizations.
+     */
+    cursor?: CharRomanizationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CharRomanizations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CharRomanizations.
+     */
+    skip?: number
+    distinct?: CharRomanizationScalarFieldEnum | CharRomanizationScalarFieldEnum[]
+  }
+
+  /**
+   * CharRomanization create
+   */
+  export type CharRomanizationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * The data needed to create a CharRomanization.
+     */
+    data: XOR<CharRomanizationCreateInput, CharRomanizationUncheckedCreateInput>
+  }
+
+  /**
+   * CharRomanization createMany
+   */
+  export type CharRomanizationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CharRomanizations.
+     */
+    data: CharRomanizationCreateManyInput | CharRomanizationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CharRomanization createManyAndReturn
+   */
+  export type CharRomanizationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * The data used to create many CharRomanizations.
+     */
+    data: CharRomanizationCreateManyInput | CharRomanizationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CharRomanization update
+   */
+  export type CharRomanizationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * The data needed to update a CharRomanization.
+     */
+    data: XOR<CharRomanizationUpdateInput, CharRomanizationUncheckedUpdateInput>
+    /**
+     * Choose, which CharRomanization to update.
+     */
+    where: CharRomanizationWhereUniqueInput
+  }
+
+  /**
+   * CharRomanization updateMany
+   */
+  export type CharRomanizationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CharRomanizations.
+     */
+    data: XOR<CharRomanizationUpdateManyMutationInput, CharRomanizationUncheckedUpdateManyInput>
+    /**
+     * Filter which CharRomanizations to update
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * Limit how many CharRomanizations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CharRomanization updateManyAndReturn
+   */
+  export type CharRomanizationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * The data used to update CharRomanizations.
+     */
+    data: XOR<CharRomanizationUpdateManyMutationInput, CharRomanizationUncheckedUpdateManyInput>
+    /**
+     * Filter which CharRomanizations to update
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * Limit how many CharRomanizations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CharRomanization upsert
+   */
+  export type CharRomanizationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * The filter to search for the CharRomanization to update in case it exists.
+     */
+    where: CharRomanizationWhereUniqueInput
+    /**
+     * In case the CharRomanization found by the `where` argument doesn't exist, create a new CharRomanization with this data.
+     */
+    create: XOR<CharRomanizationCreateInput, CharRomanizationUncheckedCreateInput>
+    /**
+     * In case the CharRomanization was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CharRomanizationUpdateInput, CharRomanizationUncheckedUpdateInput>
+  }
+
+  /**
+   * CharRomanization delete
+   */
+  export type CharRomanizationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
+    /**
+     * Filter which CharRomanization to delete.
+     */
+    where: CharRomanizationWhereUniqueInput
+  }
+
+  /**
+   * CharRomanization deleteMany
+   */
+  export type CharRomanizationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CharRomanizations to delete
+     */
+    where?: CharRomanizationWhereInput
+    /**
+     * Limit how many CharRomanizations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CharRomanization without action
+   */
+  export type CharRomanizationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CharRomanization
+     */
+    select?: CharRomanizationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CharRomanization
+     */
+    omit?: CharRomanizationOmit<ExtArgs> | null
   }
 
 
@@ -71547,6 +72594,14 @@ export namespace Prisma {
   export type AppPasswordScalarFieldEnum = (typeof AppPasswordScalarFieldEnum)[keyof typeof AppPasswordScalarFieldEnum]
 
 
+  export const CharRomanizationScalarFieldEnum: {
+    ch: 'ch',
+    roman: 'roman'
+  };
+
+  export type CharRomanizationScalarFieldEnum = (typeof CharRomanizationScalarFieldEnum)[keyof typeof CharRomanizationScalarFieldEnum]
+
+
   export const ContactScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -73704,6 +74759,43 @@ export namespace Prisma {
     revokedAt?: DateTimeNullableWithAggregatesFilter<"AppPassword"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"AppPassword"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"AppPassword"> | Date | string
+  }
+
+  export type CharRomanizationWhereInput = {
+    AND?: CharRomanizationWhereInput | CharRomanizationWhereInput[]
+    OR?: CharRomanizationWhereInput[]
+    NOT?: CharRomanizationWhereInput | CharRomanizationWhereInput[]
+    ch?: StringFilter<"CharRomanization"> | string
+    roman?: StringFilter<"CharRomanization"> | string
+  }
+
+  export type CharRomanizationOrderByWithRelationInput = {
+    ch?: SortOrder
+    roman?: SortOrder
+  }
+
+  export type CharRomanizationWhereUniqueInput = Prisma.AtLeast<{
+    ch?: string
+    AND?: CharRomanizationWhereInput | CharRomanizationWhereInput[]
+    OR?: CharRomanizationWhereInput[]
+    NOT?: CharRomanizationWhereInput | CharRomanizationWhereInput[]
+    roman?: StringFilter<"CharRomanization"> | string
+  }, "ch">
+
+  export type CharRomanizationOrderByWithAggregationInput = {
+    ch?: SortOrder
+    roman?: SortOrder
+    _count?: CharRomanizationCountOrderByAggregateInput
+    _max?: CharRomanizationMaxOrderByAggregateInput
+    _min?: CharRomanizationMinOrderByAggregateInput
+  }
+
+  export type CharRomanizationScalarWhereWithAggregatesInput = {
+    AND?: CharRomanizationScalarWhereWithAggregatesInput | CharRomanizationScalarWhereWithAggregatesInput[]
+    OR?: CharRomanizationScalarWhereWithAggregatesInput[]
+    NOT?: CharRomanizationScalarWhereWithAggregatesInput | CharRomanizationScalarWhereWithAggregatesInput[]
+    ch?: StringWithAggregatesFilter<"CharRomanization"> | string
+    roman?: StringWithAggregatesFilter<"CharRomanization"> | string
   }
 
   export type ContactWhereInput = {
@@ -79205,6 +80297,41 @@ export namespace Prisma {
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CharRomanizationCreateInput = {
+    ch: string
+    roman: string
+  }
+
+  export type CharRomanizationUncheckedCreateInput = {
+    ch: string
+    roman: string
+  }
+
+  export type CharRomanizationUpdateInput = {
+    ch?: StringFieldUpdateOperationsInput | string
+    roman?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CharRomanizationUncheckedUpdateInput = {
+    ch?: StringFieldUpdateOperationsInput | string
+    roman?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CharRomanizationCreateManyInput = {
+    ch: string
+    roman: string
+  }
+
+  export type CharRomanizationUpdateManyMutationInput = {
+    ch?: StringFieldUpdateOperationsInput | string
+    roman?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CharRomanizationUncheckedUpdateManyInput = {
+    ch?: StringFieldUpdateOperationsInput | string
+    roman?: StringFieldUpdateOperationsInput | string
   }
 
   export type ContactCreateInput = {
@@ -85565,6 +86692,21 @@ export namespace Prisma {
     revokedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type CharRomanizationCountOrderByAggregateInput = {
+    ch?: SortOrder
+    roman?: SortOrder
+  }
+
+  export type CharRomanizationMaxOrderByAggregateInput = {
+    ch?: SortOrder
+    roman?: SortOrder
+  }
+
+  export type CharRomanizationMinOrderByAggregateInput = {
+    ch?: SortOrder
+    roman?: SortOrder
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
