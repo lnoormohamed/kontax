@@ -1,6 +1,17 @@
 # P46-DB07 — Design brief: settings IA redesign (regroup everything, one nav, consistent depth)
 
-Status: **Pre-plan** · Priority: P1 · Depends: —
+Status: **Design converged (handoff #31, 2026-07-05) — ready for build tickets** · Priority: P1 · Depends: —
+
+> Design mocked in Claude Design; one review round
+> (`design-briefs/p46-db07-review-round-1.md`, resolved by diff-verification).
+> Locked: eight groups; nested URL scheme with a complete 301 redirect table
+> (`#plan-billing` → `/settings/billing`; `/sync` + `/import-export` stay
+> workspace-level, linked from the Data & sync index; `/shares` moves to
+> `/settings/sharing/shared`); seats owned by Plan & billing (Teams read-only);
+> mobile index keeps the account card + sign-out shortcut (home = Security);
+> Webhooks marked future. Build sequence T1–T6 per the design (T1 nav-config
+> unification first — P46-09 pattern). Build-note: T6 routes Merge review via
+> the real duplicates surfaces, not the design's placeholder `/duplicates`.
 Phase: [Phase 46](phase-46-alphabet-scrubber.md)
 Scope: **both breakpoints** — the IA is structural; mobile *chrome* (headers,
 backs, sheets) stays governed by [P46-DB06](p46-db06-design-brief-mobile-consistency-audit.md).

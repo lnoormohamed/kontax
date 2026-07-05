@@ -1,5 +1,24 @@
 # P46-DB07 Settings IA Redesign — design review (round 1)
 
+> **RESOLVED in handoff #31 (2026-07-05) — verified by diff. Design converged;
+> ready for build tickets.** All four adjustments landed: (1) new **5c "URL
+> scheme & redirects"** section — three rules (children nest under their group;
+> `/sync` + `/import-export` stay workspace-level and are *linked out*, shown
+> with ↗ in the render; every move 301s, incl. `/settings#plan-billing` →
+> `/settings/billing`) plus a complete old→new table; (2) **seats pinned** —
+> Plan & billing owns count/purchase, Teams shows read-only usage (both cards
+> updated); (3) **mobile root keeps the account identity card + a sign-out
+> shortcut row** (sign-out's home is Security; the index carries the common
+> shortcut); (4) **Webhooks marked FUTURE** (mobile card lists API tokens
+> only). All three minors fixed (illustrative top-bar caption, legend dedup,
+> smell-13 credited once — T1 now claims 2/11/12, T6 owns 13).
+>
+> **One build-note (not a design round):** the table sends Merge review to
+> "`/duplicates`" — no such route exists; the duplicates surface is
+> `/contacts?tab=duplicates` and the tools are `/merge/manual` +
+> `/merge-suggestions/[id]`. Intent is unambiguous (out of settings, reached
+> from the Duplicates view); T6 implements it against the real routes.
+
 Reviewer: engineering · Date: 2026-07-05 · Deliverable: handoff #30,
 `p46-db07/P46-DB07 Settings IA Redesign.html` (+ db07.css).
 
