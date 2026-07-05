@@ -85,6 +85,37 @@ scrubber; ∥ with each other except where deps noted):
 20. [P46-04](build-phase/p46-04-contact-photo-upload-ui.md) — contact photo
     file upload UI, desktop + mobile (contacts are URL-paste only today)
 
+Added 2026-07-04 (two more small workstreams — ∥ with each other and with the
+photo/nav work; briefs front-run their builds):
+
+20a. ∥ [P46-DB03](build-phase/p46-db03-design-brief-notification-aging.md) —
+    notification aging brief (muted treatment for >7-day-old **and**
+    event-passed notifications; desktop dropdown + mobile overlay; extends the
+    original P22-DB05 notification brief). Front-runs P46-06.
+20b. [P46-06](build-phase/p46-06-notification-aging-treatment.md) — build the
+    aging/event-passed treatment (system is fully built; add the aging layer it
+    lacks — no `expiresAt`/event date today). Low urgency (P2).
+20c. ∥ [P46-DB04](build-phase/p46-db04-design-brief-mobile-contact-list-refresh.md)
+    — mobile contact-list row brief (image + name + one optional secondary line
+    + scrubber; supersedes the mobile section of 01-contacts-list.md). Row is
+    mostly as-built, so this ratifies + documents.
+20d. [P46-07](build-phase/p46-07-mobile-contact-list-row-polish.md) —
+    **contingent** row polish; dropped if DB04 changes nothing (P3).
+
+Added 2026-07-05 (brand/marketing brief; independent of all the above):
+
+20e. ∥ [P46-DB05](build-phase/p46-db05-design-brief-social-media-assets.md) —
+    social media assets brief (LinkedIn/X/Facebook/Instagram: profile + banner
+    + featured images, slogans + bios). Extends brand-assets.md; no app code
+    (external-platform uploads). P2.
+20f. [P46-DB06](build-phase/p46-db06-design-brief-mobile-consistency-audit.md) —
+    mobile UI consistency audit (mobile-only): one header system, one back
+    contract, one banner stack across every screen; fixes the 3 header-less
+    screens + icon-only settings back; removes the mobile Overview and relocates
+    its options (Shared→Settings, health→People, wordmark→/contacts). Largest
+    mobile surface in the phase; front-runs the mobile-chrome build tickets it
+    will spawn. Desktop pass = future brief. P1.
+
 ### Phase 43 — interface preferences (gate passed; taste knob, low urgency)
 
 16. [P43-DB01](build-phase/p43-db01-design-brief-interface-preferences.md) —
