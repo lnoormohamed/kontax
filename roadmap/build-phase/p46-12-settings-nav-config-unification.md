@@ -1,6 +1,6 @@
 # P46-12 (DB07·T1) — Unify the settings nav definition
 
-Status: **In progress (2026-07-05)** · Priority: P1 · Depends: P46-DB07
+Status: **Built & preview-verified (2026-07-06, 35c9ddf) — mobile 375px + desktop 1280px** · Priority: P1 · Depends: P46-DB07
 Phase: [Phase 46](phase-46-alphabet-scrubber.md) · Spec: DB07 §5 (converged handoff #31)
 
 One ordered `settings-nav` config (the eight groups, Developer plan-gated) is
