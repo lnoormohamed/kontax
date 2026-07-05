@@ -24,6 +24,7 @@ const SUBPAGE_TITLES: Record<string, string> = {
   "export-presets": "Export presets",
   data: "Data & sync",
   sharing: "Sharing & groups",
+  billing: "Plan & billing",
 };
 
 export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {

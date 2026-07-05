@@ -108,7 +108,7 @@ export async function createCheckoutSession(input: {
       ? `${appUrl}/welcome/family?checkout=success`
       : plan === "TEAMS"
         ? `${appUrl}/welcome/teams?checkout=success`
-        : `${appUrl}/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`;
+        : `${appUrl}/settings/billing?billing=success&session_id={CHECKOUT_SESSION_ID}`;
 
   try {
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -206,7 +206,7 @@ export async function createBillingPortalSession(): Promise<
   try {
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customer.providerCustomerId,
-      return_url: `${appUrl}/settings?portal=returned`,
+      return_url: `${appUrl}/settings/billing?portal=returned`,
     });
     if (!portalSession.url) return { error: "SESSION_URL_MISSING" };
     return { url: portalSession.url };

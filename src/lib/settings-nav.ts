@@ -26,8 +26,7 @@ export const SETTINGS_NAV: readonly SettingsNavEntry[] = [
   { id: "notifications", label: "Notifications", icon: "bell", route: "/settings/notifications", sub: "Toggles, digest, reminders" },
   { id: "data", label: "Data & sync", icon: "sync", route: "/settings/data", sub: "Connections, import & export, books", divider: "Data" },
   { id: "sharing", label: "Sharing & groups", icon: "users", route: "/settings/sharing", sub: "Shared with me, family, teams" },
-  // TODO(P46-13): route becomes /settings/billing when the anchor dies.
-  { id: "billing", label: "Plan & billing", icon: "briefcase", route: "/settings#plan-billing", sub: "Plan, invoices, seats", divider: "Account-level" },
+  { id: "billing", label: "Plan & billing", icon: "briefcase", route: "/settings/billing", sub: "Plan, invoices, seats", divider: "Account-level" },
   { id: "developer", label: "Developer", icon: "code", route: "/settings/developer", sub: "API tokens", gate: "pro" },
 ];
 

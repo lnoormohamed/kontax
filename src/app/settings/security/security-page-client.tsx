@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+
+import { signOutAction } from "~/app/actions/auth";
 import { SettingsPageHead, StSecLabel } from "~/app/_components/settings-ui";
 import { DeleteAccountSection } from "./delete-account-section";
 import { SessionsSection } from "./sessions-section";
@@ -241,6 +243,27 @@ export function SecurityPageClient({
 
       <StSecLabel>Active sessions</StSecLabel>
       <SessionsSection flash={flash} />
+
+      {/* P46-13 / DB07: the account-session sign-out card, relocated from the
+          old root #plan-billing section — sign-out's home is with sessions. */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#d8ddd6] bg-white p-5">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+            This device
+          </p>
+          <p className="mt-1.5 text-[14px] text-[#3a4540]">
+            Signed in as <span className="font-semibold text-[#1d2823]">{connectedAccounts.primaryEmail}</span>
+          </p>
+        </div>
+        <form action={signOutAction}>
+          <button
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8ddd6] px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+            type="submit"
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
 
       <StSecLabel>Connected accounts</StSecLabel>
       <ConnectedAccountsSection data={connectedAccounts} />
