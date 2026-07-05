@@ -77,6 +77,31 @@ test("phone formatting differences do not manufacture supported-field drift", ()
   assert.equal(providerSupportedShadowsEqual(local, other), false);
 });
 
+test("generic address labels do not manufacture supported-field drift, but explicit ones do", () => {
+  const profile = resolveSyncProviderCapabilityProfile({
+    provider: "CARDDAV",
+    baseUrl: "https://carddav.fastmail.com/dav/addressbooks/user/x/Default",
+  });
+  const withAddressLabel = (label: string): PortableContactInput => ({
+    ...contactFixture,
+    postalAddresses: [{ label, formatted: "26 Kings Drive, Eastbourne, BN21 2NU" }],
+    addressEntries: [
+      { label, formatted: "26 Kings Drive, Eastbourne, BN21 2NU", isPrimary: true },
+    ],
+  });
+
+  // kontax's generic placeholder labels vs the CardDAV round-trip default "home".
+  const local = buildProviderSupportedContactShadow(withAddressLabel("address"), profile);
+  const localPrimary = buildProviderSupportedContactShadow(withAddressLabel("primary"), profile);
+  const remote = buildProviderSupportedContactShadow(withAddressLabel("home"), profile);
+  assert.equal(providerSupportedShadowsEqual(local, remote), true);
+  assert.equal(providerSupportedShadowsEqual(localPrimary, remote), true);
+
+  // An explicit "work" label is a genuine difference — must still register.
+  const work = buildProviderSupportedContactShadow(withAddressLabel("work"), profile);
+  assert.equal(providerSupportedShadowsEqual(work, remote), false);
+});
+
 test("generic-safe roundtrips supported fields without turning unsupported dates into drift", () => {
   const profile = resolveSyncProviderCapabilityProfile({
     provider: "CARDDAV",

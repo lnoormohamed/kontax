@@ -557,6 +557,25 @@ const normalizePhoneEntries = (
       ),
     );
 
+// CardDAV round-trips an address's TYPE lossily: kontax's generic placeholder
+// labels ("address", "primary", "other", or none) come back as the vCard
+// default "home", so an otherwise-identical address reads as drift on every
+// sync (same false-conflict pattern as phone formatting above). Fold that
+// generic set to the provider default for comparison. Explicit labels such as
+// "work" are preserved, so a genuine home↔work relabel on the same address
+// still surfaces as an update. Shadow-only — stored data is untouched.
+const GENERIC_ADDRESS_LABELS = new Set([
+  "",
+  "address",
+  "primary",
+  "other",
+  "home",
+]);
+const canonicalizeAddressLabel = (label: string | null | undefined): string => {
+  const lowered = (normalizeString(label) ?? "").toLowerCase();
+  return GENERIC_ADDRESS_LABELS.has(lowered) ? "home" : lowered;
+};
+
 const normalizePostalAddresses = (
   values: PortableContactInput["postalAddresses"],
 ) =>
@@ -566,7 +585,7 @@ const normalizePostalAddresses = (
       if (!formatted) {
         return [];
       }
-      return [{ label: normalizeString(entry.label) ?? "Other", formatted }];
+      return [{ label: canonicalizeAddressLabel(entry.label), formatted }];
     })
     .sort((left, right) =>
       `${left.label}\u0000${left.formatted}`.localeCompare(
@@ -585,7 +604,7 @@ const normalizeAddressEntries = (
       }
       return [
         {
-          label: normalizeString(entry.label) ?? "Other",
+          label: canonicalizeAddressLabel(entry.label),
           formatted,
           isPrimary: entry.isPrimary === true,
           ...(normalizeString(entry.countryOrRegion)
