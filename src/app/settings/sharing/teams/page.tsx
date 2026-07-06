@@ -66,7 +66,7 @@ function Tag({ children, green }: { children: React.ReactNode; green?: boolean }
 
 export default async function TeamSettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) return redirectToLogin("/settings/teams");
+  if (!session?.user?.id) return redirectToLogin("/settings/sharing/teams");
   const userId = session.user.id;
   const billing = await getUserBillingContext(userId);
 
@@ -438,7 +438,7 @@ export default async function TeamSettingsPage() {
           <div className="flex shrink-0 flex-wrap gap-2">
             <Link
               className="inline-flex items-center gap-1.5 rounded-xl border border-[#d8ddd6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
-              href="/settings/teams/audit"
+              href="/settings/sharing/teams/audit"
             >
               <WorkspaceIcon name="clock" size={15} />
               Audit log

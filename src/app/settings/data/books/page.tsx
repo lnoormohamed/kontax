@@ -281,7 +281,7 @@ export default async function BooksSettingsPage() {
                   </div>
                   <p className="mt-3 text-[12.5px] text-[#8b938c]">
                     Changes to family editing access are managed under{" "}
-                    <Link className="font-semibold text-[#4158f4]" href="/settings/family">
+                    <Link className="font-semibold text-[#4158f4]" href="/settings/sharing/family">
                       Family management
                     </Link>
                     .
@@ -340,7 +340,7 @@ export default async function BooksSettingsPage() {
               </p>
               <Link
                 className="shrink-0 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                href="/settings/teams/audit"
+                href="/settings/sharing/teams/audit"
               >
                 Open team audit log
               </Link>

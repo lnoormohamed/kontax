@@ -5,7 +5,6 @@ import { redirectToLogin } from "~/server/auth/require-page-auth";
 import {
   LifecycleBadge,
   SectionLabel,
-  SettingsCard,
   SettingsPageHead,
 } from "~/app/_components/settings-ui";
 import { BillingSection } from "~/app/settings/_components/billing-section";
@@ -76,7 +75,6 @@ export default async function SettingsBillingPage({
     db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true, password: true } }),
   ]);
 
-  const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
   const currentIdx = PLAN_ORDER.indexOf(planSummary.planLabel as (typeof PLAN_ORDER)[number]);
 
   // Cancellation impact (downgrade modal §3). Members exclude the owner.
@@ -117,44 +115,8 @@ export default async function SettingsBillingPage({
         ) : null}
         <BillingSection cancelDetails={cancelDetails} surface={billingSurface} hasPassword={!!overrideInfo?.password} />
 
-        {/* group membership shortcut */}
-        {isGroupPlan ? (
-          <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
-                {planSummary.plan === "FAMILY" ? "Family group" : "Team"}
-              </p>
-              <p className="mt-1.5 text-[14px] text-[#3a4540]">
-                {groupMembership?.group ? (
-                  <>
-                    {groupMembership.role === "OWNER" ? "Owner of " : "Member of "}
-                    <span className="font-semibold text-[#1d2823]">{groupMembership.group.name}</span>
-                    {groupMembership.group.memberSlotsLimit
-                      ? ` · ${groupMembership.group._count.members}/${groupMembership.group.memberSlotsLimit} members`
-                      : ` · ${groupMembership.group._count.members} members`}
-                    {planSummary.plan === "TEAMS" && groupMembership.group._count.addressBooks > 0
-                      ? ` · ${groupMembership.group._count.addressBooks} book${groupMembership.group._count.addressBooks === 1 ? "" : "s"}`
-                      : null}
-                  </>
-                ) : (
-                  <>Your {planSummary.plan === "FAMILY" ? "family" : "team"} group isn&apos;t set up yet.</>
-                )}
-              </p>
-            </div>
-            <Link
-              className="shrink-0 rounded-xl bg-[#4158f4] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-              href={planSummary.plan === "FAMILY" ? "/settings/family" : "/settings/teams"}
-            >
-              {planSummary.plan === "FAMILY"
-                ? groupMembership?.group
-                  ? "Manage family book"
-                  : "Set up family book"
-                : groupMembership?.group
-                  ? "Manage team"
-                  : "Set up team"}
-            </Link>
-          </SettingsCard>
-        ) : null}
+        {/* P46-16: the group-membership shortcut moved to the Sharing & groups
+            index — it's a navigation card, not a billing control. */}
 
         {/* plan comparison */}
         <div>

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { AppShell } from "~/app/_components/app-shell";
 import { EmptyState } from "~/app/_components/empty-state";
 import { UpsellCard } from "~/app/_components/mobile-variance";
 import { acceptLiveShare, acceptStaticShare, declineStaticShare } from "~/app/actions/shares";
@@ -16,17 +15,13 @@ export default async function SharesPage() {
   const session = await auth();
   if (!session?.user?.id) {
     const h = await headers();
-    const next = h.get("x-pathname") ?? "/shares";
+    const next = h.get("x-pathname") ?? "/settings/sharing/shared";
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
   const userId = session.user.id;
 
-  const [plan, people, favorites, archived, duplicates, pending, history] = await Promise.all([
+  const [plan, pending, history] = await Promise.all([
     getUserPlanSummary(userId),
-    db.contact.count({ where: { userId, archivedAt: null } }),
-    db.contact.count({ where: { userId, archivedAt: null, isFavorite: true } }),
-    db.contact.count({ where: { userId, NOT: { archivedAt: null } } }),
-    db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
     // Pending: active shares the recipient hasn't yet accepted (no recipientContactId yet).
     db.contactShare.findMany({
       where: {
@@ -60,8 +55,6 @@ export default async function SharesPage() {
     }),
   ]);
 
-  const name = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
-
   const outboundGated =
     !plan.entitlements.staticShareEnabled && !plan.entitlements.liveShareEnabled;
   const readOnly =
@@ -78,14 +71,9 @@ export default async function SharesPage() {
   };
 
   return (
-    <AppShell
-      account={{ name, email: session.user.email ?? "", plan: plan.planLabel }}
-      counts={{ people, favorites, archived, duplicates }}
-      mobileTitle="Shared with me"
-      mobileBackHref="/settings"
-      mobileBackLabel="Settings"
-    >
-      <div className="mx-auto w-full max-w-2xl px-4 py-8 lg:px-0">
+    // P46-16 / DB07: lives inside the settings layout now (sidebar + settings
+    // headers come from it) — the page renders content only.
+    <div className="mx-auto w-full max-w-2xl">
         <h1 className="text-2xl font-semibold text-[#1d2823]">Shared with me</h1>
         <p className="mt-1 text-sm text-[#5c655e]">
           Contacts other Kontax users have shared with you. Accept to add a copy to your account.
@@ -237,7 +225,6 @@ export default async function SharesPage() {
             </ul>
           </div>
         ) : null}
-      </div>
-    </AppShell>
+    </div>
   );
 }

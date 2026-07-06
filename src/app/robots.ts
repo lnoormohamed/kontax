@@ -21,7 +21,7 @@ export default function robots(): MetadataRoute.Robots {
         "/family",
         "/teams",
         "/share",
-        "/shares",
+        "/settings/sharing/shared",
         "/dav",
         "/verify-email",
         "/reset-password",

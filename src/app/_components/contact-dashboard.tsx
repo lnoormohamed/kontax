@@ -282,7 +282,7 @@ export function ContactDashboard({
     },
     {
       title: "Shared with me",
-      href: "/shares",
+      href: "/settings/sharing/shared",
       body:
         incomingShares && incomingShares > 0
           ? `${incomingShares.toLocaleString()} pending share${incomingShares === 1 ? "" : "s"} waiting for you.`
@@ -474,7 +474,7 @@ export function ContactDashboard({
           true,
         )}
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
-        {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
+        {navItem(false, "/settings/sharing/shared", "download", "Shared with me", incomingShares ?? null, true)}
 
         {useCondensedTabletOverviewRail ? (
           <>

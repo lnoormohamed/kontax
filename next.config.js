@@ -108,6 +108,27 @@ const config = {
         destination: "/import-export?tab=presets",
         permanent: true,
       },
+      // P46-16 / DB07 §5c: the sharing surfaces nest under /settings/sharing.
+      {
+        source: "/shares",
+        destination: "/settings/sharing/shared",
+        permanent: true,
+      },
+      {
+        source: "/settings/family",
+        destination: "/settings/sharing/family",
+        permanent: true,
+      },
+      {
+        source: "/settings/teams",
+        destination: "/settings/sharing/teams",
+        permanent: true,
+      },
+      {
+        source: "/settings/teams/:path*",
+        destination: "/settings/sharing/teams/:path*",
+        permanent: true,
+      },
       {
         source: "/settings/profile",
         destination: "/settings/account",

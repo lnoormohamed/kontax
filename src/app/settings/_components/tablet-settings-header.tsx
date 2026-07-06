@@ -11,19 +11,21 @@ const SUBPAGE_TITLES: Record<string, string> = {
   preferences: "Preferences",
   developer: "Developer",
   security: "Security",
-  family: "Family",
-  teams: "Team management",
   data: "Data & sync",
   sharing: "Sharing & groups",
   billing: "Plan & billing",
 };
 
-// P46-14/15: nested children get their own titles (deepest match wins).
+// P46-14/15/16: nested children get their own titles (deepest match wins).
 const DEEP_TITLES: Record<string, string> = {
   "account/card": "Public card",
   "data/export": "Download your data",
   "data/books": "Books",
   "data/devices": "Connect a device",
+  "sharing/shared": "Shared with me",
+  "sharing/family": "Family",
+  "sharing/teams": "Team management",
+  "sharing/teams/audit": "Team audit log",
 };
 
 export function TabletSettingsHeader() {

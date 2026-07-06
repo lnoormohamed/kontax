@@ -246,7 +246,7 @@ export function BillingSection({
               {surface.members.used} / {surface.members.total} slots used
             </span>
           </div>
-          <Link className="text-[13px] font-semibold text-[#4452c9] hover:underline" href="/settings/family">
+          <Link className="text-[13px] font-semibold text-[#4452c9] hover:underline" href="/settings/sharing/family">
             Invite a member
           </Link>
         </div>

@@ -699,7 +699,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
             <Link
               aria-label={incomingShares > 0 ? `${incomingShares} pending shares` : "Notifications"}
               className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
-              href="/shares"
+              href="/settings/sharing/shared"
             >
               <WorkspaceIcon name="bell" size={18} />
               {incomingShares > 0 ? (

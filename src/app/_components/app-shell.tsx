@@ -168,7 +168,7 @@ export async function AppShell({
           {navItem("/contacts?tab=archived&filter=all", "archive", "Archived", counts?.archived)}
           {navItem("/contacts?tab=duplicates&filter=all", "people", "Duplicates", counts?.duplicates, true)}
           {navItem("/contacts?tab=activity", "clock", "Activity")}
-          {navItem("/shares", "download", "Shared with me", incomingShares || undefined, true)}
+          {navItem("/settings/sharing/shared", "download", "Shared with me", incomingShares || undefined, true)}
 
           <div className="mt-auto border-t border-[#e9ece7] pt-2">
             {(
