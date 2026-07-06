@@ -1,11 +1,12 @@
 # P44-06 — End-to-end photo sync QA matrix
 
-Status: **Partially run on staging 2026-07-05** — the phase-exit blocker (row 7,
-echo double-cycle) **PASSES on both CardDAV providers (Fastmail + iCloud)**;
-inbound pull (row 1) verified end-to-end. Remaining rows (local push / change /
+Status: **Partially run on staging 2026-07-05/06** — the phase-exit blocker (row 7,
+echo double-cycle) **PASSES on all three live providers (Fastmail + iCloud +
+Google)**; inbound pull (row 1) verified end-to-end on all three. Remaining rows
+(local push / change /
 delete / conflict / excluded-fields / >1MB / 5k-contact / real-device) and the
-Google + Nextcloud columns are **not yet exercised** (Google token dead; no
-Nextcloud account). See [Live run](#live-run--staging-20260705) below ·
+Nextcloud column are **not yet exercised** (no Nextcloud account).
+See [Live run](#live-run--staging-20260705) below ·
 Priority: P1 · Depends: [P44-03](p44-03-inbound-photo-sync.md), [P44-04](p44-04-outbound-photo-push-normalization.md)
 Phase: [Phase 44](phase-44-photo-sync.md)
 
@@ -84,24 +85,25 @@ the generic-CardDAV stand-in (P44-01 waiver); iCloud is the second CardDAV.
 
 | # | Fastmail (CardDAV) | iCloud | Google | Nextcloud | Notes |
 | --- | --- | --- | --- | --- | --- |
-| 1 | ✅ | ✅ | ⛔ | ☐ | Remote→pull: 7/7 (FM) + 6/6 (iC) got normalized avatar + `photoShadow` + MinIO `.jpg`+`-thumb.webp`; EXIF-stripped, ≤1024px |
-| 2 | ☐ | ☐ | ⛔ | ☐ | local→push not exercised |
-| 3 | ☐ | ☐ | ⛔ | ☐ | |
-| 4 | ☐ | ☐ | ⛔ | ☐ | |
-| 5 | ☐ | ☐ | ⛔ | ☐ | |
-| 6 | ☐ | ☐ | ⛔ | ☐ | |
-| 7 (echo) | ✅ | ✅ | ⛔ | ☐ | **PASS** — 2 consecutive no-change cycles = **0 photo writes** (DB `photoShadow`/`avatarUrl` byte-identical + no new MinIO objects). Phase-exit blocker cleared for both CardDAV providers |
-| 8 | ☐ | ☐ | ⛔ | ☐ | |
-| 9 | ☐ | ☐ | ⛔ | ☐ | |
-| 10 | ☐ | ☐ | ⛔ | ☐ | |
+| 1 | ✅ | ✅ | ✅ | ☐ | Remote→pull: 7/7 (FM) + 6/6 (iC) QA contacts; Google 60/821 real contacts with remote photos got normalized avatar + `photoShadow` + MinIO `.jpg`+`-thumb.webp`; EXIF-stripped, ≤1024px |
+| 2 | ☐ | ☐ | ☐ | ☐ | local→push not exercised |
+| 3 | ☐ | ☐ | ☐ | ☐ | |
+| 4 | ☐ | ☐ | ☐ | ☐ | |
+| 5 | ☐ | ☐ | ☐ | ☐ | |
+| 6 | ☐ | ☐ | ☐ | ☐ | |
+| 7 (echo) | ✅ | ✅ | ✅ | ☐ | **PASS** — 2 consecutive no-change cycles = **0 photo writes** (DB `photoShadow`/`avatarUrl` byte-identical). Phase-exit blocker cleared on all three live providers |
+| 8 | ☐ | ☐ | ☐ | ☐ | |
+| 9 | ☐ | ☐ | ☐ | ☐ | |
+| 10 | ☐ | ☐ | ☐ | ☐ | |
 | 11 | n/a | ☐ | n/a | ☐ | Google cap ≫1MB |
-| 12 | ☐ | ☐ | ⛔ | ☐ | cost numbers |
-| 13 | ☐ | ☐ | ⛔ | ☐ | device + OS versions |
+| 12 | ☐ | ☐ | ☐ | ☐ | cost numbers |
+| 13 | ☐ | ☐ | ☐ | ☐ | device + OS versions |
 
-⛔ Google = both staging Google sync tokens unusable (`NEEDS_REAUTH` / dead); a
-live Google column needs a fresh OAuth grant. ☐ Nextcloud = no staging account.
+☐ Nextcloud = no staging account. Google column run 2026-07-06 against the
+re-authed `li@noormohamed.uk` connection (the two older Google connections
+remain `NEEDS_REAUTH` and were not used).
 
-Reviewer: Claude (paired w/ Li) · Date: 2026-07-05 · Build: `staging@662ab1d` (deployed container, `PHOTO_SYNC_ENABLED=1`)
+Reviewer: Claude (paired w/ Li) · Date: 2026-07-05 (CardDAV) / 2026-07-06 (Google) · Build: `staging@662ab1d`+ (deployed container, `PHOTO_SYNC_ENABLED=1`)
 
 ---
 
@@ -141,14 +143,36 @@ photo not stored`), so `avatarUrl`/`photoShadow` never persisted. Fix: added the
   `10.0.0.144:9000` → `media-staging.getkontax.com`, forcing a one-time re-store)
   plus the iCloud card settling after its first write — **not** a loop.
 
+### Google run — staging 2026-07-06
+
+The third provider (and the third **signal kind** exercise: Google
+`resourceIdentifier` from the People API photo URL) went green a day after the
+CardDAV pair, once the `li@noormohamed.uk` connection was re-authed:
+
+- **First healthy sync** (acct `cmqjx0xbz…`): SUCCEEDED in ~5 min — 448 contacts
+  created, 174 updated, 48 field-pushes. Photo pass stored **60/821** linked
+  contacts' remote photos (the ones that have real Google photos): `avatarUrl` →
+  MinIO via `media-staging.getkontax.com` (spot-check GET → 200 `image/jpeg`),
+  `photoShadow.signalKind = "resourceIdentifier"`, and **0/60** signals carry an
+  `=sNN` size suffix (the suffix-strip that makes the signal stable is working).
+- **Echo double-cycle**: cycle 1 — all 60 `avatarUrl`+`remoteSignal` states
+  **byte-identical** (13 outbound writes were field `SYNC_PUSHED` events, not
+  photos); cycle 2 — fully quiet (`updatedCount=0`, `pushedUpdatedCount=0`),
+  states again byte-identical. **Zero photo writes across both cycles.**
+- Ops note: sync was driven via `POST /api/cron/sync` (CRON_SECRET). Cloudflare
+  cuts the HTTP response at ~30s (502) on the long first sync, but the runner
+  keeps executing server-side — poll `SyncJob` for the real result. The 5 stale
+  2026-07-02/03 queued jobs from the dead-token era were closed as
+  `SKIPPED/SUPERSEDED`.
+
 ### Not yet done (to fully close the matrix later)
 
 Rows 2–6, 8–13 (local push, remote/local change, delete both ways, conflict pick,
 same-image auto-resolve, "Photos" exclusion, iCloud >1MB, 5k-contact cost,
-real-device display) were **not** exercised. Google + Nextcloud columns
-outstanding (dead token / no account). Row 7 — the only phase-exit blocker —
-is green, so Phase 44 is not gated on the remaining rows, but they should be
-completed before the feature is enabled in prod.
+real-device display) were **not** exercised on any provider. Nextcloud column
+outstanding (no account). Row 7 — the only phase-exit blocker — is green on all
+three live providers, so Phase 44 is not gated on the remaining rows, but they
+should be completed before the feature is enabled in prod.
 
 ### How the run was driven (for reproducibility)
 
