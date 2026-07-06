@@ -57,6 +57,7 @@ and make detail-tab navigation behave.
 | [P46-15](p46-15-settings-data-sync-consolidation.md) | Data & sync consolidation (DB07·T4) | P1 | P46-12 |
 | [P46-16](p46-16-settings-sharing-groups.md) | Sharing & groups restructure (DB07·T5) | P1 | P46-12 |
 | [P46-17](p46-17-remove-merge-review-from-settings.md) | Remove Merge review from settings (DB07·T6) | P2 | P46-12 |
+| [P46-18](p46-18-teams-page-split-seats.md) | Teams page body-split + seats relocation (T5 remainder) | P2 | P46-16 |
 | [P46-08](p46-08-mobile-chrome-conformance-pass.md) | Mobile chrome conformance pass (backs, missing headers, Overview removal) | P1 | P46-DB06 |
 | [P46-09](p46-09-mobile-header-unification-banner-stack.md) | Mobile header primitive unification + banner stack | P1 | P46-08 |
 | [P46-10](p46-10-contact-health-people-prompt.md) | Contact-health "needs attention" prompt in People | P2 | P46-08 |
