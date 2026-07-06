@@ -66,7 +66,10 @@ export type MergeSuggestionSignal =
   | "name-and-company-proximity"
   | "name-and-missing-company"
   | "phonetic-name"
-  | "email-domain-and-name";
+  | "email-domain-and-name"
+  | "conflicting-name"
+  | "conflicting-given-name"
+  | "conflicting-company";
 
 // Per-signal score contribution, surfaced in the "why was this suggested?" panel (P10-08).
 export type SignalContribution = {
@@ -740,6 +743,22 @@ const pickFieldValue = ({
   return primaryValue?.trim() ?? secondaryValue?.trim() ?? null;
 };
 
+// Names "genuinely differ" only beyond spelling variance: not equal, not within
+// fuzzy edit distance, and not phonetically equivalent. "Katherine"/"Catherine"
+// is a variant, not a conflict.
+const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
+  const leftName = normalizeName(leftFullName);
+  const rightName = normalizeName(rightFullName);
+  if (!leftName || !rightName || leftName === rightName) {
+    return false;
+  }
+  if (levenshtein(leftName, rightName, 2) <= 2) {
+    return false;
+  }
+  const leftPhonetic = phoneticNameKey(leftFullName);
+  return !(leftPhonetic && leftPhonetic === phoneticNameKey(rightFullName));
+};
+
 const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) => {
   const warnings: string[] = [];
   const leftEmail = normalizeValue(left.email);
@@ -772,7 +791,7 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
     leftPhone &&
     rightPhone &&
     leftPhone === rightPhone &&
-    normalizeName(left.fullName) !== normalizeName(right.fullName)
+    namesGenuinelyDiffer(left.fullName, right.fullName)
   ) {
     warnings.push(
       "Shared phone with different names detected. This could be an assistant line, family number, or front-desk number rather than a true duplicate.",
@@ -804,11 +823,11 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
   if (
     leftGivenName &&
     rightGivenName &&
-    leftGivenName !== rightGivenName &&
+    namesGenuinelyDiffer(leftGivenName, rightGivenName) &&
     leftFamilyName &&
     rightFamilyName &&
     leftFamilyName === rightFamilyName &&
-    (leftEmail === rightEmail || (leftPhone && leftPhone === rightPhone))
+    ((leftEmail && leftEmail === rightEmail) || (leftPhone && leftPhone === rightPhone))
   ) {
     warnings.push(
       "Names differ while surnames and identifiers overlap. This could be a nickname, transliteration, or different member of the same household.",
@@ -917,6 +936,42 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
       getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName);
     if (commonDomain && !isPublicDomain && (surnameMatch || givenInitialMatch(left.fullName, right.fullName))) {
       add("email-domain-and-name", `Same email domain and similar name: @${leftDomain}`, 15);
+    }
+  }
+
+  // --- Conflicting evidence ------------------------------------------------------
+  // A shared identifier is strong evidence, but two clearly different people
+  // sharing a line (assistant, front desk, household number) is the classic
+  // false positive. When the edge-case review warnings would fire, the score
+  // must agree with them: conflicting names/companies subtract points instead
+  // of leaving a contradictory 95 next to a "probably not a duplicate" warning.
+  if (hardMatch) {
+    const surnameKeysMatch = Boolean(
+      getFamilyNameKey(left.fullName) &&
+        getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName),
+    );
+    const namesConflict = namesGenuinelyDiffer(left.fullName, right.fullName);
+
+    if (namesConflict && !surnameKeysMatch) {
+      add(
+        "conflicting-name",
+        `Names don't match: ${left.fullName} vs ${right.fullName}`,
+        -40,
+      );
+    } else if (namesConflict && !givenInitialMatch(left.fullName, right.fullName)) {
+      add(
+        "conflicting-given-name",
+        `Same surname but different first names: ${left.fullName} vs ${right.fullName}`,
+        -20,
+      );
+    }
+
+    if (leftCompany && rightCompany && !sameCompany) {
+      add(
+        "conflicting-company",
+        `Different companies: ${left.company} vs ${right.company}`,
+        -20,
+      );
     }
   }
 

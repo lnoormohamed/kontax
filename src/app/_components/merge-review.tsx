@@ -377,28 +377,28 @@ function WhyPanel({
                 width: 7,
                 height: 7,
                 borderRadius: "50%",
-                background: C.green,
+                background: c.score < 0 ? C.amber : C.green,
                 flexShrink: 0,
               }}
             />
             <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, color: C.ink }}>
               {c.label}
             </span>
-            {c.score > 0 && (
+            {c.score !== 0 && (
               <span
                 style={{
                   flexShrink: 0,
                   fontSize: 12.5,
                   fontWeight: 700,
-                  color: C.green,
-                  background: C.greenT,
+                  color: c.score < 0 ? C.amber : C.green,
+                  background: c.score < 0 ? C.amberT : C.greenT,
                   padding: "3px 9px",
                   borderRadius: 7,
                   minWidth: 44,
                   textAlign: "center",
                 }}
               >
-                +{c.score}
+                {c.score < 0 ? `−${Math.abs(c.score)}` : `+${c.score}`}
               </span>
             )}
           </div>
