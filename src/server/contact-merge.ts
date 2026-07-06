@@ -72,7 +72,8 @@ export type MergeSuggestionSignal =
   | "conflicting-name"
   | "conflicting-given-name"
   | "conflicting-company"
-  | "conflicting-birthday";
+  | "conflicting-birthday"
+  | "conflicting-identifiers";
 
 // Per-signal score contribution, surfaced in the "why was this suggested?" panel (P10-08).
 export type SignalContribution = {
@@ -958,6 +959,8 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   // false positive. When the edge-case review warnings would fire, the score
   // must agree with them: conflicting names/companies subtract points instead
   // of leaving a contradictory 95 next to a "probably not a duplicate" warning.
+  const hasPositiveSignal = contributions.some((contribution) => contribution.score > 0);
+
   if (hardMatch) {
     const surnameKeysMatch = Boolean(
       getFamilyNameKey(left.fullName) &&
@@ -978,14 +981,38 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
         -20,
       );
     }
+  }
 
-    if (leftCompany && rightCompany && !sameCompany) {
-      add(
-        "conflicting-company",
-        `Different companies: ${left.company} vs ${right.company}`,
-        -20,
-      );
-    }
+  // Company conflict counts against name-based matches too — a "similar name"
+  // at a different company is much weaker evidence than the same name signal
+  // with no company context at all.
+  if (hasPositiveSignal && leftCompany && rightCompany && !sameCompany) {
+    add(
+      "conflicting-company",
+      `Different companies: ${left.company} vs ${right.company}`,
+      -20,
+    );
+  }
+
+  // When nothing hard matched and the names aren't exactly equal, two records
+  // that each carry their own distinct email AND distinct phone look like two
+  // separate identities, not one person recorded twice.
+  if (
+    hasPositiveSignal &&
+    !hardMatch &&
+    !exactName &&
+    leftEmail &&
+    rightEmail &&
+    leftEmail !== rightEmail &&
+    leftPhoneKey &&
+    rightPhoneKey &&
+    leftPhoneKey !== rightPhoneKey
+  ) {
+    add(
+      "conflicting-identifiers",
+      "Each record has its own distinct email and phone",
+      -15,
+    );
   }
 
   // Different recorded birthdays is near-decisive counter-evidence regardless
@@ -993,12 +1020,7 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   // fuzzy/name-based matches too, not just hard identifier matches.
   const leftBirthday = normalizeValue(left.birthday);
   const rightBirthday = normalizeValue(right.birthday);
-  if (
-    contributions.some((contribution) => contribution.score > 0) &&
-    leftBirthday &&
-    rightBirthday &&
-    leftBirthday !== rightBirthday
-  ) {
+  if (hasPositiveSignal && leftBirthday && rightBirthday && leftBirthday !== rightBirthday) {
     add(
       "conflicting-birthday",
       `Different birthdays: ${left.birthday} vs ${right.birthday}`,

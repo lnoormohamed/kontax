@@ -163,3 +163,44 @@ test("legitimate spelling variants still fuzzy-match at the same company", () =>
     suggestions[0]!.signals.some((signal) => signal.startsWith("fuzzy-name")),
   );
 });
+
+test("phonetically-close names with distinct companies, emails, and phones are not suggested", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Árni Jónsson", {
+      email: "demo.multilingual.093@kontax-seed.test",
+      phone: "+354 000 736 467",
+      company: "Reykjavík Studio",
+    }),
+    contact("b", "Aron Jonsson", {
+      email: "aron.jonsson.is@kontax-seed.test",
+      phone: "+353 61 11234",
+      company: "Reykjavik Retail",
+    }),
+  ]);
+
+  assert.equal(suggestions.length, 0);
+});
+
+test("fuzzy name at the same company survives distinct identifiers as a review item", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Jon Smithe", { company: "Acme", email: "jon@acme-corp.test", phone: "+44 7700 900111" }),
+    contact("b", "John Smith", { company: "Acme", email: "john.smith@acme-corp.test", phone: "+44 7700 900222" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.equal(suggestion.confidence, "medium");
+  assert.ok(suggestion.signals.includes("conflicting-identifiers"));
+});
+
+test("exact name at different companies is still suggested for review", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Layla Hassan", { company: "Emerald Logistics" }),
+    contact("b", "Layla Hassan", { company: "Kyiv Imports" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.equal(suggestion.confidence, "medium");
+  assert.equal(suggestion.score, 60); // 80 exact name − 20 conflicting company
+});
