@@ -1,6 +1,6 @@
 # P46-14 (DB07·T3) — Auth-boundary moves (Account = identity, Security = sign-in)
 
-Status: **Pre-plan** · Priority: P1 · Depends: P46-12
+Status: **Built & preview-verified (2026-07-06, d82fd8e)** · Priority: P1 · Depends: P46-12
 Phase: [Phase 46](phase-46-alphabet-scrubber.md) · Spec: DB07 §3
 
 Password change → Security; sessions + sign-out card → Security (with T2);
