@@ -3,6 +3,7 @@ import { emitEvent } from "~/lib/activity";
 import { propagateLiveShares } from "~/server/contact-shares";
 import {
   emailDomain,
+  familyNamesCompatible,
   getFamilyName as getFamilyNameKey,
   givenInitialMatch,
   givenNamesCompatible,
@@ -754,7 +755,11 @@ const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
   if (!leftName || !rightName || leftName === rightName) {
     return false;
   }
-  if (levenshtein(leftName, rightName, 2) <= 2 && givenNamesCompatible(leftFullName, rightFullName)) {
+  if (
+    levenshtein(leftName, rightName, 2) <= 2 &&
+    givenNamesCompatible(leftFullName, rightFullName) &&
+    familyNamesCompatible(leftFullName, rightFullName)
+  ) {
     return false;
   }
   const leftPhonetic = phoneticNameKey(leftFullName);
@@ -893,10 +898,13 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   const exactName = Boolean(leftName && rightName && leftName === rightName);
   const nameDist = leftName && rightName ? levenshtein(leftName, rightName, 2) : 3;
   // Whole-name edit distance alone over-matches short names ("Thảo Nguyễn" is
-  // 2 edits from "Hải Nguyễn") — the given names must also be plausible
-  // variants of each other.
+  // 2 edits from "Hải Nguyễn", "Priya Khan" is 2 from "Priya Shah") — both the
+  // given names and the family names must also be plausible variants.
   const fuzzyName =
-    !exactName && nameDist <= 2 && givenNamesCompatible(left.fullName, right.fullName);
+    !exactName &&
+    nameDist <= 2 &&
+    givenNamesCompatible(left.fullName, right.fullName) &&
+    familyNamesCompatible(left.fullName, right.fullName);
 
   if (exactName) {
     add("exact-name", `Same full name: ${left.fullName}`, 80);

@@ -204,3 +204,34 @@ test("exact name at different companies is still suggested for review", () => {
   assert.equal(suggestion.confidence, "medium");
   assert.equal(suggestion.score, 60); // 80 exact name − 20 conflicting company
 });
+
+test("same given name with a different surname is not a fuzzy match (Priya Khan vs Priya Shah)", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Priya Khan", { email: "priya.khan.tt@kontax-seed.test" }),
+    contact("b", "Priya Shah", { email: "priya.shah.in@kontax-seed.test" }),
+  ]);
+
+  assert.equal(suggestions.length, 0);
+});
+
+test("surname change on a shared phone stays a review item, not a confident match", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Priya Khan", { phone: "+353501234567" }),
+    contact("b", "Priya Shah", { phone: "+353501234567" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.equal(suggestion.confidence, "medium");
+  assert.ok(suggestion.signals.includes("conflicting-name"));
+});
+
+test("one-edit surname variants still fuzzy-match", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Priya Sha", { company: "Mumbai Health" }),
+    contact("b", "Priya Shah", { company: "Mumbai Health" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.ok(suggestions[0]!.signals.some((signal) => signal.startsWith("fuzzy-name")));
+});

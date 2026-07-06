@@ -135,33 +135,40 @@ export const phoneticNameKey = (value: string | null | undefined) => {
 };
 
 /**
- * True when two given names could plausibly refer to the same person: equal,
- * initial-vs-full, a one-edit spelling variant, or phonetically equivalent.
- * Whole-name edit distance alone is too permissive for short names — "Thảo"
- * vs "Hải" is 2 edits from end to end but they are different people — so
- * fuzzy name matching must also pass this given-name gate.
+ * True when two name tokens could plausibly be spellings of the same name:
+ * equal, initial-vs-full, a one-edit variant, or phonetically equivalent.
  */
-export const givenNamesCompatible = (left: string | null | undefined, right: string | null | undefined) => {
-  const leftGiven = getGivenName(left);
-  const rightGiven = getGivenName(right);
-  if (!leftGiven || !rightGiven) {
+const nameTokensCompatible = (leftToken: string, rightToken: string) => {
+  if (!leftToken || !rightToken) {
     return true;
   }
-  if (leftGiven === rightGiven) {
+  if (leftToken === rightToken) {
     return true;
   }
   if (
-    (leftGiven.length === 1 || rightGiven.length === 1) &&
-    leftGiven.charAt(0) === rightGiven.charAt(0)
+    (leftToken.length === 1 || rightToken.length === 1) &&
+    leftToken.charAt(0) === rightToken.charAt(0)
   ) {
     return true;
   }
-  if (levenshtein(leftGiven, rightGiven, 1) <= 1) {
+  if (levenshtein(leftToken, rightToken, 1) <= 1) {
     return true;
   }
-  const leftPhonetic = phoneticToken(leftGiven);
-  return Boolean(leftPhonetic && leftPhonetic === phoneticToken(rightGiven));
+  const leftPhonetic = phoneticToken(leftToken);
+  return Boolean(leftPhonetic && leftPhonetic === phoneticToken(rightToken));
 };
+
+/**
+ * Whole-name edit distance alone is too permissive for short names — "Thảo"
+ * vs "Hải" and "Khan" vs "Shah" are each 2 edits but are different people —
+ * so fuzzy name matching must pass this per-token gate: both the given names
+ * and the family names must be plausible variants of each other.
+ */
+export const givenNamesCompatible = (left: string | null | undefined, right: string | null | undefined) =>
+  nameTokensCompatible(getGivenName(left), getGivenName(right));
+
+export const familyNamesCompatible = (left: string | null | undefined, right: string | null | undefined) =>
+  nameTokensCompatible(getFamilyName(left), getFamilyName(right));
 
 /**
  * True when two names look like the same person referenced with an initial,
