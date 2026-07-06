@@ -24,8 +24,14 @@ export function levenshtein(a: string, b: string, maxDist = 3): number {
 
 const normalizeValue = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
 
+// Fold accented letters to their base form ("Thảo" → "thao", "Nguyễn" →
+// "nguyen") instead of stripping them: dropping non-ASCII letters mangles
+// names ("thảo" → "th o") and corrupts every token-based signal downstream.
 export const normalizeName = (value: string | null | undefined) =>
   normalizeValue(value)
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -126,6 +132,35 @@ export const phoneticNameKey = (value: string | null | undefined) => {
     return "";
   }
   return [...tokens].sort().join(" ");
+};
+
+/**
+ * True when two given names could plausibly refer to the same person: equal,
+ * initial-vs-full, a one-edit spelling variant, or phonetically equivalent.
+ * Whole-name edit distance alone is too permissive for short names — "Thảo"
+ * vs "Hải" is 2 edits from end to end but they are different people — so
+ * fuzzy name matching must also pass this given-name gate.
+ */
+export const givenNamesCompatible = (left: string | null | undefined, right: string | null | undefined) => {
+  const leftGiven = getGivenName(left);
+  const rightGiven = getGivenName(right);
+  if (!leftGiven || !rightGiven) {
+    return true;
+  }
+  if (leftGiven === rightGiven) {
+    return true;
+  }
+  if (
+    (leftGiven.length === 1 || rightGiven.length === 1) &&
+    leftGiven.charAt(0) === rightGiven.charAt(0)
+  ) {
+    return true;
+  }
+  if (levenshtein(leftGiven, rightGiven, 1) <= 1) {
+    return true;
+  }
+  const leftPhonetic = phoneticToken(leftGiven);
+  return Boolean(leftPhonetic && leftPhonetic === phoneticToken(rightGiven));
 };
 
 /**

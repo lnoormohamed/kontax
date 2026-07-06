@@ -107,3 +107,59 @@ test("fuzzy name variants on a shared phone are not penalized", () => {
   assert.ok(!suggestion.signals.some((signal) => signal.startsWith("conflicting-")));
   assert.equal(suggestion.confidence, "high");
 });
+
+test("different given names at the same company are not a fuzzy match (Thảo vs Hải)", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Thảo Nguyễn", {
+      email: "demo.multilingual.034@kontax-seed.test",
+      phone: "+84 000 269 246",
+      company: "Kontax Demo",
+    }),
+    contact("b", "Hải Nguyễn", {
+      email: "demo.multilingual.022@kontax-seed.test",
+      phone: "+84 000 174 218",
+      company: "Kontax Demo",
+    }),
+  ]);
+
+  assert.equal(suggestions.length, 0);
+});
+
+test("diacritic variants of the same name are an exact match", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Thảo Nguyễn", { company: "Kontax Demo" }),
+    contact("b", "Thao Nguyen", { company: "Kontax Demo" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.ok(suggestions[0]!.signals.includes("exact-name"));
+});
+
+test("conflicting birthdays subtract from the score and demote confidence", () => {
+  const withBirthday = (id: string, fullName: string, birthday: string) => ({
+    ...contact(id, fullName, { phone: "+353501234567" }),
+    birthday,
+  });
+  const suggestions = buildContactMergeSuggestions([
+    withBirthday("a", "Layla Hassan", "1983-10-16"),
+    withBirthday("b", "Layla Hassan", "1981-10-08"),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.ok(suggestion.signals.includes("conflicting-birthday"));
+  assert.equal(suggestion.confidence, "medium");
+  assert.ok(suggestion.reasons.some((r) => r.includes("different birthdays")));
+});
+
+test("legitimate spelling variants still fuzzy-match at the same company", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Jon Smithe", { company: "Acme" }),
+    contact("b", "John Smith", { company: "Acme" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.ok(
+    suggestions[0]!.signals.some((signal) => signal.startsWith("fuzzy-name")),
+  );
+});

@@ -5,7 +5,9 @@ import {
   emailDomain,
   getFamilyName as getFamilyNameKey,
   givenInitialMatch,
+  givenNamesCompatible,
   levenshtein,
+  normalizeName as normalizeNameKey,
   normalizePhoneKey,
   phoneticNameKey,
 } from "~/lib/duplicate-signals";
@@ -69,7 +71,8 @@ export type MergeSuggestionSignal =
   | "email-domain-and-name"
   | "conflicting-name"
   | "conflicting-given-name"
-  | "conflicting-company";
+  | "conflicting-company"
+  | "conflicting-birthday";
 
 // Per-signal score contribution, surfaced in the "why was this suggested?" panel (P10-08).
 export type SignalContribution = {
@@ -401,11 +404,9 @@ type MergeDecisionSnapshot = {
 const normalizeValue = (value: string | null | undefined) =>
   value?.trim().toLowerCase() ?? "";
 
-const normalizeName = (value: string) =>
-  normalizeValue(value)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+// Diacritics fold to their base letters (see ~/lib/duplicate-signals) so
+// accented names normalize to comparable tokens instead of being mangled.
+const normalizeName = (value: string) => normalizeNameKey(value);
 
 const normalizePhone = (value: string | null | undefined) => {
   return normalizePhoneExactKey(value) ?? normalizePhoneKey(value);
@@ -752,7 +753,7 @@ const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
   if (!leftName || !rightName || leftName === rightName) {
     return false;
   }
-  if (levenshtein(leftName, rightName, 2) <= 2) {
+  if (levenshtein(leftName, rightName, 2) <= 2 && givenNamesCompatible(leftFullName, rightFullName)) {
     return false;
   }
   const leftPhonetic = phoneticNameKey(leftFullName);
@@ -808,6 +809,14 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
   ) {
     warnings.push(
       "The same phone number appears across different companies. Treat this as review-first rather than an obvious duplicate.",
+    );
+  }
+
+  const leftBirthday = normalizeValue(left.birthday);
+  const rightBirthday = normalizeValue(right.birthday);
+  if (leftBirthday && rightBirthday && leftBirthday !== rightBirthday) {
+    warnings.push(
+      "The two records have different birthdays. That usually means two different people, so review carefully before merging.",
     );
   }
 
@@ -882,7 +891,11 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   // --- Name signals ------------------------------------------------------------
   const exactName = Boolean(leftName && rightName && leftName === rightName);
   const nameDist = leftName && rightName ? levenshtein(leftName, rightName, 2) : 3;
-  const fuzzyName = !exactName && nameDist <= 2;
+  // Whole-name edit distance alone over-matches short names ("Thảo Nguyễn" is
+  // 2 edits from "Hải Nguyễn") — the given names must also be plausible
+  // variants of each other.
+  const fuzzyName =
+    !exactName && nameDist <= 2 && givenNamesCompatible(left.fullName, right.fullName);
 
   if (exactName) {
     add("exact-name", `Same full name: ${left.fullName}`, 80);
@@ -973,6 +986,24 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
         -20,
       );
     }
+  }
+
+  // Different recorded birthdays is near-decisive counter-evidence regardless
+  // of what matched — the same person doesn't have two birthdays. Applies to
+  // fuzzy/name-based matches too, not just hard identifier matches.
+  const leftBirthday = normalizeValue(left.birthday);
+  const rightBirthday = normalizeValue(right.birthday);
+  if (
+    contributions.some((contribution) => contribution.score > 0) &&
+    leftBirthday &&
+    rightBirthday &&
+    leftBirthday !== rightBirthday
+  ) {
+    add(
+      "conflicting-birthday",
+      `Different birthdays: ${left.birthday} vs ${right.birthday}`,
+      -40,
+    );
   }
 
   const signals = contributions.map((contribution) => contribution.signal);
@@ -1480,6 +1511,7 @@ export const refreshMergeSuggestionsForUser = async (
       email: true,
       phone: true,
       company: true,
+      birthday: true,
       importJobId: true,
       updatedAt: true,
     },
@@ -1660,6 +1692,7 @@ export const regenerateStaleSuggestionsForUser = async (userId: string) => {
           email: true,
           phone: true,
           company: true,
+          birthday: true,
           importJobId: true,
           archivedAt: true,
           updatedAt: true,
@@ -1672,6 +1705,7 @@ export const regenerateStaleSuggestionsForUser = async (userId: string) => {
           email: true,
           phone: true,
           company: true,
+          birthday: true,
           importJobId: true,
           archivedAt: true,
           updatedAt: true,
