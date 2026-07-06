@@ -13,6 +13,10 @@ import {
   phoneticNameKey,
 } from "~/lib/duplicate-signals";
 import {
+  comparableNameKey,
+  hasNonLatinLetters,
+} from "~/lib/name-romanization";
+import {
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -74,7 +78,9 @@ export type MergeSuggestionSignal =
   | "conflicting-given-name"
   | "conflicting-company"
   | "conflicting-birthday"
-  | "conflicting-identifiers";
+  | "conflicting-identifiers"
+  | "romanized-name"
+  | "romanized-fuzzy-name";
 
 // Per-signal score contribution, surfaced in the "why was this suggested?" panel (P10-08).
 export type SignalContribution = {
@@ -179,6 +185,8 @@ const SIGNAL_LABELS: Record<string, string> = {
   "name-and-company-proximity": "Similar name",
   "phonetic-name": "Similar name",
   "email-domain-and-name": "Similar name",
+  "romanized-name": "Same name",
+  "romanized-fuzzy-name": "Similar name",
 };
 
 const SIGNAL_PRIORITY = [
@@ -746,9 +754,38 @@ const pickFieldValue = ({
   return primaryValue?.trim() ?? secondaryValue?.trim() ?? null;
 };
 
+// P46-20: cross-script comparison via romanization (陈志强 ≡ 陳志強 ≡
+// "chen zhi qiang", Ольга ≡ "Olga"). Lossy, so it's a supporting signal
+// only — never a hard match — and it's consulted only when at least one
+// side has non-Latin letters; Latin-only pairs use the normal name signals.
+const romanizedComparison = (
+  leftFullName: string,
+  rightFullName: string,
+): "equal" | "fuzzy" | "none" => {
+  if (!hasNonLatinLetters(leftFullName) && !hasNonLatinLetters(rightFullName)) {
+    return "none";
+  }
+  const leftKey = comparableNameKey(leftFullName);
+  const rightKey = comparableNameKey(rightFullName);
+  if (!leftKey || !rightKey) {
+    return "none";
+  }
+  if (leftKey === rightKey) {
+    return "equal";
+  }
+  if (
+    levenshtein(leftKey, rightKey, 2) <= 2 &&
+    givenNamesCompatible(leftKey, rightKey) &&
+    familyNamesCompatible(leftKey, rightKey)
+  ) {
+    return "fuzzy";
+  }
+  return "none";
+};
+
 // Names "genuinely differ" only beyond spelling variance: not equal, not within
-// fuzzy edit distance, and not phonetically equivalent. "Katherine"/"Catherine"
-// is a variant, not a conflict.
+// fuzzy edit distance, not phonetically equivalent, and not the same name
+// written in two scripts. "Katherine"/"Catherine" is a variant, not a conflict.
 const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
   const leftName = normalizeName(leftFullName);
   const rightName = normalizeName(rightFullName);
@@ -760,6 +797,9 @@ const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
     givenNamesCompatible(leftFullName, rightFullName) &&
     familyNamesCompatible(leftFullName, rightFullName)
   ) {
+    return false;
+  }
+  if (romanizedComparison(leftFullName, rightFullName) !== "none") {
     return false;
   }
   const leftPhonetic = phoneticNameKey(leftFullName);
@@ -787,7 +827,8 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
     leftEmail === rightEmail &&
     leftFamilyName &&
     rightFamilyName &&
-    leftFamilyName !== rightFamilyName
+    !familyNamesCompatible(left.fullName, right.fullName) &&
+    romanizedComparison(left.fullName, right.fullName) === "none"
   ) {
     warnings.push(
       "Shared email with different family names detected. This could be a household address or shared inbox, so review carefully before merging.",
@@ -930,6 +971,27 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
       `Likely same person at ${left.company}: ${left.fullName} ≈ ${right.fullName}`,
       60,
     );
+  }
+
+  // --- Cross-script name (supporting signal only — never a hard match) ---------
+  // P46-20: the same person recorded in two scripts (陈志强 / 陳志強 /
+  // "Chen Zhi Qiang") matches via romanized keys when the in-script
+  // signals can't see it.
+  if (!exactName && !fuzzyName) {
+    const romanized = romanizedComparison(left.fullName, right.fullName);
+    if (romanized === "equal") {
+      add(
+        "romanized-name",
+        `Same name across scripts: ${left.fullName} ≈ ${right.fullName}`,
+        70,
+      );
+    } else if (romanized === "fuzzy") {
+      add(
+        "romanized-fuzzy-name",
+        `Similar name across scripts: ${left.fullName} ≈ ${right.fullName}`,
+        40,
+      );
+    }
   }
 
   // --- Phonetic name (supporting signal only — never a hard match) -------------

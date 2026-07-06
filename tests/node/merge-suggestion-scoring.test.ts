@@ -419,3 +419,67 @@ test("different Thai names sharing a phone are demoted", () => {
   assert.equal(suggestions.length, 1);
   assert.equal(suggestions[0]!.confidence, "medium");
 });
+
+// ── P46-20: cross-script romanized matching ──────────────────────────────────
+
+test("simplified and traditional Chinese records of one person are high confidence", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "陈志强", { email: "chen@example.test" }),
+    contact("b", "陳志強", { email: "chen@example.test" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.equal(suggestion.confidence, "high");
+  assert.ok(suggestion.signals.includes("romanized-name"));
+  assert.ok(!suggestion.signals.some((s) => s.startsWith("conflicting-")));
+});
+
+test("native script and romanized record pair up even without a shared identifier", () => {
+  const chinese = buildContactMergeSuggestions([
+    contact("a", "李娜", { phone: "+8613900000101" }),
+    contact("b", "Li Na", { phone: "+8613955555555" }),
+  ]);
+  assert.equal(chinese.length, 1);
+  assert.equal(chinese[0]!.confidence, "medium");
+  assert.ok(chinese[0]!.signals.includes("romanized-name"));
+
+  const cyrillic = buildContactMergeSuggestions([
+    contact("a", "Ольга Смирнова", { email: "olga.a@example.test" }),
+    contact("b", "Olga Smirnova", { email: "olga.b@example.test" }),
+  ]);
+  assert.equal(cyrillic.length, 1);
+  assert.ok(cyrillic[0]!.signals.includes("romanized-name"));
+});
+
+test("kana record matches its romaji spelling via romanized fuzzy", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "タナカ タロウ", { email: "tanaka@example.test" }),
+    contact("b", "Tanaka Taro", { email: "tanaka@example.test" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "high");
+  assert.ok(
+    suggestions[0]!.signals.some((s) => s.startsWith("romanized-")),
+  );
+  assert.ok(!suggestions[0]!.signals.some((s) => s.startsWith("conflicting-")));
+});
+
+test("romanization does not revive in-script negatives", () => {
+  // 王芳/王磊 → "wang fang"/"wang lei" and राम/रीमा → "raam"/"riimaa" must
+  // stay distinct after romanization.
+  const chinese = buildContactMergeSuggestions([
+    contact("a", "王磊", { company: "北京科技", email: "wl@dupe-qa.test", phone: "+8613900000031" }),
+    contact("b", "王芳", { company: "北京科技", email: "wf@dupe-qa.test", phone: "+8613900000032" }),
+  ]);
+  assert.equal(chinese.length, 0);
+
+  const hindi = buildContactMergeSuggestions([
+    contact("a", "राम शर्मा", { phone: "+919812345678" }),
+    contact("b", "रीमा शर्मा", { phone: "+919812345678" }),
+  ]);
+  assert.equal(hindi.length, 1);
+  assert.equal(hindi[0]!.confidence, "medium");
+  assert.ok(hindi[0]!.signals.some((s) => s.startsWith("conflicting-")));
+});
