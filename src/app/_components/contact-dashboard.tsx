@@ -676,6 +676,15 @@ export function ContactDashboard({
             <>
               <span className="text-[13.5px] font-semibold text-[#1d2823]">{countLabel}</span>
               <div className="ml-auto flex items-center gap-2">
+                {/* P46-17 / DB07 T6: Merge review left the settings nav — the
+                    duplicates view is the tool's home entry point. */}
+                <Link
+                  className="flex h-8 items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-2.5 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  href="/merge/manual"
+                >
+                  <WorkspaceIcon name="people" size={14} strokeWidth={1.8} />
+                  Manual merge
+                </Link>
                 <MergeSuggestionRefreshButton />
                 <BulkMergeButton count={highConfidenceCount} />
               </div>
