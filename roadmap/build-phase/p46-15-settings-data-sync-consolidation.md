@@ -1,6 +1,12 @@
 # P46-15 (DB07·T4) — Data & sync consolidation
 
-Status: **Pre-plan** · Priority: P1 · Depends: P46-12
+Status: **Built & preview-verified (2026-07-06, 8c7cd16)** · Priority: P1 · Depends: P46-12
+
+> Deviation: the Security "mirror" is a cross-linked management card (count +
+> destination) rather than a full inline revoke list — AppPasswordManager's
+> create/step-up flow is too entangled to split cheaply. Matches the design's
+> "cross-linked" SPLIT decision; revisit only if lost-device revocation from
+> Security proves to need zero-hop.
 Phase: [Phase 46](phase-46-alphabet-scrubber.md) · Spec: DB07 §6
 
 Presets fold into `/import-export` as a **Presets tab** (301s from
