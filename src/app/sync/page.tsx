@@ -202,7 +202,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, incomingShares, syncErrorCount, labels, projectionBooks, rawAccounts, rawPastAccounts] =
+  const [planSummary, incomingShares, syncErrorCount, openMergeSuggestions, labels, projectionBooks, rawAccounts, rawPastAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
       db.contactShare.count({
@@ -214,6 +214,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
         },
       }),
       db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+      db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
       // P36: the user's labels power the auto-label-on-import and export-filter pickers.
       db.label.findMany({
         where: { userId },
@@ -779,7 +780,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <BottomNav syncErrorCount={syncErrorCount} />
+      <BottomNav syncErrorCount={syncErrorCount} duplicatesCount={openMergeSuggestions} />
     </div>
   );
 }

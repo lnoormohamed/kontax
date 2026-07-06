@@ -568,7 +568,11 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         show={selectedTab === "people"}
         atLimit={planSummary.contactsRemaining !== null && planSummary.contactsRemaining <= 0}
       />
-      <BottomNav unreadCount={workspaceCounts.unreadNotifications} syncErrorCount={workspaceCounts.syncErrors} />
+      <BottomNav
+        unreadCount={workspaceCounts.unreadNotifications}
+        syncErrorCount={workspaceCounts.syncErrors}
+        duplicatesCount={workspaceCounts.openMergeSuggestions}
+      />
     </main>
   );
 }

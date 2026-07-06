@@ -36,9 +36,10 @@ export default async function SettingsLayout({ children }: { children: React.Rea
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
-  const [unreadCount, syncErrorCount] = await Promise.all([
+  const [unreadCount, syncErrorCount, openMergeSuggestions] = await Promise.all([
     db.notification.count({ where: { userId, readAt: null, dismissedAt: null } }),
     db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+    db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
   ]);
 
 
@@ -88,7 +89,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
         </div>
       </div>
 
-      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
+      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} duplicatesCount={openMergeSuggestions} />
     </div>
   );
 }

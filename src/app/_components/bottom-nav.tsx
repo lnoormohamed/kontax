@@ -8,29 +8,34 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 interface BottomNavProps {
   unreadCount?: number;
   syncErrorCount?: number;
+  duplicatesCount?: number;
 }
 
 const TABS = [
   // Mobile lands on the contacts list, not the Overview dashboard (a desktop
   // concept). Overview stays reachable via the Kontax wordmark in the mobile
-  // header, so Duplicates/Archived/Shared aren't stranded.
+  // header, so Archived/Shared aren't stranded.
+  // P46-19: Duplicates holds the third slot (recurring, phone-friendly work);
+  // /sync moved under Settings → Data & sync, and its error badge moved to
+  // the Settings tab so broken sync stays visible.
   { key: "contacts", label: "Contacts", icon: "layoutList", href: "/contacts" },
   { key: "activity", label: "Activity", icon: "activity", href: "/contacts?tab=activity" },
-  { key: "sync", label: "Sync", icon: "sync", href: "/sync" },
+  { key: "duplicates", label: "Duplicates", icon: "merge", href: "/contacts?tab=duplicates" },
   { key: "settings", label: "Settings", icon: "gear", href: "/settings" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
 
 function getActiveTab(pathname: string, searchParams: ReturnType<typeof useSearchParams>): TabKey {
-  if (pathname.startsWith("/settings")) return "settings";
-  if (pathname.startsWith("/sync")) return "sync";
+  if (pathname.startsWith("/settings") || pathname.startsWith("/sync")) return "settings";
+  if (pathname.startsWith("/merge")) return "duplicates";
+  if (pathname.startsWith("/contacts") && searchParams.get("tab") === "duplicates") return "duplicates";
   if (pathname.startsWith("/contacts") && searchParams.get("tab") === "activity") return "activity";
   if (pathname.startsWith("/contacts") || pathname === "/") return "contacts";
   return "contacts";
 }
 
-export function BottomNav({ unreadCount = 0, syncErrorCount = 0 }: BottomNavProps) {
+export function BottomNav({ unreadCount = 0, syncErrorCount = 0, duplicatesCount = 0 }: BottomNavProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeKey = getActiveTab(pathname, searchParams);
@@ -53,7 +58,8 @@ export function BottomNav({ unreadCount = 0, syncErrorCount = 0 }: BottomNavProp
       {TABS.map(({ key, label, icon, href }) => {
         const isActive = key === activeKey;
         const color = isActive ? "#17352e" : "#8b938c";
-        const badge = key === "activity" ? unreadCount : key === "sync" ? syncErrorCount : 0;
+        const badge =
+          key === "activity" ? unreadCount : key === "duplicates" ? duplicatesCount : key === "settings" ? syncErrorCount : 0;
 
         return (
           <Link

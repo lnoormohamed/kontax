@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
 export const metadata: Metadata = { title: "Data & sync — Kontax" };
 
@@ -21,6 +22,12 @@ const ROWS = [
 export default async function SettingsDataIndexPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+
+  // P46-19: with Sync out of the mobile bottom nav, this row is the wayfinding
+  // step between the badged Settings tab and /sync — flag broken accounts here.
+  const syncErrorCount = await db.syncAccount.count({
+    where: { userId: session.user.id, status: { in: ["ERROR", "NEEDS_REAUTH"] } },
+  });
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-6">
@@ -48,6 +55,11 @@ export default async function SettingsDataIndexPage() {
               </span>
               <span className="block truncate text-[12.5px] text-[#8b938c]">{row.sub}</span>
             </span>
+            {row.icon === "sync" && syncErrorCount > 0 ? (
+              <span className="shrink-0 rounded-full bg-[#f3e1da] px-2 py-0.5 text-[11px] font-semibold text-[#b5472f]">
+                {syncErrorCount} need{syncErrorCount === 1 ? "s" : ""} attention
+              </span>
+            ) : null}
             <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
           </Link>
         ))}

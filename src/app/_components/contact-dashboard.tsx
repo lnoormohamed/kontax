@@ -981,6 +981,19 @@ export function ContactDashboard({
 
           {currentTab === "duplicates" ? (
             <div className="grid gap-6">
+              {/* P46-19: the merge actions live in the desktop-only toolbar above;
+                  on mobile they render here so the tab isn't review-only. */}
+              <div className="flex flex-wrap items-center gap-2 px-4 pt-4 md:hidden">
+                <Link
+                  className="flex h-9 items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 text-[13px] font-semibold text-[#5c655e]"
+                  href="/merge/manual"
+                >
+                  <WorkspaceIcon name="merge" size={14} strokeWidth={1.8} />
+                  Manual merge
+                </Link>
+                <MergeSuggestionRefreshButton />
+                <BulkMergeButton count={highConfidenceCount} />
+              </div>
               {mergeSuggestionsRefreshed ? (
                 <p className="px-4 pt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67]">
                   Suggestions refreshed
