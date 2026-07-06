@@ -25,14 +25,17 @@ export function levenshtein(a: string, b: string, maxDist = 3): number {
 const normalizeValue = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
 
 // Fold accented letters to their base form ("Thảo" → "thao", "Nguyễn" →
-// "nguyen") instead of stripping them: dropping non-ASCII letters mangles
-// names ("thảo" → "th o") and corrupts every token-based signal downstream.
+// "nguyen") instead of stripping them, and keep ALL Unicode letters — not just
+// a-z. Stripping non-Latin scripts normalized every Arabic/CJK/Hangul/Cyrillic
+// name to "", which blinded every name signal AND suppressed the name-conflict
+// warnings/penalties (empty names "can't conflict"), so two different people
+// sharing a phone surfaced as a high-confidence one-click merge.
 export const normalizeName = (value: string | null | undefined) =>
   normalizeValue(value)
     .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\p{M}/gu, "")
     .replace(/đ/g, "d")
-    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
 
@@ -151,7 +154,13 @@ const nameTokensCompatible = (leftToken: string, rightToken: string) => {
   ) {
     return true;
   }
-  if (levenshtein(leftToken, rightToken, 1) <= 1) {
+  // A single edit only reads as a typo when the token is long enough for it
+  // to be a small fraction of the name. For short tokens — "Li" vs "Lu", or
+  // two-character CJK names like 王芳 vs 王磊 — one edit IS a different name.
+  if (
+    Math.min(leftToken.length, rightToken.length) >= 4 &&
+    levenshtein(leftToken, rightToken, 1) <= 1
+  ) {
     return true;
   }
   const leftPhonetic = phoneticToken(leftToken);

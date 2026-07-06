@@ -235,3 +235,111 @@ test("one-edit surname variants still fuzzy-match", () => {
   assert.equal(suggestions.length, 1);
   assert.ok(suggestions[0]!.signals.some((signal) => signal.startsWith("fuzzy-name")));
 });
+
+// ── Non-Latin scripts ────────────────────────────────────────────────────────
+
+test("different Chinese names sharing a phone are demoted, not high confidence", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "张伟", { phone: "+8613912345678" }),
+    contact("b", "王芳", { phone: "+8613912345678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.equal(suggestion.confidence, "medium");
+  assert.ok(suggestion.signals.includes("conflicting-name"));
+});
+
+test("identical CJK names on a shared phone stay high confidence", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "张伟", { phone: "+8613912345678" }),
+    contact("b", "张伟", { phone: "+86 139 1234 5678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  const suggestion = suggestions[0]!;
+  assert.equal(suggestion.confidence, "high");
+  assert.ok(suggestion.signals.includes("exact-name"));
+});
+
+test("different Arabic names sharing a phone are demoted", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "محمد الأحمد", { phone: "+9665012345678" }),
+    contact("b", "فاطمة الزهراء", { phone: "+9665012345678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "medium");
+});
+
+test("Arabic hamza variants of the same name are an exact match", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "محمد الأحمد", { phone: "+9665012345678" }),
+    contact("b", "محمد الاحمد", { phone: "+9665012345678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "high");
+  assert.ok(suggestions[0]!.signals.includes("exact-name"));
+});
+
+test("different Korean names sharing a phone are demoted", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "김민준", { phone: "+821012345678" }),
+    contact("b", "이서연", { phone: "+821012345678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "medium");
+});
+
+test("different Russian names sharing a phone are demoted; same name matches exactly", () => {
+  const conflicting = buildContactMergeSuggestions([
+    contact("a", "Иван Петров", { phone: "+79161234567" }),
+    contact("b", "Ольга Смирнова", { phone: "+79161234567" }),
+  ]);
+  assert.equal(conflicting.length, 1);
+  assert.equal(conflicting[0]!.confidence, "medium");
+
+  const matching = buildContactMergeSuggestions([
+    contact("a", "Иван Петров", { email: "ivan@example.test" }),
+    contact("b", "Иван Петров", { email: "ivan@example.test" }),
+  ]);
+  assert.equal(matching.length, 1);
+  assert.equal(matching[0]!.confidence, "high");
+  assert.ok(matching[0]!.signals.includes("exact-name"));
+});
+
+test("simplified vs traditional Chinese record of one person still hard-matches on identifier", () => {
+  // 陈志强 (simplified) vs 陳志強 (traditional): no Unicode fold maps between
+  // them, so name signals stay silent — but the shared email still surfaces
+  // the pair for review rather than losing it.
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "陈志强", { email: "chen@example.test" }),
+    contact("b", "陳志強", { email: "chen@example.test" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.ok(suggestions[0]!.hardMatch);
+});
+
+test("one-character difference in short CJK names is not a fuzzy match", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "王磊", { company: "北京科技", email: "wang.lei@dupe-qa.test", phone: "+8613900000031" }),
+    contact("b", "王芳", { company: "北京科技", email: "wang.fang@dupe-qa.test", phone: "+8613900000032" }),
+  ]);
+
+  assert.equal(suggestions.length, 0);
+});
+
+test("short Latin given names still match via phonetics, not edit distance", () => {
+  // "Jon"/"John" is 3 chars — below the one-edit length floor — but remains
+  // compatible through the phonetic key, so real spelling variants survive.
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "Jon Smith", { company: "Acme" }),
+    contact("b", "John Smith", { company: "Acme" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.ok(suggestions[0]!.signals.some((signal) => signal.startsWith("fuzzy-name")));
+});
