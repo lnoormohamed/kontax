@@ -6,29 +6,22 @@ import { ConfirmAction } from "~/app/_components/confirm-action";
 import { SectionLabel, SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
-  archiveTeamBook,
   createTeam,
-  createTeamBook,
   deleteTeam,
-  deleteTeamBook,
   inviteTeamMember,
   leaveTeam,
-  linkTeamSyncAccount,
   openTeamBillingPortal,
   removeTeamMember,
   resendTeamInvite,
   setBillingManager,
-  setMemberBookPermission,
   setTeamMemberRole,
   transferTeamOwnership,
-  unlinkTeamSyncAccount,
-  updateTeamSeats,
 } from "~/app/actions/teams";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
-import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
-import { getTeamBillingSummary, getTeamGraceState } from "~/server/team-access";
+import { getTeamBillingSummary } from "~/server/team-access";
+import { loadOwnedTeam } from "./_lib";
 
 const fmtDate = (value: Date | null) =>
   value
@@ -68,23 +61,12 @@ export default async function TeamSettingsPage() {
   const session = await auth();
   if (!session?.user?.id) return redirectToLogin("/settings/sharing/teams");
   const userId = session.user.id;
-  const billing = await getUserBillingContext(userId);
 
-  const ownedTeam = await db.group.findFirst({
-    where: { ownerId: userId, type: "TEAM" },
-    include: {
-      members: {
-        orderBy: [{ role: "asc" }, { createdAt: "asc" }],
-        include: { user: { select: { name: true, email: true } } },
-      },
-      addressBooks: {
-        orderBy: { createdAt: "asc" },
-        select: { id: true, name: true, description: true, archivedAt: true, _count: { select: { contacts: true } } },
-      },
-    },
-  });
+  // P46-18: one shared owned-team loader (also used by the Books /
+  // Permissions child pages) — the member / no-team states stay here.
+  const ctx = await loadOwnedTeam(userId);
 
-  const memberOf = ownedTeam
+  const memberOf = ctx
     ? null
     : await db.groupMember.findFirst({
         where: { userId, inviteStatus: "ACCEPTED", group: { type: "TEAM" } },
@@ -169,7 +151,8 @@ export default async function TeamSettingsPage() {
   }
 
   // ── No team yet ──
-  if (!ownedTeam) {
+  if (!ctx) {
+    const billing = await getUserBillingContext(userId);
     if (!billing.entitlements.teamsEnabled) {
       return (
         <>
@@ -225,15 +208,12 @@ export default async function TeamSettingsPage() {
   }
 
   // ── Owner/admin view ──
-  // P34F-02 §08: team-active is read off the Group's own entitlement. The fallback
-  // to the owner's personal entitlement covers teams not yet migrated to org
-  // billing (P34F-03); remove the fallback once migration completes.
-  const teamsActive = ownedTeam.teamsEnabled || billing.entitlements.teamsEnabled;
+  const { ownedTeam, pendingSetup, isLocked, isGrace } = ctx;
 
   // Option A: a group created at checkout that hasn't been paid yet — it exists,
   // is not active, and is not in grace. Show a "finishing setup" state rather than
   // the full management UI (which getTeamGraceState would otherwise read active).
-  if (!teamsActive && ownedTeam.teamsGraceEndsAt === null) {
+  if (pendingSetup) {
     return (
       <>
         <SettingsPageHead title="Team management" sub="Finishing your Teams setup." />
@@ -250,40 +230,11 @@ export default async function TeamSettingsPage() {
     );
   }
 
-  const teamState = getTeamGraceState(ownedTeam.teamsGraceEndsAt, teamsActive);
-  const isLocked = teamState === "locked";
-  const isGrace = teamState === "grace";
-
   const accepted = ownedTeam.members.filter((m) => m.role === "OWNER" || m.inviteStatus === "ACCEPTED");
   const pending = ownedTeam.members.filter((m) => m.role !== "OWNER" && m.inviteStatus !== "ACCEPTED");
   const activeCount = ownedTeam.members.filter((m) => m.inviteStatus !== "DECLINED").length;
   const full = activeCount >= ownedTeam.maxMembers;
   const activeBooks = ownedTeam.addressBooks.filter((b) => !b.archivedAt);
-  const regularMembers = ownedTeam.members.filter((m) => m.role === "MEMBER" && m.inviteStatus === "ACCEPTED");
-  const memberPerm = (m: (typeof ownedTeam.members)[number], bookId: string): string => {
-    const perms =
-      m.addressBookPermissions && typeof m.addressBookPermissions === "object"
-        ? (m.addressBookPermissions as Record<string, string>)
-        : {};
-    return perms[bookId] ?? "EDIT";
-  };
-
-  const [mySyncAccounts, teamSyncLinks] = await Promise.all([
-    db.syncAccount.findMany({
-      where: { userId, status: { notIn: [...SYNC_ACCOUNT_HISTORICAL_STATUSES] } },
-      orderBy: { createdAt: "asc" },
-      select: { id: true, label: true },
-    }),
-    db.teamSyncAccount.findMany({
-      where: { groupId: ownedTeam.id },
-      include: {
-        syncAccount: { select: { label: true, status: true } },
-        addressBook: { select: { name: true } },
-      },
-    }),
-  ]);
-  const linkedAccountIds = new Set(teamSyncLinks.map((l) => l.syncAccountId));
-  const linkableAccounts = mySyncAccounts.filter((a) => !linkedAccountIds.has(a.id));
 
   // P34F-06: read-only billing summary (owner is always a billing manager).
   const billingSummary = await getTeamBillingSummary(ownedTeam.id);
@@ -395,32 +346,23 @@ export default async function TeamSettingsPage() {
           </SettingsCard>
         )}
 
-        {/* seat management — hidden when locked (no active Teams plan to adjust) */}
+        {/* P46-18 / DB07: seats are READ-ONLY here — Plan & billing owns the
+            seat count and purchase; this card links there. */}
         {!isLocked && (
           <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
               <div className="text-[14.5px] font-semibold text-[#1d2823]">Seats</div>
               <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
-                You have {ownedTeam.maxMembers} seats on your plan.
-                Changes are prorated and take effect immediately.
+                {activeCount} of {ownedTeam.maxMembers} seats in use. Seat changes are prorated and
+                managed on Plan &amp; billing.
               </p>
             </div>
-            <form action={updateTeamSeats} className="flex items-center gap-2">
-              <input
-                className="w-20 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-center text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-                defaultValue={ownedTeam.maxMembers}
-                min={Math.max(3, activeCount)}
-                max={500}
-                name="seats"
-                type="number"
-              />
-              <button
-                className="rounded-xl border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
-                type="submit"
-              >
-                Update seats
-              </button>
-            </form>
+            <Link
+              className="shrink-0 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+              href="/settings/billing"
+            >
+              Manage seats
+            </Link>
           </SettingsCard>
         )}
 
@@ -592,118 +534,43 @@ export default async function TeamSettingsPage() {
           </div>
         ) : null}
 
-        {/* address books */}
+        {/* P46-18: Books & permissions live on child pages now (DB07 T5 —
+            even depth with Family; no single page carries books + seats +
+            billing + audit at once). */}
         <div>
-          <SectionLabel>Address books</SectionLabel>
-          <SettingsCard>
-            <p className="text-[13.5px] text-[#5c655e]">
-              Organise team contacts into named books (e.g. Clients, Partners). Archived books are read-only.
-            </p>
-            <div className="mt-3 divide-y divide-[#e9ece7]">
-              {ownedTeam.addressBooks.map((b) => (
-                <div className="flex items-center justify-between gap-3 py-2.5" key={b.id}>
+          <SectionLabel>Books &amp; permissions</SectionLabel>
+          <SettingsCard className="!p-0">
+            <div className="divide-y divide-[#e9ece7]">
+              <Link
+                className="flex items-center justify-between gap-3 px-5 py-3.5 transition hover:bg-[#fbfcf9]"
+                href="/settings/sharing/teams/books"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[14px] font-semibold text-[#1d2823]">Team books</span>
+                  <span className="block text-[12.5px] text-[#8b938c]">
+                    {activeBooks.length} active book{activeBooks.length === 1 ? "" : "s"} · create,
+                    archive, link sync accounts
+                  </span>
+                </span>
+                <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" />
+              </Link>
+              {!isLocked ? (
+                <Link
+                  className="flex items-center justify-between gap-3 px-5 py-3.5 transition hover:bg-[#fbfcf9]"
+                  href="/settings/sharing/teams/permissions"
+                >
                   <span className="min-w-0">
-                    <span className="text-[14px] font-semibold text-[#1d2823]">{b.name}</span>
-                    {b.archivedAt ? <span className="ml-2 text-[12px] font-semibold text-[#8b938c]">Archived</span> : null}
+                    <span className="block text-[14px] font-semibold text-[#1d2823]">Book permissions</span>
                     <span className="block text-[12.5px] text-[#8b938c]">
-                      {b.description ? `${b.description} · ` : ""}{b._count.contacts.toLocaleString()} contacts
+                      Per-member, per-book access — edit, view, or none
                     </span>
                   </span>
-                  {!isLocked && (
-                    <span className="flex shrink-0 items-center gap-3">
-                      <form action={archiveTeamBook}>
-                        <input name="bookId" type="hidden" value={b.id} />
-                        <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
-                          {b.archivedAt ? "Restore" : "Archive"}
-                        </button>
-                      </form>
-                      <ConfirmAction
-                        action={deleteTeamBook}
-                        body={`"${b.name}" and its contacts are permanently removed for everyone. This can't be undone.`}
-                        confirmLabel="Delete book"
-                        danger
-                        fields={{ bookId: b.id }}
-                        title={`Delete ${b.name}?`}
-                        trigger="Delete"
-                      />
-                    </span>
-                  )}
-                </div>
-              ))}
+                  <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" />
+                </Link>
+              ) : null}
             </div>
-            {!isLocked && (
-              <form action={createTeamBook} className="mt-3 flex flex-wrap items-center gap-2">
-                <input
-                  className="min-w-[160px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-                  name="name"
-                  placeholder="New book name"
-                  required
-                />
-                <input
-                  className="min-w-[160px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-                  name="description"
-                  placeholder="Description (optional)"
-                />
-                <button
-                  className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
-                  type="submit"
-                >
-                  Add book
-                </button>
-              </form>
-            )}
           </SettingsCard>
         </div>
-
-        {/* per-book permissions — hidden when locked */}
-        {!isLocked && regularMembers.length > 0 && activeBooks.length > 0 ? (
-          <div>
-            <SectionLabel>Book permissions</SectionLabel>
-            <SettingsCard>
-              <p className="text-[13.5px] text-[#5c655e]">
-                Set what each member can do per book. Owners and admins always have full access.
-              </p>
-              <div className="mt-3 grid gap-4">
-                {regularMembers.map((m) => (
-                  <div key={m.id}>
-                    <p className="text-[13.5px] font-semibold text-[#1d2823]">
-                      {m.user?.name?.trim() ?? m.user?.email ?? "Member"}
-                    </p>
-                    <div className="mt-1.5 grid gap-1.5">
-                      {activeBooks.map((b) => {
-                        const cur = memberPerm(m, b.id);
-                        return (
-                          <div className="flex items-center justify-between gap-3 text-[13px]" key={b.id}>
-                            <span className="min-w-0 truncate text-[#5c655e]">{b.name}</span>
-                            <span className="flex shrink-0 items-center gap-1">
-                              {(["EDIT", "VIEW", "NONE"] as const).map((perm) => (
-                                <form action={setMemberBookPermission} key={perm}>
-                                  <input name="memberId" type="hidden" value={m.id} />
-                                  <input name="bookId" type="hidden" value={b.id} />
-                                  <input name="permission" type="hidden" value={perm} />
-                                  <button
-                                    className={`rounded-md px-2.5 py-1 text-[12px] font-semibold transition ${
-                                      cur === perm
-                                        ? "bg-[#17352e] text-white"
-                                        : "bg-[#f2f4f0] text-[#5c655e] hover:bg-[#e6e9e3]"
-                                    }`}
-                                    type="submit"
-                                  >
-                                    {perm === "EDIT" ? "Edit" : perm === "VIEW" ? "View" : "None"}
-                                  </button>
-                                </form>
-                              ))}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </SettingsCard>
-          </div>
-        ) : null}
 
         {/* invite — hidden when locked */}
         {!isLocked && (
@@ -743,81 +610,6 @@ export default async function TeamSettingsPage() {
           </SettingsCard>
         )}
 
-        {/* sync accounts */}
-        <div>
-          <SectionLabel>Sync accounts</SectionLabel>
-          <SettingsCard>
-            <p className="text-[13.5px] text-[#5c655e]">
-              Sync a team book to an external CardDAV provider (Google Workspace, Nextcloud…). Connect an
-              account under{" "}
-              <Link className="font-semibold text-[#4158f4]" href="/sync">
-                Sync
-              </Link>
-              , then link it to a book here.
-            </p>
-
-            {teamSyncLinks.length > 0 ? (
-              <div className="mt-3 divide-y divide-[#e9ece7]">
-                {teamSyncLinks.map((l) => (
-                  <div className="flex items-center justify-between gap-3 py-2.5 text-[13px]" key={l.id}>
-                    <span className="min-w-0">
-                      <span className="text-[#1d2823]">{l.syncAccount.label}</span>
-                      <span className="text-[#8b938c]"> → {l.addressBook.name}</span>
-                    </span>
-                    {!isLocked && (
-                      <form action={unlinkTeamSyncAccount}>
-                        <input name="teamSyncAccountId" type="hidden" value={l.id} />
-                        <button className="shrink-0 text-[13px] font-semibold text-[#b5472f]" type="submit">
-                          Unlink
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : null}
-
-            {!isLocked && linkableAccounts.length > 0 && activeBooks.length > 0 ? (
-              <form action={linkTeamSyncAccount} className="mt-3 flex flex-wrap items-center gap-2">
-                <select
-                  className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px]"
-                  name="syncAccountId"
-                  required
-                >
-                  {linkableAccounts.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.label}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-[13px] text-[#8b938c]">→</span>
-                <select
-                  className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px]"
-                  name="bookId"
-                  required
-                >
-                  {activeBooks.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className="rounded-xl bg-[#4158f4] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#3248db]"
-                  type="submit"
-                >
-                  Link
-                </button>
-              </form>
-            ) : (
-              <p className="mt-3 text-[12.5px] text-[#8b938c]">
-                {activeBooks.length === 0
-                  ? "Create an address book first."
-                  : "Connect a CardDAV account under Sync to link it here."}
-              </p>
-            )}
-          </SettingsCard>
-        </div>
       </div>
     </>
   );

@@ -10,6 +10,9 @@ import {
 import { BillingSection } from "~/app/settings/_components/billing-section";
 import { BillingSuccessBanner } from "~/app/settings/_components/billing-success-banner";
 import { PortalReturnedBanner } from "~/app/settings/_components/portal-returned-banner";
+import { SettingsCard } from "~/app/_components/settings-ui";
+import { updateTeamSeats } from "~/app/actions/teams";
+import { loadOwnedTeam } from "~/app/settings/sharing/teams/_lib";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { getBillingSurface } from "~/server/billing-surface";
@@ -52,6 +55,9 @@ export default async function SettingsBillingPage({
   }
 
   const planSummary = await getUserPlanSummary(userId);
+  // P46-18 / DB07: Plan & billing owns seat count & purchase — the seat form
+  // lives here; the Teams page shows read-only usage and links back.
+  const teamCtx = planSummary.plan === "TEAMS" ? await loadOwnedTeam(userId) : null;
   const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo] = await Promise.all([
     getBillingSurface(userId),
     db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
@@ -117,6 +123,42 @@ export default async function SettingsBillingPage({
 
         {/* P46-16: the group-membership shortcut moved to the Sharing & groups
             index — it's a navigation card, not a billing control. */}
+
+        {/* P46-18: team seat management (owner-only; hidden when locked —
+            no active Teams plan to adjust). Same updateTeamSeats Stripe
+            action as before, relocated from the Teams page. */}
+        {teamCtx && !teamCtx.isLocked && !teamCtx.pendingSetup ? (() => {
+          const activeCount = teamCtx.ownedTeam.members.filter(
+            (m) => m.inviteStatus !== "DECLINED",
+          ).length;
+          return (
+            <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-[14.5px] font-semibold text-[#1d2823]">Team seats</div>
+                <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
+                  {teamCtx.ownedTeam.name} · {activeCount} of {teamCtx.ownedTeam.maxMembers} seats
+                  in use. Changes are prorated and take effect immediately.
+                </p>
+              </div>
+              <form action={updateTeamSeats} className="flex items-center gap-2">
+                <input
+                  className="w-20 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-center text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+                  defaultValue={teamCtx.ownedTeam.maxMembers}
+                  min={Math.max(3, activeCount)}
+                  max={500}
+                  name="seats"
+                  type="number"
+                />
+                <button
+                  className="rounded-xl border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                  type="submit"
+                >
+                  Update seats
+                </button>
+              </form>
+            </SettingsCard>
+          );
+        })() : null}
 
         {/* plan comparison */}
         <div>

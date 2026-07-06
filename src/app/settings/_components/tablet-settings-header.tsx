@@ -26,6 +26,8 @@ const DEEP_TITLES: Record<string, string> = {
   "sharing/family": "Family",
   "sharing/teams": "Team management",
   "sharing/teams/audit": "Team audit log",
+  "sharing/teams/books": "Team books",
+  "sharing/teams/permissions": "Book permissions",
 };
 
 export function TabletSettingsHeader() {
