@@ -86,8 +86,8 @@ the generic-CardDAV stand-in (P44-01 waiver); iCloud is the second CardDAV.
 | # | Fastmail (CardDAV) | iCloud | Google | Nextcloud | Notes |
 | --- | --- | --- | --- | --- | --- |
 | 1 | ✅ | ✅ | ✅ | ☐ | Remote→pull: 7/7 (FM) + 6/6 (iC) QA contacts; Google 60/821 real contacts with remote photos got normalized avatar + `photoShadow` + MinIO `.jpg`+`-thumb.webp`; EXIF-stripped, ≤1024px |
-| 2 | ☐ | ☐ | ☐ | ☐ | local→push not exercised |
-| 3 | ☐ | ☐ | ☐ | ☐ | |
+| 2 | ☐ | ☐ | ☐ | ☐ | local→push-to-empty-remote not exercised as a discrete row (push *mechanics* proven by row 3) |
+| 3 | ✅ | ☐ | ⏳ | ☐ | Local photo **change** → push: FM shadow flipped to new normalized hash (`eccda4c6…`), `lastPushRejected=false`, next cycle echo-quiet (remote re-fetch matches pushed hash = photo confirmed ON the Fastmail server, no loop). Google attempt blocked by `GOOGLE_QUOTA_EXCEEDED` (People API), not a defect — retry after quota reset |
 | 4 | ☐ | ☐ | ☐ | ☐ | |
 | 5 | ☐ | ☐ | ☐ | ☐ | |
 | 6 | ☐ | ☐ | ☐ | ☐ | |
@@ -164,6 +164,30 @@ CardDAV pair, once the `li@noormohamed.uk` connection was re-authed:
   keeps executing server-side — poll `SyncJob` for the real result. The 5 stale
   2026-07-02/03 queued jobs from the dead-token era were closed as
   `SKIPPED/SUPERSEDED`.
+
+### Row 3 (local photo change → push) — 2026-07-06 afternoon
+
+Replaced the local photo on both copies of `P44 Photo QA jpeg-512` (new distinct
+test JPEG in MinIO, `avatarUrl` + `updatedAt` bumped — the same state an in-app
+upload produces):
+
+- **Fastmail ✅** — photo pass pushed the new image (shadow `localPhotoHash`
+  `8703fe61…` → `eccda4c6…`, `remoteSignal` seeded to the pushed hash,
+  `lastPushRejected=false`); the **next cycle was echo-quiet** for the contact,
+  i.e. the re-fetched remote card's inline photo hash equals what we pushed —
+  the photo is confirmed on the Fastmail server and does not re-push. Local
+  `avatarUrl` untouched by the pass; zero photo conflicts recorded.
+- **Google ⏳** — two attempts failed `GOOGLE_QUOTA_EXCEEDED` (People API rate
+  limit after the day's 821-contact first sync + echo cycles + 60 photo
+  downloads). Not a code defect. **Ops finding:** a quota-starved Google job
+  looks *frozen* for minutes (RUNNING, heartbeat static, empty logs) while the
+  googleapis client silently backoff-retries 429s before surfacing the error —
+  don't reap those under ~10 min. Retry the row-3 push after quota reset.
+- Second ops finding: a genuinely frozen `SCHEDULED` Fastmail job from 05:00
+  (heartbeat never advanced, 4 h old) was blocking follow-up jobs via the
+  same-account sibling guard until reaped — stale `RUNNING` rows block their
+  account's whole queue silently (`skipped` counts in the cron response are the
+  tell).
 
 ### Not yet done (to fully close the matrix later)
 
