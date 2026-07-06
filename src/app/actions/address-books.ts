@@ -71,7 +71,7 @@ export async function createAddressBook(
   });
   revalidatePath("/contacts");
   revalidatePath("/contacts/new");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
   return created;
 }
 
@@ -96,7 +96,7 @@ export async function renameAddressBook(
   });
   revalidatePath("/contacts");
   revalidatePath("/contacts/new");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
 }
 
 export async function archiveAddressBook(id: string): Promise<void> {
@@ -126,7 +126,7 @@ export async function archiveAddressBook(id: string): Promise<void> {
   }
   revalidatePath("/contacts");
   revalidatePath("/contacts/new");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
 }
 
 export async function setDefaultAddressBook(targetBookId: string): Promise<void> {
@@ -164,7 +164,7 @@ export async function setDefaultAddressBook(targetBookId: string): Promise<void>
 
   revalidatePath("/contacts");
   revalidatePath("/contacts/new");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
 }
 
 export async function moveContactsToBook(input: {
@@ -202,5 +202,5 @@ export async function moveContactsToBook(input: {
     }
   });
   revalidatePath("/contacts");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
 }

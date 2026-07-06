@@ -2592,7 +2592,7 @@ function AccountHeader({
         <div style={{ fontSize: 13, lineHeight: 1.55, color: T.ink2, marginTop: account.provider === "CARDDAV" ? 6 : 0 }}>
           <span style={{ fontWeight: 600, color: T.ink }}>Kontax books:</span>{" "}
           Organise your private and shared books separately in{" "}
-          <Link href="/settings/books" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>
+          <Link href="/settings/data/books" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>
             Settings → Books
           </Link>
           .
@@ -3073,7 +3073,7 @@ function AddAccountForm({
       >
         After a CardDAV connection is saved, you can choose which remote address books it pulls from.
         Your Kontax-side private and shared books stay managed separately in{" "}
-        <Link href="/settings/books" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>
+        <Link href="/settings/data/books" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>
           Settings → Books
         </Link>
         .

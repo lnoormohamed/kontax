@@ -19,9 +19,6 @@ const SUBPAGE_TITLES: Record<string, string> = {
   security: "Security",
   family: "Family",
   teams: "Team management",
-  books: "Books",
-  "import-presets": "Import presets",
-  "export-presets": "Export presets",
   data: "Data & sync",
   sharing: "Sharing & groups",
   billing: "Plan & billing",
@@ -31,6 +28,8 @@ const SUBPAGE_TITLES: Record<string, string> = {
 const DEEP_TITLES: Record<string, string> = {
   "account/card": "Public card",
   "data/export": "Download your data",
+  "data/books": "Books",
+  "data/devices": "Connect a device",
 };
 
 export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {

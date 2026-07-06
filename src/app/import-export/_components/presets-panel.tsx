@@ -1,5 +1,9 @@
 "use client";
 
+// P46-15 / DB07 T4 — saved field-mapping presets, folded into the
+// import/export surface as a tab (they were two standalone settings pages;
+// the feature is reunited). One parameterized panel serves both kinds.
+
 import { useEffect, useRef, useState } from "react";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -7,8 +11,23 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 type Preset = {
   id: string;
   name: string;
-  updatedAt: string;
+  usageCount?: number;
+  lastUsedAt?: string;
+  updatedAt?: string;
+  createdAt?: string;
 };
+
+function relativeDate(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
+  const months = Math.floor(days / 30);
+  return `${months} month${months === 1 ? "" : "s"} ago`;
+}
 
 function RenameInput({
   preset,
@@ -23,7 +42,10 @@ function RenameInput({
 }) {
   const [value, setValue] = useState(preset.name);
   const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => { ref.current?.focus(); ref.current?.select(); }, []);
+  useEffect(() => {
+    ref.current?.focus();
+    ref.current?.select();
+  }, []);
 
   const trimmed = value.trim().toLowerCase();
   const isDup = trimmed !== preset.name.toLowerCase() && taken.includes(trimmed);
@@ -67,7 +89,31 @@ function RenameInput({
   );
 }
 
-export default function ExportPresetsPage() {
+const KIND_CONFIG = {
+  import: {
+    apiBase: "/api/imports/presets",
+    icon: "upload",
+    heading: "Import presets",
+    blurb:
+      "Saved column mappings. Kontax applies a matching preset automatically when you import a file with the same columns.",
+    emptyTitle: "No saved import presets yet",
+    emptyBody:
+      "When you finish an import, you can save its column mapping as a preset to reuse next time.",
+    emptyCta: { label: "← Start an import", href: "?tab=import" },
+  },
+  export: {
+    apiBase: "/api/exports/presets",
+    icon: "download",
+    heading: "Export presets",
+    blurb: "Saved export configurations — format, fields and filters — ready to rerun.",
+    emptyTitle: "No saved export presets yet",
+    emptyBody: "When you run an export, you can save its configuration as a preset to reuse.",
+    emptyCta: { label: "← Go to export", href: "?tab=export" },
+  },
+} as const;
+
+export function PresetsPanel({ kind }: { kind: "import" | "export" }) {
+  const cfg = KIND_CONFIG[kind];
   const [presets, setPresets] = useState<Preset[]>([]);
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
@@ -76,11 +122,14 @@ export default function ExportPresetsPage() {
   const [flash, setFlash] = useState("");
 
   useEffect(() => {
-    fetch("/api/exports/presets")
+    fetch(cfg.apiBase)
       .then((r) => r.json())
-      .then((d: { presets: Preset[] }) => { setPresets(d.presets ?? []); setLoading(false); })
+      .then((data: { presets: Preset[] }) => {
+        setPresets(data.presets ?? []);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
-  }, []);
+  }, [cfg.apiBase]);
 
   const showFlash = (msg: string) => {
     setFlash(msg);
@@ -88,7 +137,7 @@ export default function ExportPresetsPage() {
   };
 
   const handleRename = async (id: string, name: string) => {
-    await fetch(`/api/exports/presets/${id}`, {
+    await fetch(`${cfg.apiBase}/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -101,7 +150,7 @@ export default function ExportPresetsPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleteBusy(true);
-    await fetch(`/api/exports/presets/${deleteTarget.id}`, { method: "DELETE" });
+    await fetch(`${cfg.apiBase}/${deleteTarget.id}`, { method: "DELETE" });
     const name = deleteTarget.name;
     setPresets((ps) => ps.filter((p) => p.id !== deleteTarget.id));
     setDeleteTarget(null);
@@ -111,22 +160,21 @@ export default function ExportPresetsPage() {
 
   const takenNames = presets.map((p) => p.name.toLowerCase());
 
-  return (
-    <div className="mx-auto max-w-[640px] px-4 py-8 sm:px-6">
-      <a
-        className="mb-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#5c655e] hover:text-[#1d2823]"
-        href="/settings"
-      >
-        <WorkspaceIcon name="back" size={14} className="text-[#8b938c]" />
-        Settings
-      </a>
+  const metaLine = (p: Preset) => {
+    if (kind === "import" && p.lastUsedAt) {
+      return `Last used ${relativeDate(p.lastUsedAt)} · Used ${p.usageCount ?? 0} ${
+        (p.usageCount ?? 0) === 1 ? "time" : "times"
+      }`;
+    }
+    if (p.updatedAt) return `Updated ${relativeDate(p.updatedAt)}`;
+    if (p.createdAt) return `Created ${relativeDate(p.createdAt)}`;
+    return "";
+  };
 
-      <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">Data</div>
-      <h1 className="mb-1 text-[24px] font-bold tracking-[-0.01em] text-[#1d2823]">Export presets</h1>
-      <p className="mb-6 text-[14px] leading-[1.55] text-[#5c655e]">
-        Saved field selections for CSV exports. Load a preset in the export card to quickly restore
-        a previous selection.
-      </p>
+  return (
+    <div>
+      <h2 className="mb-1 text-[16px] font-semibold text-[#1d2823]">{cfg.heading}</h2>
+      <p className="mb-4 text-[13.5px] leading-[1.55] text-[#5c655e]">{cfg.blurb}</p>
 
       {flash ? (
         <div className="mb-4 rounded-[10px] border border-[#c5d9cc] bg-[#edf5f0] px-3.5 py-2.5 text-[13.5px] font-medium text-[#17352e]">
@@ -140,24 +188,23 @@ export default function ExportPresetsPage() {
         ) : presets.length === 0 ? (
           <div className="grid place-items-center gap-3 px-6 py-14 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-[12px] bg-[#f2f4f0]">
-              <WorkspaceIcon name="download" size={22} className="text-[#8b938c]" strokeWidth={1.6} />
+              <WorkspaceIcon name={cfg.icon} size={22} className="text-[#8b938c]" strokeWidth={1.6} />
             </span>
-            <div className="text-[15px] font-semibold text-[#1d2823]">No export presets yet</div>
-            <p className="max-w-[320px] text-[13.5px] leading-[1.5] text-[#5c655e]">
-              When you export with &ldquo;Choose fields&rdquo; selected, you can save that field
-              selection as a preset to reuse next time.
-            </p>
+            <div className="text-[15px] font-semibold text-[#1d2823]">{cfg.emptyTitle}</div>
+            <p className="max-w-[320px] text-[13.5px] leading-[1.5] text-[#5c655e]">{cfg.emptyBody}</p>
             <a
               className="mt-1 inline-flex h-10 items-center rounded-[9px] border border-[#d8ddd6] bg-white px-4 text-[13.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
-              href="/import-export"
+              href={cfg.emptyCta.href}
             >
-              ← Go to export
+              {cfg.emptyCta.label}
             </a>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between border-b border-[#e9ece7] px-5 py-3.5">
-              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">Saved presets</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">
+                Saved presets
+              </span>
               <span className="tabular-nums text-[12.5px] text-[#8b938c]">{presets.length}</span>
             </div>
             {presets.map((p) => (
@@ -166,8 +213,9 @@ export default function ExportPresetsPage() {
                 className="flex items-center gap-3.5 border-b border-[#f2f4f0] px-4 py-3.5 last:border-0 transition hover:bg-[#fbfcf9]"
               >
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border border-[#d8ddd6] bg-white">
-                  <WorkspaceIcon name="download" size={18} className="text-[#5c655e]" strokeWidth={1.7} />
+                  <WorkspaceIcon name={cfg.icon} size={18} className="text-[#5c655e]" strokeWidth={1.7} />
                 </span>
+
                 {editId === p.id ? (
                   <RenameInput
                     preset={p}
@@ -179,9 +227,7 @@ export default function ExportPresetsPage() {
                   <>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[14.5px] font-semibold text-[#1d2823]">{p.name}</div>
-                      <div className="text-[12.5px] text-[#8b938c]">
-                        Updated {new Date(p.updatedAt).toLocaleDateString()}
-                      </div>
+                      <div className="tabular-nums text-[12.5px] text-[#8b938c]">{metaLine(p)}</div>
                     </div>
                     <div className="flex shrink-0 gap-1.5">
                       <button
@@ -211,6 +257,9 @@ export default function ExportPresetsPage() {
         )}
       </div>
 
+      {/* Delete confirm modal — explicit dismiss only would be the DB06 rule
+          for destructive modals; Cancel + backdrop kept as the preset pages
+          had (non-destructive to dismiss). */}
       {deleteTarget ? (
         <div
           className="fixed inset-0 z-[90] grid place-items-center bg-[rgba(20,30,25,0.42)] p-4"
@@ -229,8 +278,9 @@ export default function ExportPresetsPage() {
               <h3 className="text-[17px] font-semibold text-[#1d2823]">Delete this preset?</h3>
             </div>
             <p className="mb-5 text-[14px] leading-[1.55] text-[#5c655e]">
-              &ldquo;<b className="font-semibold text-[#1d2823]">{deleteTarget.name}</b>&rdquo; will
-              be removed. Any exports you&rsquo;ve already done are unaffected.
+              &ldquo;<b className="font-semibold text-[#1d2823]">{deleteTarget.name}</b>&rdquo; will be
+              removed. {kind === "import" ? "Imports you’ve already run are unaffected" : "Exports you’ve already downloaded are unaffected"} — this only
+              deletes the saved {kind === "import" ? "mapping" : "configuration"}.
             </p>
             <div className="flex justify-end gap-2.5">
               <button

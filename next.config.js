@@ -86,6 +86,28 @@ const config = {
         destination: "/settings/account/card",
         permanent: true,
       },
+      // P46-15 / DB07 §5c: books + devices nest under Data & sync; presets
+      // fold into the import/export surface.
+      {
+        source: "/settings/books",
+        destination: "/settings/data/books",
+        permanent: true,
+      },
+      {
+        source: "/settings/devices",
+        destination: "/settings/data/devices",
+        permanent: true,
+      },
+      {
+        source: "/settings/import-presets",
+        destination: "/import-export?tab=presets",
+        permanent: true,
+      },
+      {
+        source: "/settings/export-presets",
+        destination: "/import-export?tab=presets",
+        permanent: true,
+      },
       {
         source: "/settings/profile",
         destination: "/settings/account",

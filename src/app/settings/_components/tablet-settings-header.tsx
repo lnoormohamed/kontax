@@ -9,20 +9,29 @@ const SUBPAGE_TITLES: Record<string, string> = {
   account: "Account",
   notifications: "Notifications",
   preferences: "Preferences",
-  devices: "Devices & app passwords",
   developer: "Developer",
   security: "Security",
   family: "Family",
   teams: "Team management",
-  "export-presets": "Export presets",
-  "import-presets": "Import presets",
+  data: "Data & sync",
+  sharing: "Sharing & groups",
+  billing: "Plan & billing",
+};
+
+// P46-14/15: nested children get their own titles (deepest match wins).
+const DEEP_TITLES: Record<string, string> = {
+  "account/card": "Public card",
+  "data/export": "Download your data",
+  "data/books": "Books",
+  "data/devices": "Connect a device",
 };
 
 export function TabletSettingsHeader() {
   const pathname = usePathname();
-  const segment = pathname.replace(/^\/settings\/?/, "").split("/")[0] ?? "";
+  const subPath = pathname.replace(/^\/settings\/?/, "");
+  const segment = subPath.split("/")[0] ?? "";
   if (!segment) return null;
-  const title = SUBPAGE_TITLES[segment] ?? "Settings";
+  const title = DEEP_TITLES[subPath] ?? SUBPAGE_TITLES[segment] ?? "Settings";
 
   return (
     <div className="mb-4 flex items-center gap-2 lg:hidden">

@@ -6,6 +6,7 @@ import { AppShell } from "~/app/_components/app-shell";
 import { ExportCard } from "~/app/_components/export-card";
 import { ImportJobRollbackButton } from "~/app/_components/import-job-rollback-button";
 import { ImportPreviewForm } from "~/app/_components/import-preview-form";
+import { PresetsPanel } from "./_components/presets-panel";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
@@ -105,17 +106,20 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
     new Date(now.getFullYear(), now.getMonth() + 1, 1),
   );
 
-  const activeTab =
-    ((Array.isArray(params?.tab) ? params?.tab[0] : params?.tab) ?? "import") === "export"
-      ? "export"
-      : "import";
+  // P46-15 / DB07: "presets" joins the segmented modes — saved field-mapping
+  // presets folded in from the two old settings pages (301s point here).
+  const rawTab = (Array.isArray(params?.tab) ? params?.tab[0] : params?.tab) ?? "import";
+  const activeTab = rawTab === "export" ? "export" : rawTab === "presets" ? "presets" : "import";
   const exportMode = activeTab === "export";
+  const presetsMode = activeTab === "presets";
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
   const account = { name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel };
-  const introCopy = exportMode
-    ? "Download your contacts as CSV for spreadsheets or vCard for address books."
-    : "Bring contacts in from a CSV file, or export your contacts to CSV or vCard.";
+  const introCopy = presetsMode
+    ? "Your saved import mappings and export configurations, ready to reuse."
+    : exportMode
+      ? "Download your contacts as CSV for spreadsheets or vCard for address books."
+      : "Bring contacts in from a CSV file, or export your contacts to CSV or vCard.";
 
   return (
     <AppShell account={account} mobileTitle="Import & Export" mobileBackHref="/contacts" mobileBackLabel="Contacts">
@@ -159,9 +163,27 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
             >
               Export
             </a>
+            <a
+              aria-current={activeTab === "presets" ? "page" : undefined}
+              className={`flex h-10 flex-1 items-center justify-center text-[14px] font-semibold transition ${
+                activeTab === "presets"
+                  ? "bg-[#4158f4] text-white"
+                  : "text-[#5c655e] hover:bg-[#f2f4f0]"
+              }`}
+              href="?tab=presets"
+            >
+              Presets
+            </a>
           </div>
 
-          <div className={`grid items-start gap-4 ${exportMode ? "" : "xl:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]"}`}>
+          {presetsMode ? (
+            <div className="grid items-start gap-6 xl:grid-cols-2">
+              <PresetsPanel kind="import" />
+              <PresetsPanel kind="export" />
+            </div>
+          ) : null}
+
+          <div className={`${presetsMode ? "hidden" : "grid"} items-start gap-4 ${exportMode ? "" : "xl:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]"}`}>
             {!exportMode ? (
               <div>
                 <ImportPreviewForm gate={gate} quota={{ used, cap: cap ?? 0, reset: resetDate }} readOnly={readOnly} />

@@ -246,6 +246,28 @@ export function SecurityPageClient({
         </form>
       </div>
 
+      {/* P46-15 / DB07: app passwords are credentials — their revocation home
+          is cross-linked here beside sessions; creation stays on the
+          connect-a-device task page. */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#d8ddd6] bg-white p-5">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+            App passwords
+          </p>
+          <p className="mt-1.5 text-[14px] text-[#3a4540]">
+            {connectedAccounts.activeAppPasswordCount === 0
+              ? "None issued — created when you connect a device over CardDAV."
+              : `${connectedAccounts.activeAppPasswordCount} active. Revoke any you no longer recognise, especially for lost devices.`}
+          </p>
+        </div>
+        <Link
+          className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-[#d8ddd6] px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+          href="/settings/data/devices"
+        >
+          Manage app passwords
+        </Link>
+      </div>
+
       <StSecLabel>Connected accounts</StSecLabel>
       <ConnectedAccountsSection data={connectedAccounts} />
 

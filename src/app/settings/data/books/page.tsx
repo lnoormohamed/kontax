@@ -13,10 +13,6 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
 import {
-  describePermissionValue,
-  loadSharedBookPermissionAudit,
-} from "~/server/shared-book-permission-audit";
-import {
   getAccessibleTeamBooks,
   getUserTeamMembership,
   resolveBookPermission,
@@ -31,18 +27,10 @@ const roleTone = (role: "Owner" | "Editor" | "Viewer") =>
       ? "bg-[#edf0fe] text-[#3142c4]"
       : "bg-[#f2f4f0] text-[#5c655e]";
 
-const fmtDateTime = (value: Date) =>
-  new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(value);
 
 export default async function BooksSettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) return redirectToLogin("/settings/books");
+  if (!session?.user?.id) return redirectToLogin("/settings/data/books");
   const userId = session.user.id;
 
   const [
@@ -140,10 +128,6 @@ export default async function BooksSettingsPage() {
       };
     });
 
-  const auditGroupIds = [familyMembership?.groupId, teamMembership?.groupId].filter(
-    (value): value is string => Boolean(value),
-  );
-  const permissionAudit = await loadSharedBookPermissionAudit(auditGroupIds, 12);
 
   return (
     <>
@@ -343,37 +327,26 @@ export default async function BooksSettingsPage() {
           </SettingsCard>
         </div>
 
-        <div>
-          <SectionLabel>Permission history</SectionLabel>
-          <SettingsCard>
-            {permissionAudit.length === 0 ? (
-              <p className="text-[13.5px] text-[#8b938c]">
-                No shared-book permission changes yet.
+        {/* P46-15 / DB07: the hub is an INDEX pointing to owners — the inline
+            permission-audit list duplicated the Teams audit log and could
+            drift; it's a pointer now. */}
+        {teamMembership ? (
+          <div>
+            <SectionLabel>Permission history</SectionLabel>
+            <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+              <p className="min-w-0 text-[13.5px] leading-relaxed text-[#5c655e]">
+                Shared-book permission changes live in the team audit log,
+                alongside every other team event.
               </p>
-            ) : (
-              <div className="divide-y divide-[#e9ece7]">
-                {permissionAudit.map((event) => (
-                  <div className="flex flex-wrap items-start justify-between gap-3 py-3" key={event.id}>
-                    <div className="min-w-0">
-                      <p className="text-[14px] font-semibold text-[#1d2823]">
-                        {event.targetName}
-                        <span className="font-normal text-[#5c655e]">
-                          {" "}
-                          · {event.groupAddressBookName ?? event.groupName}
-                        </span>
-                      </p>
-                      <p className="mt-1 text-[12.5px] text-[#5c655e]">
-                        {describePermissionValue(event.beforeValue)} → {describePermissionValue(event.afterValue)} · changed by{" "}
-                        {event.actorName}
-                      </p>
-                    </div>
-                    <span className="text-[12px] text-[#8b938c]">{fmtDateTime(event.createdAt)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </SettingsCard>
-        </div>
+              <Link
+                className="shrink-0 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                href="/settings/teams/audit"
+              >
+                Open team audit log
+              </Link>
+            </SettingsCard>
+          </div>
+        ) : null}
       </div>
     </>
   );

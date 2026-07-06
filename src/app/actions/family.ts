@@ -400,7 +400,7 @@ export const setMemberCanEdit = async (formData: FormData) => {
   }
   if (member.canEdit === canEdit) {
     revalidatePath("/settings/family");
-    revalidatePath("/settings/books");
+    revalidatePath("/settings/data/books");
     return;
   }
   const actorName = await getAuditActorName(userId);
@@ -425,7 +425,7 @@ export const setMemberCanEdit = async (formData: FormData) => {
     });
   });
   revalidatePath("/settings/family");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
 };
 
 export const resendFamilyInvite = async (formData: FormData) => {

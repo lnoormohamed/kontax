@@ -534,7 +534,7 @@ export const setMemberBookPermission = async (formData: FormData) => {
       : {};
   if ((current[bookId] ?? "EDIT") === permission) {
     revalidatePath("/settings/teams");
-    revalidatePath("/settings/books");
+    revalidatePath("/settings/data/books");
     return;
   }
   const next = { ...current, [bookId]: permission };
@@ -562,7 +562,7 @@ export const setMemberBookPermission = async (formData: FormData) => {
     });
   });
   revalidatePath("/settings/teams");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/data/books");
 };
 
 // "Add to team book": copy a private contact into a team book (copy, not move).

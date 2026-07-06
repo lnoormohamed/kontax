@@ -11,7 +11,7 @@ import { getPublicOrigin } from "~/lib/public-origin";
 
 export default async function SettingsDevicesPage() {
   const session = await auth();
-  if (!session?.user?.id) return redirectToLogin("/settings/devices");
+  if (!session?.user?.id) return redirectToLogin("/settings/data/devices");
   const userId = session.user.id;
   const [appPasswords, appPasswordAllowance, carddavServerUrl, userRecord] = await Promise.all([
     listUserAppPasswords(userId),
@@ -24,9 +24,11 @@ export default async function SettingsDevicesPage() {
 
   return (
     <>
+      {/* P46-15 / DB07: rescoped as the connect-a-device TASK page. Live sync
+          status stays on /sync; app-password revocation mirrors to Security. */}
       <SettingsPageHead
-        title="Devices & app passwords"
-        sub="Add Kontax to your iPhone, Mac, or Android as a contacts account. Your contacts then stay in sync automatically — no app required."
+        title="Connect a device"
+        sub="Add Kontax to your iPhone, Mac, or Android as a CardDAV contacts account. Your contacts then stay in sync automatically — no app required."
       />
 
       <div className="grid gap-[18px]">
