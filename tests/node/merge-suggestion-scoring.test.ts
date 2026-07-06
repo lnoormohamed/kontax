@@ -343,3 +343,79 @@ test("short Latin given names still match via phonetics, not edit distance", () 
   assert.equal(suggestions.length, 1);
   assert.ok(suggestions[0]!.signals.some((signal) => signal.startsWith("fuzzy-name")));
 });
+
+// ── Round 2 scripts: Indic, Thai, Japanese, Greek, Hebrew, special Latin ─────
+
+test("different Hindi names sharing a phone are demoted (vowel signs preserved)", () => {
+  // राम vs रीमा differ only in combining vowel signs — stripping marks in
+  // Indic scripts folds different people into an exact-name match.
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "राम शर्मा", { phone: "+919812345678" }),
+    contact("b", "रीमा शर्मा", { phone: "+919812345678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "medium");
+  assert.ok(!suggestions[0]!.signals.includes("exact-name"));
+});
+
+test("katakana and hiragana spellings of one Japanese name match exactly", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "タナカ タロウ", { phone: "+819012345678" }),
+    contact("b", "たなか たろう", { phone: "+81 90 1234 5678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "high");
+  assert.ok(suggestions[0]!.signals.includes("exact-name"));
+});
+
+test("Greek accent variants match; different Greek names on a shared phone demote", () => {
+  const matching = buildContactMergeSuggestions([
+    contact("a", "Ελένη Παπαδοπούλου", { email: "eleni@example.test" }),
+    contact("b", "Ελενη Παπαδοπουλου", { email: "eleni@example.test" }),
+  ]);
+  assert.equal(matching[0]!.confidence, "high");
+  assert.ok(matching[0]!.signals.includes("exact-name"));
+
+  const conflicting = buildContactMergeSuggestions([
+    contact("a", "Ελένη Παπαδοπούλου", { phone: "+306912345678" }),
+    contact("b", "Νίκος Οικονόμου", { phone: "+306912345678" }),
+  ]);
+  assert.equal(conflicting[0]!.confidence, "medium");
+});
+
+test("Hebrew niqqud variants match exactly", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "דָּוִד כהן", { phone: "+972501234567" }),
+    contact("b", "דוד כהן", { phone: "+972 50 123 4567" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "high");
+  assert.ok(suggestions[0]!.signals.includes("exact-name"));
+});
+
+test("Turkish dotless-i and Polish ł fold to their Latin base", () => {
+  const turkish = buildContactMergeSuggestions([
+    contact("a", "İlker Yıldız", { email: "ilker@example.test" }),
+    contact("b", "Ilker Yildiz", { email: "ilker@example.test" }),
+  ]);
+  assert.ok(turkish[0]!.signals.includes("exact-name"));
+
+  const polish = buildContactMergeSuggestions([
+    contact("a", "Łukasz Wójcik", { email: "lukasz@example.test" }),
+    contact("b", "Lukasz Wojcik", { email: "lukasz@example.test" }),
+  ]);
+  assert.ok(polish[0]!.signals.includes("exact-name"));
+});
+
+test("different Thai names sharing a phone are demoted", () => {
+  const suggestions = buildContactMergeSuggestions([
+    contact("a", "สมชาย ใจดี", { phone: "+66812345678" }),
+    contact("b", "สมหญิง ใจดี", { phone: "+66812345678" }),
+  ]);
+
+  assert.equal(suggestions.length, 1);
+  assert.equal(suggestions[0]!.confidence, "medium");
+});

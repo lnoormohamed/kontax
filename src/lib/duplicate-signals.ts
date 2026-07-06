@@ -30,14 +30,34 @@ const normalizeValue = (value: string | null | undefined) => value?.trim().toLow
 // name to "", which blinded every name signal AND suppressed the name-conflict
 // warnings/penalties (empty names "can't conflict"), so two different people
 // sharing a phone surfaced as a high-confidence one-click merge.
-export const normalizeName = (value: string | null | undefined) =>
-  normalizeValue(value)
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "")
-    .replace(/đ/g, "d")
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+// Combining marks are stripped only in scripts where they mark accents or
+// vocalization (Latin, Greek, Cyrillic, Arabic, Hebrew). In Indic and Thai
+// scripts the marks ARE the vowels — stripping them folds different names
+// together (राम "Ram" and रीमा "Rima" both became "रम").
+const ACCENT_BASE = /[\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Arabic}\p{Script=Hebrew}]/u;
+const MARKS_AFTER_ACCENT_BASE = new RegExp(`(?<=${ACCENT_BASE.source})\\p{M}+`, "gu");
+
+// Katakana → hiragana so the two kana spellings of one Japanese name compare
+// equal (タナカ ≡ たなか). Standard kana are a fixed 0x60 offset apart.
+const foldKana = (value: string) =>
+  value.replace(/[\u30a1-\u30f6]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+
+// Letters NFKD does not decompose but that have a conventional Latin folding.
+const LETTER_FOLDS: Array<[RegExp, string]> = [
+  [/đ/g, "d"], [/ł/g, "l"], [/ı/g, "i"], [/ß/g, "ss"],
+  [/ø/g, "o"], [/æ/g, "ae"], [/œ/g, "oe"], [/þ/g, "th"], [/ð/g, "d"],
+];
+
+export const normalizeName = (value: string | null | undefined) => {
+  let name = normalizeValue(value).normalize("NFKD").replace(MARKS_AFTER_ACCENT_BASE, "");
+  for (const [pattern, replacement] of LETTER_FOLDS) {
+    name = name.replace(pattern, replacement);
+  }
+  return foldKana(name)
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
+};
 
 export const getNameTokens = (value: string | null | undefined) =>
   normalizeName(value).split(" ").filter(Boolean);
