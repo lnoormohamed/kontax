@@ -6,6 +6,7 @@ import { getCardAnalytics } from "~/server/public-card/analytics";
 import { type PublicCardFieldConfig, resolveCardFields } from "~/server/public-card/types";
 import { CardSettingsClient } from "./card-settings-client";
 import { CardShareTools } from "./card-share-tools";
+import { UsernameSection } from "../username-section";
 
 export const metadata = { title: "Public card" };
 
@@ -33,7 +34,7 @@ function formatLatestActivity(value: Date | null) {
 
 export default async function CardSettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) return redirectToLogin("/settings/profile/card");
+  if (!session?.user?.id) return redirectToLogin("/settings/account/card");
 
   const [user, analytics] = await Promise.all([
     db.user.findUniqueOrThrow({
@@ -52,8 +53,14 @@ export default async function CardSettingsPage() {
     <>
       <SettingsPageHead
         title="Public card"
-        sub="Choose which fields are visible when someone views your card at getkontax.com/u/…"
+        sub="Your public handle and which fields are visible at getkontax.com/u/…"
       />
+
+      {/* P46-14 / DB07: the username IS the card handle — it lives here now
+          (moved from Account, which keeps a link row). */}
+      <section className="mb-4 rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
+        <UsernameSection initialUsername={user.username ?? null} />
+      </section>
 
       {/* Visibility controls */}
       <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">

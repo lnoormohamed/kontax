@@ -80,6 +80,12 @@ const config = {
   },
   async redirects() {
     return [
+      // P46-14 / DB07 §5c: Public card moved under Account.
+      {
+        source: "/settings/profile/card",
+        destination: "/settings/account/card",
+        permanent: true,
+      },
       {
         source: "/settings/profile",
         destination: "/settings/account",

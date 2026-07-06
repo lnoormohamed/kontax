@@ -15,8 +15,7 @@ const ROWS = [
   { icon: "upload", label: "Import & export", sub: "CSV, vCard · saved presets", href: "/import-export", external: true },
   { icon: "book", label: "Books", sub: "Personal book index", href: "/settings/books" },
   { icon: "phone", label: "Connect a device", sub: "CardDAV setup · app passwords", href: "/settings/devices" },
-  // TODO(P46-14/15): moves to /settings/data/export; lives on Account today.
-  { icon: "download", label: "Download your data", sub: "Full account export", href: "/settings/account" },
+  { icon: "download", label: "Download your data", sub: "Full account export", href: "/settings/data/export" },
 ] as const;
 
 export default async function SettingsDataIndexPage() {
