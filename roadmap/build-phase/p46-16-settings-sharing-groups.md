@@ -1,6 +1,6 @@
 # P46-16 (DB07·T5) — Sharing & groups restructure
 
-Status: **Pre-plan** · Priority: P1 · Depends: P46-12
+Status: **Built & preview-verified (2026-07-06, 10ffaac) — Teams body-split + seats deferred to [P46-18](p46-18-teams-page-split-seats.md)** · Priority: P1 · Depends: P46-12
 Phase: [Phase 46](phase-46-alphabet-scrubber.md) · Spec: DB07 §6/§5c
 
 `/shares` → `/settings/sharing/shared` (301; now on both breakpoints);
