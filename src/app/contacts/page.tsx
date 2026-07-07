@@ -524,6 +524,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         }}
         query={query}
         viewMode={selectedView}
+        mobileViewMode={prefs.mobileViewMode ?? "cozy"}
         currentScope={scope}
         currentBook={activeBook ?? activePersonalBookId}
         hasShared={hasShared}

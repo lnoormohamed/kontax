@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import { getClientIp } from "~/lib/client-ip";
 import { seedDefaultBooksForNewUser } from "~/server/address-books";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
@@ -14,10 +15,7 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    request.headers.get("x-real-ip") ??
-    "unknown";
+  const ip = getClientIp(request.headers) ?? "unknown";
 
   const rl = await checkRateLimit(rateLimiters.registration, `ip:${ip}`);
   if (!rl.allowed) {

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { getClientIp } from "~/lib/client-ip";
 import { renderEmail } from "~/server/render-email";
 import { sendEmail } from "~/server/email";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -25,8 +26,7 @@ const SUBJECT_LABELS: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = getClientIp(req.headers) ?? "unknown";
 
   const { allowed } = await checkRateLimit(rateLimiters.contactForm, ip);
   if (!allowed) {

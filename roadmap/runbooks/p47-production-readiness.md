@@ -52,10 +52,10 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 | # | Item | Status | Notes | Ticket |
 |---|------|--------|-------|--------|
 | 15 | **Backups** | ✅ **built + drilled 2026-07-05**: nightly 02:30 UTC cron on the Proxmox host (`/etc/cron.d/kontax-backup` → `/usr/local/bin/kontax-backup.sh`) dumps `kontax` (`pg_dump -Fc` via `runuser` — NOT `su -`, whose MOTD banner corrupts the stream) + tars the `kontax-uploads` bucket to NAS `/mnt/pve/pve-ugreen/backup/kontax/{db,minio}`, 14-day retention, size sanity check, log at `/var/log/kontax-backup.log`. **Restore drill passed**: dump → scratch DB → 49 tables + user row verified → dropped. Note: no Proxmox-wide vzdump schedule exists (`jobs.cfg` absent) — consider one for 122/129/151/152 separately | first run + restore drill | P47-12 |
-| 16 | **Uptime monitoring** | ◑ Uptime Kuma runs (LXC 131) — confirm it watches `getkontax.com` + `media.` + cron, with alerting | not yet checked in Kuma UI | P47-12 |
+| 16 | **Uptime monitoring** | ◑ **2026-07-07**: Uptime Kuma (LXC 131, systemd `uptime-kuma.service`, SQLite `/opt/uptime-kuma/data/kuma.db`). App already monitored (id 14 `getkontax.com/api/health`, 300s/3-retry). **Added id 17 `Kontax Media (MinIO)` → `media.getkontax.com/minio/health/live`** (cloned id 14's config; verified UP 200/279ms; DB backup `kuma.db.bak-p47-20260707`). **Two gaps remain, both need input:** (a) **cron** — no public GET health (routes need `CRON_SECRET`+POST); proper fix = a Kuma **Push** monitor with each cron job heartbeating Kuma (edits LXC 152 crontab); (b) **NO alerting configured at all** (zero notification providers in Kuma — every monitor is dashboard-only) → needs a channel choice + creds (email via SES / Telegram / Discord webhook) | Kuma SQLite inspect + monitor add | P47-12 |
 | 17 | **Production smoke test** | ◑ **scripted pass GREEN 2026-07-05** — full results in [smoke-test-results-p47.md](smoke-test-results-p47.md): auth, contacts CRUD+search via REST v1, avatar plane, P45 archive export → public presigned download → **open-format validator VALID ✓**, public card, API rate limits in Redis, cron re-verified on the new build. **Zero P0 failures.** Remaining for sign-off: manual/device items (2FA, mobile gestures, sharing flow, import wizard, notification visuals) + overnight-cron check | scripted battery on live origin | P47-13 |
-| 18 | **Go-live cutover** | ◑ app already serves prod traffic; "cutover" reduces to: merge staging→main, schema apply (P47-06), redeploy, admin bootstrap (owner account already exists — grant admin), post-swap smoke | — | P47-14 |
-| 19 | **Post-launch review** | ⬜ | — | P47-14 |
+| 18 | **Go-live cutover** | ◑ mostly done — prod already serves getkontax.com; merge+schema+redeploy ✅, post-swap scripted smoke ✅. **Admin bootstrap DONE 2026-07-07**: `li@linoormohamed.com` granted ADMIN (`grant-admin.mjs`) — sole admin + earliest user ⇒ GOVERNANCE bootstrap tier; `/admin` verified 200 (tested via temp-promote of p47qa, then revoked). **Remaining:** (a) decide `kontax.vexon.co` redirect — 301→prod (retire staging) vs leave as-is (staging on 10.0.0.x, currently unreachable); (b) at real launch, clean up QA fixtures — delete/repurpose `p47qa` user + `/u/p47qa` username, revoke ApiToken `p47-smoke`; both gated on finishing the manual smoke + photo QA that still use them | admin grant + `/admin` 200 | P47-14 |
+| 19 | **Post-launch review** | ⬜ gated — write `p47-post-launch-review.md` at T+24h **after the actual launch** (which is itself gated on P47-13 manual sign-off + Stripe live + Google submit). Premature until then | — | P47-14 |
 
 ## Open gap list (ordered — externals deliberately last per 2026-07-05 decision)
 
@@ -156,18 +156,17 @@ no data loss; existing stored avatars remain.
 
 ## P47-06 apply-day runbook (execute with the staging→main deploy)
 
-> ⚠️ **PENDING SCHEMA ON STAGING (as of 2026-07-05 eve): `CharRomanization`.**
-> After the first apply (P38–P47 train, done), staging added one new table
-> (`CharRomanization`, P46-01 romanization follow-up). It is **not on main and
-> not in the prod DB.** The 2026-07-05 18:38 merge to main (`d09e0ec`) happened
-> to be schema-neutral, so its auto-deploy was safe — but **the next
-> staging→main merge carries this table, and a bare `git push` will crash-loop
-> prod** (validate boot, missing table). Whoever merges next MUST run steps 1–6
-> below first. Extra step for this one: after `db push`, run
-> `DATABASE_URL=<prod> npm run seed:sort-romanization` (one-time data seed) or
-> non-Latin names bucket under "#" instead of their romanized letter. Because
-> Coolify **auto-deploys main on push**, the safe order is: apply+seed+drift-gate
-> on prod → *then* push main. Do not push main while the prod DB is unreachable.
+> ✅ **`CharRomanization` APPLIED + DEPLOYED 2026-07-07.** The second apply ran
+> per this runbook: snapshot → additive diff (1 stmt, `CREATE TABLE
+> CharRomanization`, 0 drops) → `db push` → `seed:sort-romanization` (33,948
+> rows, 李→li verified) → drift gate exit 0 → push main (`5fa6b51`) → auto-deploy.
+> **The first auto-deploy FAILED** (build died at Next "Collecting page data",
+> exit 255) — a transient build failure (local build of the same commit was
+> clean; no OOM/disk); **retrying the deploy succeeded**. New container boots
+> clean in `validate`; site 200. Reverse-drift window (DB ahead of old container
+> between apply and successful deploy) is closed. Lesson: a failed Coolify build
+> after a prod schema apply leaves the *old* container unable to restart safely —
+> get the matching build deployed promptly (retry) rather than leaving it.
 
 Prepped 2026-07-05. The apply MUST be choreographed with the deploy because the
 `validate` boot diffs **DB → build schema** in both directions: applying early
@@ -186,8 +185,13 @@ first makes *it* crash-loop on missing tables. Keep the window minutes-wide:
    ever). Staging precedent: may need 2 attempts (P41 note).
 4. **Backfills** (sized against live prod 2026-07-05 — 2 users, 0 contacts /
    books / sync accounts / groups):
-   - `migrate-default-address-books.mjs` — **RUN** (creates the default book
-     for the 2 pre-books users).
+   - `migrate-default-address-books.mjs` — for accounts with **no** books, now
+     seeds the **Personal (default) + Work** pair (P40-05), not the old single
+     "All Contacts"/default book. No-op once every account has books.
+   - `reconcile-books-to-personal-work.mjs` — **RUN** for accounts still on the
+     legacy single "All Contacts"/default book: converts it in place to
+     Personal/personal + adds Work/work (contacts keep their bookId). Dry-run by
+     default; `--apply` to write.
    - `backfill-contact-book-memberships.mjs` — run after it; no-op at 0
      contacts but validates wiring.
    - `backfill-avatar-thumbs.mjs`, `backfill-source-type.mjs`,

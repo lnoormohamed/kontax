@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { updatePhoneticSettings } from "~/app/actions/settings";
+import { setDefaultAddressBook } from "~/app/actions/address-books";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { DEFAULT_PREFERENCES } from "~/lib/preferences";
@@ -31,6 +32,11 @@ export default async function SettingsPreferencesPage() {
   const userSettings = await db.user.findUnique({
     where: { id: session.user.id },
     select: { autoFillPhoneticNames: true },
+  });
+  const books = await db.addressBook.findMany({
+    where: { userId: session.user.id, archivedAt: null },
+    select: { id: true, name: true, isDefault: true },
+    orderBy: [{ isDefault: "desc" }, { name: "asc" }],
   });
   const preferences = session.user.preferences ?? DEFAULT_PREFERENCES;
 
@@ -73,6 +79,41 @@ export default async function SettingsPreferencesPage() {
           </button>
         </form>
       </SettingsCard>
+      {books.length > 1 ? (
+        <SettingsCard>
+          <p className="text-[15px] font-semibold text-[#1d2823]">Default book</p>
+          <p className="mt-2 text-[14px] leading-6 text-[#5c655e]">
+            New contacts land in this book unless you pick another. Changing it
+            never moves your existing contacts.
+          </p>
+          <div className="mt-5 space-y-2">
+            {books.map((book) => (
+              <div
+                className="flex items-center justify-between gap-3 rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] px-4 py-3"
+                key={book.id}
+              >
+                <span className="min-w-0 truncate text-[14px] font-semibold text-[#1d2823]">
+                  {book.name}
+                </span>
+                {book.isDefault ? (
+                  <span className="shrink-0 rounded-lg bg-[#17352e] px-3 py-1.5 text-[12.5px] font-semibold text-white">
+                    Default
+                  </span>
+                ) : (
+                  <form action={setDefaultAddressBook.bind(null, book.id)}>
+                    <button
+                      className="shrink-0 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                      type="submit"
+                    >
+                      Make default
+                    </button>
+                  </form>
+                )}
+              </div>
+            ))}
+          </div>
+        </SettingsCard>
+      ) : null}
       <DisplayPreferencesSection initialPreferences={preferences} />
       <InterfacePreferencesSection initialPreferences={preferences} />
     </SessionProvider>

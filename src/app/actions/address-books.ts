@@ -165,6 +165,7 @@ export async function setDefaultAddressBook(targetBookId: string): Promise<void>
   revalidatePath("/contacts");
   revalidatePath("/contacts/new");
   revalidatePath("/settings/data/books");
+  revalidatePath("/settings/preferences");
 }
 
 export async function moveContactsToBook(input: {

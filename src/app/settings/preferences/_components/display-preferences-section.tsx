@@ -155,31 +155,63 @@ export function DisplayPreferencesSection({
           </div>
         </div>
 
-        {/* P34B-04 — Default view mode */}
+        {/* P34B-04 / P47 — Default view mode, per device density */}
         <div className="border-t border-[#f2f4f0] pt-5">
           <FieldLabel>Default view mode</FieldLabel>
           <p className="mb-3 text-[13px] text-[#5c655e]">
-            Contact list density when you first open the app.
+            Contact list density. Desktop and mobile can differ — on desktop
+            &ldquo;compact&rdquo; is a columns grid; on mobile it&rsquo;s a
+            single-line row.
           </p>
-          <div
-            className="inline-flex overflow-hidden rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] p-0.5"
-            role="group"
-          >
-            {(["compact", "cozy"] as const).map((mode) => (
-              <button
-                aria-pressed={prefs.defaultViewMode === mode}
-                className={`rounded-[10px] px-5 py-2 text-[13.5px] font-medium capitalize transition ${
-                  prefs.defaultViewMode === mode
-                    ? "bg-white text-[#1d2823] shadow-sm"
-                    : "text-[#5c655e] hover:text-[#1d2823]"
-                }`}
-                key={mode}
-                onClick={() => setPref("defaultViewMode", mode)}
-                type="button"
-              >
-                {mode === "compact" ? "Compact" : "Cozy"}
-              </button>
-            ))}
+
+          {/* Desktop */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="w-14 shrink-0 text-[13px] text-[#8b938c]">Desktop</span>
+            <div
+              className="inline-flex overflow-hidden rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] p-0.5"
+              role="group"
+            >
+              {(["compact", "cozy"] as const).map((mode) => (
+                <button
+                  aria-pressed={prefs.defaultViewMode === mode}
+                  className={`rounded-[10px] px-5 py-2 text-[13.5px] font-medium capitalize transition ${
+                    prefs.defaultViewMode === mode
+                      ? "bg-white text-[#1d2823] shadow-sm"
+                      : "text-[#5c655e] hover:text-[#1d2823]"
+                  }`}
+                  key={mode}
+                  onClick={() => setPref("defaultViewMode", mode)}
+                  type="button"
+                >
+                  {mode === "compact" ? "Compact" : "Cozy"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile */}
+          <div className="mt-2.5 flex flex-wrap items-center gap-3">
+            <span className="w-14 shrink-0 text-[13px] text-[#8b938c]">Mobile</span>
+            <div
+              className="inline-flex overflow-hidden rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] p-0.5"
+              role="group"
+            >
+              {(["compact", "cozy"] as const).map((mode) => (
+                <button
+                  aria-pressed={prefs.mobileViewMode === mode}
+                  className={`rounded-[10px] px-5 py-2 text-[13.5px] font-medium capitalize transition ${
+                    prefs.mobileViewMode === mode
+                      ? "bg-white text-[#1d2823] shadow-sm"
+                      : "text-[#5c655e] hover:text-[#1d2823]"
+                  }`}
+                  key={mode}
+                  onClick={() => setPref("mobileViewMode", mode)}
+                  type="button"
+                >
+                  {mode === "compact" ? "Compact" : "Cozy"}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

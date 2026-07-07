@@ -2,6 +2,7 @@ import "server-only";
 
 import { headers } from "next/headers";
 
+import { getClientIp } from "~/lib/client-ip";
 import { db } from "~/server/db";
 import type { Prisma } from "../../../generated/prisma";
 
@@ -42,12 +43,7 @@ const HIGH_SEVERITY_ACTIONS = new Set<string>([
 
 async function clientIp(): Promise<string | null> {
   try {
-    const h = await headers();
-    return (
-      h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      h.get("x-real-ip") ??
-      null
-    );
+    return getClientIp(await headers());
   } catch {
     return null;
   }

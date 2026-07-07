@@ -4,6 +4,7 @@ import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences-sha
 const VALID_KEYS = new Set<keyof UserPreferences>([
   "defaultSort",
   "defaultViewMode",
+  "mobileViewMode",
   "dateFormat",
   "nameDisplayOrder",
   "weekStartsOn",
