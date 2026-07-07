@@ -156,6 +156,19 @@ no data loss; existing stored avatars remain.
 
 ## P47-06 apply-day runbook (execute with the staging→main deploy)
 
+> ⚠️ **PENDING SCHEMA ON STAGING (as of 2026-07-05 eve): `CharRomanization`.**
+> After the first apply (P38–P47 train, done), staging added one new table
+> (`CharRomanization`, P46-01 romanization follow-up). It is **not on main and
+> not in the prod DB.** The 2026-07-05 18:38 merge to main (`d09e0ec`) happened
+> to be schema-neutral, so its auto-deploy was safe — but **the next
+> staging→main merge carries this table, and a bare `git push` will crash-loop
+> prod** (validate boot, missing table). Whoever merges next MUST run steps 1–6
+> below first. Extra step for this one: after `db push`, run
+> `DATABASE_URL=<prod> npm run seed:sort-romanization` (one-time data seed) or
+> non-Latin names bucket under "#" instead of their romanized letter. Because
+> Coolify **auto-deploys main on push**, the safe order is: apply+seed+drift-gate
+> on prod → *then* push main. Do not push main while the prod DB is unreachable.
+
 Prepped 2026-07-05. The apply MUST be choreographed with the deploy because the
 `validate` boot diffs **DB → build schema** in both directions: applying early
 makes the *old* build crash-loop on its next restart; deploying the new build
@@ -182,6 +195,10 @@ first makes *it* crash-loop on missing tables. Keep the window minutes-wide:
      QA avatar already has its thumb).
    - `setup-contact-search-index.mjs` — already present in prod (validate boot
      confirms the trigger); re-run only if the drift check complains.
+   - `seed:sort-romanization` — **RUN when the diff includes `CharRomanization`**
+     (`DATABASE_URL=<prod> npm run seed:sort-romanization`); seeds the character
+     lookup so non-Latin names sort/bucket by romanized initial. Data seed, not
+     schema — safe to re-run (idempotent upsert).
 5. **Drift gate** — `DATABASE_URL=<prod> node scripts/check-schema-drift.mjs`
    → exit 0 (also verifies the search trigger).
 6. **Deploy the merged build** (Coolify; queue via tinker helper if the UI is
