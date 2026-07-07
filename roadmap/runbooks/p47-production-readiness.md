@@ -185,8 +185,13 @@ first makes *it* crash-loop on missing tables. Keep the window minutes-wide:
    ever). Staging precedent: may need 2 attempts (P41 note).
 4. **Backfills** (sized against live prod 2026-07-05 — 2 users, 0 contacts /
    books / sync accounts / groups):
-   - `migrate-default-address-books.mjs` — **RUN** (creates the default book
-     for the 2 pre-books users).
+   - `migrate-default-address-books.mjs` — for accounts with **no** books, now
+     seeds the **Personal (default) + Work** pair (P40-05), not the old single
+     "All Contacts"/default book. No-op once every account has books.
+   - `reconcile-books-to-personal-work.mjs` — **RUN** for accounts still on the
+     legacy single "All Contacts"/default book: converts it in place to
+     Personal/personal + adds Work/work (contacts keep their bookId). Dry-run by
+     default; `--apply` to write.
    - `backfill-contact-book-memberships.mjs` — run after it; no-op at 0
      contacts but validates wiring.
    - `backfill-avatar-thumbs.mjs`, `backfill-source-type.mjs`,
