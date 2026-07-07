@@ -88,6 +88,7 @@ type ContactDashboardProps = {
   mergeSuggestions: PersistedMergeSuggestion[];
   mergeSuggestionsRefreshed: boolean;
   viewMode: WorkspaceView;
+  mobileViewMode: WorkspaceView;
   currentScope: "all" | "private" | "shared";
   currentBook: string | null;
   hasShared: boolean;
@@ -142,6 +143,7 @@ export function ContactDashboard({
   mergeSuggestions,
   mergeSuggestionsRefreshed,
   viewMode,
+  mobileViewMode,
   currentScope,
   currentBook,
   hasShared,
@@ -951,6 +953,7 @@ export function ContactDashboard({
                 rowLabels={rowLabels}
                 query={query}
                 viewMode={viewMode}
+                mobileViewMode={mobileViewMode}
                 books={personalBooks}
                 labelSuggestions={labelSuggestions}
                 smartLists={savedFilters}
@@ -972,6 +975,7 @@ export function ContactDashboard({
               rowLabels={rowLabels}
               query={query}
               viewMode={viewMode}
+              mobileViewMode={mobileViewMode}
               books={personalBooks}
               labelSuggestions={labelSuggestions}
               smartLists={savedFilters}

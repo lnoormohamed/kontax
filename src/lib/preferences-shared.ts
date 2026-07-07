@@ -1,6 +1,13 @@
 export type UserPreferences = {
   defaultSort?: "name" | "updated";
   defaultViewMode?: "compact" | "cozy";
+  // Independent list density for touch/mobile (< 1024px), where "compact" is the
+  // 48px single-line row (name + company, email/phone inline) and "cozy" is the
+  // 60px two-line row. Defaults to cozy — the user-confirmed mobile default
+  // (P46-DB04) — with compact as an opt-in. Desktop density is defaultViewMode
+  // (where "compact" is the multi-column grid). Resolved via useResolvedViewMode
+  // (src/lib/interface-preferences.ts).
+  mobileViewMode?: "compact" | "cozy";
   dateFormat?: "DD MMM YYYY" | "MM/DD/YYYY" | "YYYY-MM-DD";
   nameDisplayOrder?: "first-last" | "last-first";
   weekStartsOn?: 0 | 1; // 0 = Sunday, 1 = Monday
@@ -24,6 +31,7 @@ export type UserPreferences = {
 export const DEFAULT_PREFERENCES: Required<UserPreferences> = {
   defaultSort: "name",
   defaultViewMode: "compact",
+  mobileViewMode: "cozy",
   dateFormat: "DD MMM YYYY",
   nameDisplayOrder: "first-last",
   weekStartsOn: 1,

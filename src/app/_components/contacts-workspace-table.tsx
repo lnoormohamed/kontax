@@ -75,6 +75,8 @@ type ContactsWorkspaceTableProps = {
   emptyState: string;
   mode: "active" | "archived";
   viewMode: "compact" | "cozy";
+  // Mobile (< 1024px) density; desktop uses viewMode. Defaults to cozy.
+  mobileViewMode?: "compact" | "cozy";
   groupByLetter: boolean;
   query: string;
   nameDisplayOrder?: "first-last" | "last-first";
@@ -659,59 +661,36 @@ const ContactRow = memo(function ContactRow({
     contactLabels.length > 0 ? `${contactLabels.length} label${contactLabels.length === 1 ? "" : "s"}` : null,
   ].filter((value): value is string => Boolean(value));
 
-  const mobileStacked = (
-    <div className="flex min-w-0 flex-1 items-start gap-3">
-      <span className="pt-0.5">{avatarSlot}</span>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start gap-2">
-          <Link
-            className="min-w-0 flex-1 truncate"
-            href={`/contacts/${contact.id}`}
-            onClick={() => onOpenContact(contact.id)}
-            onPointerDown={() => onOpenContact(contact.id)}
-            prefetch={false}
-          >
-            <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
-              <Highlight query={query} text={displayName} />
-            </span>
-          </Link>
-          <div className="shrink-0 pt-0.5">
-            <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
-          </div>
-        </div>
-        <p className="truncate text-[12.5px] text-[#8b938c]">
-          {meta.length > 0
-            ? meta.map((value, index) => (
-                <span key={index}>
-                  {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
-                  <Highlight query={query} text={value} />
-                </span>
-              ))
-            : "No details yet"}
-        </p>
-        {mobileContext.length > 0 ? (
-          <p className="mt-0.5 truncate text-[11.5px] text-[#8b938c]">
-            {mobileContext.join(" · ")}
-          </p>
-        ) : null}
-        {matchSnippet && (
-          <p className="mt-0.5 truncate text-[11.5px] text-[#8b938c]" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            {matchSnippet.field === "label" ? (
-              <>
-                <LabelDot col={labelColors[matchSnippet.snippet] ?? "#aeb4ac"} />
-                <span style={{ color: "#5c655e", fontWeight: 500 }}>{matchSnippet.snippet}</span>
-              </>
-            ) : (
-              <>
-                <span style={{ color: "#aeb4ac" }}>Note:</span>
-                <span className="truncate">
-                  <Highlight query={query} text={matchSnippet.snippet} />
-                </span>
-              </>
-            )}
-          </p>
-        )}
-      </div>
+  // P47 — Compact mobile row (01-contacts-list.md §"Compact view": ~48px, name +
+  // primary detail on one line, email/phone inline). A genuinely denser
+  // single-line row for the mobile "compact" density, vs the two-line cozy row.
+  const mobileCompact = (
+    <div className="flex min-w-0 flex-1 items-center gap-2.5">
+      {avatarSlot}
+      <Link
+        className="min-w-0 shrink truncate"
+        href={`/contacts/${contact.id}`}
+        onClick={() => onOpenContact(contact.id)}
+        onPointerDown={() => onOpenContact(contact.id)}
+        prefetch={false}
+      >
+        <span className="truncate text-[14px] font-semibold text-[#1d2823]">
+          <Highlight query={query} text={displayName} />
+        </span>
+      </Link>
+      {meta.length > 0 ? (
+        <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#8b938c]">
+          <Highlight query={query} text={meta[0]!} />
+        </span>
+      ) : (
+        <span className="flex-1" />
+      )}
+      {optimisticFavorite ? (
+        <span aria-hidden className="shrink-0 text-[12px] leading-none text-[#c9960c]">
+          ★
+        </span>
+      ) : null}
+      <RowActions contact={contact} mode={mode} onArchived={onArchived} onRemoved={onRemoved} />
     </div>
   );
 
@@ -833,8 +812,8 @@ const ContactRow = memo(function ContactRow({
           onArchive={handleSwipeArchive}
           onToggleFavourite={handleSwipeFavourite}
         >
-          <div className={`flex min-h-[76px] items-start px-3 py-2 ${selected ? "bg-[#edf0fe]" : "bg-white"}`}>
-            {mobileStacked}
+          <div className={`flex min-h-[52px] items-center px-3 py-1.5 ${selected ? "bg-[#edf0fe]" : "bg-white hover:bg-[#f2f4f0]"}`}>
+            {mobileCompact}
           </div>
         </SwipeableRow>
       </div>
@@ -913,6 +892,7 @@ export function ContactsWorkspaceTable({
   emptyState,
   mode,
   viewMode,
+  mobileViewMode = "cozy",
   groupByLetter,
   query,
   nameDisplayOrder,
@@ -1252,11 +1232,11 @@ export function ContactsWorkspaceTable({
     [orderedVisibleIds],
   );
 
-  // P46-DB04 §D4 — cozy is the canonical mobile row (40px avatar, name + one
-  // secondary line). The density toggle isn't reachable on mobile, so below
-  // 1024px we always render cozy; desktop keeps its selected mode (compact grid
-  // by default). Explicit density choices still apply on desktop.
-  const effectiveViewMode = isMobile ? "cozy" : viewMode;
+  // P46-DB04 §D4 / P47 — below 1024px the desktop compact *grid* can't render, so
+  // mobile has its own density: "cozy" (60px two-line, the default) or "compact"
+  // (52px single-line, opt-in via the mobileViewMode preference). Desktop keeps
+  // its own selected mode (compact grid / cozy).
+  const effectiveViewMode = isMobile ? mobileViewMode : viewMode;
 
   const rowH = effectiveViewMode === "cozy" ? 60 : 52;
 
