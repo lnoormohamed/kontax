@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
+
+import { signOutAction } from "~/app/actions/auth";
+import { PasswordChangeForm } from "./password-change-form";
 import { SettingsPageHead, StSecLabel } from "~/app/_components/settings-ui";
 import { DeleteAccountSection } from "./delete-account-section";
 import { SessionsSection } from "./sessions-section";
@@ -15,10 +18,6 @@ type ConnectedAccountsData = {
   totpVerifiedAt: string | null;
   activeSessionCount: number;
   activeAppPasswordCount: number;
-  syncProviderConnections: Array<{
-    provider: "GOOGLE" | "MICROSOFT";
-    count: number;
-  }>;
 };
 
 function Toast({ message }: { message: string }) {
@@ -69,12 +68,6 @@ function ConnectedAccountsSection({
         })}`
       : "Enabled"
     : "Not enabled";
-
-  const syncProviderSummary = data.syncProviderConnections.length
-    ? data.syncProviderConnections
-        .map((entry) => `${entry.provider === "GOOGLE" ? "Google" : "Microsoft"} (${entry.count})`)
-        .join(" · ")
-    : null;
 
   return (
     <section className="rounded-[2rem] border border-[#d8ddd6] bg-[#fbfcf9] p-4 shadow-none md:p-6">
@@ -195,24 +188,9 @@ function ConnectedAccountsSection({
         </div>
       </div>
 
-      <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] px-4 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-[14px] font-semibold text-[#1d2823]">Connected sync providers</div>
-            <div className="mt-1 text-[12.5px] leading-[1.5] text-[#5c655e]">
-              {syncProviderSummary
-                ? `${syncProviderSummary}. These accounts sync contacts but do not sign you into Kontax.`
-                : "No Google or Microsoft sync providers are connected right now."}
-            </div>
-          </div>
-          <Link
-            className="rounded-[1.1rem] border border-[#d8ddd6] bg-white px-4 py-[8px] text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-            href="/sync"
-          >
-            Review sync accounts
-          </Link>
-        </div>
-      </div>
+      {/* P46-14 / DB07: the sync-provider status card was dropped — Security
+          lists sign-in methods only; live sync status is /sync's (it was
+          duplicated here and could disagree). */}
     </section>
   );
 }
@@ -233,14 +211,62 @@ export function SecurityPageClient({
     <>
       <SettingsPageHead
         title="Security"
-        sub="Protect your account with two-factor authentication, review where you're signed in, and understand how sign-in and sync connections relate."
+        sub="Everything that signs you in: password, two-factor authentication, sessions and connected sign-in methods."
       />
+
+      {/* P46-14 / DB07: password moved here from Account — Account is
+          identity, Security is sign-in. */}
+      <StSecLabel>Password</StSecLabel>
+      <PasswordChangeForm />
 
       <StSecLabel>Two-factor authentication</StSecLabel>
       <TwoFactorSection flash={flash} />
 
       <StSecLabel>Active sessions</StSecLabel>
       <SessionsSection flash={flash} />
+
+      {/* P46-13 / DB07: the account-session sign-out card, relocated from the
+          old root #plan-billing section — sign-out's home is with sessions. */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#d8ddd6] bg-white p-5">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+            This device
+          </p>
+          <p className="mt-1.5 text-[14px] text-[#3a4540]">
+            Signed in as <span className="font-semibold text-[#1d2823]">{connectedAccounts.primaryEmail}</span>
+          </p>
+        </div>
+        <form action={signOutAction}>
+          <button
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8ddd6] px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+            type="submit"
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
+
+      {/* P46-15 / DB07: app passwords are credentials — their revocation home
+          is cross-linked here beside sessions; creation stays on the
+          connect-a-device task page. */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#d8ddd6] bg-white p-5">
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+            App passwords
+          </p>
+          <p className="mt-1.5 text-[14px] text-[#3a4540]">
+            {connectedAccounts.activeAppPasswordCount === 0
+              ? "None issued — created when you connect a device over CardDAV."
+              : `${connectedAccounts.activeAppPasswordCount} active. Revoke any you no longer recognise, especially for lost devices.`}
+          </p>
+        </div>
+        <Link
+          className="inline-flex h-10 shrink-0 items-center justify-center rounded-xl border border-[#d8ddd6] px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+          href="/settings/data/devices"
+        >
+          Manage app passwords
+        </Link>
+      </div>
 
       <StSecLabel>Connected accounts</StSecLabel>
       <ConnectedAccountsSection data={connectedAccounts} />

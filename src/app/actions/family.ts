@@ -64,7 +64,7 @@ export const createFamilyGroup = async (formData: FormData) => {
     select: { id: true },
   });
   if (existing) {
-    redirect("/settings/family");
+    redirect("/settings/sharing/family");
   }
 
   const maxMembers = billing.entitlements.memberSlotsLimit ?? 6;
@@ -94,9 +94,9 @@ export const createFamilyGroup = async (formData: FormData) => {
     });
   });
 
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
   revalidatePath("/settings");
-  redirect("/settings/family");
+  redirect("/settings/sharing/family");
 };
 
 // --- Invite -----------------------------------------------------------------
@@ -177,7 +177,7 @@ export const inviteFamilyMember = async (formData: FormData) => {
     recipientExists: Boolean(recipient),
   });
 
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
 };
 
 // --- Accept / decline (token) -----------------------------------------------
@@ -208,7 +208,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
   });
 
   revalidatePath("/contacts");
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
   redirect("/contacts?tab=people&filter=all");
 };
 
@@ -222,7 +222,7 @@ export const declineFamilyInvite = async (formData: FormData) => {
       data: { inviteStatus: "DECLINED", inviteToken: null, inviteExpiresAt: null },
     });
   }
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
   redirect("/contacts");
 };
 
@@ -250,7 +250,7 @@ export const removeFamilyMember = async (formData: FormData) => {
   }
   // Removing a member only revokes shared-book access; private contacts untouched.
   await db.groupMember.delete({ where: { id: member.id } });
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
 };
 
 // --- Shared contact operations (P13-03) -------------------------------------
@@ -399,8 +399,8 @@ export const setMemberCanEdit = async (formData: FormData) => {
     throw new Error("The owner always has edit access.");
   }
   if (member.canEdit === canEdit) {
-    revalidatePath("/settings/family");
-    revalidatePath("/settings/books");
+    revalidatePath("/settings/sharing/family");
+    revalidatePath("/settings/data/books");
     return;
   }
   const actorName = await getAuditActorName(userId);
@@ -424,8 +424,8 @@ export const setMemberCanEdit = async (formData: FormData) => {
       afterValue: canEdit ? "EDIT" : "VIEW",
     });
   });
-  revalidatePath("/settings/family");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/sharing/family");
+  revalidatePath("/settings/data/books");
 };
 
 export const resendFamilyInvite = async (formData: FormData) => {
@@ -457,7 +457,7 @@ export const resendFamilyInvite = async (formData: FormData) => {
     token,
     recipientExists: Boolean(recipient),
   });
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
 };
 
 // Delete the family group. Owner only. Permanently deletes the shared contacts
@@ -526,5 +526,5 @@ export const leaveFamilyGroup = async (formData: FormData) => {
   });
 
   revalidatePath("/contacts");
-  revalidatePath("/settings/family");
+  revalidatePath("/settings/sharing/family");
 };

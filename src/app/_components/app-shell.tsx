@@ -54,7 +54,7 @@ export async function AppShell({
   const billing = userId ? await getUserBillingContext(userId) : null;
   const readOnly = billing ? !getLifecycleAccessPolicy(billing.lifecycleState).canWrite : false;
 
-  const [incomingShares, syncConnected, unreadCount, syncErrorCount, labelRegistry] = userId
+  const [incomingShares, syncConnected, unreadCount, syncErrorCount, openMergeSuggestions, labelRegistry] = userId
     ? await Promise.all([
         db.contactShare.count({
           where: {
@@ -69,13 +69,14 @@ export async function AppShell({
           .then((n) => n > 0),
         db.notification.count({ where: { userId, readAt: null, dismissedAt: null } }),
         db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+        db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
         db.label.findMany({
           where: { userId },
           select: { name: true, color: true },
           orderBy: { position: "asc" },
         }),
       ])
-    : [0, false, 0, 0, []];
+    : [0, false, 0, 0, 0, []];
   const navItem = (href: string, icon: string, label: string, count?: number, badge?: boolean) => (
     <Link
       className="flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium text-[#5c655e] transition hover:bg-[#f2f4f0]"
@@ -168,7 +169,7 @@ export async function AppShell({
           {navItem("/contacts?tab=archived&filter=all", "archive", "Archived", counts?.archived)}
           {navItem("/contacts?tab=duplicates&filter=all", "people", "Duplicates", counts?.duplicates, true)}
           {navItem("/contacts?tab=activity", "clock", "Activity")}
-          {navItem("/shares", "download", "Shared with me", incomingShares || undefined, true)}
+          {navItem("/settings/sharing/shared", "download", "Shared with me", incomingShares || undefined, true)}
 
           <div className="mt-auto border-t border-[#e9ece7] pt-2">
             {(
@@ -199,7 +200,7 @@ export async function AppShell({
         </div>
       </div>
 
-      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
+      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} duplicatesCount={openMergeSuggestions} />
     </div>
   );
 }

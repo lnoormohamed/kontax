@@ -98,7 +98,7 @@ export const createTeam = async (formData: FormData) => {
     select: { id: true },
   });
   if (existing) {
-    redirect("/settings/teams");
+    redirect("/settings/sharing/teams");
   }
 
   const maxMembers = billing.entitlements.memberSlotsLimit ?? 25;
@@ -122,9 +122,9 @@ export const createTeam = async (formData: FormData) => {
     },
   });
 
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
   revalidatePath("/settings");
-  redirect("/settings/teams");
+  redirect("/settings/sharing/teams");
 };
 
 // --- Invite -----------------------------------------------------------------
@@ -205,7 +205,7 @@ export const inviteTeamMember = async (formData: FormData) => {
     token,
     recipientExists: Boolean(recipient),
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // --- Accept / decline -------------------------------------------------------
@@ -230,7 +230,7 @@ export const acceptTeamInvite = async (formData: FormData) => {
     },
   });
   revalidatePath("/contacts");
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
   redirect("/contacts?tab=people&filter=all");
 };
 
@@ -244,7 +244,7 @@ export const declineTeamInvite = async (formData: FormData) => {
       data: { inviteStatus: "DECLINED", inviteToken: null, inviteExpiresAt: null },
     });
   }
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
   redirect("/contacts");
 };
 
@@ -280,7 +280,7 @@ export const setTeamMemberRole = async (formData: FormData) => {
     throw new Error("Unknown role.");
   }
   await db.groupMember.update({ where: { id: member.id }, data: { role } });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 export const removeTeamMember = async (formData: FormData) => {
@@ -292,7 +292,7 @@ export const removeTeamMember = async (formData: FormData) => {
     throw new Error("The owner can't be removed. Transfer ownership or delete the team.");
   }
   await db.groupMember.delete({ where: { id: member.id } });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // --- Billing access (P34F-04) -----------------------------------------------
@@ -345,7 +345,7 @@ export const setBillingManager = async (formData: FormData) => {
     where: { id: member.id },
     data: { canManageBilling: enabled },
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // --- Owner transfer (P34F-05) -----------------------------------------------
@@ -397,7 +397,7 @@ export const transferTeamOwnership = async (formData: FormData) => {
     await tx.group.update({ where: { id: groupId }, data: { ownerId: newOwner.userId } });
   });
 
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 export const resendTeamInvite = async (formData: FormData) => {
@@ -428,7 +428,7 @@ export const resendTeamInvite = async (formData: FormData) => {
     token,
     recipientExists: Boolean(recipient),
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // --- Address books (P14-03) -------------------------------------------------
@@ -461,7 +461,7 @@ export const createTeamBook = async (formData: FormData) => {
   await db.groupAddressBook.create({
     data: { groupId: manageable.team.id, name, description, isDefault: false },
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 export const renameTeamBook = async (formData: FormData) => {
@@ -475,7 +475,7 @@ export const renameTeamBook = async (formData: FormData) => {
   }
   await requireManagedBook(userId, bookId);
   await db.groupAddressBook.update({ where: { id: bookId }, data: { name, description } });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 export const archiveTeamBook = async (formData: FormData) => {
@@ -487,7 +487,7 @@ export const archiveTeamBook = async (formData: FormData) => {
     where: { id: bookId },
     data: { archivedAt: book.archivedAt ? null : new Date() },
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // Delete a book: soft-archive its contacts (audit trail) then drop the book.
@@ -510,7 +510,7 @@ export const deleteTeamBook = async (formData: FormData) => {
     }
     await tx.groupAddressBook.delete({ where: { id: bookId } });
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // Set a member's permission (EDIT | VIEW | NONE) for one book.
@@ -533,8 +533,8 @@ export const setMemberBookPermission = async (formData: FormData) => {
       ? (member.addressBookPermissions as Record<string, string>)
       : {};
   if ((current[bookId] ?? "EDIT") === permission) {
-    revalidatePath("/settings/teams");
-    revalidatePath("/settings/books");
+    revalidatePath("/settings/sharing/teams");
+    revalidatePath("/settings/data/books");
     return;
   }
   const next = { ...current, [bookId]: permission };
@@ -561,8 +561,8 @@ export const setMemberBookPermission = async (formData: FormData) => {
       afterValue: permission,
     });
   });
-  revalidatePath("/settings/teams");
-  revalidatePath("/settings/books");
+  revalidatePath("/settings/sharing/teams");
+  revalidatePath("/settings/data/books");
 };
 
 // "Add to team book": copy a private contact into a team book (copy, not move).
@@ -717,7 +717,7 @@ export const linkTeamSyncAccount = async (formData: FormData) => {
       addedByUserId: userId,
     },
   });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 export const unlinkTeamSyncAccount = async (formData: FormData) => {
@@ -736,7 +736,7 @@ export const unlinkTeamSyncAccount = async (formData: FormData) => {
     throw new Error("Sync link not found.");
   }
   await db.teamSyncAccount.delete({ where: { id: link.id } });
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 export const leaveTeam = async (formData: FormData) => {
@@ -754,7 +754,7 @@ export const leaveTeam = async (formData: FormData) => {
   }
   await db.groupMember.delete({ where: { id: member.id } });
   revalidatePath("/contacts");
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
 };
 
 // Owner only. Permanently removes the team, its books, and their contacts.
@@ -840,6 +840,6 @@ export const updateTeamSeats = async (formData: FormData) => {
     }
   });
 
-  revalidatePath("/settings/teams");
+  revalidatePath("/settings/sharing/teams");
   revalidatePath("/settings");
 };

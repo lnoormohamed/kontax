@@ -42,7 +42,7 @@ export default async function WelcomePage({
     select: { upgradeOnboardingCompletedAt: true, upgradeOnboardingPlan: true },
   });
   if (state?.upgradeOnboardingCompletedAt && state.upgradeOnboardingPlan === plan) {
-    redirect(plan === "FAMILY" ? "/settings/family" : "/settings/teams");
+    redirect(plan === "FAMILY" ? "/settings/sharing/family" : "/settings/sharing/teams");
   }
 
   return <UpgradeOnboarding plan={plan} />;

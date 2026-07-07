@@ -183,6 +183,11 @@ exports.Prisma.AppPasswordScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.CharRomanizationScalarFieldEnum = {
+  ch: 'ch',
+  roman: 'roman'
+};
+
 exports.Prisma.ContactScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1300,6 +1305,7 @@ exports.Prisma.ModelName = {
   PublicCardView: 'PublicCardView',
   UserOnboardingState: 'UserOnboardingState',
   AppPassword: 'AppPassword',
+  CharRomanization: 'CharRomanization',
   Contact: 'Contact',
   ContactBookMembership: 'ContactBookMembership',
   ContactPrivateField: 'ContactPrivateField',

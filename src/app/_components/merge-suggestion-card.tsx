@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
+import {
+  dismissMergeSuggestion,
+  mergeClusterContacts,
+  quickMergeSuggestion,
+} from "~/app/actions/merge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { arePhoneValuesEquivalent } from "~/lib/phone-normalization";
 import type {
@@ -587,6 +591,218 @@ function MergeSuggestionGroup({
   );
 }
 
+// ── Cluster card (N distinct records of one contact) ─────────────────────────
+// Connected suggestions whose records *differ* (typo'd name, empty name,
+// phone-as-name…) still describe one real-world contact. Rather than showing
+// each pair as an unrelated decision, collapse the component into one card:
+// pick the record to keep, fold the rest into it.
+
+function clusterMembers(group: PersistedMergeSuggestion[]): SuggestionContact[] {
+  const byId = new Map<string, SuggestionContact>();
+  for (const s of group) {
+    byId.set(s.leftContact.id, s.leftContact);
+    byId.set(s.rightContact.id, s.rightContact);
+  }
+  return Array.from(byId.values()).sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+}
+
+function MergeSuggestionCluster({
+  group,
+  onAllDismissed,
+  onSuggestionDismissed,
+}: {
+  group: PersistedMergeSuggestion[];
+  onAllDismissed: () => void;
+  onSuggestionDismissed: (id: string) => void;
+}) {
+  const router = useRouter();
+  const members = clusterMembers(group);
+  const [survivorId, setSurvivorId] = useState(members[0]!.id);
+  const [merging, setMerging] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [error, setError] = useState("");
+  const [, startTransition] = useTransition();
+
+  const survivor = members.find((m) => m.id === survivorId) ?? members[0]!;
+  const best = group.reduce((a, b) => (b.score > a.score ? b : a), group[0]!);
+  const survivorName = getContactDisplayName(survivor, "the selected record");
+
+  const handleMergeCluster = () => {
+    setMerging(true);
+    setError("");
+    startTransition(async () => {
+      try {
+        const result = await mergeClusterContacts(
+          survivor.id,
+          members.filter((m) => m.id !== survivor.id).map((m) => m.id),
+        );
+        router.refresh();
+        if (result.failed > 0) {
+          setError(
+            `${result.failed} record${result.failed === 1 ? "" : "s"} couldn't be merged — rescan and try again.`,
+          );
+          setMerging(false);
+        } else {
+          onAllDismissed();
+        }
+      } catch (e) {
+        setError(toMergeError(e));
+        setMerging(false);
+      }
+    });
+  };
+
+  const handleDismissAll = async () => {
+    setDismissing(true);
+    try {
+      await Promise.all(
+        group.map((s) =>
+          Promise.all([
+            fetch("/api/merge-suggestions/dismiss", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ suggestionId: s.id }),
+            }),
+            dismissMergeSuggestion(s.leftContact.id, s.rightContact.id),
+          ]),
+        ),
+      );
+      onAllDismissed();
+    } catch {
+      setError("Couldn't dismiss — try again");
+      setDismissing(false);
+    }
+  };
+
+  const busy = merging || dismissing;
+
+  return (
+    <article className="rounded-[14px] border border-[#d8ddd6] bg-white p-4">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ConfidencePill confidence={best.confidence} />
+          <span className="inline-flex h-[22px] items-center rounded-[6px] bg-[#eef1fd] px-2 text-[11.5px] font-bold text-[#4158f4]">
+            {members.length} records · same contact
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          <button
+            className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#17352e] px-3 py-1.5 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-50"
+            disabled={busy}
+            onClick={handleMergeCluster}
+            type="button"
+          >
+            {merging ? (
+              <>
+                <span className="h-[12px] w-[12px] animate-spin rounded-full border-[2px] border-white/40 border-t-white" />
+                Merging…
+              </>
+            ) : (
+              <>
+                <WorkspaceIcon name="merge" size={13} strokeWidth={2} />
+                Merge {members.length} into one
+              </>
+            )}
+          </button>
+          <button
+            className="rounded-[9px] px-3 py-1.5 text-[13px] font-semibold text-[#b5472f] transition hover:bg-[#fdf3f1] disabled:opacity-50"
+            disabled={busy}
+            onClick={handleDismissAll}
+            type="button"
+          >
+            {dismissing ? "Dismissing…" : "Not duplicates"}
+          </button>
+        </div>
+      </div>
+
+      <p className="mt-3 text-[12.5px] text-[#5c655e]">
+        These {members.length} records look like the same contact. Choose the one to keep —
+        the others are folded into it, and every step can be undone for 30 days.
+      </p>
+
+      {/* Member picker */}
+      <div className="mt-3 grid gap-1.5">
+        {members.map((member, index) => {
+          const selected = member.id === survivor.id;
+          const detail = [member.email, member.phone, member.company]
+            .filter(Boolean)
+            .join(" · ");
+          return (
+            <label
+              className="flex cursor-pointer items-center gap-3 rounded-[10px] border px-3 py-2 transition"
+              key={member.id}
+              style={{
+                borderColor: selected ? "#17352e" : "#e3e7e1",
+                background: selected ? "#f2f6f3" : "white",
+              }}
+            >
+              <input
+                checked={selected}
+                className="accent-[#17352e]"
+                disabled={busy}
+                name={`cluster-survivor-${group[0]!.id}`}
+                onChange={() => setSurvivorId(member.id)}
+                type="radio"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[13.5px] font-semibold text-[#1d2823]">
+                  {getContactDisplayName(member, "(no name)")}
+                  {index === 0 ? (
+                    <span className="ml-2 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">
+                      oldest
+                    </span>
+                  ) : null}
+                </span>
+                {detail ? (
+                  <span className="block truncate text-[12px] text-[#8b938c]">{detail}</span>
+                ) : null}
+              </span>
+              {selected ? (
+                <span className="shrink-0 text-[11px] font-bold uppercase tracking-[0.05em] text-[#1f7a67]">
+                  Keeps this
+                </span>
+              ) : null}
+            </label>
+          );
+        })}
+      </div>
+
+      <p className="mt-2 text-[12px] text-[#aeb4ac]">
+        Merging keeps {survivorName} and preserves emails, phones, and labels from the
+        other {members.length - 1} record{members.length === 2 ? "" : "s"}.
+      </p>
+
+      {/* Individual pair review */}
+      <div className="mt-3 border-t border-[#edf0ea] pt-2">
+        <button
+          className="text-[12.5px] font-semibold text-[#4158f4] hover:underline"
+          onClick={() => setExpanded((v) => !v)}
+          type="button"
+        >
+          {expanded ? "Hide individual pairs ↑" : `Review the ${group.length} pairs individually ↓`}
+        </button>
+        {expanded ? (
+          <div className="mt-3 grid gap-3">
+            {group.map((s) => (
+              <MergeSuggestionCard
+                key={s.id}
+                onDismissed={() => onSuggestionDismissed(s.id)}
+                suggestion={s}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      {error ? <p className="mt-2 text-[12px] text-[#b5472f]">{error}</p> : null}
+    </article>
+  );
+}
+
 // ── Wrapper with optimistic list ──────────────────────────────────────────────
 
 const MERGE_SUGGESTION_RENDER_BATCH = 24;
@@ -615,10 +831,30 @@ export function MergeSuggestionList({
     );
   }
 
-  // Group identical pairs — same contact details on both sides
+  // Group connected suggestions — pairs sharing a contact form one cluster
+  // (4 records of one contact → up to 6 pairwise suggestions → 1 card).
+  const parent = new Map<string, string>();
+  const find = (id: string): string => {
+    let root = id;
+    while ((parent.get(root) ?? root) !== root) root = parent.get(root)!;
+    let cursor = id;
+    while (cursor !== root) {
+      const next = parent.get(cursor)!;
+      parent.set(cursor, root);
+      cursor = next;
+    }
+    return root;
+  };
+  for (const s of shown) {
+    const [a, b] = [s.leftContact.id, s.rightContact.id];
+    if (!parent.has(a)) parent.set(a, a);
+    if (!parent.has(b)) parent.set(b, b);
+    const [rootA, rootB] = [find(a), find(b)];
+    if (rootA !== rootB) parent.set(rootB, rootA);
+  }
   const groupMap = new Map<string, PersistedMergeSuggestion[]>();
   for (const s of shown) {
-    const key = identityKey(s);
+    const key = find(s.leftContact.id);
     const bucket = groupMap.get(key) ?? [];
     bucket.push(s);
     groupMap.set(key, bucket);
@@ -631,21 +867,37 @@ export function MergeSuggestionList({
 
   return (
     <div className="grid gap-3 p-4">
-      {visibleItems.map((group) =>
-        group.length === 1 ? (
-          <MergeSuggestionCard
-            key={group[0]!.id}
-            suggestion={group[0]!}
-            onDismissed={() => dismissIds([group[0]!.id])}
-          />
-        ) : (
-          <MergeSuggestionGroup
+      {visibleItems.map((group) => {
+        if (group.length === 1) {
+          return (
+            <MergeSuggestionCard
+              key={group[0]!.id}
+              suggestion={group[0]!}
+              onDismissed={() => dismissIds([group[0]!.id])}
+            />
+          );
+        }
+        // All pairs visually identical (exact copies) → compact batch card;
+        // otherwise the records differ and the user should pick a survivor.
+        const firstKey = identityKey(group[0]!);
+        if (group.every((s) => identityKey(s) === firstKey)) {
+          return (
+            <MergeSuggestionGroup
+              key={group.map((s) => s.id).join(",")}
+              group={group}
+              onAllDismissed={() => dismissIds(group.map((s) => s.id))}
+            />
+          );
+        }
+        return (
+          <MergeSuggestionCluster
             key={group.map((s) => s.id).join(",")}
             group={group}
             onAllDismissed={() => dismissIds(group.map((s) => s.id))}
+            onSuggestionDismissed={(id) => dismissIds([id])}
           />
-        ),
-      )}
+        );
+      })}
       {canLoadMore ? (
         <div className="flex justify-center pt-1">
           <button

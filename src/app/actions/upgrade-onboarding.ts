@@ -112,6 +112,6 @@ export async function completeUpgradeOnboarding(input: {
   });
 
   revalidatePath("/contacts");
-  revalidatePath(input.plan === "FAMILY" ? "/settings/family" : "/settings/teams");
+  revalidatePath(input.plan === "FAMILY" ? "/settings/sharing/family" : "/settings/sharing/teams");
   return { ok: true, invited, failed };
 }

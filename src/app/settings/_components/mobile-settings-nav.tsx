@@ -1,74 +1,13 @@
 import Link from "next/link";
 
+import { signOutAction } from "~/app/actions/auth";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import { SETTINGS_NAV } from "~/lib/settings-nav";
 
-function NavRow({
-  icon,
-  label,
-  detail,
-  detailColor,
-  href,
-  danger,
-  last,
-}: {
-  icon: string;
-  label: string;
-  detail?: string;
-  detailColor?: string;
-  href: string;
-  danger?: boolean;
-  last?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 13,
-        padding: "13px 16px",
-        borderBottom: last ? "none" : "1px solid #f2f4f0",
-        textDecoration: "none",
-        background: "#fff",
-        WebkitTapHighlightColor: "transparent",
-      }}
-    >
-      <span
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: 8,
-          background: danger ? "rgba(181,71,47,0.10)" : "#f2f4f0",
-          display: "grid",
-          placeItems: "center",
-          flexShrink: 0,
-        }}
-      >
-        <WorkspaceIcon
-          name={icon}
-          size={17}
-          className={danger ? "text-[#b5472f]" : "text-[#5c655e]"}
-          strokeWidth={1.7}
-        />
-      </span>
-      <span
-        style={{
-          flex: 1,
-          fontSize: 15,
-          fontWeight: 500,
-          color: danger ? "#b5472f" : "#1d2823",
-          textAlign: "left",
-        }}
-      >
-        {label}
-      </span>
-      {detail && (
-        <span style={{ fontSize: 13, color: detailColor ?? "#8b938c", marginRight: 4 }}>{detail}</span>
-      )}
-      <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
-    </Link>
-  );
-}
+// P46-12 / DB07 §5b — the mobile settings index: the shared SETTINGS_NAV
+// config rendered as a card list. Account identity card stays pinned on top;
+// a sign-out shortcut row sits at the bottom (sign-out's *home* is Security —
+// this is the common mobile shortcut, per the converged design).
 
 function GroupCard({ children }: { children: React.ReactNode }) {
   return (
@@ -86,56 +25,114 @@ function GroupCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ── group entry detail ────────────────────────────────────────────────────────
-export type FamilyEntryState =
-  | { kind: "nogroup" }
-  | { kind: "needsAttention" }
-  | { kind: "family"; memberCount: number; limit: number };
-
-export type TeamEntryState =
-  | { kind: "nogroup" }
-  | { kind: "needsAttention" }
-  | { kind: "teams"; teamName: string; memberCount: number };
-
-function familyEntryDetail(g: FamilyEntryState): { text: string; color: string } {
-  switch (g.kind) {
-    case "nogroup":        return { text: "Set up",          color: "#17352e" };
-    case "needsAttention": return { text: "Needs attention", color: "#bf8526" };
-    case "family":         return { text: `${g.memberCount} member${g.memberCount === 1 ? "" : "s"}`, color: "#8b938c" };
-  }
-}
-
-function teamEntryDetail(g: TeamEntryState): { text: string; color: string } {
-  switch (g.kind) {
-    case "nogroup":        return { text: "Set up",          color: "#17352e" };
-    case "needsAttention": return { text: "Needs attention", color: "#bf8526" };
-    case "teams":          return { text: `${g.teamName} · ${g.memberCount}`, color: "#8b938c" };
-  }
+function IndexRow({
+  icon,
+  label,
+  sub,
+  href,
+  gated,
+  last,
+}: {
+  icon: string;
+  label: string;
+  sub: string;
+  href: string;
+  gated?: boolean;
+  last?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 13,
+        padding: "13px 16px",
+        borderBottom: last ? "none" : "1px solid #f2f4f0",
+        textDecoration: "none",
+        background: "#fff",
+        opacity: gated ? 0.72 : 1,
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      <span
+        style={{
+          width: 30,
+          height: 30,
+          borderRadius: 8,
+          background: "#f2f4f0",
+          display: "grid",
+          placeItems: "center",
+          flexShrink: 0,
+        }}
+      >
+        <WorkspaceIcon name={icon} size={17} className="text-[#5c655e]" strokeWidth={1.7} />
+      </span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <span style={{ fontSize: 15, fontWeight: 500, color: "#1d2823" }}>{label}</span>
+          {gated ? (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                color: "#4158f4",
+                background: "#edf0fe",
+                borderRadius: 4,
+                padding: "1px 6px",
+                letterSpacing: "0.04em",
+              }}
+            >
+              PRO
+            </span>
+          ) : null}
+        </span>
+        <span
+          style={{
+            display: "block",
+            fontSize: 12.5,
+            color: "#8b938c",
+            marginTop: 1,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {sub}
+        </span>
+      </span>
+      <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
+    </Link>
+  );
 }
 
 export function MobileSettingsNav({
   name,
   email,
   plan,
-  syncActive,
-  familyEntry,
-  teamEntry,
 }: {
   name: string;
   email: string;
   plan: string;
-  syncActive: number;
-  familyEntry: FamilyEntryState | null;
-  teamEntry: TeamEntryState | null;
 }) {
   const getInitials = (s: string) =>
     s.split(/\s+/).map((p) => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 
   return (
     <div className="lg:hidden" style={{ paddingBottom: 8 }}>
-      {/* Account card */}
+      {/* Account identity card — pinned on top of the index (DB07 §5b) */}
       <GroupCard>
-        <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "14px 16px" }}>
+        <Link
+          href="/settings/account"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 13,
+            padding: "14px 16px",
+            textDecoration: "none",
+            WebkitTapHighlightColor: "transparent",
+          }}
+        >
           <span
             style={{
               width: 48,
@@ -152,7 +149,7 @@ export function MobileSettingsNav({
           >
             {getInitials(name)}
           </span>
-          <div style={{ minWidth: 0 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: "#1d2823", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {name}
             </div>
@@ -160,36 +157,61 @@ export function MobileSettingsNav({
               {email} · {plan}
             </div>
           </div>
-        </div>
+          <WorkspaceIcon name="chevronRight" size={18} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
+        </Link>
       </GroupCard>
 
-      {/* Navigation sections */}
+      {/* The eight groups — one config, same set as the desktop sidebar */}
       <GroupCard>
-        <NavRow icon="sync" label="Sync connections" detail={syncActive > 0 ? `${syncActive} active` : undefined} href="/sync" />
-        {/* P46-DB06 Part B: Shared-with-me relocated here from the removed mobile Overview. */}
-        <NavRow icon="arrowDownLeft" label="Shared with me" href="/shares" />
-        {familyEntry && (() => {
-          const { text, color } = familyEntryDetail(familyEntry);
-          const href = familyEntry.kind === "nogroup" ? "/settings#plan-billing" : "/settings/family";
-          return <NavRow icon="users" label="Family" detail={text} href={href} detailColor={color} />;
-        })()}
-        {teamEntry && (() => {
-          const { text, color } = teamEntryDetail(teamEntry);
-          const href = teamEntry.kind === "nogroup" ? "/settings#plan-billing" : "/settings/teams";
-          return <NavRow icon="team" label="Team management" detail={text} href={href} detailColor={color} />;
-        })()}
-        <NavRow icon="upload" label="Import & export" href="/import-export" />
-        <NavRow icon="upload" label="Import presets" href="/settings/import-presets" />
-        <NavRow icon="download" label="Export presets" href="/settings/export-presets" last />
+        {SETTINGS_NAV.map((entry, i) => (
+          <IndexRow
+            key={entry.id}
+            icon={entry.icon}
+            label={entry.label}
+            sub={entry.sub}
+            href={entry.route}
+            gated={entry.gate === "pro"}
+            last={i === SETTINGS_NAV.length - 1}
+          />
+        ))}
       </GroupCard>
 
+      {/* Sign-out shortcut — home is Security; this is the index shortcut row */}
       <GroupCard>
-        <NavRow icon="person" label="Account" href="/settings/account" />
-        <NavRow icon="qr" label="Public card" href="/settings/profile/card" />
-        <NavRow icon="bell" label="Notifications" href="/settings/notifications" />
-        <NavRow icon="phone" label="Devices & app passwords" href="/settings/devices" />
-        <NavRow icon="emergency" label="Security" href="/settings/security" />
-        <NavRow icon="briefcase" label="Plan & billing" href="/settings#plan-billing" last />
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 13,
+              width: "100%",
+              padding: "13px 16px",
+              border: "none",
+              background: "#fff",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            <span
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 8,
+                background: "rgba(181,71,47,0.10)",
+                display: "grid",
+                placeItems: "center",
+                flexShrink: 0,
+              }}
+            >
+              <WorkspaceIcon name="close" size={15} className="text-[#b5472f]" strokeWidth={1.9} />
+            </span>
+            <span style={{ flex: 1, textAlign: "left", fontSize: 15, fontWeight: 500, color: "#b5472f" }}>
+              Sign out
+            </span>
+          </button>
+        </form>
       </GroupCard>
 
       <div style={{ textAlign: "center", fontSize: 12, color: "#aeb4ac", padding: "4px 0 16px" }}>

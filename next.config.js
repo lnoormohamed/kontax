@@ -80,6 +80,55 @@ const config = {
   },
   async redirects() {
     return [
+      // P46-14 / DB07 §5c: Public card moved under Account.
+      {
+        source: "/settings/profile/card",
+        destination: "/settings/account/card",
+        permanent: true,
+      },
+      // P46-15 / DB07 §5c: books + devices nest under Data & sync; presets
+      // fold into the import/export surface.
+      {
+        source: "/settings/books",
+        destination: "/settings/data/books",
+        permanent: true,
+      },
+      {
+        source: "/settings/devices",
+        destination: "/settings/data/devices",
+        permanent: true,
+      },
+      {
+        source: "/settings/import-presets",
+        destination: "/import-export?tab=presets",
+        permanent: true,
+      },
+      {
+        source: "/settings/export-presets",
+        destination: "/import-export?tab=presets",
+        permanent: true,
+      },
+      // P46-16 / DB07 §5c: the sharing surfaces nest under /settings/sharing.
+      {
+        source: "/shares",
+        destination: "/settings/sharing/shared",
+        permanent: true,
+      },
+      {
+        source: "/settings/family",
+        destination: "/settings/sharing/family",
+        permanent: true,
+      },
+      {
+        source: "/settings/teams",
+        destination: "/settings/sharing/teams",
+        permanent: true,
+      },
+      {
+        source: "/settings/teams/:path*",
+        destination: "/settings/sharing/teams/:path*",
+        permanent: true,
+      },
       {
         source: "/settings/profile",
         destination: "/settings/account",

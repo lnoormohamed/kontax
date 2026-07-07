@@ -282,7 +282,7 @@ export function ContactDashboard({
     },
     {
       title: "Shared with me",
-      href: "/shares",
+      href: "/settings/sharing/shared",
       body:
         incomingShares && incomingShares > 0
           ? `${incomingShares.toLocaleString()} pending share${incomingShares === 1 ? "" : "s"} waiting for you.`
@@ -474,7 +474,7 @@ export function ContactDashboard({
           true,
         )}
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
-        {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
+        {navItem(false, "/settings/sharing/shared", "download", "Shared with me", incomingShares ?? null, true)}
 
         {useCondensedTabletOverviewRail ? (
           <>
@@ -676,6 +676,15 @@ export function ContactDashboard({
             <>
               <span className="text-[13.5px] font-semibold text-[#1d2823]">{countLabel}</span>
               <div className="ml-auto flex items-center gap-2">
+                {/* P46-17 / DB07 T6: Merge review left the settings nav — the
+                    duplicates view is the tool's home entry point. */}
+                <Link
+                  className="flex h-8 items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-2.5 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  href="/merge/manual"
+                >
+                  <WorkspaceIcon name="people" size={14} strokeWidth={1.8} />
+                  Manual merge
+                </Link>
                 <MergeSuggestionRefreshButton />
                 <BulkMergeButton count={highConfidenceCount} />
               </div>
@@ -972,6 +981,19 @@ export function ContactDashboard({
 
           {currentTab === "duplicates" ? (
             <div className="grid gap-6">
+              {/* P46-19: the merge actions live in the desktop-only toolbar above;
+                  on mobile they render here so the tab isn't review-only. */}
+              <div className="flex flex-wrap items-center gap-2 px-4 pt-4 md:hidden">
+                <Link
+                  className="flex h-9 items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 text-[13px] font-semibold text-[#5c655e]"
+                  href="/merge/manual"
+                >
+                  <WorkspaceIcon name="merge" size={14} strokeWidth={1.8} />
+                  Manual merge
+                </Link>
+                <MergeSuggestionRefreshButton />
+                <BulkMergeButton count={highConfidenceCount} />
+              </div>
               {mergeSuggestionsRefreshed ? (
                 <p className="px-4 pt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67]">
                   Suggestions refreshed

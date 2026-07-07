@@ -1,272 +1,78 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { signOutAction } from "~/app/actions/auth";
 import { redirectToLogin } from "~/server/auth/require-page-auth";
 
-import {
-  LifecycleBadge,
-  SectionLabel,
-  SettingsCard,
-  SettingsPageHead,
-} from "~/app/_components/settings-ui";
-import { BillingSection } from "~/app/settings/_components/billing-section";
-import { BillingSuccessBanner } from "~/app/settings/_components/billing-success-banner";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { MobileSettingsNav } from "~/app/settings/_components/mobile-settings-nav";
-import { PortalReturnedBanner } from "~/app/settings/_components/portal-returned-banner";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
-import { getBillingSurface } from "~/server/billing-surface";
-import { getUserFamilyMembership } from "~/server/family-access";
-import { syncStripeBillingState } from "~/server/stripe-handlers";
-import { getUserTeamMembership } from "~/server/team-access";
-import { db } from "~/server/db";
+import { SETTINGS_NAV } from "~/lib/settings-nav";
 
-const PLAN_SUMMARY: Record<string, string> = {
-  Free: "500 contacts · 1 sync account · 1 device · per-contact history (last 3) · no activity feed",
-  Pro: "Unlimited contacts · 5 sync accounts · 5 devices · activity log (365 days) · live & static sharing",
-  Family: "Everything in Pro for up to 6 members · 1 shared family book · 90-day history",
-  Teams: "Everything in Pro for up to 25 members · multiple shared books · unlimited audit log",
-};
-const PLAN_ORDER = ["Free", "Pro", "Family", "Teams"] as const;
+// P46-13 / DB07 §4 — /settings is a NAV INDEX on both breakpoints; billing
+// lives at /settings/billing (the #plan-billing anchor is dead). One URL, one
+// meaning. Legacy Stripe returns that still target /settings?billing=success
+// or ?portal=returned are forwarded to the billing page.
 
-export default async function SettingsPlanPage({
+export default async function SettingsIndexPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const session = await auth();
   if (!session?.user?.id) return redirectToLogin("/settings");
-  const userId = session.user.id;
-  const sp = searchParams ? await searchParams : undefined;
-  const showBillingSuccess = sp?.billing === "success";
-  const showPortalReturned = sp?.portal === "returned";
 
-  if (showBillingSuccess || showPortalReturned) {
-    try {
-      await syncStripeBillingState(userId);
-    } catch {
-      // Best-effort refresh only. The page still renders from local state if
-      // Stripe is temporarily unavailable.
+  const sp = searchParams ? await searchParams : undefined;
+  if (sp?.billing === "success" || sp?.portal === "returned") {
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(sp)) {
+      if (typeof v === "string") params.set(k, v);
     }
+    redirect(`/settings/billing?${params.toString()}`);
   }
 
-  const planSummary = await getUserPlanSummary(userId);
-  const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo, familyMembership, teamMembership, familyGroup, teamGroup] = await Promise.all([
-    getBillingSurface(userId),
-    db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
-    db.contactShare.count({
-      where: { recipientUserId: userId, shareType: "LIVE_SYNC", status: "ACTIVE" },
-    }),
-    db.groupMember.findFirst({
-      where: { userId, inviteStatus: "ACCEPTED" },
-      select: {
-        role: true,
-        group: {
-          select: {
-            name: true,
-            type: true,
-            memberSlotsLimit: true,
-            _count: { select: { members: true, addressBooks: true } },
-          },
-        },
-      },
-    }),
-    db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true, password: true } }),
-    getUserFamilyMembership(userId),
-    getUserTeamMembership(userId),
-    db.group.findFirst({
-      where: { members: { some: { userId, inviteStatus: "ACCEPTED" } }, type: "FAMILY" },
-      select: { maxMembers: true, _count: { select: { members: true } } },
-    }),
-    db.group.findFirst({
-      where: { members: { some: { userId, inviteStatus: "ACCEPTED" } }, type: "TEAM" },
-      select: { name: true, _count: { select: { members: true } } },
-    }),
-  ]);
-
-  const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
-  const currentIdx = PLAN_ORDER.indexOf(planSummary.planLabel as (typeof PLAN_ORDER)[number]);
-
-  // Cancellation impact (downgrade modal §3). Members exclude the owner.
-  const cancelDetails = {
-    syncConnections,
-    liveContacts,
-    totalContacts: planSummary.contactsUsed,
-    contactLimit: 500,
-    familyMembers:
-      billingSurface.members && groupMembership?.group.type === "FAMILY"
-        ? Math.max(0, billingSurface.members.used - 1)
-        : null,
-  };
-
+  const planSummary = await getUserPlanSummary(session.user.id);
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
-
-  // Derive separate family/team entry states for the mobile nav (P24B-DB15 §00).
-  const isNeedsAttention =
-    planSummary.lifecyclePolicy.label === "Grace" ||
-    planSummary.lifecyclePolicy.label === "Locked";
-
-  const showFamily = !!(familyMembership || planSummary.plan === "FAMILY");
-  const showTeams = !!(teamMembership || planSummary.plan === "TEAMS");
-
-  const familyEntry = showFamily
-    ? isNeedsAttention
-      ? { kind: "needsAttention" as const }
-      : familyGroup
-        ? { kind: "family" as const, memberCount: familyGroup._count.members, limit: familyGroup.maxMembers }
-        : { kind: "nogroup" as const }
-    : null;
-
-  const teamEntry = showTeams
-    ? isNeedsAttention
-      ? { kind: "needsAttention" as const }
-      : teamGroup
-        ? { kind: "teams" as const, teamName: teamGroup.name, memberCount: teamGroup._count.members }
-        : { kind: "nogroup" as const }
-    : null;
 
   return (
     <>
-      {/* Mobile settings nav — full-screen nav list, hidden on desktop */}
+      {/* Mobile index — the shared SETTINGS_NAV as a card list (P46-12) */}
       <MobileSettingsNav
         email={session.user.email ?? ""}
-        familyEntry={familyEntry}
-        teamEntry={teamEntry}
         name={userLabel}
         plan={planSummary.planLabel}
-        syncActive={syncConnections}
       />
 
-      {/* Billing content — P24B-12a keeps plan/billing usable on mobile too. */}
-      <div id="plan-billing" className="mt-2 md:mt-0">
-      {showBillingSuccess ? (
-        <BillingSuccessBanner planLabel={planSummary.planLabel} />
-      ) : null}
-      {showPortalReturned ? <PortalReturnedBanner /> : null}
-      <SettingsPageHead
-        title="Plan & billing"
-        sub="Your subscription, what you’re using, and how to manage payment."
-        right={<LifecycleBadge label={planSummary.lifecyclePolicy.label} />}
-      />
-
-      <div className="grid gap-[18px]">
-        {overrideInfo?.planOverriddenAt ? (
-          <div className="flex items-center gap-2.5 rounded-xl border border-[#c7d0fb] bg-[#f0f2fb] px-4 py-3 text-[13px] font-medium text-[#1d4ed8]">
-            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 21V4" />
-              <path d="M5 4h11l-2.2 3.5L16 11H5" />
-            </svg>
-            <span>
-              Your plan is set by an admin override. Billing changes are managed by the Kontax team.
-            </span>
-          </div>
-        ) : null}
-        <BillingSection cancelDetails={cancelDetails} surface={billingSurface} hasPassword={!!overrideInfo?.password} />
-
-        {/* group membership shortcut */}
-        {isGroupPlan ? (
-          <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
-                {planSummary.plan === "FAMILY" ? "Family group" : "Team"}
-              </p>
-              <p className="mt-1.5 text-[14px] text-[#3a4540]">
-                {groupMembership?.group ? (
-                  <>
-                    {groupMembership.role === "OWNER" ? "Owner of " : "Member of "}
-                    <span className="font-semibold text-[#1d2823]">{groupMembership.group.name}</span>
-                    {groupMembership.group.memberSlotsLimit
-                      ? ` · ${groupMembership.group._count.members}/${groupMembership.group.memberSlotsLimit} members`
-                      : ` · ${groupMembership.group._count.members} members`}
-                    {planSummary.plan === "TEAMS" && groupMembership.group._count.addressBooks > 0
-                      ? ` · ${groupMembership.group._count.addressBooks} book${groupMembership.group._count.addressBooks === 1 ? "" : "s"}`
-                      : null}
-                  </>
-                ) : (
-                  <>Your {planSummary.plan === "FAMILY" ? "family" : "team"} group isn&apos;t set up yet.</>
-                )}
-              </p>
-            </div>
+      {/* Desktop index — same config, a card grid in the content area */}
+      <div className="hidden lg:block">
+        <h1 className="text-2xl font-semibold text-[#1d2823]">Settings</h1>
+        <p className="mt-1 text-sm text-[#5c655e]">Everything about your account, data and plan.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {SETTINGS_NAV.map((entry) => (
             <Link
-              className="shrink-0 rounded-xl bg-[#4158f4] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-              href={planSummary.plan === "FAMILY" ? "/settings/family" : "/settings/teams"}
+              key={entry.id}
+              href={entry.route}
+              className="flex items-center gap-3.5 rounded-2xl border border-[#d8ddd6] bg-white p-4 no-underline transition hover:bg-[#f6f7f4]"
             >
-              {planSummary.plan === "FAMILY"
-                ? groupMembership?.group
-                  ? "Manage family book"
-                  : "Set up family book"
-                : groupMembership?.group
-                  ? "Manage team"
-                  : "Set up team"}
-            </Link>
-          </SettingsCard>
-        ) : null}
-
-        {/* plan comparison */}
-        <div>
-          <SectionLabel>Compare plans</SectionLabel>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {PLAN_ORDER.map((name, idx) => {
-              const current = name === planSummary.planLabel;
-              return (
-                <div
-                  key={name}
-                  className={`flex flex-col rounded-2xl border bg-white p-5 ${
-                    current ? "border-[#17352e]" : "border-[#d8ddd6]"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[16px] font-semibold text-[#1d2823]">{name}</span>
-                    {current ? (
-                      <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#17352e]">
-                        Current
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-2.5 flex-1 text-[12.5px] leading-5 text-[#5c655e]">{PLAN_SUMMARY[name]}</p>
-                  {current ? (
-                    <span className="mt-3.5 inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#d8ddd6] text-[13.5px] font-semibold text-[#8b938c]">
-                      Your plan
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#f2f4f0]">
+                <WorkspaceIcon name={entry.icon} size={19} className="text-[#5c655e]" strokeWidth={1.7} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-2 text-[15px] font-semibold text-[#1d2823]">
+                  {entry.label}
+                  {entry.gate === "pro" ? (
+                    <span className="rounded-full bg-[#edf0fe] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.04em] text-[#4158f4]">
+                      Pro
                     </span>
-                  ) : (
-                    <Link
-                      className="mt-3.5 inline-flex h-10 w-full items-center justify-center rounded-xl bg-[#17352e] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b]"
-                      href="/pricing"
-                    >
-                      {idx > currentIdx ? "Upgrade" : "Switch"}
-                    </Link>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  ) : null}
+                </span>
+                <span className="block truncate text-[12.5px] text-[#8b938c]">{entry.sub}</span>
+              </span>
+              <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
+            </Link>
+          ))}
         </div>
-
-        <p className="px-0.5 text-[14px] leading-6 text-[#5c655e]">{planSummary.lifecyclePolicy.description}</p>
-        <p className="px-0.5 text-[12px] text-[#8b938c]">
-          Activity log retained for 30 days on Free · 1 year on Pro · 90 days on Family · unlimited on Teams.
-        </p>
-
-        <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
-              Account session
-            </p>
-            <p className="mt-1.5 text-[14px] text-[#3a4540]">
-              Signed in as <span className="font-semibold text-[#1d2823]">{session.user.email ?? userLabel}</span>
-            </p>
-          </div>
-          <form action={signOutAction}>
-            <button
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8ddd6] px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-              type="submit"
-            >
-              Sign out
-            </button>
-          </form>
-        </SettingsCard>
       </div>
-      </div>{/* end billing wrapper */}
     </>
   );
 }

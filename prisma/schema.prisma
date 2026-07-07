@@ -430,6 +430,19 @@ model AppPassword {
   @@index([userId, revokedAt])
 }
 
+// P46-01 follow-up — static character → Latin romanization lookup (Han via
+// pinyin-pro, other scripts — Arabic, Cyrillic, Greek, Hebrew, Hangul, Kana,
+// Indic, Thai… — via the transliteration package), seeded once per environment
+// (npm run seed:sort-romanization). The workspace sort keys
+// (contacts-workspace.ts SORT_KEY_COLUMNS) prefix a leading character's
+// romanization so un-phoneticised non-Latin names sort — and therefore bucket
+// in the alphabet rail — under their romanized letter (李晨 → "li李晨" → L,
+// محمد → "mمحمد" → M) instead of falling into "#".
+model CharRomanization {
+  ch    String @id
+  roman String
+}
+
 model Contact {
   id                       String                  @id @default(cuid())
   userId                   String

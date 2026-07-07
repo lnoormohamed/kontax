@@ -281,11 +281,29 @@ const labelPredicate = (label: string | null): Prisma.Sql =>
 
 // first/last prefer the phonetic reading; empty-name contacts fall back to
 // company (or its reading), then full name.
+
+// P46-01 romanization fallback: when a key still starts with a non-Latin
+// character (no phonetic override), prefix that character's romanization from
+// the seeded CharRomanization table (scripts/seed-sort-romanization.mjs — Han
+// via pinyin, Arabic/Cyrillic/Greek/Hebrew/Hangul/Kana/Indic/… via
+// transliteration), so 李晨 gets the key "li李晨" and محمد gets "mmhmdمحمد" —
+// each sorts among its romanized letter's names and the client's
+// bucketLetter() folds it to that letter instead of "#". Latin keys miss the
+// lookup and pass through unchanged; an unseeded table degrades to the old
+// #-bucket behaviour rather than erroring.
+const romanizationFolded = (key: Prisma.Sql): Prisma.Sql =>
+  Prisma.sql`(coalesce((SELECT cr.roman FROM "CharRomanization" cr WHERE cr.ch = left(${key}, 1)), '') || ${key})`;
+
+const K_FIRST = Prisma.sql`lower(coalesce(nullif(trim(c."phoneticFirstName"), ''), nullif(trim(c."firstName"), ''), ''))`;
+const K_LAST = Prisma.sql`lower(coalesce(nullif(trim(c."phoneticLastName"), ''), nullif(trim(c."lastName"), ''), ''))`;
+const K_COMPANY = Prisma.sql`lower(coalesce(nullif(trim(c."phoneticCompany"), ''), nullif(trim(c.company), ''), ''))`;
+const K_FULL = Prisma.sql`lower(coalesce(nullif(trim(c."fullName"), ''), ''))`;
+
 const SORT_KEY_COLUMNS = Prisma.sql`
-  lower(coalesce(nullif(trim(c."phoneticFirstName"), ''), nullif(trim(c."firstName"), ''), '')) AS k_first,
-  lower(coalesce(nullif(trim(c."phoneticLastName"), ''), nullif(trim(c."lastName"), ''), '')) AS k_last,
-  lower(coalesce(nullif(trim(c."phoneticCompany"), ''), nullif(trim(c.company), ''), '')) AS k_company,
-  lower(coalesce(nullif(trim(c."fullName"), ''), '')) AS k_full
+  ${romanizationFolded(K_FIRST)} AS k_first,
+  ${romanizationFolded(K_LAST)} AS k_last,
+  ${romanizationFolded(K_COMPANY)} AS k_company,
+  ${romanizationFolded(K_FULL)} AS k_full
 `;
 
 const NAME_ORDER = Prisma.sql`

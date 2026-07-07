@@ -727,7 +727,7 @@ export function ExportCard({
                             </button>
                           ))}
                           <div className="border-t border-[#f2f4f0] px-3.5 py-1.5">
-                            <Link className="text-[12px] text-[#8b938c] underline underline-offset-2 hover:text-[#5c655e]" href="/settings/export-presets">
+                            <Link className="text-[12px] text-[#8b938c] underline underline-offset-2 hover:text-[#5c655e]" href="/import-export?tab=presets">
                               Manage presets →
                             </Link>
                           </div>

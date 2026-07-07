@@ -4,6 +4,7 @@ import type {
   ContactValueEntryInput,
   PortableContactInput,
 } from "./contact-portability";
+import { normalizePhoneExactKey } from "~/lib/phone-normalization";
 import { resolveCardDavProviderIdentity } from "./sync-provider-identity";
 
 export type SyncProviderCapabilityProfileId =
@@ -507,6 +508,74 @@ const normalizeValueEntries = (
       ),
     );
 
+// Phone values arrive formatted differently per provider — kontax stores them
+// space-stripped ("+447799720622") while CardDAV round-trips the spaces intact
+// ("+44 7799 720622"). Compared verbatim, those two representations of the SAME
+// number make the supported-field shadows unequal, which manufactures a
+// LOCAL_REMOTE_MUTATION conflict on every sync (self-perpetuating, since the
+// conflict never advances lastSyncedAt/etag). Canonicalise to an E.164 key so
+// only genuine number differences count. Shadow-only: never touches stored data
+// or the pushed vCard.
+const canonicalizePhone = (value: string | null | undefined): string | null => {
+  const trimmed = normalizeString(value);
+  if (trimmed == null) {
+    return null;
+  }
+  const exactKey = normalizePhoneExactKey(trimmed);
+  // Parseable → E.164 key. Otherwise strip common formatting punctuation so two
+  // representations of the same UNparseable number still collapse together
+  // (falls back to the trimmed original if that leaves nothing).
+  return exactKey || trimmed.replace(/[\s().\-]/g, "") || trimmed;
+};
+
+const normalizePhoneArray = (values: string[] | null | undefined) =>
+  [...(values ?? [])]
+    .map((value) => canonicalizePhone(value))
+    .filter((value): value is string => value != null)
+    .sort((left, right) => left.localeCompare(right));
+
+const normalizePhoneEntries = (
+  values: ContactValueEntryInput[] | null | undefined,
+) =>
+  [...(values ?? [])]
+    .flatMap((entry) => {
+      const value = canonicalizePhone(entry.value);
+      if (!value) {
+        return [];
+      }
+      return [
+        {
+          label: normalizeString(entry.label) ?? "Other",
+          value,
+          isPrimary: entry.isPrimary === true,
+        },
+      ];
+    })
+    .sort((left, right) =>
+      `${left.label} ${left.value} ${left.isPrimary ? 1 : 0}`.localeCompare(
+        `${right.label} ${right.value} ${right.isPrimary ? 1 : 0}`,
+      ),
+    );
+
+// CardDAV round-trips an address's TYPE lossily: kontax's generic placeholder
+// labels ("address", "primary", "other", or none) come back as the vCard
+// default "home", so an otherwise-identical address reads as drift on every
+// sync (same false-conflict pattern as phone formatting above). Fold that
+// generic set to the provider default for comparison. Explicit labels such as
+// "work" are preserved, so a genuine home↔work relabel on the same address
+// still surfaces as an update. Shadow-only — stored data is untouched.
+const GENERIC_ADDRESS_LABELS = new Set([
+  "",
+  "address",
+  "primary",
+  "other",
+  "home",
+]);
+const canonicalizeAddressLabel = (label: string | null | undefined): string => {
+  const lowered = (normalizeString(label) ?? "").toLowerCase();
+  return GENERIC_ADDRESS_LABELS.has(lowered) ? "home" : lowered;
+};
+
 const normalizePostalAddresses = (
   values: PortableContactInput["postalAddresses"],
 ) =>
@@ -516,7 +585,7 @@ const normalizePostalAddresses = (
       if (!formatted) {
         return [];
       }
-      return [{ label: normalizeString(entry.label) ?? "Other", formatted }];
+      return [{ label: canonicalizeAddressLabel(entry.label), formatted }];
     })
     .sort((left, right) =>
       `${left.label}\u0000${left.formatted}`.localeCompare(
@@ -535,7 +604,7 @@ const normalizeAddressEntries = (
       }
       return [
         {
-          label: normalizeString(entry.label) ?? "Other",
+          label: canonicalizeAddressLabel(entry.label),
           formatted,
           isPrimary: entry.isPrimary === true,
           ...(normalizeString(entry.countryOrRegion)
@@ -606,9 +675,9 @@ export const buildProviderSupportedContactShadow = (
     email: normalizeString(projected.email),
     emailAddresses: normalizeStringArray(projected.emailAddresses),
     emailEntries: normalizeValueEntries(projected.emailEntries),
-    phone: normalizeString(projected.phone),
-    phoneNumbers: normalizeStringArray(projected.phoneNumbers),
-    phoneEntries: normalizeValueEntries(projected.phoneEntries),
+    phone: canonicalizePhone(projected.phone),
+    phoneNumbers: normalizePhoneArray(projected.phoneNumbers),
+    phoneEntries: normalizePhoneEntries(projected.phoneEntries),
     company: normalizeString(projected.company),
     department: normalizeString(projected.department),
     jobTitle: normalizeString(projected.jobTitle),

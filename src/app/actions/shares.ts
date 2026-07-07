@@ -296,7 +296,7 @@ export const createStaticShare = async (formData: FormData) => {
       category: "SHARING",
       title: `${ownerName} shared a contact`,
       body: `"${contact.fullName ?? "A contact"}" was shared with you — accept it in Shared with me.`,
-      actionUrl: "/shares",
+      actionUrl: "/settings/sharing/shared",
       contactShareId: share.id,
       expiresAt: share.expiresAt,
     });
@@ -418,7 +418,7 @@ export const acceptStaticShare = async (formData: FormData) => {
     newContactId = created.id;
   });
 
-  revalidatePath("/shares");
+  revalidatePath("/settings/sharing/shared");
   revalidatePath("/contacts");
   if (newContactId) {
     redirect(`/contacts/${newContactId}`);
@@ -439,7 +439,7 @@ export const declineStaticShare = async (formData: FormData) => {
     data: { status: "DECLINED" },
   });
 
-  revalidatePath("/shares");
+  revalidatePath("/settings/sharing/shared");
 };
 
 // ── P12-04: live Kontax-to-Kontax share (Pro+, both parties) ─────────────────
@@ -518,7 +518,7 @@ export const createLiveShare = async (formData: FormData) => {
       category: "SHARING",
       title: `${ownerName} shared a contact`,
       body: `"${snapshotFields.fullName ?? "A contact"}" was shared with you — accept it in Shared with me.`,
-      actionUrl: "/shares",
+      actionUrl: "/settings/sharing/shared",
       contactShareId: share.id,
       expiresAt: share.expiresAt,
     });
@@ -622,7 +622,7 @@ export const acceptLiveShare = async (formData: FormData) => {
     newContactId = created.id;
   });
 
-  revalidatePath("/shares");
+  revalidatePath("/settings/sharing/shared");
   revalidatePath("/contacts");
   if (newContactId) {
     redirect(`/contacts/${newContactId}`);

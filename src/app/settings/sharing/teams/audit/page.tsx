@@ -30,7 +30,7 @@ export default async function TeamAuditPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const session = await auth();
-  if (!session?.user?.id) return redirectToLogin("/settings/teams/audit");
+  if (!session?.user?.id) return redirectToLogin("/settings/sharing/teams/audit");
   const sp = searchParams ? await searchParams : undefined;
   const filters = {
     memberId: single(sp?.member),
@@ -46,7 +46,7 @@ export default async function TeamAuditPage({
   if (!data) {
     return (
       <div className="text-[#1d2823]">
-        <Link className="text-sm font-semibold text-[#5c655e]" href="/settings/teams">
+        <Link className="text-sm font-semibold text-[#5c655e]" href="/settings/sharing/teams">
           ← Team
         </Link>
         <p className="mt-6 rounded-2xl border border-[#d8ddd6] bg-white p-6 text-center text-sm text-[#8b938c]">
@@ -67,7 +67,7 @@ export default async function TeamAuditPage({
     <div className="text-[#1d2823]">
       <Link
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
-        href="/settings/teams"
+        href="/settings/sharing/teams"
       >
         <WorkspaceIcon name="back" size={16} />
         Team
@@ -91,7 +91,7 @@ export default async function TeamAuditPage({
 
       {/* filter bar (GET form drives URL params) */}
       <form
-        action="/settings/teams/audit"
+        action="/settings/sharing/teams/audit"
         className="mt-5 flex flex-wrap items-end gap-2 rounded-[12px] border border-[#d8ddd6] bg-white p-3"
         method="get"
       >
@@ -149,7 +149,7 @@ export default async function TeamAuditPage({
         >
           Apply
         </button>
-        <Link className="px-2 py-2 text-[13px] font-semibold text-[#5c655e]" href="/settings/teams/audit">
+        <Link className="px-2 py-2 text-[13px] font-semibold text-[#5c655e]" href="/settings/sharing/teams/audit">
           Clear
         </Link>
       </form>

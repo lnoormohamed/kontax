@@ -51,6 +51,14 @@ and make detail-tab navigation behave.
 | [P46-DB05](p46-db05-design-brief-social-media-assets.md) | Design brief: social media assets (LinkedIn/X/Facebook/Instagram) | P2 | — |
 | [P46-DB06](p46-db06-design-brief-mobile-consistency-audit.md) | Design brief: mobile UI consistency audit + Overview removal (mobile-only) | P1 | — |
 | [P46-DB07](p46-db07-design-brief-settings-ia-redesign.md) | Design brief: settings IA redesign (both breakpoints) | P1 | — |
+| [P46-12](p46-12-settings-nav-config-unification.md) | Settings nav-config unification (DB07·T1) | P1 | P46-DB07 |
+| [P46-13](p46-13-settings-billing-page.md) | Kill the anchor · birth /settings/billing (DB07·T2) | P1 | P46-12 |
+| [P46-14](p46-14-settings-auth-boundary-moves.md) | Auth-boundary moves (DB07·T3) | P1 | P46-12 |
+| [P46-15](p46-15-settings-data-sync-consolidation.md) | Data & sync consolidation (DB07·T4) | P1 | P46-12 |
+| [P46-16](p46-16-settings-sharing-groups.md) | Sharing & groups restructure (DB07·T5) | P1 | P46-12 |
+| [P46-17](p46-17-remove-merge-review-from-settings.md) | Remove Merge review from settings (DB07·T6) | P2 | P46-12 |
+| [P46-18](p46-18-teams-page-split-seats.md) | Teams page body-split + seats relocation (T5 remainder) | P2 | P46-16 |
+| [P46-19](p46-19-mobile-nav-duplicates-swap.md) | Mobile bottom nav: Duplicates replaces Sync + mobile merge actions | P2 | P46-17 |
 | [P46-08](p46-08-mobile-chrome-conformance-pass.md) | Mobile chrome conformance pass (backs, missing headers, Overview removal) | P1 | P46-DB06 |
 | [P46-09](p46-09-mobile-header-unification-banner-stack.md) | Mobile header primitive unification + banner stack | P1 | P46-08 |
 | [P46-10](p46-10-contact-health-people-prompt.md) | Contact-health "needs attention" prompt in People | P2 | P46-08 |

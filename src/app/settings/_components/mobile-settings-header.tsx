@@ -17,19 +17,33 @@ const SUBPAGE_TITLES: Record<string, string> = {
   devices: "Devices & app passwords",
   developer: "Developer",
   security: "Security",
-  family: "Family",
-  teams: "Team management",
-  books: "Books",
-  "import-presets": "Import presets",
-  "export-presets": "Export presets",
+  data: "Data & sync",
+  sharing: "Sharing & groups",
+  billing: "Plan & billing",
+};
+
+// P46-14: nested children get their own titles (deepest match wins).
+const DEEP_TITLES: Record<string, string> = {
+  "account/card": "Public card",
+  "data/export": "Download your data",
+  "data/books": "Books",
+  "data/devices": "Connect a device",
+  "sharing/shared": "Shared with me",
+  "sharing/family": "Family",
+  "sharing/teams": "Team management",
+  "sharing/teams/audit": "Team audit log",
+  "sharing/teams/books": "Team books",
+  "sharing/teams/permissions": "Book permissions",
 };
 
 export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {
   const pathname = usePathname();
-  // First segment under /settings ("" at the root).
-  const segment = pathname.replace(/^\/settings\/?/, "").split("/")[0] ?? "";
+  const subPath = pathname.replace(/^\/settings\/?/, "");
+  const segment = subPath.split("/")[0] ?? "";
   const isRoot = segment === "";
-  const title = isRoot ? "Settings" : (SUBPAGE_TITLES[segment] ?? "Settings");
+  const title = isRoot
+    ? "Settings"
+    : (DEEP_TITLES[subPath] ?? SUBPAGE_TITLES[segment] ?? "Settings");
 
   if (isRoot) {
     return <MobileHeader variant="section" title="Settings" bell={bell} />;

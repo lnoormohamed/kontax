@@ -3,12 +3,19 @@ import { emitEvent } from "~/lib/activity";
 import { propagateLiveShares } from "~/server/contact-shares";
 import {
   emailDomain,
+  familyNamesCompatible,
   getFamilyName as getFamilyNameKey,
   givenInitialMatch,
+  givenNamesCompatible,
   levenshtein,
+  normalizeName as normalizeNameKey,
   normalizePhoneKey,
   phoneticNameKey,
 } from "~/lib/duplicate-signals";
+import {
+  comparableNameKey,
+  hasNonLatinLetters,
+} from "~/lib/name-romanization";
 import {
   parseContactPostalAddresses,
   parseContactStringArray,
@@ -66,7 +73,14 @@ export type MergeSuggestionSignal =
   | "name-and-company-proximity"
   | "name-and-missing-company"
   | "phonetic-name"
-  | "email-domain-and-name";
+  | "email-domain-and-name"
+  | "conflicting-name"
+  | "conflicting-given-name"
+  | "conflicting-company"
+  | "conflicting-birthday"
+  | "conflicting-identifiers"
+  | "romanized-name"
+  | "romanized-fuzzy-name";
 
 // Per-signal score contribution, surfaced in the "why was this suggested?" panel (P10-08).
 export type SignalContribution = {
@@ -171,6 +185,8 @@ const SIGNAL_LABELS: Record<string, string> = {
   "name-and-company-proximity": "Similar name",
   "phonetic-name": "Similar name",
   "email-domain-and-name": "Similar name",
+  "romanized-name": "Same name",
+  "romanized-fuzzy-name": "Similar name",
 };
 
 const SIGNAL_PRIORITY = [
@@ -398,11 +414,9 @@ type MergeDecisionSnapshot = {
 const normalizeValue = (value: string | null | undefined) =>
   value?.trim().toLowerCase() ?? "";
 
-const normalizeName = (value: string) =>
-  normalizeValue(value)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+// Diacritics fold to their base letters (see ~/lib/duplicate-signals) so
+// accented names normalize to comparable tokens instead of being mangled.
+const normalizeName = (value: string) => normalizeNameKey(value);
 
 const normalizePhone = (value: string | null | undefined) => {
   return normalizePhoneExactKey(value) ?? normalizePhoneKey(value);
@@ -740,6 +754,58 @@ const pickFieldValue = ({
   return primaryValue?.trim() ?? secondaryValue?.trim() ?? null;
 };
 
+// P46-20: cross-script comparison via romanization (陈志强 ≡ 陳志強 ≡
+// "chen zhi qiang", Ольга ≡ "Olga"). Lossy, so it's a supporting signal
+// only — never a hard match — and it's consulted only when at least one
+// side has non-Latin letters; Latin-only pairs use the normal name signals.
+const romanizedComparison = (
+  leftFullName: string,
+  rightFullName: string,
+): "equal" | "fuzzy" | "none" => {
+  if (!hasNonLatinLetters(leftFullName) && !hasNonLatinLetters(rightFullName)) {
+    return "none";
+  }
+  const leftKey = comparableNameKey(leftFullName);
+  const rightKey = comparableNameKey(rightFullName);
+  if (!leftKey || !rightKey) {
+    return "none";
+  }
+  if (leftKey === rightKey) {
+    return "equal";
+  }
+  if (
+    levenshtein(leftKey, rightKey, 2) <= 2 &&
+    givenNamesCompatible(leftKey, rightKey) &&
+    familyNamesCompatible(leftKey, rightKey)
+  ) {
+    return "fuzzy";
+  }
+  return "none";
+};
+
+// Names "genuinely differ" only beyond spelling variance: not equal, not within
+// fuzzy edit distance, not phonetically equivalent, and not the same name
+// written in two scripts. "Katherine"/"Catherine" is a variant, not a conflict.
+const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
+  const leftName = normalizeName(leftFullName);
+  const rightName = normalizeName(rightFullName);
+  if (!leftName || !rightName || leftName === rightName) {
+    return false;
+  }
+  if (
+    levenshtein(leftName, rightName, 2) <= 2 &&
+    givenNamesCompatible(leftFullName, rightFullName) &&
+    familyNamesCompatible(leftFullName, rightFullName)
+  ) {
+    return false;
+  }
+  if (romanizedComparison(leftFullName, rightFullName) !== "none") {
+    return false;
+  }
+  const leftPhonetic = phoneticNameKey(leftFullName);
+  return !(leftPhonetic && leftPhonetic === phoneticNameKey(rightFullName));
+};
+
 const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) => {
   const warnings: string[] = [];
   const leftEmail = normalizeValue(left.email);
@@ -761,7 +827,8 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
     leftEmail === rightEmail &&
     leftFamilyName &&
     rightFamilyName &&
-    leftFamilyName !== rightFamilyName
+    !familyNamesCompatible(left.fullName, right.fullName) &&
+    romanizedComparison(left.fullName, right.fullName) === "none"
   ) {
     warnings.push(
       "Shared email with different family names detected. This could be a household address or shared inbox, so review carefully before merging.",
@@ -772,7 +839,7 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
     leftPhone &&
     rightPhone &&
     leftPhone === rightPhone &&
-    normalizeName(left.fullName) !== normalizeName(right.fullName)
+    namesGenuinelyDiffer(left.fullName, right.fullName)
   ) {
     warnings.push(
       "Shared phone with different names detected. This could be an assistant line, family number, or front-desk number rather than a true duplicate.",
@@ -792,6 +859,14 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
     );
   }
 
+  const leftBirthday = normalizeValue(left.birthday);
+  const rightBirthday = normalizeValue(right.birthday);
+  if (leftBirthday && rightBirthday && leftBirthday !== rightBirthday) {
+    warnings.push(
+      "The two records have different birthdays. That usually means two different people, so review carefully before merging.",
+    );
+  }
+
   if (
     (leftSource === "imported" || rightSource === "imported") &&
     ((!left.email && !left.phone) || (!right.email && !right.phone))
@@ -804,11 +879,11 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
   if (
     leftGivenName &&
     rightGivenName &&
-    leftGivenName !== rightGivenName &&
+    namesGenuinelyDiffer(leftGivenName, rightGivenName) &&
     leftFamilyName &&
     rightFamilyName &&
     leftFamilyName === rightFamilyName &&
-    (leftEmail === rightEmail || (leftPhone && leftPhone === rightPhone))
+    ((leftEmail && leftEmail === rightEmail) || (leftPhone && leftPhone === rightPhone))
   ) {
     warnings.push(
       "Names differ while surnames and identifiers overlap. This could be a nickname, transliteration, or different member of the same household.",
@@ -863,7 +938,14 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   // --- Name signals ------------------------------------------------------------
   const exactName = Boolean(leftName && rightName && leftName === rightName);
   const nameDist = leftName && rightName ? levenshtein(leftName, rightName, 2) : 3;
-  const fuzzyName = !exactName && nameDist <= 2;
+  // Whole-name edit distance alone over-matches short names ("Thảo Nguyễn" is
+  // 2 edits from "Hải Nguyễn", "Priya Khan" is 2 from "Priya Shah") — both the
+  // given names and the family names must also be plausible variants.
+  const fuzzyName =
+    !exactName &&
+    nameDist <= 2 &&
+    givenNamesCompatible(left.fullName, right.fullName) &&
+    familyNamesCompatible(left.fullName, right.fullName);
 
   if (exactName) {
     add("exact-name", `Same full name: ${left.fullName}`, 80);
@@ -889,6 +971,27 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
       `Likely same person at ${left.company}: ${left.fullName} ≈ ${right.fullName}`,
       60,
     );
+  }
+
+  // --- Cross-script name (supporting signal only — never a hard match) ---------
+  // P46-20: the same person recorded in two scripts (陈志强 / 陳志強 /
+  // "Chen Zhi Qiang") matches via romanized keys when the in-script
+  // signals can't see it.
+  if (!exactName && !fuzzyName) {
+    const romanized = romanizedComparison(left.fullName, right.fullName);
+    if (romanized === "equal") {
+      add(
+        "romanized-name",
+        `Same name across scripts: ${left.fullName} ≈ ${right.fullName}`,
+        70,
+      );
+    } else if (romanized === "fuzzy") {
+      add(
+        "romanized-fuzzy-name",
+        `Similar name across scripts: ${left.fullName} ≈ ${right.fullName}`,
+        40,
+      );
+    }
   }
 
   // --- Phonetic name (supporting signal only — never a hard match) -------------
@@ -918,6 +1021,81 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
     if (commonDomain && !isPublicDomain && (surnameMatch || givenInitialMatch(left.fullName, right.fullName))) {
       add("email-domain-and-name", `Same email domain and similar name: @${leftDomain}`, 15);
     }
+  }
+
+  // --- Conflicting evidence ------------------------------------------------------
+  // A shared identifier is strong evidence, but two clearly different people
+  // sharing a line (assistant, front desk, household number) is the classic
+  // false positive. When the edge-case review warnings would fire, the score
+  // must agree with them: conflicting names/companies subtract points instead
+  // of leaving a contradictory 95 next to a "probably not a duplicate" warning.
+  const hasPositiveSignal = contributions.some((contribution) => contribution.score > 0);
+
+  if (hardMatch) {
+    const surnameKeysMatch = Boolean(
+      getFamilyNameKey(left.fullName) &&
+        getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName),
+    );
+    const namesConflict = namesGenuinelyDiffer(left.fullName, right.fullName);
+
+    if (namesConflict && !surnameKeysMatch) {
+      add(
+        "conflicting-name",
+        `Names don't match: ${left.fullName} vs ${right.fullName}`,
+        -40,
+      );
+    } else if (namesConflict && !givenInitialMatch(left.fullName, right.fullName)) {
+      add(
+        "conflicting-given-name",
+        `Same surname but different first names: ${left.fullName} vs ${right.fullName}`,
+        -20,
+      );
+    }
+  }
+
+  // Company conflict counts against name-based matches too — a "similar name"
+  // at a different company is much weaker evidence than the same name signal
+  // with no company context at all.
+  if (hasPositiveSignal && leftCompany && rightCompany && !sameCompany) {
+    add(
+      "conflicting-company",
+      `Different companies: ${left.company} vs ${right.company}`,
+      -20,
+    );
+  }
+
+  // When nothing hard matched and the names aren't exactly equal, two records
+  // that each carry their own distinct email AND distinct phone look like two
+  // separate identities, not one person recorded twice.
+  if (
+    hasPositiveSignal &&
+    !hardMatch &&
+    !exactName &&
+    leftEmail &&
+    rightEmail &&
+    leftEmail !== rightEmail &&
+    leftPhoneKey &&
+    rightPhoneKey &&
+    leftPhoneKey !== rightPhoneKey
+  ) {
+    add(
+      "conflicting-identifiers",
+      "Each record has its own distinct email and phone",
+      -15,
+    );
+  }
+
+  // Different recorded birthdays is near-decisive counter-evidence regardless
+  // of what matched — the same person doesn't have two birthdays. Applies to
+  // fuzzy/name-based matches too, not just hard identifier matches.
+  const leftBirthday = normalizeValue(left.birthday);
+  const rightBirthday = normalizeValue(right.birthday);
+  if (hasPositiveSignal && leftBirthday && rightBirthday && leftBirthday !== rightBirthday) {
+    add(
+      "conflicting-birthday",
+      `Different birthdays: ${left.birthday} vs ${right.birthday}`,
+      -40,
+    );
   }
 
   const signals = contributions.map((contribution) => contribution.signal);
@@ -1425,6 +1603,7 @@ export const refreshMergeSuggestionsForUser = async (
       email: true,
       phone: true,
       company: true,
+      birthday: true,
       importJobId: true,
       updatedAt: true,
     },
@@ -1605,6 +1784,7 @@ export const regenerateStaleSuggestionsForUser = async (userId: string) => {
           email: true,
           phone: true,
           company: true,
+          birthday: true,
           importJobId: true,
           archivedAt: true,
           updatedAt: true,
@@ -1617,6 +1797,7 @@ export const regenerateStaleSuggestionsForUser = async (userId: string) => {
           email: true,
           phone: true,
           company: true,
+          birthday: true,
           importJobId: true,
           archivedAt: true,
           updatedAt: true,

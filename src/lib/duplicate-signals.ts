@@ -24,11 +24,40 @@ export function levenshtein(a: string, b: string, maxDist = 3): number {
 
 const normalizeValue = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
 
-export const normalizeName = (value: string | null | undefined) =>
-  normalizeValue(value)
-    .replace(/[^a-z0-9\s]/g, " ")
+// Fold accented letters to their base form ("Thảo" → "thao", "Nguyễn" →
+// "nguyen") instead of stripping them, and keep ALL Unicode letters — not just
+// a-z. Stripping non-Latin scripts normalized every Arabic/CJK/Hangul/Cyrillic
+// name to "", which blinded every name signal AND suppressed the name-conflict
+// warnings/penalties (empty names "can't conflict"), so two different people
+// sharing a phone surfaced as a high-confidence one-click merge.
+// Combining marks are stripped only in scripts where they mark accents or
+// vocalization (Latin, Greek, Cyrillic, Arabic, Hebrew). In Indic and Thai
+// scripts the marks ARE the vowels — stripping them folds different names
+// together (राम "Ram" and रीमा "Rima" both became "रम").
+const ACCENT_BASE = /[\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Arabic}\p{Script=Hebrew}]/u;
+const MARKS_AFTER_ACCENT_BASE = new RegExp(`(?<=${ACCENT_BASE.source})\\p{M}+`, "gu");
+
+// Katakana → hiragana so the two kana spellings of one Japanese name compare
+// equal (タナカ ≡ たなか). Standard kana are a fixed 0x60 offset apart.
+const foldKana = (value: string) =>
+  value.replace(/[\u30a1-\u30f6]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+
+// Letters NFKD does not decompose but that have a conventional Latin folding.
+const LETTER_FOLDS: Array<[RegExp, string]> = [
+  [/đ/g, "d"], [/ł/g, "l"], [/ı/g, "i"], [/ß/g, "ss"],
+  [/ø/g, "o"], [/æ/g, "ae"], [/œ/g, "oe"], [/þ/g, "th"], [/ð/g, "d"],
+];
+
+export const normalizeName = (value: string | null | undefined) => {
+  let name = normalizeValue(value).normalize("NFKD").replace(MARKS_AFTER_ACCENT_BASE, "");
+  for (const [pattern, replacement] of LETTER_FOLDS) {
+    name = name.replace(pattern, replacement);
+  }
+  return foldKana(name)
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
+};
 
 export const getNameTokens = (value: string | null | undefined) =>
   normalizeName(value).split(" ").filter(Boolean);
@@ -127,6 +156,48 @@ export const phoneticNameKey = (value: string | null | undefined) => {
   }
   return [...tokens].sort().join(" ");
 };
+
+/**
+ * True when two name tokens could plausibly be spellings of the same name:
+ * equal, initial-vs-full, a one-edit variant, or phonetically equivalent.
+ */
+const nameTokensCompatible = (leftToken: string, rightToken: string) => {
+  if (!leftToken || !rightToken) {
+    return true;
+  }
+  if (leftToken === rightToken) {
+    return true;
+  }
+  if (
+    (leftToken.length === 1 || rightToken.length === 1) &&
+    leftToken.charAt(0) === rightToken.charAt(0)
+  ) {
+    return true;
+  }
+  // A single edit only reads as a typo when the token is long enough for it
+  // to be a small fraction of the name. For short tokens — "Li" vs "Lu", or
+  // two-character CJK names like 王芳 vs 王磊 — one edit IS a different name.
+  if (
+    Math.min(leftToken.length, rightToken.length) >= 4 &&
+    levenshtein(leftToken, rightToken, 1) <= 1
+  ) {
+    return true;
+  }
+  const leftPhonetic = phoneticToken(leftToken);
+  return Boolean(leftPhonetic && leftPhonetic === phoneticToken(rightToken));
+};
+
+/**
+ * Whole-name edit distance alone is too permissive for short names — "Thảo"
+ * vs "Hải" and "Khan" vs "Shah" are each 2 edits but are different people —
+ * so fuzzy name matching must pass this per-token gate: both the given names
+ * and the family names must be plausible variants of each other.
+ */
+export const givenNamesCompatible = (left: string | null | undefined, right: string | null | undefined) =>
+  nameTokensCompatible(getGivenName(left), getGivenName(right));
+
+export const familyNamesCompatible = (left: string | null | undefined, right: string | null | undefined) =>
+  nameTokensCompatible(getFamilyName(left), getFamilyName(right));
 
 /**
  * True when two names look like the same person referenced with an initial,

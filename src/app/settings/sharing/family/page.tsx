@@ -62,7 +62,7 @@ function Tag({ children, kind }: { children: React.ReactNode; kind?: TagKind; gr
 
 export default async function FamilySettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) return redirectToLogin("/settings/family");
+  if (!session?.user?.id) return redirectToLogin("/settings/sharing/family");
   const userId = session.user.id;
 
   const billing = await getUserBillingContext(userId);

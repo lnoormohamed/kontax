@@ -26,7 +26,7 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 | 2 | **MinIO** — LXC 151 · `192.168.1.119:9000` · bucket `kontax-uploads` | ✅ **fully verified 2026-07-05**: env wired (`MINIO_ENDPOINT` now `https://media.getkontax.com`); **avatar round-trip green** — QA-user upload via `/api/upload/avatar` → two objects (canonical PNG + 96px webp thumb) → both load publicly over `media.getkontax.com` (200, correct content-types); **presigned export plane green** — `DataExportJob` processed to READY, `downloadUrl` signs the **public** host, 200 download from the internet, valid ZIP. Shared instance kept (bucket + scoped key) | live round-trip on prod | P47-02 |
 | 3 | **Redis / Valkey** — LXC 143 `redis-rate-limit` | ✅ **live 2026-07-05**: `REDIS_URL` (logical DB 1, existing `requirepass`) set in Coolify via tinker + restart-only deploy; verified end-to-end — hitting `/api/register` produced `rl:registration:ip:*` in DB 1. Shared instance kept (`.30` = passportbase on DB 0, `.97` = 143 itself). ⚠️ **Follow-up found during verify:** the rate-limit key's IP is `192.168.1.124` (NPM) — Traefik doesn't trust NPM's `X-Forwarded-For`, so **all visitors share one bucket**; fix = `forwardedHeaders.trustedIPs=192.168.1.124` on the coolify-proxy entrypoints (affects all Coolify apps; brief proxy restart) | live key observed in DB 1 | P47-03 |
 | 4 | **Cron** — LXC 152 `kontax-cron` | ✅ all 8 jobs + 15-min sync in `/etc/cron.d/kontax` with `APP_URL=https://getkontax.com`; **live probes `sync`, `birthday-reminders`, `reset-api-counters` → 200** (secret matches the app). Remaining: crontab-vs-route reconcile after the staging merge; observe a real sync pull+push | crontab read + curl with crontab secret | P47-04 |
-| 5 | **App container env** — Coolify LXC 122 | ◑ far beyond P34D-era: `KONTAX_DEPLOY_ENV=production`, `KONTAX_SCHEMA_MODE=validate`, `TOTP_ENCRYPTION_KEY`, `CRON_SECRET`, all `MINIO_*`, Google OAuth (prod redirect), SES (`noreply@getkontax.com`, us-east-1), all `STRIPE_*` set. **Missing:** `REDIS_URL`, `MICROSOFT_*` (4), `NEXT_PUBLIC_PRICE_*` (6), `PHOTO_SYNC_ENABLED` + other off-schema vars (see P47-05 table). Extra var present: `SES_TO_EMAIL` (not in env.js) | `docker inspect` env dump (names + non-secret values) | P47-05 |
+| 5 | **App container env** — Coolify LXC 122 | ✅ **complete 2026-07-05** — no unintended degraded mode. All hard-required + service-group vars set and verified (`MINIO_*`, `REDIS_URL`, SES, Google OAuth, Stripe-test, `TOTP_ENCRYPTION_KEY`, `CRON_SECRET`, `KONTAX_DEPLOY_ENV=production`). **Decisions ratified:** `MICROSOFT_*` parked; `NEXT_PUBLIC_PRICE_*` not needed (prices render from Stripe catalog); **the four off-schema tuning vars (`ADMIN_CAPABILITY_OVERRIDES`, `ADMIN_DEFAULT_TIER`, `SESSION_VALIDATION_CACHE`, `SYNC_COMMIT_TX_TIMEOUT_MS`) correctly left UNSET** — code defaults are optimal for prod's LAN topology + bootstrap-admin governance; mirroring staging would be wrong (see analysis below). **`PHOTO_SYNC_ENABLED` decision: launch WITH it ON** — set to `1` only once the P44-06 remaining rows pass on prod (row 7 echo-blocker already green on all 3 providers from staging). Extra var present: `SES_TO_EMAIL` (not in env.js — harmless) | `docker inspect` env dump + code-default analysis | P47-05 |
 | 6 | **Schema apply** | ✅ **EXECUTED 2026-07-05** with the staging→main merge (`3c917d5`, 52 commits — the P38–P47 feature train). Ran per the apply-day runbook below: fresh snapshot → additive-only diff confirmed ([artifact](artifacts/p47-06-prod-schema-diff-2026-07-05.sql)) → `db push` (49→52 tables) → backfills (`migrate-default-address-books` created 2 books; memberships no-op at 0 contacts; rest skip-empty) → **drift gate exit 0** → auto-deploy on push → new build boots clean in `validate` (`Starting Kontax.`), site 200, `/format/*` artifacts 200, authed /contacts 200, pre-deploy session survived. Note: DB link from the dev machine is flaky (VPN) — scripts may need one retry | full apply + live verification | P47-06 |
 
 ## External services (Workstream B)
@@ -91,11 +91,24 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
      these vars is `pricing-comparison.tsx`, which is **dead code** (imported
      nowhere). Prices auto-update when P47-08 flips to live keys.
    - `MICROSOFT_*` — parked (post-launch feature, user decision 2026-07-05).
-   - `PHOTO_SYNC_ENABLED` absent = **off** (de-facto launch decision; P44-06
-     QA never ran) (P47-05).
-5. Confirm **Uptime Kuma** coverage of app + media + cron (P47-12 residual).
-6. **SES sandbox/DKIM for getkontax.com** + a live send (P47-09).
-7. **Externals last (user decision)**: Stripe live mode (P47-08) + Google
+   - Off-schema tuning vars (`ADMIN_CAPABILITY_OVERRIDES`, `ADMIN_DEFAULT_TIER`,
+     `SESSION_VALIDATION_CACHE`, `SYNC_COMMIT_TX_TIMEOUT_MS`) — **left unset by
+     design.** Code-default analysis (2026-07-05): admin tier defaults to
+     least-privilege `SUPPORT_OPS` with the bootstrap admin auto-`GOVERNANCE`;
+     session-validation cache is now ON (Redis present); the tx-timeout 120s
+     default suits prod's same-LAN DB (the override exists only for high-latency
+     dev/staging-over-VPN). Prod must NOT mirror staging here — admin overrides
+     are per-deployment, the knobs are topology-specific. Live staging-env diff
+     couldn't run (10.0.0.x unreachable) but is unnecessary given the semantics.
+   - `PHOTO_SYNC_ENABLED` — **launch decision: ON** (user, 2026-07-05). Set to
+     `1` only after the P44-06 remaining matrix rows pass **on prod** (row 7
+     echo-blocker already green on all 3 providers from the staging run). Until
+     then it stays absent (=off). Tracked as the P44-06 prod completion below.
+5. **P44-06 photo-sync QA on prod** → then flip `PHOTO_SYNC_ENABLED=1` (see the
+   dedicated runbook section below). Gates the launch-with-photo-sync-on decision.
+6. Confirm **Uptime Kuma** coverage of app + media + cron (P47-12 residual).
+7. **SES sandbox/DKIM for getkontax.com** + a live send (P47-09) — ✅ done.
+8. **Externals last (user decision)**: Stripe live mode (P47-08) + Google
    People-API verification & Microsoft registration (P47-07) once everything
    else works.
 8. Housekeeping: ~~ddns missing-comma bug~~ + ~~`api.getkontax.com` CNAME-vs-A
@@ -107,7 +120,54 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
    REST API rewrite host (`middleware.ts` maps `api./v1/*` → `/api/v1/*`;
    root 404 is expected).
 
+## P44-06 photo-sync prod QA (gates PHOTO_SYNC_ENABLED=1)
+
+Decision 2026-07-05: **launch with photo sync ON**, but only after the P44-06
+matrix is completed on **prod**. Current state (from the staging run, see
+`roadmap/build-phase/p44-06-photo-sync-qa-matrix.md`): the phase-exit blocker
+**row 7 (echo double-cycle / no-loop) is GREEN on all 3 providers** (Fastmail,
+iCloud, Google) and inbound pull (row 1) verified; the P47-02 MinIO-drop bug
+that broke every earlier attempt is fixed on prod. What's left is re-confirming
+on prod + the un-exercised rows.
+
+**Prereqs (Li — interactive, can't be scripted):**
+1. On prod (`getkontax.com`), log in as the QA account (`p47qa@getkontax.com`)
+   or a dedicated photo-QA user.
+2. Connect provider **test** accounts via the in-app OAuth/app-password flow:
+   Google Contacts (OAuth is live on prod) + at least one CardDAV
+   (Fastmail/iCloud app-password). Use throwaway/test accounts only.
+3. Seed a few contacts prefixed `P44QA ` with photos (in-app avatar upload or
+   the P44-01 harness).
+
+**Then (Claude, once VPN is up + accounts connected):**
+4. Set `PHOTO_SYNC_ENABLED=1` in Coolify (same tinker+restart path as `REDIS_URL`).
+5. Drive sync via the product path (`/api/cron/sync` with `CRON_SECRET`, or
+   `/api/sync/run`); confirm row 7 echo-quiet on prod + exercise the un-run rows
+   (2,4–6,8–13: local push, change/delete both ways, conflict pick, same-image
+   auto-resolve, Photos-exclusion, >1MB, cost). Watch for the known ops traps:
+   Cloudflare 502 at ~30s on long first syncs (runner continues — poll `SyncJob`),
+   Google `GOOGLE_QUOTA_EXCEEDED` looks frozen for ~10 min, stale `RUNNING` jobs
+   block their account queue.
+6. Record results in the P44-06 matrix; **leave `PHOTO_SYNC_ENABLED=1`** once green
+   (this is the launch state). Clean up `P44QA ` contacts on every provider.
+
+Rollback: unset `PHOTO_SYNC_ENABLED` (or set `0`) + restart — the pipes go dormant,
+no data loss; existing stored avatars remain.
+
 ## P47-06 apply-day runbook (execute with the staging→main deploy)
+
+> ⚠️ **PENDING SCHEMA ON STAGING (as of 2026-07-05 eve): `CharRomanization`.**
+> After the first apply (P38–P47 train, done), staging added one new table
+> (`CharRomanization`, P46-01 romanization follow-up). It is **not on main and
+> not in the prod DB.** The 2026-07-05 18:38 merge to main (`d09e0ec`) happened
+> to be schema-neutral, so its auto-deploy was safe — but **the next
+> staging→main merge carries this table, and a bare `git push` will crash-loop
+> prod** (validate boot, missing table). Whoever merges next MUST run steps 1–6
+> below first. Extra step for this one: after `db push`, run
+> `DATABASE_URL=<prod> npm run seed:sort-romanization` (one-time data seed) or
+> non-Latin names bucket under "#" instead of their romanized letter. Because
+> Coolify **auto-deploys main on push**, the safe order is: apply+seed+drift-gate
+> on prod → *then* push main. Do not push main while the prod DB is unreachable.
 
 Prepped 2026-07-05. The apply MUST be choreographed with the deploy because the
 `validate` boot diffs **DB → build schema** in both directions: applying early
@@ -135,6 +195,10 @@ first makes *it* crash-loop on missing tables. Keep the window minutes-wide:
      QA avatar already has its thumb).
    - `setup-contact-search-index.mjs` — already present in prod (validate boot
      confirms the trigger); re-run only if the drift check complains.
+   - `seed:sort-romanization` — **RUN when the diff includes `CharRomanization`**
+     (`DATABASE_URL=<prod> npm run seed:sort-romanization`); seeds the character
+     lookup so non-Latin names sort/bucket by romanized initial. Data seed, not
+     schema — safe to re-run (idempotent upsert).
 5. **Drift gate** — `DATABASE_URL=<prod> node scripts/check-schema-drift.mjs`
    → exit 0 (also verifies the search trigger).
 6. **Deploy the merged build** (Coolify; queue via tinker helper if the UI is
