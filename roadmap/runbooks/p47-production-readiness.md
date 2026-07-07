@@ -156,18 +156,17 @@ no data loss; existing stored avatars remain.
 
 ## P47-06 apply-day runbook (execute with the staging→main deploy)
 
-> ⚠️ **PENDING SCHEMA ON STAGING (as of 2026-07-05 eve): `CharRomanization`.**
-> After the first apply (P38–P47 train, done), staging added one new table
-> (`CharRomanization`, P46-01 romanization follow-up). It is **not on main and
-> not in the prod DB.** The 2026-07-05 18:38 merge to main (`d09e0ec`) happened
-> to be schema-neutral, so its auto-deploy was safe — but **the next
-> staging→main merge carries this table, and a bare `git push` will crash-loop
-> prod** (validate boot, missing table). Whoever merges next MUST run steps 1–6
-> below first. Extra step for this one: after `db push`, run
-> `DATABASE_URL=<prod> npm run seed:sort-romanization` (one-time data seed) or
-> non-Latin names bucket under "#" instead of their romanized letter. Because
-> Coolify **auto-deploys main on push**, the safe order is: apply+seed+drift-gate
-> on prod → *then* push main. Do not push main while the prod DB is unreachable.
+> ✅ **`CharRomanization` APPLIED + DEPLOYED 2026-07-07.** The second apply ran
+> per this runbook: snapshot → additive diff (1 stmt, `CREATE TABLE
+> CharRomanization`, 0 drops) → `db push` → `seed:sort-romanization` (33,948
+> rows, 李→li verified) → drift gate exit 0 → push main (`5fa6b51`) → auto-deploy.
+> **The first auto-deploy FAILED** (build died at Next "Collecting page data",
+> exit 255) — a transient build failure (local build of the same commit was
+> clean; no OOM/disk); **retrying the deploy succeeded**. New container boots
+> clean in `validate`; site 200. Reverse-drift window (DB ahead of old container
+> between apply and successful deploy) is closed. Lesson: a failed Coolify build
+> after a prod schema apply leaves the *old* container unable to restart safely —
+> get the matching build deployed promptly (retry) rather than leaving it.
 
 Prepped 2026-07-05. The apply MUST be choreographed with the deploy because the
 `validate` boot diffs **DB → build schema** in both directions: applying early
