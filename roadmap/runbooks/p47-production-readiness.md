@@ -52,7 +52,7 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 | # | Item | Status | Notes | Ticket |
 |---|------|--------|-------|--------|
 | 15 | **Backups** | ✅ **built + drilled 2026-07-05**: nightly 02:30 UTC cron on the Proxmox host (`/etc/cron.d/kontax-backup` → `/usr/local/bin/kontax-backup.sh`) dumps `kontax` (`pg_dump -Fc` via `runuser` — NOT `su -`, whose MOTD banner corrupts the stream) + tars the `kontax-uploads` bucket to NAS `/mnt/pve/pve-ugreen/backup/kontax/{db,minio}`, 14-day retention, size sanity check, log at `/var/log/kontax-backup.log`. **Restore drill passed**: dump → scratch DB → 49 tables + user row verified → dropped. Note: no Proxmox-wide vzdump schedule exists (`jobs.cfg` absent) — consider one for 122/129/151/152 separately | first run + restore drill | P47-12 |
-| 16 | **Uptime monitoring** | ◑ **2026-07-07**: Uptime Kuma (LXC 131, systemd `uptime-kuma.service`, SQLite `/opt/uptime-kuma/data/kuma.db`). App already monitored (id 14 `getkontax.com/api/health`, 300s/3-retry). **Added id 17 `Kontax Media (MinIO)` → `media.getkontax.com/minio/health/live`** (cloned id 14's config; verified UP 200/279ms; DB backup `kuma.db.bak-p47-20260707`). **Two gaps remain, both need input:** (a) **cron** — no public GET health (routes need `CRON_SECRET`+POST); proper fix = a Kuma **Push** monitor with each cron job heartbeating Kuma (edits LXC 152 crontab); (b) **NO alerting configured at all** (zero notification providers in Kuma — every monitor is dashboard-only) → needs a channel choice + creds (email via SES / Telegram / Discord webhook) | Kuma SQLite inspect + monitor add | P47-12 |
+| 16 | **Uptime monitoring** | ◑ **2026-07-07**: Uptime Kuma (LXC 131, systemd `uptime-kuma.service`, SQLite `/opt/uptime-kuma/data/kuma.db`). App already monitored (id 14 `getkontax.com/api/health`, 300s/3-retry). **Added id 17 `Kontax Media (MinIO)` → `media.getkontax.com/minio/health/live`** (cloned id 14's config; verified UP 200/279ms; DB backup `kuma.db.bak-p47-20260707`). **Two gaps DEFERRED TO A FUTURE PLAN (user 2026-07-07):** (a) **cron** — no public GET health (routes need `CRON_SECRET`+POST); proper fix = a Kuma **Push** monitor with each cron job heartbeating Kuma (edits LXC 152 crontab); (b) **alerting** — zero notification providers in Kuma (every monitor is dashboard-only across ALL projects, not just Kontax). **Channel decided: Telegram** (bot token + chat id needed) — set-up deferred to a later plan. App + media uptime *are* watched today; only alerting + cron-heartbeat are outstanding | Kuma SQLite inspect + monitor add | P47-12 |
 | 17 | **Production smoke test** | ◑ **scripted pass GREEN 2026-07-05** — full results in [smoke-test-results-p47.md](smoke-test-results-p47.md): auth, contacts CRUD+search via REST v1, avatar plane, P45 archive export → public presigned download → **open-format validator VALID ✓**, public card, API rate limits in Redis, cron re-verified on the new build. **Zero P0 failures.** Remaining for sign-off: manual/device items (2FA, mobile gestures, sharing flow, import wizard, notification visuals) + overnight-cron check | scripted battery on live origin | P47-13 |
 | 18 | **Go-live cutover** | ◑ mostly done — prod already serves getkontax.com; merge+schema+redeploy ✅, post-swap scripted smoke ✅. **Admin bootstrap DONE 2026-07-07**: `li@linoormohamed.com` granted ADMIN (`grant-admin.mjs`) — sole admin + earliest user ⇒ GOVERNANCE bootstrap tier; `/admin` verified 200 (tested via temp-promote of p47qa, then revoked). **Remaining:** (a) decide `kontax.vexon.co` redirect — 301→prod (retire staging) vs leave as-is (staging on 10.0.0.x, currently unreachable); (b) at real launch, clean up QA fixtures — delete/repurpose `p47qa` user + `/u/p47qa` username, revoke ApiToken `p47-smoke`; both gated on finishing the manual smoke + photo QA that still use them | admin grant + `/admin` 200 | P47-14 |
 | 19 | **Post-launch review** | ⬜ gated — write `p47-post-launch-review.md` at T+24h **after the actual launch** (which is itself gated on P47-13 manual sign-off + Stripe live + Google submit). Premature until then | — | P47-14 |
@@ -67,15 +67,18 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
    revisit with split-horizon DNS if export archives outgrow it. A `deploy`-scoped
    Coolify API token `claude-p47-deploy` now exists (instance API is disabled;
    deployments queued via tinker helper instead).
-1b. **NEW — real client IP** (found while verifying Redis): edge chain is
-   Cloudflare → NPM (.124) → **coolify-proxy Traefik** (`192.168.1.30:80`) → app.
-   NPM sends correct `X-Forwarded-For`, but Traefik doesn't trust it → app sees
-   `.124` for every visitor → **rate limits are one shared global bucket**.
-   Fix: add `--entryPoints.http.forwardedHeaders.trustedIPs=192.168.1.124` (+
-   https entrypoint) to `/data/coolify/proxy/docker-compose.yml` and restart
-   coolify-proxy (seconds of downtime for ALL Coolify apps — schedule it).
-   Longer term consider `CF-Connecting-IP` to resist XFF spoofing from
-   direct-to-origin traffic.
+1b. ~~real client IP~~ **✅ FIXED + VERIFIED 2026-07-07.** The rate limiter saw
+   `.124` (NPM) for every visitor because Traefik doesn't trust NPM's XFF.
+   Traefik change was **vetoed** (user: don't touch the Cloudflare→NPM→Coolify
+   chain — [[dont-modify-edge-proxy-chain]]). Fixed in **app code** instead
+   (`src/lib/client-ip.ts`): read `CF-Connecting-IP` first (Cloudflare sets it to
+   the true visitor IP; NPM+Traefik pass it through; trustworthy since the origin
+   is only reachable via Cloudflare), fall back to XFF/X-Real-IP. Wired into all
+   6 IP-derivation sites. Shipped in merge `ab10c61`. **Verified on prod**: a
+   `/api/register` hit through Cloudflare produced `rl:registration:ip:<my real
+   public IP>`, not `.124`. Homelab's dynamic public IP is irrelevant — it never
+   enters the header (ddns handles origin routing; CF-Connecting-IP is the
+   visitor's IP).
 2. ~~Avatar round-trip + export-download test~~ **DONE 2026-07-05** — QA
    account `p47qa@getkontax.com` (id `cmr7fczy60000mq4cex0ak6kl`, email
    force-verified via DB; keep for P47-13 smoke tests, rotate its password
@@ -106,7 +109,8 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
      then it stays absent (=off). Tracked as the P44-06 prod completion below.
 5. **P44-06 photo-sync QA on prod** → then flip `PHOTO_SYNC_ENABLED=1` (see the
    dedicated runbook section below). Gates the launch-with-photo-sync-on decision.
-6. Confirm **Uptime Kuma** coverage of app + media + cron (P47-12 residual).
+6. **Uptime Kuma** (P47-12 residual) — app + media monitored; **Telegram
+   alerting + cron heartbeat DEFERRED to a future plan** (user 2026-07-07).
 7. **SES sandbox/DKIM for getkontax.com** + a live send (P47-09) — ✅ done.
 8. **Externals last (user decision)**: Stripe live mode (P47-08) + Google
    People-API verification & Microsoft registration (P47-07) once everything
