@@ -1,3 +1,4 @@
+import { getClientIp } from "~/lib/client-ip";
 import { verifyCardDavCredentials } from "~/server/app-passwords";
 import {
   forbiddenDavResponse,
@@ -23,10 +24,7 @@ const EMAIL_FAILURE_LIMIT = 10;
 // protection — replace with a Redis-backed counter before exposing to high traffic.
 const buckets = new Map<string, RateLimitBucket>();
 
-const getRequestIp = (request: Request) => {
-  const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return forwardedFor ?? request.headers.get("x-real-ip") ?? "unknown";
-};
+const getRequestIp = (request: Request) => getClientIp(request.headers) ?? "unknown";
 
 const getBucket = (key: string) => {
   const now = Date.now();

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { createId } from "@paralleldrive/cuid2";
 import { z } from "zod";
 
+import { getClientIp } from "~/lib/client-ip";
 import { db } from "~/server/db";
 import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
 import { checkRateLimit, peekRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -90,9 +91,7 @@ export const authConfig = {
 
         // Capture IP + UA for UserSession creation in JWT callback (P18-06) and
         // for failed-login detection (P22-04).
-        const ip = request?.headers?.get("x-forwarded-for")?.split(",")[0]?.trim()
-          ?? request?.headers?.get("x-real-ip")
-          ?? null;
+        const ip = request?.headers ? getClientIp(request.headers) : null;
         const ua = request?.headers?.get("user-agent") ?? null;
 
         // P34D-01: brute-force protection.
