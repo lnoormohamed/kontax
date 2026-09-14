@@ -26,6 +26,16 @@ import {
   davCredentialUserIndexKey,
 } from "./src/server/dav/credential-cache.mjs";
 
+// P48-15: this process is the actual Node entrypoint (`npm start` /
+// `node server.mjs`) — log fatals instead of letting them vanish silently.
+process.on("unhandledRejection", (reason) => {
+  console.error("[Kontax] fatal unhandledRejection:", reason);
+});
+process.on("uncaughtException", (error) => {
+  console.error("[Kontax] fatal uncaughtException:", error);
+  process.exit(1);
+});
+
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME ?? "0.0.0.0";
 const port = Number.parseInt(process.env.PORT ?? "3000", 10);

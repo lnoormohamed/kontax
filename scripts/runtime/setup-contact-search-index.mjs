@@ -16,7 +16,7 @@
  * column via the Unsupported("tsvector") field in schema.prisma; the trigger
  * and index are owned by this script and verified by check-schema-drift.mjs.
  *
- * Usage: DATABASE_URL=... node scripts/setup-contact-search-index.mjs
+ * Usage: DATABASE_URL=... node scripts/runtime/setup-contact-search-index.mjs
  */
 
 import { PrismaClient } from "../generated/prisma/index.js";

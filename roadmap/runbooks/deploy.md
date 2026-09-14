@@ -11,7 +11,7 @@ Kontax runs as a Docker container managed by Coolify on Proxmox LXC 114.
 Containers boot through:
 
 ```bash
-node scripts/start-production.mjs
+node scripts/runtime/start-production.mjs
 ```
 
 That startup script supports three schema modes:
@@ -78,7 +78,7 @@ Default behavior:
 2. Apply the intended schema change manually against the target DB (point `DATABASE_URL` at it — e.g. staging `10.0.0.200`, prod `192.168.1.193`):
    - additive-safe: `npm run db:push` (verify the diff is `[+] Added`-only first with `npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code`)
    - data migration: run SQL/backfill first, then apply the schema
-3. Redeploy or restart the app so validation passes (confirm locally with `node scripts/check-schema-drift.mjs` → exit 0).
+3. Redeploy or restart the app so validation passes (confirm locally with `node scripts/runtime/check-schema-drift.mjs` → exit 0).
 4. If you need to unblock immediately, revert the schema change and redeploy the previous app build.
 
 > **Prevention:** set `KONTAX_DEPLOY_ENV=staging` on the staging app (→ `push` mode auto-applies additive schema) and `KONTAX_DEPLOY_ENV=production` on prod (→ `validate` + intentional apply). Leaving it unset is what forces a staging app into validate mode.
@@ -114,6 +114,68 @@ Default behavior:
 
 ---
 
+## Image layout & running admin scripts (P48-15)
+
+The runtime image is a pruned, non-root, multi-stage build — it does **not**
+contain `src/`, the wider `scripts/` tree, or dev tooling (eslint,
+typescript, playwright, tailwind). Two stages:
+
+- **builder** (`node:22-alpine`): `npm ci` (installs `devDependencies` too,
+  and its `postinstall` runs `prisma generate` against the container's own
+  Linux target — never the repo's committed output, since `generated/` is
+  gitignored and dockerignored) → `next build` → `npm prune --omit=dev`,
+  then `prisma` (the CLI, a devDependency) is reinstalled on its own because
+  `scripts/runtime/start-production.mjs` and
+  `scripts/runtime/check-schema-drift.mjs` shell out to
+  `npx prisma db push` / `prisma migrate diff` at boot.
+- **runner** (`node:22-alpine`, `USER node`): copies only `.next`, `public`,
+  `next.config.js`, `server.mjs`, `prisma/` (schema + migrations),
+  the pruned `node_modules`, `generated/` **from the builder**, `package.json`,
+  and `scripts/runtime/` (`start-production.mjs`, `check-schema-drift.mjs`,
+  `setup-contact-search-index.mjs`).
+
+Everything else that used to ship in the image — the 40+ seed/backfill/QA
+scripts in `scripts/` (`seed-demo-showcase.mjs`, `grant-admin.mjs`,
+`rollback-teams-billing-to-org.mjs`, the phase37/44/45 harnesses, etc.) and
+`src/` itself — is **not present in the running container**. `docker run
+kontax ls scripts` only lists `runtime/`; `docker run kontax ls src` fails
+with "No such file or directory". This is intentional: those scripts are
+one-off/admin tooling, not boot-path code, and keeping them out of the image
+shrinks the attack surface if the container is ever compromised.
+
+**To run an admin/seed script against a deployed environment**, you need a
+full checkout, not the runtime image. Options, in order of preference:
+
+1. **From a workstation/CI runner with the repo checked out** (normal case):
+   point `DATABASE_URL` (and any other required env) at the target database
+   and run the script directly, e.g.
+   `DATABASE_URL=<target> npm run search:setup-index` or
+   `DATABASE_URL=<target> node scripts/grant-admin.mjs <email>`. This is how
+   `reconcile-books-to-personal-work.mjs`, `seed:sort-romanization`, and
+   similar one-offs are already run per the
+   [P47 production readiness runbook](p47-production-readiness.md).
+2. **One-off `docker build --target builder`**: the `builder` stage still has
+   the full `scripts/` tree and `node_modules` (including devDependencies).
+   `docker build --target builder -t kontax-builder .` then
+   `docker run --rm -e DATABASE_URL=<target> kontax-builder node scripts/<script>.mjs`
+   runs a script without touching your local machine's Node/npm setup.
+3. **A maintenance/ops host (e.g. the Proxmox LXC)** with its own checkout
+   and network access to the target DB, for scripts that need to run
+   repeatedly or on a schedule (cron backfills, etc.).
+
+Never add an admin/seed script to `scripts/runtime/` just to make it
+reachable in the running container — that directory is an intentional
+allowlist of boot-path code only (see P48-15).
+
+> **Known gap:** `package.json`'s `search:setup-index` script still points at
+> the old `scripts/setup-contact-search-index.mjs` path (package.json is
+> owned by a different P48 ticket, so only `start:production` and
+> `db:check:drift` were repointed here). Until that's fixed, run
+> `node scripts/runtime/setup-contact-search-index.mjs` directly instead of
+> `npm run search:setup-index`.
+
+---
+
 ## Key environment variables for deploy
 
 | Variable | Required | Notes |
@@ -132,7 +194,7 @@ See [env-secrets.md](env-secrets.md) for the full variable inventory.
 ## References
 
 - Dockerfile: `Dockerfile`
-- Startup policy: `scripts/start-production.mjs`
-- Drift check: `scripts/check-schema-drift.mjs`
+- Startup policy: `scripts/runtime/start-production.mjs`
+- Drift check: `scripts/runtime/check-schema-drift.mjs`
 - Prisma schema: `prisma/schema.prisma`
 - Memory: [Email/SES deployment](../memory/project_email-ses-deployment.md)

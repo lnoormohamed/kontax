@@ -9,7 +9,7 @@
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
-    "db:check:drift": "node scripts/check-schema-drift.mjs",
+    "db:check:drift": "node scripts/runtime/check-schema-drift.mjs",
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
@@ -49,7 +49,7 @@
     "seed:sort-romanization": "node scripts/seed-sort-romanization.mjs",
     "seed:demo:multilingual": "node scripts/seed-multilingual-demo-contacts.mjs",
     "start": "node server.mjs",
-    "start:production": "node scripts/start-production.mjs",
+    "start:production": "node scripts/runtime/start-production.mjs",
     "typecheck": "tsc --noEmit",
     "seed:phase37:asia-latam": "node scripts/seed-phase37-asia-latam.mjs",
     "search:setup-index": "node scripts/setup-contact-search-index.mjs",
