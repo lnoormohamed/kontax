@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { Prisma } from "../../../generated/prisma";
+import { safeInternalPath } from "~/lib/safe-internal-path";
 import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
@@ -136,7 +137,12 @@ const getOptionalString = (formData: FormData, key: string) => {
 
 const getRedirectTarget = (formData: FormData) => {
   const value = formData.get("redirectTo");
-  return typeof value === "string" && value.startsWith("/") ? value : undefined;
+  if (typeof value !== "string") return undefined;
+  // P48-03: `startsWith("/")` let `//evil.com` and `/\evil.com` through on all
+  // 13 call sites. `undefined` (not the fallback) is returned for a rejected or
+  // absent value so each caller keeps its own default destination.
+  const safe = safeInternalPath(value, "");
+  return safe.length > 0 ? safe : undefined;
 };
 
 const getLineSeparatedValues = (value: string | undefined) =>

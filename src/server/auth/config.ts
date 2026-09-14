@@ -60,6 +60,16 @@ class AccountLockedSigninError extends CredentialsSignin {
   code = "account_locked";
 }
 
+/**
+ * P48-03: a valid bcrypt hash of a value nobody can supply. Compared against
+ * when the email is unknown so an attacker cannot distinguish "no such account"
+ * from "wrong password" by response time. Copied (not imported) from
+ * `~/server/app-passwords` on purpose — that module is Node-only and pulling it
+ * into the auth config would drag its DAV dependencies along.
+ */
+const DUMMY_BCRYPT_HASH =
+  "$2b$12$3Y0mFQ0M0l9n4Y3Q6p0g2uh2jQ7JmYI3d2eY0m4rA4Aq0vN5iVfL2";
+
 export const authConfig = {
   // Required for self-hosted deploys behind a reverse proxy (Coolify): trust the
   // proxy's x-forwarded-host / x-forwarded-proto headers. Without this, Auth.js
@@ -106,7 +116,12 @@ export const authConfig = {
           where: { email: parsedCredentials.data.email },
         });
 
-        if (!user) return null;
+        if (!user) {
+          // P48-03: burn the same ~250ms a real bcrypt.compare costs so the
+          // response time does not reveal whether the account exists.
+          await bcrypt.compare(parsedCredentials.data.password, DUMMY_BCRYPT_HASH);
+          return null;
+        }
 
         // Peek the per-account bucket before the bcrypt call.
         const emailPeek = await peekRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
@@ -215,7 +230,10 @@ export const authConfig = {
 
         if (cached) {
           if (cached.revoked || cached.lifecycleState === "LOCKED" || cached.sessionVersion !== token.sv) {
-            return {};
+            // P48-03: `null` (not `{}`) so Auth.js clears the cookie instead of
+            // leaving an empty-but-present token that every `session?.user`
+            // gate then has to defend against.
+            return null;
           }
           token.emailVerified = cached.emailVerified;
           token.role = cached.role;
@@ -237,7 +255,7 @@ export const authConfig = {
           ]);
 
           if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
-            return {};
+            return null;
           }
 
           // P18-07: TOTP challenge completed — clear pendingTotp from token
@@ -262,8 +280,12 @@ export const authConfig = {
           }
 
           // Only cache fully-validated, non-pendingTotp sessions.
+          // P48-03: awaited, not fire-and-forget. A concurrent revoke deletes
+          // the key while this request is in flight; if the write lands after
+          // that delete, the revoked session stays valid for the full 45s TTL.
+          // Awaiting a single local SETEX costs well under a millisecond.
           if (!token.pendingTotp) {
-            void writeSessionValidation(token.sub, token.sid as string, {
+            await writeSessionValidation(token.sub, token.sid as string, {
               sessionVersion: dbUser.sessionVersion,
               lifecycleState: dbUser.lifecycleState,
               role: dbUser.role,
@@ -280,7 +302,7 @@ export const authConfig = {
           where: { id: token.sub },
           select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true, scheduledDeleteAt: true },
         });
-        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv) return {};
+        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv) return null;
         token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
         token.role = dbUser.role;
         token.pendingDeletion = dbUser.scheduledDeleteAt ? true : undefined;
@@ -295,7 +317,7 @@ export const authConfig = {
           getPreferences(token.sub ?? ""),
         ]);
         if (fresh?.lifecycleState === "LOCKED") {
-          return {};
+          return null;
         }
         token.sv = fresh?.sessionVersion ?? token.sv;
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;

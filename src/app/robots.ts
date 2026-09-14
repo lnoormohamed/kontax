@@ -27,6 +27,7 @@ export default function robots(): MetadataRoute.Robots {
         "/reset-password",
         "/account-deleted",
         "/account-pending-deletion",
+        "/revert-email", // P48-03: single-use token link, never indexable
         "/books",
       ],
     },

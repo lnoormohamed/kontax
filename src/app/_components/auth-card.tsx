@@ -4,6 +4,8 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import { safeInternalPath } from "~/lib/safe-internal-path";
+
 // ── Password strength ──────────────────────────────────────────────────────
 function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
   if (!pw) return { level: 0, label: "" };
@@ -285,7 +287,9 @@ export function AuthCard({
       }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
-      window.location.assign(next ?? "/contacts");
+      // P48-03: `next` reaches this component as a prop — re-validate it here so
+      // an open redirect can never depend on a single upstream check.
+      window.location.assign(safeInternalPath(next, "/contacts"));
     } else {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -319,7 +323,7 @@ export function AuthCard({
       }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
-      window.location.assign(next ?? "/contacts");
+      window.location.assign(safeInternalPath(next, "/contacts"));
     }
   };
 

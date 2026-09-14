@@ -124,10 +124,47 @@ export async function verifyEmailToken(
 
   await db.$transaction(async (tx) => {
     if (token.type === "SIGNUP") {
-      await tx.user.updateMany({
+      // `updateMany` with `emailVerified: null` makes this idempotent: an
+      // already-verified user is matched by nothing and nothing is written.
+      const verified = await tx.user.updateMany({
         where: { id: token.userId, emailVerified: null },
         data: { emailVerified: new Date() },
       });
+
+      // P48-03: claim shares and invites HERE, not at registration.
+      // `/api/register` used to link them while `emailVerified` was still null,
+      // so registering with someone else's address handed you everything that
+      // had been shared to it. Gated on `verified.count` so it runs exactly
+      // once, on the transition to verified — an existing verified user
+      // re-consuming a token changes nothing.
+      if (verified.count > 0) {
+        const user = await tx.user.findUnique({
+          where: { id: token.userId },
+          select: { email: true },
+        });
+        if (user) {
+          // P12-06: pending shares sent to this address before the recipient
+          // had an account, so they appear in "Shared with me".
+          await tx.contactShare.updateMany({
+            where: {
+              recipientEmail: user.email,
+              recipientUserId: null,
+              status: "ACTIVE",
+            },
+            data: { recipientUserId: token.userId },
+          });
+          // P13-02: pending family invites addressed to this address, so the
+          // join link resolves to this account.
+          await tx.groupMember.updateMany({
+            where: {
+              invitedEmail: user.email,
+              userId: null,
+              inviteStatus: "PENDING",
+            },
+            data: { userId: token.userId },
+          });
+        }
+      }
     }
     await tx.emailVerificationToken.update({
       where: { id: token.id },

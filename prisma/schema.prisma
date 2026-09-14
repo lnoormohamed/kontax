@@ -288,12 +288,25 @@ model User {
   // P18-03: pending email change (cleared on activation or cancellation)
   emailPendingChange               String?
   emailPendingChangeRequestedAt    DateTime?
+  // P48-03: "this wasn't me" revert link mailed to the OLD address whenever an
+  // email change is requested. SHA-256 of a 256-bit token (never the token
+  // itself), valid 24h. `emailPreviousAddress` is the address to restore if the
+  // change has already been activated by the time the link is used. All three
+  // are cleared once the link is used, the change is cancelled, or a new change
+  // is requested. Nullable columns only — safe for the deploy's `db push`.
+  emailChangeRevertTokenHash       String?
+  emailChangeRevertExpiresAt       DateTime?
+  emailPreviousAddress             String?
   // P20-10: SES bounce/complaint status — suppresses sends when not OK
   emailStatus                      EmailStatus                       @default(OK)
   // P18-07: TOTP two-factor authentication
   totpEnabled                      Boolean                           @default(false)
   totpSecret                       String? // AES-256-GCM encrypted
   totpVerifiedAt                   DateTime?
+  // P48-03: the last 30-second TOTP step accepted for this user. A code stays
+  // valid for its whole window, so without this a code observed in transit
+  // could be replayed within the same step. Rejected when <= the stored value.
+  lastTotpCounter                  Int?
   // P18-09: scheduled hard-delete (30-day grace period after user confirms deletion)
   scheduledDeleteAt                DateTime?
   // P21-01: platform admin role (default USER). Gates the /admin surfaces.

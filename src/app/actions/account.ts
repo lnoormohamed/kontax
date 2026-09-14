@@ -1,11 +1,17 @@
 "use server";
 
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { sendAccountDeletionScheduledEmail } from "~/server/billing-emails";
 import { auth } from "~/server/auth";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
+import {
+  EMAIL_CHANGE_REVERT_HOURS,
+  REVERT_FIELDS_CLEARED,
+  sendEmailChangeNotice,
+} from "~/server/email-change-revert";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
@@ -149,22 +155,40 @@ export async function requestEmailChange(input: {
   });
   if (conflict) return { error: "EMAIL_ALREADY_IN_USE" };
 
+  // P48-03: mint the single-use "this wasn't me" token now, so the notice below
+  // carries a real escape hatch. Only the SHA-256 hash is stored.
+  const revertToken = crypto.randomBytes(32).toString("hex");
+  const revertTokenHash = crypto.createHash("sha256").update(revertToken).digest("hex");
+  const requestedAt = new Date();
+
   await db.user.update({
     where: { id: session.user.id },
     data: {
       emailPendingChange: email,
-      emailPendingChangeRequestedAt: new Date(),
+      emailPendingChangeRequestedAt: requestedAt,
+      emailChangeRevertTokenHash: revertTokenHash,
+      emailChangeRevertExpiresAt: new Date(
+        requestedAt.getTime() + EMAIL_CHANGE_REVERT_HOURS * 60 * 60 * 1000,
+      ),
+      // Remembered so the link can restore the address even if the change has
+      // already been confirmed by the time the real owner reads this email.
+      emailPreviousAddress: user.email,
     },
   });
 
   // Send verification to the new address
   await sendVerificationEmail(session.user.id, "EMAIL_CHANGE", email);
 
-  // Notify the old address (fire-and-forget — never fails the action)
-  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
-  console.log(
-    `[Kontax] Notify old email ${user.email}: email change to ${email} requested. Reset: ${appUrl}/forgot-password`,
-  );
+  // P48-03: tell the OLD address. This used to be a console.log, so a hijacked
+  // session could walk the account to an attacker's address in silence.
+  // Fire-and-forget — a slow or failing send must not fail the request, and the
+  // user can still cancel from Settings.
+  void sendEmailChangeNotice({
+    to: user.email,
+    newEmail: email,
+    requestedAt,
+    revertToken,
+  });
 
   await db.activityEvent.create({
     data: {
@@ -206,7 +230,13 @@ export async function cancelEmailChange(): Promise<{ success: true }> {
 
   await db.user.update({
     where: { id: session.user.id },
-    data: { emailPendingChange: null, emailPendingChangeRequestedAt: null },
+    data: {
+      emailPendingChange: null,
+      emailPendingChangeRequestedAt: null,
+      // P48-03: the revert link exists only for a live change — retire it here
+      // too, so a cancelled-and-re-requested change never has two valid tokens.
+      ...REVERT_FIELDS_CLEARED,
+    },
   });
 
   await db.emailVerificationToken.updateMany({

@@ -68,27 +68,11 @@ export async function POST(request: NextRequest) {
     console.warn("[Kontax] Failed to seed default books:", err),
   );
 
-  // P12-06: link any pending shares sent to this email before the recipient had
-  // an account, so they appear in "Shared with me" on first login.
-  await db.contactShare.updateMany({
-    where: {
-      recipientEmail: parsedBody.data.email,
-      recipientUserId: null,
-      status: "ACTIVE",
-    },
-    data: { recipientUserId: user.id },
-  });
-
-  // P13-02: link pending family invites addressed to this email to the new
-  // account so the join link resolves to them after registration.
-  await db.groupMember.updateMany({
-    where: {
-      invitedEmail: parsedBody.data.email,
-      userId: null,
-      inviteStatus: "PENDING",
-    },
-    data: { userId: user.id },
-  });
+  // P48-03: pending shares (P12-06) and family invites (P13-02) addressed to
+  // this email are NO LONGER claimed here. At this point `emailVerified` is
+  // null — anyone who knows an address that has contacts shared to it could
+  // register with it and immediately read them. The linking now runs in the
+  // SIGNUP branch of `verifyEmailToken`, once the address is proven.
 
   // Send verification email — failure must never block registration
   sendVerificationEmail(user.id, "SIGNUP").catch((err: unknown) =>

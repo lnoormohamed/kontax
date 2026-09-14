@@ -25,6 +25,10 @@ const PUBLIC_PREFIXES = [
   "/forgot-password", // P18-05
   "/reset-password", // P18-05
   "/verify-email",
+  // P48-03: the "this wasn't me" link from the email-change notice. Must work
+  // signed-out — the person clicking it may have just lost access to the
+  // account, and the page authenticates the single-use token, not a session.
+  "/revert-email",
   "/account-deleted", // P18-09
   "/share/", // vCard share public links (P12-02) — trailing slash so it
   // matches /share/<token> but NOT the authenticated /shares page

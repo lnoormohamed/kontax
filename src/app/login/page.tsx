@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
+import { safeInternalPath } from "~/lib/safe-internal-path";
 import { authIncludingPendingTotp } from "~/server/auth";
 
 export const metadata: Metadata = {
@@ -21,7 +22,10 @@ export default async function LoginPage({
   const params = searchParams ? await searchParams : undefined;
   const rawNext = params?.next;
   const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
-  const next = nextParam && /^\/(?![/\\])/.test(nextParam) ? nextParam : undefined;
+  // P48-03: `?next=` is attacker-supplied — only a real internal path survives.
+  // `undefined` (not the fallback) so the "continue to…" hint below still only
+  // shows when a destination was actually requested.
+  const next = nextParam ? safeInternalPath(nextParam, "/contacts") : undefined;
   const rawMessage = params?.message;
   const message = Array.isArray(rawMessage) ? rawMessage[0] : rawMessage;
   const expired = params?.expired === "1";

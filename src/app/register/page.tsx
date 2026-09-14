@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
+import { safeInternalPath } from "~/lib/safe-internal-path";
 import { auth } from "~/server/auth";
 import { CardRegisterContext } from "./card-register-context";
 
@@ -20,7 +21,8 @@ export default async function RegisterPage({
   const params = searchParams ? await searchParams : undefined;
   const rawNext = params?.next;
   const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
-  const next = nextParam?.startsWith("/") ? nextParam : undefined;
+  // P48-03: `startsWith("/")` also accepted `//evil.com` and `/\evil.com`.
+  const next = nextParam ? safeInternalPath(nextParam, "/contacts") : undefined;
   const rawPlan = params?.plan;
   const plan = Array.isArray(rawPlan) ? rawPlan[0] : rawPlan;
 
