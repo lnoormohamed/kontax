@@ -61,6 +61,10 @@ export const rateLimiters = {
   // P34C-14: contact form — 3 submissions per IP per hour
   contactForm: makeLimiter(3, 60 * 60, "rl:contact-form"),
 
+  // P48-10: public-card "add to Kontax" click counter — 30 per IP per hour so
+  // the unauthenticated analytics counter cannot be inflated trivially.
+  cardClick: makeLimiter(30, 60 * 60, "rl:card-click"),
+
   // P38-08 follow-up: external avatar image proxy — 240 fetches per user per
   // minute (a full list window of proxied avatars stays well under this).
   imageProxy: makeLimiter(240, 60, "rl:image-proxy"),

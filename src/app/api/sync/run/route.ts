@@ -1,53 +1,36 @@
-import { revalidatePath } from "next/cache";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-import { auth } from "~/server/auth";
+import { assertCronSecret } from "~/server/cron-guard";
 import { runQueuedSyncJobs } from "~/server/sync-runner";
 
-const isAuthorizedRunnerRequest = async (request: Request) => {
-  const session = await auth();
-  if (session?.user?.id) {
-    return true;
+// P48-10: this endpoint drains the GLOBAL sync queue, so it is a scheduler /
+// QA-harness endpoint, not a user endpoint. It used to accept any signed-in
+// session (letting one user run every tenant's jobs with an unbounded limit),
+// a bearer equal to AUTH_SECRET compared with `===`, and a form-post redirect
+// target that allowed `//evil.com`. It now requires the same x-cron-secret as
+// /api/cron/*, caps the batch, and returns JSON only. The user-facing
+// "Sync now" flow goes through the server actions in src/app/actions/sync.ts,
+// which are scoped to the caller's own accounts.
+const MAX_LIMIT = 25;
+
+export async function POST(request: NextRequest) {
+  const denied = assertCronSecret(request);
+  if (denied) return denied;
+
+  let limit = 5;
+  const contentType = request.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    const body = (await request.json().catch(() => null)) as { limit?: unknown } | null;
+    if (typeof body?.limit === "number" && Number.isFinite(body.limit)) limit = body.limit;
+  } else {
+    const formData = await request.formData().catch(() => null);
+    const limitValue = formData?.get("limit");
+    if (typeof limitValue === "string" && Number.isFinite(Number(limitValue))) {
+      limit = Number(limitValue);
+    }
   }
-
-  const header = request.headers.get("authorization");
-  const expectedSecret = process.env.AUTH_SECRET;
-
-  if (!header?.startsWith("Bearer ") || !expectedSecret) {
-    return false;
-  }
-
-  return header.slice("Bearer ".length) === expectedSecret;
-};
-
-export async function POST(request: Request) {
-  const allowed = await isAuthorizedRunnerRequest(request);
-
-  if (!allowed) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const formData = await request.formData().catch(() => null);
-  const redirectTo = formData?.get("redirectTo");
-  const limitValue = formData?.get("limit");
-  const limit =
-    typeof limitValue === "string" && Number.isFinite(Number(limitValue))
-      ? Number(limitValue)
-      : 5;
+  limit = Math.min(Math.max(Math.floor(limit), 1), MAX_LIMIT);
 
   const result = await runQueuedSyncJobs({ limit });
-
-  revalidatePath("/contacts");
-  revalidatePath("/sync");
-
-  if (typeof redirectTo === "string" && redirectTo.startsWith("/")) {
-    return new NextResponse(null, {
-      status: 303,
-      headers: {
-        Location: redirectTo,
-      },
-    });
-  }
-
   return NextResponse.json(result);
 }
