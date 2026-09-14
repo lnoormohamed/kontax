@@ -2,7 +2,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
-import { auth } from "~/server/auth";
+import { authIncludingPendingTotp } from "~/server/auth";
 
 export const metadata: Metadata = {
   title: "Log in",
@@ -15,16 +15,21 @@ export default async function LoginPage({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const session = await auth();
+  // P48-01: the login page is the one place that needs to see a pending-TOTP
+  // session, so it can send the user to the challenge instead of the form.
+  const session = await authIncludingPendingTotp();
   const params = searchParams ? await searchParams : undefined;
   const rawNext = params?.next;
   const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
-  const next = nextParam?.startsWith("/") ? nextParam : undefined;
+  const next = nextParam && /^\/(?![/\\])/.test(nextParam) ? nextParam : undefined;
   const rawMessage = params?.message;
   const message = Array.isArray(rawMessage) ? rawMessage[0] : rawMessage;
   const expired = params?.expired === "1";
 
-  if (session?.user) {
+  if (session?.user?.id) {
+    if (session.pendingTotp) {
+      redirect(next ? `/login/verify-2fa?next=${encodeURIComponent(next)}` : "/login/verify-2fa");
+    }
     redirect(next ?? "/contacts");
   }
 

@@ -263,6 +263,20 @@ export function AuthCard({
         setTimeout(() => errorBoxRef.current?.focus(), 0);
         return;
       }
+      // P48-01: a correct password on a 2FA-enabled account yields a session
+      // that still owes the TOTP challenge. Ask the server which case we are in
+      // and route to the challenge page; the server refuses the pending session
+      // everywhere else, so this is UX, not the security boundary.
+      const pendingTotp = await fetch("/api/auth/session", { credentials: "include" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((s: { pendingTotp?: boolean } | null) => s?.pendingTotp === true)
+        .catch(() => false);
+      if (pendingTotp) {
+        window.location.assign(
+          next ? `/login/verify-2fa?next=${encodeURIComponent(next)}` : "/login/verify-2fa",
+        );
+        return;
+      }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
       window.location.assign(next ?? "/contacts");

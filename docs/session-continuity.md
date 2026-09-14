@@ -11,7 +11,7 @@
 Runs on every request before any page code:
 
 1. Static assets + auth API: always pass through.
-2. `pendingTotp=true` sessions: redirect to `/login/verify-2fa` (everywhere except the 2FA page itself).
+2. `pendingTotp=true` sessions: **not handled at the edge** (P48-01). `auth()` in `src/server/auth/index.ts` returns `null` for them, so every page/action/route treats them as anonymous; `/login` (which uses `authIncludingPendingTotp()`) redirects them to `/login/verify-2fa`.
 3. `pendingDeletion=true` sessions: redirect to `/account-pending-deletion`.
 4. Public pages (`/login`, `/register`, `/share/…`, etc.): pass through.
 5. **No session:** redirect to `/login?next={pathname}` — the `?next=` param preserves the intended destination.
@@ -31,7 +31,7 @@ Only fires when the middleware passed through (case 6 above — session cookie p
 | Trigger | Destination | Reason |
 |---------|-------------|--------|
 | No session, any protected route | `/login?next={pathname}` | Gate all app routes |
-| `pendingTotp=true` | `/login/verify-2fa` | Enforce 2FA challenge before app access |
+| `pendingTotp=true` | `/login` → `/login/verify-2fa` | Enforce 2FA challenge before app access (server-side via `auth()` returning null, P48-01) |
 | `pendingDeletion=true` | `/account-pending-deletion` | Prevent app use during deletion grace period |
 | Non-ADMIN on `/admin/…` | `/contacts` | Role gate; DB re-checked on every admin action |
 

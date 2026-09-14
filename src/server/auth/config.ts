@@ -290,10 +290,10 @@ export const authConfig = {
         token.name = fresh?.name ?? token.name;
         token.avatarUrl = fresh?.avatarUrl ?? null;
         token.preferences = preferences;
-        // P18-07: clear pendingTotp after successful TOTP challenge
-        if ((session as { clearPendingTotp?: boolean }).clearPendingTotp) {
-          token.pendingTotp = undefined;
-        }
+        // P48-01: `pendingTotp` is NEVER cleared from the client-supplied update
+        // payload. The only path that clears it is the DB-backed check above
+        // (`userSession.totpChallengeVerified`), which the 2FA page triggers by
+        // fetching /api/auth/session after a successful challenge.
       }
       return token;
     },

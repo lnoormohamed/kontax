@@ -45,3 +45,5 @@ yarn-error.log*
 
 # idea files
 .idea
+# Claude Code agent worktrees
+/.claude/worktrees/

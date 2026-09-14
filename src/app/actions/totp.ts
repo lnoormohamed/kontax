@@ -4,7 +4,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import QRCode from "qrcode";
 
-import { auth } from "~/server/auth";
+import { auth, authIncludingPendingTotp } from "~/server/auth";
 import { db } from "~/server/db";
 import {
   createTotpSecret,
@@ -133,7 +133,7 @@ export async function regenerateRecoveryCodes(): Promise<
 export async function submitTotpChallenge(
   code: string,
 ): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
+  const session = await authIncludingPendingTotp();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
   if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
   if (!session.pendingTotp) return { error: "NOT_PENDING_TOTP" };
@@ -164,7 +164,7 @@ export async function submitTotpChallenge(
 export async function redeemTotpRecoveryCode(
   code: string,
 ): Promise<{ success: true; remaining: number } | { error: string }> {
-  const session = await auth();
+  const session = await authIncludingPendingTotp();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
   if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
   if (!session.pendingTotp) return { error: "NOT_PENDING_TOTP" };
