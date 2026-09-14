@@ -161,3 +161,168 @@ export function isFieldShared(
 ): boolean {
   return effectivePolicy[policyKeyForField(fieldType, label)];
 }
+
+/**
+ * P48-07 — sharing-policy projection for copies & snapshots.
+ *
+ * The paths that persist an INDEPENDENT COPY of a contact — "add to family
+ * book", "add to team book", the "leave the family book" personal snapshot,
+ * a static Kontax-to-Kontax share and the initial live-share snapshot — must
+ * not carry the owner's policy-private fields into that copy. This is the one
+ * function every one of those paths routes through before persisting.
+ *
+ * Two behaviours, by target:
+ *   - "family" / "team": the effective policy (resolveEffectiveSharingPolicy)
+ *     governs personalPhone / homeAddress / birthday / labels / customFields.
+ *     Email and phone are split per entry by label (work vs personal) via
+ *     isFieldShared; an entry with no label falls into the personal bucket
+ *     (policyKeyForField's default), same as the live-edit routing in
+ *     edit-context.ts.
+ *   - "static-share" / "live-share": a deliberate one-to-one grant the owner
+ *     made by typing a recipient's email — everything flows through, matching
+ *     the already-established LIVE_FIELD_SELECT scope (contact-shares.ts) so
+ *     the initial snapshot never disagrees with what ongoing live propagation
+ *     sends.
+ *
+ * `notes` is dropped unconditionally, for every target, regardless of what
+ * `policy.notes` says — this matches LIVE_FIELD_SELECT (which deliberately
+ * excludes `notes`) and is a harder rule than the generic policy: a member
+ * opting their *own* notes into the shared-book edit layer (edit-context.ts)
+ * is a different concern from what a COPY of the contact carries.
+ */
+export type SharingTarget = "family" | "team" | "static-share" | "live-share";
+
+/**
+ * The union of contact fields any copy/snapshot SELECT constant fetches.
+ * Callers pass whatever subset their own select actually fetched — a key
+ * absent from the input (`undefined`) is left absent on the way out, so this
+ * one type safely covers COPY_SELECT, TEAM_COPY_SELECT, family-snapshot's
+ * COPY_SELECT and SNAPSHOT_SELECT despite their slightly different shapes.
+ */
+export type SharingContactInput = {
+  fullName?: string | null;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  phoneticFirstName?: string | null;
+  phoneticLastName?: string | null;
+  namePrefix?: string | null;
+  nameSuffix?: string | null;
+  nickname?: string | null;
+  email?: string | null;
+  emailAddresses?: unknown;
+  emailEntries?: unknown;
+  phone?: string | null;
+  phoneNumbers?: unknown;
+  phoneEntries?: unknown;
+  company?: string | null;
+  phoneticCompany?: string | null;
+  jobTitle?: string | null;
+  department?: string | null;
+  website?: string | null;
+  websiteEntries?: unknown;
+  birthday?: string | null;
+  address?: string | null;
+  postalAddresses?: unknown;
+  addressEntries?: unknown;
+  avatarUrl?: string | null;
+  labels?: unknown;
+  significantDates?: unknown;
+  relatedPeople?: unknown;
+  customFields?: unknown;
+  notes?: string | null;
+};
+
+type Entry = Record<string, unknown> & { label?: unknown; isPrimary?: unknown; value?: unknown };
+
+const toEntryArray = (value: unknown): Entry[] | null =>
+  Array.isArray(value) ? (value as Entry[]) : null;
+
+const entryLabel = (entry: Entry): string | null =>
+  typeof entry.label === "string" ? entry.label : null;
+
+/** The value carried into the recomputed scalar field after entries are filtered. */
+const pickPrimaryValue = (entries: Entry[]): unknown => {
+  if (entries.length === 0) return null;
+  const primary = entries.find((entry) => entry.isPrimary === true) ?? entries[0]!;
+  return "value" in primary ? (primary.value ?? null) : null;
+};
+
+/**
+ * Apply the work/personal split (by entry label) to one EMAIL or PHONE field
+ * family: the structured entries array, the recomputed scalar convenience
+ * field, and the legacy plain-value list (kept in sync with the surviving
+ * entries so it can never carry a value the entries array just dropped).
+ */
+function applyEntryFieldPolicy(
+  out: Record<string, unknown>,
+  scalarKey: string,
+  entriesKey: string,
+  legacyListKey: string,
+  fieldType: "EMAIL" | "PHONE",
+  policy: EffectiveSharingPolicy,
+): void {
+  const entriesValue = out[entriesKey];
+  const scalarValue = out[scalarKey];
+  const legacyValue = out[legacyListKey];
+  const entries = toEntryArray(entriesValue);
+
+  if (entries) {
+    const kept = entries.filter((entry) => isFieldShared(fieldType, entryLabel(entry), policy));
+    out[entriesKey] = kept;
+    if (scalarValue !== undefined) out[scalarKey] = kept.length > 0 ? pickPrimaryValue(kept) : null;
+    if (legacyValue !== undefined) {
+      out[legacyListKey] = kept.length > 0 ? kept.map((entry) => entry.value ?? null) : [];
+    }
+    return;
+  }
+
+  // No entries to split by label (absent, or not an array) — the scalar and
+  // legacy-list values carry no label metadata, so they fall into the
+  // unlabeled bucket, same as policyKeyForField(type, null).
+  const shared = isFieldShared(fieldType, null, policy);
+  if (scalarValue !== undefined) out[scalarKey] = shared ? scalarValue : null;
+  if (legacyValue !== undefined) out[legacyListKey] = shared ? legacyValue : null;
+}
+
+const dropIfPresent = (out: Record<string, unknown>, key: string): void => {
+  if (out[key] !== undefined) out[key] = null;
+};
+
+export function projectContactForSharing<T extends SharingContactInput>(
+  contact: T,
+  policy: EffectiveSharingPolicy,
+  target: SharingTarget,
+): T {
+  const out: Record<string, unknown> = { ...contact };
+
+  // Never carried into a copy or snapshot, for any target.
+  dropIfPresent(out, "notes");
+
+  if (target === "static-share" || target === "live-share") {
+    // A deliberate one-to-one grant: everything else flows through, matching
+    // LIVE_FIELD_SELECT's existing scope.
+    return out as T;
+  }
+
+  // "family" / "team": the full field-level policy applies.
+  applyEntryFieldPolicy(out, "email", "emailEntries", "emailAddresses", "EMAIL", policy);
+  applyEntryFieldPolicy(out, "phone", "phoneEntries", "phoneNumbers", "PHONE", policy);
+
+  if (!policy.homeAddress) {
+    dropIfPresent(out, "address");
+    dropIfPresent(out, "addressEntries");
+    dropIfPresent(out, "postalAddresses");
+  }
+  if (!policy.birthday) {
+    dropIfPresent(out, "birthday");
+  }
+  if (!policy.labels) {
+    dropIfPresent(out, "labels");
+  }
+  if (!policy.customFields) {
+    dropIfPresent(out, "customFields");
+  }
+
+  return out as T;
+}

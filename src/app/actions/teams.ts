@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
+import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
@@ -605,18 +606,38 @@ export const addContactToTeamBook = async (formData: FormData) => {
   }
   const book = await db.groupAddressBook.findUnique({
     where: { id: bookId },
-    select: { name: true, group: { select: { ownerId: true, name: true } } },
+    select: {
+      name: true,
+      minimumSharingPolicy: true,
+      group: { select: { id: true, ownerId: true, name: true } },
+    },
   });
   if (!book) {
     throw new Error("Team book not found.");
   }
-  const source = await db.contact.findFirst({
-    where: { id: contactId, userId },
-    select: TEAM_COPY_SELECT,
-  });
-  if (!source) {
+  const [rawSource, groupMember] = await Promise.all([
+    db.contact.findFirst({
+      where: { id: contactId, userId },
+      select: TEAM_COPY_SELECT,
+    }),
+    // P48-07: this member's own share defaults for the team; the book's
+    // minimumSharingPolicy is a floor a member can't loosen (§3.4).
+    db.groupMember.findFirst({
+      where: { groupId: book.group.id, userId },
+      select: { sharingPolicy: true },
+    }),
+  ]);
+  if (!rawSource) {
     throw new Error("Contact not found.");
   }
+
+  // P48-07: never carry the member's policy-private fields (notes, personal
+  // phone, home address, birthday, labels, custom fields) into the shared copy.
+  const policy = resolveEffectiveSharingPolicy(
+    groupMember?.sharingPolicy ?? null,
+    book.minimumSharingPolicy,
+  );
+  const source = projectContactForSharing(rawSource, policy, "team");
   const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
 
   await db.$transaction(async (tx) => {

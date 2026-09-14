@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
+import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
@@ -305,27 +306,47 @@ export const addContactToFamilyBook = async (formData: FormData) => {
   }
 
   // Must be a private contact the user owns.
-  const source = await db.contact.findFirst({
-    where: { id: contactId, userId },
-    select: COPY_SELECT,
-  });
-  if (!source) {
+  const [rawSource, group, groupMember, book] = await Promise.all([
+    db.contact.findFirst({
+      where: { id: contactId, userId },
+      select: COPY_SELECT,
+    }),
+    db.group.findUnique({
+      where: { id: membership.groupId },
+      select: { ownerId: true, name: true },
+    }),
+    // P48-07: this member's own share defaults for the family book (null = default policy).
+    db.groupMember.findFirst({
+      where: { groupId: membership.groupId, userId },
+      select: { sharingPolicy: true },
+    }),
+    // Family books have no Teams-style floor, but reuse the same resolver shape.
+    db.groupAddressBook.findUnique({
+      where: { id: membership.bookId },
+      select: { minimumSharingPolicy: true },
+    }),
+  ]);
+  if (!rawSource) {
     throw new Error("Contact not found.");
   }
-
-  const group = await db.group.findUnique({
-    where: { id: membership.groupId },
-    select: { ownerId: true, name: true },
-  });
   if (!group) {
     throw new Error("Family group not found.");
   }
 
-  // Already in the book?
+  // P48-07: never carry the member's policy-private fields (notes, personal
+  // phone, home address, birthday, labels, custom fields) into the shared copy.
+  const policy = resolveEffectiveSharingPolicy(
+    groupMember?.sharingPolicy ?? null,
+    book?.minimumSharingPolicy ?? null,
+  );
+  const source = projectContactForSharing(rawSource, policy, "family");
+
+  // Already in the book? Dedupe against the unprojected email — this is only a
+  // comparison, never stored, so it isn't a policy leak.
   const dupe = await db.groupContact.findFirst({
     where: {
       groupAddressBookId: membership.bookId,
-      contact: { fullName: source.fullName, email: source.email },
+      contact: { fullName: rawSource.fullName, email: rawSource.email },
     },
     select: { id: true },
   });
