@@ -51,7 +51,10 @@ import {
   stripExcludedPortableFields,
 } from "~/server/sync-field-exclusions";
 import { isWithinSyncWindow, SYNC_WINDOW_DEFERRED_CODE } from "~/server/sync-window";
-import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
+import {
+  decryptSyncCredentialPayload,
+  reencryptSyncCredentialIfStale,
+} from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
@@ -762,6 +765,9 @@ export const runQueuedSyncJobs = async ({
           remoteCTag: true,
           lastSyncCursor: true,
           credentialReference: true,
+          // P48-16: the key a row was encrypted under, used as the decrypt hint
+          // for pre-keyring envelopes and to spot rows due for re-encryption.
+          encryptionKeyRef: true,
           credentialRevokedAt: true,
           // P39-02: one-shot deletion-guard bypass set by "Resume and allow".
           deletionGuardBypassOnce: true,
@@ -1116,7 +1122,10 @@ export const runQueuedSyncJobs = async ({
     let decryptedCredentials: ReturnType<typeof decryptSyncCredentialPayload>;
 
     try {
-      decryptedCredentials = decryptSyncCredentialPayload(job.syncAccount.credentialReference);
+      decryptedCredentials = decryptSyncCredentialPayload(
+        job.syncAccount.credentialReference,
+        job.syncAccount.encryptionKeyRef,
+      );
     } catch (error) {
       const errorSummary =
         error instanceof Error
@@ -1135,6 +1144,31 @@ export const runQueuedSyncJobs = async ({
       });
       summary.failed += 1;
       continue;
+    }
+
+    // P48-16: lazy key rotation. The credentials just decrypted fine, so if the
+    // row is on a retired key or the pre-keyring envelope, quietly rewrite it
+    // under the current key. Best-effort — a failure here must never fail the
+    // sync job, and the next run will simply try again.
+    try {
+      const rotated = reencryptSyncCredentialIfStale(
+        job.syncAccount.credentialReference,
+        job.syncAccount.encryptionKeyRef,
+      );
+      if (rotated) {
+        await db.syncAccount.update({
+          where: { id: job.syncAccountId },
+          data: {
+            credentialReference: rotated.credentialReference,
+            encryptionKeyRef: rotated.encryptionKeyRef,
+          },
+        });
+      }
+    } catch (error) {
+      console.warn(
+        `[sync-runner] credential re-encryption skipped for account ${job.syncAccountId}:`,
+        error,
+      );
     }
 
     try {

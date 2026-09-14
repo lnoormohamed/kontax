@@ -1,5 +1,6 @@
 import { SendEmailCommand, SESv2Client } from "@aws-sdk/client-sesv2";
 
+import { getAppUrl } from "~/lib/site-url";
 import { db } from "~/server/db";
 import { env } from "~/env";
 
@@ -114,4 +115,9 @@ export const sendEmail = async ({
   }
 };
 
-export const appUrl = () => env.APP_URL ?? "https://vexon.co";
+/**
+ * P48-16: was `env.APP_URL ?? "https://vexon.co"` — a missing APP_URL silently
+ * sent every email CTA to an unrelated domain. Now one shared resolver: APP_URL,
+ * localhost in dev, a thrown error in production.
+ */
+export const appUrl = () => getAppUrl();

@@ -9,17 +9,42 @@
 
 All env vars are validated at startup by `src/env.js` (using `@t3-oss/env-nextjs`). Missing required vars crash the process with a clear message. Optional vars degrade gracefully (e.g. SES falls back to console logging, MinIO falls back to URL-only avatar mode).
 
+Two layers of validation run at boot:
+
+1. **Per-variable schema** — types and formats, via `createEnv`.
+2. **`assertProductionEnv()`** (P48-16) — the cross-field rule "these are required *in production*", which a per-variable schema cannot express without breaking dev. `@t3-oss/env-nextjs@0.12` has no schema-level refinement hook, so this is a plain function called at module scope in `src/env.js` (server-side only, skipped under `SKIP_ENV_VALIDATION`).
+
 The canonical reference is `.env.example` in the repo root. This runbook adds rotation guidance.
 
 ---
 
-## Required in all environments
+## Required in production (P48-16)
 
-| Variable | Purpose | How to generate / where to find |
-|----------|---------|--------------------------------|
+The process **refuses to boot** when `NODE_ENV=production` (or
+`KONTAX_DEPLOY_ENV=production`) and any of these is unset. The assertion lives in
+`assertProductionEnv()` in `src/env.js` and runs at module scope, so the failure
+is one clear message at startup rather than a surprise at the first email, sync
+or login.
+
+| Variable | Purpose | Generate with |
+|----------|---------|---------------|
 | `DATABASE_URL` | PostgreSQL connection string | Coolify DB service or external Postgres |
-| `AUTH_SECRET` | NextAuth JWT signing secret | `npx auth secret` |
-| `APP_URL` | Public origin (e.g. `https://kontax.vexon.co`) | Set to the production domain |
+| `AUTH_SECRET` | NextAuth JWT signing secret; also the HKDF input for the impersonation cookie MAC | `npx auth secret` |
+| `APP_URL` | Public origin — every absolute link we generate (email CTAs, OAuth redirects, share links, CardDAV URLs) | the production domain |
+| `TOTP_ENCRYPTION_KEY` *or* `TOTP_ENCRYPTION_KEYS` | Encrypts stored TOTP secrets at rest | `openssl rand -hex 32` |
+| `SYNC_CREDENTIAL_ENCRYPTION_KEY` *or* `SYNC_CREDENTIAL_ENCRYPTION_KEYS` | Encrypts stored provider credentials at rest | `openssl rand -hex 32` |
+| `CRON_SECRET` | Guards the `/api/cron/*` endpoints | `openssl rand -hex 32` |
+| `REDIS_URL` | Shared rate-limit store | Valkey service URL |
+
+Why these and not the rest: each has a **silent** failure mode. An unset
+`APP_URL` used to send password-reset links to an unrelated domain; an unset
+`SYNC_CREDENTIAL_ENCRYPTION_KEY` silently reused the JWT signing secret as the
+credential KEK; an unset `REDIS_URL` silently made rate limits per-process. The
+optional vars (SES, MinIO, Stripe, OAuth connectors) degrade *visibly* instead
+and stay optional.
+
+`SKIP_ENV_VALIDATION=1` bypasses the assertion. It is set in the Docker **build**
+stage only — never set it on a running production app.
 
 ---
 
@@ -27,8 +52,8 @@ The canonical reference is `.env.example` in the repo root. This runbook adds ro
 
 | Variable | Notes |
 |----------|-------|
-| `AUTH_SECRET` | Changing this invalidates **all** active sessions site-wide. Coordinate with users before rotating. After rotation, increment is handled automatically by NextAuth. |
-| `TOTP_ENCRYPTION_KEY` | 32-byte hex key used to encrypt TOTP secrets at rest. Rotating requires re-encrypting all stored TOTP secrets — **do not rotate casually**. Generate: `openssl rand -hex 32`. |
+| `AUTH_SECRET` | **Blast radius: all active sessions.** Changing it signs users out site-wide and invalidates in-flight impersonation cookies (their HMAC key is `HKDF(AUTH_SECRET, "kontax:impersonation")`). Coordinate before rotating. It is also the *legacy* credential-encryption key — see the keyring section before rotating it on a deployment that still has rows under key id `legacy`. |
+| `TOTP_ENCRYPTION_KEY` / `TOTP_ENCRYPTION_KEYS` | **Blast radius: none, when rotated through the keyring.** See "Rotating a credential or TOTP key" below. |
 
 ---
 
@@ -40,11 +65,125 @@ The canonical reference is `.env.example` in the repo root. This runbook adds ro
 
 ---
 
+## At-rest encryption keyring (P48-16)
+
+Provider credentials (`SyncAccount.credentialReference`) and TOTP secrets
+(`User.totpSecret`) share one envelope format and one key-management scheme, so
+both are rotatable **online**.
+
+### Format
+
+```
+SYNC_CREDENTIAL_ENCRYPTION_KEYS="k2:<64 hex chars>,k1:<64 hex chars>"
+TOTP_ENCRYPTION_KEYS="t2:<64 hex chars>,t1:<64 hex chars>"
+```
+
+Comma-separated `id:hex64` pairs, **current key first**. New ciphertext is
+written under the first entry; every other entry is retained purely so existing
+rows still decrypt. Key ids are free-form (`[A-Za-z0-9_.-]`, ≤64 chars) and
+travel *inside* the envelope, so a row is decryptable without consulting any
+other column. A malformed value throws at first use rather than being skipped —
+a typo must not look like "all credentials suddenly unreadable".
+
+### Keys that are always present
+
+| Id | Source | Role |
+|----|--------|------|
+| first entry of `*_KEYS` | the keyring var | current — encrypts |
+| `k1` (or `SYNC_CREDENTIAL_ENCRYPTION_KEY_ID`) | `SYNC_CREDENTIAL_ENCRYPTION_KEY` | decrypt-only when a keyring is also set; current otherwise |
+| `t1` | `TOTP_ENCRYPTION_KEY` | same, for TOTP |
+| `legacy` | `AUTH_SECRET` | decrypt-only. Rows written before a dedicated credential key existed used the JWT signing secret as the KEK; this entry keeps them readable. Only becomes *current* when nothing else is configured, which production forbids. |
+
+### Envelope
+
+`<prefix>:<base64url>` where the binary body is
+`version(1) | keyIdLen(1) | keyId | iv(12) | tag(16) | ciphertext`, AES-256-GCM,
+AAD `"<prefix>:<keyId>"`. Prefixes: `kontax-sync-v2`, `kontax-totp-v2`. The
+content-encryption key is `HKDF-SHA256(keyMaterial, info)` with a per-context
+info label, so the same key material never produces the same DEK in two
+contexts. Implementation: `src/server/sync-credentials.ts` (shared primitives),
+`src/server/totp-crypto.ts` (TOTP wrapper).
+
+Older formats stay readable and are upgraded in place — `kontax-sync-v1`
+(JSON envelope, `sha256(secret)` key) and the bare-base64url TOTP blob.
+
+### Rotating a credential or TOTP key
+
+**Blast radius: none.** Old and new keys coexist; no restart, no downtime, no
+user impact.
+
+1. Generate a key: `openssl rand -hex 32`.
+2. **Prepend** it to the keyring var — the first entry is the one that encrypts —
+   keeping every existing key in place. Redeploy.
+   ```
+   SYNC_CREDENTIAL_ENCRYPTION_KEYS="k3:<new>,k2:<old>,k1:<older>"
+   ```
+3. Dry-run, then apply:
+   ```
+   node scripts/rotate-sync-credential-key.mjs
+   node scripts/rotate-sync-credential-key.mjs --apply
+   node scripts/rotate-sync-credential-key.mjs --totp --apply   # TOTP too
+   ```
+   The script re-encrypts every row under the current key and reports how many
+   are rotated / already current / unreadable. It exits non-zero if anything is
+   unreadable.
+4. Only once the script reports **0 unreadable and 0 rotated on a fresh run**,
+   drop the retired key from the var and redeploy.
+
+Rows are also re-encrypted **lazily**: the sync runner rewrites any credential
+it successfully decrypts under a non-current key (`src/server/sync-runner.ts`),
+so a slow rotation converges on its own. The script exists to finish the job
+before you remove a key.
+
+> **Removing a key that still has rows makes those rows permanently
+> unreadable.** Always dry-run first. Recovery means the user reconnecting the
+> provider (or re-enrolling 2FA).
+
+Moving off the `legacy` (AUTH_SECRET-derived) key is the same procedure: set a
+dedicated `SYNC_CREDENTIAL_ENCRYPTION_KEYS`, run the script, and keep
+`AUTH_SECRET` itself unchanged (it stays registered as `legacy` for as long as
+it is set).
+
+---
+
 ## Rate limiting
 
 | Variable | Notes |
 |----------|-------|
-| `REDIS_URL` | Self-hosted Valkey (Redis-compatible). Falls back to in-memory store if unset — **not suitable for production** as limits are not shared across container restarts. Format: `redis://host:6379`. |
+| `REDIS_URL` | Self-hosted Valkey (Redis-compatible). **Required in production** (P48-16) — boot fails without it. Falls back to an in-memory store in dev/test only. Format: `redis://host:6379`. |
+
+### Behaviour during a Redis outage (P48-16)
+
+Every Redis-backed limiter is constructed with an `insuranceLimiter`: a
+`RateLimiterMemory` with identical points/duration. When a Redis round-trip
+fails, `rate-limiter-flexible` transparently retries the operation against that
+in-process limiter.
+
+- **All buckets keep limiting** — security-critical (login, password reset, TOTP,
+  registration, step-up, sync elevation) *and* convenience (image proxy, REST
+  API, contact form, card clicks). Protection degrades from cluster-wide to
+  per-process; it does not disappear, and nobody is locked out.
+- Counters start empty and are per-process, so effective limits are multiplied
+  by the process count for the duration of the outage. That is the deliberate
+  trade-off.
+- A warning is logged **at most once a minute** per scope:
+  `[Kontax] rate-limit store unavailable (…)`. Both the ioredis `error` event and
+  the limiter call sites feed the same throttle.
+- **Recovery needs no restart.** The next successful round-trip goes to Redis
+  again; the memory counters simply age out.
+- `checkRateLimit` distinguishes a `RateLimiterRes` rejection (over limit →
+  `{ allowed: false }`) from a transport `Error` (store down → allowed, logged).
+  With insurance configured the second case is unreachable, which is why
+  `api-rate-limit.ts` no longer carries a "fail open" branch.
+
+Login is consistent with the rest: `peekRateLimit` gates before the bcrypt
+compare, and the failure-path `checkRateLimit` calls are awaited
+(`src/server/auth/config.ts`) rather than fire-and-forget, so a failed attempt
+is always counted before the response is returned.
+
+**Verify on staging:** stop Valkey → log in with a wrong password 6 times; the
+6th must still be refused by the limiter, the image proxy must still serve, and
+exactly one warning per minute should appear. Start Valkey → no restart needed.
 
 ---
 
@@ -125,7 +264,7 @@ See [ses-setup.md](ses-setup.md) for full SES configuration.
 
 | Variable | Notes |
 |----------|-------|
-| `CRON_SECRET` | Sent as `x-cron-secret` header by the LXC cron `curl` calls. Generate: `openssl rand -hex 32`. Rotating requires updating the LXC crontab and the Coolify env var. |
+| `CRON_SECRET` | Sent as `x-cron-secret` header by the LXC cron `curl` calls. Generate: `openssl rand -hex 32`. **Required in production.** **Blast radius: every cron job, until the crontab is updated.** Rotating means updating the LXC 152 crontab *and* the Coolify env var — the app compares with a timing-safe equality check and there is no grace window for the old value, so the two must land together. Rotate during a quiet slot between job runs, then confirm the next scheduled run succeeds. |
 
 Cron endpoints: `/api/cron/delete-accounts`, `/api/cron/birthday-reminders`, `/api/cron/data-export`, `/api/cron/expire-exports`, `/api/cron/digest`, `/api/cron/cleanup-card-views`, `/api/cron/reset-api-counters`.
 
@@ -180,11 +319,29 @@ When rotating a secret:
 4. Verify the feature that depends on the secret still works.
 5. Delete the old secret from the upstream service (AWS, Stripe, Google, etc.).
 
+### Blast radius at a glance
+
+| Secret | Impact of rotating | Procedure |
+|--------|-------------------|-----------|
+| `AUTH_SECRET` | **All sessions dropped.** Users must sign in again; active impersonation cookies die. Also the `legacy` credential key — do not *remove* it while rows remain under key id `legacy`. | Announce, rotate, redeploy |
+| `SYNC_CREDENTIAL_ENCRYPTION_KEY(S)` | **None** when done via the keyring | [Rotating a credential or TOTP key](#rotating-a-credential-or-totp-key) |
+| `TOTP_ENCRYPTION_KEY(S)` | **None** when done via the keyring | same, with `--totp` |
+| `CRON_SECRET` | All cron jobs fail until the LXC 152 crontab is updated to match | Update crontab + env var together |
+| `REDIS_URL` | Rate-limit counters reset (buckets re-fill from empty); no user impact | Rotate, redeploy |
+| `DATABASE_URL` | Downtime for the length of the redeploy | Rotate, redeploy |
+| `MINIO_*` | Avatar upload falls back to URL-only until corrected | Rotate in MinIO console, redeploy |
+| Stripe / Google / Microsoft | Existing user tokens stay valid; new flows fail until updated | See the per-provider sections above |
+
 ---
 
 ## References
 
-- Env schema & validation: `src/env.js`
+- Env schema & validation: `src/env.js` (`assertProductionEnv`)
 - Canonical example: `.env.example`
+- Keyring + envelope: `src/server/sync-credentials.ts`, `src/server/totp-crypto.ts`
+- Key rotation script: `scripts/rotate-sync-credential-key.mjs`
+- Rate-limit outage policy: `src/server/rate-limit.ts`
+- Shared `APP_URL` resolver: `src/lib/site-url.ts` (`getAppUrl`)
+- Ticket: `roadmap/build-phase/p48-16-rate-limit-policy-env-key-rotation.md`
 - SES setup: [ses-setup.md](ses-setup.md)
 - Stripe rotation: [stripe-billing.md](stripe-billing.md)

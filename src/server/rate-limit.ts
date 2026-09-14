@@ -1,7 +1,52 @@
-import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible";
+import { RateLimiterMemory, RateLimiterRedis, RateLimiterRes } from "rate-limiter-flexible";
 import Redis from "ioredis";
 
 type Limiter = RateLimiterRedis | RateLimiterMemory;
+
+/**
+ * P48-16 — Redis outage policy.
+ *
+ * Every Redis-backed limiter below is created with an `insuranceLimiter`: a
+ * `RateLimiterMemory` with identical points/duration. When the Redis round-trip
+ * fails, rate-limiter-flexible transparently retries the operation against that
+ * in-process memory limiter (see `RateLimiterInsuredAbstract._handleError`), so
+ * `consume()`/`get()` still resolve or reject with a real `RateLimiterRes`.
+ *
+ * The practical consequences:
+ *
+ *   - Every bucket — security-critical (login, password reset, TOTP,
+ *     registration, step-up, sync elevation) *and* convenience (image proxy,
+ *     REST API, contact form, card clicks) — keeps limiting during an outage.
+ *     Protection degrades from cluster-wide to per-process, it does not vanish.
+ *   - Counters are per-process and start empty, so limits are effectively
+ *     multiplied by the number of app processes for the duration of the outage.
+ *     That is the deliberate trade-off: no lockout of legitimate users, no
+ *     unlimited brute-force window.
+ *   - Nothing needs restarting when Redis comes back; the next successful
+ *     round-trip goes to Redis again. The memory counters simply age out.
+ *   - `checkRateLimit` therefore never sees a transport `Error` for these
+ *     limiters, which makes the old "fail open" branch in
+ *     `src/server/api-rate-limit.ts` unreachable — it has been removed.
+ *
+ * The transport-error branch in `checkRateLimit` is kept only for limiters
+ * constructed without insurance (e.g. a bare `RateLimiterMemory` in tests, or a
+ * future store-backed limiter added without one).
+ */
+
+const isProductionDeploy =
+  process.env.NODE_ENV === "production" ||
+  process.env.KONTAX_DEPLOY_ENV === "production";
+
+// P48-16: production must use the shared store. The in-memory fallback is a dev
+// convenience — in production it silently turns cluster-wide limits into
+// per-process ones that reset on every deploy. `SKIP_ENV_VALIDATION` (set by the
+// Docker build stage) exempts `next build`, which imports this module while
+// prerendering but never serves traffic.
+if (isProductionDeploy && !process.env.REDIS_URL && !process.env.SKIP_ENV_VALIDATION) {
+  throw new Error(
+    "REDIS_URL is required in production — rate limiting would silently fall back to a per-process in-memory store that resets on every deploy. Set REDIS_URL (e.g. redis://valkey:6379).",
+  );
+}
 
 // Singleton Valkey/Redis client. Falls back to null in dev if REDIS_URL is unset.
 const redisClient =
@@ -13,6 +58,28 @@ const redisClient =
       })
     : null;
 
+// ── Throttled outage logging ─────────────────────────────────────────────────
+// An outage produces one failure per request; log at most once a minute so the
+// warning is visible without drowning the log.
+
+const WARN_INTERVAL_MS = 60_000;
+const lastWarnAt = new Map<string, number>();
+
+const warnThrottled = (scope: string, error: unknown) => {
+  const now = Date.now();
+  const previous = lastWarnAt.get(scope) ?? 0;
+  if (now - previous < WARN_INTERVAL_MS) return;
+  lastWarnAt.set(scope, now);
+  const detail = error instanceof Error ? error.message : String(error);
+  console.warn(
+    `[Kontax] rate-limit store unavailable (${scope}): ${detail} — limiters are running on per-process memory insurance until Redis recovers.`,
+  );
+};
+
+redisClient?.on("error", (error: unknown) => {
+  warnThrottled("redis-client", error);
+});
+
 // P38-09: shared client for other Redis-backed concerns (session validation
 // cache). Null when REDIS_URL is unset — callers must fail open to the DB.
 export const getRedis = () => redisClient;
@@ -22,7 +89,14 @@ function makeLimiter(points: number, duration: number, keyPrefix: string): Limit
     // Dev fallback: per-process in-memory store. Not shared across instances.
     return new RateLimiterMemory({ points, duration, keyPrefix });
   }
-  return new RateLimiterRedis({ storeClient: redisClient, points, duration, keyPrefix });
+  return new RateLimiterRedis({
+    storeClient: redisClient,
+    points,
+    duration,
+    keyPrefix,
+    // P48-16: fail closed to a per-process memory limiter during a Redis outage.
+    insuranceLimiter: new RateLimiterMemory({ points, duration, keyPrefix }),
+  });
 }
 
 // Named limiters — each has its own key namespace and window.
@@ -82,8 +156,27 @@ export interface RateLimitResult {
 }
 
 /**
+ * A rejection carrying limiter state (`RateLimiterRes`, or the plain object a
+ * custom store may reject with) means "limited". A rejection that is an `Error`
+ * means the store itself failed. With `insuranceLimiter` configured the latter
+ * cannot reach us — see the outage policy note at the top of this file.
+ */
+const isLimitedRejection = (rejection: unknown): rejection is RateLimiterRes => {
+  if (rejection instanceof RateLimiterRes) return true;
+  if (rejection instanceof Error) return false;
+  return (
+    typeof rejection === "object" &&
+    rejection !== null &&
+    "msBeforeNext" in rejection
+  );
+};
+
+/**
  * Consume one point and return the result. Use for actions that should always
  * count toward the limit (e.g. failed login attempts).
+ *
+ * Never throws. A limited key returns `{ allowed: false }`; a store failure on
+ * a limiter without insurance is logged (throttled) and treated as allowed.
  */
 export async function checkRateLimit(
   limiter: Limiter,
@@ -96,13 +189,19 @@ export async function checkRateLimit(
       remaining: res.remainingPoints,
       resetAt: new Date(Date.now() + res.msBeforeNext),
     };
-  } catch (res: unknown) {
-    const msBeforeNext = (res as { msBeforeNext?: number }).msBeforeNext ?? 0;
-    return {
-      allowed: false,
-      remaining: 0,
-      resetAt: new Date(Date.now() + msBeforeNext),
-    };
+  } catch (rejection: unknown) {
+    if (isLimitedRejection(rejection)) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt: new Date(Date.now() + (rejection.msBeforeNext ?? 0)),
+      };
+    }
+
+    // Transport failure on a limiter with no insurance limiter. Fail open so a
+    // store outage cannot lock every user out, but make it loud.
+    warnThrottled("consume", rejection);
+    return { allowed: true, remaining: 0, resetAt: new Date(0) };
   }
 }
 
@@ -125,7 +224,10 @@ export async function peekRateLimit(
       remaining: 0,
       resetAt: new Date(Date.now() + (res.msBeforeNext ?? 0)),
     };
-  } catch {
+  } catch (error) {
+    // `get()` also routes through the insurance limiter, so this is only
+    // reachable for limiters configured without one.
+    warnThrottled("peek", error);
     return { allowed: true, remaining: 0, resetAt: new Date(0) };
   }
 }

@@ -2,7 +2,7 @@
 // Generates the Google OAuth consent URL and redirects the user to it.
 import { NextResponse, type NextRequest } from "next/server";
 
-import { env } from "~/env";
+import { getAppUrl } from "~/lib/site-url";
 import { auth } from "~/server/auth";
 import {
   GOOGLE_CONTACTS_SCOPES,
@@ -11,7 +11,8 @@ import {
   isGoogleSyncConfigured,
 } from "~/server/google-sync";
 
-const appUrl = () => env.APP_URL ?? "https://getkontax.com";
+// P48-16: one shared APP_URL resolver (localhost in dev, throws in production).
+const appUrl = () => getAppUrl();
 
 export async function GET(_req: NextRequest) {
   const session = await auth();
