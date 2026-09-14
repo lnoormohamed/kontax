@@ -11,6 +11,11 @@ const port = Number.parseInt(process.env.PORT ?? "3000", 10);
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 const prisma = new PrismaClient();
+// P48-12: see the Host pinning block before handle() at the bottom of this file.
+const appUrlHost =
+  process.env.APP_URL && URL.canParse(process.env.APP_URL)
+    ? new URL(process.env.APP_URL).host
+    : null;
 
 const DAV_CAPABILITY_HEADER = "1, addressbook";
 const DAV_REALM = 'Basic realm="Kontax CardDAV"';
@@ -1855,6 +1860,16 @@ createServer(async (req, res) => {
   try {
     if (await handleDavRequest(req, res)) {
       return;
+    }
+
+    // P48-12: pin Host/X-Forwarded-Host to APP_URL before Next sees the
+    // request. On custom servers Next trusts the client-supplied
+    // `x-forwarded-host` when checking Server Action origins
+    // (GHSA-89xv-2m56-2m9x). Fails open when APP_URL is unset — P48-16
+    // makes APP_URL required.
+    if (appUrlHost) {
+      req.headers.host = appUrlHost;
+      req.headers["x-forwarded-host"] = appUrlHost;
     }
 
     await handle(req, res);
