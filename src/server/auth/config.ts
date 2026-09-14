@@ -118,8 +118,8 @@ export const authConfig = {
         );
         if (!passwordMatches) {
           // Consume a point only on failure so successful logins don't lock users out.
-          void checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
-          if (ip) void checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
+          await checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
+          if (ip) await checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
           // P22-04 Rule 3: track repeated failed logins against this account.
           await recordFailedLogin(user.id, ip);
           return null;

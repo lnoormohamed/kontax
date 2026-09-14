@@ -12,7 +12,7 @@ import {
   emitSyncConnectionLifecycleEvent,
   reconnectExistingSyncAccount,
 } from "~/server/sync-lineage";
-import { env } from "~/env";
+import { getAppUrl } from "~/lib/site-url";
 import {
   MICROSOFT_SCOPES,
   createMsalClient,
@@ -25,7 +25,8 @@ import { decodeOAuthState } from "~/server/sync-oauth-state";
 const GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
 
 const redirectTo = (_req: NextRequest, path: string) =>
-  NextResponse.redirect(new URL(path, env.APP_URL ?? "https://getkontax.com"));
+  // P48-16: one shared APP_URL resolver (localhost in dev, throws in production).
+  NextResponse.redirect(new URL(path, getAppUrl()));
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
