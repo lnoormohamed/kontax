@@ -7,6 +7,7 @@ import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
 import { db } from "~/server/db";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
+import { invalidateDavCredentialCacheForUser } from "~/server/app-passwords";
 import { sendAccountSuspendedEmail } from "~/server/billing-emails";
 import { coerceCardDavCapabilityProfileOverrideId } from "~/server/sync-provider-capabilities";
 import {
@@ -134,6 +135,9 @@ export async function suspendAccount(input: { userId: string; reason: string; re
   });
   // P38-09: the lock must beat the 45s validation cache
   await invalidateSessionValidation(target.id);
+  // P48-09: a verified CardDAV credential is cached for 10 minutes — drop it so
+  // the lock also cuts off device sync immediately.
+  await invalidateDavCredentialCacheForUser(target.id);
 
   void sendAccountSuspendedEmail({ userId: target.id, reason });
 
