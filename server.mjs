@@ -2,15 +2,29 @@ import { createServer } from "node:http";
 import { Buffer } from "node:buffer";
 import next from "next";
 import bcrypt from "bcryptjs";
+import Redis from "ioredis";
+import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible";
 
 import { PrismaClient } from "./generated/prisma/index.js";
+import { getRequestIp } from "./src/server/dav/client-ip.mjs";
 import {
   DAV_BODY_LIMITS,
+  decodePathSegment,
   extractRequestedPropNames,
   hasDoctypeOrEntity,
   hrefToSyncUid,
   parseReportRequest,
 } from "./src/server/dav/parse.mjs";
+import {
+  DAV_CREDENTIAL_CACHE_TTL_MS,
+  DAV_CREDENTIAL_CACHE_TTL_SECONDS,
+  davCredentialAppPasswordIndexKey,
+  davCredentialCacheKey,
+  davCredentialMemoryGet,
+  davCredentialMemorySet,
+  davCredentialRedisKey,
+  davCredentialUserIndexKey,
+} from "./src/server/dav/credential-cache.mjs";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME ?? "0.0.0.0";
@@ -30,10 +44,58 @@ const MAX_PUT_BODY_BYTES = DAV_BODY_LIMITS.put; // PUT — 1 MB
 // P48-08: what we are willing to persist into SyncConflict.remoteSnapshot.
 const MAX_CONFLICT_SNAPSHOT_BYTES = 64 * 1024;
 
-const WINDOW_MS = 15 * 60 * 1000;
-const IP_FAILURE_LIMIT = 20;
-const EMAIL_FAILURE_LIMIT = 10;
-const buckets = new Map();
+// P48-09: DAV auth brute-force limits.
+//
+// `src/server/rate-limit.ts` owns the equivalent limiters for the Next side, but
+// this file is plain ESM and cannot import TypeScript, so the limiters are built
+// here against the same `rate-limiter-flexible` + ioredis stack. Key layout is
+// `dav:ip:<ip>` and `dav:pair:<ip>:<email>`.
+//
+// The pair bucket is the one that actually blocks (10 failures / 15 min): a burst
+// from one shared Cloudflare edge IP must not lock every other user behind it.
+// The IP bucket is a much looser backstop (100 failures / 15 min).
+const DAV_AUTH_WINDOW_SECONDS = 15 * 60;
+const DAV_PAIR_FAILURE_LIMIT = 10;
+const DAV_IP_FAILURE_LIMIT = 100;
+// P48-09: at most one `lastUsedAt` write per app password per 5 minutes.
+const LAST_USED_DEBOUNCE_MS = 5 * 60 * 1000;
+
+const davRedis = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, {
+      enableOfflineQueue: false,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+    })
+  : null;
+
+if (davRedis) {
+  // Never let a Redis blip take the HTTP server down; the limiters fall back to
+  // their in-memory insurance limiter and the credential cache degrades to the
+  // in-process map.
+  davRedis.on("error", (error) => {
+    console.error("DAV Redis error", error.message);
+  });
+}
+
+const makeDavLimiter = (points, keyPrefix) => {
+  const memory = new RateLimiterMemory({ points, duration: DAV_AUTH_WINDOW_SECONDS, keyPrefix });
+  if (!davRedis) return memory;
+  return new RateLimiterRedis({
+    storeClient: davRedis,
+    points,
+    duration: DAV_AUTH_WINDOW_SECONDS,
+    keyPrefix,
+    insuranceLimiter: memory,
+  });
+};
+
+// RateLimiterMemory expires its own entries, so neither fallback leaks (the old
+// hand-rolled `buckets` Map was never pruned).
+const davPairLimiter = makeDavLimiter(DAV_PAIR_FAILURE_LIMIT, "dav:pair");
+const davIpLimiter = makeDavLimiter(DAV_IP_FAILURE_LIMIT, "dav:ip");
+
+// appPasswordId -> epoch ms of the last `lastUsedAt` write made by this process.
+const lastUsedWrites = new Map();
 
 const normalizeToken = (value) => value.replaceAll("-", "").replaceAll(" ", "").trim();
 const escapeXml = (value) =>
@@ -44,28 +106,14 @@ const escapeXml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
 
-const getBucket = (key) => {
-  const now = Date.now();
-  const current = buckets.get(key);
-
-  if (!current || current.resetAt <= now) {
-    const nextBucket = { count: 0, resetAt: now + WINDOW_MS };
-    buckets.set(key, nextBucket);
-    return nextBucket;
-  }
-
-  return current;
-};
-
-const isLimited = (key, limit) => getBucket(key).count >= limit;
-const recordFailure = (key) => {
-  getBucket(key).count += 1;
-};
-const resetBucket = (key) => buckets.delete(key);
-
+// P48-09: DAV responses are written by this file and never pass through Next's
+// middleware, so they carried none of its security headers. Add them here.
+// `extra` is spread last so a handler can still override Cache-Control etc.
 const davHeaders = (extra = {}) => ({
   DAV: DAV_CAPABILITY_HEADER,
-  "Cache-Control": "no-cache, no-store",
+  "Cache-Control": "no-store",
+  "X-Content-Type-Options": "nosniff",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
   ...extra,
 });
 
@@ -87,15 +135,21 @@ const forbidden = (res) =>
     "Content-Type": "text/plain; charset=utf-8",
   });
 
-const tooManyRequests = (res) =>
+const tooManyRequests = (res, retryAfterSeconds = DAV_AUTH_WINDOW_SECONDS) =>
   send(res, 429, "Too many requests", {
     "Content-Type": "text/plain; charset=utf-8",
-    "Retry-After": "900",
+    "Retry-After": String(Math.max(1, Math.ceil(retryAfterSeconds))),
   });
 
-// P48-08: a malformed DAV request body gets a 400, not a 500.
+// P48-09: malformed percent-escapes / NUL bytes in a resource name used to throw
+// out of decodeURIComponent and surface as a 500 with a stack trace.
 const badRequest = (res, message) =>
   send(res, 400, message ?? "Bad request", {
+    "Content-Type": "text/plain; charset=utf-8",
+  });
+
+const conflict = (res, message) =>
+  send(res, 409, message ?? "Conflict", {
     "Content-Type": "text/plain; charset=utf-8",
   });
 
@@ -164,10 +218,9 @@ const decodeBasicAuth = (header) => {
   };
 };
 
-const getRequestIp = (req) => {
-  const forwardedFor = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
-  return forwardedFor ?? req.headers["x-real-ip"] ?? req.socket.remoteAddress ?? "unknown";
-};
+// P48-09: `getRequestIp` now lives in ./src/server/dav/client-ip.mjs and prefers
+// `cf-connecting-ip` — see the comment there for why the old
+// x-forwarded-for-first order collapsed every client into one bucket.
 
 const getPublicRequestUrl = (req) => {
   const configuredOrigin = process.env.APP_URL ?? process.env.AUTH_URL;
@@ -198,15 +251,97 @@ const getPublicRequestUrl = (req) => {
   return new URL(req.url ?? "/", `${proto}://${host}`);
 };
 
-const verifyCardDavCredentials = async (email, plaintext) => {
-  const normalizedEmail = email.trim().toLowerCase();
+// P48-09: read a previously verified (email, token) pair. Redis when available
+// (survives a restart and is shared across instances), otherwise the in-process
+// map that `src/server/app-passwords.ts` can also reach through globalThis.
+const readCachedCredential = async (cacheKey) => {
+  if (davRedis) {
+    try {
+      const raw = await davRedis.get(davCredentialRedisKey(cacheKey));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.userId && parsed?.appPasswordId) {
+          return { userId: parsed.userId, appPasswordId: parsed.appPasswordId };
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("DAV credential cache read failed", error);
+      // fall through to the memory store
+    }
+  }
+
+  const entry = davCredentialMemoryGet(cacheKey);
+  return entry ? { userId: entry.userId, appPasswordId: entry.appPasswordId } : null;
+};
+
+const writeCachedCredential = async (cacheKey, value) => {
+  davCredentialMemorySet(cacheKey, value, DAV_CREDENTIAL_CACHE_TTL_MS);
+
+  if (!davRedis) return;
+
+  try {
+    // Entry plus the two revocation indexes, all on the same TTL.
+    await davRedis
+      .multi()
+      .set(
+        davCredentialRedisKey(cacheKey),
+        JSON.stringify(value),
+        "EX",
+        DAV_CREDENTIAL_CACHE_TTL_SECONDS,
+      )
+      .sadd(davCredentialAppPasswordIndexKey(value.appPasswordId), cacheKey)
+      .expire(davCredentialAppPasswordIndexKey(value.appPasswordId), DAV_CREDENTIAL_CACHE_TTL_SECONDS)
+      .sadd(davCredentialUserIndexKey(value.userId), cacheKey)
+      .expire(davCredentialUserIndexKey(value.userId), DAV_CREDENTIAL_CACHE_TTL_SECONDS)
+      .exec();
+  } catch (error) {
+    console.error("DAV credential cache write failed", error);
+  }
+};
+
+// P48-09: iOS sends many requests per sync cycle; one `lastUsedAt` UPDATE each
+// was pure write amplification. At most one write per app password per 5 minutes.
+const touchLastUsedAt = async (appPasswordId) => {
+  const now = Date.now();
+  const previous = lastUsedWrites.get(appPasswordId) ?? 0;
+
+  if (now - previous < LAST_USED_DEBOUNCE_MS) return;
+  lastUsedWrites.set(appPasswordId, now);
+
+  // Bound the map: an instance can only ever hold as many entries as there are
+  // app passwords that authenticated in the last window, but be defensive.
+  if (lastUsedWrites.size > 10_000) {
+    for (const [id, at] of lastUsedWrites) {
+      if (now - at >= LAST_USED_DEBOUNCE_MS) lastUsedWrites.delete(id);
+    }
+  }
+
+  try {
+    await prisma.appPassword.update({
+      where: { id: appPasswordId },
+      data: { lastUsedAt: new Date(now) },
+    });
+  } catch (error) {
+    console.error("Failed to update app password lastUsedAt", error);
+  }
+};
+
+// P48-09: this is the single DAV credential verifier.
+// `verifyCardDavCredentials` in `src/server/app-passwords.ts` is the Next-side
+// twin, reachable only through the `/.well-known/carddav` route fallback; both
+// reject LOCKED accounts and both keep the dummy-hash compare.
+const verifyCardDavCredentials = async (normalizedEmail, plaintext) => {
   const normalizedToken = normalizeToken(plaintext);
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail },
-    select: { id: true },
+    select: { id: true, lifecycleState: true },
   });
 
-  if (!user) {
+  // P48-09: exactly one bcrypt compare on every failure path. Previously an
+  // unknown email cost one dummy compare but a *known* email with zero app
+  // passwords cost none — a timing oracle for account enumeration.
+  if (!user || user.lifecycleState === "LOCKED") {
     await bcrypt.compare(normalizedToken, DUMMY_BCRYPT_HASH);
     return null;
   }
@@ -225,17 +360,17 @@ const verifyCardDavCredentials = async (email, plaintext) => {
     },
   });
 
+  if (appPasswords.length === 0) {
+    await bcrypt.compare(normalizedToken, DUMMY_BCRYPT_HASH);
+    return null;
+  }
+
   for (const appPassword of appPasswords) {
     const matches = await bcrypt.compare(normalizedToken, appPassword.hashedPassword);
 
     if (!matches) {
       continue;
     }
-
-    await prisma.appPassword.update({
-      where: { id: appPassword.id },
-      data: { lastUsedAt: new Date() },
-    });
 
     return {
       userId: user.id,
@@ -244,6 +379,35 @@ const verifyCardDavCredentials = async (email, plaintext) => {
   }
 
   return null;
+};
+
+const consumeDavFailure = async (ip, pairKey) => {
+  await Promise.all([
+    davPairLimiter.consume(pairKey, 1).catch(() => undefined),
+    davIpLimiter.consume(ip, 1).catch(() => undefined),
+  ]);
+};
+
+const resetDavFailures = async (ip, pairKey) => {
+  await Promise.all([
+    davPairLimiter.delete(pairKey).catch(() => undefined),
+    davIpLimiter.delete(ip).catch(() => undefined),
+  ]);
+};
+
+// Blocked? Peek without consuming so a *successful* login is never penalised.
+const davLimitRetryAfterSeconds = async (ip, pairKey) => {
+  const [pair, byIp] = await Promise.all([
+    davPairLimiter.get(pairKey).catch(() => null),
+    davIpLimiter.get(ip).catch(() => null),
+  ]);
+
+  const blocked = [
+    pair && pair.remainingPoints <= 0 ? pair.msBeforeNext : 0,
+    byIp && byIp.remainingPoints <= 0 ? byIp.msBeforeNext : 0,
+  ].filter((ms) => typeof ms === "number" && ms > 0);
+
+  return blocked.length > 0 ? Math.max(...blocked) / 1000 : null;
 };
 
 const requireDavAuth = async (req, res, expectedUserId) => {
@@ -255,21 +419,36 @@ const requireDavAuth = async (req, res, expectedUserId) => {
   }
 
   const normalizedEmail = credentials.email.trim().toLowerCase();
-  const ipKey = `ip:${getRequestIp(req)}`;
-  const emailKey = `email:${normalizedEmail}`;
+  const normalizedToken = normalizeToken(credentials.password);
+  const ip = getRequestIp(req);
+  const pairKey = `${ip}:${normalizedEmail}`;
+  const cacheKey = davCredentialCacheKey(normalizedEmail, normalizedToken);
 
-  if (isLimited(ipKey, IP_FAILURE_LIMIT) || isLimited(emailKey, EMAIL_FAILURE_LIMIT)) {
-    tooManyRequests(res);
-    return null;
-  }
-
-  const result = await verifyCardDavCredentials(normalizedEmail, credentials.password);
+  // Fast path: a credential we verified in the last 10 minutes. No bcrypt, no
+  // rate-limit round trip, no `lastUsedAt` write beyond the 5-minute debounce.
+  let result = await readCachedCredential(cacheKey);
 
   if (!result) {
-    recordFailure(ipKey);
-    recordFailure(emailKey);
-    unauthorized(res);
-    return null;
+    // Peek (never consume) before the user lookup and bcrypt, so a blocked key
+    // reaches neither the database nor the expensive compare — and a successful
+    // authentication is never charged a point.
+    const retryAfter = await davLimitRetryAfterSeconds(ip, pairKey);
+
+    if (retryAfter !== null) {
+      tooManyRequests(res, retryAfter);
+      return null;
+    }
+
+    result = await verifyCardDavCredentials(normalizedEmail, credentials.password);
+
+    if (!result) {
+      await consumeDavFailure(ip, pairKey);
+      unauthorized(res);
+      return null;
+    }
+
+    await writeCachedCredential(cacheKey, result);
+    await resetDavFailures(ip, pairKey);
   }
 
   if (expectedUserId && result.userId !== expectedUserId) {
@@ -277,8 +456,8 @@ const requireDavAuth = async (req, res, expectedUserId) => {
     return null;
   }
 
-  resetBucket(ipKey);
-  resetBucket(emailKey);
+  void touchLastUsedAt(result.appPasswordId);
+
   return result;
 };
 
@@ -511,12 +690,15 @@ const buildReportResponses = (contacts, report, hrefFor) => {
 // P23-07: resolve which contacts belong to a personal Kontax-server book. A book
 // with sourceBookIds aggregates contacts from those books; otherwise it scopes to
 // its own contacts (bookId = book.id). A null book means the legacy "all contacts".
+// P48-09: every branch carries `userId`. The sourceBookIds branch dropped it,
+// which would have let a caller reach another user's contacts if a book ever
+// aggregated ids it does not own.
 const bookScopeWhere = (userId, book) => {
   if (!book) return { userId };
   if (Array.isArray(book.sourceBookIds) && book.sourceBookIds.length > 0) {
-    return { bookId: { in: book.sourceBookIds } };
+    return { userId, bookId: { in: book.sourceBookIds } };
   }
-  return { bookId: book.id };
+  return { userId, bookId: book.id };
 };
 
 const computeAddressBookCTag = async (userId, book) => {
@@ -543,14 +725,17 @@ const getCollectionParams = (pathname) => {
 // Legacy compat — keep for callers that only need userId
 const getCollectionUserId = (pathname) => getCollectionParams(pathname)?.userId ?? null;
 
+// P48-09: `invalid: true` instead of throwing out of decodeURIComponent — the
+// handler answers 400 rather than a 500 with a stack trace.
 const getResourceParams = (pathname) => {
   const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/([^/]+)\/([^/]+)$/);
   if (!match) return null;
   const slug = match[2];
   if (slug === 'family' || slug?.startsWith('team-')) return null;
   const rawUid = match[3];
-  const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
-  return { userId: match[1], bookSlug: slug, uid: decodeURIComponent(uid) };
+  const uid = decodePathSegment(rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid);
+  if (uid === null) return { userId: match[1], bookSlug: slug, uid: null, invalid: true };
+  return { userId: match[1], bookSlug: slug, uid };
 };
 
 // P18-11: resolve AddressBook row by userId + slug (creates default if missing)
@@ -587,8 +772,9 @@ const getFamilyResourceParams = (pathname) => {
     return null;
   }
   const rawUid = match[2];
-  const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
-  return { userId: match[1], uid: decodeURIComponent(uid) };
+  const uid = decodePathSegment(rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid);
+  if (uid === null) return { userId: match[1], uid: null, invalid: true };
+  return { userId: match[1], uid };
 };
 const familyResourceHref = (userId, syncUid) =>
   `/dav/addressbooks/${userId}/family/${encodeURIComponent(syncUid)}.vcf`;
@@ -604,8 +790,9 @@ const getTeamResourceParams = (pathname) => {
     return null;
   }
   const raw = m[3];
-  const uid = raw.endsWith(".vcf") ? raw.slice(0, -4) : raw;
-  return { userId: m[1], bookId: m[2], uid: decodeURIComponent(uid) };
+  const uid = decodePathSegment(raw.endsWith(".vcf") ? raw.slice(0, -4) : raw);
+  if (uid === null) return { userId: m[1], bookId: m[2], uid: null, invalid: true };
+  return { userId: m[1], bookId: m[2], uid };
 };
 const teamResourceHref = (userId, bookId, syncUid) =>
   `/dav/addressbooks/${userId}/team-${bookId}/${encodeURIComponent(syncUid)}.vcf`;
@@ -1128,9 +1315,11 @@ const handleWellKnown = async (req, res, requestUrl) => {
     return true;
   }
 
-  const location = new URL(`/dav/principals/${authResult.userId}/`, requestUrl);
+  // P48-09: relative Location. The absolute form was built from the request
+  // Host when APP_URL/AUTH_URL was unset, so a forged Host header could aim a
+  // client's redirect at another origin.
   return send(res, 301, req.method === "HEAD" ? null : "Moved permanently", {
-    Location: location.toString(),
+    Location: `/dav/principals/${authResult.userId}/`,
     "Content-Type": "text/plain; charset=utf-8",
   });
 };
@@ -1397,6 +1586,10 @@ const handleFamilyResource = async (req, res, requestUrl) => {
   if (!params) {
     return false;
   }
+  // P48-09: undecodable resource name → 400, not a 500 with a stack trace.
+  if (params.invalid) {
+    return badRequest(res, "Invalid resource name");
+  }
   const { userId, uid } = params;
   const allow = "OPTIONS, GET, PUT, DELETE";
   if (req.method === "OPTIONS") {
@@ -1617,6 +1810,10 @@ const handleTeamResource = async (req, res, requestUrl) => {
   if (!params) {
     return false;
   }
+  // P48-09: undecodable resource name → 400, not a 500 with a stack trace.
+  if (params.invalid) {
+    return badRequest(res, "Invalid resource name");
+  }
   const { userId, bookId, uid } = params;
   const allow = "OPTIONS, GET, PUT, DELETE";
   if (req.method === "OPTIONS") {
@@ -1821,6 +2018,11 @@ const handleContactResource = async (req, res, requestUrl) => {
     return false;
   }
 
+  // P48-09: undecodable resource name → 400, not a 500 with a stack trace.
+  if (params.invalid) {
+    return badRequest(res, "Invalid resource name");
+  }
+
   const { userId, bookSlug, uid } = params;
   const allow = "OPTIONS, GET, PUT, DELETE";
 
@@ -1847,9 +2049,42 @@ const handleContactResource = async (req, res, requestUrl) => {
     return forbidden(res);
   }
 
-  const existing = await prisma.contact.findFirst({
-    where: { userId, syncUid: uid },
+  // P48-09: scope the lookup to the book in the URL. It used to match on
+  // `{ userId, syncUid }` alone, so a PUT under a writable slug could edit a
+  // contact that actually lives in a `deviceWritable = false` book — the
+  // read-only flag checked above was bypassable by addressing the same UID
+  // through any other collection.
+  let existing = await prisma.contact.findFirst({
+    where: { ...bookScopeWhere(userId, book), syncUid: uid },
   });
+
+  // P48-09: resolve what a PUT is actually allowed to touch through this URL.
+  if (req.method === "PUT") {
+    if (existing && existing.bookId !== book.id) {
+      // Aggregate book (sourceBookIds): readable through this collection, but a
+      // write here is ambiguous about which underlying book it lands in.
+      return conflict(res, "Contact belongs to a different address book.");
+    }
+
+    if (!existing) {
+      const elsewhere = await prisma.contact.findFirst({
+        where: { userId, syncUid: uid },
+        select: { id: true, bookId: true },
+      });
+
+      if (elsewhere?.bookId != null) {
+        // The UID exists, but in another book — refuse rather than create a
+        // duplicate or edit across the read-only boundary.
+        return conflict(res, "Contact belongs to a different address book.");
+      }
+
+      if (elsewhere) {
+        // Legacy contact from before per-book scoping (bookId null). Adopt it
+        // into the book it was written through instead of duplicating it.
+        existing = await prisma.contact.findFirst({ where: { id: elsewhere.id } });
+      }
+    }
+  }
 
   if (req.method === "GET" || req.method === "HEAD") {
     if (!existing || existing.archivedAt || existing.syncTombstoneAt) {
@@ -1928,14 +2163,16 @@ const handleContactResource = async (req, res, requestUrl) => {
 
     const updated = await prisma.$transaction(async (tx) => {
       const current = await tx.contact.findFirst({
-        where: { userId, syncUid: uid },
-        select: { id: true, syncVersion: true },
+        where: { id: existing.id },
+        select: { id: true, syncVersion: true, bookId: true },
       });
 
       return tx.contact.update({
         where: { id: current.id },
         data: {
           ...fields,
+          // P48-09: adopt a legacy book-less contact into this book.
+          ...(current.bookId === null ? { bookId: book.id } : {}),
           syncVersion: (current.syncVersion ?? 0) + 1,
           syncTombstoneAt: null,
           archivedAt: null,
@@ -2063,7 +2300,10 @@ server.listen(port, hostname, () => {
 });
 
 const shutdown = async () => {
-  await prisma.$disconnect();
+  await prisma.$disconnect().catch(() => undefined);
+  if (davRedis) {
+    davRedis.disconnect();
+  }
   process.exit(0);
 };
 
