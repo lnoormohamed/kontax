@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 
-import { createBillingPortalSession } from "~/app/actions/billing";
+import { useBillingPortal } from "~/app/_components/use-billing-portal";
 
 export type CancelPlanDetails = {
   syncConnections: number;
@@ -48,16 +48,13 @@ export function CancelPlanModal({
   };
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(false);
+  const portal = useBillingPortal();
 
   const handleConfirm = () => {
     setError(false);
     startTransition(async () => {
-      const result = await createBillingPortalSession();
-      if ("url" in result) {
-        window.location.href = result.url;
-      } else {
-        setError(true);
-      }
+      // P48-02: "prompting" is not a failure — the password modal took over.
+      if ((await portal.launch()) === "failed") setError(true);
     });
   };
 
@@ -79,6 +76,7 @@ export function CancelPlanModal({
 
   return (
     <>
+      {portal.modal}
       {!isControlled ? (
         <button
           className="h-11 w-full rounded-2xl border border-[#d8ddd6] bg-white px-[18px] text-[13px] font-semibold text-[#8b938c] transition hover:text-[#5c655e] hover:underline md:h-auto md:w-auto md:border-none md:bg-transparent md:p-1"

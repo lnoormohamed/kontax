@@ -30,6 +30,13 @@ export default async function SettingsLayout({ children }: { children: React.Rea
     const next = h.get("x-pathname") ?? "/settings";
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
+  // P48-02: during the deletion grace period the account is read-only plus
+  // cancel. Settings is the densest cluster of write surfaces, so send pending
+  // users to the cancel screen rather than rendering forms whose every action
+  // would be refused with PENDING_DELETION.
+  if (session.pendingDeletion) {
+    redirect("/account-pending-deletion");
+  }
   const userId = session.user.id;
 
   const planSummary = await getUserPlanSummary(userId);

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 
-import { createBillingPortalSession, createCheckoutSession } from "~/app/actions/billing";
+import { createCheckoutSession } from "~/app/actions/billing";
+import { useBillingPortal } from "~/app/_components/use-billing-portal";
 
 export type StripePrices = {
   currency: string;
@@ -160,6 +161,7 @@ export function PricingToggle({
   const [loading, setLoading] = useState<string | null>(null);
   const [ctaError, setCtaError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const portal = useBillingPortal();
   const interval = annual ? "YEARLY" : "MONTHLY";
 
   const handlePaidCta = (planId: string) => {
@@ -191,9 +193,11 @@ export function PricingToggle({
 
       if (result.error === "USE_CUSTOMER_PORTAL") {
         // Active subscription detected server-side — fall through to portal.
-        const portalResult = await createBillingPortalSession();
-        if ("url" in portalResult) {
-          window.location.href = portalResult.url;
+        // P48-02: the portal may ask for a password first; when it does, the
+        // modal owns the rest of the flow, so this is not an error.
+        const launch = await portal.launch();
+        if (launch !== "failed") {
+          setLoading(null);
           return;
         }
       }
@@ -205,6 +209,7 @@ export function PricingToggle({
 
   return (
     <>
+      {portal.modal}
       {/* Billing toggle */}
       <section className="pr-billing">
         <div className="pr-toggle" role="tablist" aria-label="Billing period">

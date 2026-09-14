@@ -30,26 +30,35 @@ export function DeleteAccountSection() {
 
   const matches = !!email && confirmEmail.trim().toLowerCase() === email.toLowerCase();
 
-  const executeDelete = () => {
+  // P48-02: the password now travels INTO the action, which verifies it with
+  // bcrypt and rate-limits the attempt. Returns an error string for the modal
+  // to show (password problems), or sets the inline error and returns nothing
+  // for everything else.
+  const executeDelete = async (currentPassword: string): Promise<string | void> => {
     setError("");
-    startTransition(async () => {
-      const result = await scheduleAccountDeletion({ confirmEmail });
-      if ("success" in result) {
-        await signOutAction();
-        router.push("/account-deleted");
-      } else {
-        setError(
-          result.error === "EMAIL_MISMATCH" ? "Email address does not match." :
-          result.error === "OWNS_ACTIVE_GROUP" ? "You must transfer or delete your Family/Teams group before closing your account." :
-          "Something went wrong. Please try again."
-        );
-      }
-    });
+    const result = await scheduleAccountDeletion({ confirmEmail, currentPassword });
+    if ("success" in result) {
+      await signOutAction();
+      router.push("/account-deleted");
+      return;
+    }
+    if (result.error === "WRONG_PASSWORD") return "Incorrect password. Please try again.";
+    if (result.error === "RATE_LIMIT_EXCEEDED")
+      return "Too many attempts. Please wait a moment and try again.";
+    if (result.error === "STEP_UP_REQUIRED") return "Please enter your password.";
+    setShowStepUp(false);
+    setError(
+      result.error === "EMAIL_MISMATCH" ? "Email address does not match." :
+      result.error === "OWNS_ACTIVE_GROUP" ? "You must transfer or delete your Family/Teams group before closing your account." :
+      "Something went wrong. Please try again."
+    );
   };
 
   const handleDelete = () => {
     if (hasPassword) { setShowStepUp(true); return; }
-    executeDelete();
+    // OAuth-only account: no password to prove — the action accepts the active
+    // session as the step-up signal.
+    startTransition(() => { void executeDelete(""); });
   };
 
   return (
@@ -77,7 +86,8 @@ export function DeleteAccountSection() {
           title="Confirm your identity"
           description="Enter your password to continue deleting your account."
           confirmLabel="Continue"
-          onConfirmed={async () => { setShowStepUp(false); executeDelete(); }}
+          serverVerifies
+          onConfirmed={(password) => executeDelete(password)}
           onClose={() => setShowStepUp(false)}
         />
       )}

@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, useState, useTransition } from "react";
 
 import { redeemTotpRecoveryCode, submitTotpChallenge } from "~/app/actions/totp";
 import { signOutAction } from "~/app/actions/auth";
+import { safeInternalPath } from "~/lib/safe-internal-path";
 
 export const dynamic = "force-dynamic";
 
@@ -64,8 +65,8 @@ function VerifyTwoFaInner() {
   const searchParams = useSearchParams();
   // P48-01: carry the original destination through the challenge; only accept
   // an internal path (no protocol-relative `//host` or backslash tricks).
-  const rawNext = searchParams.get("next");
-  const next = rawNext && /^\/(?![/\\])/.test(rawNext) ? rawNext : "/contacts";
+  // P48-03: the inline regex is now the shared `safeInternalPath` validator.
+  const next = safeInternalPath(searchParams.get("next"), "/contacts");
   const [code, setCode] = useState("");
   const [recoveryCode, setRecoveryCode] = useState("");
   const [useRecovery, setUseRecovery] = useState(false);
@@ -78,6 +79,8 @@ function VerifyTwoFaInner() {
     INVALID_RECOVERY_CODE: "Recovery code not found or already used.",
     RATE_LIMIT_EXCEEDED: "Too many attempts. Please try again in 15 minutes.",
     NOT_PENDING_TOTP: "Session error. Please sign in again.",
+    // P48-03: replay guard — the same 30s code can't be used twice.
+    TOTP_CODE_ALREADY_USED: "That code has already been used. Wait for the next one.",
   };
 
   // Refresh the JWT so pendingTotp is cleared before navigating. The JWT

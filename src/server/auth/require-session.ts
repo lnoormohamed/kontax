@@ -39,8 +39,28 @@ type FullSession = NonNullable<Awaited<ReturnType<typeof auth>>>;
  * - Anonymous or pending-TOTP → `UNAUTHENTICATED`
  * - `write: true` and the session is an admin impersonation → `IMPERSONATION_READ_ONLY`
  * - `write: true` and the account is in its deletion grace period → `PENDING_DELETION`
- *   (P48-02 defines which writes remain allowed; today only `cancelAccountDeletion`
- *   should bypass this by reading `auth()` directly.)
+ *
+ * P48-02 — the pending-deletion contract, decided and documented:
+ *
+ *   A user-initiated deletion leaves `lifecycleState: "ACTIVE"` and sets
+ *   `User.scheduledDeleteAt`. (LOCKED stays reserved for admin suspension,
+ *   whose sign-in is refused outright in `authorize`.) The user can therefore
+ *   sign in normally — password plus TOTP — and the JWT carries
+ *   `pendingDeletion: true` for as long as `scheduledDeleteAt` is set.
+ *
+ *   Such a session is READ-ONLY PLUS CANCEL:
+ *     - reads are allowed, so the 30-day grace period is actually useful — the
+ *       user can review and export their data before it is destroyed;
+ *     - every write goes through `requireSession({ write: true })` and is
+ *       refused with PENDING_DELETION;
+ *     - the single exception is `cancelAccountDeletion`, which reads `auth()`
+ *       directly on purpose (see the comment on that action);
+ *     - sign-out is always available.
+ *
+ *   The flag follows the database: the JWT callback recomputes it from
+ *   `scheduledDeleteAt` on every validation (cached and uncached), and
+ *   cancelling invalidates the session-validation cache, so the gate lifts on
+ *   the next request rather than at the next sign-in.
  */
 export async function requireSession(opts: RequireSessionOptions = {}): Promise<FullSession> {
   const session = await auth();

@@ -81,10 +81,20 @@ export function DataExportSection({ hasPassword }: { hasPassword: boolean }) {
     return () => clearInterval(interval);
   }, [job?.status]);
 
-  const executeRequest = async () => {
+  // P48-02: the password goes into the action, which verifies it server-side.
+  // Returns a message for the modal to display on a step-up failure.
+  const executeRequest = async (currentPassword: string): Promise<string | void> => {
     setRequesting(true);
     try {
-      await requestDataExport({ includeArchived });
+      const result = await requestDataExport({ includeArchived, currentPassword });
+      if (!result.ok) {
+        if (result.reason === "STEP_UP_REQUIRED") return "Please enter your password.";
+        if (result.message === "WRONG_PASSWORD") return "Incorrect password. Please try again.";
+        if (result.message === "RATE_LIMIT_EXCEEDED")
+          return "Too many attempts. Please wait a moment and try again.";
+        return "Something went wrong. Please try again.";
+      }
+      setShowStepUp(false);
       const updated = await getDataExportStatus();
       setJob(updated);
     } finally {
@@ -94,7 +104,8 @@ export function DataExportSection({ hasPassword }: { hasPassword: boolean }) {
 
   const handleRequest = () => {
     if (hasPassword) { setShowStepUp(true); return; }
-    void executeRequest();
+    // OAuth-only account: no password to prove.
+    void executeRequest("");
   };
 
   const isIdle = !job || job.status === "EXPIRED" || job.status === "FAILED";
@@ -110,7 +121,8 @@ export function DataExportSection({ hasPassword }: { hasPassword: boolean }) {
           title="Confirm your identity"
           description="Enter your password to request a data export."
           confirmLabel="Request export"
-          onConfirmed={async () => { setShowStepUp(false); await executeRequest(); }}
+          serverVerifies
+          onConfirmed={(password) => executeRequest(password)}
           onClose={() => setShowStepUp(false)}
         />
       )}

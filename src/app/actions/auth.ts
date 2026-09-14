@@ -2,15 +2,18 @@
 
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { z } from "zod";
 
 import PasswordReset from "~/emails/password-reset";
+import { getClientIp } from "~/lib/client-ip";
 import { signOut } from "~/server/auth";
 import { db } from "~/server/db";
 import { sendEmail } from "~/server/email";
 import { generateVerificationToken } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { renderEmail } from "~/server/render-email";
+import { invalidateSessionValidation } from "~/server/session-validation-cache";
 
 export async function signOutAction() {
   await signOut({ redirectTo: "/" });
@@ -22,14 +25,16 @@ export async function signOutAction() {
  * Request a password reset link. Always returns success — never reveals
  * whether an account exists for the given email (prevents enumeration).
  */
-export async function requestPasswordReset(
-  email: string,
-  ip?: string,
-): Promise<{ success: true }> {
+export async function requestPasswordReset(email: string): Promise<{ success: true }> {
   const parsed = z.string().trim().toLowerCase().email().safeParse(email);
   if (!parsed.success) return { success: true };
 
   const normalised = parsed.data;
+
+  // P48-03: the IP is derived from the request, never taken as an argument.
+  // It used to be a parameter that the UI simply never passed, so the per-IP
+  // limiter never fired and `requestedFromIp` was whatever a caller claimed.
+  const ip = getClientIp(await headers());
 
   // Rate limit by email and IP (silently — don't reveal the limit was hit)
   const [emailRl, ipRl] = await Promise.all([
@@ -128,6 +133,11 @@ export async function resetPassword(input: {
       data: { usedAt: new Date() },
     }),
   ]);
+  // P48-03: the sessionVersion bump must beat the 45s validation cache, exactly
+  // as every other bumping path already does. Without this an attacker's live
+  // session survived the victim's password reset for up to a full TTL — the one
+  // window the reset exists to close.
+  await invalidateSessionValidation(token.userId);
 
   await db.activityEvent.create({
     data: {

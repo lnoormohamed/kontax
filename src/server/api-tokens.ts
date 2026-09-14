@@ -33,10 +33,30 @@ export async function validateApiToken(
 
   const token = await db.apiToken.findUnique({
     where: { tokenHash: hash },
-    select: { userId: true, scope: true, revokedAt: true },
+    select: {
+      userId: true,
+      scope: true,
+      revokedAt: true,
+      // P48-03: the token used to be validated in isolation, so a suspended or
+      // self-deleting account kept full REST API access — the web session was
+      // the only thing anyone had bothered to lock.
+      user: { select: { lifecycleState: true, scheduledDeleteAt: true } },
+    },
   });
 
   if (!token || token.revokedAt) return null;
+
+  // Admin-suspended account: refuse outright (the caller turns null into 401).
+  if (token.user.lifecycleState === "LOCKED") return null;
+
+  // Pending deletion: the web app grants these sessions reads-but-no-writes
+  // (P48-02). The REST layer resolves a token to a { userId, scope } pair
+  // *before* it knows whether the route mutates, so there is no honest place to
+  // draw that line here — the read/write split lives in each handler. Refusing
+  // the token entirely is the conservative choice and matches the grace
+  // period's intent: the account is on its way out. Revisit if/when the API
+  // layer gains a method-aware guard.
+  if (token.user.scheduledDeleteAt) return null;
 
   // Fire-and-forget — don't block the API response on a stats write
   void db.apiToken.update({

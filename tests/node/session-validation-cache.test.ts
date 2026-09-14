@@ -100,6 +100,7 @@ test("session validation cache round-trips, expires via SETEX, invalidates by sc
     role: "USER" as const,
     emailVerified: "2026-01-01T00:00:00.000Z",
     revoked: false,
+    scheduledDeleteAt: null,
   };
 
   // miss → null
@@ -140,6 +141,7 @@ test("cache disabled via env flag is a no-op", async () => {
     role: "USER",
     emailVerified: null,
     revoked: false,
+    scheduledDeleteAt: null,
   });
   assert.equal(await readSessionValidation("userC", "sid"), null);
   delete process.env.SESSION_VALIDATION_CACHE;
