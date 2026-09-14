@@ -154,7 +154,7 @@ See:
 Development and staging can still use `db push` conveniently.
 
 Production should not rely on startup-time schema mutation by default. The
-container now boots through `scripts/start-production.mjs`:
+container now boots through `scripts/runtime/start-production.mjs`:
 
 - `KONTAX_SCHEMA_MODE=push`
   - apply `prisma db push` before boot
@@ -195,6 +195,6 @@ Runbooks:
 - contact import/export issue:
   - `src/server/contact-portability.ts`
 - deploy/schema issue:
-  - `scripts/start-production.mjs`
-  - `scripts/check-schema-drift.mjs`
+  - `scripts/runtime/start-production.mjs`
+  - `scripts/runtime/check-schema-drift.mjs`
   - [deploy runbook](/Users/lnoormohamed/ChatGPT/Kontax/roadmap/runbooks/deploy.md)

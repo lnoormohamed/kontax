@@ -105,7 +105,7 @@ if (schemaMode === "push") {
   }
 } else if (schemaMode === "validate") {
   console.log("[startup] Validating live schema before boot.");
-  run("node", ["scripts/check-schema-drift.mjs"]);
+  run("node", ["scripts/runtime/check-schema-drift.mjs"]);
 } else {
   console.log("[startup] Skipping schema step before boot.");
 }

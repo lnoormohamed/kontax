@@ -3,7 +3,20 @@
 .next
 node_modules
 npm-debug.log
-README.md
-.env
-.env.local
-.env.*.local
+.env*
+
+# The container generates its own Linux Prisma client via `npm ci`'s
+# `postinstall` (`prisma generate`). Never ship a host-generated copy into
+# the build context — `COPY . .` would otherwise overwrite the fresh
+# container-built client with whatever platform generated this checkout.
+generated
+
+# Docs, tickets, and test artifacts the build never reads.
+docs
+roadmap
+tests
+test-results
+.github
+.claude
+open-format
+*.md

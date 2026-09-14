@@ -28,7 +28,7 @@ const result = spawnSync(
 if (result.status === 0) {
   console.log("[schema-check] Database schema matches prisma/schema.prisma.");
   // P38-06: the contact search trigger + function live outside Prisma's model
-  // (owned by scripts/setup-contact-search-index.mjs). Verify them so a fresh
+  // (owned by scripts/runtime/setup-contact-search-index.mjs). Verify them so a fresh
   // or restored database fails fast instead of silently serving empty search.
   const triggerCheck = spawnSync(
     "npx",
@@ -37,7 +37,7 @@ if (result.status === 0) {
       input: `DO $$
 BEGIN
   IF (SELECT count(*) FROM pg_trigger WHERE tgname = 'contact_search_vector_trigger') < 1 THEN
-    RAISE EXCEPTION 'missing trigger contact_search_vector_trigger — run scripts/setup-contact-search-index.mjs';
+    RAISE EXCEPTION 'missing trigger contact_search_vector_trigger — run scripts/runtime/setup-contact-search-index.mjs';
   END IF;
 END $$;`,
       env: process.env,
@@ -47,7 +47,7 @@ END $$;`,
   if (triggerCheck.status !== 0) {
     console.error(triggerCheck.stderr || triggerCheck.stdout);
     console.error(
-      "[schema-check] Contact search trigger missing — run scripts/setup-contact-search-index.mjs (P38-06).",
+      "[schema-check] Contact search trigger missing — run scripts/runtime/setup-contact-search-index.mjs (P38-06).",
     );
     process.exit(2);
   }
