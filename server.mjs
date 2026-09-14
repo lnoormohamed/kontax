@@ -16,6 +16,10 @@ const appUrlHost =
   process.env.APP_URL && URL.canParse(process.env.APP_URL)
     ? new URL(process.env.APP_URL).host
     : null;
+// Hosts Next may see unchanged: the app origin and the `api.` alias that
+// src/middleware.ts rewrites to /api/* (pinning that one would break the REST
+// API host). Anything else is pinned to the app origin.
+const allowedHosts = appUrlHost ? new Set([appUrlHost, `api.${appUrlHost}`]) : null;
 
 const DAV_CAPABILITY_HEADER = "1, addressbook";
 const DAV_REALM = 'Basic realm="Kontax CardDAV"';
@@ -1867,9 +1871,12 @@ createServer(async (req, res) => {
     // `x-forwarded-host` when checking Server Action origins
     // (GHSA-89xv-2m56-2m9x). Fails open when APP_URL is unset — P48-16
     // makes APP_URL required.
-    if (appUrlHost) {
-      req.headers.host = appUrlHost;
-      req.headers["x-forwarded-host"] = appUrlHost;
+    if (appUrlHost && allowedHosts) {
+      const forwarded = req.headers["x-forwarded-host"];
+      const presented = (Array.isArray(forwarded) ? forwarded[0] : forwarded) ?? req.headers.host ?? "";
+      const pinned = allowedHosts.has(presented.toLowerCase()) ? presented.toLowerCase() : appUrlHost;
+      req.headers.host = pinned;
+      req.headers["x-forwarded-host"] = pinned;
     }
 
     await handle(req, res);
