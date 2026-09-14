@@ -125,6 +125,10 @@ export const authConfig = {
           return null;
         }
 
+        // P48-02: LOCKED now means *admin suspension* only. A user who
+        // scheduled their own deletion stays ACTIVE with a non-null
+        // `scheduledDeleteAt`, so they can sign back in and cancel — which is
+        // what the UI has always promised.
         if (user.lifecycleState === "LOCKED") {
           throw new AccountLockedSigninError();
         }
@@ -215,13 +219,16 @@ export const authConfig = {
           }
           token.emailVerified = cached.emailVerified;
           token.role = cached.role;
+          // P48-02: keep pendingDeletion in step with the DB, so cancelling the
+          // deletion lifts the read-only gate on the very next request.
+          token.pendingDeletion = cached.scheduledDeleteAt ? true : undefined;
           // lastActiveAt refresh is skipped on cache hits: the 45s TTL is far
           // inside the 5-minute staleness window, so a miss updates it soon.
         } else {
           const [dbUser, userSession] = await Promise.all([
             db.user.findUnique({
               where: { id: token.sub },
-              select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
+              select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true, scheduledDeleteAt: true },
             }),
             db.userSession.findUnique({
               where: { jti: token.sid as string },
@@ -241,6 +248,9 @@ export const authConfig = {
           // Keep emailVerified + role fresh
           token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
           token.role = dbUser.role;
+          // P48-02: same refresh as the cache-hit path — the flag follows
+          // `scheduledDeleteAt`, it is never sticky on the token.
+          token.pendingDeletion = dbUser.scheduledDeleteAt ? true : undefined;
 
           // Update lastActiveAt if stale by > 5 minutes (fire-and-forget)
           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -259,6 +269,7 @@ export const authConfig = {
               role: dbUser.role,
               emailVerified: dbUser.emailVerified?.toISOString() ?? null,
               revoked: false,
+              scheduledDeleteAt: dbUser.scheduledDeleteAt?.toISOString() ?? null,
             });
           }
         }
@@ -267,18 +278,19 @@ export const authConfig = {
         // Sessions created before P18-06 — validate sessionVersion only
         const dbUser = await db.user.findUnique({
           where: { id: token.sub },
-          select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
+          select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true, scheduledDeleteAt: true },
         });
         if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv) return {};
         token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
         token.role = dbUser.role;
+        token.pendingDeletion = dbUser.scheduledDeleteAt ? true : undefined;
       }
 
       if (trigger === "update" && session) {
         const [fresh, preferences] = await Promise.all([
           db.user.findUnique({
             where: { id: token.sub ?? "" },
-            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, lifecycleState: true },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, lifecycleState: true, scheduledDeleteAt: true },
           }),
           getPreferences(token.sub ?? ""),
         ]);
@@ -287,6 +299,7 @@ export const authConfig = {
         }
         token.sv = fresh?.sessionVersion ?? token.sv;
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;
+        token.pendingDeletion = fresh?.scheduledDeleteAt ? true : undefined;
         token.name = fresh?.name ?? token.name;
         token.avatarUrl = fresh?.avatarUrl ?? null;
         token.preferences = preferences;

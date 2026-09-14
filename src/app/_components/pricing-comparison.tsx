@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
-import { createBillingPortalSession, createCheckoutSession, getDowngradeSummary } from "~/app/actions/billing";
+import { createCheckoutSession, getDowngradeSummary } from "~/app/actions/billing";
+import { useBillingPortal } from "~/app/_components/use-billing-portal";
 import { CancelPlanModal, type CancelPlanDetails } from "~/app/settings/_components/cancel-plan-modal";
 
 type PlanCol = "FREE" | "PRO" | "FAMILY" | "TEAMS";
@@ -198,6 +199,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
   const [annual, setAnnual] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const portal = useBillingPortal();
   const [downgradeDetails, setDowngradeDetails] = useState<CancelPlanDetails | null>(null);
   const [downgradeOpen, setDowngradeOpen] = useState(false);
   const [teamSeats, setTeamSeats] = useState(3);
@@ -238,8 +240,9 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
   const handlePortal = (card: string) => {
     setLoadingPlan(card);
     startTransition(async () => {
-      const result = await createBillingPortalSession();
-      window.location.href = "url" in result ? result.url : "/settings";
+      // P48-02: "prompting" means the password modal is up — stay on the page
+      // and let it finish instead of bouncing to /settings.
+      if ((await portal.launch()) === "failed") window.location.href = "/settings";
       setLoadingPlan(null);
     });
   };
@@ -336,6 +339,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
 
   return (
     <>
+      {portal.modal}
       <section className="phead">
         <div className="container">
           <p className="section-kicker" style={{ textAlign: "center" }}>Pricing</p>

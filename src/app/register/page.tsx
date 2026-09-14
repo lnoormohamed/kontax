@@ -28,6 +28,10 @@ export default async function RegisterPage({
   const prefillParam = Array.isArray(rawPrefill) ? rawPrefill[0] : rawPrefill;
 
   if (session?.user) {
+    // P48-02: pending-deletion sessions belong on the cancel screen.
+    if (session.pendingDeletion) {
+      redirect("/account-pending-deletion");
+    }
     // Logged-in users visiting /register?prefill go straight to create contact with the data
     if (prefillParam) {
       redirect(`/contacts/new?prefill=${encodeURIComponent(prefillParam)}`);

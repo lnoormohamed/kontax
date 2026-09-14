@@ -16,7 +16,7 @@ export default function AccountDeletedPage() {
         </div>
         <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Account deletion scheduled</h1>
         <p className="mt-3 text-[14px] leading-[1.55] text-[#5c655e]">
-          Your account has been locked and will be permanently deleted in 30 days. You can sign back in during that period if you change your mind.
+          Your account will be permanently deleted in 30 days. You can sign back in at any time during that period to cancel — your password and two-factor code still work.
         </p>
         <Link
           className="mt-5 inline-flex h-10 items-center rounded-full border border-[#d8ddd6] px-5 text-[14px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"

@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { sendAccountDeletionScheduledEmail } from "~/server/billing-emails";
 import { auth } from "~/server/auth";
+import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
@@ -220,11 +221,18 @@ export async function cancelEmailChange(): Promise<{ success: true }> {
 
 export async function scheduleAccountDeletion(input: {
   confirmEmail: string;
+  /**
+   * P48-02: real, server-verified step-up. `confirmEmail` only proves the
+   * caller can read the session, which a hijacked cookie can do too.
+   */
+  currentPassword: string;
 }): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id || !session.user.email)
     return { error: "UNAUTHORIZED" };
   if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  // Already pending: nothing to schedule, and the grace period is read-only.
+  if (session.pendingDeletion) return { error: "ALREADY_PENDING_DELETION" };
 
   if (
     input.confirmEmail.trim().toLowerCase() !== session.user.email.toLowerCase()
@@ -234,8 +242,15 @@ export async function scheduleAccountDeletion(input: {
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { avatarUrl: true },
+    select: { avatarUrl: true, password: true },
   });
+  if (!user) return { error: "UNAUTHORIZED" };
+
+  // P48-02: step-up is enforced here, not in the modal. Rate-limited on the
+  // same bucket as the standalone step-up so it can't be used as a password
+  // oracle.
+  const stepUp = await verifyStepUpPassword(session.user.id, user.password, input.currentPassword);
+  if (stepUp !== "OK") return { error: stepUp };
 
   // Check for owned groups
   const ownedGroup = await db.group.findFirst({
@@ -272,16 +287,21 @@ export async function scheduleAccountDeletion(input: {
 
   const scheduledDeleteAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-  // Lock account + set deletion date + invalidate all sessions
+  // P48-02: the account stays ACTIVE — `scheduledDeleteAt` alone marks the
+  // user-initiated grace period. LOCKED is reserved for admin suspension, and
+  // `authorize` refuses LOCKED sign-ins, which is exactly what stopped users
+  // from ever reaching the "cancel deletion" screen the UI promised them.
+  // The sessionVersion bump still terminates every existing session; signing
+  // back in mints a `pendingDeletion` token that can read and cancel only.
   await db.user.update({
     where: { id: session.user.id },
     data: {
-      lifecycleState: "LOCKED",
+      lifecycleState: "ACTIVE",
       scheduledDeleteAt,
       sessionVersion: { increment: 1 },
     },
   });
-  // P38-09: the lock must beat the 45s validation cache
+  // P38-09: the sessionVersion bump must beat the 45s validation cache
   await invalidateSessionValidation(session.user.id);
 
   // Delete MinIO avatar (best effort)
@@ -338,14 +358,27 @@ export async function scheduleAccountDeletion(input: {
   return { success: true };
 }
 
+/**
+ * P48-02: the ONE write a pending-deletion session is allowed to make.
+ *
+ * It deliberately calls `auth()` directly rather than
+ * `requireSession({ write: true })` — that helper throws PENDING_DELETION,
+ * which is the whole point everywhere else. Reads stay allowed during the grace
+ * period so the user can export their data before it goes.
+ */
 export async function cancelAccountDeletion(): Promise<{ success: true }> {
   const session = await auth();
   if (!session?.user?.id) return { success: true };
+  if (session.impersonatedBy) return { success: true };
 
   await db.user.update({
     where: { id: session.user.id },
     data: { lifecycleState: "ACTIVE", scheduledDeleteAt: null },
   });
+  // The cached snapshot carries `scheduledDeleteAt`; drop it so the very next
+  // request rebuilds the token without `pendingDeletion` instead of waiting out
+  // the 45s TTL.
+  await invalidateSessionValidation(session.user.id);
 
   await db.activityEvent.create({
     data: {

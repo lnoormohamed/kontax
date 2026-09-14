@@ -8,17 +8,33 @@ import { verifyPasswordForStepUp } from "~/app/actions/account";
 // Reusable step-up auth modal (P31-02). Shows before any sensitive action when
 // the user has a password set. OAuth-only users bypass this automatically at
 // the server action level — this component should not be mounted for them.
+//
+// P48-02: the password is handed to `onConfirmed` so the sensitive action can
+// verify it ITSELF. Calling `verifyPasswordForStepUp` here and then invoking
+// the action with nothing attached was theatre: the boolean bound to nothing,
+// and anyone able to call the action could skip the modal entirely. Callers
+// whose action does its own check pass `serverVerifies` and surface the error
+// the action returns; the rest keep the legacy pre-check until their actions
+// are hardened too.
 export function ConfirmPasswordModal({
   title,
   description,
   confirmLabel = "Confirm",
+  serverVerifies = false,
   onConfirmed,
   onClose,
 }: {
   title: string;
   description: string;
   confirmLabel?: string;
-  onConfirmed: () => Promise<void>;
+  /**
+   * True when `onConfirmed` passes the password to an action that verifies it
+   * server-side. Skips the (now redundant) `verifyPasswordForStepUp` round
+   * trip; `onConfirmed` returns an error message to display, or nothing on
+   * success.
+   */
+  serverVerifies?: boolean;
+  onConfirmed: (password: string) => Promise<string | void>;
   onClose: () => void;
 }) {
   const [mounted, setMounted] = useState(false);
@@ -48,19 +64,26 @@ export function ConfirmPasswordModal({
     if (!password || isPending) return;
     setError(null);
     startTransition(async () => {
-      const result = await verifyPasswordForStepUp(password);
-      if (!result.ok) {
-        setError(
-          result.error === "RATE_LIMITED"
-            ? "Too many attempts. Please wait a moment and try again."
-            : "Incorrect password. Please try again.",
-        );
-        setPassword("");
-        inputRef.current?.focus();
-        return;
+      if (!serverVerifies) {
+        const result = await verifyPasswordForStepUp(password);
+        if (!result.ok) {
+          setError(
+            result.error === "RATE_LIMITED"
+              ? "Too many attempts. Please wait a moment and try again."
+              : "Incorrect password. Please try again.",
+          );
+          setPassword("");
+          inputRef.current?.focus();
+          return;
+        }
       }
       try {
-        await onConfirmed();
+        const failure = await onConfirmed(password);
+        if (typeof failure === "string" && failure.length > 0) {
+          setError(failure);
+          setPassword("");
+          inputRef.current?.focus();
+        }
       } catch {
         setError("Something went wrong. Please try again.");
       }

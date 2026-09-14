@@ -30,6 +30,11 @@ export default async function LoginPage({
     if (session.pendingTotp) {
       redirect(next ? `/login/verify-2fa?next=${encodeURIComponent(next)}` : "/login/verify-2fa");
     }
+    // P48-02: a signed-in user whose account is in its deletion grace period
+    // gets the cancel screen, not the app.
+    if (session.pendingDeletion) {
+      redirect("/account-pending-deletion");
+    }
     redirect(next ?? "/contacts");
   }
 

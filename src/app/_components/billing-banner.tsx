@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 
-import { createBillingPortalSession } from "~/app/actions/billing";
+import { useBillingPortal } from "~/app/_components/use-billing-portal";
 import type { BillingBannerVariant } from "~/server/billing-surface";
 
 /* §2 In-app grace / trial banner. Pinned below the top nav, not dismissable. */
@@ -15,14 +15,18 @@ const ArrowRight = ({ color }: { color: string }) => (
 
 function PortalLink({ label, solid }: { label: string; solid?: boolean }) {
   const [isPending, startTransition] = useTransition();
+  // P48-02: opening the portal needs a server-verified password; the hook shows
+  // the prompt when the action asks for one.
+  const portal = useBillingPortal();
   const handleClick = () => {
     startTransition(async () => {
-      const result = await createBillingPortalSession();
-      if ("url" in result) window.location.href = result.url;
+      await portal.launch();
     });
   };
   if (solid) {
     return (
+      <>
+      {portal.modal}
       <button
         className="inline-flex h-[34px] shrink-0 items-center gap-1.5 rounded-[9px] border-none bg-[#b5472f] px-3.5 text-[13px] font-semibold text-white transition hover:bg-[#9a3a23] disabled:opacity-70"
         disabled={isPending}
@@ -32,9 +36,12 @@ function PortalLink({ label, solid }: { label: string; solid?: boolean }) {
         {isPending ? "Opening…" : label}
         {!isPending ? <ArrowRight color="#fff" /> : null}
       </button>
+      </>
     );
   }
   return (
+    <>
+    {portal.modal}
     <button
       className="inline-flex shrink-0 items-center gap-1.5 border-none bg-transparent p-0 text-[13.5px] font-semibold text-[#4158f4] transition hover:underline disabled:opacity-70"
       disabled={isPending}
@@ -44,6 +51,7 @@ function PortalLink({ label, solid }: { label: string; solid?: boolean }) {
       {isPending ? "Opening…" : label}
       {!isPending ? <ArrowRight color="#4158f4" /> : null}
     </button>
+    </>
   );
 }
 
