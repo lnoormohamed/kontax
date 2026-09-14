@@ -4,6 +4,13 @@ import next from "next";
 import bcrypt from "bcryptjs";
 
 import { PrismaClient } from "./generated/prisma/index.js";
+import {
+  DAV_BODY_LIMITS,
+  extractRequestedPropNames,
+  hasDoctypeOrEntity,
+  hrefToSyncUid,
+  parseReportRequest,
+} from "./src/server/dav/parse.mjs";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME ?? "0.0.0.0";
@@ -16,6 +23,13 @@ const DAV_CAPABILITY_HEADER = "1, addressbook";
 const DAV_REALM = 'Basic realm="Kontax CardDAV"';
 const DUMMY_BCRYPT_HASH =
   "$2b$12$3Y0mFQ0M0l9n4Y3Q6p0g2uh2jQ7JmYI3d2eY0m4rA4Aq0vN5iVfL2";
+
+// P48-08: request-body caps, applied at every DAV call site.
+const MAX_QUERY_BODY_BYTES = DAV_BODY_LIMITS.query; // PROPFIND / REPORT — 64 KB
+const MAX_PUT_BODY_BYTES = DAV_BODY_LIMITS.put; // PUT — 1 MB
+// P48-08: what we are willing to persist into SyncConflict.remoteSnapshot.
+const MAX_CONFLICT_SNAPSHOT_BYTES = 64 * 1024;
+
 const WINDOW_MS = 15 * 60 * 1000;
 const IP_FAILURE_LIMIT = 20;
 const EMAIL_FAILURE_LIMIT = 10;
@@ -77,6 +91,12 @@ const tooManyRequests = (res) =>
   send(res, 429, "Too many requests", {
     "Content-Type": "text/plain; charset=utf-8",
     "Retry-After": "900",
+  });
+
+// P48-08: a malformed DAV request body gets a 400, not a 500.
+const badRequest = (res, message) =>
+  send(res, 400, message ?? "Bad request", {
+    "Content-Type": "text/plain; charset=utf-8",
   });
 
 const methodNotAllowed = (res, allow) =>
@@ -295,33 +315,105 @@ const renderProp = (prop) => {
 
 const renderNotFoundProp = (name) => `<d:${escapeXml(name)}/>`;
 
-const readRequestBody = async (req) => {
-  const chunks = [];
+// P48-08: a request body is read only through here, always with a byte cap.
+// Without one, a handful of parallel multi-megabyte PROPFINDs from a single
+// valid app password stalled the thread that also serves every Next.js page.
+class BodyTooLargeError extends Error {
+  constructor(maxBytes) {
+    super(`Request body exceeds ${maxBytes} bytes`);
+    this.name = "BodyTooLargeError";
+    this.maxBytes = maxBytes;
+  }
+}
 
+const readRequestBody = async (req, maxBytes) => {
+  if (!Number.isFinite(maxBytes) || maxBytes <= 0) {
+    throw new TypeError("readRequestBody requires a positive byte cap");
+  }
+
+  // Reject on the declared length before reading a single byte — this is what
+  // turns a 4 MB pathological PROPFIND into a sub-millisecond 413.
+  const declared = Number.parseInt(req.headers["content-length"] ?? "", 10);
+
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    throw new BodyTooLargeError(maxBytes);
+  }
+
+  const chunks = [];
+  let total = 0;
+
+  // Chunked / unset Content-Length: stop as soon as the running total goes over.
   for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    total += buffer.length;
+
+    if (total > maxBytes) {
+      throw new BodyTooLargeError(maxBytes);
+    }
+
+    chunks.push(buffer);
   }
 
   return Buffer.concat(chunks).toString("utf8");
 };
 
-const extractRequestedPropNames = (body) => {
-  if (!body.trim()) {
+// Answer 413 and tear the connection down rather than draining whatever the
+// client is still streaming at us. `destroySoon` flushes the response first.
+const payloadTooLarge = (res, maxBytes) => {
+  send(res, 413, `Request body exceeds ${maxBytes} bytes`, {
+    "Content-Type": "text/plain; charset=utf-8",
+    Connection: "close",
+  });
+
+  const socket = res.socket;
+
+  if (socket && !socket.destroyed) {
+    if (typeof socket.destroySoon === "function") socket.destroySoon();
+    else socket.end();
+  }
+
+  return true;
+};
+
+// Returns the body, or `null` when a 413 has already been written (the caller
+// must then return `true` to stop routing). Note: an empty body is `""`, so
+// callers compare against `null` explicitly.
+const readCappedBody = async (req, res, maxBytes) => {
+  try {
+    return await readRequestBody(req, maxBytes);
+  } catch (error) {
+    if (error instanceof BodyTooLargeError) {
+      payloadTooLarge(res, maxBytes);
+      return null;
+    }
+    throw error;
+  }
+};
+
+// PROPFIND / REPORT: capped read plus a DTD reject. Entities are never expanded
+// here, so classic XXE is not reachable — but a DOCTYPE has no legitimate place
+// in a DAV request, so treat it as malformed.
+const readDavQueryBody = async (req, res) => {
+  const body = await readCappedBody(req, res, MAX_QUERY_BODY_BYTES);
+
+  if (body === null) return null;
+
+  if (hasDoctypeOrEntity(body)) {
+    badRequest(res, "XML document type declarations are not accepted");
     return null;
   }
 
-  const propMatch = body.match(/<[^>]*:?prop\b[^>]*>([\s\S]*?)<\/[^>]*:?prop>/i);
-  const propBody = propMatch?.[1];
+  return body;
+};
 
-  if (!propBody) {
-    return null;
-  }
+// PROPFIND: capped read + DTD reject + linear prop-name extraction.
+// Returns `{ handled: true }` when a 4xx has already been written.
+const readRequestedPropNames = async (req, res) => {
+  const body = await readDavQueryBody(req, res);
 
-  const names = [...propBody.matchAll(/<\s*(?:[A-Za-z0-9_-]+:)?([A-Za-z0-9_-]+)\b[^>]*\/?>/g)]
-    .map((match) => match[1])
-    .filter(Boolean);
+  if (body === null) return { handled: true, names: null };
 
-  return names.length > 0 ? [...new Set(names)] : null;
+  return { handled: false, names: extractRequestedPropNames(body) };
 };
 
 const splitDavProps = (props, requestedNames) => {
@@ -343,6 +435,12 @@ const splitDavProps = (props, requestedNames) => {
 const buildPropfindResponse = (responses) => {
   const body = responses
     .map((response) => {
+      // P48-08: addressbook-multiget reports a bare status for hrefs the client
+      // asked for that no longer resolve (RFC 6352 §8.7).
+      if (response.status) {
+        return `<d:response><d:href>${escapeXml(response.href)}</d:href><d:status>${escapeXml(response.status)}</d:status></d:response>`;
+      }
+
       const okProps = response.props.map(renderProp).join("");
       const notFoundProps = response.notFoundProps?.map(renderNotFoundProp).join("") ?? "";
       const okPropstat = okProps
@@ -357,6 +455,56 @@ const buildPropfindResponse = (responses) => {
     .join("");
 
   return `<?xml version="1.0" encoding="utf-8"?><d:multistatus xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav" xmlns:cs="http://calendarserver.org/ns/">${body}</d:multistatus>`;
+};
+
+// P48-08: REPORT responses.
+//
+// `addressbook-multiget` now returns only the resources the client named instead
+// of the whole collection (P14 debt — iOS asks for a handful per cycle), with a
+// bare 404 status for hrefs that no longer resolve. `sync-collection` and
+// `addressbook-query` keep today's full-collection behaviour.
+//
+// Requested props are honoured where the client listed them, but an empty
+// intersection falls back to sending everything rather than an empty response —
+// a parse surprise must never silently blank a client's address book.
+const buildReportResponses = (contacts, report, hrefFor) => {
+  const propsFor = (contact) => {
+    const all = [
+      { name: "getetag", value: etagForContact(contact) },
+      { name: "address-data", value: serializeContactToVCard(contact) },
+    ];
+    const names = report?.propNames;
+
+    if (!names) return { props: all, notFoundProps: [] };
+
+    const filtered = all.filter((prop) => names.includes(prop.name));
+    return { props: filtered.length > 0 ? filtered : all, notFoundProps: [] };
+  };
+
+  if (report?.type !== "addressbook-multiget" || report.hrefs.length === 0) {
+    return contacts.map((contact) => ({ href: hrefFor(contact), ...propsFor(contact) }));
+  }
+
+  const byUid = new Map(contacts.map((contact) => [contact.syncUid, contact]));
+  const responses = [];
+  const seen = new Set();
+
+  for (const href of report.hrefs) {
+    if (seen.has(href)) continue;
+    seen.add(href);
+
+    const uid = hrefToSyncUid(href);
+    const contact = uid === null ? undefined : byUid.get(uid);
+
+    if (!contact) {
+      responses.push({ href, status: "HTTP/1.1 404 Not Found", props: [], notFoundProps: [] });
+      continue;
+    }
+
+    responses.push({ href: hrefFor(contact), ...propsFor(contact) });
+  }
+
+  return responses;
 };
 
 // P18-11: CTag is now per-book (was per-user)
@@ -922,6 +1070,27 @@ const emitTeamDavEvent = async (userId, contactId, eventType, label) => {
 // Default resolution is last-write-wins (server is authoritative); the record is
 // kept OPEN for the Phase 10 activity log / review UI. Never throws into the
 // request path — a failed log must not turn a 412 into a 500.
+// P48-08: PUT bodies are capped at 1 MB, but a stale If-Match persists the body
+// verbatim — cap what reaches the DB at 64 KB so a client that loops on a
+// conflict cannot grow SyncConflict without bound.
+const truncateConflictSnapshot = (vcard) => {
+  if (typeof vcard !== "string" || vcard.length === 0) return undefined;
+
+  const bytes = Buffer.byteLength(vcard, "utf8");
+
+  if (bytes <= MAX_CONFLICT_SNAPSHOT_BYTES) {
+    return { rawVCard: vcard };
+  }
+
+  return {
+    rawVCard: Buffer.from(vcard, "utf8")
+      .subarray(0, MAX_CONFLICT_SNAPSHOT_BYTES)
+      .toString("utf8"),
+    truncated: true,
+    originalBytes: bytes,
+  };
+};
+
 const logDeviceWriteConflict = async ({ contact, appPasswordId, clientEtag, incomingVCard, conflictType }) => {
   try {
     await prisma.syncConflict.create({
@@ -935,7 +1104,7 @@ const logDeviceWriteConflict = async ({ contact, appPasswordId, clientEtag, inco
         localSyncVersion: contact.syncVersion ?? null,
         remoteETag: clientEtag ?? null,
         localSnapshot: JSON.parse(JSON.stringify(contact)),
-        remoteSnapshot: incomingVCard ? { rawVCard: incomingVCard } : undefined,
+        remoteSnapshot: truncateConflictSnapshot(incomingVCard),
         detectedAt: new Date(),
       },
     });
@@ -1008,7 +1177,9 @@ const handlePrincipal = async (req, res, requestUrl) => {
     return send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
-  const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+  const propNamesResult = await readRequestedPropNames(req, res);
+  if (propNamesResult.handled) return true;
+  const requestedNames = propNamesResult.names;
   const props = [
     { name: "current-user-principal", href: `/dav/principals/${user.id}/` },
     { name: "addressbook-home-set", href: `/dav/addressbooks/${user.id}/` },
@@ -1068,7 +1239,9 @@ const handleAddressBooks = async (req, res, requestUrl) => {
     return send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
-  const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+  const propNamesResult = await readRequestedPropNames(req, res);
+  if (propNamesResult.handled) return true;
+  const requestedNames = propNamesResult.names;
   const homeHref = `/dav/addressbooks/${user.id}/`;
   const homeProps = [
     { name: "displayname", value: "Address Books" },
@@ -1180,7 +1353,9 @@ const handleFamilyCollection = async (req, res, requestUrl) => {
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const propNamesResult = await readRequestedPropNames(req, res);
+    if (propNamesResult.handled) return true;
+    const requestedNames = propNamesResult.names;
     const collectionProps = [
       { name: "displayname", value: `${familyBook.groupName} (Family)` },
       { name: "resourcetype", types: ["collection", "addressbook"] },
@@ -1206,17 +1381,14 @@ const handleFamilyCollection = async (req, res, requestUrl) => {
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  // REPORT (addressbook-query)
-  await readRequestBody(req);
+  // REPORT (addressbook-query / addressbook-multiget)
+  const reportBody = await readDavQueryBody(req, res);
+  if (reportBody === null) return true;
+  const report = parseReportRequest(reportBody);
   const contacts = await fetchFamilyContacts(familyBook.bookId);
-  const responses = contacts.map((contact) => ({
-    href: familyResourceHref(userId, contact.syncUid),
-    props: [
-      { name: "getetag", value: etagForContact(contact) },
-      { name: "address-data", value: serializeContactToVCard(contact) },
-    ],
-    notFoundProps: [],
-  }));
+  const responses = buildReportResponses(contacts, report, (contact) =>
+    familyResourceHref(userId, contact.syncUid),
+  );
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1267,7 +1439,8 @@ const handleFamilyResource = async (req, res, requestUrl) => {
   }
 
   if (req.method === "PUT") {
-    const body = await readRequestBody(req);
+    const body = await readCappedBody(req, res, MAX_PUT_BODY_BYTES);
+    if (body === null) return true;
     if (isGroupVCard(body)) {
       return unsupportedMediaType(res);
     }
@@ -1404,7 +1577,9 @@ const handleTeamCollection = async (req, res, requestUrl) => {
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const propNamesResult = await readRequestedPropNames(req, res);
+    if (propNamesResult.handled) return true;
+    const requestedNames = propNamesResult.names;
     const collectionProps = [
       { name: "displayname", value: label },
       { name: "resourcetype", types: ["collection", "addressbook"] },
@@ -1426,16 +1601,14 @@ const handleTeamCollection = async (req, res, requestUrl) => {
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  await readRequestBody(req);
+  // REPORT (addressbook-query / addressbook-multiget)
+  const reportBody = await readDavQueryBody(req, res);
+  if (reportBody === null) return true;
+  const report = parseReportRequest(reportBody);
   const contacts = await fetchTeamBookContacts(bookId);
-  const responses = contacts.map((contact) => ({
-    href: teamResourceHref(userId, bookId, contact.syncUid),
-    props: [
-      { name: "getetag", value: etagForContact(contact) },
-      { name: "address-data", value: serializeContactToVCard(contact) },
-    ],
-    notFoundProps: [],
-  }));
+  const responses = buildReportResponses(contacts, report, (contact) =>
+    teamResourceHref(userId, bookId, contact.syncUid),
+  );
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1483,7 +1656,8 @@ const handleTeamResource = async (req, res, requestUrl) => {
   }
 
   if (req.method === "PUT") {
-    const body = await readRequestBody(req);
+    const body = await readCappedBody(req, res, MAX_PUT_BODY_BYTES);
+    if (body === null) return true;
     if (isGroupVCard(body)) {
       return unsupportedMediaType(res);
     }
@@ -1604,7 +1778,9 @@ const handleAddressBookCollection = async (req, res, requestUrl) => {
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const propNamesResult = await readRequestedPropNames(req, res);
+    if (propNamesResult.handled) return true;
+    const requestedNames = propNamesResult.names;
     const collectionProps = [
       { name: "displayname", value: book.name },
       { name: "resourcetype", types: ["collection", "addressbook"] },
@@ -1627,17 +1803,14 @@ const handleAddressBookCollection = async (req, res, requestUrl) => {
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  // REPORT
-  await readRequestBody(req);
+  // REPORT (addressbook-query / addressbook-multiget / sync-collection)
+  const reportBody = await readDavQueryBody(req, res);
+  if (reportBody === null) return true;
+  const report = parseReportRequest(reportBody);
   const contacts = await fetchActiveContacts(userId, book);
-  const responses = contacts.map((contact) => ({
-    href: contactResourceHref(userId, contact.syncUid, bookSlug),
-    props: [
-      { name: "getetag", value: etagForContact(contact) },
-      { name: "address-data", value: serializeContactToVCard(contact) },
-    ],
-    notFoundProps: [],
-  }));
+  const responses = buildReportResponses(contacts, report, (contact) =>
+    contactResourceHref(userId, contact.syncUid, bookSlug),
+  );
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1694,7 +1867,8 @@ const handleContactResource = async (req, res, requestUrl) => {
   }
 
   if (req.method === "PUT") {
-    const body = await readRequestBody(req);
+    const body = await readCappedBody(req, res, MAX_PUT_BODY_BYTES);
+    if (body === null) return true;
 
     if (isGroupVCard(body)) {
       return unsupportedMediaType(res);
@@ -1851,7 +2025,7 @@ const handleDavRequest = async (req, res) => {
 
 await app.prepare();
 
-createServer(async (req, res) => {
+const server = createServer(async (req, res) => {
   try {
     if (await handleDavRequest(req, res)) {
       return;
@@ -1868,7 +2042,23 @@ createServer(async (req, res) => {
       res.end();
     }
   }
-}).listen(port, hostname, () => {
+});
+
+// P48-08: explicit timeouts. Node's defaults let a slow or stalled client hold a
+// request open indefinitely, which on a single-threaded server that also serves
+// every Next.js page is a denial-of-service primitive.
+//
+// requestTimeout  — whole request (headers + body) must arrive within 30 s.
+// headersTimeout  — headers alone within 15 s (slowloris).
+// keepAliveTimeout — 65 s, comfortably above the 60 s idle timeout of the
+//                    Cloudflare → NPM → Traefik chain in front of us, so the
+//                    proxy always closes an idle connection before we do and
+//                    clients never see a race-condition 502.
+server.requestTimeout = 30_000;
+server.headersTimeout = 15_000;
+server.keepAliveTimeout = 65_000;
+
+server.listen(port, hostname, () => {
   console.log(`Kontax server ready on http://${hostname}:${port}`);
 });
 
