@@ -2134,13 +2134,16 @@ export const disconnectSyncAccount = async (formData: FormData) => {
     where: currentSyncAccountWhere(userId, syncAccountId),
     select: { id: true, provider: true, credentialReference: true, connectionId: true, label: true },
   });
+  // P48-05: never continue with a caller-supplied id the user does not own —
+  // the job cleanup below must not touch another tenant's queue.
+  if (!account) throw new Error("Sync account not found.");
   // Dynamic import keeps the googleapis/MSAL dependency graph server-only — a
   // static import would drag it into this "use server" file's client reference
   // graph (it's imported by the sync page client) and break the action module.
-  if (account?.provider === "GOOGLE") {
+  if (account.provider === "GOOGLE") {
     const { revokeGoogleToken } = await import("~/server/google-sync");
     await revokeGoogleToken(account);
-  } else if (account?.provider === "MICROSOFT") {
+  } else if (account.provider === "MICROSOFT") {
     const { revokeMicrosoftToken } = await import("~/server/microsoft-sync");
     await revokeMicrosoftToken(account);
   }
@@ -2152,7 +2155,7 @@ export const disconnectSyncAccount = async (formData: FormData) => {
   const now = new Date();
   await db.$transaction(async (tx) => {
     await tx.syncJob.deleteMany({
-      where: { syncAccountId, status: { in: ["QUEUED", "RUNNING"] } },
+      where: { syncAccountId, syncAccount: { userId }, status: { in: ["QUEUED", "RUNNING"] } },
     });
 
     const updated = await tx.syncAccount.updateMany({
@@ -2167,7 +2170,7 @@ export const disconnectSyncAccount = async (formData: FormData) => {
       },
     });
 
-    if (updated.count > 0 && account?.connectionId) {
+    if (updated.count > 0 && account.connectionId) {
       await emitSyncConnectionLifecycleEvent(tx, {
         userId,
         eventType: "SYNC_CONNECTION_DISCONNECTED",

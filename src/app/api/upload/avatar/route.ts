@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
 import { isKontaxHosted } from "~/lib/avatar-src";
 import {
@@ -57,9 +58,20 @@ export async function POST(req: NextRequest) {
 
   // Replace — drop the superseded object best-effort (Kontax-hosted only; never
   // a pasted external URL). Never blocks the response.
+  //
+  // P48-05: `prevUrl` is caller-supplied and avatar URLs are public, so only
+  // delete an object that is currently the caller's own profile photo or the
+  // photo of a contact the caller owns. Anything else is silently ignored.
   const prevUrl = formData?.get("prevUrl");
   if (typeof prevUrl === "string" && prevUrl && prevUrl !== url && isKontaxHosted(prevUrl)) {
-    void deleteContactPhoto(prevUrl);
+    const userId = session.user.id;
+    const [me, ownedContact] = await Promise.all([
+      db.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } }),
+      db.contact.findFirst({ where: { userId, avatarUrl: prevUrl }, select: { id: true } }),
+    ]);
+    if (me?.avatarUrl === prevUrl || ownedContact) {
+      void deleteContactPhoto(prevUrl);
+    }
   }
 
   return NextResponse.json({ url, thumbUrl: getAvatarThumbUrl(url) });

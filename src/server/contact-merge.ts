@@ -1911,6 +1911,9 @@ export const getOpenMergeSuggestionsForUser = async (
       confidence: {
         in: ["HIGH", "MEDIUM"],
       },
+      // P48-05: never surface a suggestion whose contacts the user does not own.
+      leftContact: { userId },
+      rightContact: { userId },
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }],
     take,
@@ -2031,6 +2034,9 @@ export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId
       id: suggestionId,
       userId,
       status: "OPEN",
+      // P48-05: never surface a suggestion whose contacts the user does not own.
+      leftContact: { userId },
+      rightContact: { userId },
     },
     select: {
       id: true,
