@@ -1555,10 +1555,14 @@ export const runQueuedSyncJobs = async ({
       ): Promise<string | null> => {
         if (!PHOTO_SYNC_ENABLED || !photo) return null;
         if (photo.kind === "inline") return photo.base64.replace(/\s+/g, "");
-        const bytes = await fetchCardDavPhotoBytes(photo.uri, {
-          username: decryptedCredentials.username,
-          password: decryptedCredentials.password,
-        });
+        const bytes = await fetchCardDavPhotoBytes(
+          photo.uri,
+          {
+            username: decryptedCredentials.username,
+            password: decryptedCredentials.password,
+          },
+          job.syncAccount.addressBookUrl ?? undefined,
+        );
         return bytes ? bytes.toString("base64") : null;
       };
 
@@ -2158,7 +2162,7 @@ export const runQueuedSyncJobs = async ({
             } else {
               remote = { hasPhoto: true, signal: photo.uri };
               signalKind = "resourceIdentifier";
-              loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds);
+              loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds, abUrl);
             }
 
             const pushCardWithPhoto = async (photoBase64: string | null): Promise<string | null> => {

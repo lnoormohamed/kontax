@@ -24,6 +24,7 @@ import {
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { canEditTeamBook } from "~/server/team-access";
 import { isKontaxHosted } from "~/lib/avatar-src";
+import { validateImageUrl } from "~/server/safe-image-fetch";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { buildNormalizedPhoneEntries } from "~/lib/phone-normalization";
@@ -609,6 +610,10 @@ export const createContact = async (formData: FormData) => {
   // Kontax-hosted object on save (best-effort — on failure we keep the URL and
   // it renders through the proxy). Key under the contact's nominal owner.
   if (contactFields.avatarUrl && !isKontaxHosted(contactFields.avatarUrl)) {
+    // P48-04: never persist a URL the SSRF guard would refuse — it would sit in
+    // the DB until the photo pass tried to fetch it.
+    const check = validateImageUrl(contactFields.avatarUrl);
+    if (!check.ok) throw new Error("That photo link is not allowed. Use a public https:// image address.");
     const internal = await internalizeExternalAvatar(bookTarget?.ownerId ?? userId, contactFields.avatarUrl);
     if (internal) contactFields.avatarUrl = internal;
   }
@@ -683,6 +688,9 @@ export const updateContact = async (formData: FormData) => {
 
   // P46-03: internalize a newly-pasted external avatar URL before the write.
   if (input.avatarUrl && !isKontaxHosted(input.avatarUrl)) {
+    // P48-04: refuse URLs the SSRF guard would block instead of storing them.
+    const check = validateImageUrl(input.avatarUrl);
+    if (!check.ok) throw new Error("That photo link is not allowed. Use a public https:// image address.");
     const internal = await internalizeExternalAvatar(userId, input.avatarUrl);
     if (internal) input.avatarUrl = internal;
   }

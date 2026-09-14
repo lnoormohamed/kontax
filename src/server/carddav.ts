@@ -1,4 +1,5 @@
 import type { PortableContactInput } from "~/server/contact-portability";
+import { safeFetch, SafeFetchError, type SafeFetchResponse } from "~/server/safe-fetch";
 import { contactsToVCard } from "~/server/contact-portability";
 import {
   type SyncProviderCapabilityProfile,
@@ -115,6 +116,34 @@ export class CardDavPreflightError extends Error {
 
 const USER_AGENT = "Kontax/0.1 CardDAV preflight";
 
+const basicAuthHeader = (credentials: CardDavCredentials) =>
+  `Basic ${Buffer.from(`${credentials.username}:${credentials.password}`, "utf8").toString("base64")}`;
+
+/**
+ * P48-04: every outbound CardDAV request goes through the SSRF-hardened
+ * `safeFetch` (public https only in production, DNS-pinned, private ranges
+ * rejected, redirects re-validated per hop, size/time capped). Transport
+ * failures are mapped to generic codes — the raw Node error text embeds the
+ * resolved host:port and must never reach the UI or `lastErrorMessage`.
+ */
+const toPreflightError = (error: unknown, phase: "" | "PUSH_" | "DELETE_"): CardDavPreflightError => {
+  if (error instanceof SafeFetchError) {
+    if (error.kind === "blocked") {
+      return new CardDavPreflightError(
+        `CARDDAV_${phase}URL_BLOCKED`,
+        "That server address is not allowed. Kontax only connects to public https:// CardDAV servers.",
+      );
+    }
+    if (error.kind === "timeout") {
+      return new CardDavPreflightError(`CARDDAV_${phase}NETWORK_ERROR`, "The CardDAV server did not respond in time.");
+    }
+    if (error.kind === "too_large") {
+      return new CardDavPreflightError(`CARDDAV_${phase}HTTP_ERROR`, "The CardDAV server returned a response that was too large.");
+    }
+  }
+  return new CardDavPreflightError(`CARDDAV_${phase}NETWORK_ERROR`, "Kontax could not reach the CardDAV server.");
+};
+
 const decodeXmlEntities = (value: string) =>
   value
     .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
@@ -213,35 +242,28 @@ const davRequest = async ({
   depth: 0 | 1;
   body: string;
 }) => {
-  let response: Response;
+  let response: SafeFetchResponse;
 
   try {
-    response = await fetch(url, {
+    response = await safeFetch(url, {
       method,
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${credentials.username}:${credentials.password}`,
-          "utf8",
-        ).toString("base64")}`,
+        Authorization: basicAuthHeader(credentials),
         Depth: String(depth),
         "Content-Type": "application/xml; charset=utf-8",
         "User-Agent": USER_AGENT,
       },
       body,
-      cache: "no-store",
+      maxBytes: 10 * 1024 * 1024,
+      timeoutMs: 20_000,
     });
   } catch (error) {
-    throw new CardDavPreflightError(
-      "CARDDAV_NETWORK_ERROR",
-      error instanceof Error
-        ? `CardDAV preflight could not reach the remote server: ${error.message}`
-        : "CardDAV preflight could not reach the remote server.",
-    );
+    throw toPreflightError(error, "");
   }
 
   // Force UTF-8: some servers return text/xml without an explicit charset, which
-  // would otherwise cause response.text() to default to Latin-1 per RFC 2616.
-  const xml = new TextDecoder("utf-8").decode(await response.arrayBuffer());
+  // would otherwise be decoded as Latin-1 per RFC 2616.
+  const xml = new TextDecoder("utf-8").decode(response.body);
 
   if (response.status === 401 || response.status === 403) {
     throw new CardDavPreflightError(
@@ -855,20 +877,34 @@ export const fetchCardDavAddressBookCards = async ({
 export const fetchCardDavPhotoBytes = async (
   uri: string,
   credentials: CardDavCredentials,
+  /**
+   * P48-04: the address-book URL this card came from. The connection's Basic
+   * credentials are attached ONLY when the photo lives on the same origin —
+   * a remote card can name any host in PHOTO;VALUE=URI, and we must not hand
+   * that host the user's password.
+   */
+  addressBookUrl?: string,
 ): Promise<Buffer | null> => {
   try {
-    const response = await fetch(uri, {
+    let sameOrigin = false;
+    if (addressBookUrl) {
+      try {
+        sameOrigin = new URL(uri).origin === new URL(addressBookUrl).origin;
+      } catch {
+        sameOrigin = false;
+      }
+    }
+    const response = await safeFetch(uri, {
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${credentials.username}:${credentials.password}`,
-          "utf8",
-        ).toString("base64")}`,
+        ...(sameOrigin ? { Authorization: basicAuthHeader(credentials) } : {}),
+        Accept: "image/*",
         "User-Agent": USER_AGENT,
       },
-      cache: "no-store",
+      maxBytes: 5 * 1024 * 1024,
+      timeoutMs: 10_000,
     });
     if (!response.ok) return null;
-    return Buffer.from(await response.arrayBuffer());
+    return response.body;
   } catch {
     return null;
   }
@@ -945,33 +981,27 @@ export const pushCardDavContact = async ({
     photoBase64,
   );
 
-  let response: Response;
+  let response: SafeFetchResponse;
   // Explicitly convert to UTF-8 Buffer so the underlying HTTP stack cannot
   // re-interpret the string in any other encoding (e.g. Latin-1 fallback).
   const bodyBytes = Buffer.from(body, "utf-8");
 
   try {
-    response = await fetch(href, {
+    response = await safeFetch(href, {
       method: "PUT",
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${credentials.username}:${credentials.password}`,
-          "utf8",
-        ).toString("base64")}`,
+        Authorization: basicAuthHeader(credentials),
         "Content-Type": "text/vcard; charset=utf-8",
         "Content-Length": String(bodyBytes.byteLength),
         "User-Agent": USER_AGENT,
       },
       body: bodyBytes,
-      cache: "no-store",
+      // A PUT must land where we aimed it; a redirect is treated as a failure.
+      followRedirects: false,
+      timeoutMs: 20_000,
     });
   } catch (error) {
-    throw new CardDavPreflightError(
-      "CARDDAV_PUSH_NETWORK_ERROR",
-      error instanceof Error
-        ? `CardDAV push could not reach the remote server: ${error.message}`
-        : "CardDAV push could not reach the remote server.",
-    );
+    throw toPreflightError(error, "PUSH_");
   }
 
   if (response.status === 401 || response.status === 403) {
@@ -988,9 +1018,10 @@ export const pushCardDavContact = async ({
     );
   }
 
+  const etagHeader = response.headers.etag;
   return {
     href,
-    etag: response.headers.get("etag"),
+    etag: Array.isArray(etagHeader) ? (etagHeader[0] ?? null) : (etagHeader ?? null),
   };
 };
 
@@ -1001,27 +1032,20 @@ export const deleteCardDavContact = async ({
   href: string;
   credentials: CardDavCredentials;
 }): Promise<void> => {
-  let response: Response;
+  let response: SafeFetchResponse;
 
   try {
-    response = await fetch(href, {
+    response = await safeFetch(href, {
       method: "DELETE",
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${credentials.username}:${credentials.password}`,
-          "utf8",
-        ).toString("base64")}`,
+        Authorization: basicAuthHeader(credentials),
         "User-Agent": USER_AGENT,
       },
-      cache: "no-store",
+      followRedirects: false,
+      timeoutMs: 20_000,
     });
   } catch (error) {
-    throw new CardDavPreflightError(
-      "CARDDAV_DELETE_NETWORK_ERROR",
-      error instanceof Error
-        ? `CardDAV delete could not reach the remote server: ${error.message}`
-        : "CardDAV delete could not reach the remote server.",
-    );
+    throw toPreflightError(error, "DELETE_");
   }
 
   // 404 means it's already gone — treat as success.

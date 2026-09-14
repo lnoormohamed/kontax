@@ -41,6 +41,7 @@ import {
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
 import { resolveSyncProviderIdentity } from "~/server/sync-provider-identity";
+import { validateOutboundUrl } from "~/server/safe-fetch";
 
 const syncDirectionSchema = z.enum(["TWO_WAY", "IMPORT_ONLY", "EXPORT_ONLY"]);
 const conflictPolicySchema = z.enum(["SERVER_WINS", "DEVICE_WINS", "MANUAL"]);
@@ -53,11 +54,23 @@ const syncResolutionStrategySchema = z.enum([
 ]);
 const cardDavCapabilityOverrideSchema = z.enum(CARD_DAV_CAPABILITY_OVERRIDE_IDS);
 
+// P48-04: CardDAV URLs are user-supplied and fetched server-side, so they must
+// pass the outbound policy (public https:// host, no private ranges) before we
+// even try to connect. The transport re-validates every request and redirect.
+const OUTBOUND_URL_MESSAGE = "Enter a public https:// CardDAV address (private or local hosts are not allowed).";
+const outboundUrl = (message: string) =>
+  z
+    .string()
+    .trim()
+    .url(message)
+    .max(500)
+    .refine((value) => validateOutboundUrl(value).ok, OUTBOUND_URL_MESSAGE);
+
 const createSyncAccountSchema = z.object({
   label: z.string().trim().min(1, "Label is required.").max(120),
-  baseUrl: z.string().trim().url("Enter a valid CardDAV base URL.").max(500),
-  principalUrl: z.string().trim().url("Enter a valid principal URL.").max(500).optional(),
-  addressBookUrl: z.string().trim().url("Enter a valid address book URL.").max(500).optional(),
+  baseUrl: outboundUrl("Enter a valid CardDAV base URL."),
+  principalUrl: outboundUrl("Enter a valid principal URL.").optional(),
+  addressBookUrl: outboundUrl("Enter a valid address book URL.").optional(),
   syncDirection: syncDirectionSchema,
   username: z.string().trim().min(1, "Username is required.").max(320),
   password: z.string().min(6, "Password or app password is required.").max(500),

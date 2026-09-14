@@ -193,9 +193,10 @@ export async function loadAvatarBytes(avatarUrl: string): Promise<Buffer | null>
       const res = await s3.send(new GetObjectCommand({ Bucket: bucket(), Key: key }));
       return await streamToBuffer(res.Body);
     }
-    const res = await fetch(avatarUrl);
-    if (!res.ok) return null;
-    return Buffer.from(await res.arrayBuffer());
+    // P48-04: an external avatarUrl is remote-influenced (pasted, synced, or
+    // imported) — go through the SSRF guard, never a raw fetch.
+    const { body } = await fetchExternalImage(avatarUrl);
+    return body;
   } catch (error) {
     console.warn("[Kontax] failed to load avatar bytes", error);
     return null;
