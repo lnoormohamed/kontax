@@ -1,4 +1,5 @@
 import type { Prisma } from "../../generated/prisma";
+import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 
 type Tx = Prisma.TransactionClient;
@@ -75,6 +76,26 @@ export async function snapshotFamilyBookForUser(
   });
   if (shared.length === 0) return null;
 
+  // P48-07: never carry the departing member's policy-private fields (notes,
+  // personal phone, home address, birthday, labels, custom fields) into their
+  // kept personal copy — same projection as addContactToFamilyBook's COPY_SELECT,
+  // resolved for this member/book so a defense-in-depth re-filter is always
+  // applied, even though the shared row should already be filtered at add-time.
+  const groupAddressBook = await tx.groupAddressBook.findUnique({
+    where: { id: args.bookId },
+    select: { groupId: true, minimumSharingPolicy: true },
+  });
+  const groupMember = groupAddressBook
+    ? await tx.groupMember.findFirst({
+        where: { groupId: groupAddressBook.groupId, userId: args.targetUserId },
+        select: { sharingPolicy: true },
+      })
+    : null;
+  const policy = resolveEffectiveSharingPolicy(
+    groupMember?.sharingPolicy ?? null,
+    groupAddressBook?.minimumSharingPolicy ?? null,
+  );
+
   const slug = await uniqueBookSlug(tx, args.targetUserId, args.groupName);
   const personalBook = await tx.addressBook.create({
     data: {
@@ -87,7 +108,8 @@ export async function snapshotFamilyBookForUser(
     select: { id: true },
   });
 
-  for (const { contact } of shared) {
+  for (const raw of shared) {
+    const contact = projectContactForSharing(raw.contact, policy, "family");
     const copy = await tx.contact.create({
       data: {
         userId: args.targetUserId,

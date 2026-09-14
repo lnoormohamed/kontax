@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
+import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { auth } from "~/server/auth";
 import {
   assertCanLiveShare,
@@ -67,7 +68,11 @@ const str = (formData: FormData, key: string) => {
 };
 
 // Fields copied into the static-share snapshot and used to recreate the
-// recipient's independent copy on acceptance.
+// recipient's independent copy on acceptance. `notes` is deliberately absent
+// (P48-07): live shares already exclude it (LIVE_FIELD_SELECT,
+// contact-shares.ts), and both static and live-share snapshots project
+// through projectContactForSharing before persisting, which drops it
+// unconditionally regardless of this select.
 const SNAPSHOT_SELECT = {
   fullName: true,
   firstName: true,
@@ -97,8 +102,15 @@ const SNAPSHOT_SELECT = {
   significantDates: true,
   relatedPeople: true,
   customFields: true,
-  notes: true,
 } as const;
+
+// P48-07: a static/live Kontax-to-Kontax share is a deliberate one-to-one
+// grant, not a book membership — there's no GroupMember/GroupAddressBook
+// policy to resolve, so projectContactForSharing's "static-share"/"live-share"
+// branch is used, which ignores this policy value entirely and only ever
+// drops `notes`. Kept as a named constant so the intent is explicit at the
+// call site rather than a bare `resolveEffectiveSharingPolicy(null, null)`.
+const PERSONAL_SHARE_POLICY = resolveEffectiveSharingPolicy(null, null);
 
 // ── P12-02: vCard share link (all plans) ─────────────────────────────────────
 
@@ -264,6 +276,9 @@ export const createStaticShare = async (formData: FormData) => {
       ? trimmedOwnerName
       : (owner?.email ?? "A Kontax user");
 
+  // P48-07: notes never travel into a share snapshot.
+  const projected = projectContactForSharing(contact, PERSONAL_SHARE_POLICY, "static-share");
+
   const share = await db.contactShare.create({
     data: {
       ownerUserId: userId,
@@ -274,7 +289,7 @@ export const createStaticShare = async (formData: FormData) => {
       recipientEmail,
       // Snapshot the contact at share time so it's deliverable even if the owner
       // later edits/archives/deletes the original (P12-03 risk note).
-      snapshot: { ...contact, ownerName },
+      snapshot: { ...projected, ownerName },
     },
     select: { id: true, expiresAt: true },
   });
@@ -489,6 +504,10 @@ export const createLiveShare = async (formData: FormData) => {
       ? trimmedOwnerName
       : (owner?.email ?? "A Kontax user");
 
+  // P48-07: notes never travel into the initial live-share snapshot — matches
+  // LIVE_FIELD_SELECT (contact-shares.ts), which every subsequent propagation uses.
+  const projected = projectContactForSharing(snapshotFields, PERSONAL_SHARE_POLICY, "live-share");
+
   const share = await db.contactShare.create({
     data: {
       ownerUserId: userId,
@@ -497,7 +516,7 @@ export const createLiveShare = async (formData: FormData) => {
       status: "ACTIVE",
       recipientUserId: recipient?.id ?? null,
       recipientEmail,
-      snapshot: { ...snapshotFields, ownerName },
+      snapshot: { ...projected, ownerName },
     },
     select: { id: true, expiresAt: true },
   });
@@ -505,7 +524,7 @@ export const createLiveShare = async (formData: FormData) => {
   await sendShareInviteEmail({
     recipientEmail,
     ownerName,
-    contactName: snapshotFields.fullName ?? "a contact",
+    contactName: projected.fullName ?? "a contact",
     recipientExists: Boolean(recipient?.id),
     live: true,
   });
