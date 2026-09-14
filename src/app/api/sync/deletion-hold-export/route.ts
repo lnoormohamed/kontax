@@ -6,10 +6,8 @@ import { NextResponse } from "next/server";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { escapeCsvCell } from "~/server/contact-portability";
 import type { DeletionHoldPayload } from "~/server/sync-deletion-guard";
-
-const csvEscape = (value: string) =>
-  /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -53,9 +51,9 @@ export async function GET(request: Request) {
 
   const rows = links.map((link) =>
     [
-      csvEscape(link.contact?.fullName ?? "Unknown contact"),
-      csvEscape(link.contact?.email ?? ""),
-      csvEscape(link.contact?.book?.name ?? "Personal"),
+      escapeCsvCell(link.contact?.fullName ?? "Unknown contact"),
+      escapeCsvCell(link.contact?.email ?? ""),
+      escapeCsvCell(link.contact?.book?.name ?? "Personal"),
       outbound.has(link.id) ? "outbound (remote copy removed)" : "inbound (Kontax copy removed)",
       link.tombstonedAt ? "reconciled" : "pending",
     ].join(","),

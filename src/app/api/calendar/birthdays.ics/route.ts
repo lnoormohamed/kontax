@@ -41,7 +41,10 @@ export async function GET(req: NextRequest) {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
       "Content-Disposition": 'attachment; filename="kontax-birthdays.ics"',
-      "Cache-Control": "max-age=3600, must-revalidate",
+      // P48-11 item 5: this feed is keyed by a revocable calToken, not a
+      // session — a shared/CDN cache keying only on the URL would leak one
+      // user's contact dates to whoever else requests the same cache slot.
+      "Cache-Control": "private, max-age=3600",
     },
   });
 }
