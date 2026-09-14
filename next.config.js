@@ -67,6 +67,14 @@ const config = {
   // Allow parallel dev + prod-verification servers in the same checkout
   // (each Claude/terminal session sets its own NEXT_DIST_DIR).
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
+  // P48-12: the app has zero `next/image` imports, so the Image Optimization
+  // API is pure attack surface (GHSA-2xp9-vwfh-vxw4 — unauthenticated RCE via
+  // AVIF). `unoptimized` short-circuits /_next/image.
+  images: {
+    unoptimized: true,
+  },
+  // P48-12: don't advertise the framework on every response.
+  poweredByHeader: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
