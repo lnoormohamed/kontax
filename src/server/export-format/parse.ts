@@ -50,6 +50,56 @@ const tryParseJson = (text: string): unknown => {
 const isZip = (buffer: Buffer) =>
   buffer.length > 3 && buffer[0] === 0x50 && buffer[1] === 0x4b;
 
+// ── zip bounds (P48-11 item 2) ───────────────────────────────────────────────
+// adm-zip's `entry.getData()` inflates the *declared* uncompressed size with
+// no cap of its own (advisory GHSA-xcpc-8h2w-3j85) — a zip that is small on
+// disk but declares a multi-GB entry OOMs the process the moment anything
+// reads it. `entry.header.size` is the uncompressed length recorded in the
+// central directory, readable with zero inflation, so every bound below is
+// checked before any `getData()` call touches the archive.
+const MAX_ZIP_ENTRY_BYTES = 20 * 1024 * 1024; // 20 MB per entry, uncompressed
+const MAX_ZIP_TOTAL_BYTES = 200 * 1024 * 1024; // 200 MB total, uncompressed
+const MAX_ZIP_ENTRY_COUNT = 50_000;
+
+export class ZipBoundsError extends Error {}
+
+function assertZipWithinBounds(zip: AdmZip): void {
+  const entries = zip.getEntries();
+  if (entries.length > MAX_ZIP_ENTRY_COUNT) {
+    throw new ZipBoundsError(
+      `This archive has too many files (max ${MAX_ZIP_ENTRY_COUNT.toLocaleString()}).`,
+    );
+  }
+  let total = 0;
+  for (const entry of entries) {
+    const size = entry.header.size;
+    if (size > MAX_ZIP_ENTRY_BYTES) {
+      throw new ZipBoundsError(
+        `This archive contains a file that is too large when decompressed (max ${MAX_ZIP_ENTRY_BYTES / (1024 * 1024)} MB per file).`,
+      );
+    }
+    total += size;
+    if (total > MAX_ZIP_TOTAL_BYTES) {
+      throw new ZipBoundsError(
+        `This archive is too large when decompressed (max ${MAX_ZIP_TOTAL_BYTES / (1024 * 1024)} MB total).`,
+      );
+    }
+  }
+}
+
+// ── archive photo media types (P48-11 item 1) ────────────────────────────────
+// A bare-document `data:<mediaType>;base64,…` photo URI carries an
+// attacker-chosen mediaType straight through to the public media host. Only
+// the raster types adm-zip archives also use (parseKontaxArchive's
+// extension→mediaType map below) are ever accepted here; everything else
+// (text/html, image/svg+xml, …) is treated as "no photo" rather than stored.
+const ALLOWED_PHOTO_MEDIA_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
 const recognizeDocumentValue = (value: unknown): KontaxRecognition => {
   if (!isRecord(value)) return { kind: "unrecognized" };
   const formatVersion = value[FORMAT_VERSION_KEY];
@@ -77,6 +127,10 @@ export function recognizeKontaxFile(buffer: Buffer): KontaxRecognition {
     let zip: AdmZip;
     try {
       zip = new AdmZip(buffer);
+      // Bounds are checked before the manifest (or anything else) is read —
+      // a hostile manifest.json entry is just as capable of declaring a
+      // multi-GB uncompressed size as a photo entry.
+      assertZipWithinBounds(zip);
     } catch {
       return { kind: "unrecognized" };
     }
@@ -214,8 +268,14 @@ const dateLabelForKind = (kind: unknown, vendorLabel: string | null): string => 
 const parseDataUrl = (uri: string): { bytes: Buffer; mediaType: string } | null => {
   const match = /^data:([^;,]+);base64,(.+)$/s.exec(uri);
   if (!match) return null;
+  const mediaType = match[1]!.toLowerCase();
+  // Reject non-raster (or unrecognized) media types here rather than trusting
+  // the attacker-chosen label all the way to storage; import.ts additionally
+  // re-encodes every accepted photo, but this keeps obviously-wrong types
+  // (text/html, image/svg+xml, application/*, …) from ever being decoded.
+  if (!ALLOWED_PHOTO_MEDIA_TYPES.has(mediaType)) return null;
   try {
-    return { bytes: Buffer.from(match[2]!, "base64"), mediaType: match[1]! };
+    return { bytes: Buffer.from(match[2]!, "base64"), mediaType };
   } catch {
     return null;
   }
@@ -439,6 +499,11 @@ export function verifyKontaxArchiveIntegrity(buffer: Buffer): ArchiveIntegrityRe
     // A zip that won't even open is itself a truncation signal.
     return { verified: true, ok: false, entryCount: 0, problems: [{ path: "", issue: "missing" }] };
   }
+  // In the normal request path recognizeKontaxFile() already rejected an
+  // over-bounds archive before this is ever called; this throws (rather than
+  // reporting a truncation) so any other caller can't be tricked into
+  // inflating a hostile entry via getData() below.
+  assertZipWithinBounds(zip);
 
   const manifestEntry = zip.getEntry(ARCHIVE_MANIFEST_NAME);
   if (!manifestEntry) return unverified;
@@ -480,6 +545,10 @@ export type ParsedKontaxArchive = {
 
 export function parseKontaxArchive(buffer: Buffer): ParsedKontaxArchive {
   const zip = new AdmZip(buffer);
+  // Same reasoning as verifyKontaxArchiveIntegrity: normally unreachable for
+  // an over-bounds archive (recognizeKontaxFile already filtered it out),
+  // kept here so this exported function is safe to call on its own.
+  assertZipWithinBounds(zip);
   const resolveMediaRef = (uri: string) => {
     const entry = zip.getEntry(uri.replace(/^\.\//, ""));
     if (!entry) return null;

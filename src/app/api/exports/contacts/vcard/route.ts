@@ -31,9 +31,29 @@ export async function GET(request: Request) {
     },
   });
 
+  // P48-11 item 6: assertCanUsePremiumExport throws a curated, user-safe
+  // billing message ("vCard export is available on the Pro plan.", "This
+  // account is locked…") — safe to surface with 403. Everything from the DB
+  // query/serialize below is not: it used to fall through to the same
+  // `error.message` passthrough at 403, which could leak a raw Prisma error.
   try {
     await assertCanUsePremiumExport(userId);
+  } catch (error) {
+    await db.exportJob.update({
+      where: { id: job.id },
+      data: {
+        status: "FAILED",
+        filterQuery: query || null,
+        resultFileName,
+        errorSummary: error instanceof Error ? error.message : "vCard export failed.",
+        completedAt: new Date(),
+      },
+    });
+    const message = error instanceof Error ? error.message : "Export failed";
+    return new Response(message, { status: 403 });
+  }
 
+  try {
     const contacts = await db.contact.findMany({
       where: {
         userId,
@@ -111,6 +131,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
+    console.error("[exports/contacts/vcard] unexpected failure", error);
     await db.exportJob.update({
       where: { id: job.id },
       data: {
@@ -122,7 +143,6 @@ export async function GET(request: Request) {
       },
     });
 
-    const message = error instanceof Error ? error.message : "Export failed";
-    return new Response(message, { status: 403 });
+    return new Response("Export failed. Please try again.", { status: 500 });
   }
 }

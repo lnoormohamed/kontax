@@ -3,13 +3,23 @@ import { z } from "zod";
 import { auth } from "~/server/auth";
 import { assertCanImportContacts } from "~/server/billing";
 import { parseCsvContacts } from "~/server/contact-portability";
+import {
+  approximateCsvRowCount,
+  csvRowCountExceedsCap,
+  MAX_CSV_ROWS,
+  MAX_CSV_TEXT_LENGTH,
+} from "~/server/import/csv-bounds";
 import { db } from "~/server/db";
 
 const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
   value && value.length > 0 ? value : undefined;
 
 const commitRequestSchema = z.object({
-  csvText: z.string().min(1, "Paste CSV data or choose a CSV file."),
+  // P48-11 item 4: same 10 MB / 50,000-row bounds as the preview route.
+  csvText: z
+    .string()
+    .min(1, "Paste CSV data or choose a CSV file.")
+    .max(MAX_CSV_TEXT_LENGTH, "That CSV is too large (10 MB max)."),
   profile: z.enum(["GENERIC", "GOOGLE", "APPLE", "OUTLOOK"]),
   sourceFileName: z.string().trim().optional(),
   sourceFileSizeBytes: z.number().int().nonnegative().optional(),
@@ -27,6 +37,14 @@ const commitRequestSchema = z.object({
     .optional(),
 });
 
+/**
+ * P48-11 item 6: marks an error whose message is already curated/user-facing
+ * (a validation rejection, a plan-limit message) — safe to return as-is.
+ * Anything else that reaches the outer catch is an unexpected failure: it's
+ * logged server-side and masked with a fixed message for the caller.
+ */
+class KnownCommitError extends Error {}
+
 export async function POST(request: Request) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -41,6 +59,15 @@ export async function POST(request: Request) {
   if (!parsedBody.success) {
     return Response.json(
       { message: parsedBody.error.issues[0]?.message ?? "Invalid import request." },
+      { status: 400 },
+    );
+  }
+
+  if (csvRowCountExceedsCap(parsedBody.data.csvText)) {
+    return Response.json(
+      {
+        message: `That CSV has too many rows (${MAX_CSV_ROWS.toLocaleString()} max). Split it into smaller files.`,
+      },
       { status: 400 },
     );
   }
@@ -79,25 +106,51 @@ export async function POST(request: Request) {
       });
 
   try {
-    const preview = parseCsvContacts(
-      parsedBody.data.csvText,
-      parsedBody.data.profile,
-      parsedBody.data.columnMappings,
-    );
+    // P48-11 item 4: check the quota against a cheap row-count estimate
+    // *before* running the full classifier/dedupe parse — an over-quota
+    // import shouldn't pay for a parse it can't commit anyway. The exact
+    // check against preview.contacts.length below still runs (skipped rows
+    // only ever make the real count lower than this estimate).
+    try {
+      await assertCanImportContacts(userId, approximateCsvRowCount(parsedBody.data.csvText) - 1);
+    } catch (error) {
+      throw new KnownCommitError(
+        error instanceof Error ? error.message : "Import limit reached.",
+      );
+    }
+
+    let preview: ReturnType<typeof parseCsvContacts>;
+    try {
+      preview = parseCsvContacts(
+        parsedBody.data.csvText,
+        parsedBody.data.profile,
+        parsedBody.data.columnMappings,
+      );
+    } catch (error) {
+      throw new KnownCommitError(
+        error instanceof Error ? error.message : "Could not parse that CSV file.",
+      );
+    }
     const warningCount = preview.issues.filter((issue) => issue.severity === "warning").length;
     const errorCount = preview.issues.filter((issue) => issue.severity === "error").length;
 
     if (!preview.canImport) {
-      throw new Error(
+      throw new KnownCommitError(
         preview.blockingReasons[0] ?? "Import is blocked until duplicate conflicts are resolved.",
       );
     }
 
     if (preview.contacts.length === 0) {
-      throw new Error("No importable contacts were found in that CSV file.");
+      throw new KnownCommitError("No importable contacts were found in that CSV file.");
     }
 
-    await assertCanImportContacts(userId, preview.contacts.length);
+    try {
+      await assertCanImportContacts(userId, preview.contacts.length);
+    } catch (error) {
+      throw new KnownCommitError(
+        error instanceof Error ? error.message : "Import limit reached.",
+      );
+    }
 
     const created = await db.contact.createMany({
       data: preview.contacts.map((contact) => ({
@@ -179,6 +232,16 @@ export async function POST(request: Request) {
       issueCount: preview.issues.length,
     });
   } catch (error) {
+    const known = error instanceof KnownCommitError;
+    const message = known
+      ? error.message
+      : error instanceof Error
+        ? error.message
+        : "Import failed.";
+    if (!known) {
+      console.error("[imports/contacts/commit] unexpected failure", error);
+    }
+
     await db.importJob.update({
       where: { id: job.id },
       data: {
@@ -186,15 +249,15 @@ export async function POST(request: Request) {
         sourceProfile: parsedBody.data.profile,
         sourceFileName,
         sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
-        errorSummary: error instanceof Error ? error.message : "Import failed.",
+        errorSummary: message,
         committedAt: new Date(),
         completedAt: new Date(),
       },
     });
 
     return Response.json(
-      { message: error instanceof Error ? error.message : "Import failed." },
-      { status: 400 },
+      { message: known ? message : "Import failed. Please try again." },
+      { status: known ? 400 : 500 },
     );
   }
 }

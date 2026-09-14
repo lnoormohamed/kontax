@@ -6,6 +6,7 @@ import { auth } from "~/server/auth";
 import { assertCanImportContacts } from "~/server/billing";
 import { db } from "~/server/db";
 import { parseCsvContacts } from "~/server/contact-portability";
+import { csvRowCountExceedsCap, MAX_CSV_ROWS, MAX_CSV_TEXT_LENGTH } from "~/server/import/csv-bounds";
 
 const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
   value && value.length > 0 ? value : undefined;
@@ -26,9 +27,15 @@ const getRequiredUserId = async () => {
   return userId;
 };
 
+// P48-11 item 4: this action had no size cap at all (csvText or the uploaded
+// file), unlike the API routes' zod .max() — a pasted or uploaded CSV of any
+// size ran straight into the full classifier/dedupe parse.
 const getCsvText = async (formData: FormData) => {
   const inlineText = formData.get("csvText");
   if (typeof inlineText === "string" && inlineText.trim().length > 0) {
+    if (inlineText.length > MAX_CSV_TEXT_LENGTH) {
+      throw new Error("That CSV data is too large (10 MB max). Use a smaller file instead.");
+    }
     return {
       fileName: "pasted-import.csv",
       text: inlineText,
@@ -37,6 +44,9 @@ const getCsvText = async (formData: FormData) => {
 
   const uploadedFile = formData.get("csvFile");
   if (uploadedFile instanceof File && uploadedFile.size > 0) {
+    if (uploadedFile.size > MAX_CSV_TEXT_LENGTH) {
+      throw new Error("That CSV file is too large (10 MB max).");
+    }
     return {
       fileName: uploadedFile.name,
       text: await uploadedFile.text(),
@@ -60,6 +70,12 @@ export const importContactsCsv = async (formData: FormData) => {
   });
 
   try {
+    if (csvRowCountExceedsCap(text)) {
+      throw new Error(
+        `That CSV has too many rows (${MAX_CSV_ROWS.toLocaleString()} max). Split it into smaller files.`,
+      );
+    }
+
     const parsed = parseCsvContacts(text);
 
     if (parsed.contacts.length === 0) {

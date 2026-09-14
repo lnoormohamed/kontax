@@ -4,8 +4,6 @@
 
 import { randomBytes } from "crypto";
 
-import { contactName, labelOr, parseContactDate } from "~/server/reminders";
-
 /** 32-char URL-safe calendar token (revocable credential). */
 export function generateCalToken(): string {
   return randomBytes(24).toString("base64url");
@@ -19,9 +17,53 @@ type ContactWithDates = {
   significantDates: unknown;
 };
 
+// Duplicated (verbatim) from ~/server/reminders rather than imported: that
+// module's other exports (createNotification, the reminder scan) pull in
+// ~/server/db and the email-template tree, which this file — and its unit
+// tests — has no business depending on for three pure string/date helpers.
+// Keep these in sync with ~/server/reminders if the parsing rules change.
+
+/** Best-effort contact display name (empty strings fall through to the fallback). */
+function contactName(
+  c: { fullName?: string | null; firstName?: string | null },
+  fallback = "A contact",
+): string {
+  const full = c.fullName?.trim();
+  if (full) return full;
+  const first = c.firstName?.trim();
+  if (first) return first;
+  return fallback;
+}
+
+/** Trimmed label or fallback when empty/absent. */
+function labelOr(label: string | null | undefined, fallback: string): string {
+  const t = label?.trim();
+  return t && t.length > 0 ? t : fallback;
+}
+
+/** Parse a Kontax date string to { month, day }. Supports "YYYY-MM-DD" and "--MM-DD". */
+function parseContactDate(dateStr: string): { month: number; day: number } | null {
+  const full = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(dateStr);
+  if (full) return { month: Number(full[2]), day: Number(full[3]) };
+  const yearless = /^--(\d{2})-?(\d{2})$/.exec(dateStr);
+  if (yearless) return { month: Number(yearless[1]), day: Number(yearless[2]) };
+  return null;
+}
+
 // RFC 5545: escape backslashes, commas, and semicolons in text values.
-function escapeICalText(text: string): string {
-  return text.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;");
+// P48-11 item 5: a contact/date label is attacker-controlled (synced or
+// imported) — a literal CR or LF would break the current property's line and
+// let the rest of the value be parsed as a new iCal property (property
+// injection into every subscriber's calendar app). Collapse any real
+// line-break sequence to the RFC 5545 escaped-newline token ("\n" as two
+// characters) *before* escaping backslashes would double-escape it, so no
+// raw CR/LF ever reaches the output.
+export function escapeICalText(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/\r\n|\r|\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
 }
 
 function formatICalDate(month: number, day: number, year: number): string {

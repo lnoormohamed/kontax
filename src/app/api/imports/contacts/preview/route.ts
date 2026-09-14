@@ -2,10 +2,16 @@ import { z } from "zod";
 
 import { auth } from "~/server/auth";
 import { parseCsvContacts } from "~/server/contact-portability";
+import { csvRowCountExceedsCap, MAX_CSV_ROWS, MAX_CSV_TEXT_LENGTH } from "~/server/import/csv-bounds";
 import { db } from "~/server/db";
 
 const previewRequestSchema = z.object({
-  csvText: z.string().min(1, "Paste CSV data or choose a CSV file."),
+  // P48-11 item 4: an unbounded csvText ran the full classifier/dedupe pass
+  // (parseCsvContacts) before anything checked size or row count.
+  csvText: z
+    .string()
+    .min(1, "Paste CSV data or choose a CSV file.")
+    .max(MAX_CSV_TEXT_LENGTH, "That CSV is too large (10 MB max)."),
   profile: z.enum(["GENERIC", "GOOGLE", "APPLE", "OUTLOOK"]),
   sourceFileName: z.string().trim().optional(),
   sourceFileSizeBytes: z.number().int().nonnegative().optional(),
@@ -28,8 +34,29 @@ export async function POST(request: Request) {
     );
   }
 
+  if (csvRowCountExceedsCap(parsedBody.data.csvText)) {
+    return Response.json(
+      {
+        message: `That CSV has too many rows (${MAX_CSV_ROWS.toLocaleString()} max). Split it into smaller files.`,
+      },
+      { status: 400 },
+    );
+  }
+
+  // parseCsvContacts throws a small, curated set of user-facing messages
+  // (missing header row, unmatched quote, no recognized columns) — safe to
+  // surface as-is. Anything from the DB calls below is not.
+  let preview: ReturnType<typeof parseCsvContacts>;
   try {
-    const preview = parseCsvContacts(parsedBody.data.csvText, parsedBody.data.profile);
+    preview = parseCsvContacts(parsedBody.data.csvText, parsedBody.data.profile);
+  } catch (error) {
+    return Response.json(
+      { message: error instanceof Error ? error.message : "Could not parse that CSV file." },
+      { status: 400 },
+    );
+  }
+
+  try {
     const emails = preview.contacts.flatMap((contact) => (contact.email ? [contact.email] : []));
     const phones = preview.contacts.flatMap((contact) => (contact.phone ? [contact.phone] : []));
 
@@ -129,9 +156,8 @@ export async function POST(request: Request) {
       matchedPreset: matchedPreset ?? null,
     });
   } catch (error) {
-    return Response.json(
-      { message: error instanceof Error ? error.message : "Preview failed." },
-      { status: 400 },
-    );
+    // Unexpected — a DB failure, not a validation problem the user can act on.
+    console.error("[imports/contacts/preview] unexpected failure", error);
+    return Response.json({ message: "Preview failed. Please try again." }, { status: 500 });
   }
 }

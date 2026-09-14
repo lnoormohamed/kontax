@@ -21,6 +21,19 @@ import { fetchExternalImage } from "~/server/safe-image-fetch";
 const SIZES = { thumb: 96, full: 512 } as const;
 const MAX_URL_LENGTH = 500; // matches the avatarUrl column validation
 
+// P48-11 item 7: sharp's default `limitInputPixels` (~268M px) still lets a
+// small, highly-compressible file (a "pixel bomb" — e.g. a huge flat-color
+// PNG) decode into hundreds of MB of raw pixel data. 25M px (~5000x5000) is
+// comfortably above any legitimate avatar while bounding decode cost.
+const MAX_INPUT_PIXELS = 25_000_000;
+
+// A handful of concurrent sharp decodes is fine; unbounded concurrency lets
+// a burst of proxy requests (or a single attacker looping large images) pin
+// every CPU core decoding at once. This is process-local — fine for a
+// same-origin, auth-gated proxy with no external LB fan-out assumption.
+const MAX_CONCURRENT_TRANSFORMS = 4;
+let activeTransforms = 0;
+
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -42,9 +55,14 @@ export async function GET(req: NextRequest) {
   }
   const size = req.nextUrl.searchParams.get("w") === "96" ? SIZES.thumb : SIZES.full;
 
+  if (activeTransforms >= MAX_CONCURRENT_TRANSFORMS) {
+    return NextResponse.json({ error: "TOO_MANY_REQUESTS" }, { status: 503 });
+  }
+  activeTransforms += 1;
+
   try {
     const image = await fetchExternalImage(url);
-    const body = await sharp(image.body)
+    const body = await sharp(image.body, { limitInputPixels: MAX_INPUT_PIXELS })
       .rotate()
       .resize(size, size, { fit: "inside", withoutEnlargement: true })
       .webp({ quality: 82 })
@@ -66,5 +84,7 @@ export async function GET(req: NextRequest) {
       `[image-proxy] refused ${url.slice(0, 120)}: ${error instanceof Error ? error.message : "unknown"}`,
     );
     return NextResponse.json({ error: "UNAVAILABLE" }, { status: 502 });
+  } finally {
+    activeTransforms -= 1;
   }
 }

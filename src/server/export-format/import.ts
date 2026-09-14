@@ -9,20 +9,25 @@ import sharp from "sharp";
 
 import { assertCanImportContacts } from "~/server/billing";
 import { db } from "~/server/db";
+import { normalizeContactPhoto } from "~/server/contact-photo-sync";
 import type { ImportedCardContact } from "./parse";
 
 // ── imported-photo upload ────────────────────────────────────────────────────
 // Same S3 + 96px webp thumb convention as src/app/api/upload/avatar/route.ts
 // (key avatars/{userId}/{cuid}.{ext}, sibling <key minus ext>-thumb.webp).
+//
+// P48-11 item 1: an imported photo's bytes and claimed mediaType are both
+// attacker-controlled (a crafted .kontax archive/document). Previously the
+// raw bytes were uploaded with `ContentType: mediaType` straight from the
+// import file — a `data:text/html;base64,…` or `image/svg+xml` photo became
+// a public object served as HTML/SVG on the media host (stored XSS/phishing
+// on media.getkontax.com). Every photo now goes through the same
+// `normalizeContactPhoto` re-encode the CardDAV/Google photo sync uses
+// (src/server/contact-photo-sync.ts): sharp decodes it and re-encodes to a
+// canonical JPEG, so only bytes that are genuinely a raster image are ever
+// stored, always with a matching, safe content type.
 
 const THUMB_SIZE = 96;
-
-const EXT_MAP: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-  "image/gif": "gif",
-};
 
 function getS3(): S3Client | null {
   if (!process.env.MINIO_ENDPOINT) return null;
@@ -37,29 +42,46 @@ function getS3(): S3Client | null {
   });
 }
 
+export type SavedImportedAvatar = {
+  /** Public URL of the stored (re-encoded) photo, or null if nothing was stored. */
+  url: string | null;
+  /**
+   * True when the contact *had* a photo but it was rejected — not a
+   * decodable raster image, or too large/corrupt for sharp to re-encode.
+   * False covers both "no photo" and "MinIO isn't configured" — neither is
+   * a per-contact problem worth warning about.
+   */
+  rejected: boolean;
+};
+
 /**
  * Upload an imported contact photo to MinIO (original + 96px webp thumb).
- * Returns the public URL, or null when MinIO is unconfigured — the import
- * proceeds without photos in that case.
+ * The bytes are always re-encoded through `normalizeContactPhoto` first — see
+ * the module note above — so only a genuinely decodable raster image is ever
+ * stored, always as a canonical JPEG. Returns `{ url: null, rejected: true }`
+ * when the bytes can't be decoded as an image at all, and `{ url: null,
+ * rejected: false }` when MinIO is unconfigured (the import proceeds without
+ * photos in that case, same as before).
  */
 export async function saveImportedAvatar(
   userId: string,
   bytes: Buffer,
-  mediaType: string,
-): Promise<string | null> {
-  const s3 = getS3();
-  if (!s3) return null;
+): Promise<SavedImportedAvatar> {
+  const normalized = await normalizeContactPhoto(bytes);
+  if (!normalized) return { url: null, rejected: true };
 
-  const ext = EXT_MAP[mediaType] ?? "jpg";
-  const key = `avatars/${userId}/${createId()}.${ext}`;
+  const s3 = getS3();
+  if (!s3) return { url: null, rejected: false };
+
+  const key = `avatars/${userId}/${createId()}.${normalized.ext}`;
   const bucket = process.env.MINIO_BUCKET ?? "kontax-uploads";
 
-  // Thumbnailing failure (corrupt but plausibly-typed bytes) must not block
-  // the import — renderers fall back to the original when the thumb 404s.
+  // Thumbnailing failure (extremely unlikely — normalized.bytes just came
+  // out of sharp) must not block the import — renderers fall back to the
+  // original when the thumb 404s.
   let thumbBody: Buffer | null = null;
   try {
-    thumbBody = await sharp(bytes)
-      .rotate() // respect EXIF orientation
+    thumbBody = await sharp(normalized.bytes)
       .resize(THUMB_SIZE, THUMB_SIZE, { fit: "cover" })
       .webp({ quality: 80 })
       .toBuffer();
@@ -72,8 +94,12 @@ export async function saveImportedAvatar(
       s3.send(new PutObjectCommand({
         Bucket: bucket,
         Key: key,
-        Body: bytes,
-        ContentType: mediaType,
+        Body: normalized.bytes,
+        ContentType: normalized.mediaType,
+        // Both types here are always in the raster allowlist post-normalize —
+        // never served as an attachment fallback that could trigger a
+        // content-type sniff, and never anything but an image.
+        ContentDisposition: "inline",
       })),
       thumbBody
         ? s3.send(new PutObjectCommand({
@@ -81,15 +107,16 @@ export async function saveImportedAvatar(
             Key: key.replace(/\.[a-z0-9]+$/i, "-thumb.webp"),
             Body: thumbBody,
             ContentType: "image/webp",
+            ContentDisposition: "inline",
           }))
         : Promise.resolve(),
     ]);
   } catch (error) {
     console.warn("[Kontax] imported-photo upload failed — importing contact without photo", error);
-    return null;
+    return { url: null, rejected: false };
   }
 
-  return `${process.env.MINIO_PUBLIC_URL ?? process.env.MINIO_ENDPOINT}/${key}`;
+  return { url: `${process.env.MINIO_PUBLIC_URL ?? process.env.MINIO_ENDPOINT}/${key}`, rejected: false };
 }
 
 // ── commit ───────────────────────────────────────────────────────────────────
@@ -108,7 +135,19 @@ export type KontaxImportResult = {
   importedCount: number;
   skippedCount: number;
   jobId: string;
+  /** Human-readable per-contact warnings for photos that could not be imported. */
+  photoWarnings: string[];
 };
+
+const MAX_REPORTED_PHOTO_WARNINGS = 50;
+
+/**
+ * P48-11 item 6: marks an error whose message is safe (already
+ * curated/user-facing) to return as-is. Everything else thrown out of the
+ * try block below is treated as an unexpected failure — logged server-side,
+ * masked with a fixed message for the caller.
+ */
+export class KontaxImportError extends Error {}
 
 /**
  * Land parsed Kontax-format contacts for a user. Creates an ImportJob (so the
@@ -149,10 +188,19 @@ export async function commitKontaxImport(
 
   try {
     if (contacts.length === 0) {
-      throw new Error("No importable contacts were found in that file.");
+      throw new KontaxImportError("No importable contacts were found in that file.");
     }
 
-    await assertCanImportContacts(userId, contacts.length);
+    try {
+      await assertCanImportContacts(userId, contacts.length);
+    } catch (error) {
+      // billing.ts throws plain Error with a curated, user-safe plan-limit
+      // message — safe to surface, but re-tagged so the route can tell it
+      // apart from an unexpected DB/S3 failure further down.
+      throw new KontaxImportError(
+        error instanceof Error ? error.message : "Import limit reached.",
+      );
+    }
 
     // Label registry: exported registry entries win only for labels the user
     // doesn't already have — never recolor existing labels. Names on contacts
@@ -220,14 +268,21 @@ export async function commitKontaxImport(
     // createMany can't carry per-contact photo URLs, so: upload photos for a
     // chunk, then create that chunk's contacts in one transaction.
     let importedCount = 0;
+    const photoWarnings: string[] = [];
     for (const group of chunk(contacts, CHUNK_SIZE)) {
       const avatarUrls: Array<string | null> = [];
       for (const contact of group) {
-        avatarUrls.push(
-          contact.photo
-            ? await saveImportedAvatar(userId, contact.photo.bytes, contact.photo.mediaType)
-            : null,
-        );
+        if (!contact.photo) {
+          avatarUrls.push(null);
+          continue;
+        }
+        const { url, rejected } = await saveImportedAvatar(userId, contact.photo.bytes);
+        avatarUrls.push(url);
+        if (rejected && photoWarnings.length < MAX_REPORTED_PHOTO_WARNINGS) {
+          photoWarnings.push(
+            `Photo for "${contact.fullName}" could not be imported — not a readable image.`,
+          );
+        }
       }
 
       const created = await db.$transaction(
@@ -324,7 +379,11 @@ export async function commitKontaxImport(
       },
     });
 
-    return { importedCount, skippedCount, jobId: job.id };
+    const cappedWarnings =
+      photoWarnings.length >= MAX_REPORTED_PHOTO_WARNINGS
+        ? [...photoWarnings, "Additional photo warnings were omitted."]
+        : photoWarnings;
+    return { importedCount, skippedCount, jobId: job.id, photoWarnings: cappedWarnings };
   } catch (error) {
     await db.importJob.update({
       where: { id: job.id },
