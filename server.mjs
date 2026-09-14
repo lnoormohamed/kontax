@@ -2,8 +2,29 @@ import { createServer } from "node:http";
 import { Buffer } from "node:buffer";
 import next from "next";
 import bcrypt from "bcryptjs";
+import Redis from "ioredis";
+import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible";
 
 import { PrismaClient } from "./generated/prisma/index.js";
+import { getRequestIp } from "./src/server/dav/client-ip.mjs";
+import {
+  DAV_BODY_LIMITS,
+  decodePathSegment,
+  extractRequestedPropNames,
+  hasDoctypeOrEntity,
+  hrefToSyncUid,
+  parseReportRequest,
+} from "./src/server/dav/parse.mjs";
+import {
+  DAV_CREDENTIAL_CACHE_TTL_MS,
+  DAV_CREDENTIAL_CACHE_TTL_SECONDS,
+  davCredentialAppPasswordIndexKey,
+  davCredentialCacheKey,
+  davCredentialMemoryGet,
+  davCredentialMemorySet,
+  davCredentialRedisKey,
+  davCredentialUserIndexKey,
+} from "./src/server/dav/credential-cache.mjs";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME ?? "0.0.0.0";
@@ -25,10 +46,65 @@ const DAV_CAPABILITY_HEADER = "1, addressbook";
 const DAV_REALM = 'Basic realm="Kontax CardDAV"';
 const DUMMY_BCRYPT_HASH =
   "$2b$12$3Y0mFQ0M0l9n4Y3Q6p0g2uh2jQ7JmYI3d2eY0m4rA4Aq0vN5iVfL2";
-const WINDOW_MS = 15 * 60 * 1000;
-const IP_FAILURE_LIMIT = 20;
-const EMAIL_FAILURE_LIMIT = 10;
-const buckets = new Map();
+
+// P48-08: request-body caps, applied at every DAV call site.
+const MAX_QUERY_BODY_BYTES = DAV_BODY_LIMITS.query; // PROPFIND / REPORT — 64 KB
+const MAX_PUT_BODY_BYTES = DAV_BODY_LIMITS.put; // PUT — 1 MB
+// P48-08: what we are willing to persist into SyncConflict.remoteSnapshot.
+const MAX_CONFLICT_SNAPSHOT_BYTES = 64 * 1024;
+
+// P48-09: DAV auth brute-force limits.
+//
+// `src/server/rate-limit.ts` owns the equivalent limiters for the Next side, but
+// this file is plain ESM and cannot import TypeScript, so the limiters are built
+// here against the same `rate-limiter-flexible` + ioredis stack. Key layout is
+// `dav:ip:<ip>` and `dav:pair:<ip>:<email>`.
+//
+// The pair bucket is the one that actually blocks (10 failures / 15 min): a burst
+// from one shared Cloudflare edge IP must not lock every other user behind it.
+// The IP bucket is a much looser backstop (100 failures / 15 min).
+const DAV_AUTH_WINDOW_SECONDS = 15 * 60;
+const DAV_PAIR_FAILURE_LIMIT = 10;
+const DAV_IP_FAILURE_LIMIT = 100;
+// P48-09: at most one `lastUsedAt` write per app password per 5 minutes.
+const LAST_USED_DEBOUNCE_MS = 5 * 60 * 1000;
+
+const davRedis = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, {
+      enableOfflineQueue: false,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+    })
+  : null;
+
+if (davRedis) {
+  // Never let a Redis blip take the HTTP server down; the limiters fall back to
+  // their in-memory insurance limiter and the credential cache degrades to the
+  // in-process map.
+  davRedis.on("error", (error) => {
+    console.error("DAV Redis error", error.message);
+  });
+}
+
+const makeDavLimiter = (points, keyPrefix) => {
+  const memory = new RateLimiterMemory({ points, duration: DAV_AUTH_WINDOW_SECONDS, keyPrefix });
+  if (!davRedis) return memory;
+  return new RateLimiterRedis({
+    storeClient: davRedis,
+    points,
+    duration: DAV_AUTH_WINDOW_SECONDS,
+    keyPrefix,
+    insuranceLimiter: memory,
+  });
+};
+
+// RateLimiterMemory expires its own entries, so neither fallback leaks (the old
+// hand-rolled `buckets` Map was never pruned).
+const davPairLimiter = makeDavLimiter(DAV_PAIR_FAILURE_LIMIT, "dav:pair");
+const davIpLimiter = makeDavLimiter(DAV_IP_FAILURE_LIMIT, "dav:ip");
+
+// appPasswordId -> epoch ms of the last `lastUsedAt` write made by this process.
+const lastUsedWrites = new Map();
 
 const normalizeToken = (value) => value.replaceAll("-", "").replaceAll(" ", "").trim();
 const escapeXml = (value) =>
@@ -39,28 +115,14 @@ const escapeXml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
 
-const getBucket = (key) => {
-  const now = Date.now();
-  const current = buckets.get(key);
-
-  if (!current || current.resetAt <= now) {
-    const nextBucket = { count: 0, resetAt: now + WINDOW_MS };
-    buckets.set(key, nextBucket);
-    return nextBucket;
-  }
-
-  return current;
-};
-
-const isLimited = (key, limit) => getBucket(key).count >= limit;
-const recordFailure = (key) => {
-  getBucket(key).count += 1;
-};
-const resetBucket = (key) => buckets.delete(key);
-
+// P48-09: DAV responses are written by this file and never pass through Next's
+// middleware, so they carried none of its security headers. Add them here.
+// `extra` is spread last so a handler can still override Cache-Control etc.
 const davHeaders = (extra = {}) => ({
   DAV: DAV_CAPABILITY_HEADER,
-  "Cache-Control": "no-cache, no-store",
+  "Cache-Control": "no-store",
+  "X-Content-Type-Options": "nosniff",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
   ...extra,
 });
 
@@ -82,10 +144,22 @@ const forbidden = (res) =>
     "Content-Type": "text/plain; charset=utf-8",
   });
 
-const tooManyRequests = (res) =>
+const tooManyRequests = (res, retryAfterSeconds = DAV_AUTH_WINDOW_SECONDS) =>
   send(res, 429, "Too many requests", {
     "Content-Type": "text/plain; charset=utf-8",
-    "Retry-After": "900",
+    "Retry-After": String(Math.max(1, Math.ceil(retryAfterSeconds))),
+  });
+
+// P48-09: malformed percent-escapes / NUL bytes in a resource name used to throw
+// out of decodeURIComponent and surface as a 500 with a stack trace.
+const badRequest = (res, message) =>
+  send(res, 400, message ?? "Bad request", {
+    "Content-Type": "text/plain; charset=utf-8",
+  });
+
+const conflict = (res, message) =>
+  send(res, 409, message ?? "Conflict", {
+    "Content-Type": "text/plain; charset=utf-8",
   });
 
 const methodNotAllowed = (res, allow) =>
@@ -153,10 +227,9 @@ const decodeBasicAuth = (header) => {
   };
 };
 
-const getRequestIp = (req) => {
-  const forwardedFor = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
-  return forwardedFor ?? req.headers["x-real-ip"] ?? req.socket.remoteAddress ?? "unknown";
-};
+// P48-09: `getRequestIp` now lives in ./src/server/dav/client-ip.mjs and prefers
+// `cf-connecting-ip` — see the comment there for why the old
+// x-forwarded-for-first order collapsed every client into one bucket.
 
 const getPublicRequestUrl = (req) => {
   const configuredOrigin = process.env.APP_URL ?? process.env.AUTH_URL;
@@ -187,15 +260,97 @@ const getPublicRequestUrl = (req) => {
   return new URL(req.url ?? "/", `${proto}://${host}`);
 };
 
-const verifyCardDavCredentials = async (email, plaintext) => {
-  const normalizedEmail = email.trim().toLowerCase();
+// P48-09: read a previously verified (email, token) pair. Redis when available
+// (survives a restart and is shared across instances), otherwise the in-process
+// map that `src/server/app-passwords.ts` can also reach through globalThis.
+const readCachedCredential = async (cacheKey) => {
+  if (davRedis) {
+    try {
+      const raw = await davRedis.get(davCredentialRedisKey(cacheKey));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.userId && parsed?.appPasswordId) {
+          return { userId: parsed.userId, appPasswordId: parsed.appPasswordId };
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("DAV credential cache read failed", error);
+      // fall through to the memory store
+    }
+  }
+
+  const entry = davCredentialMemoryGet(cacheKey);
+  return entry ? { userId: entry.userId, appPasswordId: entry.appPasswordId } : null;
+};
+
+const writeCachedCredential = async (cacheKey, value) => {
+  davCredentialMemorySet(cacheKey, value, DAV_CREDENTIAL_CACHE_TTL_MS);
+
+  if (!davRedis) return;
+
+  try {
+    // Entry plus the two revocation indexes, all on the same TTL.
+    await davRedis
+      .multi()
+      .set(
+        davCredentialRedisKey(cacheKey),
+        JSON.stringify(value),
+        "EX",
+        DAV_CREDENTIAL_CACHE_TTL_SECONDS,
+      )
+      .sadd(davCredentialAppPasswordIndexKey(value.appPasswordId), cacheKey)
+      .expire(davCredentialAppPasswordIndexKey(value.appPasswordId), DAV_CREDENTIAL_CACHE_TTL_SECONDS)
+      .sadd(davCredentialUserIndexKey(value.userId), cacheKey)
+      .expire(davCredentialUserIndexKey(value.userId), DAV_CREDENTIAL_CACHE_TTL_SECONDS)
+      .exec();
+  } catch (error) {
+    console.error("DAV credential cache write failed", error);
+  }
+};
+
+// P48-09: iOS sends many requests per sync cycle; one `lastUsedAt` UPDATE each
+// was pure write amplification. At most one write per app password per 5 minutes.
+const touchLastUsedAt = async (appPasswordId) => {
+  const now = Date.now();
+  const previous = lastUsedWrites.get(appPasswordId) ?? 0;
+
+  if (now - previous < LAST_USED_DEBOUNCE_MS) return;
+  lastUsedWrites.set(appPasswordId, now);
+
+  // Bound the map: an instance can only ever hold as many entries as there are
+  // app passwords that authenticated in the last window, but be defensive.
+  if (lastUsedWrites.size > 10_000) {
+    for (const [id, at] of lastUsedWrites) {
+      if (now - at >= LAST_USED_DEBOUNCE_MS) lastUsedWrites.delete(id);
+    }
+  }
+
+  try {
+    await prisma.appPassword.update({
+      where: { id: appPasswordId },
+      data: { lastUsedAt: new Date(now) },
+    });
+  } catch (error) {
+    console.error("Failed to update app password lastUsedAt", error);
+  }
+};
+
+// P48-09: this is the single DAV credential verifier.
+// `verifyCardDavCredentials` in `src/server/app-passwords.ts` is the Next-side
+// twin, reachable only through the `/.well-known/carddav` route fallback; both
+// reject LOCKED accounts and both keep the dummy-hash compare.
+const verifyCardDavCredentials = async (normalizedEmail, plaintext) => {
   const normalizedToken = normalizeToken(plaintext);
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail },
-    select: { id: true },
+    select: { id: true, lifecycleState: true },
   });
 
-  if (!user) {
+  // P48-09: exactly one bcrypt compare on every failure path. Previously an
+  // unknown email cost one dummy compare but a *known* email with zero app
+  // passwords cost none — a timing oracle for account enumeration.
+  if (!user || user.lifecycleState === "LOCKED") {
     await bcrypt.compare(normalizedToken, DUMMY_BCRYPT_HASH);
     return null;
   }
@@ -214,17 +369,17 @@ const verifyCardDavCredentials = async (email, plaintext) => {
     },
   });
 
+  if (appPasswords.length === 0) {
+    await bcrypt.compare(normalizedToken, DUMMY_BCRYPT_HASH);
+    return null;
+  }
+
   for (const appPassword of appPasswords) {
     const matches = await bcrypt.compare(normalizedToken, appPassword.hashedPassword);
 
     if (!matches) {
       continue;
     }
-
-    await prisma.appPassword.update({
-      where: { id: appPassword.id },
-      data: { lastUsedAt: new Date() },
-    });
 
     return {
       userId: user.id,
@@ -233,6 +388,35 @@ const verifyCardDavCredentials = async (email, plaintext) => {
   }
 
   return null;
+};
+
+const consumeDavFailure = async (ip, pairKey) => {
+  await Promise.all([
+    davPairLimiter.consume(pairKey, 1).catch(() => undefined),
+    davIpLimiter.consume(ip, 1).catch(() => undefined),
+  ]);
+};
+
+const resetDavFailures = async (ip, pairKey) => {
+  await Promise.all([
+    davPairLimiter.delete(pairKey).catch(() => undefined),
+    davIpLimiter.delete(ip).catch(() => undefined),
+  ]);
+};
+
+// Blocked? Peek without consuming so a *successful* login is never penalised.
+const davLimitRetryAfterSeconds = async (ip, pairKey) => {
+  const [pair, byIp] = await Promise.all([
+    davPairLimiter.get(pairKey).catch(() => null),
+    davIpLimiter.get(ip).catch(() => null),
+  ]);
+
+  const blocked = [
+    pair && pair.remainingPoints <= 0 ? pair.msBeforeNext : 0,
+    byIp && byIp.remainingPoints <= 0 ? byIp.msBeforeNext : 0,
+  ].filter((ms) => typeof ms === "number" && ms > 0);
+
+  return blocked.length > 0 ? Math.max(...blocked) / 1000 : null;
 };
 
 const requireDavAuth = async (req, res, expectedUserId) => {
@@ -244,21 +428,36 @@ const requireDavAuth = async (req, res, expectedUserId) => {
   }
 
   const normalizedEmail = credentials.email.trim().toLowerCase();
-  const ipKey = `ip:${getRequestIp(req)}`;
-  const emailKey = `email:${normalizedEmail}`;
+  const normalizedToken = normalizeToken(credentials.password);
+  const ip = getRequestIp(req);
+  const pairKey = `${ip}:${normalizedEmail}`;
+  const cacheKey = davCredentialCacheKey(normalizedEmail, normalizedToken);
 
-  if (isLimited(ipKey, IP_FAILURE_LIMIT) || isLimited(emailKey, EMAIL_FAILURE_LIMIT)) {
-    tooManyRequests(res);
-    return null;
-  }
-
-  const result = await verifyCardDavCredentials(normalizedEmail, credentials.password);
+  // Fast path: a credential we verified in the last 10 minutes. No bcrypt, no
+  // rate-limit round trip, no `lastUsedAt` write beyond the 5-minute debounce.
+  let result = await readCachedCredential(cacheKey);
 
   if (!result) {
-    recordFailure(ipKey);
-    recordFailure(emailKey);
-    unauthorized(res);
-    return null;
+    // Peek (never consume) before the user lookup and bcrypt, so a blocked key
+    // reaches neither the database nor the expensive compare — and a successful
+    // authentication is never charged a point.
+    const retryAfter = await davLimitRetryAfterSeconds(ip, pairKey);
+
+    if (retryAfter !== null) {
+      tooManyRequests(res, retryAfter);
+      return null;
+    }
+
+    result = await verifyCardDavCredentials(normalizedEmail, credentials.password);
+
+    if (!result) {
+      await consumeDavFailure(ip, pairKey);
+      unauthorized(res);
+      return null;
+    }
+
+    await writeCachedCredential(cacheKey, result);
+    await resetDavFailures(ip, pairKey);
   }
 
   if (expectedUserId && result.userId !== expectedUserId) {
@@ -266,8 +465,8 @@ const requireDavAuth = async (req, res, expectedUserId) => {
     return null;
   }
 
-  resetBucket(ipKey);
-  resetBucket(emailKey);
+  void touchLastUsedAt(result.appPasswordId);
+
   return result;
 };
 
@@ -304,33 +503,105 @@ const renderProp = (prop) => {
 
 const renderNotFoundProp = (name) => `<d:${escapeXml(name)}/>`;
 
-const readRequestBody = async (req) => {
-  const chunks = [];
+// P48-08: a request body is read only through here, always with a byte cap.
+// Without one, a handful of parallel multi-megabyte PROPFINDs from a single
+// valid app password stalled the thread that also serves every Next.js page.
+class BodyTooLargeError extends Error {
+  constructor(maxBytes) {
+    super(`Request body exceeds ${maxBytes} bytes`);
+    this.name = "BodyTooLargeError";
+    this.maxBytes = maxBytes;
+  }
+}
 
+const readRequestBody = async (req, maxBytes) => {
+  if (!Number.isFinite(maxBytes) || maxBytes <= 0) {
+    throw new TypeError("readRequestBody requires a positive byte cap");
+  }
+
+  // Reject on the declared length before reading a single byte — this is what
+  // turns a 4 MB pathological PROPFIND into a sub-millisecond 413.
+  const declared = Number.parseInt(req.headers["content-length"] ?? "", 10);
+
+  if (Number.isFinite(declared) && declared > maxBytes) {
+    throw new BodyTooLargeError(maxBytes);
+  }
+
+  const chunks = [];
+  let total = 0;
+
+  // Chunked / unset Content-Length: stop as soon as the running total goes over.
   for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    total += buffer.length;
+
+    if (total > maxBytes) {
+      throw new BodyTooLargeError(maxBytes);
+    }
+
+    chunks.push(buffer);
   }
 
   return Buffer.concat(chunks).toString("utf8");
 };
 
-const extractRequestedPropNames = (body) => {
-  if (!body.trim()) {
+// Answer 413 and tear the connection down rather than draining whatever the
+// client is still streaming at us. `destroySoon` flushes the response first.
+const payloadTooLarge = (res, maxBytes) => {
+  send(res, 413, `Request body exceeds ${maxBytes} bytes`, {
+    "Content-Type": "text/plain; charset=utf-8",
+    Connection: "close",
+  });
+
+  const socket = res.socket;
+
+  if (socket && !socket.destroyed) {
+    if (typeof socket.destroySoon === "function") socket.destroySoon();
+    else socket.end();
+  }
+
+  return true;
+};
+
+// Returns the body, or `null` when a 413 has already been written (the caller
+// must then return `true` to stop routing). Note: an empty body is `""`, so
+// callers compare against `null` explicitly.
+const readCappedBody = async (req, res, maxBytes) => {
+  try {
+    return await readRequestBody(req, maxBytes);
+  } catch (error) {
+    if (error instanceof BodyTooLargeError) {
+      payloadTooLarge(res, maxBytes);
+      return null;
+    }
+    throw error;
+  }
+};
+
+// PROPFIND / REPORT: capped read plus a DTD reject. Entities are never expanded
+// here, so classic XXE is not reachable — but a DOCTYPE has no legitimate place
+// in a DAV request, so treat it as malformed.
+const readDavQueryBody = async (req, res) => {
+  const body = await readCappedBody(req, res, MAX_QUERY_BODY_BYTES);
+
+  if (body === null) return null;
+
+  if (hasDoctypeOrEntity(body)) {
+    badRequest(res, "XML document type declarations are not accepted");
     return null;
   }
 
-  const propMatch = body.match(/<[^>]*:?prop\b[^>]*>([\s\S]*?)<\/[^>]*:?prop>/i);
-  const propBody = propMatch?.[1];
+  return body;
+};
 
-  if (!propBody) {
-    return null;
-  }
+// PROPFIND: capped read + DTD reject + linear prop-name extraction.
+// Returns `{ handled: true }` when a 4xx has already been written.
+const readRequestedPropNames = async (req, res) => {
+  const body = await readDavQueryBody(req, res);
 
-  const names = [...propBody.matchAll(/<\s*(?:[A-Za-z0-9_-]+:)?([A-Za-z0-9_-]+)\b[^>]*\/?>/g)]
-    .map((match) => match[1])
-    .filter(Boolean);
+  if (body === null) return { handled: true, names: null };
 
-  return names.length > 0 ? [...new Set(names)] : null;
+  return { handled: false, names: extractRequestedPropNames(body) };
 };
 
 const splitDavProps = (props, requestedNames) => {
@@ -352,6 +623,12 @@ const splitDavProps = (props, requestedNames) => {
 const buildPropfindResponse = (responses) => {
   const body = responses
     .map((response) => {
+      // P48-08: addressbook-multiget reports a bare status for hrefs the client
+      // asked for that no longer resolve (RFC 6352 §8.7).
+      if (response.status) {
+        return `<d:response><d:href>${escapeXml(response.href)}</d:href><d:status>${escapeXml(response.status)}</d:status></d:response>`;
+      }
+
       const okProps = response.props.map(renderProp).join("");
       const notFoundProps = response.notFoundProps?.map(renderNotFoundProp).join("") ?? "";
       const okPropstat = okProps
@@ -368,16 +645,69 @@ const buildPropfindResponse = (responses) => {
   return `<?xml version="1.0" encoding="utf-8"?><d:multistatus xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav" xmlns:cs="http://calendarserver.org/ns/">${body}</d:multistatus>`;
 };
 
+// P48-08: REPORT responses.
+//
+// `addressbook-multiget` now returns only the resources the client named instead
+// of the whole collection (P14 debt — iOS asks for a handful per cycle), with a
+// bare 404 status for hrefs that no longer resolve. `sync-collection` and
+// `addressbook-query` keep today's full-collection behaviour.
+//
+// Requested props are honoured where the client listed them, but an empty
+// intersection falls back to sending everything rather than an empty response —
+// a parse surprise must never silently blank a client's address book.
+const buildReportResponses = (contacts, report, hrefFor) => {
+  const propsFor = (contact) => {
+    const all = [
+      { name: "getetag", value: etagForContact(contact) },
+      { name: "address-data", value: serializeContactToVCard(contact) },
+    ];
+    const names = report?.propNames;
+
+    if (!names) return { props: all, notFoundProps: [] };
+
+    const filtered = all.filter((prop) => names.includes(prop.name));
+    return { props: filtered.length > 0 ? filtered : all, notFoundProps: [] };
+  };
+
+  if (report?.type !== "addressbook-multiget" || report.hrefs.length === 0) {
+    return contacts.map((contact) => ({ href: hrefFor(contact), ...propsFor(contact) }));
+  }
+
+  const byUid = new Map(contacts.map((contact) => [contact.syncUid, contact]));
+  const responses = [];
+  const seen = new Set();
+
+  for (const href of report.hrefs) {
+    if (seen.has(href)) continue;
+    seen.add(href);
+
+    const uid = hrefToSyncUid(href);
+    const contact = uid === null ? undefined : byUid.get(uid);
+
+    if (!contact) {
+      responses.push({ href, status: "HTTP/1.1 404 Not Found", props: [], notFoundProps: [] });
+      continue;
+    }
+
+    responses.push({ href: hrefFor(contact), ...propsFor(contact) });
+  }
+
+  return responses;
+};
+
 // P18-11: CTag is now per-book (was per-user)
 // P23-07: resolve which contacts belong to a personal Kontax-server book. A book
 // with sourceBookIds aggregates contacts from those books; otherwise it scopes to
 // its own contacts (bookId = book.id). A null book means the legacy "all contacts".
+// P48-09: every branch carries `userId`. The sourceBookIds branch dropped it,
+// which would have let a caller reach another user's contacts if a book ever
+// aggregated ids it does not own.
 const bookScopeWhere = (userId, book) => {
   if (!book) return { userId };
   if (Array.isArray(book.sourceBookIds) && book.sourceBookIds.length > 0) {
-    return { bookId: { in: book.sourceBookIds } };
+    return { userId, bookId: { in: book.sourceBookIds } };
   }
-  return { bookId: book.id };
+  return { userId, bookId: book.id };
 };
 
 const computeAddressBookCTag = async (userId, book) => {
@@ -404,14 +734,17 @@ const getCollectionParams = (pathname) => {
 // Legacy compat — keep for callers that only need userId
 const getCollectionUserId = (pathname) => getCollectionParams(pathname)?.userId ?? null;
 
+// P48-09: `invalid: true` instead of throwing out of decodeURIComponent — the
+// handler answers 400 rather than a 500 with a stack trace.
 const getResourceParams = (pathname) => {
   const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/([^/]+)\/([^/]+)$/);
   if (!match) return null;
   const slug = match[2];
   if (slug === 'family' || slug?.startsWith('team-')) return null;
   const rawUid = match[3];
-  const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
-  return { userId: match[1], bookSlug: slug, uid: decodeURIComponent(uid) };
+  const uid = decodePathSegment(rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid);
+  if (uid === null) return { userId: match[1], bookSlug: slug, uid: null, invalid: true };
+  return { userId: match[1], bookSlug: slug, uid };
 };
 
 // P18-11: resolve AddressBook row by userId + slug (creates default if missing)
@@ -448,8 +781,9 @@ const getFamilyResourceParams = (pathname) => {
     return null;
   }
   const rawUid = match[2];
-  const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
-  return { userId: match[1], uid: decodeURIComponent(uid) };
+  const uid = decodePathSegment(rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid);
+  if (uid === null) return { userId: match[1], uid: null, invalid: true };
+  return { userId: match[1], uid };
 };
 const familyResourceHref = (userId, syncUid) =>
   `/dav/addressbooks/${userId}/family/${encodeURIComponent(syncUid)}.vcf`;
@@ -465,8 +799,9 @@ const getTeamResourceParams = (pathname) => {
     return null;
   }
   const raw = m[3];
-  const uid = raw.endsWith(".vcf") ? raw.slice(0, -4) : raw;
-  return { userId: m[1], bookId: m[2], uid: decodeURIComponent(uid) };
+  const uid = decodePathSegment(raw.endsWith(".vcf") ? raw.slice(0, -4) : raw);
+  if (uid === null) return { userId: m[1], bookId: m[2], uid: null, invalid: true };
+  return { userId: m[1], bookId: m[2], uid };
 };
 const teamResourceHref = (userId, bookId, syncUid) =>
   `/dav/addressbooks/${userId}/team-${bookId}/${encodeURIComponent(syncUid)}.vcf`;
@@ -931,6 +1266,27 @@ const emitTeamDavEvent = async (userId, contactId, eventType, label) => {
 // Default resolution is last-write-wins (server is authoritative); the record is
 // kept OPEN for the Phase 10 activity log / review UI. Never throws into the
 // request path — a failed log must not turn a 412 into a 500.
+// P48-08: PUT bodies are capped at 1 MB, but a stale If-Match persists the body
+// verbatim — cap what reaches the DB at 64 KB so a client that loops on a
+// conflict cannot grow SyncConflict without bound.
+const truncateConflictSnapshot = (vcard) => {
+  if (typeof vcard !== "string" || vcard.length === 0) return undefined;
+
+  const bytes = Buffer.byteLength(vcard, "utf8");
+
+  if (bytes <= MAX_CONFLICT_SNAPSHOT_BYTES) {
+    return { rawVCard: vcard };
+  }
+
+  return {
+    rawVCard: Buffer.from(vcard, "utf8")
+      .subarray(0, MAX_CONFLICT_SNAPSHOT_BYTES)
+      .toString("utf8"),
+    truncated: true,
+    originalBytes: bytes,
+  };
+};
+
 const logDeviceWriteConflict = async ({ contact, appPasswordId, clientEtag, incomingVCard, conflictType }) => {
   try {
     await prisma.syncConflict.create({
@@ -944,7 +1300,7 @@ const logDeviceWriteConflict = async ({ contact, appPasswordId, clientEtag, inco
         localSyncVersion: contact.syncVersion ?? null,
         remoteETag: clientEtag ?? null,
         localSnapshot: JSON.parse(JSON.stringify(contact)),
-        remoteSnapshot: incomingVCard ? { rawVCard: incomingVCard } : undefined,
+        remoteSnapshot: truncateConflictSnapshot(incomingVCard),
         detectedAt: new Date(),
       },
     });
@@ -968,9 +1324,11 @@ const handleWellKnown = async (req, res, requestUrl) => {
     return true;
   }
 
-  const location = new URL(`/dav/principals/${authResult.userId}/`, requestUrl);
+  // P48-09: relative Location. The absolute form was built from the request
+  // Host when APP_URL/AUTH_URL was unset, so a forged Host header could aim a
+  // client's redirect at another origin.
   return send(res, 301, req.method === "HEAD" ? null : "Moved permanently", {
-    Location: location.toString(),
+    Location: `/dav/principals/${authResult.userId}/`,
     "Content-Type": "text/plain; charset=utf-8",
   });
 };
@@ -1017,7 +1375,9 @@ const handlePrincipal = async (req, res, requestUrl) => {
     return send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
-  const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+  const propNamesResult = await readRequestedPropNames(req, res);
+  if (propNamesResult.handled) return true;
+  const requestedNames = propNamesResult.names;
   const props = [
     { name: "current-user-principal", href: `/dav/principals/${user.id}/` },
     { name: "addressbook-home-set", href: `/dav/addressbooks/${user.id}/` },
@@ -1077,7 +1437,9 @@ const handleAddressBooks = async (req, res, requestUrl) => {
     return send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
-  const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+  const propNamesResult = await readRequestedPropNames(req, res);
+  if (propNamesResult.handled) return true;
+  const requestedNames = propNamesResult.names;
   const homeHref = `/dav/addressbooks/${user.id}/`;
   const homeProps = [
     { name: "displayname", value: "Address Books" },
@@ -1189,7 +1551,9 @@ const handleFamilyCollection = async (req, res, requestUrl) => {
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const propNamesResult = await readRequestedPropNames(req, res);
+    if (propNamesResult.handled) return true;
+    const requestedNames = propNamesResult.names;
     const collectionProps = [
       { name: "displayname", value: `${familyBook.groupName} (Family)` },
       { name: "resourcetype", types: ["collection", "addressbook"] },
@@ -1215,17 +1579,14 @@ const handleFamilyCollection = async (req, res, requestUrl) => {
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  // REPORT (addressbook-query)
-  await readRequestBody(req);
+  // REPORT (addressbook-query / addressbook-multiget)
+  const reportBody = await readDavQueryBody(req, res);
+  if (reportBody === null) return true;
+  const report = parseReportRequest(reportBody);
   const contacts = await fetchFamilyContacts(familyBook.bookId);
-  const responses = contacts.map((contact) => ({
-    href: familyResourceHref(userId, contact.syncUid),
-    props: [
-      { name: "getetag", value: etagForContact(contact) },
-      { name: "address-data", value: serializeContactToVCard(contact) },
-    ],
-    notFoundProps: [],
-  }));
+  const responses = buildReportResponses(contacts, report, (contact) =>
+    familyResourceHref(userId, contact.syncUid),
+  );
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1233,6 +1594,10 @@ const handleFamilyResource = async (req, res, requestUrl) => {
   const params = getFamilyResourceParams(requestUrl.pathname);
   if (!params) {
     return false;
+  }
+  // P48-09: undecodable resource name → 400, not a 500 with a stack trace.
+  if (params.invalid) {
+    return badRequest(res, "Invalid resource name");
   }
   const { userId, uid } = params;
   const allow = "OPTIONS, GET, PUT, DELETE";
@@ -1276,7 +1641,8 @@ const handleFamilyResource = async (req, res, requestUrl) => {
   }
 
   if (req.method === "PUT") {
-    const body = await readRequestBody(req);
+    const body = await readCappedBody(req, res, MAX_PUT_BODY_BYTES);
+    if (body === null) return true;
     if (isGroupVCard(body)) {
       return unsupportedMediaType(res);
     }
@@ -1413,7 +1779,9 @@ const handleTeamCollection = async (req, res, requestUrl) => {
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const propNamesResult = await readRequestedPropNames(req, res);
+    if (propNamesResult.handled) return true;
+    const requestedNames = propNamesResult.names;
     const collectionProps = [
       { name: "displayname", value: label },
       { name: "resourcetype", types: ["collection", "addressbook"] },
@@ -1435,16 +1803,14 @@ const handleTeamCollection = async (req, res, requestUrl) => {
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  await readRequestBody(req);
+  // REPORT (addressbook-query / addressbook-multiget)
+  const reportBody = await readDavQueryBody(req, res);
+  if (reportBody === null) return true;
+  const report = parseReportRequest(reportBody);
   const contacts = await fetchTeamBookContacts(bookId);
-  const responses = contacts.map((contact) => ({
-    href: teamResourceHref(userId, bookId, contact.syncUid),
-    props: [
-      { name: "getetag", value: etagForContact(contact) },
-      { name: "address-data", value: serializeContactToVCard(contact) },
-    ],
-    notFoundProps: [],
-  }));
+  const responses = buildReportResponses(contacts, report, (contact) =>
+    teamResourceHref(userId, bookId, contact.syncUid),
+  );
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1452,6 +1818,10 @@ const handleTeamResource = async (req, res, requestUrl) => {
   const params = getTeamResourceParams(requestUrl.pathname);
   if (!params) {
     return false;
+  }
+  // P48-09: undecodable resource name → 400, not a 500 with a stack trace.
+  if (params.invalid) {
+    return badRequest(res, "Invalid resource name");
   }
   const { userId, bookId, uid } = params;
   const allow = "OPTIONS, GET, PUT, DELETE";
@@ -1492,7 +1862,8 @@ const handleTeamResource = async (req, res, requestUrl) => {
   }
 
   if (req.method === "PUT") {
-    const body = await readRequestBody(req);
+    const body = await readCappedBody(req, res, MAX_PUT_BODY_BYTES);
+    if (body === null) return true;
     if (isGroupVCard(body)) {
       return unsupportedMediaType(res);
     }
@@ -1613,7 +1984,9 @@ const handleAddressBookCollection = async (req, res, requestUrl) => {
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const propNamesResult = await readRequestedPropNames(req, res);
+    if (propNamesResult.handled) return true;
+    const requestedNames = propNamesResult.names;
     const collectionProps = [
       { name: "displayname", value: book.name },
       { name: "resourcetype", types: ["collection", "addressbook"] },
@@ -1636,17 +2009,14 @@ const handleAddressBookCollection = async (req, res, requestUrl) => {
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  // REPORT
-  await readRequestBody(req);
+  // REPORT (addressbook-query / addressbook-multiget / sync-collection)
+  const reportBody = await readDavQueryBody(req, res);
+  if (reportBody === null) return true;
+  const report = parseReportRequest(reportBody);
   const contacts = await fetchActiveContacts(userId, book);
-  const responses = contacts.map((contact) => ({
-    href: contactResourceHref(userId, contact.syncUid, bookSlug),
-    props: [
-      { name: "getetag", value: etagForContact(contact) },
-      { name: "address-data", value: serializeContactToVCard(contact) },
-    ],
-    notFoundProps: [],
-  }));
+  const responses = buildReportResponses(contacts, report, (contact) =>
+    contactResourceHref(userId, contact.syncUid, bookSlug),
+  );
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1655,6 +2025,11 @@ const handleContactResource = async (req, res, requestUrl) => {
 
   if (!params) {
     return false;
+  }
+
+  // P48-09: undecodable resource name → 400, not a 500 with a stack trace.
+  if (params.invalid) {
+    return badRequest(res, "Invalid resource name");
   }
 
   const { userId, bookSlug, uid } = params;
@@ -1683,9 +2058,42 @@ const handleContactResource = async (req, res, requestUrl) => {
     return forbidden(res);
   }
 
-  const existing = await prisma.contact.findFirst({
-    where: { userId, syncUid: uid },
+  // P48-09: scope the lookup to the book in the URL. It used to match on
+  // `{ userId, syncUid }` alone, so a PUT under a writable slug could edit a
+  // contact that actually lives in a `deviceWritable = false` book — the
+  // read-only flag checked above was bypassable by addressing the same UID
+  // through any other collection.
+  let existing = await prisma.contact.findFirst({
+    where: { ...bookScopeWhere(userId, book), syncUid: uid },
   });
+
+  // P48-09: resolve what a PUT is actually allowed to touch through this URL.
+  if (req.method === "PUT") {
+    if (existing && existing.bookId !== book.id) {
+      // Aggregate book (sourceBookIds): readable through this collection, but a
+      // write here is ambiguous about which underlying book it lands in.
+      return conflict(res, "Contact belongs to a different address book.");
+    }
+
+    if (!existing) {
+      const elsewhere = await prisma.contact.findFirst({
+        where: { userId, syncUid: uid },
+        select: { id: true, bookId: true },
+      });
+
+      if (elsewhere?.bookId != null) {
+        // The UID exists, but in another book — refuse rather than create a
+        // duplicate or edit across the read-only boundary.
+        return conflict(res, "Contact belongs to a different address book.");
+      }
+
+      if (elsewhere) {
+        // Legacy contact from before per-book scoping (bookId null). Adopt it
+        // into the book it was written through instead of duplicating it.
+        existing = await prisma.contact.findFirst({ where: { id: elsewhere.id } });
+      }
+    }
+  }
 
   if (req.method === "GET" || req.method === "HEAD") {
     if (!existing || existing.archivedAt || existing.syncTombstoneAt) {
@@ -1703,7 +2111,8 @@ const handleContactResource = async (req, res, requestUrl) => {
   }
 
   if (req.method === "PUT") {
-    const body = await readRequestBody(req);
+    const body = await readCappedBody(req, res, MAX_PUT_BODY_BYTES);
+    if (body === null) return true;
 
     if (isGroupVCard(body)) {
       return unsupportedMediaType(res);
@@ -1763,14 +2172,16 @@ const handleContactResource = async (req, res, requestUrl) => {
 
     const updated = await prisma.$transaction(async (tx) => {
       const current = await tx.contact.findFirst({
-        where: { userId, syncUid: uid },
-        select: { id: true, syncVersion: true },
+        where: { id: existing.id },
+        select: { id: true, syncVersion: true, bookId: true },
       });
 
       return tx.contact.update({
         where: { id: current.id },
         data: {
           ...fields,
+          // P48-09: adopt a legacy book-less contact into this book.
+          ...(current.bookId === null ? { bookId: book.id } : {}),
           syncVersion: (current.syncVersion ?? 0) + 1,
           syncTombstoneAt: null,
           archivedAt: null,
@@ -1860,7 +2271,7 @@ const handleDavRequest = async (req, res) => {
 
 await app.prepare();
 
-createServer(async (req, res) => {
+const server = createServer(async (req, res) => {
   try {
     if (await handleDavRequest(req, res)) {
       return;
@@ -1890,12 +2301,31 @@ createServer(async (req, res) => {
       res.end();
     }
   }
-}).listen(port, hostname, () => {
+});
+
+// P48-08: explicit timeouts. Node's defaults let a slow or stalled client hold a
+// request open indefinitely, which on a single-threaded server that also serves
+// every Next.js page is a denial-of-service primitive.
+//
+// requestTimeout  — whole request (headers + body) must arrive within 30 s.
+// headersTimeout  — headers alone within 15 s (slowloris).
+// keepAliveTimeout — 65 s, comfortably above the 60 s idle timeout of the
+//                    Cloudflare → NPM → Traefik chain in front of us, so the
+//                    proxy always closes an idle connection before we do and
+//                    clients never see a race-condition 502.
+server.requestTimeout = 30_000;
+server.headersTimeout = 15_000;
+server.keepAliveTimeout = 65_000;
+
+server.listen(port, hostname, () => {
   console.log(`Kontax server ready on http://${hostname}:${port}`);
 });
 
 const shutdown = async () => {
-  await prisma.$disconnect();
+  await prisma.$disconnect().catch(() => undefined);
+  if (davRedis) {
+    davRedis.disconnect();
+  }
   process.exit(0);
 };
 

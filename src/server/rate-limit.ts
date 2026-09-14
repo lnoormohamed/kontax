@@ -73,6 +73,16 @@ export const rateLimiters = {
   loginByEmail: makeLimiter(5, 15 * 60, "rl:login-email"),
   // P34D-01: login brute-force — 20 attempts per IP per 15 minutes (shared across accounts)
   loginByIp: makeLimiter(20, 15 * 60, "rl:login-ip"),
+
+  // P48-09: CardDAV auth. The (IP, email) pair is the bucket that actually
+  // blocks — a burst from one shared Cloudflare edge IP must not lock sync for
+  // every other user behind it — and the per-IP bucket is a loose backstop.
+  // Key layout (`dav:pair:<ip>:<email>`, `dav:ip:<ip>`) is deliberately
+  // identical to the limiters `server.mjs` builds, so both share Redis buckets.
+  // `server.mjs` cannot import this module (plain ESM, no TS), which is why the
+  // points/duration are repeated there — keep them in sync.
+  davAuthByPair: makeLimiter(10, 15 * 60, "dav:pair"),
+  davAuthByIp: makeLimiter(100, 15 * 60, "dav:ip"),
 } as const;
 
 export interface RateLimitResult {
