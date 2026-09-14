@@ -51,12 +51,15 @@ async function checkRedis(): Promise<boolean | null> {
 export async function GET() {
   const [dbOk, redisOk] = await Promise.all([checkDb(), checkRedis()]);
 
-  if (dbOk && redisOk !== false) {
-    return NextResponse.json({ status: "ok" }, { status: 200 });
+  // Only the database is fatal: without it nothing works, so 503 lets Coolify
+  // restart the container. A Redis outage degrades rate limiting to the
+  // per-process insurance limiters (P48-16) but the app still serves, so it is
+  // reported, not treated as a reason to restart-loop the app.
+  if (!dbOk) {
+    return NextResponse.json({ status: "degraded", db: false, redis: redisOk }, { status: 503 });
   }
-
-  return NextResponse.json(
-    { status: "degraded", db: dbOk, redis: redisOk },
-    { status: 503 },
-  );
+  if (redisOk === false) {
+    return NextResponse.json({ status: "degraded", db: true, redis: false }, { status: 200 });
+  }
+  return NextResponse.json({ status: "ok" }, { status: 200 });
 }

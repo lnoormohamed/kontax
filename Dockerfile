@@ -50,6 +50,10 @@ COPY --from=builder /app/scripts/runtime ./scripts/runtime
 # imports @t3-oss/env-nextjs + zod (already in node_modules); nothing else
 # under src/ is needed.
 COPY --from=builder /app/src/env.js ./src/env.js
+# server.mjs (plain ESM, not bundled by Next) imports the CardDAV helpers
+# added in P48-08/09 — the tokenizer, client-IP and credential-cache modules —
+# from src/server/dav/*.mjs at runtime.
+COPY --from=builder /app/src/server/dav ./src/server/dav
 
 RUN chown -R node:node /app
 USER node
