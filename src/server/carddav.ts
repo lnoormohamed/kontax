@@ -1018,10 +1018,10 @@ export const pushCardDavContact = async ({
     );
   }
 
-  const etagHeader = response.headers.etag;
+  const etagHeader: unknown = response.headers.etag;
   return {
     href,
-    etag: Array.isArray(etagHeader) ? (etagHeader[0] ?? null) : (etagHeader ?? null),
+    etag: typeof etagHeader === "string" ? etagHeader : null,
   };
 };
 
