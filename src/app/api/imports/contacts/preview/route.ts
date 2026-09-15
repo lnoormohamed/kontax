@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { parseCsvContacts } from "~/server/contact-portability";
 import { csvRowCountExceedsCap, MAX_CSV_ROWS, MAX_CSV_TEXT_LENGTH } from "~/server/import/csv-bounds";
 import { db } from "~/server/db";
@@ -18,10 +18,12 @@ const previewRequestSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return Response.json({ message: "Unauthorized" }, { status: 401 });
+    throw err;
   }
 
   const rawBody: unknown = await request.json().catch(() => null);
@@ -64,7 +66,7 @@ export async function POST(request: Request) {
       emails.length > 0 || phones.length > 0
         ? await db.contact.findMany({
             where: {
-              userId: session.user.id,
+              userId: userId,
               OR: [
                 ...(emails.length > 0 ? [{ email: { in: emails } }] : []),
                 ...(phones.length > 0 ? [{ phone: { in: phones } }] : []),
@@ -123,7 +125,7 @@ export async function POST(request: Request) {
 
     const job = await db.importJob.create({
       data: {
-        userId: session.user.id,
+        userId: userId,
         format: "CSV_GENERIC",
         status: "PENDING",
         sourceProfile: parsedBody.data.profile,
@@ -146,7 +148,7 @@ export async function POST(request: Request) {
     });
 
     const matchedPreset = await db.importMappingPreset.findUnique({
-      where: { userId_headerHash: { userId: session.user.id, headerHash: preview.headerHash } },
+      where: { userId_headerHash: { userId: userId, headerHash: preview.headerHash } },
       select: { id: true, name: true, lastUsedAt: true, columnMappings: true },
     });
 

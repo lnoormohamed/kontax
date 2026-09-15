@@ -3,7 +3,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { getAppUrl } from "~/lib/site-url";
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import {
   GOOGLE_CONTACTS_SCOPES,
   createGoogleOAuthClient,
@@ -15,9 +15,15 @@ import {
 const appUrl = () => getAppUrl();
 
 export async function GET(_req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.redirect(new URL("/login", appUrl()));
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) {
+      const dest = err.code === "UNAUTHENTICATED" ? "/login" : "/sync?error=read_only_session";
+      return NextResponse.redirect(new URL(dest, appUrl()));
+    }
+    throw err;
   }
 
   if (!isGoogleSyncConfigured()) {
@@ -25,7 +31,7 @@ export async function GET(_req: NextRequest) {
   }
 
   const client = createGoogleOAuthClient();
-  const state = encodeOAuthState({ userId: session.user.id, returnTo: "/sync" });
+  const state = encodeOAuthState({ userId, returnTo: "/sync" });
 
   const authUrl = client.generateAuthUrl({
     access_type: "offline",

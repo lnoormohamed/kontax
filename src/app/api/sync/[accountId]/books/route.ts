@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { CardDavPreflightError, discoverCardDavAddressBooks } from "~/server/carddav";
 import { db } from "~/server/db";
@@ -14,9 +14,15 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ accountId: string }> },
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) {
+      const status = err.code === "UNAUTHENTICATED" ? 401 : 403;
+      return NextResponse.json({ error: err.code }, { status });
+    }
+    throw err;
   }
 
   const { accountId } = await params;
@@ -25,7 +31,7 @@ export async function GET(
   const account = await db.syncAccount.findFirst({
     where: {
       id: accountId,
-      userId: session.user.id,
+      userId,
       status: { in: [...SYNC_ACCOUNT_ACTIVE_STATUSES] },
     },
     select: {

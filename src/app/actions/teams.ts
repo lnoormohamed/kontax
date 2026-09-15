@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { getUserBillingContext } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
 import { db } from "~/server/db";
@@ -24,18 +24,6 @@ const escapeHtml = (value: string) =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("You need to be signed in.");
-  }
-  // P21-07: impersonation sessions are read-only.
-  if (session.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return session.user.id;
-};
 
 const str = (formData: FormData, key: string) => {
   const value = formData.get(key);
@@ -86,7 +74,7 @@ const requireTeamNotLocked = async (userId: string) => {
 
 // --- Create -----------------------------------------------------------------
 export const createTeam = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const name = str(formData, "name") || "My Team";
   const description = str(formData, "description") || null;
 
@@ -150,7 +138,7 @@ const sendInviteEmail = async (opts: {
 };
 
 export const inviteTeamMember = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const email = str(formData, "email").toLowerCase();
   if (!emailPattern.test(email)) {
@@ -211,7 +199,7 @@ export const inviteTeamMember = async (formData: FormData) => {
 
 // --- Accept / decline -------------------------------------------------------
 export const acceptTeamInvite = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const token = str(formData, "token");
   const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
   if (member?.inviteStatus !== "PENDING") {
@@ -236,7 +224,7 @@ export const acceptTeamInvite = async (formData: FormData) => {
 };
 
 export const declineTeamInvite = async (formData: FormData) => {
-  await requireUserId();
+  await requireUserId({ write: true });
   const token = str(formData, "token");
   const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
   if (member?.inviteStatus === "PENDING") {
@@ -266,7 +254,7 @@ const requireManagedMember = async (userId: string, memberId: string) => {
 };
 
 export const setTeamMemberRole = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const role = str(formData, "role"); // "ADMIN" | "MEMBER"
@@ -285,7 +273,7 @@ export const setTeamMemberRole = async (formData: FormData) => {
 };
 
 export const removeTeamMember = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const { member } = await requireManagedMember(userId, memberId);
@@ -312,7 +300,7 @@ const requireBillingManager = async (groupId: string, userId: string) => {
 
 // Open the Stripe customer portal for the TEAM's customer (not the user's).
 export const openTeamBillingPortal = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   await requireBillingManager(groupId, userId);
 
@@ -335,7 +323,7 @@ export const openTeamBillingPortal = async (formData: FormData) => {
 // Grant / revoke a member's billing-manager flag. Owner + admins can toggle
 // (DB01 §09 Q3); the owner's own access is always-on and cannot be removed.
 export const setBillingManager = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const enabled = str(formData, "enabled") === "true";
   const { member } = await requireManagedMember(userId, memberId);
@@ -354,7 +342,7 @@ export const setBillingManager = async (formData: FormData) => {
 // — no Stripe operation. Fails closed if the team's billing isn't org-anchored
 // yet (would otherwise orphan billing on the old owner; see P34F-03).
 export const transferTeamOwnership = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const newOwnerMemberId = str(formData, "memberId");
 
@@ -402,7 +390,7 @@ export const transferTeamOwnership = async (formData: FormData) => {
 };
 
 export const resendTeamInvite = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const { member, team } = await requireManagedMember(userId, memberId);
@@ -448,7 +436,7 @@ const requireManagedBook = async (userId: string, bookId: string) => {
 };
 
 export const createTeamBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const name = str(formData, "name");
   const description = str(formData, "description") || null;
@@ -466,7 +454,7 @@ export const createTeamBook = async (formData: FormData) => {
 };
 
 export const renameTeamBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const bookId = str(formData, "bookId");
   const name = str(formData, "name");
@@ -480,7 +468,7 @@ export const renameTeamBook = async (formData: FormData) => {
 };
 
 export const archiveTeamBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const bookId = str(formData, "bookId");
   const { book } = await requireManagedBook(userId, bookId);
@@ -493,7 +481,7 @@ export const archiveTeamBook = async (formData: FormData) => {
 
 // Delete a book: soft-archive its contacts (audit trail) then drop the book.
 export const deleteTeamBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const bookId = str(formData, "bookId");
   await requireManagedBook(userId, bookId);
@@ -516,7 +504,7 @@ export const deleteTeamBook = async (formData: FormData) => {
 
 // Set a member's permission (EDIT | VIEW | NONE) for one book.
 export const setMemberBookPermission = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const bookId = str(formData, "bookId");
@@ -597,7 +585,7 @@ const TEAM_COPY_SELECT = {
 } as const;
 
 export const addContactToTeamBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = str(formData, "contactId");
   const bookId = str(formData, "bookId");
 
@@ -696,7 +684,7 @@ export const addContactToTeamBook = async (formData: FormData) => {
 // Link one of the admin's connected CardDAV accounts to a team book; sync then
 // operates on that book's contacts (handled in the sync runner).
 export const linkTeamSyncAccount = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const syncAccountId = str(formData, "syncAccountId");
   const bookId = str(formData, "bookId");
@@ -742,7 +730,7 @@ export const linkTeamSyncAccount = async (formData: FormData) => {
 };
 
 export const unlinkTeamSyncAccount = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const teamSyncAccountId = str(formData, "teamSyncAccountId");
   const manageable = await getManageableTeam(userId);
@@ -761,7 +749,7 @@ export const unlinkTeamSyncAccount = async (formData: FormData) => {
 };
 
 export const leaveTeam = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const member = await db.groupMember.findFirst({
     where: { groupId, userId, inviteStatus: "ACCEPTED" },
@@ -780,7 +768,7 @@ export const leaveTeam = async (formData: FormData) => {
 
 // Owner only. Permanently removes the team, its books, and their contacts.
 export const deleteTeam = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const team = await db.group.findFirst({
     where: { id: groupId, ownerId: userId, type: "TEAM" },
@@ -807,7 +795,7 @@ export const deleteTeam = async (formData: FormData) => {
 // memberSlotsLimit. We do a local DB update immediately so the UI reflects the
 // change before the webhook arrives.
 export const updateTeamSeats = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const seats = parseInt(str(formData, "seats"), 10);
   if (!Number.isInteger(seats) || seats < 3 || seats > 500) {

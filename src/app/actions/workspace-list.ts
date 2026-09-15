@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { auth } from "~/server/auth";
+import { requireSession } from "~/server/auth/require-session";
 import {
   buildWorkspaceScope,
   listWorkspaceContacts,
@@ -41,8 +41,7 @@ export type WorkspaceListRequest = z.infer<typeof paramsSchema>;
 export async function loadWorkspaceContactsPage(
   rawParams: WorkspaceListRequest,
 ): Promise<{ rows: WorkspaceRow[]; totalCount: number }> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Not authenticated.");
+  const session = await requireSession();
   const params = paramsSchema.parse(rawParams);
 
   const books = await resolveWorkspaceBooks(session.user.id);

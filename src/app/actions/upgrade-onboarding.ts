@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { inviteFamilyMember } from "~/app/actions/family";
 import { inviteTeamMember } from "~/app/actions/teams";
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 
@@ -20,20 +20,19 @@ export type UpgradeOnboardingResult =
   | { ok: true; invited: number; failed: string[] }
   | { ok: false; error: "NOT_SIGNED_IN" | "PLAN_NOT_READY" };
 
-async function requireUserId(): Promise<string | null> {
-  const session = await auth();
-  if (!session?.user?.id || session.impersonatedBy) return null;
-  return session.user.id;
-}
-
 export async function completeUpgradeOnboarding(input: {
   plan: UpgradePlan;
   bookName: string;
   whoCanEdit: WhoCanEdit;
   emails: string[];
 }): Promise<UpgradeOnboardingResult> {
-  const userId = await requireUserId();
-  if (!userId) return { ok: false, error: "NOT_SIGNED_IN" };
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { ok: false, error: "NOT_SIGNED_IN" };
+    throw err;
+  }
 
   const billing = await getUserBillingContext(userId);
   const entitled =

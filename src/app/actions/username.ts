@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { RESERVED_USERNAMES, containsProfanity } from "~/server/username/reserved";
 
@@ -29,13 +29,18 @@ export async function checkUsernameAvailability(
 export async function claimUsername(username: string): Promise<
   { success: true } | { error: "TAKEN" | "RESERVED" | "INVALID" | "COOLDOWN" | "UNAUTHORIZED" }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: "UNAUTHORIZED" };
+    throw err;
+  }
 
   const normalised = username.toLowerCase().trim();
 
   const user = await db.user.findUniqueOrThrow({
-    where: { id: session.user.id },
+    where: { id: userId },
     select: { username: true, usernameClaimedAt: true },
   });
 
@@ -51,7 +56,7 @@ export async function claimUsername(username: string): Promise<
   if (availability === "invalid") return { error: "INVALID" };
 
   await db.user.update({
-    where: { id: session.user.id },
+    where: { id: userId },
     data: { username: normalised, usernameClaimedAt: new Date() },
   });
 

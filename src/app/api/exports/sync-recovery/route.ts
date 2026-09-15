@@ -1,4 +1,4 @@
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { getSyncLineageInvariantIssues } from "~/server/sync-lineage";
 import {
@@ -16,11 +16,12 @@ const slugify = (value: string) =>
     .slice(0, 40) || "sync-account";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
+    throw err;
   }
 
   const url = new URL(request.url);

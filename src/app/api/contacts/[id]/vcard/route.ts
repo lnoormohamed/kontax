@@ -1,4 +1,4 @@
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import {
   contactsToVCard,
@@ -13,10 +13,14 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+    throw err;
   }
 
   const { id } = await params;

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
 import { isKontaxHosted } from "~/lib/avatar-src";
@@ -18,9 +18,15 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) {
+      const status = err.code === "UNAUTHENTICATED" ? 401 : 403;
+      return NextResponse.json({ error: err.code }, { status });
+    }
+    throw err;
   }
 
   if (!process.env.MINIO_ENDPOINT) {
@@ -51,7 +57,7 @@ export async function POST(req: NextRequest) {
   // Key under the uploading user (profile and contact uploads alike). Cleanup
   // keys off the stored URL, not this id, so this is sufficient and avoids an
   // IDOR on a caller-supplied contact id.
-  const url = await storeContactPhoto(session.user.id, normalized);
+  const url = await storeContactPhoto(userId, normalized);
   if (!url) {
     return NextResponse.json({ error: "UPLOAD_NOT_CONFIGURED" }, { status: 503 });
   }
@@ -64,7 +70,6 @@ export async function POST(req: NextRequest) {
   // photo of a contact the caller owns. Anything else is silently ignored.
   const prevUrl = formData?.get("prevUrl");
   if (typeof prevUrl === "string" && prevUrl && prevUrl !== url && isKontaxHosted(prevUrl)) {
-    const userId = session.user.id;
     const [me, ownedContact] = await Promise.all([
       db.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } }),
       db.contact.findFirst({ where: { userId, avatarUrl: prevUrl }, select: { id: true } }),

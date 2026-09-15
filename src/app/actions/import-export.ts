@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { assertCanImportContacts } from "~/server/billing";
 import { db } from "~/server/db";
 import { parseCsvContacts } from "~/server/contact-portability";
@@ -10,22 +10,6 @@ import { csvRowCountExceedsCap, MAX_CSV_ROWS, MAX_CSV_TEXT_LENGTH } from "~/serv
 
 const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
   value && value.length > 0 ? value : undefined;
-
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    throw new Error("You must be signed in to import contacts.");
-  }
-
-  // P21-07: impersonation sessions are read-only.
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-
-  return userId;
-};
 
 // P48-11 item 4: this action had no size cap at all (csvText or the uploaded
 // file), unlike the API routes' zod .max() — a pasted or uploaded CSV of any
@@ -57,7 +41,7 @@ const getCsvText = async (formData: FormData) => {
 };
 
 export const importContactsCsv = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const { fileName, text } = await getCsvText(formData);
 
   const job = await db.importJob.create({

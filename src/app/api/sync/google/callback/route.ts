@@ -3,7 +3,7 @@
 // email, stores an encrypted SyncAccount, and queues the initial import.
 import { NextResponse, type NextRequest } from "next/server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateSyncAccount, assertHasAvailableSyncAccountSlot } from "~/server/billing";
 import { db } from "~/server/db";
 import { SYNC_ACCOUNT_MUTABLE_STATUSES } from "~/lib/sync-account-status";
@@ -53,8 +53,16 @@ export async function GET(req: NextRequest) {
   }
 
   // Defense in depth: the signed-in user must match the user bound in state.
-  const session = await auth();
-  if (!session?.user?.id || session.user.id !== state.userId) {
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) {
+      return redirectTo(req, err.code === "UNAUTHENTICATED" ? "/login" : "/sync?error=read_only_session");
+    }
+    throw err;
+  }
+  if (userId !== state.userId) {
     return redirectTo(req, "/login");
   }
 
