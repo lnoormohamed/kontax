@@ -12,7 +12,7 @@ import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 // marks/digits, spaces, and common name punctuation only. Without this a
 // freshly-registered name could carry arbitrary text into share-invite and
 // family/team-invite emails and in-app notifications from day one.
-const NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-,]+$/u;
+const NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'’‘\-,&()]+$/u;
 
 const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email(),

@@ -319,7 +319,8 @@ export const authConfig = {
         if (fresh?.lifecycleState === "LOCKED") {
           return null;
         }
-        token.sv = fresh?.sessionVersion ?? token.sv;
+        // P48 review: never re-sync `sv` here — a client-triggered update must not
+        // let a token survive a sessionVersion bump that is still propagating.
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;
         token.pendingDeletion = fresh?.scheduledDeleteAt ? true : undefined;
         token.name = fresh?.name ?? token.name;

@@ -76,6 +76,12 @@ const MAX_CONFLICT_SNAPSHOT_BYTES = 64 * 1024;
 const DAV_AUTH_WINDOW_SECONDS = 15 * 60;
 const DAV_PAIR_FAILURE_LIMIT = 10;
 const DAV_IP_FAILURE_LIMIT = 100;
+// P48 review: `cf-connecting-ip` is only trustworthy while the origin is reachable
+// solely through Cloudflare. If it ever is not, a client can mint a fresh IP per
+// request and the two IP-keyed buckets never fill. This per-email bucket does
+// not depend on the IP at all, so a single account can never be brute-forced
+// past 50 failures per window whatever the header says.
+const DAV_EMAIL_FAILURE_LIMIT = 50;
 // P48-09: at most one `lastUsedAt` write per app password per 5 minutes.
 const LAST_USED_DEBOUNCE_MS = 5 * 60 * 1000;
 
@@ -112,6 +118,7 @@ const makeDavLimiter = (points, keyPrefix) => {
 // hand-rolled `buckets` Map was never pruned).
 const davPairLimiter = makeDavLimiter(DAV_PAIR_FAILURE_LIMIT, "dav:pair");
 const davIpLimiter = makeDavLimiter(DAV_IP_FAILURE_LIMIT, "dav:ip");
+const davEmailLimiter = makeDavLimiter(DAV_EMAIL_FAILURE_LIMIT, "dav:email");
 
 // appPasswordId -> epoch ms of the last `lastUsedAt` write made by this process.
 const lastUsedWrites = new Map();
@@ -354,13 +361,16 @@ const verifyCardDavCredentials = async (normalizedEmail, plaintext) => {
   const normalizedToken = normalizeToken(plaintext);
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail },
-    select: { id: true, lifecycleState: true },
+    select: { id: true, lifecycleState: true, scheduledDeleteAt: true },
   });
 
   // P48-09: exactly one bcrypt compare on every failure path. Previously an
   // unknown email cost one dummy compare but a *known* email with zero app
   // passwords cost none — a timing oracle for account enumeration.
-  if (!user || user.lifecycleState === "LOCKED") {
+  // P48-02 follow-up: an account in its deletion grace period is read-only
+  // plus cancel on the web and refused on the REST API; device sync is refused
+  // too so a scheduled account cannot keep writing over CardDAV.
+  if (!user || user.lifecycleState === "LOCKED" || user.scheduledDeleteAt) {
     await bcrypt.compare(normalizedToken, DUMMY_BCRYPT_HASH);
     return null;
   }
@@ -400,30 +410,34 @@ const verifyCardDavCredentials = async (normalizedEmail, plaintext) => {
   return null;
 };
 
-const consumeDavFailure = async (ip, pairKey) => {
+const consumeDavFailure = async (ip, pairKey, emailKey) => {
   await Promise.all([
     davPairLimiter.consume(pairKey, 1).catch(() => undefined),
     davIpLimiter.consume(ip, 1).catch(() => undefined),
+    davEmailLimiter.consume(emailKey, 1).catch(() => undefined),
   ]);
 };
 
-const resetDavFailures = async (ip, pairKey) => {
+const resetDavFailures = async (ip, pairKey, emailKey) => {
   await Promise.all([
     davPairLimiter.delete(pairKey).catch(() => undefined),
     davIpLimiter.delete(ip).catch(() => undefined),
+    davEmailLimiter.delete(emailKey).catch(() => undefined),
   ]);
 };
 
 // Blocked? Peek without consuming so a *successful* login is never penalised.
-const davLimitRetryAfterSeconds = async (ip, pairKey) => {
-  const [pair, byIp] = await Promise.all([
+const davLimitRetryAfterSeconds = async (ip, pairKey, emailKey) => {
+  const [pair, byIp, byEmail] = await Promise.all([
     davPairLimiter.get(pairKey).catch(() => null),
     davIpLimiter.get(ip).catch(() => null),
+    davEmailLimiter.get(emailKey).catch(() => null),
   ]);
 
   const blocked = [
     pair && pair.remainingPoints <= 0 ? pair.msBeforeNext : 0,
     byIp && byIp.remainingPoints <= 0 ? byIp.msBeforeNext : 0,
+    byEmail && byEmail.remainingPoints <= 0 ? byEmail.msBeforeNext : 0,
   ].filter((ms) => typeof ms === "number" && ms > 0);
 
   return blocked.length > 0 ? Math.max(...blocked) / 1000 : null;
@@ -451,7 +465,7 @@ const requireDavAuth = async (req, res, expectedUserId) => {
     // Peek (never consume) before the user lookup and bcrypt, so a blocked key
     // reaches neither the database nor the expensive compare — and a successful
     // authentication is never charged a point.
-    const retryAfter = await davLimitRetryAfterSeconds(ip, pairKey);
+    const retryAfter = await davLimitRetryAfterSeconds(ip, pairKey, normalizedEmail);
 
     if (retryAfter !== null) {
       tooManyRequests(res, retryAfter);
@@ -461,13 +475,13 @@ const requireDavAuth = async (req, res, expectedUserId) => {
     result = await verifyCardDavCredentials(normalizedEmail, credentials.password);
 
     if (!result) {
-      await consumeDavFailure(ip, pairKey);
+      await consumeDavFailure(ip, pairKey, normalizedEmail);
       unauthorized(res);
       return null;
     }
 
     await writeCachedCredential(cacheKey, result);
-    await resetDavFailures(ip, pairKey);
+    await resetDavFailures(ip, pairKey, normalizedEmail);
   }
 
   if (expectedUserId && result.userId !== expectedUserId) {
@@ -1098,7 +1112,10 @@ const parseVCardToContactFields = (text) => {
 
   const photoLine = lines.find((line) => line.name === "PHOTO");
   if (photoLine && photoLine.params.some((param) => /VALUE=URI/i.test(param))) {
-    fields.avatarUrl = photoLine.value || null;
+    // P48-04 follow-up: a device can put anything in PHOTO;VALUE=URI. Only keep
+    // http(s) URLs; every later fetch of this value goes through the SSRF guard.
+    const photoUri = (photoLine.value || "").trim();
+    fields.avatarUrl = /^https?:\/\//i.test(photoUri) ? photoUri : null;
   }
 
   return fields;

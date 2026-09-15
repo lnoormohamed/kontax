@@ -221,13 +221,14 @@ export async function verifyCardDavCredentials(email: string, plaintext: string)
     select: {
       id: true,
       lifecycleState: true,
+      scheduledDeleteAt: true,
     },
   });
 
   // P48-09: a LOCKED account must not be able to sync. The dummy compare keeps
   // every failure path costing one bcrypt — a known email with zero app
   // passwords used to cost none, which was an account-enumeration oracle.
-  if (!user || user.lifecycleState === "LOCKED") {
+  if (!user || user.lifecycleState === "LOCKED" || user.scheduledDeleteAt) {
     await bcrypt.compare(normalizedToken, DUMMY_BCRYPT_HASH);
     return null;
   }

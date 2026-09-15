@@ -14,6 +14,7 @@ import {
   sendEmailChangeNotice,
 } from "~/server/email-change-revert";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
+import { invalidateDavCredentialCacheForUser } from "~/server/app-passwords";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -24,7 +25,7 @@ import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 // the group-owner display used across family/team invites. Constrain it to
 // Unicode letters/marks/digits, spaces, and common name punctuation so it can
 // never carry control characters, markup, or arbitrary attacker text.
-const NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-,]+$/u;
+const NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'’‘\-,&()]+$/u;
 
 // ─── Profile Edit (P18-01) ───────────────────────────────────────────────────
 
@@ -367,6 +368,9 @@ export async function scheduleAccountDeletion(input: {
   });
   // P38-09: the sessionVersion bump must beat the 45s validation cache
   await invalidateSessionValidation(session.user.id);
+  // P48-09/02: a verified CardDAV credential is cached for 10 minutes — drop it
+  // so device sync stops with the rest of the account.
+  await invalidateDavCredentialCacheForUser(session.user.id);
 
   // Delete MinIO avatar (best effort)
   const avatarUrl = user?.avatarUrl;

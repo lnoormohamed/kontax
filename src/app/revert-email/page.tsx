@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 import Link from "next/link";
 
-import { revertEmailChange } from "~/server/email-change-revert";
+import { RevertEmailForm } from "./revert-form";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,10 @@ export const metadata: Metadata = {
  * settings shell redirects anyone without a session to `/login`, and the person
  * clicking this link is by definition the one who may have just been locked out
  * of the account. The page must work signed-out.
+ *
+ * P48 review (L3): rendering this page does NOT revert anything. The token is
+ * consumed only when the visitor submits the confirm form (a server action), so
+ * link scanners and email prefetchers cannot cancel a legitimate change.
  */
 export default async function RevertEmailPage({
   searchParams,
@@ -25,36 +29,6 @@ export default async function RevertEmailPage({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  const result = await revertEmailChange(token ?? "");
-
-  const body = result.ok
-    ? {
-        tone: "ok" as const,
-        title: result.wasActivated ? "Your email address is back" : "Email change cancelled",
-        message: result.wasActivated
-          ? `Your Kontax account has been restored to ${result.restoredEmail}, and every signed-in device has been signed out.`
-          : `The pending change was cancelled — your account stays on ${result.restoredEmail} — and every signed-in device has been signed out.`,
-        footer:
-          "Because someone else may know your password, reset it now before signing back in.",
-        cta: { href: "/forgot-password", label: "Reset my password →" },
-      }
-    : {
-        tone: "error" as const,
-        title:
-          result.reason === "TOKEN_EXPIRED"
-            ? "This link has expired"
-            : result.reason === "EMAIL_TAKEN"
-              ? "That address is no longer available"
-              : "This link is no longer valid",
-        message:
-          result.reason === "TOKEN_EXPIRED"
-            ? "Undo links are valid for 24 hours. If you still don't recognise the change, reset your password to secure the account."
-            : result.reason === "EMAIL_TAKEN"
-              ? "Your previous address has since been claimed by another account, so it can't be restored automatically. Please contact support."
-              : "It may already have been used, or the change was cancelled another way. If you're unsure, reset your password to secure the account.",
-        footer: null,
-        cta: { href: "/forgot-password", label: "Reset my password →" },
-      };
 
   return (
     <main
@@ -69,55 +43,9 @@ export default async function RevertEmailPage({
       </Link>
 
       <div className="w-full max-w-[440px] rounded-[2rem] border border-[#d8ddd6] bg-white p-8 text-center shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
-        <div
-          className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full"
-          style={{ backgroundColor: body.tone === "ok" ? "#e7efe9" : "#f7e9e4" }}
-        >
-          {body.tone === "ok" ? (
-            <svg
-              fill="none"
-              height="22"
-              stroke="#17352e"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="22"
-            >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg
-              fill="none"
-              height="22"
-              stroke="#b5472f"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="22"
-            >
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 8v5M12 16h.01" />
-            </svg>
-          )}
-        </div>
-
-        <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">
-          {body.title}
-        </h1>
-        <p className="mt-3 text-[14px] leading-[1.55] text-[#5c655e]">{body.message}</p>
-        {body.footer && (
-          <p className="mt-3 text-[13px] leading-[1.55] text-[#8b938c]">{body.footer}</p>
-        )}
-
-        <Link
-          className="mt-5 inline-flex h-10 items-center rounded-full bg-[#17352e] px-5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
-          href={body.cta.href}
-        >
-          {body.cta.label}
-        </Link>
+        <RevertEmailForm token={typeof token === "string" ? token : ""} />
       </div>
+      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
     </main>
   );
 }

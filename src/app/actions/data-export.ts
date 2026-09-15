@@ -28,7 +28,7 @@ export async function requestDataExport(
 ): Promise<ActionResult<{ jobId: string }>> {
   let userId: string;
   try {
-    userId = await requireUserId({ write: true });
+    userId = await requireUserId(); // P48-02: exports stay available during the deletion grace period
   } catch {
     return { ok: false, reason: "SESSION_EXPIRED" };
   }

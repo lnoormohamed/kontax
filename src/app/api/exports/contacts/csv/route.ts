@@ -12,7 +12,7 @@ import {
 export async function GET(request: Request) {
   let userId: string;
   try {
-    userId = await requireUserId({ write: true });
+    userId = await requireUserId(); // P48-02: exports stay available during the deletion grace period
   } catch (err) {
     if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
     throw err;
@@ -149,7 +149,7 @@ const postSchema = z.object({
 export async function POST(request: Request) {
   let userId: string;
   try {
-    userId = await requireUserId({ write: true });
+    userId = await requireUserId(); // P48-02: exports stay available during the deletion grace period
   } catch (err) {
     if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
     throw err;

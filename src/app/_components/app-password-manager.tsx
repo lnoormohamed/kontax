@@ -140,17 +140,34 @@ export function AppPasswordManager({
   const [revokeError, setRevokeError] = useState<string | null>(null);
   const [revealKey, setRevealKey] = useState(0);
 
+  const runCreate = async (label: string, password?: string) => {
+    const formData = new FormData();
+    formData.set("label", label);
+    if (password) formData.set("currentPassword", password);
+    const result = await createAppPassword(null, formData);
+    return result;
+  };
+
   const executeCreate = (label: string) => {
     startCreate(async () => {
-      const formData = new FormData();
-      formData.set("label", label);
-      const result = await createAppPassword(null, formData);
+      const result = await runCreate(label);
       setCreateState(result);
       if (result?.ok) {
         setRevealKey((k) => k + 1);
         formRef.current?.reset();
       }
     });
+  };
+
+  // P48 review: the modal hands the password to the action, which verifies it
+  // server-side (`verifyStepUpPassword`); a wrong password is shown in the modal.
+  const createWithStepUp = async (password: string): Promise<string | void> => {
+    const result = await runCreate(pendingLabel, password);
+    if (!result?.ok) return result?.error ?? "Could not create the app password.";
+    setCreateState(result);
+    setRevealKey((k) => k + 1);
+    formRef.current?.reset();
+    setShowCreateStepUp(false);
   };
 
   const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -191,7 +208,8 @@ export function AppPasswordManager({
           title="Confirm your identity"
           description="Enter your password to create an app password."
           confirmLabel="Create password"
-          onConfirmed={async () => { setShowCreateStepUp(false); executeCreate(pendingLabel); }}
+          serverVerifies
+          onConfirmed={createWithStepUp}
           onClose={() => setShowCreateStepUp(false)}
         />
       )}

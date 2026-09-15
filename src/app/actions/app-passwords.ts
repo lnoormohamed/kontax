@@ -13,11 +13,15 @@ import {
   revokeUserAppPassword,
 } from "~/server/app-passwords";
 import { requireUserId } from "~/server/auth/require-session";
+import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 
 const createAppPasswordSchema = z.object({
   label: z.string().trim().min(1, "Label is required.").max(64, "Label must be 64 characters or fewer."),
+  // P48 review: minting a CardDAV credential is a sensitive action — the
+  // password is verified here, not in a client-side modal.
+  currentPassword: z.string().max(500).optional(),
 });
 
 const revokeAppPasswordSchema = z.object({
@@ -28,12 +32,27 @@ export const createAppPassword = async (_previousState: unknown, formData: FormD
   const userId = await requireUserId({ write: true });
   const parsed = createAppPasswordSchema.safeParse({
     label: formData.get("label"),
+    currentPassword: formData.get("currentPassword") ?? undefined,
   });
 
   if (!parsed.success) {
     return {
       ok: false as const,
       error: parsed.error.issues[0]?.message ?? "Invalid app password label.",
+    };
+  }
+
+  const owner = await db.user.findUnique({ where: { id: userId }, select: { password: true } });
+  const stepUp = await verifyStepUpPassword(userId, owner?.password, parsed.data.currentPassword);
+  if (stepUp !== "OK") {
+    return {
+      ok: false as const,
+      error:
+        stepUp === "STEP_UP_REQUIRED"
+          ? "STEP_UP_REQUIRED"
+          : stepUp === "RATE_LIMIT_EXCEEDED"
+            ? "Too many attempts. Try again in an hour."
+            : "Incorrect password.",
     };
   }
 

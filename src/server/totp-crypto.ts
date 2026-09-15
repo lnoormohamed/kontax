@@ -146,7 +146,9 @@ export function isTotpCiphertextStale(stored: string): boolean {
       keyring.current.id
     );
   } catch {
-    return false;
+    // Unreadable under every configured key: report it as needing attention
+    // rather than silently counting it as already current.
+    return true;
   }
 }
 

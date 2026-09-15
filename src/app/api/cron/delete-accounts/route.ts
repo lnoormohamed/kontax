@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { invalidateDavCredentialCacheForUser } from "~/server/app-passwords";
 import { cancelBillingForDeletedUser } from "~/server/billing-lifecycle";
 import { assertCronSecret } from "~/server/cron-guard";
 import { db } from "~/server/db";
@@ -40,6 +41,8 @@ export async function POST(req: NextRequest) {
       // non-throwing by design (see billing-lifecycle.ts): a Stripe outage
       // logs for manual reconciliation rather than stalling the sweep.
       await cancelBillingForDeletedUser(user.id);
+      // P48-09: a cached DAV credential must not outlive the row it points at.
+      await invalidateDavCredentialCacheForUser(user.id);
 
       await db.user.delete({ where: { id: user.id } });
       // Cascade deletes all child records via Prisma onDelete: Cascade

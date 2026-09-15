@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { LABEL_PALETTE } from "~/app/_components/label-chip";
-import { requireUserId } from "~/server/auth/require-session";
+import { requireUserId, isSessionError } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 
 // P31B-01: label registry CRUD. Contact.labels[] stays as the membership
@@ -42,7 +42,16 @@ const validColor = (col: string) => {
 // on first load without a separate migration job.
 
 export async function ensureLabelRegistry(): Promise<void> {
-  const userId = await requireUserId();
+  // P48 review: this upserts Label rows, so it is a write. An impersonating
+  // admin browsing the contacts page must not create rows in the target's
+  // account — skip silently rather than surface an error on a read surface.
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err) && err.code !== "UNAUTHENTICATED") return;
+    throw err;
+  }
 
   const existing = await db.label.findMany({
     where: { userId },

@@ -162,6 +162,11 @@ const dedupeById = (entries: KeyringEntry[]): KeyringEntry[] => {
   for (const entry of entries) {
     const existing = byId.get(entry.id);
     if (existing) {
+      if (existing.secret !== entry.secret) {
+        throw new Error(
+          `Encryption key id "${entry.id}" is configured twice with different secrets (keyring vs single-key variable). Give the second key its own id.`,
+        );
+      }
       for (const alias of entry.aliases) {
         if (!existing.aliases.includes(alias)) existing.aliases.push(alias);
       }
