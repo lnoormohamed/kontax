@@ -57,6 +57,15 @@ jobs return 200**. The biggest true gaps: Stripe test mode, missing
 | 18 | **Go-live cutover** | ◑ mostly done — prod already serves getkontax.com; merge+schema+redeploy ✅, post-swap scripted smoke ✅. **Admin bootstrap DONE 2026-07-07**: `li@linoormohamed.com` granted ADMIN (`grant-admin.mjs`) — sole admin + earliest user ⇒ GOVERNANCE bootstrap tier; `/admin` verified 200 (tested via temp-promote of p47qa, then revoked). **Remaining:** (a) decide `kontax.vexon.co` redirect — 301→prod (retire staging) vs leave as-is (staging on 10.0.0.x, currently unreachable); (b) at real launch, clean up QA fixtures — delete/repurpose `p47qa` user + `/u/p47qa` username, revoke ApiToken `p47-smoke`; both gated on finishing the manual smoke + photo QA that still use them | admin grant + `/admin` 200 | P47-14 |
 | 19 | **Post-launch review** | ⬜ gated — write `p47-post-launch-review.md` at T+24h **after the actual launch** (which is itself gated on P47-13 manual sign-off + Stripe live + Google submit). Premature until then | — | P47-14 |
 
+> **2026-09-15 (Phase 48 deploy):** cron LXC 152 was found stopped and restarted;
+> crontab verified (all 8 routes, secret matches app env, first tick 09:45 UTC
+> executed). Fixed in `/etc/cron.d/kontax` (backup `/root/kontax.cron.bak-*`):
+> Kuma heartbeat re-pointed `192.168.1.58` → `10.0.50.73`; `data-export` now
+> every 5 min and `expire-exports` hourly. Hosts have moved to `10.0.50.x`
+> (Proxmox `10.0.50.10`, Postgres LXC 129 `10.0.50.193`, cron LXC 152
+> `10.0.50.84`, Kuma LXC 131 `10.0.50.73`) — the `192.168.1.x` addresses below
+> are historical.
+
 ## Open gap list (ordered — externals deliberately last per 2026-07-05 decision)
 
 1. ~~Two Coolify env changes + redeploy~~ **DONE 2026-07-05** (set via Coolify

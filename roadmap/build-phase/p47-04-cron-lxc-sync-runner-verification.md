@@ -22,12 +22,13 @@ current app.
 |----------|----------|
 | `/api/cron/reset-api-counters` | daily 00:00 UTC |
 | `/api/cron/delete-accounts` | daily 01:00 UTC |
-| `/api/cron/expire-exports` | daily 01:15 UTC |
-| `/api/cron/data-export` | daily 01:30 UTC |
+| `/api/cron/expire-exports` | hourly at :15 (changed 2026-09-15; was daily 01:15) |
+| `/api/cron/data-export` | every 5 min (changed 2026-09-15; was daily 01:30 — a request could wait 24 h) |
 | `/api/cron/cleanup-card-views` | daily 02:00 UTC |
 | `/api/cron/birthday-reminders` | daily 08:00 UTC |
 | `/api/cron/digest` | daily 08:00 UTC |
 | **sync runner** | every 15 min |
+| Uptime Kuma heartbeat (push monitor id 18) | every 15 min → `http://10.0.50.73:3001/api/push/…` (re-pointed 2026-09-15 from the old `192.168.1.58`) |
 
 > Cross-check `env-secrets.md` lists these plus `data-export`/`expire-exports`
 > and note any endpoint that exists in code but is **not** in the crontab (e.g.
