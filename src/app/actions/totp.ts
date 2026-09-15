@@ -4,7 +4,8 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import QRCode from "qrcode";
 
-import { auth, authIncludingPendingTotp } from "~/server/auth";
+import { authIncludingPendingTotp } from "~/server/auth";
+import { isSessionError, requireSession } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import {
   createTotpSecret,
@@ -32,9 +33,13 @@ function generateRecoveryCode(): string {
 export async function startTotpEnrolment(): Promise<
   { qrCodeDataUri: string; plaintextSecret: string; pendingToken: string } | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -61,9 +66,13 @@ export async function confirmTotpEnrolment(input: {
   totpCode: string;
   pendingToken: string;
 }): Promise<{ success: true; recoveryCodes: string[] } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   // P48-03: enrolment verifies a TOTP code, so it is a guessable-code endpoint
   // like the login challenge and gets the same bucket.
@@ -114,9 +123,13 @@ export async function confirmTotpEnrolment(input: {
 export async function regenerateRecoveryCodes(): Promise<
   { success: true; recoveryCodes: string[] } | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -226,9 +239,13 @@ export async function disableTotpAuth(input: {
   password: string;
   totpCode: string;
 }): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   // P48-03: turning 2FA OFF takes both a password and a TOTP code, so it was
   // the one unmetered endpoint where either could be brute-forced.
@@ -274,7 +291,7 @@ export async function getTotpStatus(): Promise<{
   verifiedAt: Date | null;
   remainingCodes: number;
 }> {
-  const session = await auth();
+  const session = await requireSession().catch(() => null);
   if (!session?.user?.id) return { enabled: false, verifiedAt: null, remainingCodes: 0 };
 
   const [user, remaining] = await Promise.all([

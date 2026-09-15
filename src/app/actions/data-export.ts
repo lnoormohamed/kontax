@@ -3,21 +3,13 @@
 import { revalidatePath } from "next/cache";
 
 import { type ActionResult } from "~/lib/action-result";
-import { auth } from "~/server/auth";
 import { requireUserId } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { createDataExportJob, getActiveDataExportJob } from "~/server/data-export/jobs";
 import { db } from "~/server/db";
 
-async function getRequiredUserId() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("You must be signed in.");
-  return userId;
-}
-
 export async function getDataExportStatus() {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId();
   return db.dataExportJob.findFirst({
     where: { userId },
     orderBy: { requestedAt: "desc" },

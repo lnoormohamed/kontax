@@ -4,16 +4,18 @@
 // first 50 names.
 import { NextResponse } from "next/server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { escapeCsvCell } from "~/server/contact-portability";
 import type { DeletionHoldPayload } from "~/server/sync-deletion-guard";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    throw err;
   }
 
   const syncAccountId = new URL(request.url).searchParams.get("syncAccountId");

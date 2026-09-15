@@ -82,3 +82,28 @@ export async function requireUserId(opts: RequireSessionOptions = {}): Promise<s
 export function isSessionError(err: unknown): err is SessionError {
   return err instanceof SessionError;
 }
+
+/** Human-readable text for a `SessionError`, for actions that throw rather than return an `ActionResult`. */
+export function sessionErrorMessage(err: SessionError): string {
+  switch (err.code) {
+    case "UNAUTHENTICATED":
+      return "You need to be signed in.";
+    case "IMPERSONATION_READ_ONLY":
+      return "This is a read-only impersonation session — changes are blocked.";
+    case "PENDING_DELETION":
+      return "Your account is scheduled for deletion. Cancel the deletion to make changes.";
+  }
+}
+
+/**
+ * P48-06: map a `SessionError` to the `ActionResult` failure shape used across
+ * `src/app/actions/*`. `UNAUTHENTICATED` becomes the existing `SESSION_EXPIRED`
+ * reason; the two write-refusal codes become `ERROR` with a message, since
+ * `ActionResult`'s `reason` union has no dedicated slot for them.
+ */
+export function sessionErrorResult(
+  err: SessionError,
+): { ok: false; reason: "SESSION_EXPIRED" | "ERROR"; message?: string } {
+  if (err.code === "UNAUTHENTICATED") return { ok: false, reason: "SESSION_EXPIRED" };
+  return { ok: false, reason: "ERROR", message: sessionErrorMessage(err) };
+}

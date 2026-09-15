@@ -2,7 +2,7 @@
 // the uploaded bytes (never trusts the client's recognition), parses, and
 // lands contacts via commitKontaxImport.
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { commitKontaxImport, KontaxImportError } from "~/server/export-format/import";
 import {
   parseKontaxArchive,
@@ -19,11 +19,12 @@ import {
 const MAX_BYTES = 64 * 1024 * 1024; // 64 MB
 
 export async function POST(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return Response.json({ message: "Unauthorized" }, { status: 401 });
+    throw err;
   }
 
   const formData = await request.formData().catch(() => null);

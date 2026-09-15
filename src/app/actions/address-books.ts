@@ -2,24 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { movePrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
 
 // P28-03: personal address-book management. The default book is immutable
 // (cannot be renamed or archived); slugs are stable after creation so CardDAV
 // device subscriptions survive a rename.
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("You need to be signed in.");
-  }
-  if (session.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return session.user.id;
-};
 
 const cleanName = (name: string) => {
   const trimmed = name.trim();
@@ -61,7 +50,7 @@ const uniqueSlug = async (userId: string, base: string) => {
 export async function createAddressBook(
   input: { name: string } | FormData,
 ): Promise<{ id: string }> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const name = cleanName(input instanceof FormData ? readString(input, "name") : input.name);
   const slug = await uniqueSlug(userId, slugify(name));
 
@@ -82,7 +71,7 @@ export async function createAddressBookFromForm(formData: FormData): Promise<voi
 export async function renameAddressBook(
   input: { id: string; name: string } | FormData,
 ): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const id = input instanceof FormData ? readString(input, "id") : input.id;
   const name = input instanceof FormData ? readString(input, "name") : input.name;
   const book = await db.addressBook.findFirst({ where: { id, userId } });
@@ -100,7 +89,7 @@ export async function renameAddressBook(
 }
 
 export async function archiveAddressBook(id: string): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const book = await db.addressBook.findFirst({ where: { id, userId } });
   if (!book) throw new Error("That book no longer exists.");
   if (book.isDefault) throw new Error("The default book can't be archived.");
@@ -130,7 +119,7 @@ export async function archiveAddressBook(id: string): Promise<void> {
 }
 
 export async function setDefaultAddressBook(targetBookId: string): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const target = await db.addressBook.findFirst({
     where: { id: targetBookId, userId, archivedAt: null },
     select: { id: true, isDefault: true },
@@ -172,7 +161,7 @@ export async function moveContactsToBook(input: {
   contactIds: string[];
   targetBookId: string;
 }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   if (input.contactIds.length === 0) return;
 
   // Verify the target book belongs to this user (and isn't archived).

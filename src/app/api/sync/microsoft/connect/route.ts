@@ -3,7 +3,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { getAppUrl } from "~/lib/site-url";
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import {
   MICROSOFT_SCOPES,
   createMsalClient,
@@ -16,9 +16,15 @@ import { encodeOAuthState } from "~/server/sync-oauth-state";
 const appUrl = () => getAppUrl();
 
 export async function GET(_req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.redirect(new URL("/login", appUrl()));
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) {
+      const dest = err.code === "UNAUTHENTICATED" ? "/login" : "/sync?error=read_only_session";
+      return NextResponse.redirect(new URL(dest, appUrl()));
+    }
+    throw err;
   }
 
   if (!isMicrosoftSyncConfigured()) {
@@ -26,7 +32,7 @@ export async function GET(_req: NextRequest) {
   }
 
   const cca = createMsalClient();
-  const state = encodeOAuthState({ userId: session.user.id, returnTo: "/sync" });
+  const state = encodeOAuthState({ userId, returnTo: "/sync" });
 
   const authUrl = await cca.getAuthCodeUrl({
     scopes: MICROSOFT_SCOPES,

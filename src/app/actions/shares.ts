@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import {
   assertCanLiveShare,
   assertCanStaticShare,
@@ -49,18 +49,6 @@ const sendShareInviteEmail = async (opts: {
 };
 
 const FREE_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("You need to be signed in.");
-  }
-  // P21-07: impersonation sessions are read-only.
-  if (session.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return session.user.id;
-};
 
 const str = (formData: FormData, key: string) => {
   const value = formData.get(key);
@@ -115,7 +103,7 @@ const PERSONAL_SHARE_POLICY = resolveEffectiveSharingPolicy(null, null);
 // ── P12-02: vCard share link (all plans) ─────────────────────────────────────
 
 export const createVcardShareLink = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = str(formData, "contactId");
   if (!contactId) {
     throw new Error("Missing contact.");
@@ -158,7 +146,7 @@ export const createVcardShareLink = async (formData: FormData) => {
 export const getOrCreateVcardShareLink = async (
   contactId: string,
 ): Promise<{ url: string; expiresAt: string | null }> => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
 
   const contact = await db.contact.findFirst({
     where: { id: contactId, userId },
@@ -207,7 +195,7 @@ export const getOrCreateVcardShareLink = async (
 };
 
 export const revokeShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const shareId = str(formData, "shareId");
   const contactId = str(formData, "contactId");
 
@@ -240,7 +228,7 @@ export const revokeShare = async (formData: FormData) => {
 // ── P12-03: static Kontax-to-Kontax share (Pro and above) ────────────────────
 
 export const createStaticShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await assertCanStaticShare(userId); // Pro+ gate
 
   const contactId = str(formData, "contactId");
@@ -354,7 +342,7 @@ type ShareSnapshot = {
 };
 
 export const acceptStaticShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const shareId = str(formData, "shareId");
   let newContactId = "";
 
@@ -441,7 +429,7 @@ export const acceptStaticShare = async (formData: FormData) => {
 };
 
 export const declineStaticShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const shareId = str(formData, "shareId");
 
   await db.contactShare.updateMany({
@@ -460,7 +448,7 @@ export const declineStaticShare = async (formData: FormData) => {
 // ── P12-04: live Kontax-to-Kontax share (Pro+, both parties) ─────────────────
 
 export const createLiveShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await assertCanLiveShare(userId); // Pro+ gate (sender)
 
   const contactId = str(formData, "contactId");
@@ -547,7 +535,7 @@ export const createLiveShare = async (formData: FormData) => {
 };
 
 export const acceptLiveShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const shareId = str(formData, "shareId");
 
   // Recipient must also be on a paid plan; otherwise the live share falls back
@@ -651,7 +639,7 @@ export const acceptLiveShare = async (formData: FormData) => {
 // Recipient unlinks a live contact: the share is revoked and their copy freezes
 // into an independent static record.
 export const unlinkLiveShare = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = str(formData, "contactId");
 
   await db.$transaction(async (tx) => {

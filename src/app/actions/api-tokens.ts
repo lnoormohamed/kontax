@@ -5,21 +5,14 @@ import { revalidatePath } from "next/cache";
 import type { ApiTokenScope } from "~/server/api-tokens";
 import { generateApiToken } from "~/server/api-tokens";
 import { getUserBillingContext } from "~/server/billing";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
-
-async function getRequiredUserId() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) throw new Error("UNAUTHENTICATED");
-  return userId;
-}
 
 export async function createApiToken(input: {
   name: string;
   scope: ApiTokenScope;
 }): Promise<{ token: string; id: string }> {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
 
   const context = await getUserBillingContext(userId);
   if (!context.entitlements.apiAccessEnabled) throw new Error("UPGRADE_REQUIRED");
@@ -46,7 +39,7 @@ export async function createApiToken(input: {
 }
 
 export async function revokeApiToken(id: string): Promise<void> {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
 
   await db.apiToken.update({
     where: { id, userId },

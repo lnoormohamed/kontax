@@ -9,7 +9,7 @@ import {
   listUserAppPasswords,
   revokeUserAppPassword,
 } from "~/server/app-passwords";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 
 const createAppPasswordSchema = z.object({
   label: z.string().trim().min(1, "Label is required.").max(64, "Label must be 64 characters or fewer."),
@@ -19,24 +19,8 @@ const revokeAppPasswordSchema = z.object({
   appPasswordId: z.string().trim().min(1, "App password id is required."),
 });
 
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    throw new Error("You must be signed in to manage app passwords.");
-  }
-
-  // P21-07: impersonation sessions are read-only.
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-
-  return userId;
-};
-
 export const createAppPassword = async (_previousState: unknown, formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const parsed = createAppPasswordSchema.safeParse({
     label: formData.get("label"),
   });
@@ -72,12 +56,12 @@ export const createAppPassword = async (_previousState: unknown, formData: FormD
 };
 
 export const getAppPasswords = async () => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId();
   return listUserAppPasswords(userId);
 };
 
 export const revokeAppPassword = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const parsed = revokeAppPasswordSchema.safeParse({
     appPasswordId: formData.get("appPasswordId"),
   });

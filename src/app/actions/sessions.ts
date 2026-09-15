@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireSession } from "~/server/auth/require-session";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { db } from "~/server/db";
 
@@ -14,7 +14,7 @@ export interface SessionSummary {
 }
 
 export async function listActiveSessions(): Promise<SessionSummary[]> {
-  const session = await auth();
+  const session = await requireSession().catch(() => null);
   if (!session?.user?.id) return [];
 
   const currentJti = (session as { jti?: string }).jti;
@@ -38,8 +38,13 @@ export async function listActiveSessions(): Promise<SessionSummary[]> {
 export async function revokeSession(
   sessionId: string,
 ): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: "UNAUTHORIZED" };
+    throw err;
+  }
 
   const currentJti = (session as { jti?: string }).jti;
 
@@ -71,7 +76,7 @@ export async function revokeSession(
 }
 
 export async function revokeAllOtherSessions(): Promise<{ revokedCount: number }> {
-  const session = await auth();
+  const session = await requireSession({ write: true }).catch(() => null);
   if (!session?.user?.id) return { revokedCount: 0 };
 
   const currentJti = (session as { jti?: string }).jti;

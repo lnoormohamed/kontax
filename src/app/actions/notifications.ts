@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requestPasswordReset } from "~/app/actions/auth";
-import { auth } from "~/server/auth";
+import { requireSession, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { generateCalToken } from "~/server/ical";
 import {
@@ -18,36 +18,20 @@ import {
 
 import type { DigestCadence } from "../../../generated/prisma";
 
-/**
- * Auth guard shared by every notification mutation. Mirrors actions/settings.ts:
- * impersonation sessions (P21-07) are read-only.
- */
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You must be signed in.");
-  }
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return userId;
-};
-
 export const markNotificationReadAction = async (id: string) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   await markNotificationRead(userId, id);
   revalidatePath("/contacts");
 };
 
 export const markAllNotificationsReadAction = async () => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   await markAllNotificationsRead(userId);
   revalidatePath("/contacts");
 };
 
 export const dismissNotificationAction = async (id: string) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   await dismissNotification(userId, id);
   revalidatePath("/contacts");
 };
@@ -56,14 +40,8 @@ export const resolveSecurityAlertAction = async (
   alertId: string,
   resolution: "DISMISSED" | "SECURED",
 ) => {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    throw new Error("You must be signed in.");
-  }
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
+  const session = await requireSession({ write: true });
+  const userId = session.user.id;
   await resolveSecurityAlert(userId, alertId, resolution);
   // P22-06: after lockdown, email a password-reset link so the user must set a
   // new password to sign back in. Their current session is already invalidated.
@@ -78,15 +56,14 @@ export const resolveSecurityAlertAction = async (
 export const fetchSecurityAlertAction = async (
   alertId: string,
 ): Promise<SecurityAlertView | null> => {
-  const session = await auth();
-  const userId = session?.user?.id;
+  const userId = await requireUserId().catch(() => null);
   if (!userId) return null;
   return getSecurityAlert(userId, alertId);
 };
 
 /** P22-11: create the iCal token if absent, returning it. Idempotent. */
 export const ensureCalTokenAction = async (): Promise<string> => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const existing = await db.user.findUnique({
     where: { id: userId },
     select: { calToken: true },
@@ -100,7 +77,7 @@ export const ensureCalTokenAction = async (): Promise<string> => {
 
 /** P22-11: revoke the old token and issue a new one (breaks existing subscriptions). */
 export const regenerateCalTokenAction = async (): Promise<string> => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const token = generateCalToken();
   await db.user.update({ where: { id: userId }, data: { calToken: token } });
   revalidatePath("/settings/notifications");
@@ -115,7 +92,7 @@ const DIGEST_VALUES: DigestCadence[] = ["NONE", "DAILY", "WEEKLY"];
  * are always-on and have no fields.
  */
 export const updateNotificationPreferences = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const on = (name: string) => formData.get(name) === "on";
   const rawDigest = formData.get("digest");
   const digest =

@@ -1,5 +1,5 @@
 import { actorIconName, formatActorLabel, formatEventSummary } from "~/lib/activity/formatters";
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { readableContactWhere } from "~/server/family-access";
@@ -11,11 +11,14 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) {
+      return Response.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    throw err;
   }
 
   const { id: contactId } = await params;

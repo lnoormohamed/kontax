@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import {
   contactsToCsv,
@@ -10,11 +10,12 @@ import {
 } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
+    throw err;
   }
 
   const url = new URL(request.url);
@@ -146,9 +147,13 @@ const postSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
+    throw err;
+  }
 
   const raw: unknown = await request.json().catch(() => null);
   const parsed = postSchema.safeParse(raw);

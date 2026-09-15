@@ -1,5 +1,5 @@
 import { assertCanUsePremiumExport } from "~/server/billing";
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import {
   contactsToVCard,
@@ -9,11 +9,12 @@ import {
 } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
+    throw err;
   }
 
   const url = new URL(request.url);

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { fetchExternalImage } from "~/server/safe-image-fetch";
 
@@ -35,13 +35,18 @@ const MAX_CONCURRENT_TRANSFORMS = 4;
 let activeTransforms = 0;
 
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+    throw err;
   }
 
   try {
-    const { allowed } = await checkRateLimit(rateLimiters.imageProxy, session.user.id);
+    const { allowed } = await checkRateLimit(rateLimiters.imageProxy, userId);
     if (!allowed) {
       return NextResponse.json({ error: "RATE_LIMITED" }, { status: 429 });
     }

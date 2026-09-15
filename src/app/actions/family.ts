@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
@@ -22,18 +22,6 @@ const escapeHtml = (value: string) =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("You need to be signed in.");
-  }
-  // P21-07: impersonation sessions are read-only.
-  if (session.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return session.user.id;
-};
 
 const str = (formData: FormData, key: string) => {
   const value = formData.get(key);
@@ -52,7 +40,7 @@ const getAuditActorName = async (userId: string) => {
 
 // --- Create -----------------------------------------------------------------
 export const createFamilyGroup = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const name = str(formData, "name") || "My Family";
 
   const billing = await getUserBillingContext(userId);
@@ -122,7 +110,7 @@ const sendInviteEmail = async (opts: {
 };
 
 export const inviteFamilyMember = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const email = str(formData, "email").toLowerCase();
   if (!emailPattern.test(email)) {
     throw new Error("Enter a valid email address.");
@@ -183,7 +171,7 @@ export const inviteFamilyMember = async (formData: FormData) => {
 
 // --- Accept / decline (token) -----------------------------------------------
 export const acceptFamilyInvite = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const token = str(formData, "token");
 
   const member = await db.groupMember.findUnique({
@@ -214,7 +202,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
 };
 
 export const declineFamilyInvite = async (formData: FormData) => {
-  await requireUserId();
+  await requireUserId({ write: true });
   const token = str(formData, "token");
   const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
   if (member?.inviteStatus === "PENDING") {
@@ -243,7 +231,7 @@ const requireOwnedMember = async (ownerId: string, memberId: string) => {
 };
 
 export const removeFamilyMember = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const member = await requireOwnedMember(userId, memberId);
   if (member.role === "OWNER") {
@@ -291,7 +279,7 @@ const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
 // book (a copy, not a move — the original is untouched). Creates a new Contact
 // owned (nominally) by the group owner + a GroupContact link.
 export const addContactToFamilyBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = str(formData, "contactId");
 
   const membership = await getUserFamilyMembership(userId);
@@ -412,7 +400,7 @@ export const addContactToFamilyBook = async (formData: FormData) => {
 
 // --- Owner management: permissions, resend, delete (P13-06) -----------------
 export const setMemberCanEdit = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const canEdit = str(formData, "canEdit") === "true";
   const member = await requireOwnedMember(userId, memberId);
@@ -450,7 +438,7 @@ export const setMemberCanEdit = async (formData: FormData) => {
 };
 
 export const resendFamilyInvite = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const member = await requireOwnedMember(userId, memberId);
   if (member.inviteStatus !== "PENDING" || !member.invitedEmail) {
@@ -484,7 +472,7 @@ export const resendFamilyInvite = async (formData: FormData) => {
 // Delete the family group. Owner only. Permanently deletes the shared contacts
 // (they live in the book, not a member's private library) and all membership.
 export const deleteFamilyGroup = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const group = await db.group.findFirst({
     where: { id: groupId, ownerId: userId, type: "FAMILY" },
@@ -510,7 +498,7 @@ export const deleteFamilyGroup = async (formData: FormData) => {
 };
 
 export const leaveFamilyGroup = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const member = await db.groupMember.findFirst({
     where: { groupId, userId, inviteStatus: "ACCEPTED" },

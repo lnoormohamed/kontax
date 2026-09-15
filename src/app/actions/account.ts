@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { sendAccountDeletionScheduledEmail } from "~/server/billing-emails";
 import { auth } from "~/server/auth";
+import { isSessionError, requireSession } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
 import {
   EMAIL_CHANGE_REVERT_HOURS,
@@ -23,9 +24,13 @@ export async function updateProfile(input: {
   name: string;
   avatarUrl?: string | null;
 }): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const name = input.name.trim();
   if (!name) return { error: "NAME_REQUIRED" };
@@ -64,9 +69,13 @@ export async function changePassword(input: {
   currentPassword: string;
   newPassword: string;
 }): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const rl = await checkRateLimit(
     rateLimiters.passwordChange,
@@ -117,9 +126,13 @@ export async function requestEmailChange(input: {
   newEmail: string;
   currentPassword: string;
 }): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const parsed = z
     .string()
@@ -205,8 +218,13 @@ export async function requestEmailChange(input: {
 // Resend the verification email for an already-pending email change.
 // Password not required — authorization happened when the change was first requested.
 export async function resendPendingEmailChange(): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const rl = await checkRateLimit(
     rateLimiters.emailResend,
@@ -225,7 +243,7 @@ export async function resendPendingEmailChange(): Promise<{ success: true } | { 
 }
 
 export async function cancelEmailChange(): Promise<{ success: true }> {
-  const session = await auth();
+  const session = await requireSession({ write: true }).catch(() => null);
   if (!session?.user?.id) return { success: true };
 
   await db.user.update({
@@ -430,7 +448,7 @@ export async function cancelAccountDeletion(): Promise<{ success: true }> {
 export async function verifyPasswordForStepUp(
   password: string,
 ): Promise<{ ok: true } | { ok: false; error: "INCORRECT_PASSWORD" | "RATE_LIMITED" | "NOT_AUTHENTICATED" }> {
-  const session = await auth();
+  const session = await requireSession().catch(() => null);
   if (!session?.user?.id) return { ok: false, error: "NOT_AUTHENTICATED" };
 
   const rl = await checkRateLimit(rateLimiters.stepUpVerify, `user:${session.user.id}`);
@@ -455,7 +473,7 @@ export async function getDeleteAccountInfo(): Promise<{
   contactCount: number;
   hasPassword: boolean;
 }> {
-  const session = await auth();
+  const session = await requireSession().catch(() => null);
   if (!session?.user?.id) return { email: "", contactCount: 0, hasPassword: false };
 
   const [contactCount, user] = await Promise.all([
@@ -472,9 +490,13 @@ export async function getDeleteAccountInfo(): Promise<{
 export async function resendVerificationEmail(): Promise<
   { success: true } | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const rl = await checkRateLimit(
     rateLimiters.emailResend,

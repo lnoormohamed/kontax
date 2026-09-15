@@ -1,23 +1,22 @@
 "use server";
 
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import type { PublicCardFieldConfig } from "~/server/public-card/types";
 
 export async function updateCardVisibility(
   patch: Partial<PublicCardFieldConfig>,
 ): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("UNAUTHENTICATED");
+  const userId = await requireUserId({ write: true });
 
   const user = await db.user.findUniqueOrThrow({
-    where: { id: session.user.id },
+    where: { id: userId },
     select: { publicCardFields: true },
   });
 
   const current = (user.publicCardFields ?? {}) as PublicCardFieldConfig;
   await db.user.update({
-    where: { id: session.user.id },
+    where: { id: userId },
     data: { publicCardFields: { ...current, ...patch } },
   });
 }

@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { Prisma } from "../../../generated/prisma";
 import { safeInternalPath } from "~/lib/safe-internal-path";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateContacts } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 import {
@@ -107,22 +107,6 @@ const mergeContactSchema = z.object({
   notesChoice: z.enum(["primary", "secondary", "combine"]).optional(),
   avatarUrlChoice: z.enum(["primary", "secondary"]).optional(), // P44-05
 });
-
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    throw new Error("You must be signed in to manage contacts.");
-  }
-
-  // P21-07: impersonation sessions are read-only.
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-
-  return userId;
-};
 
 const getOptionalString = (formData: FormData, key: string) => {
   const value = formData.get(key);
@@ -506,7 +490,7 @@ const cleanupDeletedContactPhotos = async (avatarUrls: (string | null | undefine
 // P22-10: set (or clear) the per-contact reminder lead-time override. Empty /
 // "default" clears it so the contact falls back to User.reminderLeadDays.
 export const setContactReminderOverride = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const raw = formData.get("reminderLeadDays");
   const num = typeof raw === "string" ? Number(raw) : NaN;
@@ -554,7 +538,7 @@ const parseMergeContactInput = (formData: FormData) => {
 };
 
 export const createContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const input = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
   const userSettings = await db.user.findUnique({
@@ -670,7 +654,7 @@ export const createContact = async (formData: FormData) => {
 };
 
 export const updateContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const { sourceType: _st, sourceCardUsername: _scu, ...input } = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
@@ -828,7 +812,7 @@ const deriveFullNameFromParts = (parts: {
 };
 
 export const updateContactField = async (contactId: string, field: string, rawValue: string) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   if (!INLINE_EDITABLE_FIELDS.has(field)) {
     throw new Error("That field can't be edited inline.");
   }
@@ -935,7 +919,7 @@ export const updateContactEntries = async (
   group: string,
   rawEntries: unknown,
 ) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   if (!isEntryGroup(group)) {
     throw new Error("Unknown contact field group.");
   }
@@ -1001,7 +985,7 @@ export const updateContactEntries = async (
 };
 
 export const toggleFavoriteContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1044,7 +1028,7 @@ export const toggleFavoriteContact = async (formData: FormData) => {
 // Emergency designation (P15-02) — Kontax-local user state, mirrors favorites.
 // Not translated to CardDAV/vCard semantics in v1.
 export const toggleEmergencyContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1075,7 +1059,7 @@ export const toggleEmergencyContact = async (formData: FormData) => {
 };
 
 export const archiveContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const access = await resolveContactEditAccess(userId, contactId);
   if (access.shared && !access.allowed) {
@@ -1114,7 +1098,7 @@ export const archiveContact = async (formData: FormData) => {
 };
 
 export const archiveContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1159,7 +1143,7 @@ export const archiveContactsBulk = async (formData: FormData) => {
 };
 
 export const restoreContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const access = await resolveContactEditAccess(userId, contactId);
   if (access.shared && !access.allowed) {
@@ -1200,7 +1184,7 @@ export const restoreContact = async (formData: FormData) => {
 };
 
 export const restoreContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1241,7 +1225,7 @@ export const restoreContactsBulk = async (formData: FormData) => {
 };
 
 export const favoriteContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1281,7 +1265,7 @@ export const favoriteContactsBulk = async (formData: FormData) => {
 };
 
 export const deleteContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1331,7 +1315,7 @@ export const deleteContactsBulk = async (formData: FormData) => {
 };
 
 export const permanentlyDeleteContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1377,7 +1361,7 @@ export const permanentlyDeleteContact = async (formData: FormData) => {
 };
 
 export const mergeContacts = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const input = parseMergeContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1414,7 +1398,7 @@ export const mergeContacts = async (formData: FormData) => {
 };
 
 export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const redirectTo = getRedirectTarget(formData);
 
   const { mergedCount, failedCount } = await bulkAcceptHighConfidenceForUser(userId);
@@ -1432,7 +1416,7 @@ export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
 };
 
 export const undoMergeContacts = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const decisionId = parseMergeDecisionId(formData);
 
   const survivingContactId = await undoMergedContactsForUser({

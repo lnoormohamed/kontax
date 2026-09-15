@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import {
   getOrderedNameSearchQueries,
@@ -129,11 +129,15 @@ function attributeMatch(
 // across the user's own contacts + accessible shared books, with matchField + snippet
 // attribution so the client can group results and show why a contact matched.
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ results: [] }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) {
+      return NextResponse.json({ results: [] }, { status: 401 });
+    }
+    throw err;
   }
-  const userId = session.user.id;
 
   const q = (new URL(request.url).searchParams.get("q") ?? "").trim();
   if (q.length === 0) {

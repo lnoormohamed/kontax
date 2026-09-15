@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { LABEL_PALETTE } from "~/app/_components/label-chip";
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 
 // P31B-01: label registry CRUD. Contact.labels[] stays as the membership
@@ -15,13 +15,6 @@ const SYNC_TOUCH = {
   lastMutatedBy: "MANUAL" as const,
   lastMutatedByDetail: null,
   syncVersion: { increment: 1 },
-};
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("You need to be signed in.");
-  if (session.impersonatedBy) throw new Error("This is a read-only impersonation session.");
-  return session.user.id;
 };
 
 const cleanName = (name: string) => {
@@ -162,7 +155,7 @@ export async function getLabels(): Promise<LabelWithCount[]> {
 // ── mutations ─────────────────────────────────────────────────────────────────
 
 export async function createLabel(input: { name: string }): Promise<{ id: string }> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const name = cleanName(input.name);
 
   // Idempotent: return existing if the name already exists (case-insensitive).
@@ -193,7 +186,7 @@ export async function createLabel(input: { name: string }): Promise<{ id: string
 }
 
 export async function renameLabel(input: { id: string; name: string }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const label = await db.label.findFirst({ where: { id: input.id, userId } });
   if (!label) throw new Error("Label not found.");
 
@@ -231,7 +224,7 @@ export async function renameLabel(input: { id: string; name: string }): Promise<
 }
 
 export async function recolorLabel(input: { id: string; color: string }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await db.label.updateMany({
     where: { id: input.id, userId },
     data: { color: validColor(input.color) },
@@ -243,7 +236,7 @@ export async function mergeLabels(input: {
   sourceId: string; // label being folded away
   targetId: string; // label that survives
 }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   if (input.sourceId === input.targetId) throw new Error("Cannot merge a label into itself.");
 
   const [source, target] = await Promise.all([
@@ -280,7 +273,7 @@ export async function mergeLabels(input: {
 }
 
 export async function deleteLabel(input: { id: string }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const label = await db.label.findFirst({ where: { id: input.id, userId } });
   if (!label) throw new Error("Label not found.");
 
@@ -305,7 +298,7 @@ export async function deleteLabel(input: { id: string }): Promise<void> {
 }
 
 export async function reorderLabels(orderedIds: string[]): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await db.$transaction(
     orderedIds.map((id, index) =>
       db.label.updateMany({ where: { id, userId }, data: { position: index } }),
