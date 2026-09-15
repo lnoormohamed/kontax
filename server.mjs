@@ -37,7 +37,11 @@ process.on("uncaughtException", (error) => {
 });
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.HOSTNAME ?? "0.0.0.0";
+// Bind to all interfaces. Docker sets HOSTNAME to the container id, so the old
+// `process.env.HOSTNAME ?? "0.0.0.0"` bound to the container's eth0 address
+// only and the in-container health check (127.0.0.1:3000) was refused —
+// which made Coolify roll back the P48 deploy. BIND_HOST overrides for dev.
+const hostname = process.env.BIND_HOST ?? "0.0.0.0";
 const port = Number.parseInt(process.env.PORT ?? "3000", 10);
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
