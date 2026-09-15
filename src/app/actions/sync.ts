@@ -5,8 +5,17 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { Prisma } from "../../../generated/prisma";
-import { auth } from "~/server/auth";
-import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
+import {
+  isSessionError,
+  requireUserId,
+  sessionErrorMessage,
+} from "~/server/auth/require-session";
+import {
+  assertCanCreateSyncAccount,
+  assertCanCreateSyncAccountTx,
+  assertCanUseCardDavSync,
+  lockUserForPlanCheck,
+} from "~/server/billing";
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
 import {
   parseContactDateEntries,
@@ -41,6 +50,7 @@ import {
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
 import { resolveSyncProviderIdentity } from "~/server/sync-provider-identity";
+import { validateOutboundUrl } from "~/server/safe-fetch";
 
 const syncDirectionSchema = z.enum(["TWO_WAY", "IMPORT_ONLY", "EXPORT_ONLY"]);
 const conflictPolicySchema = z.enum(["SERVER_WINS", "DEVICE_WINS", "MANUAL"]);
@@ -53,11 +63,23 @@ const syncResolutionStrategySchema = z.enum([
 ]);
 const cardDavCapabilityOverrideSchema = z.enum(CARD_DAV_CAPABILITY_OVERRIDE_IDS);
 
+// P48-04: CardDAV URLs are user-supplied and fetched server-side, so they must
+// pass the outbound policy (public https:// host, no private ranges) before we
+// even try to connect. The transport re-validates every request and redirect.
+const OUTBOUND_URL_MESSAGE = "Enter a public https:// CardDAV address (private or local hosts are not allowed).";
+const outboundUrl = (message: string) =>
+  z
+    .string()
+    .trim()
+    .url(message)
+    .max(500)
+    .refine((value) => validateOutboundUrl(value).ok, OUTBOUND_URL_MESSAGE);
+
 const createSyncAccountSchema = z.object({
   label: z.string().trim().min(1, "Label is required.").max(120),
-  baseUrl: z.string().trim().url("Enter a valid CardDAV base URL.").max(500),
-  principalUrl: z.string().trim().url("Enter a valid principal URL.").max(500).optional(),
-  addressBookUrl: z.string().trim().url("Enter a valid address book URL.").max(500).optional(),
+  baseUrl: outboundUrl("Enter a valid CardDAV base URL."),
+  principalUrl: outboundUrl("Enter a valid principal URL.").optional(),
+  addressBookUrl: outboundUrl("Enter a valid address book URL.").optional(),
   syncDirection: syncDirectionSchema,
   username: z.string().trim().min(1, "Username is required.").max(320),
   password: z.string().min(6, "Password or app password is required.").max(500),
@@ -84,22 +106,6 @@ const syncConflictResolutionSchema = z.object({
   resolutionStrategy: syncResolutionStrategySchema,
   resolutionNotes: z.string().trim().max(500).optional(),
 });
-
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    throw new Error("You must be signed in to manage sync accounts.");
-  }
-
-  // P21-07: impersonation sessions are read-only.
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-
-  return userId;
-};
 
 const currentSyncAccountWhere = (userId: string, syncAccountId: string) => ({
   id: syncAccountId,
@@ -672,7 +678,15 @@ export const createSyncAccount = async (
 ): Promise<SyncFormState> => {
   let input: ReturnType<typeof parseCreateSyncAccountInput>;
   try {
-    const userId = await getRequiredUserId();
+    let userId: string;
+    try {
+      userId = await requireUserId({ write: true });
+    } catch (error) {
+      if (isSessionError(error)) {
+        return { ok: false, error: sessionErrorMessage(error) };
+      }
+      throw error;
+    }
     input = parseCreateSyncAccountInput(formData);
     const choice = parseChoiceResolution(formData);
 
@@ -854,6 +868,17 @@ export const createSyncAccount = async (
     let accountId: string;
     try {
       accountId = await db.$transaction(async (tx) => {
+        // P48-17: assertCanCreateSyncAccount above ran before the (potentially
+        // slow, user-controlled) CardDAV discovery call, purely so an
+        // obviously-over-cap request fails fast without paying for discovery.
+        // It is a separate round-trip from this insert, so two concurrent
+        // "add sync account" requests could both pass it and both land here —
+        // re-check atomically: lock the user row (serialises a concurrent
+        // create for the same user) and re-verify the slot inside this same
+        // transaction as the insert.
+        await lockUserForPlanCheck(tx, userId);
+        await assertCanCreateSyncAccountTx(tx, userId);
+
         const syncAccount = await tx.syncAccount.create({
           data: {
             userId,
@@ -936,7 +961,7 @@ export const createSyncAccount = async (
 };
 
 export const activateSyncAccount = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   await assertCanUseCardDavSync(userId);
@@ -964,7 +989,7 @@ export const activateSyncAccount = async (formData: FormData) => {
 
 /** Review payload for the paused-for-deletions surface (P39-DB01 §1a/1d). */
 export const getDeletionHoldReview = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId();
   const syncAccountId = parseSyncAccountId(formData);
   const { getDeletionHoldReviewCore } = await import("~/server/sync-deletion-resume");
   return getDeletionHoldReviewCore(userId, syncAccountId);
@@ -972,7 +997,7 @@ export const getDeletionHoldReview = async (formData: FormData) => {
 
 /** "Resume without deleting" (P39-DB01 §1c). */
 export const resumeSyncWithoutDeletions = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
   const { resumeSyncWithoutDeletionsCore } = await import("~/server/sync-deletion-resume");
   const result = await resumeSyncWithoutDeletionsCore(userId, syncAccountId);
@@ -982,7 +1007,7 @@ export const resumeSyncWithoutDeletions = async (formData: FormData) => {
 
 /** "Resume and allow deletions" (P39-DB01 §1f, post-confirm). */
 export const resumeSyncAllowDeletions = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
   const { resumeSyncAllowDeletionsCore } = await import("~/server/sync-deletion-resume");
   const result = await resumeSyncAllowDeletionsCore(userId, syncAccountId);
@@ -1016,7 +1041,15 @@ export const attachSyncCredentials = async (
   formData: FormData,
 ): Promise<SyncFormState> => {
   try {
-    const userId = await getRequiredUserId();
+    let userId: string;
+    try {
+      userId = await requireUserId({ write: true });
+    } catch (error) {
+      if (isSessionError(error)) {
+        return { ok: false, error: sessionErrorMessage(error) };
+      }
+      throw error;
+    }
     const input = parseAttachSyncCredentialInput(formData);
 
     await assertCanUseCardDavSync(userId);
@@ -1074,7 +1107,7 @@ export const attachSyncCredentials = async (
 };
 
 export const revokeSyncCredentials = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   await assertCanUseCardDavSync(userId);
@@ -1104,7 +1137,7 @@ export const revokeSyncCredentials = async (formData: FormData) => {
 };
 
 export const prepareSyncRelink = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   await assertCanUseCardDavSync(userId);
@@ -1165,7 +1198,7 @@ export const prepareSyncRelink = async (formData: FormData) => {
 };
 
 export const pauseSyncAccount = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   await db.syncAccount.updateMany({
@@ -1182,7 +1215,7 @@ export const pauseSyncAccount = async (formData: FormData) => {
 };
 
 export const revalidateSyncAccount = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   await assertCanUseCardDavSync(userId);
@@ -1324,7 +1357,7 @@ export const revalidateSyncAccount = async (formData: FormData) => {
 };
 
 export const queueSyncJob = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   const account = await db.syncAccount.findFirst({
@@ -1569,7 +1602,7 @@ export const queueSyncJob = async (formData: FormData) => {
 };
 
 export const retrySyncJob = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncJobId = parseSyncJobId(formData);
 
   await assertCanUseCardDavSync(userId);
@@ -1625,7 +1658,7 @@ export const retrySyncJob = async (formData: FormData) => {
 };
 
 export const resolveSyncConflict = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const input = parseSyncConflictResolution(formData);
 
   await assertCanUseCardDavSync(userId);
@@ -1769,7 +1802,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
       }
       await tx.syncContactLink.update({
         where: { id: conflict.syncContactLinkId! },
-        data: { photoShadow: reseed as unknown as Prisma.InputJsonValue },
+        data: { photoShadow: reseed },
       });
     });
   } else if (input.resolutionStrategy === "KEEP_LOCAL") {
@@ -1806,7 +1839,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
           remoteETag: pushed.etag,
           capabilityProfileId: capabilityProfile.id,
-          supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+          supportedFieldShadow: localShadow,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1849,7 +1882,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
               capabilityProfile,
             ),
             capabilityProfile,
-          ) as Prisma.InputJsonValue,
+          ),
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1919,7 +1952,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
               capabilityProfile,
             ),
             capabilityProfile,
-          ) as Prisma.InputJsonValue,
+          ),
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -2073,7 +2106,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
           remoteETag: pushed.etag,
           capabilityProfileId: capabilityProfile.id,
-          supportedFieldShadow: mergedShadow as Prisma.InputJsonValue,
+          supportedFieldShadow: mergedShadow,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -2125,7 +2158,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
 };
 
 export const disconnectSyncAccount = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const syncAccountId = parseSyncAccountId(formData);
 
   // P27-07: revoke OAuth authorisation before deleting the account (best-effort —
@@ -2134,13 +2167,16 @@ export const disconnectSyncAccount = async (formData: FormData) => {
     where: currentSyncAccountWhere(userId, syncAccountId),
     select: { id: true, provider: true, credentialReference: true, connectionId: true, label: true },
   });
+  // P48-05: never continue with a caller-supplied id the user does not own —
+  // the job cleanup below must not touch another tenant's queue.
+  if (!account) throw new Error("Sync account not found.");
   // Dynamic import keeps the googleapis/MSAL dependency graph server-only — a
   // static import would drag it into this "use server" file's client reference
   // graph (it's imported by the sync page client) and break the action module.
-  if (account?.provider === "GOOGLE") {
+  if (account.provider === "GOOGLE") {
     const { revokeGoogleToken } = await import("~/server/google-sync");
     await revokeGoogleToken(account);
-  } else if (account?.provider === "MICROSOFT") {
+  } else if (account.provider === "MICROSOFT") {
     const { revokeMicrosoftToken } = await import("~/server/microsoft-sync");
     await revokeMicrosoftToken(account);
   }
@@ -2152,7 +2188,7 @@ export const disconnectSyncAccount = async (formData: FormData) => {
   const now = new Date();
   await db.$transaction(async (tx) => {
     await tx.syncJob.deleteMany({
-      where: { syncAccountId, status: { in: ["QUEUED", "RUNNING"] } },
+      where: { syncAccountId, syncAccount: { userId }, status: { in: ["QUEUED", "RUNNING"] } },
     });
 
     const updated = await tx.syncAccount.updateMany({
@@ -2167,7 +2203,7 @@ export const disconnectSyncAccount = async (formData: FormData) => {
       },
     });
 
-    if (updated.count > 0 && account?.connectionId) {
+    if (updated.count > 0 && account.connectionId) {
       await emitSyncConnectionLifecycleEvent(tx, {
         userId,
         eventType: "SYNC_CONNECTION_DISCONNECTED",
@@ -2263,9 +2299,12 @@ export const updateSyncAccountSettings = async (
 ): Promise<{ ok: true } | { ok: false; error: string }> => {
   let userId: string;
   try {
-    userId = await getRequiredUserId();
+    userId = await requireUserId({ write: true });
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+    if (isSessionError(error)) {
+      return { ok: false, error: sessionErrorMessage(error) };
+    }
+    throw error;
   }
 
   const parsed = updateSyncAccountSettingsSchema.safeParse(input);
@@ -2512,7 +2551,7 @@ export const updateSyncAccountSettings = async (
                     capabilityProfile,
                   ),
                   capabilityProfile,
-                ) as Prisma.InputJsonValue,
+                ),
                 lastSyncedAt: resolvedAt,
               },
             });
@@ -2605,9 +2644,12 @@ export const completeSyncSetup = async (
 ): Promise<{ ok: true } | { ok: false; error: string }> => {
   let userId: string;
   try {
-    userId = await getRequiredUserId();
+    userId = await requireUserId({ write: true });
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+    if (isSessionError(error)) {
+      return { ok: false, error: sessionErrorMessage(error) };
+    }
+    throw error;
   }
 
   const parsed = updateSyncAccountSettingsSchema.safeParse(input);
@@ -2776,9 +2818,12 @@ export const dismissProjectionAutolinkCaveat = async (
 ): Promise<{ ok: true } | { ok: false; error: string }> => {
   let userId: string;
   try {
-    userId = await getRequiredUserId();
+    userId = await requireUserId({ write: true });
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+    if (isSessionError(error)) {
+      return { ok: false, error: sessionErrorMessage(error) };
+    }
+    throw error;
   }
 
   const parsed = dismissProjectionAutolinkCaveatSchema.safeParse(input);
@@ -2823,9 +2868,12 @@ export const updateBookAllowlist = async (
 ): Promise<{ ok: true } | { ok: false; error: string }> => {
   let userId: string;
   try {
-    userId = await getRequiredUserId();
+    userId = await requireUserId({ write: true });
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+    if (isSessionError(error)) {
+      return { ok: false, error: sessionErrorMessage(error) };
+    }
+    throw error;
   }
 
   const parsed = updateBookAllowlistSchema.safeParse(input);

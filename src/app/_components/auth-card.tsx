@@ -4,6 +4,8 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import { safeInternalPath } from "~/lib/safe-internal-path";
+
 // ── Password strength ──────────────────────────────────────────────────────
 function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
   if (!pw) return { level: 0, label: "" };
@@ -263,9 +265,31 @@ export function AuthCard({
         setTimeout(() => errorBoxRef.current?.focus(), 0);
         return;
       }
+      // P48-01: a correct password on a 2FA-enabled account yields a session
+      // that still owes the TOTP challenge. Ask the server which case we are in
+      // and route to the challenge page; the server refuses the pending session
+      // everywhere else, so this is UX, not the security boundary.
+      const state = await fetch("/api/auth/session", { credentials: "include" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((s: { pendingTotp?: boolean; pendingDeletion?: boolean } | null) => s)
+        .catch(() => null);
+      if (state?.pendingTotp === true) {
+        window.location.assign(
+          next ? `/login/verify-2fa?next=${encodeURIComponent(next)}` : "/login/verify-2fa",
+        );
+        return;
+      }
+      // P48-02: an account inside its deletion grace period lands on the cancel
+      // screen instead of the app (the server enforces the same thing).
+      if (state?.pendingDeletion === true) {
+        window.location.assign("/account-pending-deletion");
+        return;
+      }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
-      window.location.assign(next ?? "/contacts");
+      // P48-03: `next` reaches this component as a prop — re-validate it here so
+      // an open redirect can never depend on a single upstream check.
+      window.location.assign(safeInternalPath(next, "/contacts"));
     } else {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -299,7 +323,7 @@ export function AuthCard({
       }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
-      window.location.assign(next ?? "/contacts");
+      window.location.assign(safeInternalPath(next, "/contacts"));
     }
   };
 

@@ -2,24 +2,29 @@
 // the uploaded bytes (never trusts the client's recognition), parses, and
 // lands contacts via commitKontaxImport.
 
-import { auth } from "~/server/auth";
-import { commitKontaxImport } from "~/server/export-format/import";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
+import { commitKontaxImport, KontaxImportError } from "~/server/export-format/import";
 import {
   parseKontaxArchive,
   parseKontaxDocument,
   recognizeKontaxFile,
   verifyKontaxArchiveIntegrity,
+  ZipBoundsError,
   type ImportedCardContact,
 } from "~/server/export-format/parse";
 
-const MAX_BYTES = 512 * 1024 * 1024; // 512 MB
+// P48-11 item 2: lowered from 512 MB — archives are bounded per-entry/total
+// at parse time (see ZipBoundsError below), so there's no reason to buffer a
+// half-gigabyte upload before we even get to sniff it.
+const MAX_BYTES = 64 * 1024 * 1024; // 64 MB
 
 export async function POST(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    return Response.json({ message: "Unauthorized" }, { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return Response.json({ message: "Unauthorized" }, { status: 401 });
+    throw err;
   }
 
   const formData = await request.formData().catch(() => null);
@@ -29,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   if (file.size > MAX_BYTES) {
-    return Response.json({ error: "That file is too large to import (512 MB max)." }, { status: 413 });
+    return Response.json({ error: "That file is too large to import (64 MB max)." }, { status: 413 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -43,7 +48,7 @@ export async function POST(request: Request) {
   }
   if (recognition.kind === "unrecognized") {
     return Response.json(
-      { error: "We couldn't read this file. It may be damaged or not a Kontax export." },
+      { error: "We couldn't read this file. It may be damaged, too large, or not a Kontax export." },
       { status: 400 },
     );
   }
@@ -51,27 +56,38 @@ export async function POST(request: Request) {
   let contacts: ImportedCardContact[];
   let parseSkippedCount = 0;
   let sourceDetail: string;
-  if (recognition.kind === "archive") {
-    // Reject a truncated or tampered archive before landing anything — the
-    // manifest's integrity table (spec §7.3) makes a partial download
-    // detectable. Never a silent partial import.
-    const integrity = verifyKontaxArchiveIntegrity(buffer);
-    if (integrity.verified && !integrity.ok) {
-      return Response.json(
-        {
-          error: `This archive is corrupted or incomplete — ${integrity.problems.length} file(s) failed the integrity check. Re-export and try again.`,
-        },
-        { status: 400 },
-      );
+  try {
+    if (recognition.kind === "archive") {
+      // Reject a truncated or tampered archive before landing anything — the
+      // manifest's integrity table (spec §7.3) makes a partial download
+      // detectable. Never a silent partial import.
+      const integrity = verifyKontaxArchiveIntegrity(buffer);
+      if (integrity.verified && !integrity.ok) {
+        return Response.json(
+          {
+            error: `This archive is corrupted or incomplete — ${integrity.problems.length} file(s) failed the integrity check. Re-export and try again.`,
+          },
+          { status: 400 },
+        );
+      }
+      const parsed = parseKontaxArchive(buffer);
+      contacts = parsed.contacts;
+      parseSkippedCount = parsed.skippedCount;
+      sourceDetail = "kontax-archive";
+    } else {
+      const contact = parseKontaxDocument(buffer);
+      contacts = contact ? [contact] : [];
+      sourceDetail = "kontax-document";
     }
-    const parsed = parseKontaxArchive(buffer);
-    contacts = parsed.contacts;
-    parseSkippedCount = parsed.skippedCount;
-    sourceDetail = "kontax-archive";
-  } else {
-    const contact = parseKontaxDocument(buffer);
-    contacts = contact ? [contact] : [];
-    sourceDetail = "kontax-document";
+  } catch (error) {
+    if (error instanceof ZipBoundsError) {
+      return Response.json({ error: error.message }, { status: 413 });
+    }
+    console.error("[imports/kontax/commit] archive parse failed", error);
+    return Response.json(
+      { error: "This file could not be processed. It may be damaged or too large." },
+      { status: 400 },
+    );
   }
 
   if (contacts.length === 0) {
@@ -89,9 +105,13 @@ export async function POST(request: Request) {
     });
     return Response.json(result);
   } catch (error) {
+    const known = error instanceof KontaxImportError;
+    if (!known) {
+      console.error("[imports/kontax/commit] commit failed", error);
+    }
     return Response.json(
-      { error: error instanceof Error ? error.message : "Import failed." },
-      { status: 400 },
+      { error: known ? error.message : "Import failed. Please try again." },
+      { status: known ? 400 : 500 },
     );
   }
 }

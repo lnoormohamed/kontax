@@ -1,5 +1,6 @@
 import { SendEmailCommand, SESv2Client } from "@aws-sdk/client-sesv2";
 
+import { getAppUrl } from "~/lib/site-url";
 import { db } from "~/server/db";
 import { env } from "~/env";
 
@@ -86,8 +87,20 @@ export const sendEmail = async ({
   }
 
   if (!SES_CONFIGURED) {
-    console.log(`[email:dev] TO: ${to} | SUBJECT: ${subject}`);
-    console.log(`[email:dev] TEXT:\n${text}`);
+    // P48-17: this used to log the full recipient address, subject, and
+    // plain-text body (including password-reset and email-verification
+    // links) whenever any SES env var was missing, regardless of NODE_ENV —
+    // so a misconfigured production deploy would put PII and live auth
+    // tokens straight into the log stream. Full detail only outside
+    // production; in production, log enough to debug delivery without
+    // leaking the address or the message content.
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[email:dev] TO: ${to} | SUBJECT: ${subject}`);
+      console.log(`[email:dev] TEXT:\n${text}`);
+    } else {
+      const redacted = to.replace(/^(.).*(@.*)$/, "$1***$2");
+      console.warn(`[Kontax] email not sent (SES unconfigured): "${subject}" to ${redacted}`);
+    }
     return { success: true, messageId: "dev-console" };
   }
 
@@ -114,4 +127,9 @@ export const sendEmail = async ({
   }
 };
 
-export const appUrl = () => env.APP_URL ?? "https://vexon.co";
+/**
+ * P48-16: was `env.APP_URL ?? "https://vexon.co"` — a missing APP_URL silently
+ * sent every email CTA to an unrelated domain. Now one shared resolver: APP_URL,
+ * localhost in dev, a thrown error in production.
+ */
+export const appUrl = () => getAppUrl();

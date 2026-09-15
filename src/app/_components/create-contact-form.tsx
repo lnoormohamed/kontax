@@ -356,6 +356,10 @@ export function CreateContactForm({
           {/* avatar + person/org toggle */}
           <div className="flex flex-col items-center gap-3">
             {avatarUrl.trim() ? (
+              // P48-12: next/image's Image Optimization API is intentionally
+              // disabled repo-wide (images.unoptimized in next.config.js) —
+              // plain <img> is the deliberate choice.
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 alt={displayName.trim() || "Contact photo"}
                 className="h-20 w-20 rounded-full object-cover"

@@ -51,7 +51,10 @@ import {
   stripExcludedPortableFields,
 } from "~/server/sync-field-exclusions";
 import { isWithinSyncWindow, SYNC_WINDOW_DEFERRED_CODE } from "~/server/sync-window";
-import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
+import {
+  decryptSyncCredentialPayload,
+  reencryptSyncCredentialIfStale,
+} from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
@@ -762,6 +765,9 @@ export const runQueuedSyncJobs = async ({
           remoteCTag: true,
           lastSyncCursor: true,
           credentialReference: true,
+          // P48-16: the key a row was encrypted under, used as the decrypt hint
+          // for pre-keyring envelopes and to spot rows due for re-encryption.
+          encryptionKeyRef: true,
           credentialRevokedAt: true,
           // P39-02: one-shot deletion-guard bypass set by "Resume and allow".
           deletionGuardBypassOnce: true,
@@ -1116,7 +1122,10 @@ export const runQueuedSyncJobs = async ({
     let decryptedCredentials: ReturnType<typeof decryptSyncCredentialPayload>;
 
     try {
-      decryptedCredentials = decryptSyncCredentialPayload(job.syncAccount.credentialReference);
+      decryptedCredentials = decryptSyncCredentialPayload(
+        job.syncAccount.credentialReference,
+        job.syncAccount.encryptionKeyRef,
+      );
     } catch (error) {
       const errorSummary =
         error instanceof Error
@@ -1135,6 +1144,31 @@ export const runQueuedSyncJobs = async ({
       });
       summary.failed += 1;
       continue;
+    }
+
+    // P48-16: lazy key rotation. The credentials just decrypted fine, so if the
+    // row is on a retired key or the pre-keyring envelope, quietly rewrite it
+    // under the current key. Best-effort — a failure here must never fail the
+    // sync job, and the next run will simply try again.
+    try {
+      const rotated = reencryptSyncCredentialIfStale(
+        job.syncAccount.credentialReference,
+        job.syncAccount.encryptionKeyRef,
+      );
+      if (rotated) {
+        await db.syncAccount.update({
+          where: { id: job.syncAccountId },
+          data: {
+            credentialReference: rotated.credentialReference,
+            encryptionKeyRef: rotated.encryptionKeyRef,
+          },
+        });
+      }
+    } catch (error) {
+      console.warn(
+        `[sync-runner] credential re-encryption skipped for account ${job.syncAccountId}:`,
+        error,
+      );
     }
 
     try {
@@ -1555,10 +1589,14 @@ export const runQueuedSyncJobs = async ({
       ): Promise<string | null> => {
         if (!PHOTO_SYNC_ENABLED || !photo) return null;
         if (photo.kind === "inline") return photo.base64.replace(/\s+/g, "");
-        const bytes = await fetchCardDavPhotoBytes(photo.uri, {
-          username: decryptedCredentials.username,
-          password: decryptedCredentials.password,
-        });
+        const bytes = await fetchCardDavPhotoBytes(
+          photo.uri,
+          {
+            username: decryptedCredentials.username,
+            password: decryptedCredentials.password,
+          },
+          job.syncAccount.addressBookUrl ?? undefined,
+        );
         return bytes ? bytes.toString("base64") : null;
       };
 
@@ -1708,7 +1746,7 @@ export const runQueuedSyncJobs = async ({
               remoteUid: created.remoteUid,
               remoteETag: created.remoteETag,
               capabilityProfileId: capabilityProfile.id,
-              supportedFieldShadow: created.supportedFieldShadow as Prisma.InputJsonValue,
+              supportedFieldShadow: created.supportedFieldShadow,
               lastSyncedAt: created.lastSyncedAt,
             },
             update: {
@@ -1716,7 +1754,7 @@ export const runQueuedSyncJobs = async ({
               remoteUid: created.remoteUid,
               remoteETag: created.remoteETag,
               capabilityProfileId: capabilityProfile.id,
-              supportedFieldShadow: created.supportedFieldShadow as Prisma.InputJsonValue,
+              supportedFieldShadow: created.supportedFieldShadow,
               remoteDeletedAt: null,
               tombstonedAt: null,
               lastErrorCode: null,
@@ -1793,7 +1831,7 @@ export const runQueuedSyncJobs = async ({
               supportedFieldShadow: buildProviderSupportedContactShadow(
                 cardDavCardToPortable(card),
                 capabilityProfile,
-              ) as Prisma.InputJsonValue,
+              ),
               // Use the contact's actual updatedAt (set by Prisma during create) so that
               // subsequent syncs don't falsely detect all bootstrapped contacts as localChanged.
               lastSyncedAt: createdContact.updatedAt,
@@ -1868,7 +1906,7 @@ export const runQueuedSyncJobs = async ({
                     excludedFields,
                   ),
                   capabilityProfile,
-                ) as Prisma.InputJsonValue,
+                ),
                 remoteDeletedAt: null,
                 tombstonedAt: null,
                 lastErrorCode: null,
@@ -1941,7 +1979,7 @@ export const runQueuedSyncJobs = async ({
                         excludedFields,
                       ),
                       capabilityProfile,
-                    ) as Prisma.InputJsonValue,
+                    ),
                   }
                 : {}),
               lastSyncedAt: now,
@@ -1993,7 +2031,7 @@ export const runQueuedSyncJobs = async ({
               remoteUid: refresh.remoteUid,
               remoteETag: refresh.remoteETag,
               capabilityProfileId: capabilityProfile.id,
-              supportedFieldShadow: refresh.supportedFieldShadow as Prisma.InputJsonValue,
+              supportedFieldShadow: refresh.supportedFieldShadow,
               remoteDeletedAt: null,
               tombstonedAt: null,
               lastErrorCode: null,
@@ -2040,7 +2078,6 @@ export const runQueuedSyncJobs = async ({
         });
         const queueFull = openConflictCount >= MANUAL_CONFLICT_QUEUE_LIMIT;
 
-        const totalPushed = pushedLinks.length + deletedLinkIds.length;
         await tx.syncJob.update({
           where: { id: job.id },
           data: {
@@ -2158,7 +2195,7 @@ export const runQueuedSyncJobs = async ({
             } else {
               remote = { hasPhoto: true, signal: photo.uri };
               signalKind = "resourceIdentifier";
-              loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds);
+              loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds, abUrl);
             }
 
             const pushCardWithPhoto = async (photoBase64: string | null): Promise<string | null> => {
@@ -2172,7 +2209,11 @@ export const runQueuedSyncJobs = async ({
                   excludedFields,
                 ),
                 capabilityProfile,
-                hrefOverride: link.remoteHref || undefined,
+                // Not `link.remoteHref ?? undefined`: an empty string is a
+                // possible (if degenerate) stored value and must still be
+                // treated as "no override", same as null/undefined.
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                hrefOverride: link.remoteHref ? link.remoteHref : undefined,
                 photoBase64,
               });
               return res.etag;

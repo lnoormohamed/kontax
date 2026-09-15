@@ -202,9 +202,20 @@ const Avatar = memo(function Avatar({
   useEffect(() => setThumbFailed(false), [avatarUrl]);
   if (avatarUrl && fullSrc) {
     const src = thumbSrc && !thumbFailed ? thumbSrc : fullSrc;
+    // Trimmed-to-undefined chain: an empty/whitespace-only name must still
+    // fall through to company, which `??` alone won't do (only null/undefined
+    // count as absent) — see the identical helper in merge-suggestion-card.tsx.
+    const trimmedFullName = fullName?.trim() ? fullName.trim() : undefined;
+    const trimmedCompany = company?.trim() ? company.trim() : undefined;
+    const avatarAlt = trimmedFullName ?? trimmedCompany ?? "Contact photo";
     return (
+      // P48-12: next/image's Image Optimization API is intentionally disabled
+      // repo-wide (images.unoptimized in next.config.js) since it's pure
+      // unauthenticated attack surface with zero real usage; plain <img> is
+      // the deliberate choice.
+      // eslint-disable-next-line @next/next/no-img-element
       <img
-        alt={fullName?.trim() || company?.trim() || "Contact photo"}
+        alt={avatarAlt}
         className="shrink-0 rounded-full object-cover"
         src={src}
         onError={src !== fullSrc ? () => setThumbFailed(true) : undefined}
@@ -231,7 +242,7 @@ const Avatar = memo(function Avatar({
 // Inline cluster after the name: favorite toggle + governed status badges.
 // Delegates to the shared ContactBadgeCluster (P15-01) so the icon vocabulary
 // is identical across rows, the detail page, and future sidebar groupings.
-const RowBadges = memo(function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+const RowBadges = memo(function RowBadges({ contact, mode: _mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
   return (
     <ContactBadgeCluster
       contactId={contact.id}
@@ -654,12 +665,6 @@ const ContactRow = memo(function ContactRow({
   const meta = primaryDetail ? [primaryDetail] : [];
   const contactLabels = parseLabels(contact.labels);
   const matchSnippet = inferMatchSnippet(contact, query);
-  const mobileContext = [
-    contact.isEmergency ? "Emergency" : null,
-    contact.sharedKind === "family" ? "Family" : null,
-    contact.sharedKind === "team" ? "Team" : null,
-    contactLabels.length > 0 ? `${contactLabels.length} label${contactLabels.length === 1 ? "" : "s"}` : null,
-  ].filter((value): value is string => Boolean(value));
 
   // P47 — Compact mobile row (01-contacts-list.md §"Compact view": ~48px, name +
   // primary detail on one line, email/phone inline). A genuinely denser

@@ -319,7 +319,7 @@ export async function loadAdminOverview() {
               : row.lifecycleState === "LOCKED"
                 ? "Account suspended"
                 : "Access restricted",
-        meta: row.name?.trim() || "No profile name",
+        meta: row.name?.trim() ? row.name.trim() : "No profile name",
         tone:
           row.scheduledDeleteAt != null || row.lifecycleState === "LOCKED" || row.lifecycleState === "CANCELED"
             ? "warning"
@@ -434,7 +434,7 @@ export async function loadAdminOverview() {
             : row.scheduledDeleteAt != null
               ? "Deletion scheduled"
               : "Grace period active",
-        meta: row.name?.trim() || fmtRelative(row.updatedAt),
+        meta: row.name?.trim() ? row.name.trim() : fmtRelative(row.updatedAt),
         tone:
           row.scheduledDeleteAt != null
             ? "warning"

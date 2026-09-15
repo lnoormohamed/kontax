@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState, useTransition } from "react";
 
 import { redeemTotpRecoveryCode, submitTotpChallenge } from "~/app/actions/totp";
 import { signOutAction } from "~/app/actions/auth";
+import { safeInternalPath } from "~/lib/safe-internal-path";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,20 @@ function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
 }
 
 export default function VerifyTwoFaPage() {
-  const router = useRouter();
+  // useSearchParams needs a Suspense boundary for static prerender.
+  return (
+    <Suspense fallback={null}>
+      <VerifyTwoFaInner />
+    </Suspense>
+  );
+}
+
+function VerifyTwoFaInner() {
+  const searchParams = useSearchParams();
+  // P48-01: carry the original destination through the challenge; only accept
+  // an internal path (no protocol-relative `//host` or backslash tricks).
+  // P48-03: the inline regex is now the shared `safeInternalPath` validator.
+  const next = safeInternalPath(searchParams.get("next"), "/contacts");
   const [code, setCode] = useState("");
   const [recoveryCode, setRecoveryCode] = useState("");
   const [useRecovery, setUseRecovery] = useState(false);
@@ -65,16 +79,18 @@ export default function VerifyTwoFaPage() {
     INVALID_RECOVERY_CODE: "Recovery code not found or already used.",
     RATE_LIMIT_EXCEEDED: "Too many attempts. Please try again in 15 minutes.",
     NOT_PENDING_TOTP: "Session error. Please sign in again.",
+    // P48-03: replay guard — the same 30s code can't be used twice.
+    TOTP_CODE_ALREADY_USED: "That code has already been used. Wait for the next one.",
   };
 
-  // Refresh the JWT so the middleware sees pendingTotp cleared before navigating.
-  // The JWT callback clears pendingTotp when it sees totpChallengeVerified in the DB,
-  // but only runs in the full Node.js runtime — the edge middleware can't do this.
-  // Fetching /api/auth/session forces a full JWT callback run and issues a new cookie
-  // without pendingTotp, so router.push("/contacts") then passes through middleware.
+  // Refresh the JWT so pendingTotp is cleared before navigating. The JWT
+  // callback clears the flag only when it sees totpChallengeVerified in the DB
+  // (P48-01: the client can no longer clear it via the update trigger).
+  // Fetching /api/auth/session forces a full JWT callback run and issues a new
+  // cookie without pendingTotp, so the destination page's auth() then resolves.
   const completeLogin = async () => {
     await fetch("/api/auth/session", { credentials: "include" });
-    router.push("/contacts");
+    window.location.assign(next);
   };
 
   const handleTotpSubmit = (val?: string) => {

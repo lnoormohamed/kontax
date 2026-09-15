@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { getUserDefaultBook } from "~/server/address-books";
 import { movePrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { corsHeaders } from "~/lib/api-cors";
 import { API_CONTACT_SELECT, formatContactForApi, mapUpdateInputToDb } from "../../_lib/contact-mapper";
 import { ContactUpdateSchema } from "../../_lib/schemas";
-import { requireWriteScope, withApiAuth } from "../../_lib/auth";
+import { requireWriteScope, resolveOwnedBookId, withApiAuth } from "../../_lib/auth";
 
 export function OPTIONS(_request: Request) {
   return new Response(null, { status: 200, headers: corsHeaders });
@@ -81,7 +80,13 @@ export async function PUT(req: NextRequest, { params }: Params) {
     // and dual-write the primary membership so the contact never loses its book.
     let movedBookId: string | null = null;
     if ("bookId" in patch) {
-      movedBookId = (patch.bookId as string | null) ?? (await getUserDefaultBook(userId)).id;
+      // P48-05: the target book must belong to the token owner.
+      const resolvedBook = await resolveOwnedBookId(
+        userId,
+        typeof patch.bookId === "string" ? patch.bookId : null,
+      );
+      if ("error" in resolvedBook) return resolvedBook.error;
+      movedBookId = resolvedBook.bookId;
       patch.bookId = movedBookId;
     }
 

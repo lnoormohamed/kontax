@@ -67,7 +67,7 @@ async function pushNonAsciiContacts() {
           birthday: link.contact.birthday,
           address: link.contact.address,
           postalAddresses: Array.isArray(link.contact.postalAddresses)
-            ? (link.contact.postalAddresses as any)
+            ? (link.contact.postalAddresses as Array<{ label: string; formatted: string }>)
             : null,
           notes: link.contact.notes,
         },

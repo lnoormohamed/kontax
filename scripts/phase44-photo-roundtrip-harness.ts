@@ -686,7 +686,7 @@ const pushCardDav = async (
   for (const image of images) {
     const uid = `${UID_PREFIX}-${account.id}-${image.id}`;
     const href = new URL(`${encodeURIComponent(uid)}.vcf`, collectionUrl).toString();
-    const body = buildPhotoVCard({ uid, image, flavor: vcardFlavor as 3 | 4 });
+    const body = buildPhotoVCard({ uid, image, flavor: vcardFlavor });
     try {
       const response = await putVCard({ href, credentials: creds, body });
       results.push({
@@ -1301,7 +1301,7 @@ const main = async () => {
           userEmail: account.user.email,
         },
         providerKey,
-        vcardFlavor: vcardFlavor as 3 | 4,
+        vcardFlavor: vcardFlavor,
         referenceImages: images.map(stripBuffer),
         push: { at: new Date().toISOString(), results: pushResults },
         pulls: [],

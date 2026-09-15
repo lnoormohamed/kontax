@@ -15,7 +15,7 @@ const OPEN_SUPPORT_CASE_STATUSES: AdminSupportCaseStatus[] = [
   "WAITING_ON_CUSTOMER",
   "WAITING_ON_PROVIDER",
 ];
-const SUPPORT_CASE_SUBJECT_TYPES = ["USER", "SYNC_ACCOUNT"] as const;
+type SupportCaseSubjectType = "USER" | "SYNC_ACCOUNT";
 
 export type AdminSupportCaseQueueId =
   | "open"
@@ -28,9 +28,7 @@ export type AdminSupportCaseQueueId =
   | "resolved";
 
 export type AdminSupportCaseOwnerFilter = "all" | "me" | "assigned" | "unassigned";
-export type AdminSupportCaseSubjectTypeFilter =
-  | "all"
-  | (typeof SUPPORT_CASE_SUBJECT_TYPES)[number];
+export type AdminSupportCaseSubjectTypeFilter = "all" | SupportCaseSubjectType;
 
 const SUPPORT_CASE_QUEUES: AdminSupportCaseQueueId[] = [
   "open",
@@ -293,6 +291,7 @@ export async function loadAdminSupportCaseWorkbench(input: {
         resolvedAt: true,
         createdAt: true,
         updatedAt: true,
+        creatorAdminEmail: true,
         creator: { select: { name: true, email: true } },
         assignee: { select: { id: true, name: true, email: true } },
         targetUser: { select: { email: true, name: true } },
@@ -333,7 +332,9 @@ export async function loadAdminSupportCaseWorkbench(input: {
       const followUpState = followUpTone(row.nextFollowUpAt, todayStart, tomorrowStart);
       const target =
         row.subjectType === "SYNC_ACCOUNT"
-          ? syncAccount?.label?.trim() || syncAccount?.user.email || `Sync account ${row.subjectId.slice(0, 8)}`
+          ? syncAccount?.label?.trim()
+            ? syncAccount.label.trim()
+            : (syncAccount?.user.email ?? `Sync account ${row.subjectId.slice(0, 8)}`)
           : row.targetUser?.email ??
             row.targetUser?.name?.trim() ??
             `${subjectTypeLabel(row.subjectType)} ${row.subjectId.slice(0, 8)}`;
@@ -370,7 +371,7 @@ export async function loadAdminSupportCaseWorkbench(input: {
             : row.assignee?.id
               ? ("assigned" as const)
               : ("unassigned" as const),
-        createdBy: row.creator.name?.trim() ?? row.creator.email,
+        createdBy: row.creator?.name?.trim() ?? row.creator?.email ?? row.creatorAdminEmail ?? "system",
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         updatedWhen: fmtRelative(row.updatedAt),
@@ -466,6 +467,7 @@ export async function listSupportCasesForSubject(subjectType: string, subjectId:
       resolvedAt: true,
       createdAt: true,
       updatedAt: true,
+      creatorAdminEmail: true,
       creator: { select: { name: true, email: true } },
       assignee: { select: { name: true, email: true } },
     },
@@ -480,7 +482,7 @@ export async function listSupportCasesForSubject(subjectType: string, subjectId:
     severity: row.severity,
     severityLabel: adminSupportCaseSeverityLabel(row.severity),
     owner: row.assignee?.name?.trim() ?? row.assignee?.email ?? "Unassigned",
-    createdBy: row.creator.name?.trim() ?? row.creator.email,
+    createdBy: row.creator?.name?.trim() ?? row.creator?.email ?? row.creatorAdminEmail ?? "system",
     updatedAt: row.updatedAt,
     updatedWhen: fmtRelative(row.updatedAt),
     nextFollowUpAt: row.nextFollowUpAt,

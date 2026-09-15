@@ -418,7 +418,7 @@ export const pushGoogleContact = async (
       data: {
         remoteETag: res.data.etag ?? null,
         capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
-        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: localShadow,
         lastSyncedAt: new Date(),
       },
     });
@@ -481,7 +481,7 @@ export const pushGoogleContact = async (
       data: {
         remoteETag: res.data.etag ?? null,
         capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
-        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: localShadow,
         lastSyncedAt: now,
       },
     });
@@ -674,7 +674,7 @@ const createGoogleContactRemote = async (
       remoteUid: created.resourceName,
       remoteETag: created.etag ?? null,
       capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
-      supportedFieldShadow: buildGooglePushShadow(pushSource) as Prisma.InputJsonValue,
+      supportedFieldShadow: buildGooglePushShadow(pushSource),
       lastSyncedAt: new Date(),
     },
   });

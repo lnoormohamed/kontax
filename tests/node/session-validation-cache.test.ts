@@ -100,6 +100,7 @@ test("session validation cache round-trips, expires via SETEX, invalidates by sc
     role: "USER" as const,
     emailVerified: "2026-01-01T00:00:00.000Z",
     revoked: false,
+    scheduledDeleteAt: null,
   };
 
   // miss → null
@@ -112,7 +113,7 @@ test("session validation cache round-trips, expires via SETEX, invalidates by sc
   // SETEX carried the 45s TTL
   const setex = commandLog.find((c) => c[0]!.toUpperCase() === "SETEX");
   assert.ok(setex, "SETEX issued");
-  assert.equal(setex![2], "45");
+  assert.equal(setex[2], "45");
 
   // targeted invalidation removes one session, leaves the other
   await writeSessionValidation("userA", "sid2", snapshot);
@@ -140,6 +141,7 @@ test("cache disabled via env flag is a no-op", async () => {
     role: "USER",
     emailVerified: null,
     revoked: false,
+    scheduledDeleteAt: null,
   });
   assert.equal(await readSessionValidation("userC", "sid"), null);
   delete process.env.SESSION_VALIDATION_CACHE;

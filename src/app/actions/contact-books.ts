@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import {
   addMembership,
   removeMembership,
@@ -17,15 +17,6 @@ import { updatePreferences } from "~/server/preferences";
  * P40-06 membership helpers, and keeps `Contact.bookId` (the primary/home book)
  * in sync during the soak.
  */
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("You need to be signed in.");
-  if (session.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return session.user.id;
-};
 
 /** Assert the contact and the target book both belong to the user. */
 const assertOwned = async (userId: string, contactId: string, bookId: string) => {
@@ -45,7 +36,7 @@ export async function addContactToBook(input: {
   contactId: string;
   bookId: string;
 }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await assertOwned(userId, input.contactId, input.bookId);
   await addMembership(db, input.contactId, input.bookId);
   revalidatePath(`/contacts/${input.contactId}`);
@@ -61,7 +52,7 @@ export async function removeContactFromBook(input: {
   contactId: string;
   bookId: string;
 }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await assertOwned(userId, input.contactId, input.bookId);
   await db.$transaction(async (tx) => {
     const { newPrimaryBookId } = await removeMembership(tx, input.contactId, input.bookId);
@@ -81,7 +72,7 @@ export async function removeContactFromBook(input: {
  * Persists the timestamp in preferences so it never shows this user again.
  */
 export async function dismissBooksExplainer(): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await updatePreferences(userId, {
     booksExplainerDismissedAt: new Date().toISOString(),
   });
@@ -95,7 +86,7 @@ export async function setContactPrimaryBook(input: {
   contactId: string;
   bookId: string;
 }): Promise<void> {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   await assertOwned(userId, input.contactId, input.bookId);
   await db.$transaction(async (tx) => {
     // Promote an existing membership to primary (keeps all memberships intact).

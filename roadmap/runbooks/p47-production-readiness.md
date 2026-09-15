@@ -208,7 +208,7 @@ first makes *it* crash-loop on missing tables. Keep the window minutes-wide:
      (`DATABASE_URL=<prod> npm run seed:sort-romanization`); seeds the character
      lookup so non-Latin names sort/bucket by romanized initial. Data seed, not
      schema — safe to re-run (idempotent upsert).
-5. **Drift gate** — `DATABASE_URL=<prod> node scripts/check-schema-drift.mjs`
+5. **Drift gate** — `DATABASE_URL=<prod> node scripts/runtime/check-schema-drift.mjs`
    → exit 0 (also verifies the search trigger).
 6. **Deploy the merged build** (Coolify; queue via tinker helper if the UI is
    inconvenient — see Access notes) and watch the log for

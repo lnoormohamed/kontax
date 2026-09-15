@@ -443,8 +443,13 @@ export function FieldMappingStep({
   const flashTimers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
+    // `flashTimers` is a stable ref (created once via useRef) whose Map is
+    // mutated in place, never replaced — capturing it here and reading it at
+    // cleanup time is the same Map either way, so this satisfies the lint
+    // rule without changing behavior.
+    const timers = flashTimers.current;
     return () => {
-      for (const t of flashTimers.current.values()) clearTimeout(t);
+      for (const t of timers.values()) clearTimeout(t);
     };
   }, []);
 

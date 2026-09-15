@@ -5,12 +5,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
-import { auth } from "~/server/auth";
-import { getUserBillingContext } from "~/server/billing";
+import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
+import { requireUserId } from "~/server/auth/require-session";
+import {
+  assertCanCreateContactsTx,
+  getUserBillingContext,
+  lockUserForPlanCheck,
+} from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { snapshotFamilyBookForUser } from "~/server/family-snapshot";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000; // 48h signed-token expiry
@@ -21,18 +27,6 @@ const escapeHtml = (value: string) =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-
-const requireUserId = async () => {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("You need to be signed in.");
-  }
-  // P21-07: impersonation sessions are read-only.
-  if (session.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-  return session.user.id;
-};
 
 const str = (formData: FormData, key: string) => {
   const value = formData.get(key);
@@ -51,7 +45,7 @@ const getAuditActorName = async (userId: string) => {
 
 // --- Create -----------------------------------------------------------------
 export const createFamilyGroup = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const name = str(formData, "name") || "My Family";
 
   const billing = await getUserBillingContext(userId);
@@ -121,7 +115,7 @@ const sendInviteEmail = async (opts: {
 };
 
 export const inviteFamilyMember = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const email = str(formData, "email").toLowerCase();
   if (!emailPattern.test(email)) {
     throw new Error("Enter a valid email address.");
@@ -129,44 +123,53 @@ export const inviteFamilyMember = async (formData: FormData) => {
 
   const group = await db.group.findFirst({
     where: { ownerId: userId, type: "FAMILY" },
-    include: { members: true, owner: { select: { name: true, email: true } } },
+    include: { owner: { select: { name: true, email: true } } },
   });
   if (!group) {
     throw new Error("Create a family group first.");
   }
 
-  // Seat limit: owner + (maxMembers - 1) others; count non-declined members.
-  const activeMembers = group.members.filter((m) => m.inviteStatus !== "DECLINED").length;
-  if (activeMembers >= group.maxMembers) {
-    throw new Error(`Your family book is full (${group.maxMembers} members).`);
-  }
-
   const recipient = await db.user.findUnique({ where: { email }, select: { id: true } });
-  // Block duplicate invites / existing members.
-  const dupe = group.members.find(
-    (m) => m.invitedEmail === email || m.userId === recipient?.id,
-  );
-  if (dupe && dupe.inviteStatus !== "DECLINED") {
-    throw new Error("That person is already invited or a member.");
-  }
-
   const token = randomBytes(24).toString("base64url");
-  const data = {
-    groupId: group.id,
-    userId: recipient?.id ?? null,
-    invitedEmail: email,
-    role: "MEMBER" as const,
-    inviteStatus: "PENDING" as const,
-    canEdit: true,
-    inviteToken: token,
-    inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
-    invitedByUserId: userId,
-  };
-  if (dupe) {
-    await db.groupMember.update({ where: { id: dupe.id }, data });
-  } else {
-    await db.groupMember.create({ data });
-  }
+
+  // P48-17: seat-count-then-insert race. Family groups can only be invited to
+  // by their owner (the `where: { ownerId: userId }` above), so locking the
+  // owner's own User row fully serialises concurrent invites to this group —
+  // a second concurrent invite blocks here until the first commits, then its
+  // own member re-read sees the first invite's row.
+  await db.$transaction(async (tx) => {
+    await lockUserForPlanCheck(tx, userId);
+
+    const members = await tx.groupMember.findMany({ where: { groupId: group.id } });
+    // Seat limit: owner + (maxMembers - 1) others; count non-declined members.
+    const activeMembers = members.filter((m) => m.inviteStatus !== "DECLINED").length;
+    if (activeMembers >= group.maxMembers) {
+      throw new Error(`Your family book is full (${group.maxMembers} members).`);
+    }
+
+    // Block duplicate invites / existing members.
+    const dupe = members.find((m) => m.invitedEmail === email || m.userId === recipient?.id);
+    if (dupe && dupe.inviteStatus !== "DECLINED") {
+      throw new Error("That person is already invited or a member.");
+    }
+
+    const data = {
+      groupId: group.id,
+      userId: recipient?.id ?? null,
+      invitedEmail: email,
+      role: "MEMBER" as const,
+      inviteStatus: "PENDING" as const,
+      canEdit: true,
+      inviteToken: token,
+      inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
+      invitedByUserId: userId,
+    };
+    if (dupe) {
+      await tx.groupMember.update({ where: { id: dupe.id }, data });
+    } else {
+      await tx.groupMember.create({ data });
+    }
+  });
 
   const ownerName = group.owner.name?.trim() ?? group.owner.email ?? "A Kontax user";
   await sendInviteEmail({
@@ -182,7 +185,7 @@ export const inviteFamilyMember = async (formData: FormData) => {
 
 // --- Accept / decline (token) -----------------------------------------------
 export const acceptFamilyInvite = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const token = str(formData, "token");
 
   const member = await db.groupMember.findUnique({
@@ -213,7 +216,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
 };
 
 export const declineFamilyInvite = async (formData: FormData) => {
-  await requireUserId();
+  await requireUserId({ write: true });
   const token = str(formData, "token");
   const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
   if (member?.inviteStatus === "PENDING") {
@@ -242,7 +245,7 @@ const requireOwnedMember = async (ownerId: string, memberId: string) => {
 };
 
 export const removeFamilyMember = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const member = await requireOwnedMember(userId, memberId);
   if (member.role === "OWNER") {
@@ -290,7 +293,7 @@ const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
 // book (a copy, not a move — the original is untouched). Creates a new Contact
 // owned (nominally) by the group owner + a GroupContact link.
 export const addContactToFamilyBook = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = str(formData, "contactId");
 
   const membership = await getUserFamilyMembership(userId);
@@ -305,27 +308,47 @@ export const addContactToFamilyBook = async (formData: FormData) => {
   }
 
   // Must be a private contact the user owns.
-  const source = await db.contact.findFirst({
-    where: { id: contactId, userId },
-    select: COPY_SELECT,
-  });
-  if (!source) {
+  const [rawSource, group, groupMember, book] = await Promise.all([
+    db.contact.findFirst({
+      where: { id: contactId, userId },
+      select: COPY_SELECT,
+    }),
+    db.group.findUnique({
+      where: { id: membership.groupId },
+      select: { ownerId: true, name: true },
+    }),
+    // P48-07: this member's own share defaults for the family book (null = default policy).
+    db.groupMember.findFirst({
+      where: { groupId: membership.groupId, userId },
+      select: { sharingPolicy: true },
+    }),
+    // Family books have no Teams-style floor, but reuse the same resolver shape.
+    db.groupAddressBook.findUnique({
+      where: { id: membership.bookId },
+      select: { minimumSharingPolicy: true },
+    }),
+  ]);
+  if (!rawSource) {
     throw new Error("Contact not found.");
   }
-
-  const group = await db.group.findUnique({
-    where: { id: membership.groupId },
-    select: { ownerId: true, name: true },
-  });
   if (!group) {
     throw new Error("Family group not found.");
   }
 
-  // Already in the book?
+  // P48-07: never carry the member's policy-private fields (notes, personal
+  // phone, home address, birthday, labels, custom fields) into the shared copy.
+  const policy = resolveEffectiveSharingPolicy(
+    groupMember?.sharingPolicy ?? null,
+    book?.minimumSharingPolicy ?? null,
+  );
+  const source = projectContactForSharing(rawSource, policy, "family");
+
+  // Already in the book? Dedupe against the unprojected email — this is only a
+  // comparison, never stored, so it isn't a policy leak.
   const dupe = await db.groupContact.findFirst({
     where: {
       groupAddressBookId: membership.bookId,
-      contact: { fullName: source.fullName, email: source.email },
+      contact: { fullName: rawSource.fullName, email: rawSource.email },
     },
     select: { id: true },
   });
@@ -334,6 +357,13 @@ export const addContactToFamilyBook = async (formData: FormData) => {
   }
 
   await db.$transaction(async (tx) => {
+    // P48-17: this acceptance path created a contact without any plan-cap
+    // check at all. Check (and serialise, via the row lock) against the
+    // book's nominal owner — the account the new contact is actually created
+    // under — not the acting member.
+    await lockUserForPlanCheck(tx, group.ownerId);
+    await assertCanCreateContactsTx(tx, group.ownerId);
+
     const copy = await tx.contact.create({
       data: {
         userId: group.ownerId, // group owns the shared contact (nominal owner)
@@ -391,7 +421,7 @@ export const addContactToFamilyBook = async (formData: FormData) => {
 
 // --- Owner management: permissions, resend, delete (P13-06) -----------------
 export const setMemberCanEdit = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const canEdit = str(formData, "canEdit") === "true";
   const member = await requireOwnedMember(userId, memberId);
@@ -429,11 +459,18 @@ export const setMemberCanEdit = async (formData: FormData) => {
 };
 
 export const resendFamilyInvite = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const member = await requireOwnedMember(userId, memberId);
   if (member.inviteStatus !== "PENDING" || !member.invitedEmail) {
     throw new Error("That invite can't be resent.");
+  }
+  // P48-17: resend was uncapped — keyed per invite (not per owner) so an owner
+  // resending to several different pending invitees in one hour isn't blocked
+  // by someone else's resend spam on the same invite.
+  const rl = await checkRateLimit(rateLimiters.inviteResend, `family:${member.id}`);
+  if (!rl.allowed) {
+    throw new Error("That invite was resent too many times recently. Try again later.");
   }
   const group = await db.group.findUnique({
     where: { id: member.groupId },
@@ -463,7 +500,7 @@ export const resendFamilyInvite = async (formData: FormData) => {
 // Delete the family group. Owner only. Permanently deletes the shared contacts
 // (they live in the book, not a member's private library) and all membership.
 export const deleteFamilyGroup = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const group = await db.group.findFirst({
     where: { id: groupId, ownerId: userId, type: "FAMILY" },
@@ -489,7 +526,7 @@ export const deleteFamilyGroup = async (formData: FormData) => {
 };
 
 export const leaveFamilyGroup = async (formData: FormData) => {
-  const userId = await requireUserId();
+  const userId = await requireUserId({ write: true });
   const groupId = str(formData, "groupId");
   const member = await db.groupMember.findFirst({
     where: { groupId, userId, inviteStatus: "ACCEPTED" },

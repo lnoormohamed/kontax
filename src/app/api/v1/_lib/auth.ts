@@ -74,3 +74,31 @@ export function requireWriteScope(scope: ApiTokenScope): NextResponse | null {
   }
   return null;
 }
+
+/**
+ * P48-05: resolve the book a contact should live in. A caller-supplied `bookId`
+ * must belong to the token owner; a missing/null id means the default book.
+ * Returns the same "not found" shape for a foreign id and a non-existent id so
+ * book ids cannot be probed.
+ */
+export async function resolveOwnedBookId(
+  userId: string,
+  bookId: string | null | undefined,
+): Promise<{ bookId: string } | { error: NextResponse }> {
+  const { db } = await import("~/server/db");
+  const { getUserDefaultBook } = await import("~/server/address-books");
+  if (!bookId) return { bookId: (await getUserDefaultBook(userId)).id };
+  const book = await db.addressBook.findFirst({
+    where: { id: bookId, userId, archivedAt: null },
+    select: { id: true },
+  });
+  if (!book) {
+    return {
+      error: NextResponse.json(
+        { error: "VALIDATION_ERROR", message: "bookId does not refer to one of your address books." },
+        { status: 422, headers: corsHeaders },
+      ),
+    };
+  }
+  return { bookId: book.id };
+}

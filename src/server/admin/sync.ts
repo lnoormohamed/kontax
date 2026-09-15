@@ -113,8 +113,8 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
     filters.status && [...MUTABLE_STATUSES].includes(filters.status as (typeof MUTABLE_STATUSES)[number])
       ? filters.status
       : "all";
-  const profileFilter = filters.profile?.trim() || "all";
-  const q = filters.q?.trim() || "";
+  const profileFilter = filters.profile?.trim() ? filters.profile.trim() : "all";
+  const q = filters.q?.trim() ?? "";
 
   const where: Prisma.SyncAccountWhereInput = {
     ...(providerFilter !== "all" ? { provider: providerFilter } : {}),
@@ -329,7 +329,7 @@ export async function loadAdminSyncOverview(filters: AdminSyncFilters = {}) {
       lastEventLabel: fmtRelative(row.lastErrorAt ?? row.updatedAt),
       tone: row.healthToneValue,
       body:
-        row.lastErrorMessage?.trim() ||
+        (row.lastErrorMessage?.trim() ? row.lastErrorMessage.trim() : null) ??
         (row.status === "NEEDS_REAUTH"
           ? "Credentials need to be refreshed before syncing can continue."
           : row.status === "PAUSED"
@@ -525,7 +525,7 @@ export async function loadAdminSyncConnectionDetail(syncAccountId: string) {
     user: {
       id: account.user.id,
       email: account.user.email,
-      name: account.user.name?.trim() || account.user.email,
+      name: account.user.name?.trim() ? account.user.name.trim() : account.user.email,
       lifecycleState: account.user.lifecycleState,
     },
     health: operationalHealth,

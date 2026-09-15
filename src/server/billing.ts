@@ -406,6 +406,172 @@ export const assertHasAvailableSyncAccountSlot = async (
 export const assertCanCreateSyncAccount = async (userId: string) =>
   assertHasAvailableSyncAccountSlot(userId);
 
+// ── P48-17: transactional cap-check variants ─────────────────────────────────
+//
+// The read-only helpers above (`getUserPlanSummary`, `assertCanCreateContacts`,
+// etc.) count usage and enforce the plan cap as two separate round-trips, with
+// the insert as a third, later one — a classic check-then-act race. Two
+// concurrent requests can both read "499 of 500 contacts used" and both
+// proceed, landing 501.
+//
+// The fix is to run the count and the insert inside the same `db.$transaction`,
+// after first serialising concurrent callers with a row lock. Postgres has no
+// advisory-lock-by-string-key requirement here — locking the caller's own
+// `User` row with `SELECT ... FOR UPDATE` is enough: a second transaction for
+// the same user blocks at the lock until the first commits, and (under the
+// default READ COMMITTED isolation) its own count re-read after the lock then
+// sees the first transaction's committed insert.
+//
+// Callers: `db.$transaction(async (tx) => { await lockUserForPlanCheck(tx,
+// userId); const summary = await assertCanCreateContactsTx(tx, userId, n);
+// await tx.contact.create(...); })`.
+type TxClient = Prisma.TransactionClient;
+
+/**
+ * Must be the FIRST statement inside the `$transaction` callback, before the
+ * cap check and the insert — see the note above.
+ */
+export const lockUserForPlanCheck = (tx: TxClient, userId: string) =>
+  tx.$queryRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+
+const getUserBillingContextTx = async (tx: TxClient, userId: string): Promise<BillingContext> => {
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: {
+      lifecycleState: true,
+      subscriptions: {
+        where: { status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] } },
+        orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
+        take: 1,
+        select: { plan: true, memberSlotsLimit: true },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new Error("User account could not be found.");
+  }
+
+  const subscription = user.subscriptions[0];
+  const plan = subscription?.plan ?? "FREE";
+  const entitlements = { ...PLAN_DEFAULTS[plan] };
+  if (plan === "TEAMS" && subscription?.memberSlotsLimit != null) {
+    entitlements.memberSlotsLimit = subscription.memberSlotsLimit;
+  }
+
+  return {
+    lifecycleState: user.lifecycleState,
+    plan,
+    planLabel: PLAN_LABELS[plan],
+    entitlements,
+  };
+};
+
+const getUserPlanSummaryTx = async (tx: TxClient, userId: string) => {
+  const context = await getUserBillingContextTx(tx, userId);
+  const monthStart = getMonthStart();
+
+  const [contactsUsed, importedThisMonthAggregate, syncAccountsUsed, appPasswordsUsed] =
+    await Promise.all([
+      tx.contact.count({ where: { userId } }),
+      tx.importJob.aggregate({
+        where: { userId, status: "COMPLETED", createdAt: { gte: monthStart } },
+        _sum: { importedCount: true },
+      }),
+      tx.syncAccount.count({ where: liveSyncAccountWhere(userId) }),
+      tx.appPassword.count({ where: { userId } }),
+    ]);
+
+  return {
+    ...context,
+    lifecyclePolicy: getLifecycleAccessPolicy(context.lifecycleState),
+    contactsUsed,
+    contactsRemaining:
+      context.entitlements.contactsLimit === null
+        ? null
+        : Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
+    importedThisMonth: importedThisMonthAggregate._sum.importedCount ?? 0,
+    syncAccountsUsed,
+    appPasswordsUsed,
+  };
+};
+
+/** Transactional twin of `assertCanCreateContacts` — call after `lockUserForPlanCheck`. */
+export const assertCanCreateContactsTx = async (
+  tx: TxClient,
+  userId: string,
+  incomingCount = 1,
+) => {
+  const summary = await getUserPlanSummaryTx(tx, userId);
+  assertWritableAccount(summary);
+
+  const limit = summary.entitlements.contactsLimit;
+  if (limit !== null && summary.contactsUsed + incomingCount > limit) {
+    throw new Error(
+      `${summary.planLabel} plan limit reached. You can store up to ${limit} contacts on this plan.`,
+    );
+  }
+
+  return summary;
+};
+
+/** Transactional twin of `assertCanImportContacts` — call after `lockUserForPlanCheck`. */
+export const assertCanImportContactsTx = async (
+  tx: TxClient,
+  userId: string,
+  incomingCount: number,
+) => {
+  const summary = await assertCanCreateContactsTx(tx, userId, incomingCount);
+
+  const limit = summary.entitlements.monthlyImportLimit;
+  if (limit !== null && summary.importedThisMonth + incomingCount > limit) {
+    throw new Error(
+      `${summary.planLabel} plan import limit reached. You can import up to ${limit} contacts per month on this plan.`,
+    );
+  }
+
+  return summary;
+};
+
+const assertCanUseCardDavSyncTx = async (tx: TxClient, userId: string) => {
+  const summary = await getUserPlanSummaryTx(tx, userId);
+  assertWritableAccount(summary);
+
+  if (!summary.entitlements.cardDavSyncEnabled) {
+    throw new Error("CardDAV sync is available on the Pro plan.");
+  }
+
+  return summary;
+};
+
+/** Transactional twin of `assertHasAvailableSyncAccountSlot` — call after `lockUserForPlanCheck`. */
+export const assertHasAvailableSyncAccountSlotTx = async (
+  tx: TxClient,
+  userId: string,
+  options?: { excludingSyncAccountIds?: string[] },
+) => {
+  const summary = await assertCanUseCardDavSyncTx(tx, userId);
+  const syncAccountsUsed = await tx.syncAccount.count({
+    where: liveSyncAccountWhere(userId, options?.excludingSyncAccountIds ?? []),
+  });
+
+  if (syncAccountsUsed + 1 > summary.entitlements.syncAccountsLimit) {
+    throw new Error(
+      `${summary.planLabel} plan sync limit reached. You can connect up to ${summary.entitlements.syncAccountsLimit} sync account${summary.entitlements.syncAccountsLimit === 1 ? "" : "s"} on this plan.`,
+    );
+  }
+
+  return {
+    ...summary,
+    syncAccountsUsed,
+    syncAccountsRemaining: Math.max(summary.entitlements.syncAccountsLimit - syncAccountsUsed, 0),
+  };
+};
+
+/** Transactional twin of `assertCanCreateSyncAccount` — call after `lockUserForPlanCheck`. */
+export const assertCanCreateSyncAccountTx = (tx: TxClient, userId: string) =>
+  assertHasAvailableSyncAccountSlotTx(tx, userId);
+
 // --- Activity log & sharing gates (P11-03) -----------------------------------
 
 // The global activity feed is gated by retention: Free has retention 0 (no feed);

@@ -124,7 +124,7 @@ export function MobileContactDetail({
       }
       scrollTarget.removeEventListener("scroll", handleScroll);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   // Keyboard-awareness: when editing, use visualViewport to pad the scroll
@@ -167,7 +167,7 @@ export function MobileContactDetail({
       window.visualViewport?.removeEventListener("scroll", handleVV);
       if (container) container.style.paddingBottom = "";
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [editing]);
 
   const showCompactHeader = !heroVisible || editing;

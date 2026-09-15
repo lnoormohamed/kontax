@@ -180,10 +180,16 @@ function ContactAvatar({ fullName, company, size, avatarUrl }: { fullName: strin
   // P46-02: show the contact photo (thumb → canonical → initials fallback), the
   // same chain as the list rows and detail hero. Search used to be initials-only.
   if (avatarUrl) {
+    // Trimmed-to-undefined chain: an empty/whitespace-only name must still
+    // fall through to company, which `??` alone won't do (only null/undefined
+    // count as absent) — see the identical helper in merge-suggestion-card.tsx.
+    const trimmedFullName = fullName?.trim() ? fullName.trim() : undefined;
+    const trimmedCompany = company?.trim() ? company.trim() : undefined;
+    const avatarAlt = trimmedFullName ?? trimmedCompany ?? "Contact photo";
     return (
       <ContactHeroAvatar
         avatarUrl={avatarUrl}
-        alt={fullName?.trim() || company?.trim() || "Contact photo"}
+        alt={avatarAlt}
         initials={initials}
         bg={bg}
         fg={fg}

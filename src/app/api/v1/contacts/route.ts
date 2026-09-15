@@ -2,7 +2,6 @@
 // Base URL when created: https://api.getkontax.com/v1
 import { type NextRequest, NextResponse } from "next/server";
 
-import { getUserDefaultBook } from "~/server/address-books";
 import { assertCanCreateContacts } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
@@ -10,7 +9,7 @@ import { emitEvent } from "~/lib/activity";
 import { corsHeaders } from "~/lib/api-cors";
 import { API_CONTACT_SELECT, formatContactForApi, mapCreateInputToDb } from "../_lib/contact-mapper";
 import { ContactCreateSchema } from "../_lib/schemas";
-import { requireWriteScope, withApiAuth } from "../_lib/auth";
+import { requireWriteScope, resolveOwnedBookId, withApiAuth } from "../_lib/auth";
 
 export function OPTIONS(_request: Request) {
   return new Response(null, { status: 200, headers: corsHeaders });
@@ -115,7 +114,10 @@ export async function POST(req: NextRequest) {
     // P40-06: every personal contact lives in a book. A null bookId historically
     // meant "the default book"; make that explicit so the membership read cutover
     // shows the contact, and dual-write the primary membership.
-    const bookId = data.bookId ?? (await getUserDefaultBook(userId)).id;
+    // P48-05: the book must belong to the token owner.
+    const resolvedBook = await resolveOwnedBookId(userId, data.bookId);
+    if ("error" in resolvedBook) return resolvedBook.error;
+    const bookId = resolvedBook.bookId;
     data.bookId = bookId;
 
     const contact = await db.$transaction(async (tx) => {

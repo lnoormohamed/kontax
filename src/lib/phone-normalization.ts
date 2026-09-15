@@ -50,7 +50,7 @@ export type NormalizedPhoneCandidate = {
 const tidyPhoneInput = (value: string | null | undefined) => value?.trim() ?? "";
 
 const extractExtension = (value: string) => {
-  const match = value.match(/(?:ext\.?|extension|x|#)\s*(\d+)\s*$/i);
+  const match = /(?:ext\.?|extension|x|#)\s*(\d+)\s*$/i.exec(value);
   if (!match) {
     return { base: value, extension: null as string | null };
   }

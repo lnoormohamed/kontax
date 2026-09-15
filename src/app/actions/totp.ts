@@ -4,7 +4,8 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import QRCode from "qrcode";
 
-import { auth } from "~/server/auth";
+import { authIncludingPendingTotp } from "~/server/auth";
+import { isSessionError, requireSession } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import {
   createTotpSecret,
@@ -17,14 +18,28 @@ import {
 } from "~/server/totp-crypto";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 
+/**
+ * P48-03: a 10-character recovery code, as the UI has always claimed.
+ * `randomBytes(5).toString("base64url")` produced only 7 characters, so
+ * `.slice(0, 10)` was a no-op and every code was ~10 bits short of the intended
+ * strength. Hex over 8 bytes gives 16 characters to trim to a full 10 (40 bits).
+ */
+function generateRecoveryCode(): string {
+  return crypto.randomBytes(8).toString("hex").toUpperCase().slice(0, 10);
+}
+
 // ── Enrolment ─────────────────────────────────────────────────────────────────
 
 export async function startTotpEnrolment(): Promise<
   { qrCodeDataUri: string; plaintextSecret: string; pendingToken: string } | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -51,9 +66,18 @@ export async function confirmTotpEnrolment(input: {
   totpCode: string;
   pendingToken: string;
 }): Promise<{ success: true; recoveryCodes: string[] } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
+
+  // P48-03: enrolment verifies a TOTP code, so it is a guessable-code endpoint
+  // like the login challenge and gets the same bucket.
+  const rl = await checkRateLimit(rateLimiters.totpChallenge, `enrol:${session.user.id}`);
+  if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
   // Decrypt and validate the pending token
   let payload: { secret: string; expiresAt: number };
@@ -70,9 +94,7 @@ export async function confirmTotpEnrolment(input: {
   }
 
   // Generate 8 single-use recovery codes
-  const recoveryCodes = Array.from({ length: 8 }, () =>
-    crypto.randomBytes(5).toString("base64url").toUpperCase().slice(0, 10),
-  );
+  const recoveryCodes = Array.from({ length: 8 }, generateRecoveryCode);
   const codeHashes = recoveryCodes.map((c) =>
     crypto.createHash("sha256").update(c).digest("hex"),
   );
@@ -83,7 +105,7 @@ export async function confirmTotpEnrolment(input: {
   await db.$transaction([
     db.user.update({
       where: { id: userId },
-      data: { totpEnabled: true, totpSecret: encryptedSecret, totpVerifiedAt: new Date() },
+      data: { totpEnabled: true, totpSecret: encryptedSecret, totpVerifiedAt: new Date(), lastTotpCounter: null },
     }),
     db.totpRecoveryCode.deleteMany({ where: { userId } }),
     db.totpRecoveryCode.createMany({
@@ -101,9 +123,13 @@ export async function confirmTotpEnrolment(input: {
 export async function regenerateRecoveryCodes(): Promise<
   { success: true; recoveryCodes: string[] } | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -111,9 +137,7 @@ export async function regenerateRecoveryCodes(): Promise<
   });
   if (!user?.totpEnabled) return { error: "TOTP_NOT_ENABLED" };
 
-  const recoveryCodes = Array.from({ length: 8 }, () =>
-    crypto.randomBytes(5).toString("base64url").toUpperCase().slice(0, 10),
-  );
+  const recoveryCodes = Array.from({ length: 8 }, generateRecoveryCode);
   const codeHashes = recoveryCodes.map((c) =>
     crypto.createHash("sha256").update(c).digest("hex"),
   );
@@ -133,7 +157,7 @@ export async function regenerateRecoveryCodes(): Promise<
 export async function submitTotpChallenge(
   code: string,
 ): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
+  const session = await authIncludingPendingTotp();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
   if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
   if (!session.pendingTotp) return { error: "NOT_PENDING_TOTP" };
@@ -143,12 +167,26 @@ export async function submitTotpChallenge(
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { totpSecret: true, totpEnabled: true },
+    select: { totpSecret: true, totpEnabled: true, lastTotpCounter: true },
   });
   if (!user?.totpEnabled || !user.totpSecret) return { error: "TOTP_NOT_ENABLED" };
 
   const secret = decryptTotp(user.totpSecret);
   if (!verifyTotpToken(secret, code)) return { error: "INVALID_TOTP_CODE" };
+
+  // P48-03: replay guard. A TOTP code is valid for its whole 30s step, so a
+  // code captured in transit (shoulder-surfed, phished, read off a proxy) can
+  // be used again inside the same window. Record the step and refuse anything
+  // at or below it — the legitimate user just waits for the next code.
+  const counter = Math.floor(Date.now() / 30_000);
+  const claimed = await db.user.updateMany({
+    where: {
+      id: session.user.id,
+      OR: [{ lastTotpCounter: null }, { lastTotpCounter: { lt: counter } }],
+    },
+    data: { lastTotpCounter: counter },
+  });
+  if (claimed.count === 0) return { error: "TOTP_CODE_ALREADY_USED" };
 
   // Mark the UserSession as TOTP-verified so JWT callback clears pendingTotp
   if (session.jti) {
@@ -164,7 +202,7 @@ export async function submitTotpChallenge(
 export async function redeemTotpRecoveryCode(
   code: string,
 ): Promise<{ success: true; remaining: number } | { error: string }> {
-  const session = await auth();
+  const session = await authIncludingPendingTotp();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
   if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
   if (!session.pendingTotp) return { error: "NOT_PENDING_TOTP" };
@@ -201,9 +239,18 @@ export async function disableTotpAuth(input: {
   password: string;
   totpCode: string;
 }): Promise<{ success: true } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
+  let session: Awaited<ReturnType<typeof requireSession>>;
+  try {
+    session = await requireSession({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
+
+  // P48-03: turning 2FA OFF takes both a password and a TOTP code, so it was
+  // the one unmetered endpoint where either could be brute-forced.
+  const rl = await checkRateLimit(rateLimiters.totpChallenge, `disable:${session.user.id}`);
+  if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -220,7 +267,7 @@ export async function disableTotpAuth(input: {
   await db.$transaction([
     db.user.update({
       where: { id: session.user.id },
-      data: { totpEnabled: false, totpSecret: null, totpVerifiedAt: null },
+      data: { totpEnabled: false, totpSecret: null, totpVerifiedAt: null, lastTotpCounter: null },
     }),
     db.totpRecoveryCode.deleteMany({ where: { userId: session.user.id } }),
   ]);
@@ -244,7 +291,7 @@ export async function getTotpStatus(): Promise<{
   verifiedAt: Date | null;
   remainingCodes: number;
 }> {
-  const session = await auth();
+  const session = await requireSession().catch(() => null);
   if (!session?.user?.id) return { enabled: false, verifiedAt: null, remainingCodes: 0 };
 
   const [user, remaining] = await Promise.all([

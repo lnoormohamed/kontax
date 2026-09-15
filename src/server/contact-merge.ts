@@ -26,7 +26,6 @@ import {
   mergePhoneEntries,
   mergePhoneValues,
   normalizePhoneCandidate,
-  normalizePhoneExactKey,
 } from "~/lib/phone-normalization";
 
 type MergeCandidateContact = {
@@ -418,10 +417,6 @@ const normalizeValue = (value: string | null | undefined) =>
 // accented names normalize to comparable tokens instead of being mangled.
 const normalizeName = (value: string) => normalizeNameKey(value);
 
-const normalizePhone = (value: string | null | undefined) => {
-  return normalizePhoneExactKey(value) ?? normalizePhoneKey(value);
-};
-
 const getNameTokens = (value: string) => normalizeName(value).split(" ").filter(Boolean);
 
 const getFamilyName = (value: string) => {
@@ -633,6 +628,13 @@ const mergeLabelValuePairs = (
   return result;
 };
 
+// Legacy-data guard: these fields are supposed to be strings, but old JSON
+// blobs (imports, hand-edited exports) can hold anything. `String(unknown)`
+// would stringify a stray object to the useless "[object Object]" instead of
+// treating it as absent, so only a genuine string counts — anything else is
+// "".
+const asText = (value: unknown): string => (typeof value === "string" ? value : "");
+
 const mergeDates = (
   primaryEntries: Array<{ label: string; date: string; isPrimary?: boolean }>,
   secondaryEntries: Array<{ label: string; date: string; isPrimary?: boolean }>,
@@ -643,8 +645,8 @@ const mergeDates = (
   for (const raw of [...primaryEntries, ...secondaryEntries]) {
     // Legacy imports stored significant dates as {label, value} instead of {label, date}.
     const entry = raw as unknown as Record<string, unknown>;
-    const label = String(entry.label ?? "").trim();
-    const date = String(entry.date ?? entry.value ?? "").trim();
+    const label = asText(entry.label).trim();
+    const date = (asText(entry.date) || asText(entry.value)).trim();
     if (!label || !date) continue;
     const key = `${label.toLowerCase()}::${date}`;
     if (seen.has(key)) continue;
@@ -664,8 +666,8 @@ const mergeDates = (
 function normaliseRelatedPerson(
   raw: Record<string, unknown>,
 ): { relationship: string; name: string } {
-  const relationship = String(raw.relationship ?? raw.label ?? "").trim();
-  const name = String(raw.name ?? raw.value ?? "").trim();
+  const relationship = (asText(raw.relationship) || asText(raw.label)).trim();
+  const name = (asText(raw.name) || asText(raw.value)).trim();
   return { relationship, name };
 }
 
@@ -677,7 +679,7 @@ const mergeRelatedPeople = (
   const result: Array<{ relationship: string; name: string }> = [];
 
   for (const raw of [...primaryEntries, ...secondaryEntries]) {
-    const entry = normaliseRelatedPerson(raw as unknown as Record<string, unknown>);
+    const entry = normaliseRelatedPerson(raw);
     if (!entry.relationship || !entry.name) continue;
     const key = `${entry.relationship.toLowerCase()}::${entry.name.toLowerCase()}`;
     if (seen.has(key)) continue;
@@ -1911,6 +1913,9 @@ export const getOpenMergeSuggestionsForUser = async (
       confidence: {
         in: ["HIGH", "MEDIUM"],
       },
+      // P48-05: never surface a suggestion whose contacts the user does not own.
+      leftContact: { userId },
+      rightContact: { userId },
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }],
     take,
@@ -2031,6 +2036,9 @@ export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId
       id: suggestionId,
       userId,
       status: "OPEN",
+      // P48-05: never surface a suggestion whose contacts the user does not own.
+      leftContact: { userId },
+      rightContact: { userId },
     },
     select: {
       id: true,

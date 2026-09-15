@@ -913,7 +913,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 >
                   {contact.avatarUrl ? (
                     <ContactHeroAvatar
-                      alt={contact.fullName || contact.company || "Contact photo"}
+                      alt={contact.fullName || (contact.company?.trim() ? contact.company.trim() : "Contact photo")}
                       avatarUrl={contact.avatarUrl}
                       bg={avatarBg}
                       className="h-full w-full"

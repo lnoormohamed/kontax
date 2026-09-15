@@ -2,27 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    throw new Error("You must be signed in to update settings.");
-  }
-
-  // P21-07: impersonation sessions are read-only.
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-
-  return userId;
-};
-
 export const updatePhoneticSettings = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const autoFillPhoneticNames = formData.get("autoFillPhoneticNames") === "true";
 
   await db.user.update({

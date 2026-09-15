@@ -60,6 +60,16 @@ class AccountLockedSigninError extends CredentialsSignin {
   code = "account_locked";
 }
 
+/**
+ * P48-03: a valid bcrypt hash of a value nobody can supply. Compared against
+ * when the email is unknown so an attacker cannot distinguish "no such account"
+ * from "wrong password" by response time. Copied (not imported) from
+ * `~/server/app-passwords` on purpose — that module is Node-only and pulling it
+ * into the auth config would drag its DAV dependencies along.
+ */
+const DUMMY_BCRYPT_HASH =
+  "$2b$12$3Y0mFQ0M0l9n4Y3Q6p0g2uh2jQ7JmYI3d2eY0m4rA4Aq0vN5iVfL2";
+
 export const authConfig = {
   // Required for self-hosted deploys behind a reverse proxy (Coolify): trust the
   // proxy's x-forwarded-host / x-forwarded-proto headers. Without this, Auth.js
@@ -106,7 +116,12 @@ export const authConfig = {
           where: { email: parsedCredentials.data.email },
         });
 
-        if (!user) return null;
+        if (!user) {
+          // P48-03: burn the same ~250ms a real bcrypt.compare costs so the
+          // response time does not reveal whether the account exists.
+          await bcrypt.compare(parsedCredentials.data.password, DUMMY_BCRYPT_HASH);
+          return null;
+        }
 
         // Peek the per-account bucket before the bcrypt call.
         const emailPeek = await peekRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
@@ -118,13 +133,17 @@ export const authConfig = {
         );
         if (!passwordMatches) {
           // Consume a point only on failure so successful logins don't lock users out.
-          void checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
-          if (ip) void checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
+          await checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
+          if (ip) await checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
           // P22-04 Rule 3: track repeated failed logins against this account.
           await recordFailedLogin(user.id, ip);
           return null;
         }
 
+        // P48-02: LOCKED now means *admin suspension* only. A user who
+        // scheduled their own deletion stays ACTIVE with a non-null
+        // `scheduledDeleteAt`, so they can sign back in and cancel — which is
+        // what the UI has always promised.
         if (user.lifecycleState === "LOCKED") {
           throw new AccountLockedSigninError();
         }
@@ -211,17 +230,23 @@ export const authConfig = {
 
         if (cached) {
           if (cached.revoked || cached.lifecycleState === "LOCKED" || cached.sessionVersion !== token.sv) {
-            return {};
+            // P48-03: `null` (not `{}`) so Auth.js clears the cookie instead of
+            // leaving an empty-but-present token that every `session?.user`
+            // gate then has to defend against.
+            return null;
           }
           token.emailVerified = cached.emailVerified;
           token.role = cached.role;
+          // P48-02: keep pendingDeletion in step with the DB, so cancelling the
+          // deletion lifts the read-only gate on the very next request.
+          token.pendingDeletion = cached.scheduledDeleteAt ? true : undefined;
           // lastActiveAt refresh is skipped on cache hits: the 45s TTL is far
           // inside the 5-minute staleness window, so a miss updates it soon.
         } else {
           const [dbUser, userSession] = await Promise.all([
             db.user.findUnique({
               where: { id: token.sub },
-              select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
+              select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true, scheduledDeleteAt: true },
             }),
             db.userSession.findUnique({
               where: { jti: token.sid as string },
@@ -230,7 +255,7 @@ export const authConfig = {
           ]);
 
           if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
-            return {};
+            return null;
           }
 
           // P18-07: TOTP challenge completed — clear pendingTotp from token
@@ -241,6 +266,9 @@ export const authConfig = {
           // Keep emailVerified + role fresh
           token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
           token.role = dbUser.role;
+          // P48-02: same refresh as the cache-hit path — the flag follows
+          // `scheduledDeleteAt`, it is never sticky on the token.
+          token.pendingDeletion = dbUser.scheduledDeleteAt ? true : undefined;
 
           // Update lastActiveAt if stale by > 5 minutes (fire-and-forget)
           const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -252,13 +280,18 @@ export const authConfig = {
           }
 
           // Only cache fully-validated, non-pendingTotp sessions.
+          // P48-03: awaited, not fire-and-forget. A concurrent revoke deletes
+          // the key while this request is in flight; if the write lands after
+          // that delete, the revoked session stays valid for the full 45s TTL.
+          // Awaiting a single local SETEX costs well under a millisecond.
           if (!token.pendingTotp) {
-            void writeSessionValidation(token.sub, token.sid as string, {
+            await writeSessionValidation(token.sub, token.sid as string, {
               sessionVersion: dbUser.sessionVersion,
               lifecycleState: dbUser.lifecycleState,
               role: dbUser.role,
               emailVerified: dbUser.emailVerified?.toISOString() ?? null,
               revoked: false,
+              scheduledDeleteAt: dbUser.scheduledDeleteAt?.toISOString() ?? null,
             });
           }
         }
@@ -267,33 +300,36 @@ export const authConfig = {
         // Sessions created before P18-06 — validate sessionVersion only
         const dbUser = await db.user.findUnique({
           where: { id: token.sub },
-          select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
+          select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true, scheduledDeleteAt: true },
         });
-        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv) return {};
+        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv) return null;
         token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
         token.role = dbUser.role;
+        token.pendingDeletion = dbUser.scheduledDeleteAt ? true : undefined;
       }
 
       if (trigger === "update" && session) {
         const [fresh, preferences] = await Promise.all([
           db.user.findUnique({
             where: { id: token.sub ?? "" },
-            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, lifecycleState: true },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, lifecycleState: true, scheduledDeleteAt: true },
           }),
           getPreferences(token.sub ?? ""),
         ]);
         if (fresh?.lifecycleState === "LOCKED") {
-          return {};
+          return null;
         }
-        token.sv = fresh?.sessionVersion ?? token.sv;
+        // P48 review: never re-sync `sv` here — a client-triggered update must not
+        // let a token survive a sessionVersion bump that is still propagating.
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;
+        token.pendingDeletion = fresh?.scheduledDeleteAt ? true : undefined;
         token.name = fresh?.name ?? token.name;
         token.avatarUrl = fresh?.avatarUrl ?? null;
         token.preferences = preferences;
-        // P18-07: clear pendingTotp after successful TOTP challenge
-        if ((session as { clearPendingTotp?: boolean }).clearPendingTotp) {
-          token.pendingTotp = undefined;
-        }
+        // P48-01: `pendingTotp` is NEVER cleared from the client-supplied update
+        // payload. The only path that clears it is the DB-backed check above
+        // (`userSession.totpChallengeVerified`), which the 2FA page triggers by
+        // fetching /api/auth/session after a successful challenge.
       }
       return token;
     },

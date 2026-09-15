@@ -5,8 +5,6 @@ import { deriveCardAnalytics } from "./analytics-utils";
 const BOT_PATTERNS =
   /googlebot|bingbot|slurp|duckduckbot|twitterbot|facebookexternalhit|linkedinbot|whatsapp|telegrambot|discordbot|applebot|semrushbot|ahrefsbot|yandexbot/i;
 
-const ONE_DAY_MS = 86_400_000;
-
 export async function recordCardView(
   userId: string,
   referrer?: string,

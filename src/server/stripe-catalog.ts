@@ -10,9 +10,7 @@ export type CatalogEntry = {
   currency: string;
 };
 
-export type StripeCatalog = {
-  [K in PlanKey]: { monthly: CatalogEntry; annual: CatalogEntry };
-};
+export type StripeCatalog = Record<PlanKey, { monthly: CatalogEntry; annual: CatalogEntry }>;
 
 type CatalogShape = Partial<Record<PlanKey, Partial<Record<IntervalKey, CatalogEntry>>>>;
 
@@ -92,8 +90,8 @@ async function getConfiguredCatalog(stripe: Stripe): Promise<StripeCatalog | nul
 
   for (const { plan, interval, entry } of resolved) {
     if (!entry) continue;
-    if (!partial[plan]) partial[plan] = {};
-    partial[plan]![interval] = entry;
+    partial[plan] ??= {};
+    partial[plan][interval] = entry;
   }
 
   return isCompleteCatalog(partial) ? partial : null;
@@ -133,8 +131,8 @@ export async function getStripeCatalog(): Promise<StripeCatalog | null> {
       const entry = toCatalogEntry(price);
       if (!entry) continue;
 
-      if (!partial[planKey]) partial[planKey] = {};
-      partial[planKey]![intervalKey] = entry;
+      partial[planKey] ??= {};
+      partial[planKey][intervalKey] = entry;
     }
 
     if (!isCompleteCatalog(partial)) {

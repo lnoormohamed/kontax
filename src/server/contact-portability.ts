@@ -521,12 +521,26 @@ const getAllValues = (row: string[], indexes: number[]) => {
   return values;
 };
 
-const escapeCsv = (value: string) => {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
+// P48-11 item 3: CSV formula injection. Excel/LibreOffice/Sheets treat a cell
+// beginning with =, +, -, @, a tab, or a CR as a formula (or as leading
+// whitespace that lets a formula slip past a naive "starts with =" filter) —
+// export a contact named `=HYPERLINK("http://evil")` or a phone number and it
+// executes on open. Prefixing with a single quote forces spreadsheet apps to
+// treat the cell as literal text; it's invisible once the sheet is open.
+// Numeric-looking values starting with "+" (phone numbers in E.164 form) are
+// prefixed too — the spec explicitly trades a little display fidelity for
+// Excel safety here.
+const CSV_FORMULA_TRIGGER_CHARS = new Set(["=", "+", "-", "@", "\t", "\r"]);
+
+export const escapeCsvCell = (value: string): string => {
+  const guarded =
+    value.length > 0 && CSV_FORMULA_TRIGGER_CHARS.has(value[0]!) ? `'${value}` : value;
+
+  if (/[",\n]/.test(guarded)) {
+    return `"${guarded.replace(/"/g, '""')}"`;
   }
 
-  return value;
+  return guarded;
 };
 
 const escapeVCard = (value: string) =>
@@ -1162,13 +1176,13 @@ export const contactsToCsvFiltered = (
   const rows = contacts.map((contact) =>
     selected.flatMap((f) => {
       if (f.key === "customFields") {
-        return customFieldKeys.map((k) => escapeCsv(contact.customFields?.[k] ?? ""));
+        return customFieldKeys.map((k) => escapeCsvCell(contact.customFields?.[k] ?? ""));
       }
-      return [escapeCsv(extractExportValue(contact, f.key))];
+      return [escapeCsvCell(extractExportValue(contact, f.key))];
     }),
   );
 
-  return [headers.map(escapeCsv).join(","), ...rows.map((r) => r.join(","))].join("\n");
+  return [headers.map(escapeCsvCell).join(","), ...rows.map((r) => r.join(","))].join("\n");
 };
 
 export const contactsToCsv = (contacts: PortableContactInput[]) => {
@@ -1193,37 +1207,37 @@ export const contactsToCsv = (contacts: PortableContactInput[]) => {
     "Notes",
   ];
   const rows = contacts.map((contact) => [
-    escapeCsv(contact.fullName),
-    escapeCsv(contact.firstName ?? ""),
-    escapeCsv(contact.lastName ?? ""),
-    escapeCsv(contact.phoneticFirstName ?? ""),
-    escapeCsv(contact.phoneticLastName ?? ""),
-    escapeCsv(contact.nickname ?? ""),
-    escapeCsv(contact.email ?? ""),
-    escapeCsv(
+    escapeCsvCell(contact.fullName),
+    escapeCsvCell(contact.firstName ?? ""),
+    escapeCsvCell(contact.lastName ?? ""),
+    escapeCsvCell(contact.phoneticFirstName ?? ""),
+    escapeCsvCell(contact.phoneticLastName ?? ""),
+    escapeCsvCell(contact.nickname ?? ""),
+    escapeCsvCell(contact.email ?? ""),
+    escapeCsvCell(
       (contact.emailAddresses ?? [])
         .filter((value) => value !== contact.email)
         .join(" | "),
     ),
-    escapeCsv(contact.phone ?? ""),
-    escapeCsv(
+    escapeCsvCell(contact.phone ?? ""),
+    escapeCsvCell(
       (contact.phoneNumbers ?? [])
         .filter((value) => value !== contact.phone)
         .join(" | "),
     ),
-    escapeCsv(contact.company ?? ""),
-    escapeCsv(contact.phoneticCompany ?? ""),
-    escapeCsv(contact.jobTitle ?? ""),
-    escapeCsv(contact.website ?? ""),
-    escapeCsv(contact.birthday ?? ""),
-    escapeCsv(contact.address ?? ""),
-    escapeCsv(
+    escapeCsvCell(contact.company ?? ""),
+    escapeCsvCell(contact.phoneticCompany ?? ""),
+    escapeCsvCell(contact.jobTitle ?? ""),
+    escapeCsvCell(contact.website ?? ""),
+    escapeCsvCell(contact.birthday ?? ""),
+    escapeCsvCell(contact.address ?? ""),
+    escapeCsvCell(
       (contact.postalAddresses ?? [])
         .filter((value) => value.formatted !== contact.address)
         .map((value) => value.formatted)
         .join(" | "),
     ),
-    escapeCsv(contact.notes ?? ""),
+    escapeCsvCell(contact.notes ?? ""),
   ]);
 
   return [header.join(","), ...rows.map((row) => row.join(","))].join("\n");

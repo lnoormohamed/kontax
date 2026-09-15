@@ -150,16 +150,31 @@ export async function saveAdminBroadcastDraft(input: {
     });
   }
 
+  // P48-14: denormalise the creator's email so a sent broadcast still names
+  // its author after that admin's User row is deleted (the relation is
+  // SetNull now instead of Cascade, which used to delete the broadcast — and
+  // its Notification children — outright).
+  const creator = await db.user.findUnique({
+    where: { id: input.adminId },
+    select: { email: true },
+  });
+
   return db.adminBroadcast.create({
     data: {
       createdByAdminUserId: input.adminId,
+      createdByAdminEmail: creator?.email ?? null,
       ...payload,
     },
   });
 }
 
 export async function sendAdminBroadcast(input: {
-  adminId: string;
+  // P48-14: nullable. The scheduled-send path attributes the send to the
+  // broadcast's creator, whose account may since have been deleted —
+  // `createdByAdminUserId` is SetNull now. `sentByAdminUserId` has always been
+  // nullable, so an unattributed automatic send is recorded faithfully rather
+  // than blocking a broadcast that was deliberately scheduled.
+  adminId: string | null;
   broadcastId: string;
 }) {
   const broadcast = await db.adminBroadcast.findUnique({
@@ -282,6 +297,7 @@ export async function listAdminBroadcasts(limit = 12, query = "") {
       deliveredRecipientCount: true,
       audienceFilters: true,
       audienceSummary: true,
+      createdByAdminEmail: true,
       creator: { select: { name: true, email: true } },
     },
   });
@@ -334,6 +350,6 @@ export async function listAdminBroadcasts(limit = 12, query = "") {
       ((row.audienceSummary as { sample?: string[] } | null)?.sample ?? []).filter(
         (value): value is string => typeof value === "string" && value.trim().length > 0,
       ),
-    createdBy: row.creator.name?.trim() ?? row.creator.email,
+    createdBy: row.creator?.name?.trim() ?? row.creator?.email ?? row.createdByAdminEmail ?? "system",
   }));
 }

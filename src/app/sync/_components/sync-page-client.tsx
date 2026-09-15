@@ -72,6 +72,10 @@ export type SyncConflictData = {
 function ConflictPhotoCell({ url, alt }: { url: string; alt: string }) {
   if (!url || url === "—") return <span style={{ fontSize: 12, color: T.mute }}>None</span>;
   return (
+    // P48-12: next/image's Image Optimization API is intentionally disabled
+    // repo-wide (images.unoptimized in next.config.js) — plain <img> is the
+    // deliberate choice.
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={url}
       alt={alt}
@@ -2233,7 +2237,7 @@ function OAuthErrorBanner({
             {providerName} API quota exceeded
           </div>
           <div style={{ fontSize: 13, color: amber.body, marginTop: 3, lineHeight: 1.5 }}>
-            Sync is paused. Kontax will automatically retry later. "Sync now" is disabled during the
+            Sync is paused. Kontax will automatically retry later. &quot;Sync now&quot; is disabled during the
             pause.
           </div>
         </div>
@@ -3013,7 +3017,7 @@ function AddAccountForm({
           Add sync account
         </h2>
         <p style={{ margin: "0 0 22px", fontSize: 13.5, color: T.ink2, maxWidth: 480 }}>
-          You've reached the sync-account limit for your plan.
+          You&apos;ve reached the sync-account limit for your plan.
         </p>
         <div style={{ maxWidth: 520 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: "#f6edd9", border: "1px solid #e9c87b", borderRadius: 10, padding: "14px 16px" }}>
@@ -3022,7 +3026,7 @@ function AddAccountForm({
             </svg>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: "#7a5a1a", lineHeight: 1.5 }}>
-                You're using all {accounts.length} of your {syncAccountsLimit} sync accounts.
+                You&apos;re using all {accounts.length} of your {syncAccountsLimit} sync accounts.
               </div>
               <div style={{ fontSize: 13, color: "#8a6a2a", marginTop: 2, lineHeight: 1.5 }}>
                 {upgradeableAtCap ? (
@@ -3095,7 +3099,7 @@ function AddAccountForm({
         {OAUTH_TILES.map((p) => {
           const existingEmails = accounts
             .filter((a) => a.provider === p.provider && a.connectedEmail)
-            .map((a) => a.connectedEmail as string);
+            .map((a) => a.connectedEmail!);
           const hasExisting = existingEmails.length > 0;
           const label = hasExisting
             ? `Connect another ${p.provider === "GOOGLE" ? "Google" : "Outlook"} account`
@@ -3334,7 +3338,7 @@ function AddAccountForm({
             <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Server URL
               <HelpTooltip learnHref="/help#carddav" place="bottom">
-                Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app's account settings.
+                Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app&apos;s account settings.
               </HelpTooltip>
             </span>
             <input
@@ -3378,7 +3382,7 @@ function AddAccountForm({
             <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Password
               <HelpTooltip learnHref="/help#carddav" place="bottom">
-                Generate an app-specific password in your account's security settings — your normal password won't work for CardDAV.
+                Generate an app-specific password in your account&apos;s security settings — your normal password won&apos;t work for CardDAV.
               </HelpTooltip>
             </label>
             <div style={{ position: "relative" }}>

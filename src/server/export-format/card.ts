@@ -56,7 +56,7 @@ const effectiveEntries = (
             label: typeof item.label === "string" ? item.label : "",
             value,
             isPrimary: item.isPrimary === true,
-          } as SimpleEntry,
+          },
         ];
       })
     : [];

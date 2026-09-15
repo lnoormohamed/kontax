@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
+import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { countLiveSyncAccountSlots } from "~/server/billing";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
@@ -24,9 +25,13 @@ export async function createCheckoutSession(input: {
   interval: string;
   seats?: number;
 }): Promise<{ url: string } | { error: string }> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  const userId = session.user.id;
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const parsed = CheckoutInputSchema.safeParse(input);
   if (!parsed.success) return { error: "INVALID_PLAN" };
@@ -151,9 +156,13 @@ export async function getDowngradeSummary(): Promise<
     }
   | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  const userId = session.user.id;
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
 
   const [syncConnections, liveContacts, totalContacts, familyGroup] = await Promise.all([
     countLiveSyncAccountSlots(userId),
@@ -181,12 +190,28 @@ export async function getDowngradeSummary(): Promise<
  * for every "Manage billing / Update payment method / Keep my plan" CTA across
  * the P19-DB02 surfaces — the app never mutates subscription rows directly.
  */
-export async function createBillingPortalSession(): Promise<
-  { url: string } | { error: string }
-> {
-  const session = await auth();
-  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
-  const userId = session.user.id;
+export async function createBillingPortalSession(
+  input: { currentPassword?: string } = {},
+): Promise<{ url: string } | { error: string }> {
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { error: err.code === "UNAUTHENTICATED" ? "UNAUTHORIZED" : err.code };
+    throw err;
+  }
+
+  // P48-02: the portal can cancel the subscription and change the payment
+  // method, so it takes a server-verified step-up. The old ConfirmPasswordModal
+  // check proved nothing — the action was callable directly. A caller with no
+  // way to collect a password gets STEP_UP_REQUIRED and prompts for one.
+  const stepUpUser = await db.user.findUnique({
+    where: { id: userId },
+    select: { password: true },
+  });
+  if (!stepUpUser) return { error: "UNAUTHORIZED" };
+  const stepUp = await verifyStepUpPassword(userId, stepUpUser.password, input.currentPassword);
+  if (stepUp !== "OK") return { error: stepUp };
 
   const customer = await db.subscriptionCustomer.findUnique({
     where: { userId },

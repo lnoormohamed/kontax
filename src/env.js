@@ -11,6 +11,14 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     SYNC_CREDENTIAL_ENCRYPTION_KEY: z.string().min(32).optional(),
     SYNC_CREDENTIAL_ENCRYPTION_KEY_ID: z.string().optional(),
+    // P48-16: credential keyring — "id:hex64,id:hex64", first entry is the
+    // current (encrypting) key. Supersedes the single-key vars above, which
+    // stay supported for backward compatibility.
+    SYNC_CREDENTIAL_ENCRYPTION_KEYS: z.string().optional(),
+    // P48-16: deployment environment marker. `production` makes the required-env
+    // assertion and the REDIS_URL guard fire even when NODE_ENV is not
+    // "production" (e.g. a script run against prod).
+    KONTAX_DEPLOY_ENV: z.string().optional(),
     // Transactional email via AWS SES (P20-01). All optional — when unset, email
     // is logged to console (dev) and the app falls back to in-app notifications.
     // SES_CONFIGURED (src/server/email.ts) treats email as live only when all
@@ -33,6 +41,8 @@ export const env = createEnv({
     MINIO_PUBLIC_URL: z.string().url().optional(),
     // TOTP encryption key — 64-char hex string (P18-07). Required in production.
     TOTP_ENCRYPTION_KEY: z.string().length(64).optional(),
+    // P48-16: TOTP keyring — "id:hex64,id:hex64", first entry is current.
+    TOTP_ENCRYPTION_KEYS: z.string().optional(),
     // Cron job secret — guards /api/cron/* routes (P18-10).
     CRON_SECRET: z.string().optional(),
     // Stripe billing (P19). All optional — billing features degrade gracefully when unset.
@@ -94,6 +104,8 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     SYNC_CREDENTIAL_ENCRYPTION_KEY: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY,
     SYNC_CREDENTIAL_ENCRYPTION_KEY_ID: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY_ID,
+    SYNC_CREDENTIAL_ENCRYPTION_KEYS: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEYS,
+    KONTAX_DEPLOY_ENV: process.env.KONTAX_DEPLOY_ENV,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_SES_REGION: process.env.AWS_SES_REGION,
@@ -107,6 +119,7 @@ export const env = createEnv({
     MINIO_BUCKET: process.env.MINIO_BUCKET,
     MINIO_PUBLIC_URL: process.env.MINIO_PUBLIC_URL,
     TOTP_ENCRYPTION_KEY: process.env.TOTP_ENCRYPTION_KEY,
+    TOTP_ENCRYPTION_KEYS: process.env.TOTP_ENCRYPTION_KEYS,
     CRON_SECRET: process.env.CRON_SECRET,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
@@ -142,3 +155,61 @@ export const env = createEnv({
    */
   emptyStringAsUndefined: true,
 });
+
+/**
+ * P48-16 — secrets that must be present in production.
+ *
+ * `@t3-oss/env-nextjs@0.12` has no schema-level refinement hook (`extends` only
+ * merges extra objects, and `createFinalSchema` only landed in 0.13), and a
+ * per-variable `z.string()` cannot express "required only in production"
+ * without breaking dev. So the cross-field rule lives in this assertion, which
+ * runs at module scope below — `~/env` is imported by every server entry point,
+ * so a production process with a missing secret dies at boot with one clear
+ * message instead of failing later at the first email, sync or login.
+ *
+ * Each of these has a silent-but-broken failure mode when unset in production:
+ * unsigned/forgeable tokens, links pointing at the wrong domain, credentials
+ * encrypted under the JWT signing secret, unguarded cron endpoints, or
+ * per-process rate limits.
+ */
+export function assertProductionEnv() {
+  const isProductionDeploy =
+    process.env.NODE_ENV === "production" ||
+    process.env.KONTAX_DEPLOY_ENV === "production";
+
+  if (!isProductionDeploy) return;
+
+  /** @type {Array<[string, string | undefined, string]>} */
+  const required = [
+    ["AUTH_SECRET", process.env.AUTH_SECRET, "signs session JWTs and derives the impersonation HMAC key"],
+    ["APP_URL", process.env.APP_URL, "public origin used for email CTAs, OAuth redirects and share links"],
+    [
+      "TOTP_ENCRYPTION_KEY",
+      process.env.TOTP_ENCRYPTION_KEYS ?? process.env.TOTP_ENCRYPTION_KEY,
+      "encrypts stored TOTP secrets at rest (or set the TOTP_ENCRYPTION_KEYS keyring)",
+    ],
+    [
+      "SYNC_CREDENTIAL_ENCRYPTION_KEY",
+      process.env.SYNC_CREDENTIAL_ENCRYPTION_KEYS ?? process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY,
+      "encrypts stored provider credentials at rest (or set the SYNC_CREDENTIAL_ENCRYPTION_KEYS keyring)",
+    ],
+    ["CRON_SECRET", process.env.CRON_SECRET, "guards the /api/cron/* endpoints"],
+    ["REDIS_URL", process.env.REDIS_URL, "shared rate-limit store"],
+  ];
+
+  const missing = required.filter(([, value]) => !value?.trim());
+
+  if (missing.length > 0) {
+    const detail = missing.map(([name, , why]) => `  - ${name}: ${why}`).join("\n");
+    throw new Error(
+      `Missing required production environment variable(s):\n${detail}\n` +
+        "See roadmap/runbooks/env-secrets.md. Set them, or (for a build step only) set SKIP_ENV_VALIDATION=1.",
+    );
+  }
+}
+
+// Server-side only: the client bundle imports this module for NEXT_PUBLIC_* vars
+// and has no access to server secrets. `SKIP_ENV_VALIDATION` exempts `next build`.
+if (typeof window === "undefined" && !process.env.SKIP_ENV_VALIDATION) {
+  assertProductionEnv();
+}

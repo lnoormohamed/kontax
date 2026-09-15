@@ -40,12 +40,22 @@ const COMPARE_FIELDS: Field[] = [
   { key: "notes", label: "Notes" },
 ];
 
+// Trimmed-to-undefined so an empty/whitespace-only field falls through to the
+// next candidate via `??` — plain `||` would also treat 0/false that way,
+// which the linter flags even though only strings are possible here, so this
+// makes the "empty string is absent" rule explicit instead of relying on
+// truthy coercion.
+const trimmedOrUndefined = (s: string | null | undefined): string | undefined => {
+  const t = s?.trim();
+  // Deliberately NOT `t ?? undefined`: `t` is `string | undefined`, and an
+  // empty string is a valid (non-nullish) value that `??` would pass through
+  // unchanged — this function's entire job is turning "" into undefined too.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  return t ? t : undefined;
+};
+
 function getContactDisplayName(contact: SuggestionContact, fallback: string) {
-  return (
-    contact.fullName?.trim() ||
-    contact.company?.trim() ||
-    fallback
-  );
+  return trimmedOrUndefined(contact.fullName) ?? trimmedOrUndefined(contact.company) ?? fallback;
 }
 
 function truncate(s: string | null, max: number): string | null {

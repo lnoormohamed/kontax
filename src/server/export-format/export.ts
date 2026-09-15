@@ -114,7 +114,10 @@ const PRIVATE_OVERLAY_TARGETS = {
 
 const appendOverlay = (existing: unknown, extra: unknown[] | undefined): unknown => {
   if (!extra || extra.length === 0) return existing;
-  return [...(Array.isArray(existing) ? existing : []), ...extra];
+  // `Array.isArray` narrows `unknown` to `any[]`, not `unknown[]` — the
+  // explicit annotation keeps the spread below type-safe.
+  const existingArray: unknown[] = Array.isArray(existing) ? existing : [];
+  return [...existingArray, ...extra];
 };
 
 /**

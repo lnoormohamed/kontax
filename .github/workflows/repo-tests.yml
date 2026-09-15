@@ -4,17 +4,95 @@ on:
   push:
     branches:
       - main
-      - "codex/**"
+      - staging
+      - "feat/**"
   pull_request:
+  # P48-13: nightly dependency audit — separate from the PR/push gate so a new
+  # advisory against an already-merged dependency doesn't block unrelated PRs;
+  # it surfaces as a failing scheduled run instead.
+  schedule:
+    - cron: "0 6 * * *"
 
 jobs:
   repo-tests:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+
+    # P48-13: the authz harness (tests/node/authz/) needs a real Postgres to
+    # exercise server actions and route handlers against actual FK/unique
+    # constraints. TEST_DATABASE_URL points the harness at this service; the
+    # suite skips itself with a clear message when the var is unset (e.g. a
+    # local `npm run test:repo` without a DB running).
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: kontax
+          POSTGRES_PASSWORD: kontax
+          POSTGRES_DB: kontax_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kontax"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DATABASE_URL: postgresql://kontax:kontax@localhost:5432/kontax_test
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
+
+      # actions/setup-node's cache:npm already caches on the lockfile hash,
+      # but pin ~/.npm explicitly too so a cache-key miss (e.g. a workflow
+      # file change) still reuses whatever npm has already fetched.
+      - name: Cache ~/.npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - run: npm ci
+
+      - run: npm run typecheck
+
+      - run: npm run lint
+
+      - run: npm run check:session-guard
+
+      # Baseline the test Postgres before the authz suite runs against it.
+      - name: Apply Prisma migrations to the test database
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+
       - run: npm run test:repo
+
+      - name: Build
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: "1"
+          DATABASE_URL: postgresql://x:y@localhost:5432/z
+
+  nightly-audit:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - run: npm audit --audit-level=high

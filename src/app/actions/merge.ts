@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "~/server/auth";
+import { requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { mergeContactsForUser } from "~/server/contact-merge";
 
@@ -8,10 +8,7 @@ export async function dismissMergeSuggestion(
   contactAId: string,
   contactBId: string,
 ): Promise<void> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthenticated");
-
-  const userId = session.user.id;
+  const userId = await requireUserId({ write: true });
   // Normalise order so (A,B) and (B,A) always produce the same row.
   const [aId, bId] = [contactAId, contactBId].sort() as [string, string];
 
@@ -26,12 +23,18 @@ export async function createManualMergeSuggestion(
   contactAId: string,
   contactBId: string,
 ): Promise<string> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthenticated");
-
-  const userId = session.user.id;
+  const userId = await requireUserId({ write: true });
   const [aId, bId] = [contactAId, contactBId].sort() as [string, string];
+  if (aId === bId) throw new Error("Pick two different contacts.");
   const pairKey = `${aId}::${bId}`;
+
+  // P48-05: both contacts must belong to the caller. Without this, a user could
+  // pair their own contact with any contact id and read the other user's record
+  // through the merge review page.
+  const owned = await db.contact.count({
+    where: { id: { in: [aId, bId] }, userId, archivedAt: null },
+  });
+  if (owned !== 2) throw new Error("Contact not found.");
 
   const suggestion = await db.mergeSuggestion.upsert({
     where: { userId_pairKey: { userId, pairKey } },
@@ -61,10 +64,7 @@ export async function mergeClusterContacts(
   survivorContactId: string,
   otherContactIds: string[],
 ): Promise<{ survivingContactId: string; merged: number; failed: number }> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthenticated");
-
-  const userId = session.user.id;
+  const userId = await requireUserId({ write: true });
   const secondaryIds = [...new Set(otherContactIds)].filter(
     (id) => id !== survivorContactId,
   );
@@ -115,10 +115,7 @@ export async function mergeClusterContacts(
 export async function quickMergeSuggestion(
   suggestionId: string,
 ): Promise<{ survivingContactId: string; decisionId: string | undefined }> {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthenticated");
-
-  const userId = session.user.id;
+  const userId = await requireUserId({ write: true });
 
   const suggestion = await db.mergeSuggestion.findFirst({
     where: { id: suggestionId, userId },

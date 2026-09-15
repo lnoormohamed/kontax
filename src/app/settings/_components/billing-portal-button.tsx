@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from "react";
 
-import { createBillingPortalSession } from "~/app/actions/billing";
-import { ConfirmPasswordModal } from "~/app/_components/confirm-password-modal";
+import { useBillingPortal } from "~/app/_components/use-billing-portal";
 
 type Variant = "blue" | "green" | "red" | "ghost";
 
@@ -37,46 +36,34 @@ export function BillingPortalButton({
   variant = "ghost",
   icon = "arrow",
   className,
-  hasPassword = false,
 }: {
   label: string;
   variant?: Variant;
   icon?: "arrow" | "card" | "none";
   className?: string;
+  /**
+   * @deprecated P48-02 — ignored. The server decides whether a step-up is
+   * required; the prop is still accepted so existing call sites compile.
+   */
   hasPassword?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(false);
-  const [showStepUp, setShowStepUp] = useState(false);
-
-  const executeClick = () => {
-    setError(false);
-    startTransition(async () => {
-      const result = await createBillingPortalSession();
-      if ("url" in result) {
-        window.location.href = result.url;
-      } else {
-        setError(true);
-      }
-    });
-  };
+  // P48-02: the server decides whether a password is needed and the hook puts
+  // the modal up. `hasPassword` is no longer consulted client-side — it was
+  // only ever a hint, and an attacker could simply not send it.
+  const portal = useBillingPortal();
 
   const handleClick = () => {
-    if (hasPassword) { setShowStepUp(true); return; }
-    executeClick();
+    setError(false);
+    startTransition(async () => {
+      if ((await portal.launch()) === "failed") setError(true);
+    });
   };
 
   return (
     <div className={className}>
-      {showStepUp && (
-        <ConfirmPasswordModal
-          title="Confirm your identity"
-          description="Enter your password to open the billing portal."
-          confirmLabel="Open billing portal"
-          onConfirmed={async () => { setShowStepUp(false); executeClick(); }}
-          onClose={() => setShowStepUp(false)}
-        />
-      )}
+      {portal.modal}
       <button
         className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-[18px] text-sm font-semibold transition disabled:opacity-75 md:w-auto ${VARIANT_CLASS[variant]}`}
         disabled={isPending}

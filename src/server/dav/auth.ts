@@ -1,5 +1,6 @@
 import { getClientIp } from "~/lib/client-ip";
 import { verifyCardDavCredentials } from "~/server/app-passwords";
+import { checkRateLimit, peekRateLimit, rateLimiters } from "~/server/rate-limit";
 import {
   forbiddenDavResponse,
   tooManyRequestsDavResponse,
@@ -11,44 +12,13 @@ type DavAuthResult = {
   appPasswordId: string;
 };
 
-type RateLimitBucket = {
-  count: number;
-  resetAt: number;
-};
-
-const WINDOW_MS = 15 * 60 * 1000;
-const IP_FAILURE_LIMIT = 20;
-const EMAIL_FAILURE_LIMIT = 10;
-// NOTE: In-memory rate limiting. Effective in long-running Node.js (Docker) deployments.
-// In serverless environments each invocation is a fresh process so this provides no
-// protection — replace with a Redis-backed counter before exposing to high traffic.
-const buckets = new Map<string, RateLimitBucket>();
-
+// P48-09: this module is the Next-side twin of the DAV auth pipeline in
+// `server.mjs`, reachable only through the `/.well-known/carddav` route
+// fallback. The hand-rolled in-memory buckets it used to keep (never pruned,
+// per-process, keyed on the proxy's IP) are gone; it now shares the
+// Redis-backed limiters and key layout, so failures recorded on either side
+// count toward the same buckets.
 const getRequestIp = (request: Request) => getClientIp(request.headers) ?? "unknown";
-
-const getBucket = (key: string) => {
-  const now = Date.now();
-  const current = buckets.get(key);
-
-  if (!current || current.resetAt <= now) {
-    const next = { count: 0, resetAt: now + WINDOW_MS };
-    buckets.set(key, next);
-    return next;
-  }
-
-  return current;
-};
-
-const isLimited = (key: string, limit: number) => getBucket(key).count >= limit;
-
-const recordFailure = (key: string) => {
-  const bucket = getBucket(key);
-  bucket.count += 1;
-};
-
-const resetBucket = (key: string) => {
-  buckets.delete(key);
-};
 
 const decodeBasicAuth = (header: string) => {
   if (!header.startsWith("Basic ")) {
@@ -81,18 +51,27 @@ export async function requireDavAuth(
   }
 
   const normalizedEmail = credentials.email.trim().toLowerCase();
-  const ipKey = `ip:${getRequestIp(request)}`;
-  const emailKey = `email:${normalizedEmail}`;
+  const ip = getRequestIp(request);
+  const pairKey = `${ip}:${normalizedEmail}`;
 
-  if (isLimited(ipKey, IP_FAILURE_LIMIT) || isLimited(emailKey, EMAIL_FAILURE_LIMIT)) {
+  // P48-09: peek before verifying so a *successful* login is never charged a
+  // point, and consume only on failure.
+  const [pair, byIp] = await Promise.all([
+    peekRateLimit(rateLimiters.davAuthByPair, pairKey),
+    peekRateLimit(rateLimiters.davAuthByIp, ip),
+  ]);
+
+  if (!pair.allowed || !byIp.allowed) {
     return tooManyRequestsDavResponse();
   }
 
   const result = await verifyCardDavCredentials(normalizedEmail, credentials.password);
 
   if (!result) {
-    recordFailure(ipKey);
-    recordFailure(emailKey);
+    await Promise.all([
+      checkRateLimit(rateLimiters.davAuthByPair, pairKey),
+      checkRateLimit(rateLimiters.davAuthByIp, ip),
+    ]);
     return unauthorizedDavResponse();
   }
 
@@ -100,8 +79,10 @@ export async function requireDavAuth(
     return forbiddenDavResponse();
   }
 
-  resetBucket(ipKey);
-  resetBucket(emailKey);
+  await Promise.all([
+    rateLimiters.davAuthByPair.delete(pairKey).catch(() => undefined),
+    rateLimiters.davAuthByIp.delete(ip).catch(() => undefined),
+  ]);
 
   return result;
 }

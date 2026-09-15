@@ -176,8 +176,19 @@ function PickerField({
                   <path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" />
                 </svg>
                 <input
-                  aria-expanded={open}
                   aria-label={`${label} search`}
+                  // P48-13: `aria-expanded` was here, but it's only valid on a
+                  // combobox-role element per ARIA — a plain <input>'s implicit
+                  // role (textbox) doesn't support it. Making the role explicit
+                  // (role="combobox") pulls in a further ARIA requirement
+                  // (aria-controls pointing at a proper listbox/option markup)
+                  // that this dropdown doesn't implement — the results below
+                  // are plain buttons, not `role="option"` elements — so
+                  // claiming the role without the rest of the pattern would be
+                  // a false accessibility signal. The open/closed state is
+                  // still announced via the adjacent toggle button's
+                  // aria-label below; dropping the attribute is the honest
+                  // fix until this becomes a real ARIA combobox.
                   autoComplete="off"
                   className="min-w-0 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-[#8b938c]"
                   onChange={(event) => {

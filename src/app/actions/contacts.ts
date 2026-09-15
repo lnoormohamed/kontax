@@ -5,8 +5,9 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { Prisma } from "../../../generated/prisma";
-import { auth } from "~/server/auth";
-import { assertCanCreateContacts } from "~/server/billing";
+import { safeInternalPath } from "~/lib/safe-internal-path";
+import { requireUserId } from "~/server/auth/require-session";
+import { assertCanCreateContactsTx, lockUserForPlanCheck } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 import {
   bulkAcceptHighConfidenceForUser,
@@ -24,6 +25,7 @@ import {
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { canEditTeamBook } from "~/server/team-access";
 import { isKontaxHosted } from "~/lib/avatar-src";
+import { validateImageUrl } from "~/server/safe-image-fetch";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { buildNormalizedPhoneEntries } from "~/lib/phone-normalization";
@@ -106,22 +108,6 @@ const mergeContactSchema = z.object({
   avatarUrlChoice: z.enum(["primary", "secondary"]).optional(), // P44-05
 });
 
-const getRequiredUserId = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    throw new Error("You must be signed in to manage contacts.");
-  }
-
-  // P21-07: impersonation sessions are read-only.
-  if (session?.impersonatedBy) {
-    throw new Error("This is a read-only impersonation session — changes are blocked.");
-  }
-
-  return userId;
-};
-
 const getOptionalString = (formData: FormData, key: string) => {
   const value = formData.get(key);
 
@@ -135,7 +121,12 @@ const getOptionalString = (formData: FormData, key: string) => {
 
 const getRedirectTarget = (formData: FormData) => {
   const value = formData.get("redirectTo");
-  return typeof value === "string" && value.startsWith("/") ? value : undefined;
+  if (typeof value !== "string") return undefined;
+  // P48-03: `startsWith("/")` let `//evil.com` and `/\evil.com` through on all
+  // 13 call sites. `undefined` (not the fallback) is returned for a rejected or
+  // absent value so each caller keeps its own default destination.
+  const safe = safeInternalPath(value, "");
+  return safe.length > 0 ? safe : undefined;
 };
 
 const getLineSeparatedValues = (value: string | undefined) =>
@@ -499,7 +490,7 @@ const cleanupDeletedContactPhotos = async (avatarUrls: (string | null | undefine
 // P22-10: set (or clear) the per-contact reminder lead-time override. Empty /
 // "default" clears it so the contact falls back to User.reminderLeadDays.
 export const setContactReminderOverride = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const raw = formData.get("reminderLeadDays");
   const num = typeof raw === "string" ? Number(raw) : NaN;
@@ -547,7 +538,7 @@ const parseMergeContactInput = (formData: FormData) => {
 };
 
 export const createContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const input = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
   const userSettings = await db.user.findUnique({
@@ -593,11 +584,7 @@ export const createContact = async (formData: FormData) => {
     }
   }
 
-  if (!bookTarget) {
-    await assertCanCreateContacts(userId);
-  }
-
-  // P18-11: resolve the user's default personal book for new private contacts
+  // P48-17: resolve the user's default personal book for new private contacts
   const { getUserDefaultBook } = await import("~/server/address-books");
   const defaultBook = !bookTarget ? await getUserDefaultBook(userId) : null;
 
@@ -609,11 +596,27 @@ export const createContact = async (formData: FormData) => {
   // Kontax-hosted object on save (best-effort — on failure we keep the URL and
   // it renders through the proxy). Key under the contact's nominal owner.
   if (contactFields.avatarUrl && !isKontaxHosted(contactFields.avatarUrl)) {
+    // P48-04: never persist a URL the SSRF guard would refuse — it would sit in
+    // the DB until the photo pass tried to fetch it.
+    const check = validateImageUrl(contactFields.avatarUrl);
+    if (!check.ok) throw new Error("That photo link is not allowed. Use a public https:// image address.");
     const internal = await internalizeExternalAvatar(bookTarget?.ownerId ?? userId, contactFields.avatarUrl);
     if (internal) contactFields.avatarUrl = internal;
   }
 
   const createdContact = await db.$transaction(async (tx) => {
+    // P48-17: the plan-cap check used to run before this transaction (a
+    // separate round-trip), so two concurrent creates could both read
+    // "under the cap" and both insert. Lock the user row first so a second
+    // concurrent create for the same user blocks here until the first
+    // commits, then re-check the cap inside the transaction — its count read
+    // then sees the first create's committed row. Shared/team-book targets
+    // are owned by the group owner and aren't subject to the personal cap.
+    if (!bookTarget) {
+      await lockUserForPlanCheck(tx, userId);
+      await assertCanCreateContactsTx(tx, userId);
+    }
+
     const contact = await tx.contact.create({
       data: {
         userId: bookTarget?.ownerId ?? userId,
@@ -659,7 +662,7 @@ export const createContact = async (formData: FormData) => {
 };
 
 export const updateContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const { sourceType: _st, sourceCardUsername: _scu, ...input } = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
@@ -683,6 +686,9 @@ export const updateContact = async (formData: FormData) => {
 
   // P46-03: internalize a newly-pasted external avatar URL before the write.
   if (input.avatarUrl && !isKontaxHosted(input.avatarUrl)) {
+    // P48-04: refuse URLs the SSRF guard would block instead of storing them.
+    const check = validateImageUrl(input.avatarUrl);
+    if (!check.ok) throw new Error("That photo link is not allowed. Use a public https:// image address.");
     const internal = await internalizeExternalAvatar(userId, input.avatarUrl);
     if (internal) input.avatarUrl = internal;
   }
@@ -814,7 +820,7 @@ const deriveFullNameFromParts = (parts: {
 };
 
 export const updateContactField = async (contactId: string, field: string, rawValue: string) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   if (!INLINE_EDITABLE_FIELDS.has(field)) {
     throw new Error("That field can't be edited inline.");
   }
@@ -921,7 +927,7 @@ export const updateContactEntries = async (
   group: string,
   rawEntries: unknown,
 ) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   if (!isEntryGroup(group)) {
     throw new Error("Unknown contact field group.");
   }
@@ -987,7 +993,7 @@ export const updateContactEntries = async (
 };
 
 export const toggleFavoriteContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1030,7 +1036,7 @@ export const toggleFavoriteContact = async (formData: FormData) => {
 // Emergency designation (P15-02) — Kontax-local user state, mirrors favorites.
 // Not translated to CardDAV/vCard semantics in v1.
 export const toggleEmergencyContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1061,7 +1067,7 @@ export const toggleEmergencyContact = async (formData: FormData) => {
 };
 
 export const archiveContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const access = await resolveContactEditAccess(userId, contactId);
   if (access.shared && !access.allowed) {
@@ -1100,7 +1106,7 @@ export const archiveContact = async (formData: FormData) => {
 };
 
 export const archiveContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1145,7 +1151,7 @@ export const archiveContactsBulk = async (formData: FormData) => {
 };
 
 export const restoreContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const access = await resolveContactEditAccess(userId, contactId);
   if (access.shared && !access.allowed) {
@@ -1186,7 +1192,7 @@ export const restoreContact = async (formData: FormData) => {
 };
 
 export const restoreContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1227,7 +1233,7 @@ export const restoreContactsBulk = async (formData: FormData) => {
 };
 
 export const favoriteContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1267,7 +1273,7 @@ export const favoriteContactsBulk = async (formData: FormData) => {
 };
 
 export const deleteContactsBulk = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1317,7 +1323,7 @@ export const deleteContactsBulk = async (formData: FormData) => {
 };
 
 export const permanentlyDeleteContact = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1363,7 +1369,7 @@ export const permanentlyDeleteContact = async (formData: FormData) => {
 };
 
 export const mergeContacts = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const input = parseMergeContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
 
@@ -1400,7 +1406,7 @@ export const mergeContacts = async (formData: FormData) => {
 };
 
 export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const redirectTo = getRedirectTarget(formData);
 
   const { mergedCount, failedCount } = await bulkAcceptHighConfidenceForUser(userId);
@@ -1418,7 +1424,7 @@ export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
 };
 
 export const undoMergeContacts = async (formData: FormData) => {
-  const userId = await getRequiredUserId();
+  const userId = await requireUserId({ write: true });
   const decisionId = parseMergeDecisionId(formData);
 
   const survivingContactId = await undoMergedContactsForUser({

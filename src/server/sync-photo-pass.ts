@@ -105,8 +105,7 @@ export async function runPhotoPass(
         }
         const linkData: Prisma.SyncContactLinkUpdateInput = {};
         if (result.shadow !== undefined) {
-          linkData.photoShadow =
-            result.shadow === null ? Prisma.DbNull : (result.shadow as unknown as Prisma.InputJsonValue);
+          linkData.photoShadow = result.shadow ?? Prisma.DbNull;
         }
         if (result.remoteETag !== undefined && result.remoteETag !== null) {
           linkData.remoteETag = result.remoteETag;
@@ -198,8 +197,8 @@ async function recordPhotoConflict(
           contactId: link.contactId,
           conflictType: "LOCAL_REMOTE_MUTATION",
           status: "OPEN",
-          localSnapshot: localSnapshot as Prisma.InputJsonValue,
-          remoteSnapshot: remoteSnapshot as Prisma.InputJsonValue,
+          localSnapshot: localSnapshot,
+          remoteSnapshot: remoteSnapshot,
         },
       });
     }
@@ -215,7 +214,7 @@ async function recordPhotoConflict(
     };
     await tx.syncContactLink.update({
       where: { id: link.linkId },
-      data: { photoShadow: ackShadow as unknown as Prisma.InputJsonValue },
+      data: { photoShadow: ackShadow },
     });
   });
 }

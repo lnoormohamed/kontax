@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 
+import { safeInternalPath } from "~/lib/safe-internal-path";
 import { assertAdmin, AdminForbiddenError } from "~/server/admin/guard";
 import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
 import { db } from "~/server/db";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
+import { invalidateDavCredentialCacheForUser } from "~/server/app-passwords";
 import { sendAccountSuspendedEmail } from "~/server/billing-emails";
 import { coerceCardDavCapabilityProfileOverrideId } from "~/server/sync-provider-capabilities";
 import {
@@ -100,7 +102,7 @@ export async function overridePlan(input: {
     action: ADMIN_ACTIONS.USER_PLAN_OVERRIDE,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() || null },
+    details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
@@ -134,6 +136,9 @@ export async function suspendAccount(input: { userId: string; reason: string; re
   });
   // P38-09: the lock must beat the 45s validation cache
   await invalidateSessionValidation(target.id);
+  // P48-09: a verified CardDAV credential is cached for 10 minutes — drop it so
+  // the lock also cuts off device sync immediately.
+  await invalidateDavCredentialCacheForUser(target.id);
 
   void sendAccountSuspendedEmail({ userId: target.id, reason });
 
@@ -142,7 +147,7 @@ export async function suspendAccount(input: { userId: string; reason: string; re
     action: ADMIN_ACTIONS.USER_SUSPENDED,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { reason, reasonCategory: input.reasonCategory?.trim() || null },
+    details: { reason, reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
@@ -175,7 +180,7 @@ export async function unsuspendAccount(input: { userId: string; reason?: string;
     targetEmail: target.email,
     details: {
       reason: input.reason?.trim() ? input.reason.trim() : null,
-      reasonCategory: input.reasonCategory?.trim() || null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
     },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
@@ -218,7 +223,7 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
     details: {
       reason,
       purgeAt: scheduledDeleteAt.toISOString(),
-      reasonCategory: input.reasonCategory?.trim() || null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
     },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
@@ -248,6 +253,9 @@ export async function addAdminSupportNote(input: {
   await db.adminSupportNote.create({
     data: {
       adminUserId: admin.adminId,
+      // P48-14: denormalised so the note keeps naming its author after the
+      // authoring admin's User row is deleted (the relation is SetNull now).
+      adminEmail: admin.email,
       subjectType: input.subjectType.trim().toUpperCase(),
       subjectId: input.subjectId,
       targetUserId: input.targetUserId ?? null,
@@ -297,6 +305,8 @@ export async function createAdminSupportCase(input: {
       subjectId: input.subjectId,
       targetUserId: input.targetUserId ?? null,
       creatorAdminUserId: admin.adminId,
+      // P48-14: denormalised creator email — survives the creator's deletion.
+      creatorAdminEmail: admin.email,
       assigneeAdminUserId: input.assignToSelf ? admin.adminId : null,
       title,
       summary: input.summary?.trim() ? input.summary.trim().slice(0, 4000) : null,
@@ -523,7 +533,7 @@ export async function startImpersonation(input: { userId: string; reason: string
     details: {
       reason,
       readOnly: true,
-      reasonCategory: input.reasonCategory?.trim() || null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
       expiresInMinutes: 30,
     },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
@@ -612,6 +622,13 @@ export async function saveProductBroadcast(input: {
   const title = input.title.trim();
   const body = input.body.trim();
   const trimmedUrl = input.actionUrl?.trim();
+  // P48-17: actionUrl was stored unvalidated and later rendered as a link in
+  // the broadcast notification — an admin (or a compromised admin session)
+  // could point it off-site. Require a safe same-origin path; reject rather
+  // than silently rewriting so the admin notices and fixes the input.
+  if (trimmedUrl && trimmedUrl.length > 0 && safeInternalPath(trimmedUrl, "") !== trimmedUrl) {
+    return { error: "ACTION_URL_INVALID" };
+  }
   const actionUrl = trimmedUrl && trimmedUrl.length > 0 ? trimmedUrl : undefined;
   if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
   if (!title) return { error: "TITLE_REQUIRED" };

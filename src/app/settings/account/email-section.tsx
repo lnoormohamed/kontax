@@ -32,7 +32,7 @@ function useCooldown(initial = 0) {
     if (cooldown <= 0) return;
     const id = setInterval(() => setCooldown((c) => (c <= 1 ? 0 : c - 1)), 1000);
     return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [cooldown]);
   const mmss = `${Math.floor(cooldown / 60)}:${String(cooldown % 60).padStart(2, "0")}`;
   return { cooldown, setCooldown, mmss };

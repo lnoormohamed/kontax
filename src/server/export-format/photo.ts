@@ -5,6 +5,7 @@
 import { createHash } from "crypto";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import sharp from "sharp";
+import { fetchExternalImage } from "~/server/safe-image-fetch";
 
 export type ExportPhoto = {
   bytes: Buffer;
@@ -72,10 +73,12 @@ export async function loadContactPhoto(avatarUrl: string): Promise<ExportPhoto |
       bytes = await streamToBuffer(result.Body);
       mediaType = result.ContentType ?? null;
     } else {
-      const response = await fetch(avatarUrl);
-      if (!response.ok) return null;
-      bytes = Buffer.from(await response.arrayBuffer());
-      mediaType = response.headers.get("content-type");
+      // P48-04 follow-up: an external avatarUrl is remote-influenced (pasted,
+      // synced over CardDAV, or imported). Never a raw fetch — the guarded
+      // image fetcher pins DNS, rejects private ranges and caps size/time.
+      const fetched = await fetchExternalImage(avatarUrl);
+      bytes = fetched.body;
+      mediaType = fetched.contentType;
     }
 
     if (!bytes || bytes.length === 0) return null;

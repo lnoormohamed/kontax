@@ -20,7 +20,6 @@ import {
 } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
-import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
 import { fetchExternalImage } from "~/server/safe-image-fetch";
 
 // ── Canonical form ─────────────────────────────────────────────────────────
@@ -193,9 +192,10 @@ export async function loadAvatarBytes(avatarUrl: string): Promise<Buffer | null>
       const res = await s3.send(new GetObjectCommand({ Bucket: bucket(), Key: key }));
       return await streamToBuffer(res.Body);
     }
-    const res = await fetch(avatarUrl);
-    if (!res.ok) return null;
-    return Buffer.from(await res.arrayBuffer());
+    // P48-04: an external avatarUrl is remote-influenced (pasted, synced, or
+    // imported) — go through the SSRF guard, never a raw fetch.
+    const { body } = await fetchExternalImage(avatarUrl);
+    return body;
   } catch (error) {
     console.warn("[Kontax] failed to load avatar bytes", error);
     return null;
@@ -378,7 +378,7 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
   let canonicalLocal: NormalizedPhoto | null = null;
   let localMatchesShadow = false;
   if (hasLocalPhoto) {
-    if (shadow && avatarUrl === shadow.localAvatarUrl) {
+    if (avatarUrl === shadow?.localAvatarUrl) {
       localMatchesShadow = true;
     } else {
       const bytes = await loadAvatarBytesSafe(avatarUrl);
@@ -405,7 +405,7 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
         if (local === "changed" && remoteState === "changed" && canonicalLocal) {
           const raw = await input.loadRemoteBytes();
           const remoteNorm = raw ? await normalizeContactPhoto(raw) : null;
-          if (remoteNorm && remoteNorm.sha256 === canonicalLocal.sha256) {
+          if (remoteNorm?.sha256 === canonicalLocal.sha256) {
             return {
               action: "noop",
               shadow: {

@@ -288,12 +288,25 @@ model User {
   // P18-03: pending email change (cleared on activation or cancellation)
   emailPendingChange               String?
   emailPendingChangeRequestedAt    DateTime?
+  // P48-03: "this wasn't me" revert link mailed to the OLD address whenever an
+  // email change is requested. SHA-256 of a 256-bit token (never the token
+  // itself), valid 24h. `emailPreviousAddress` is the address to restore if the
+  // change has already been activated by the time the link is used. All three
+  // are cleared once the link is used, the change is cancelled, or a new change
+  // is requested. Nullable columns only — safe for the deploy's `db push`.
+  emailChangeRevertTokenHash       String?
+  emailChangeRevertExpiresAt       DateTime?
+  emailPreviousAddress             String?
   // P20-10: SES bounce/complaint status — suppresses sends when not OK
   emailStatus                      EmailStatus                       @default(OK)
   // P18-07: TOTP two-factor authentication
   totpEnabled                      Boolean                           @default(false)
   totpSecret                       String? // AES-256-GCM encrypted
   totpVerifiedAt                   DateTime?
+  // P48-03: the last 30-second TOTP step accepted for this user. A code stays
+  // valid for its whole window, so without this a code observed in transit
+  // could be replayed within the same step. Rejected when <= the stored value.
+  lastTotpCounter                  Int?
   // P18-09: scheduled hard-delete (30-day grace period after user confirms deletion)
   scheduledDeleteAt                DateTime?
   // P21-01: platform admin role (default USER). Gates the /admin surfaces.
@@ -344,11 +357,15 @@ model User {
   // P40-02: per-user private field overlays owned by this user
   contactPrivateFields             ContactPrivateField[]
   // P22-11: subscribable iCal calendar token (revocable credential).
-  // NOT a DB @unique constraint: the startup `prisma db push --skip-generate`
-  // (Dockerfile) has no --accept-data-loss, so adding a unique index to a new
-  // column would crash-loop the deploy. Uniqueness is guaranteed by the 24-byte
-  // random token (generateCalToken) and looked up via findFirst. Indexed below.
-  calToken                         String?
+  // P48-14: now a DB-level @unique. The old comment here explained that the
+  // constraint was omitted because the startup `prisma db push` would treat a
+  // new unique index as potentially destructive and crash-loop the deploy —
+  // that constraint is gone now that production boots through
+  // `prisma migrate deploy` (scripts/runtime/start-production.mjs). Nullable, so
+  // Postgres still allows many rows with no token (multiple NULLs never
+  // collide in a unique index); the constraint only forbids two users sharing
+  // the same live token. Run scripts/precheck-p48-14-uniqueness.mjs first.
+  calToken                         String?                           @unique
   // P22-04: repeated failed-login detection
   failedLoginAttempts              FailedLoginAttempt[]
   // P26-04: first-run onboarding checklist state
@@ -375,7 +392,6 @@ model User {
   updatedAt                        DateTime                          @updatedAt
 
   @@index([scheduledDeleteAt])
-  @@index([calToken])
 }
 
 // P26-04: first-run onboarding checklist state. The "create account", "add a
@@ -528,6 +544,11 @@ model Contact {
   @@index([userId, archivedAt, phone])
   @@index([userId, importJobId])
   @@index([userId, mergedIntoContactId])
+  // P48-14: FK-leading indexes. The composites above are keyed on userId, so
+  // Postgres could not use them to find the children of a deleted ImportJob /
+  // merge target — every parent delete was a sequential scan of Contact.
+  @@index([importJobId])
+  @@index([mergedIntoContactId])
   @@index([bookId, archivedAt, fullName])
   // P38-06: GIN index over the trigger-maintained search vector. Declared so
   // `prisma db push` (which runs on deploy) does not drop it as drift.
@@ -585,6 +606,9 @@ model ContactPrivateField {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([contactId, userId])
+  // P48-14: FK-leading index — the composite above starts on contactId, so a
+  // User delete could not use it to find that user's overlays.
+  @@index([userId])
 }
 
 model SubscriptionCustomer {
@@ -763,6 +787,10 @@ model MergeSuggestion {
 
   @@unique([userId, pairKey])
   @@index([userId, status, updatedAt])
+  // P48-14: FK-leading indexes so deleting a Contact does not sequentially
+  // scan MergeSuggestion twice (once per side of the pair).
+  @@index([leftContactId])
+  @@index([rightContactId])
 }
 
 model MergeDecision {
@@ -798,27 +826,38 @@ model MergeDismissal {
 
   @@unique([userId, contactAId, contactBId])
   @@index([userId])
+  // P48-14: FK-leading indexes (the unique above is keyed on userId).
+  @@index([contactAId])
+  @@index([contactBId])
 }
 
 model SyncAccount {
   id                        String               @id @default(cuid())
   userId                    String
-  // P34G-01: stable logical connection identity. Nullable for deploy-safe
-  // `db push`; all new writes set it immediately and a backfill script fills
-  // legacy rows before any code relies on it being present.
+  // P34G-01: stable logical connection identity. Nullable because legacy rows
+  // predate the column; all new writes set it immediately and
+  // backfillSyncConnectionIds() fills the stragglers.
   //
-  // IMPORTANT: do not add a DB-level @unique here. The production container
-  // runs `prisma db push` during startup, and Prisma treats new unique
-  // constraints on existing tables as potential data-loss operations. That
-  // would crash-loop the app unless someone manually applies `--accept-data-loss`.
-  // We keep this indexed and enforce the intended one-row-per-logical-connection
-  // behavior in app code / invariants instead.
-  connectionId              String?
-  // Replacement lineage links are also intentionally non-unique at the schema
-  // level for the same deploy-safety reason. They remain indexed for support
-  // queries and validated by lineage invariants.
-  replacesSyncAccountId     String?
-  replacedBySyncAccountId   String?
+  // P48-14: now GLOBALLY @unique, not per-user. The identity is a fresh cuid2
+  // minted per row (createSyncConnectionId): reconnect keeps the row's existing
+  // id, and replaceSyncAccountWithNewConnection leaves the retired row's id
+  // alone while minting a new one for the replacement — so a connectionId maps
+  // to exactly one SyncAccount across the whole table, and scoping the
+  // constraint to userId would under-enforce it. Nullable columns can repeat
+  // NULL in a Postgres unique index, so legacy rows are unaffected and no
+  // partial index is needed.
+  //
+  // The old comment here warned that a unique index would crash-loop the
+  // startup `prisma db push`; production now boots through
+  // `prisma migrate deploy`, so that objection no longer applies.
+  connectionId              String?              @unique
+  // P48-14: the replacement lineage links are unique for the same reason —
+  // replaceSyncAccountWithNewConnection refuses to replace an already-RETIRED
+  // account, so a given predecessor is superseded at most once and a given
+  // replacement supersedes at most one predecessor. Both are nullable (most
+  // rows have no lineage at all), and multiple NULLs are allowed.
+  replacesSyncAccountId     String?              @unique
+  replacedBySyncAccountId   String?              @unique
   provider                  SyncProvider         @default(CARDDAV)
   status                    SyncAccountStatus    @default(PAUSED)
   syncDirection             SyncDirection        @default(TWO_WAY)
@@ -876,9 +915,11 @@ model SyncAccount {
   user                      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   destinationBook           AddressBook?         @relation("SyncAccountDestinationBook", fields: [destinationBookId], references: [id], onDelete: SetNull)
   replacesSyncAccount       SyncAccount?         @relation("SyncAccountReplaces", fields: [replacesSyncAccountId], references: [id], onDelete: SetNull)
-  replacementChildren       SyncAccount[]        @relation("SyncAccountReplaces")
+  // P48-14: singular now that the lineage FKs are @unique (was SyncAccount[]).
+  // Both back-relations were unreferenced in app code.
+  replacementChild          SyncAccount?         @relation("SyncAccountReplaces")
   replacedBySyncAccount     SyncAccount?         @relation("SyncAccountReplacedBy", fields: [replacedBySyncAccountId], references: [id], onDelete: SetNull)
-  replacedAccounts          SyncAccount[]        @relation("SyncAccountReplacedBy")
+  replacedAccount           SyncAccount?         @relation("SyncAccountReplacedBy")
   syncLinks                 SyncContactLink[]
   syncJobs                  SyncJob[]
   syncConflicts             SyncConflict[]
@@ -887,9 +928,8 @@ model SyncAccount {
 
   @@unique([userId, baseUrl, label])
   @@index([userId, status, updatedAt])
-  @@index([connectionId])
-  @@index([replacesSyncAccountId])
-  @@index([replacedBySyncAccountId])
+  // P48-14: FK-leading index for the AddressBook → SyncAccount SetNull path.
+  @@index([destinationBookId])
 }
 
 // P23-01: per-connection configuration beyond the credential/endpoint fields on
@@ -939,24 +979,27 @@ model SyncAccountSettings {
   // still lands inbound in destinationBook / the primary book unchanged. NOTE:
   // this UI ticket persists the config only — the outbound sync runner does not
   // yet enforce projection scope (deferred to P41-05+).
-  projectionBookIds      String[]
+  projectionBookIds         String[]
   // When a contact lives in >1 projected book, which book's version of a colliding
   // field this device receives. "work" | "personal"; null = default (favour the
   // contact's home/primary book). Only affects fields that collide across books.
-  fieldPrecedence        String?
+  fieldPrecedence           String?
   // P41-DB01 §4A: the iOS auto-link caveat is shown once per (device, provider) —
   // this stamps the dismissal for this connection so it never re-nags.
   autolinkCaveatDismissedAt DateTime?
   // P41-DB01 §5B (behind the projectionRouting flag): overrides the account-wide
   // conflict policy for inbound edits from this device only. null = use account
   // default. Read/written only while the flag is on.
-  conflictOverride       String?
+  conflictOverride          String?
 
   lastModifiedAt DateTime @updatedAt
   createdAt      DateTime @default(now())
 
   syncAccount SyncAccount @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
   importLabel Label?      @relation(fields: [importLabelId], references: [id], onDelete: SetNull)
+
+  // P48-14: FK-leading index for the Label → SetNull path.
+  @@index([importLabelId])
 }
 
 // P23-06: short-lived (15 min) "sudo mode" elevation, proving the user re-entered
@@ -1119,8 +1162,9 @@ model EmailVerificationToken {
   createdAt   DateTime                   @default(now())
   user        User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // P48-14: the standalone @@index([tokenHash]) was dropped — @unique on the
+  // column already creates a unique btree index that serves every lookup.
   @@index([userId, type, usedAt])
-  @@index([tokenHash])
 }
 
 // P18-05: password reset tokens (15-minute expiry, SHA-256 hash stored)
@@ -1134,8 +1178,8 @@ model PasswordResetToken {
   createdAt       DateTime  @default(now())
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // P48-14: redundant @@index([tokenHash]) dropped (see @unique on the column).
   @@index([userId, usedAt, expiresAt])
-  @@index([tokenHash])
 }
 
 // P18-06: per-device session tracking (jti maps JWT to a revocable DB row)
@@ -1153,8 +1197,8 @@ model UserSession {
   createdAt             DateTime  @default(now())
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // P48-14: redundant @@index([jti]) dropped (see @unique on the column).
   @@index([userId, revokedAt, lastActiveAt])
-  @@index([jti])
 }
 
 // P18-07: single-use TOTP recovery codes (stored as SHA-256 hashes)
@@ -1205,14 +1249,20 @@ model ActivityEvent {
 // target account being hard-deleted.
 model AdminAuditEvent {
   id           String   @id @default(cuid())
-  adminUserId  String
+  // P48-14: nullable + onDelete: SetNull. The relation used to cascade, so
+  // hard-deleting an admin's User row erased every action they had ever taken —
+  // the exact opposite of the append-only guarantee this model documents above.
+  // `adminEmail` is denormalised at write time (mirroring `targetEmail`) so the
+  // row still names its actor after the User row is gone.
+  adminUserId  String?
+  adminEmail   String?
   action       String
   targetUserId String?
   targetEmail  String?
   details      Json     @default("{}")
   ipAddress    String?
   createdAt    DateTime @default(now())
-  admin        User     @relation("AdminActor", fields: [adminUserId], references: [id], onDelete: Cascade)
+  admin        User?    @relation("AdminActor", fields: [adminUserId], references: [id], onDelete: SetNull)
 
   @@index([adminUserId, createdAt(sort: Desc)])
   @@index([action, createdAt(sort: Desc)])
@@ -1221,14 +1271,17 @@ model AdminAuditEvent {
 
 model AdminSupportNote {
   id           String   @id @default(cuid())
-  adminUserId  String
+  // P48-14: see AdminAuditEvent — SetNull + denormalised author email so a
+  // support thread survives the authoring admin's account being deleted.
+  adminUserId  String?
+  adminEmail   String?
   subjectType  String
   subjectId    String
   targetUserId String?
   body         String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  author       User     @relation("AdminSupportNoteAuthor", fields: [adminUserId], references: [id], onDelete: Cascade)
+  author       User?    @relation("AdminSupportNoteAuthor", fields: [adminUserId], references: [id], onDelete: SetNull)
 
   @@index([subjectType, subjectId, createdAt(sort: Desc)])
   @@index([targetUserId, createdAt(sort: Desc)])
@@ -1240,7 +1293,10 @@ model AdminSupportCase {
   subjectType         String
   subjectId           String
   targetUserId        String?
-  creatorAdminUserId  String
+  // P48-14: SetNull + denormalised creator email (assignee/target already
+  // SetNull). A deleted admin no longer takes their open cases with them.
+  creatorAdminUserId  String?
+  creatorAdminEmail   String?
   assigneeAdminUserId String?
   title               String
   summary             String?
@@ -1252,13 +1308,15 @@ model AdminSupportCase {
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @updatedAt
 
-  creator    User  @relation("AdminSupportCaseCreator", fields: [creatorAdminUserId], references: [id], onDelete: Cascade)
+  creator    User? @relation("AdminSupportCaseCreator", fields: [creatorAdminUserId], references: [id], onDelete: SetNull)
   assignee   User? @relation("AdminSupportCaseAssignee", fields: [assigneeAdminUserId], references: [id], onDelete: SetNull)
   targetUser User? @relation("AdminSupportCaseTargetUser", fields: [targetUserId], references: [id], onDelete: SetNull)
 
   @@index([subjectType, subjectId, status, updatedAt(sort: Desc)])
   @@index([targetUserId, status, updatedAt(sort: Desc)])
   @@index([assigneeAdminUserId, status, updatedAt(sort: Desc)])
+  // P48-14: FK-leading index for the creator SetNull path.
+  @@index([creatorAdminUserId])
 }
 
 // P21-08: feature-flag gating with per-user allow-list and percentage rollout.
@@ -1550,15 +1608,15 @@ enum ShareStatus {
 }
 
 model ContactShare {
-  id                 String      @id @default(cuid())
+  id                 String         @id @default(cuid())
   ownerUserId        String
   contactId          String?
   shareType          ShareType
-  token              String?     @unique
+  token              String?        @unique
   recipientUserId    String?
   recipientEmail     String?
   recipientContactId String?
-  status             ShareStatus @default(ACTIVE)
+  status             ShareStatus    @default(ACTIVE)
   // Snapshot of the shared contact's portable fields at share time, so a
   // static share is still deliverable if the owner edits/archives/deletes the
   // original before the recipient accepts (P12-03).
@@ -1570,20 +1628,23 @@ model ContactShare {
   // is paused (e.g. recipient account locked); cleared on the next success.
   lastErrorAt        DateTime?
   lastErrorCode      String?
-  downloadCount      Int         @default(0)
+  downloadCount      Int            @default(0)
   maxDownloads       Int? // null = unlimited; 1 = single-use
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  owner              User        @relation("ShareOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
-  contact            Contact?    @relation("ShareSourceContact", fields: [contactId], references: [id], onDelete: SetNull)
-  recipientUser      User?       @relation("ShareRecipient", fields: [recipientUserId], references: [id], onDelete: SetNull)
-  recipientContact   Contact?    @relation("ShareRecipientContact", fields: [recipientContactId], references: [id], onDelete: SetNull)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  owner              User           @relation("ShareOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  contact            Contact?       @relation("ShareSourceContact", fields: [contactId], references: [id], onDelete: SetNull)
+  recipientUser      User?          @relation("ShareRecipient", fields: [recipientUserId], references: [id], onDelete: SetNull)
+  recipientContact   Contact?       @relation("ShareRecipientContact", fields: [recipientContactId], references: [id], onDelete: SetNull)
   // P46-DB03: recipient's SHARING notification(s) that point at this invite.
   notifications      Notification[]
 
   @@index([ownerUserId, status, createdAt])
   @@index([recipientUserId, status])
   @@index([recipientEmail, status])
+  // P48-14: FK-leading indexes for the two Contact → SetNull paths.
+  @@index([contactId])
+  @@index([recipientContactId])
 }
 
 model StripeWebhookEvent {
@@ -1593,7 +1654,7 @@ model StripeWebhookEvent {
   processedAt   DateTime @default(now())
   error         String?
 
-  @@index([stripeEventId])
+  // P48-14: redundant @@index([stripeEventId]) dropped (see @unique above).
   @@index([processedAt])
 }
 
@@ -1638,8 +1699,8 @@ model Notification {
   // P46-DB03 (D5): event-passed aging. Set by the emitting source that knows the
   // real moment; both null on existing rows → "no event" → can age but never
   // event-passed. event-passed = (eventAt ?? expiresAt) < now.
-  eventAt          DateTime?            // the dated moment (e.g. birthday/anniversary)
-  expiresAt        DateTime?            // action deadline (e.g. sync window / invite expiry)
+  eventAt          DateTime? // the dated moment (e.g. birthday/anniversary)
+  expiresAt        DateTime? // action deadline (e.g. sync window / invite expiry)
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   securityAlert  SecurityAlert?  @relation(fields: [securityAlertId], references: [id], onDelete: SetNull)
@@ -1650,11 +1711,18 @@ model Notification {
   @@index([userId, read])
   @@index([adminBroadcastId])
   @@index([contactShareId])
+  // P48-14: FK-leading index for the SecurityAlert → Notification path.
+  @@index([securityAlertId])
 }
 
 model AdminBroadcast {
   id                      String               @id @default(cuid())
-  createdByAdminUserId    String
+  // P48-14: SetNull + denormalised creator email. sentBy/retractedBy were
+  // already nullable + SetNull; the creator link was the one that cascaded and
+  // would have deleted sent broadcasts (and their Notification children) when
+  // the authoring admin's account was removed.
+  createdByAdminUserId    String?
+  createdByAdminEmail     String?
   sentByAdminUserId       String?
   retractedByAdminUserId  String?
   title                   String
@@ -1671,13 +1739,17 @@ model AdminBroadcast {
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
 
-  creator       User           @relation("AdminBroadcastCreator", fields: [createdByAdminUserId], references: [id], onDelete: Cascade)
+  creator       User?          @relation("AdminBroadcastCreator", fields: [createdByAdminUserId], references: [id], onDelete: SetNull)
   sender        User?          @relation("AdminBroadcastSender", fields: [sentByAdminUserId], references: [id], onDelete: SetNull)
   retractor     User?          @relation("AdminBroadcastRetractor", fields: [retractedByAdminUserId], references: [id], onDelete: SetNull)
   notifications Notification[]
 
   @@index([status, scheduledFor, createdAt(sort: Desc)])
   @@index([createdByAdminUserId, createdAt(sort: Desc)])
+  // P48-14: FK-leading indexes for the sender/retractor SetNull paths
+  // (createdByAdminUserId already leads the composite above).
+  @@index([sentByAdminUserId])
+  @@index([retractedByAdminUserId])
 }
 
 // Persisted anomaly record behind a SECURITY notification. kind drives the drawer
@@ -1746,6 +1818,8 @@ model BirthdayReminderState {
 
   @@unique([userId, contactId, dateKey])
   @@index([userId, lastSentYear])
+  // P48-14: FK-leading index (the unique above starts on userId).
+  @@index([contactId])
 }
 
 // P25-03: records when a user accepts a non-top suggestion or rejects a chip — used
@@ -1832,7 +1906,7 @@ model ApiToken {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // P48-14: redundant @@index([tokenHash]) dropped (see @unique on the column).
   @@unique([userId, name])
   @@index([userId, revokedAt])
-  @@index([tokenHash])
 }

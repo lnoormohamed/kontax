@@ -62,6 +62,11 @@ export function ContactHeroAvatar({
 
   if (stage < candidates.length) {
     return (
+      // P48-12: next/image's Image Optimization API is intentionally disabled
+      // repo-wide (images.unoptimized in next.config.js) since it's pure
+      // unauthenticated attack surface with zero real usage; plain <img> is
+      // the deliberate choice.
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         alt={alt}
         className={className}

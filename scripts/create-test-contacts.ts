@@ -87,7 +87,9 @@ async function main() {
         website: full.website,
         birthday: full.birthday,
         address: full.address,
-        postalAddresses: Array.isArray(full.postalAddresses) ? full.postalAddresses as any : null,
+        postalAddresses: Array.isArray(full.postalAddresses)
+          ? (full.postalAddresses as Array<{ label: string; formatted: string }>)
+          : null,
         notes: full.notes,
       },
     });

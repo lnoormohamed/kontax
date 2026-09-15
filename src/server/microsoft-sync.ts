@@ -451,7 +451,7 @@ export const pushMicrosoftContact = async (
       data: {
         remoteETag: patched.etag,
         capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
-        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: localShadow,
         lastSyncedAt: new Date(),
       },
     });
@@ -500,7 +500,7 @@ export const pushMicrosoftContact = async (
       data: {
         remoteETag: retry.etag,
         capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
-        supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: localShadow,
         lastSyncedAt: now,
       },
     });
@@ -697,7 +697,7 @@ const createMicrosoftContactRemote = async (
       remoteUid: created.id,
       remoteETag: created["@odata.etag"] ?? null,
       capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
-      supportedFieldShadow: buildMicrosoftPushShadow(pushSource) as Prisma.InputJsonValue,
+      supportedFieldShadow: buildMicrosoftPushShadow(pushSource),
       lastSyncedAt: new Date(),
     },
   });

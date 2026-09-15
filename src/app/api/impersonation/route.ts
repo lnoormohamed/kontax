@@ -18,9 +18,6 @@ export async function GET() {
   return NextResponse.json({
     active: true,
     email: session.user?.email ?? "user",
-    expiresAt:
-      typeof (session as { impersonationExpiresAt?: number }).impersonationExpiresAt === "number"
-        ? (session as { impersonationExpiresAt: number }).impersonationExpiresAt
-        : null,
+    expiresAt: typeof session.impersonationExpiresAt === "number" ? session.impersonationExpiresAt : null,
   });
 }

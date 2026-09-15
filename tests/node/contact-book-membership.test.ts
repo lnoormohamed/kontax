@@ -9,23 +9,47 @@ import {
   setPrimaryMembership,
 } from "../../src/server/contact-book-membership";
 
+type MembershipRow = {
+  id: string;
+  contactId: string;
+  addressBookId: string;
+  isPrimary: boolean;
+  createdAt: number;
+};
+
+// Loose-but-concrete shapes for the (small) subset of Prisma's `where`/
+// `update`/`data` argument shapes this fake actually reads — enough to avoid
+// `any` (and the `no-unsafe-*` cascade it causes on every property access)
+// without importing Prisma's real, much larger delegate types.
+type MembershipWhere = {
+  contactId?: string;
+  isPrimary?: boolean;
+  id?: string;
+  contactId_addressBookId?: { contactId: string; addressBookId: string };
+  addressBookId?: { not?: string };
+};
+type MembershipWriteData = Partial<Omit<MembershipRow, "id" | "createdAt">>;
+
 /**
  * In-memory fake of the `contactBookMembership` Prisma delegate — just the calls
  * the helper makes. Lets us verify the ≥1-membership and single-primary
  * invariants (P40-06) without a database.
+ *
+ * `FakeDbClient` is derived from `addMembership`'s own parameter type — the
+ * real `Client` union (Prisma.TransactionClient | PrismaClient) is
+ * intentionally not exported from contact-book-membership.ts (importing
+ * Prisma there would pull its runtime into these pure unit tests), so this
+ * sidesteps needing the name while still giving every call site a concrete
+ * type instead of `any`.
  */
+type FakeDbClient = Parameters<typeof addMembership>[0];
+
 function makeFakeClient() {
   let seq = 0;
-  const rows: Array<{
-    id: string;
-    contactId: string;
-    addressBookId: string;
-    isPrimary: boolean;
-    createdAt: number;
-  }> = [];
+  const rows: MembershipRow[] = [];
 
   const cbm = {
-    async findFirst({ where }: any) {
+    async findFirst({ where }: { where: MembershipWhere }) {
       return (
         rows.find(
           (r) =>
@@ -34,31 +58,39 @@ function makeFakeClient() {
         ) ?? null
       );
     },
-    async findMany({ where }: any) {
+    async findMany({ where }: { where: MembershipWhere }) {
       return rows
         .filter((r) => r.contactId === where.contactId)
         .sort((a, b) => a.createdAt - b.createdAt)
         .map((r) => ({ ...r }));
     },
-    async upsert({ where, update, create }: any) {
-      const key = where.contactId_addressBookId;
+    async upsert({
+      where,
+      update,
+      create,
+    }: {
+      where: MembershipWhere;
+      update: MembershipWriteData;
+      create: Omit<MembershipRow, "id" | "createdAt">;
+    }) {
+      const key = where.contactId_addressBookId!;
       const existing = rows.find(
         (r) => r.contactId === key.contactId && r.addressBookId === key.addressBookId,
       );
       if (existing) {
-        if ("isPrimary" in update) existing.isPrimary = update.isPrimary;
+        if ("isPrimary" in update && update.isPrimary !== undefined) existing.isPrimary = update.isPrimary;
         return { ...existing };
       }
-      const row = { id: `m${seq++}`, createdAt: seq, ...create };
+      const row: MembershipRow = { id: `m${seq++}`, createdAt: seq, ...create };
       rows.push(row);
       return { ...row };
     },
-    async update({ where, data }: any) {
+    async update({ where, data }: { where: MembershipWhere; data: MembershipWriteData }) {
       const row = rows.find((r) => r.id === where.id)!;
       Object.assign(row, data);
       return { ...row };
     },
-    async updateMany({ where, data }: any) {
+    async updateMany({ where, data }: { where: MembershipWhere; data: MembershipWriteData }) {
       let count = 0;
       for (const r of rows) {
         if (r.contactId !== where.contactId) continue;
@@ -70,16 +102,16 @@ function makeFakeClient() {
       }
       return { count };
     },
-    async delete({ where }: any) {
+    async delete({ where }: { where: MembershipWhere }) {
       const i = rows.findIndex((r) => r.id === where.id);
       const [row] = rows.splice(i, 1);
       return row;
     },
   };
-  return { client: { contactBookMembership: cbm } as any, rows };
+  return { client: { contactBookMembership: cbm } as unknown as FakeDbClient, rows };
 }
 
-const primaries = (rows: any[]) => rows.filter((r) => r.isPrimary);
+const primaries = (rows: MembershipRow[]) => rows.filter((r) => r.isPrimary);
 
 test("setPrimaryMembership creates a single primary membership", async () => {
   const { client, rows } = makeFakeClient();

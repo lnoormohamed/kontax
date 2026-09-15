@@ -3,7 +3,7 @@
 // email, stores an encrypted SyncAccount, and queues the initial import.
 import { NextResponse, type NextRequest } from "next/server";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateSyncAccount, assertHasAvailableSyncAccountSlot } from "~/server/billing";
 import { db } from "~/server/db";
 import { SYNC_ACCOUNT_MUTABLE_STATUSES } from "~/lib/sync-account-status";
@@ -12,7 +12,7 @@ import {
   emitSyncConnectionLifecycleEvent,
   reconnectExistingSyncAccount,
 } from "~/server/sync-lineage";
-import { env } from "~/env";
+import { getAppUrl } from "~/lib/site-url";
 import { people } from "@googleapis/people";
 
 import {
@@ -28,7 +28,8 @@ import {
 const GOOGLE_BASE_URL = "https://people.googleapis.com/v1";
 
 const redirectTo = (_req: NextRequest, path: string) =>
-  NextResponse.redirect(new URL(path, env.APP_URL ?? "https://getkontax.com"));
+  // P48-16: one shared APP_URL resolver (localhost in dev, throws in production).
+  NextResponse.redirect(new URL(path, getAppUrl()));
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
@@ -52,8 +53,16 @@ export async function GET(req: NextRequest) {
   }
 
   // Defense in depth: the signed-in user must match the user bound in state.
-  const session = await auth();
-  if (!session?.user?.id || session.user.id !== state.userId) {
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) {
+      return redirectTo(req, err.code === "UNAUTHENTICATED" ? "/login" : "/sync?error=read_only_session");
+    }
+    throw err;
+  }
+  if (userId !== state.userId) {
     return redirectTo(req, "/login");
   }
 

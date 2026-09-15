@@ -23,7 +23,10 @@ import { getRedis } from "~/server/rate-limit";
  */
 
 const TTL_SECONDS = 45;
-const PREFIX = "sessval:v1";
+// P48-02: bumped to v2 — the snapshot now carries `scheduledDeleteAt` so the
+// JWT callback can refresh `pendingDeletion` on cache hits. A v1 entry has no
+// such field, and the prefix bump guarantees one is never deserialised as v2.
+const PREFIX = "sessval:v2";
 
 const cacheEnabled = () =>
   process.env.SESSION_VALIDATION_CACHE !== "off" && getRedis() !== null;
@@ -36,6 +39,13 @@ export type SessionValidationSnapshot = {
   role: "USER" | "ADMIN";
   emailVerified: string | null;
   revoked: boolean;
+  /**
+   * P48-02: ISO timestamp when the user has scheduled their own deletion, else
+   * null. Carried here so a cache hit can refresh the token's `pendingDeletion`
+   * flag — cancelling the deletion clears it within the 45s TTL at worst, and
+   * immediately because `cancelAccountDeletion` invalidates the key.
+   */
+  scheduledDeleteAt: string | null;
 };
 
 export async function readSessionValidation(

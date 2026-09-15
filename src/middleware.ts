@@ -25,6 +25,10 @@ const PUBLIC_PREFIXES = [
   "/forgot-password", // P18-05
   "/reset-password", // P18-05
   "/verify-email",
+  // P48-03: the "this wasn't me" link from the email-change notice. Must work
+  // signed-out — the person clicking it may have just lost access to the
+  // account, and the page authenticates the single-use token, not a session.
+  "/revert-email",
   "/account-deleted", // P18-09
   "/share/", // vCard share public links (P12-02) — trailing slash so it
   // matches /share/<token> but NOT the authenticated /shares page
@@ -118,15 +122,19 @@ const withStrictCardCsp = (req: NextRequest): NextResponse => {
   return res;
 };
 
-// The middleware intentionally does NOT use NextAuth(authConfigEdge) as a
-// wrapper. In a self-hosted Docker deployment (Coolify), AUTH_SECRET is a
-// runtime env var that is NOT available at `npm run build` time. Next.js
-// inlines process.env references at build time for the Edge runtime, so
-// AUTH_SECRET would be baked as undefined. The Auth.js wrapper would then
-// fail to decode JWTs and attach a Set-Cookie: delete header that wipes the
-// session cookie — even for valid sessions. The full Node.js auth() in each
-// page/action is the authoritative check; this middleware is a lightweight
-// first gate based on cookie presence only.
+// The middleware intentionally does NOT use the NextAuth edge wrapper. In a
+// self-hosted Docker deployment (Coolify), AUTH_SECRET is a runtime env var
+// that is NOT available at `npm run build` time. Next.js inlines process.env
+// references at build time for the Edge runtime, so AUTH_SECRET would be baked
+// as undefined. The Auth.js wrapper would then fail to decode JWTs and attach a
+// Set-Cookie: delete header that wipes the session cookie — even for valid
+// sessions. The full Node.js auth() in each page/action is the authoritative
+// check; this middleware is a lightweight first gate based on cookie presence
+// only.
+//
+// P48-01: because this gate cannot see JWT claims, 2FA enforcement lives in
+// `src/server/auth/index.ts` — `auth()` returns null for password-only sessions
+// that still owe a TOTP challenge, and `/login` routes them to `/login/verify-2fa`.
 export default function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
 

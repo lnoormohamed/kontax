@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { auth } from "~/server/auth";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { createKontaxArchiveJob } from "~/server/export-format/jobs";
 
@@ -27,9 +27,13 @@ const postSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId(); // P48-02: exports stay available during the deletion grace period
+  } catch (err) {
+    if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
+    throw err;
+  }
 
   const raw: unknown = await request.json().catch(() => null);
   const parsed = postSchema.safeParse(raw);
@@ -48,9 +52,13 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return new Response("Unauthorized", { status: 401 });
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) return new Response("Unauthorized", { status: 401 });
+    throw err;
+  }
 
   const job = await db.kontaxExportJob.findFirst({
     where: { userId },
