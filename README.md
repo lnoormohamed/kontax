@@ -53,9 +53,12 @@ npm run test:sync-fixtures
 npm run test:e2e
 
 # schema
-npm run db:push
-npm run db:migrate
+npm run db:push               # dev/staging convenience only
+npm run db:generate           # author a new migration (prisma migrate dev)
+npm run db:migrate            # apply pending migrations (prisma migrate deploy)
+npm run db:migrate:status     # what is applied / pending
 npm run db:check:drift
+npm run db:precheck:p48-14    # read-only: duplicates that would block P48-14
 
 # demo / QA data
 npm run seed:demo
@@ -151,23 +154,55 @@ See:
 
 ## Deployment and schema model
 
+Since P48-14 the schema has a **migration history** under `prisma/migrations/`.
+`0_init` is the baseline snapshot of the schema as it stood when migrations
+were introduced; every schema change since then lands as a reviewed migration
+file in a PR, never as an ad-hoc `db push` against production.
+
 Development and staging can still use `db push` conveniently.
 
-Production should not rely on startup-time schema mutation by default. The
-container now boots through `scripts/runtime/start-production.mjs`:
+Production applies migrations at boot. The container boots through
+`scripts/runtime/start-production.mjs`:
 
+- `KONTAX_SCHEMA_MODE=migrate` **(production default)**
+  - report `prisma migrate status`, apply `prisma migrate deploy`, then
+    re-assess drift and refuse to boot if the database is still missing
+    anything the schema requires
 - `KONTAX_SCHEMA_MODE=push`
   - apply `prisma db push` before boot
 - `KONTAX_SCHEMA_MODE=validate`
-  - refuse to boot if the live database does not match `prisma/schema.prisma`
+  - read-only pre-flight: refuse to boot on pending migrations or on drift
+    between the live database and `prisma/schema.prisma`, but apply nothing
+    (for setups that run `migrate deploy` as a separate release step)
 - `KONTAX_SCHEMA_MODE=skip`
   - boot without a schema step
 
 If `KONTAX_SCHEMA_MODE` is unset, the startup script defaults to:
 
-- `validate` when `KONTAX_DEPLOY_ENV=production`
-- `validate` when `KONTAX_DEPLOY_ENV` is unset but `NODE_ENV=production`
+- `migrate` when `KONTAX_DEPLOY_ENV=production`
+- `migrate` when `KONTAX_DEPLOY_ENV` is unset but `NODE_ENV=production`
 - `push` otherwise
+
+**One-time step on every pre-existing environment** (production and staging
+already have the `0_init` tables, so the baseline must be marked applied rather
+than re-run — otherwise `migrate deploy` tries to `CREATE TABLE` over live
+data and fails):
+
+```bash
+npm run db:migrate:resolve:baseline   # prisma migrate resolve --applied 0_init
+```
+
+See [the deploy runbook](/Users/lnoormohamed/ChatGPT/Kontax/roadmap/runbooks/deploy.md) for the full
+sequence, including the uniqueness pre-check that must pass before the P48-14
+constraints migration is deployed.
+
+Adding a schema change from here on:
+
+```bash
+# edit prisma/schema.prisma, then, against a local dev DB:
+npm run db:generate          # prisma migrate dev — writes prisma/migrations/<ts>_<name>/
+# commit the generated migration.sql together with the schema change
+```
 
 Runbooks:
 

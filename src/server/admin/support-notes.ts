@@ -32,6 +32,7 @@ export async function listAdminSupportNotes(input: {
       id: true,
       body: true,
       createdAt: true,
+      adminEmail: true,
       author: { select: { name: true, email: true } },
     },
   });
@@ -41,7 +42,9 @@ export async function listAdminSupportNotes(input: {
     body: row.body,
     createdAt: row.createdAt,
     when: fmtRelative(row.createdAt),
-    author: row.author.name?.trim() ?? row.author.email,
+    // P48-14: the author relation nulls out when that admin is deleted; the
+    // denormalised adminEmail keeps the note attributable.
+    author: row.author?.name?.trim() ?? row.author?.email ?? row.adminEmail ?? "system",
   }));
 }
 
@@ -56,6 +59,7 @@ export async function listUserSupportTimeline(targetUserId: string, limit = 24) 
       subjectId: true,
       body: true,
       createdAt: true,
+      adminEmail: true,
       author: { select: { name: true, email: true } },
     },
   });
@@ -67,6 +71,8 @@ export async function listUserSupportTimeline(targetUserId: string, limit = 24) 
     body: row.body,
     createdAt: row.createdAt,
     when: fmtRelative(row.createdAt),
-    author: row.author.name?.trim() ?? row.author.email,
+    // P48-14: the author relation nulls out when that admin is deleted; the
+    // denormalised adminEmail keeps the note attributable.
+    author: row.author?.name?.trim() ?? row.author?.email ?? row.adminEmail ?? "system",
   }));
 }

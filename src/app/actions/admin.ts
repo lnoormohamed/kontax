@@ -252,6 +252,9 @@ export async function addAdminSupportNote(input: {
   await db.adminSupportNote.create({
     data: {
       adminUserId: admin.adminId,
+      // P48-14: denormalised so the note keeps naming its author after the
+      // authoring admin's User row is deleted (the relation is SetNull now).
+      adminEmail: admin.email,
       subjectType: input.subjectType.trim().toUpperCase(),
       subjectId: input.subjectId,
       targetUserId: input.targetUserId ?? null,
@@ -301,6 +304,8 @@ export async function createAdminSupportCase(input: {
       subjectId: input.subjectId,
       targetUserId: input.targetUserId ?? null,
       creatorAdminUserId: admin.adminId,
+      // P48-14: denormalised creator email — survives the creator's deletion.
+      creatorAdminEmail: admin.email,
       assigneeAdminUserId: input.assignToSelf ? admin.adminId : null,
       title,
       summary: input.summary?.trim() ? input.summary.trim().slice(0, 4000) : null,

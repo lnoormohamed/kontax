@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { cancelBillingForDeletedUser } from "~/server/billing-lifecycle";
 import { assertCronSecret } from "~/server/cron-guard";
 import { db } from "~/server/db";
 import { sendAccountDeletionConfirmationEmail } from "~/server/deletion-notifications";
@@ -32,8 +33,14 @@ export async function POST(req: NextRequest) {
     const deletedAt = new Date();
 
     try {
-      // P48-14: cancel Stripe subscription here (before the row cascades away —
-      // the SubscriptionCustomer link is deleted with it).
+      // P48-14: cancel Stripe *before* the delete. SubscriptionCustomer.user
+      // and Subscription.user both cascade, so once the row is gone we no
+      // longer know which Stripe customer to stop — and Stripe would keep
+      // charging a card for an account that no longer exists. Best-effort and
+      // non-throwing by design (see billing-lifecycle.ts): a Stripe outage
+      // logs for manual reconciliation rather than stalling the sweep.
+      await cancelBillingForDeletedUser(user.id);
+
       await db.user.delete({ where: { id: user.id } });
       // Cascade deletes all child records via Prisma onDelete: Cascade
       deleted++;

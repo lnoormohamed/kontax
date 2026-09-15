@@ -293,6 +293,7 @@ export async function loadAdminSupportCaseWorkbench(input: {
         resolvedAt: true,
         createdAt: true,
         updatedAt: true,
+        creatorAdminEmail: true,
         creator: { select: { name: true, email: true } },
         assignee: { select: { id: true, name: true, email: true } },
         targetUser: { select: { email: true, name: true } },
@@ -370,7 +371,7 @@ export async function loadAdminSupportCaseWorkbench(input: {
             : row.assignee?.id
               ? ("assigned" as const)
               : ("unassigned" as const),
-        createdBy: row.creator.name?.trim() ?? row.creator.email,
+        createdBy: row.creator?.name?.trim() ?? row.creator?.email ?? row.creatorAdminEmail ?? "system",
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         updatedWhen: fmtRelative(row.updatedAt),
@@ -466,6 +467,7 @@ export async function listSupportCasesForSubject(subjectType: string, subjectId:
       resolvedAt: true,
       createdAt: true,
       updatedAt: true,
+      creatorAdminEmail: true,
       creator: { select: { name: true, email: true } },
       assignee: { select: { name: true, email: true } },
     },
@@ -480,7 +482,7 @@ export async function listSupportCasesForSubject(subjectType: string, subjectId:
     severity: row.severity,
     severityLabel: adminSupportCaseSeverityLabel(row.severity),
     owner: row.assignee?.name?.trim() ?? row.assignee?.email ?? "Unassigned",
-    createdBy: row.creator.name?.trim() ?? row.creator.email,
+    createdBy: row.creator?.name?.trim() ?? row.creator?.email ?? row.creatorAdminEmail ?? "system",
     updatedAt: row.updatedAt,
     updatedWhen: fmtRelative(row.updatedAt),
     nextFollowUpAt: row.nextFollowUpAt,

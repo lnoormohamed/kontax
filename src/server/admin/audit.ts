@@ -52,6 +52,8 @@ async function clientIp(): Promise<string | null> {
 /** Append-only write of one admin action. Never throws into the caller path. */
 export async function emitAdminEvent(args: {
   adminId: string;
+  /** P48-14: pass it when the caller already has it, to save a lookup. */
+  adminEmail?: string | null;
   action: string;
   targetUserId?: string | null;
   targetEmail?: string | null;
@@ -71,9 +73,25 @@ export async function emitAdminEvent(args: {
           }
         : {}),
     };
+    // P48-14: denormalise the acting admin's email alongside the existing
+    // targetEmail. The actor relation is onDelete: SetNull now (it used to
+    // Cascade, which erased an admin's entire trail when their account was
+    // deleted — the opposite of this model's append-only contract), so the
+    // email is the only thing that still identifies the actor afterwards.
+    const actorEmail =
+      args.adminEmail ??
+      (
+        await db.user.findUnique({
+          where: { id: args.adminId },
+          select: { email: true },
+        })
+      )?.email ??
+      null;
+
     await db.adminAuditEvent.create({
       data: {
         adminUserId: args.adminId,
+        adminEmail: actorEmail,
         action: args.action,
         targetUserId: args.targetUserId ?? null,
         targetEmail: args.targetEmail ?? null,
@@ -179,6 +197,7 @@ async function loadAdminAuditBase(filters: {
       select: {
         id: true,
         adminUserId: true,
+        adminEmail: true,
         createdAt: true,
         action: true,
         targetEmail: true,
@@ -213,7 +232,9 @@ async function loadAdminAuditBase(filters: {
       id: r.id,
       createdAt: r.createdAt,
       adminId: r.adminUserId,
-      adminName: r.admin?.name?.trim() ?? r.admin?.email ?? "system",
+      // P48-14: fall back to the denormalised email when the actor's User row
+      // is gone (the relation nulls out rather than deleting the event).
+      adminName: r.admin?.name?.trim() ?? r.admin?.email ?? r.adminEmail ?? "system",
       action: r.action,
       targetEmail: r.targetEmail,
       targetUserId: r.targetUserId,

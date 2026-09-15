@@ -289,10 +289,17 @@ export async function scheduleAccountDeletion(input: {
   });
   if (ownedGroup) return { error: "OWNS_ACTIVE_GROUP" };
 
-  // TODO(P19): Cancel Stripe subscription here when Phase 19 ships
-  console.warn(
-    `[Kontax] Account deletion: Stripe cancellation stub for user ${session.user.id}`,
-  );
+  // P48-14: billing is cancelled at HARD-DELETE, not here. The 30-day window
+  // is explicitly reversible — the modal promises "You can sign back in during
+  // that period to cancel" — and cancelling the Stripe subscription now would
+  // make that promise a lie: the user would come back to a dead plan we cannot
+  // silently restore (the price may have changed, the card may be detached).
+  // The copy commits only to deleting "Your subscription (if active)" as part
+  // of the deletion itself, so cancelBillingForDeletedUser(userId) runs in the
+  // hard-delete sweep, immediately before `db.user.delete`
+  // (src/app/api/cron/delete-accounts/route.ts). The user therefore keeps —
+  // and pays for — the plan for the remainder of the grace period, which is
+  // also the period in which they still have full read access to their data.
 
   // Convert accepted live shares to static copies
   await db.contactShare.updateMany({
