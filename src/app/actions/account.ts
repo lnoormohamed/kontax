@@ -18,6 +18,14 @@ import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 
+// P48-17: User.name used to accept any text up to 120 chars, and was
+// interpolated unescaped into email Subject headers (share invites — now
+// moved out of the subject, see shares.ts), in-app notification titles, and
+// the group-owner display used across family/team invites. Constrain it to
+// Unicode letters/marks/digits, spaces, and common name punctuation so it can
+// never carry control characters, markup, or arbitrary attacker text.
+const NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-,]+$/u;
+
 // ─── Profile Edit (P18-01) ───────────────────────────────────────────────────
 
 export async function updateProfile(input: {
@@ -35,6 +43,7 @@ export async function updateProfile(input: {
   const name = input.name.trim();
   if (!name) return { error: "NAME_REQUIRED" };
   if (name.length > 120) return { error: "NAME_TOO_LONG" };
+  if (!NAME_PATTERN.test(name)) return { error: "NAME_INVALID" };
 
   // Validate avatarUrl: must be HTTPS or null
   if (input.avatarUrl) {

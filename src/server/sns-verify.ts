@@ -20,6 +20,8 @@ export type SnsMessage = Record<string, unknown> & {
   SignatureVersion?: string;
   Signature?: string;
   SigningCertURL?: string;
+  Timestamp?: string;
+  MessageId?: string;
 };
 
 // Fields included in the signature, in the exact order AWS specifies. Optional
@@ -47,7 +49,36 @@ const SIGNABLE_KEYS: Record<string, string[]> = {
 };
 
 // Signing certs are long-lived; cache by URL to avoid refetching per message.
+// P48-17: bounded — AWS rotates SNS signing certs rarely, so this map should
+// only ever hold a handful of entries, but an unbounded cache keyed on an
+// attacker-influenceable URL field is still an easy memory-growth vector to
+// close. Evict the oldest entry (Map preserves insertion order) once full.
+const CERT_CACHE_MAX_ENTRIES = 16;
 const certCache = new Map<string, string>();
+
+const cacheCert = (url: string, pem: string) => {
+  if (certCache.size >= CERT_CACHE_MAX_ENTRIES && !certCache.has(url)) {
+    const oldest = certCache.keys().next().value;
+    if (oldest !== undefined) certCache.delete(oldest);
+  }
+  certCache.set(url, pem);
+};
+
+/**
+ * P48-17 — SNS replay guard: reject a message whose signed `Timestamp` is too
+ * old (a captured/replayed request) or implausibly in the future (clock-skew
+ * abuse). AWS recommends a similar window for SNS message validation.
+ */
+const MAX_TIMESTAMP_AGE_MS = 15 * 60 * 1000;
+const MAX_TIMESTAMP_SKEW_FORWARD_MS = 5 * 60 * 1000;
+
+export const isSnsTimestampFresh = (raw: string | undefined): boolean => {
+  if (!raw) return false;
+  const timestamp = new Date(raw).getTime();
+  if (Number.isNaN(timestamp)) return false;
+  const age = Date.now() - timestamp;
+  return age <= MAX_TIMESTAMP_AGE_MS && age >= -MAX_TIMESTAMP_SKEW_FORWARD_MS;
+};
 
 /** True only for `https://sns.<region>.amazonaws.com/...` URLs. */
 export const isSnsHttpsUrl = (raw: string | undefined | null): boolean => {
@@ -67,7 +98,7 @@ const fetchSigningCert = async (url: string): Promise<string | null> => {
   const res = await fetch(url).catch(() => null);
   if (!res?.ok) return null;
   const pem = await res.text();
-  certCache.set(url, pem);
+  cacheCert(url, pem);
   return pem;
 };
 
@@ -93,6 +124,14 @@ export async function verifySnsSignature(msg: SnsMessage): Promise<boolean> {
   const certUrl = typeof msg.SigningCertURL === "string" ? msg.SigningCertURL : "";
 
   if (!type || !signature || !isSnsHttpsUrl(certUrl)) return false;
+
+  // P48-17: Timestamp is part of the signed payload for every message type we
+  // handle (see SIGNABLE_KEYS), so checking it here — before the expensive
+  // cert fetch/RSA verify — both closes the replay window and fails fast for
+  // a captured/replayed request.
+  if (!isSnsTimestampFresh(typeof msg.Timestamp === "string" ? msg.Timestamp : undefined)) {
+    return false;
+  }
 
   const stringToSign = buildStringToSign(msg, type);
   if (stringToSign === null) return false;

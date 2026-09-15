@@ -7,11 +7,16 @@ import { redirect } from "next/navigation";
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { requireUserId } from "~/server/auth/require-session";
-import { getUserBillingContext } from "~/server/billing";
+import {
+  assertCanCreateContactsTx,
+  getUserBillingContext,
+  lockUserForPlanCheck,
+} from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { snapshotFamilyBookForUser } from "~/server/family-snapshot";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000; // 48h signed-token expiry
@@ -118,44 +123,53 @@ export const inviteFamilyMember = async (formData: FormData) => {
 
   const group = await db.group.findFirst({
     where: { ownerId: userId, type: "FAMILY" },
-    include: { members: true, owner: { select: { name: true, email: true } } },
+    include: { owner: { select: { name: true, email: true } } },
   });
   if (!group) {
     throw new Error("Create a family group first.");
   }
 
-  // Seat limit: owner + (maxMembers - 1) others; count non-declined members.
-  const activeMembers = group.members.filter((m) => m.inviteStatus !== "DECLINED").length;
-  if (activeMembers >= group.maxMembers) {
-    throw new Error(`Your family book is full (${group.maxMembers} members).`);
-  }
-
   const recipient = await db.user.findUnique({ where: { email }, select: { id: true } });
-  // Block duplicate invites / existing members.
-  const dupe = group.members.find(
-    (m) => m.invitedEmail === email || m.userId === recipient?.id,
-  );
-  if (dupe && dupe.inviteStatus !== "DECLINED") {
-    throw new Error("That person is already invited or a member.");
-  }
-
   const token = randomBytes(24).toString("base64url");
-  const data = {
-    groupId: group.id,
-    userId: recipient?.id ?? null,
-    invitedEmail: email,
-    role: "MEMBER" as const,
-    inviteStatus: "PENDING" as const,
-    canEdit: true,
-    inviteToken: token,
-    inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
-    invitedByUserId: userId,
-  };
-  if (dupe) {
-    await db.groupMember.update({ where: { id: dupe.id }, data });
-  } else {
-    await db.groupMember.create({ data });
-  }
+
+  // P48-17: seat-count-then-insert race. Family groups can only be invited to
+  // by their owner (the `where: { ownerId: userId }` above), so locking the
+  // owner's own User row fully serialises concurrent invites to this group —
+  // a second concurrent invite blocks here until the first commits, then its
+  // own member re-read sees the first invite's row.
+  await db.$transaction(async (tx) => {
+    await lockUserForPlanCheck(tx, userId);
+
+    const members = await tx.groupMember.findMany({ where: { groupId: group.id } });
+    // Seat limit: owner + (maxMembers - 1) others; count non-declined members.
+    const activeMembers = members.filter((m) => m.inviteStatus !== "DECLINED").length;
+    if (activeMembers >= group.maxMembers) {
+      throw new Error(`Your family book is full (${group.maxMembers} members).`);
+    }
+
+    // Block duplicate invites / existing members.
+    const dupe = members.find((m) => m.invitedEmail === email || m.userId === recipient?.id);
+    if (dupe && dupe.inviteStatus !== "DECLINED") {
+      throw new Error("That person is already invited or a member.");
+    }
+
+    const data = {
+      groupId: group.id,
+      userId: recipient?.id ?? null,
+      invitedEmail: email,
+      role: "MEMBER" as const,
+      inviteStatus: "PENDING" as const,
+      canEdit: true,
+      inviteToken: token,
+      inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
+      invitedByUserId: userId,
+    };
+    if (dupe) {
+      await tx.groupMember.update({ where: { id: dupe.id }, data });
+    } else {
+      await tx.groupMember.create({ data });
+    }
+  });
 
   const ownerName = group.owner.name?.trim() ?? group.owner.email ?? "A Kontax user";
   await sendInviteEmail({
@@ -343,6 +357,13 @@ export const addContactToFamilyBook = async (formData: FormData) => {
   }
 
   await db.$transaction(async (tx) => {
+    // P48-17: this acceptance path created a contact without any plan-cap
+    // check at all. Check (and serialise, via the row lock) against the
+    // book's nominal owner — the account the new contact is actually created
+    // under — not the acting member.
+    await lockUserForPlanCheck(tx, group.ownerId);
+    await assertCanCreateContactsTx(tx, group.ownerId);
+
     const copy = await tx.contact.create({
       data: {
         userId: group.ownerId, // group owns the shared contact (nominal owner)
@@ -443,6 +464,13 @@ export const resendFamilyInvite = async (formData: FormData) => {
   const member = await requireOwnedMember(userId, memberId);
   if (member.inviteStatus !== "PENDING" || !member.invitedEmail) {
     throw new Error("That invite can't be resent.");
+  }
+  // P48-17: resend was uncapped — keyed per invite (not per owner) so an owner
+  // resending to several different pending invitees in one hour isn't blocked
+  // by someone else's resend spam on the same invite.
+  const rl = await checkRateLimit(rateLimiters.inviteResend, `family:${member.id}`);
+  if (!rl.allowed) {
+    throw new Error("That invite was resent too many times recently. Try again later.");
   }
   const group = await db.group.findUnique({
     where: { id: member.groupId },

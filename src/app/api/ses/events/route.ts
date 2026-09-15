@@ -1,7 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { db } from "~/server/db";
+import { getRedis } from "~/server/rate-limit";
 import { isSnsHttpsUrl, verifySnsSignature } from "~/server/sns-verify";
+
+// P48-17: SNS is at-least-once delivery and can also legitimately redeliver a
+// message it never got an ack for — signature + Timestamp freshness
+// (sns-verify.ts) alone don't stop a genuine SNS redelivery, or a captured
+// message replayed inside the freshness window, from being processed twice.
+// `SET NX EX` on the MessageId makes processing idempotent: the first delivery
+// claims the id, every later delivery of the same id is a no-op. Redis is
+// required in production (see rate-limit.ts), so this only silently skips
+// dedupe in dev/test where REDIS_URL is unset — signature + freshness still
+// apply there.
+const MESSAGE_ID_DEDUPE_TTL_SECONDS = 24 * 60 * 60;
+
+async function claimMessageIdOnce(messageId: string | undefined): Promise<boolean> {
+  if (!messageId) return true; // nothing to dedupe on; let it through
+  const redis = getRedis();
+  if (!redis) return true; // no shared store available — skip dedupe, don't fail closed
+  const result = await redis.set(
+    `sns:msgid:${messageId}`,
+    "1",
+    "EX",
+    MESSAGE_ID_DEDUPE_TTL_SECONDS,
+    "NX",
+  );
+  return result === "OK";
+}
 
 export const dynamic = "force-dynamic";
 // X509Certificate / createVerify (used by verifySnsSignature) require the Node
@@ -13,6 +39,7 @@ interface SnsEnvelope {
   Type?: string;
   SubscribeURL?: string;
   Message?: string;
+  MessageId?: string;
 }
 
 interface SesBounceNotification {
@@ -53,10 +80,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid body" }, { status: 400 });
   }
 
-  // Authenticate: reject anything that isn't a signature-valid SNS message.
+  // Authenticate: reject anything that isn't a signature-valid, fresh SNS message.
   const authentic = await verifySnsSignature(body);
   if (!authentic) {
     return NextResponse.json({ error: "signature verification failed" }, { status: 403 });
+  }
+
+  // P48-17: dedupe by MessageId (signature-covered) so a genuine SNS
+  // redelivery or a captured-and-replayed message (within the freshness
+  // window) is processed at most once.
+  const firstDelivery = await claimMessageIdOnce(body.MessageId);
+  if (!firstDelivery) {
+    return NextResponse.json({ deduped: true });
   }
 
   // Type is signature-covered, so trust the body field over the header now.

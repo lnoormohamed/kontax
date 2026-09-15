@@ -10,7 +10,12 @@ import {
   requireUserId,
   sessionErrorMessage,
 } from "~/server/auth/require-session";
-import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
+import {
+  assertCanCreateSyncAccount,
+  assertCanCreateSyncAccountTx,
+  assertCanUseCardDavSync,
+  lockUserForPlanCheck,
+} from "~/server/billing";
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
 import {
   parseContactDateEntries,
@@ -863,6 +868,17 @@ export const createSyncAccount = async (
     let accountId: string;
     try {
       accountId = await db.$transaction(async (tx) => {
+        // P48-17: assertCanCreateSyncAccount above ran before the (potentially
+        // slow, user-controlled) CardDAV discovery call, purely so an
+        // obviously-over-cap request fails fast without paying for discovery.
+        // It is a separate round-trip from this insert, so two concurrent
+        // "add sync account" requests could both pass it and both land here —
+        // re-check atomically: lock the user row (serialises a concurrent
+        // create for the same user) and re-verify the slot inside this same
+        // transaction as the insert.
+        await lockUserForPlanCheck(tx, userId);
+        await assertCanCreateSyncAccountTx(tx, userId);
+
         const syncAccount = await tx.syncAccount.create({
           data: {
             userId,

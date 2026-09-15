@@ -8,10 +8,22 @@ import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 
+// P48-17: same constraint as updateProfile (account.ts) — Unicode letters/
+// marks/digits, spaces, and common name punctuation only. Without this a
+// freshly-registered name could carry arbitrary text into share-invite and
+// family/team-invite emails and in-app notifications from day one.
+const NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-,]+$/u;
+
 const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(8),
-  name: z.string().trim().min(1).max(100).optional(),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(100)
+    .regex(NAME_PATTERN, "Name may only contain letters, numbers, spaces, and . ' - ,")
+    .optional(),
 });
 
 export async function POST(request: NextRequest) {

@@ -82,13 +82,79 @@ Active crontab on 192.168.1.193 (postgres user):
 
 First backup run manually on 2026-06-17: `/var/lib/postgresql/backups/kontax/kontax_20260617.sql.gz` — 12 KB, 3,613 SQL lines. ✅
 
-### Verify a backup file
+### Backup encryption (P48-17)
+
+The crontab above writes a plain `gzip`'d dump to disk — anyone with
+filesystem or off-host-copy access to `/var/lib/postgresql/backups/kontax/`
+can read every contact, every hashed password, and (since sync credentials
+and TOTP secrets are stored as opaque ciphertext blobs, but the dump is a
+full logical backup) the encrypted blobs themselves in a form that could be
+replayed if `SYNC_CREDENTIAL_ENCRYPTION_KEY`/`AUTH_SECRET` were ever also
+exposed. Encrypt every dump with [`age`](https://github.com/FiloSottile/age)
+(asymmetric, recipient-key based — the crontab only ever needs the **public**
+key, so a compromise of the backup host alone cannot decrypt past backups).
+
+**One-time setup:**
 
 ```bash
-# From the server as postgres:
-gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | head -3
+# Generate the keypair ONCE, ideally on a machine other than the backup host:
+age-keygen -o kontax-backup-key.txt
+# Prints the public key to stderr, e.g.:
+#   Public key: age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqrx8p9x
+```
+
+- The **public** key (the `age1...` string) is not secret — it goes straight
+  into the crontab below.
+- The **private** key file (`kontax-backup-key.txt`) is the only thing that
+  can decrypt any backup ever made with it. Store it as a Coolify secret (or
+  equivalent secret store) — the same way `SYNC_CREDENTIAL_ENCRYPTION_KEY`
+  and `AUTH_SECRET` are handled per `roadmap/runbooks/env-secrets.md` — never
+  in the backup directory itself, never committed to git, and never only on
+  the database host (that would let anyone who can read the backups directory
+  also decrypt them, defeating the point).
+- Losing the private key makes every backup encrypted with it permanently
+  unreadable. Losing it is a bigger operational risk than losing a single
+  backup file, so treat it with the same care as a production signing key.
+- Rotating the key: generate a new keypair, update the crontab's `-r`
+  argument to the new public key, and keep the retired private key until the
+  last backup encrypted under it ages out (30 days, per the `-mtime +30
+  -delete` retention job below) — old backups still need the old key to
+  decrypt.
+
+**Updated crontab** (`postgres` OS user on 192.168.1.193) — pipes the gzip'd
+dump through `age` before it ever touches disk, so no unencrypted dump is
+ever written:
+
+```
+0 2 * * *   /usr/lib/postgresql/18/bin/pg_dump -h 192.168.1.193 -U kontax -d kontax \
+              | /bin/gzip \
+              | age -r age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqrx8p9x \
+              > /var/lib/postgresql/backups/kontax/kontax_$(date +\%Y\%m\%d).sql.gz.age \
+              2>> /var/lib/postgresql/backups/kontax/backup.log
+15 2 * * *  /usr/bin/find /var/lib/postgresql/backups/kontax -name "*.sql.gz.age" -mtime +30 -delete
+```
+
+(Replace the `-r age1...` value with the real public key from `age-keygen`
+above before installing this crontab.)
+
+**Decrypting a backup** (first step before any restore below):
+
+```bash
+age -d -i /path/to/kontax-backup-key.txt \
+  /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz.age \
+  > kontax_YYYYMMDD.sql.gz
+```
+
+### Verify a backup file
+
+Backups since P48-17 are `age`-encrypted (`.sql.gz.age`) — decrypt first
+(see above), then verify the plain `.sql.gz` exactly as before:
+
+```bash
+# From the server as postgres, after `age -d ...` (above):
+gunzip -c kontax_YYYYMMDD.sql.gz | head -3
 # Expected: -- PostgreSQL database dump
-gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | wc -l
+gunzip -c kontax_YYYYMMDD.sql.gz | wc -l
 # Schema-only (no data): ~3613 lines; with data: much larger
 ```
 
@@ -100,8 +166,10 @@ gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | wc -l
 # 1. Create target database (postgres superuser required)
 psql -U postgres -c "CREATE DATABASE kontax_restored OWNER kontax;"
 
-# 2. Restore
-gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | psql -U kontax -d kontax_restored
+# 2. Decrypt, then restore
+age -d -i /path/to/kontax-backup-key.txt \
+  /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz.age \
+  | gunzip -c | psql -U kontax -d kontax_restored
 
 # 3. Verify table and row counts
 psql -U kontax -d kontax_restored \
@@ -117,7 +185,9 @@ psql -U kontax -d kontax_restored \
 
 ```bash
 psql -U postgres -c "CREATE DATABASE kontax_restore_test OWNER kontax;"
-gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | psql -U kontax -d kontax_restore_test --quiet
+age -d -i /path/to/kontax-backup-key.txt \
+  /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz.age \
+  | gunzip -c | psql -U kontax -d kontax_restore_test --quiet
 psql -U kontax -d kontax_restore_test \
   -c "SELECT count(*) FROM pg_tables WHERE schemaname='public';"
 # Expected: 45

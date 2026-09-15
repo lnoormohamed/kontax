@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { safeInternalPath } from "~/lib/safe-internal-path";
 import { assertAdmin, AdminForbiddenError } from "~/server/admin/guard";
 import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
@@ -621,6 +622,13 @@ export async function saveProductBroadcast(input: {
   const title = input.title.trim();
   const body = input.body.trim();
   const trimmedUrl = input.actionUrl?.trim();
+  // P48-17: actionUrl was stored unvalidated and later rendered as a link in
+  // the broadcast notification — an admin (or a compromised admin session)
+  // could point it off-site. Require a safe same-origin path; reject rather
+  // than silently rewriting so the admin notices and fixes the input.
+  if (trimmedUrl && trimmedUrl.length > 0 && safeInternalPath(trimmedUrl, "") !== trimmedUrl) {
+    return { error: "ACTION_URL_INVALID" };
+  }
   const actionUrl = trimmedUrl && trimmedUrl.length > 0 ? trimmedUrl : undefined;
   if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
   if (!title) return { error: "TITLE_REQUIRED" };

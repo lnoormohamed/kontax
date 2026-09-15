@@ -157,6 +157,16 @@ export const rateLimiters = {
   // points/duration are repeated there — keep them in sync.
   davAuthByPair: makeLimiter(10, 15 * 60, "dav:pair"),
   davAuthByIp: makeLimiter(100, 15 * 60, "dav:ip"),
+
+  // P48-17: outbound share-invite emails (createStaticShare / createLiveShare)
+  // — 20 recipients per sending user per hour. Previously unlimited, so a
+  // compromised or malicious account could use Kontax as an open relay.
+  shareEmail: makeLimiter(20, 60 * 60, "rl:share-email"),
+
+  // P48-17: family/team invite RESENDS — keyed per invite (groupMember id), not
+  // per user, so one owner can't be locked out of resending to different
+  // pending invitees, but repeatedly re-sending the SAME invite is capped.
+  inviteResend: makeLimiter(5, 60 * 60, "rl:invite-resend"),
 } as const;
 
 export interface RateLimitResult {

@@ -100,7 +100,7 @@ export default function SecurityPage() {
           <div
             className="sp-flow"
             role="img"
-            aria-label="Data protection flow: your devices connect over TLS 1.2+ to Kontax, which stores data encrypted at rest with AES-256, and syncs to Google, Outlook, and CardDAV using encrypted credentials."
+            aria-label="Data protection flow: your devices connect over TLS 1.2+ to Kontax, which encrypts sensitive secrets — 2FA and sync credentials — with AES-256-GCM, and syncs to Google, Outlook, and CardDAV using encrypted credentials."
           >
             <div className="sp-flow__node">
               <div className="sp-flow__icon" aria-hidden="true">
@@ -131,7 +131,7 @@ export default function SecurityPage() {
                 </svg>
               </div>
               <div className="sp-flow__label">Kontax</div>
-              <div className="sp-flow__sub">Encrypted at rest · AES-256</div>
+              <div className="sp-flow__sub">Secrets encrypted · AES-256-GCM</div>
             </div>
             <div className="sp-flow__edge" aria-hidden="true">
               <span className="sp-flow__pill">Encrypted tokens</span>
@@ -163,10 +163,11 @@ export default function SecurityPage() {
             <span className="sp-cluster__kicker">
               <b>01</b> · Encryption
             </span>
-            <h2 className="sp-cluster__title">Encrypted in transit and at rest</h2>
+            <h2 className="sp-cluster__title">Encrypted in transit, secrets sealed at rest</h2>
             <p className="sp-cluster__lede">
-              From the moment a request leaves your device to the moment it&apos;s written
-              to disk, your contacts are encrypted.
+              Every request is encrypted in transit, and the credentials that could unlock
+              your accounts — your 2FA secret, your sync credentials — are sealed before they
+              ever touch disk.
             </p>
           </div>
           <div className="sp-sec-grid">
@@ -178,16 +179,18 @@ export default function SecurityPage() {
                   <path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
                 </svg>
               </div>
-              <h3 className="sp-scard__h">Encrypted at rest</h3>
+              <h3 className="sp-scard__h">Sensitive secrets, sealed</h3>
               <p className="sp-scard__p">
-                Your contacts live in a managed PostgreSQL database with encryption at the
-                storage layer. Sensitive fields go further — your TOTP secret is sealed with{" "}
-                <code>AES-256</code> before it ever touches disk, and backups carry the same
-                encryption.
+                Your contacts live in a PostgreSQL database on our own servers — not a
+                third-party managed database. Your most sensitive secrets go further: your
+                2FA secret and your sync credentials (CardDAV, Google, Outlook) are each sealed
+                with <code>AES-256-GCM</code> before they ever touch disk, so they&apos;re
+                never readable from a raw database or backup copy. Nightly backups are encrypted
+                too.
               </p>
               <div className="sp-scard__chips">
-                <span className="sp-techchip"><span className="sp-techchip__dot" />AES-256</span>
-                <span className="sp-techchip"><span className="sp-techchip__dot" />Encrypted backups</span>
+                <span className="sp-techchip"><span className="sp-techchip__dot" />AES-256-GCM secrets</span>
+                <span className="sp-techchip"><span className="sp-techchip__dot" />Encrypted nightly backups</span>
               </div>
             </article>
             <article className="sp-scard">
@@ -298,13 +301,14 @@ export default function SecurityPage() {
               </div>
               <h3 className="sp-scard__h">Your data, your rights</h3>
               <p className="sp-scard__p">
-                Export everything — contacts, labels, and account data — as vCard, CSV, or a full
-                GDPR archive, on any plan including Free. Account deletion runs on a clear
-                schedule, export links expire on their own, and we never sell your data or run ads
-                against it.
+                Export everything — contacts, labels, and account data — as CSV or a full GDPR
+                archive, on any plan including Free; vCard export is available on Pro. Account
+                deletion runs on a clear schedule, export links expire on their own, and we never
+                sell your data or run ads against it.
               </p>
               <div className="sp-scard__chips">
-                <span className="sp-techchip"><span className="sp-techchip__dot" />vCard &amp; CSV</span>
+                <span className="sp-techchip"><span className="sp-techchip__dot" />CSV, all plans</span>
+                <span className="sp-techchip"><span className="sp-techchip__dot" />vCard on Pro</span>
                 <span className="sp-techchip"><span className="sp-techchip__dot" />GDPR archive</span>
                 <span className="sp-techchip"><span className="sp-techchip__dot" />Scheduled deletion</span>
               </div>
