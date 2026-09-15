@@ -7,6 +7,8 @@
 
 # testing
 /coverage
+# Playwright output (traces, videos, .last-run.json) — P48-13, never commit
+/test-results/
 
 # database
 /prisma/db.sqlite

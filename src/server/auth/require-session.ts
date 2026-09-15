@@ -33,6 +33,28 @@ export type RequireSessionOptions = {
 
 type FullSession = NonNullable<Awaited<ReturnType<typeof auth>>>;
 
+// --- Test-only session override ---------------------------------------------
+//
+// tests/node/authz/* exercises real server actions and route handlers as a
+// specific user, but has no `AUTH_SECRET`-signed NextAuth cookie to construct
+// (see roadmap/runbooks/testing-and-critical-paths.md — "Authorization
+// regression suite"). Rather than mock cookies or the whole `next-auth`
+// module, the harness swaps the session resolver at this one seam. The
+// override is `null` by default and application code never calls the setter,
+// so a normal request is unaffected.
+let sessionOverrideForTests: (() => Promise<FullSession | null>) | null = null;
+
+/**
+ * TEST-ONLY. Set (or, with `null`, clear) the session `requireSession()` /
+ * `requireUserId()` resolve to, in place of the real `auth()`. Exported only
+ * for `tests/node/authz` — do not call this from application code.
+ */
+export function __setSessionOverrideForTests(
+  resolver: (() => Promise<FullSession | null>) | null,
+): void {
+  sessionOverrideForTests = resolver;
+}
+
 /**
  * Resolve the current session or throw a `SessionError`.
  *
@@ -63,7 +85,7 @@ type FullSession = NonNullable<Awaited<ReturnType<typeof auth>>>;
  *   the next request rather than at the next sign-in.
  */
 export async function requireSession(opts: RequireSessionOptions = {}): Promise<FullSession> {
-  const session = await auth();
+  const session = sessionOverrideForTests ? await sessionOverrideForTests() : await auth();
   if (!session?.user?.id) throw new SessionError("UNAUTHENTICATED");
   if (opts.write) {
     if (session.impersonatedBy) throw new SessionError("IMPERSONATION_READ_ONLY");

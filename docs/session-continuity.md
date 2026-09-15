@@ -22,6 +22,34 @@ Runs on every request before any page code:
 
 Only fires when the middleware passed through (case 6 above — session cookie present but undecodable at the edge). Pages call `redirectToLogin(fallbackPath)` from `~/server/auth/require-page-auth`, which reads the `x-pathname` header set by the middleware so that `?next=` reflects the real URL, not a hardcoded string.
 
+**Layer 3 — `requireSession` (server actions and API routes)**
+
+Middleware only sees a cookie's presence, not its claims (`AUTH_SECRET` isn't
+available at Edge build time — see the comment in `src/middleware.ts`), and
+page components render read-only data that the pendingDeletion grace period
+is supposed to allow. The actual write gate lives in
+`src/server/auth/require-session.ts`:
+
+- `requireSession()` / `requireUserId()` call `auth()` — which already
+  returns `null` for a pending-TOTP session (P48-01), so an unauthenticated
+  caller throws `SessionError("UNAUTHENTICATED")`.
+- `requireSession({ write: true })` additionally throws
+  `IMPERSONATION_READ_ONLY` for an admin's impersonation session and
+  `PENDING_DELETION` for an account in its deletion grace period (P48-02,
+  P48-06) — every mutating server action and API route handler calls this
+  form instead of hand-rolling a `session?.user?.id` check.
+- `scripts/check-session-guard.mjs` (`npm run check:session-guard`, wired
+  into CI) statically greps `src/app/actions/*.ts` and
+  `src/app/api/**/route.ts` for a raw `await auth()` outside a small,
+  documented allowlist, so the old per-file pattern this replaced (P48-06:
+  17 of 30 action files reimplemented the check inline; 11 skipped it
+  entirely) cannot silently reappear.
+
+So: middleware is the fast, coarse gate (cookie present or not); `auth()` /
+`requireSession()` in the Node runtime is the only place that actually
+decodes the JWT, checks `sessionVersion`/revocation, and enforces 2FA,
+impersonation and pending-deletion — every other layer defers to it.
+
 ---
 
 ## Redirect catalogue

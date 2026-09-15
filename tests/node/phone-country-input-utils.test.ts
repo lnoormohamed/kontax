@@ -16,5 +16,5 @@ test("phone input parsing keeps the detected country for international numbers",
 test("replacing the calling code keeps the local digits intact", () => {
   const nextValue = replacePhoneCallingCode("+84 000 079 190", "971");
 
-  assert.equal(nextValue, "+971 0079190");
+  assert.equal(nextValue, "+971 000079190");
 });
