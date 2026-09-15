@@ -52,6 +52,11 @@ let sessionOverrideForTests: (() => Promise<FullSession | null>) | null = null;
 export function __setSessionOverrideForTests(
   resolver: (() => Promise<FullSession | null>) | null,
 ): void {
+  // Belt and braces: the hook is unreachable over HTTP (module import only),
+  // but it must never be able to arm in a production process either.
+  if (process.env.NODE_ENV === "production" || process.env.KONTAX_DEPLOY_ENV === "production") {
+    throw new Error("__setSessionOverrideForTests is disabled in production");
+  }
   sessionOverrideForTests = resolver;
 }
 
