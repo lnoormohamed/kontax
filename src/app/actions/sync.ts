@@ -1802,7 +1802,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
       }
       await tx.syncContactLink.update({
         where: { id: conflict.syncContactLinkId! },
-        data: { photoShadow: reseed as unknown as Prisma.InputJsonValue },
+        data: { photoShadow: reseed },
       });
     });
   } else if (input.resolutionStrategy === "KEEP_LOCAL") {
@@ -1839,7 +1839,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
           remoteETag: pushed.etag,
           capabilityProfileId: capabilityProfile.id,
-          supportedFieldShadow: localShadow as Prisma.InputJsonValue,
+          supportedFieldShadow: localShadow,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1882,7 +1882,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
               capabilityProfile,
             ),
             capabilityProfile,
-          ) as Prisma.InputJsonValue,
+          ),
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -1952,7 +1952,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
               capabilityProfile,
             ),
             capabilityProfile,
-          ) as Prisma.InputJsonValue,
+          ),
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -2106,7 +2106,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
           remoteETag: pushed.etag,
           capabilityProfileId: capabilityProfile.id,
-          supportedFieldShadow: mergedShadow as Prisma.InputJsonValue,
+          supportedFieldShadow: mergedShadow,
           remoteDeletedAt: null,
           tombstonedAt: null,
           lastErrorCode: null,
@@ -2551,7 +2551,7 @@ export const updateSyncAccountSettings = async (
                     capabilityProfile,
                   ),
                   capabilityProfile,
-                ) as Prisma.InputJsonValue,
+                ),
                 lastSyncedAt: resolvedAt,
               },
             });

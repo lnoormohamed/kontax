@@ -128,7 +128,7 @@ function Avatar({ name, size = 42 }: { name: string; size?: number }) {
 
 function getContactPhoneDisplay(
   contact: MergeReviewContact,
-  peerPhone?: string | null | undefined,
+  peerPhone?: string | null  ,
 ) {
   const phoneContext = getPhoneValueContext(contact.phone, {
     peerValue: peerPhone,
@@ -1728,6 +1728,10 @@ export function MergeReview({
                       <span style={{ fontSize: 11, fontWeight: 600, color: on ? C.blue : C.mute }}>
                         {lbl}
                       </span>
+                      {/* P48-12: next/image's Image Optimization API is intentionally
+                          disabled repo-wide (images.unoptimized in next.config.js) —
+                          plain <img> is the deliberate choice. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={url}
                         alt={`${lbl} photo`}

@@ -37,7 +37,14 @@
     "**/*.cjs",
     "**/*.js",
     ".next/types/**/*.ts",
-    ".next-verify/types/**/*.ts"
+    ".next-verify/types/**/*.ts",
+    // P48-13: TypeScript's glob matching skips any path with a dot-prefixed
+    // segment by default, so the bare "**/*.ts" pattern above silently never
+    // covered the CardDAV well-known redirect route — `tsc` type-checked
+    // around it and typed-lint rules (via ESLint's projectService) failed to
+    // parse it ("was not found by the project service"). Needs an explicit
+    // entry; any future route under a dot-directory needs the same treatment.
+    "src/app/.well-known/**/*.ts"
   ],
   "exclude": ["node_modules", "generated"]
 }

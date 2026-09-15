@@ -170,7 +170,7 @@ const nameTokensCompatible = (leftToken: string, rightToken: string) => {
   }
   if (
     (leftToken.length === 1 || rightToken.length === 1) &&
-    leftToken.charAt(0) === rightToken.charAt(0)
+    leftToken.startsWith(rightToken.charAt(0))
   ) {
     return true;
   }

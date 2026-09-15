@@ -140,7 +140,11 @@ function mapSupportCaseAuditEvent(row: {
             : details.clearedAssignment
               ? "Support case unassigned"
               : "Support case updated",
-    body: reason || title || null,
+    // Not `reason ?? title ?? null`: the `.join(" · ")` branch above can
+    // legitimately produce "" (both status and severity absent), which must
+    // still fall through to `title` — `??` would let "" through unchanged.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    body: reason ? reason : title ? title : null,
     actor: actorLabel(row.admin),
     href: supportCaseId ? `/admin/support?q=${encodeURIComponent(supportCaseId)}` : "/admin/support",
     tone: status === "RESOLVED" ? "success" : severity === "CRITICAL" ? "danger" : "info",

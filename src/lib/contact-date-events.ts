@@ -68,7 +68,7 @@ export function buildUpcomingContactDates(
   (input.significantDates ?? []).forEach((entry, index) => {
     const date = entry?.date?.trim();
     if (!date) return;
-    const label = entry.label?.trim() || "Significant date";
+    const label = entry.label?.trim() ? entry.label.trim() : "Significant date";
     pushIfValid(`significant-${index}`, label, date);
   });
 

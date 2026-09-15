@@ -1,5 +1,5 @@
 import type { Prisma, PrismaClient } from "../../generated/prisma";
-import { SharedBookPermissionKind } from "../../generated/prisma";
+import { type SharedBookPermissionKind } from "../../generated/prisma";
 import { db } from "~/server/db";
 
 type AuditWriter = Prisma.TransactionClient | Pick<PrismaClient, "sharedBookPermissionAuditEvent">;

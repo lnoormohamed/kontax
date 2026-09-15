@@ -25,8 +25,6 @@ type CreateActionState =
     }
   | null;
 
-const initialState: CreateActionState = null;
-
 const inferPlatformGlyph = (label: string) => {
   const value = label.toLowerCase();
   if (value.includes("iphone") || value.includes("ipad") || value.includes("ios")) {

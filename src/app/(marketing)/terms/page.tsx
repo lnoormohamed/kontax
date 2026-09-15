@@ -8,7 +8,16 @@
 import type { Metadata } from "next";
 import "../_components/doc.css";
 
-const LAST_UPDATED = "2026-06-14";
+// P48-13: was declared but never read — the date below was a hardcoded
+// literal that could silently drift from this constant. Now the single
+// source of truth for both.
+const LAST_UPDATED = new Date("2026-06-14T00:00:00Z");
+const LAST_UPDATED_LABEL = LAST_UPDATED.toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 export const metadata: Metadata = {
   title: "Terms of Service — Kontax",
@@ -37,7 +46,7 @@ export default function TermsPage() {
   return (
     <div className="doc-wrap">
       <h1 className="doc-title">Terms of Service</h1>
-      <p className="doc-meta">Last updated: 14 June 2026</p>
+      <p className="doc-meta">Last updated: {LAST_UPDATED_LABEL}</p>
 
       <div className="doc-body">
 

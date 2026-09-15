@@ -166,7 +166,17 @@ eq("shared photo stored once (dedup)", mediaNames, [`${ARCHIVE_MEDIA_DIR}${PHOTO
 check("optional vcards/ fallback present", names.includes("vcards/contacts.vcf"));
 
 // ── manifest (§7.2) ───────────────────────────────────────────────────────────
-const manifest = JSON.parse(zip.getEntry(ARCHIVE_MANIFEST_NAME)!.getData().toString("utf8"));
+// Loose structural type for this selftest's own JSON.parse output — just
+// enough shape to type-check the assertions below without smuggling `any`
+// through every property access. `[key: string]: unknown` covers the
+// namespace-prefixed extension keys read via `ext(...)`.
+type ArchiveManifestShape = {
+  "@type": string;
+  counts: unknown;
+  integrity: { algorithm: string; entries: Array<{ path: string; sha256: string; bytes: number }> };
+  [key: string]: unknown;
+};
+const manifest = JSON.parse(zip.getEntry(ARCHIVE_MANIFEST_NAME)!.getData().toString("utf8")) as ArchiveManifestShape;
 eq("manifest @type", manifest["@type"], ARCHIVE_MANIFEST_TYPE);
 eq("manifest formatVersion", manifest[FORMAT_VERSION_KEY], "1.0");
 eq("manifest counts", manifest.counts, { contacts: 2, photos: 1 });
@@ -185,7 +195,7 @@ check("integrity excludes manifest.json", !integrityPaths.includes(ARCHIVE_MANIF
 // ── schema validity (§7.2 / §2–§6), lightweight structural check ──────────────
 const manifestOk =
   manifest["@type"] === "getkontax.com:Archive" &&
-  /^1\.[0-9]+$/.test(manifest[FORMAT_VERSION_KEY]) &&
+  /^1\.[0-9]+$/.test(String(manifest[FORMAT_VERSION_KEY])) &&
   typeof manifest[ext("exportedAt")] === "string" &&
   Array.isArray(manifest.integrity.entries) &&
   manifest.integrity.entries.every(
@@ -194,7 +204,18 @@ const manifestOk =
   );
 check("manifest validates against kontax-archive.v1 schema shape", manifestOk);
 
-const cardDoc = JSON.parse(zip.getEntry("contacts/0001.json")!.getData().toString("utf8"));
+type ArchiveCardShape = {
+  "@type": string;
+  version: string;
+  uid: string;
+  created: string;
+  updated: string;
+  media?: Record<string, { uri: string }>;
+  [key: string]: unknown;
+};
+const cardDoc = JSON.parse(
+  zip.getEntry("contacts/0001.json")!.getData().toString("utf8"),
+) as ArchiveCardShape;
 const cardOk =
   cardDoc["@type"] === "Card" &&
   cardDoc.version === "1.0" &&
@@ -203,7 +224,7 @@ const cardOk =
   typeof cardDoc.updated === "string" &&
   cardDoc[FORMAT_VERSION_KEY] === "1.0" &&
   typeof cardDoc[ext("exportedAt")] === "string" &&
-  cardDoc.media?.["m1"]?.uri === `${ARCHIVE_MEDIA_DIR}${PHOTO_SHA}.${PHOTO_EXT}`; // photo by relative ref (§3.6)
+  cardDoc.media?.m1?.uri === `${ARCHIVE_MEDIA_DIR}${PHOTO_SHA}.${PHOTO_EXT}`; // photo by relative ref (§3.6)
 check("contact document validates against kontax-contact.v1 schema shape", cardOk);
 
 // ── integrity verification (§7.3) ─────────────────────────────────────────────
@@ -302,7 +323,7 @@ const streamParsed = parseKontaxArchive(streamed);
 eq("streamed archive round-trips both contacts", streamParsed.contacts.length, 2);
 check(
   "streamed archive recovers the photo byte-identically",
-  !!streamParsed.contacts[0]!.photo && streamParsed.contacts[0]!.photo!.bytes.equals(PHOTO_BYTES),
+  !!streamParsed.contacts[0]!.photo && streamParsed.contacts[0]!.photo.bytes.equals(PHOTO_BYTES),
 );
 
 // ── write the committed worked-example fixture ────────────────────────────────

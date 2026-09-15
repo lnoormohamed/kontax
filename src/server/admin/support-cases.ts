@@ -15,7 +15,7 @@ const OPEN_SUPPORT_CASE_STATUSES: AdminSupportCaseStatus[] = [
   "WAITING_ON_CUSTOMER",
   "WAITING_ON_PROVIDER",
 ];
-const SUPPORT_CASE_SUBJECT_TYPES = ["USER", "SYNC_ACCOUNT"] as const;
+type SupportCaseSubjectType = "USER" | "SYNC_ACCOUNT";
 
 export type AdminSupportCaseQueueId =
   | "open"
@@ -28,9 +28,7 @@ export type AdminSupportCaseQueueId =
   | "resolved";
 
 export type AdminSupportCaseOwnerFilter = "all" | "me" | "assigned" | "unassigned";
-export type AdminSupportCaseSubjectTypeFilter =
-  | "all"
-  | (typeof SUPPORT_CASE_SUBJECT_TYPES)[number];
+export type AdminSupportCaseSubjectTypeFilter = "all" | SupportCaseSubjectType;
 
 const SUPPORT_CASE_QUEUES: AdminSupportCaseQueueId[] = [
   "open",
@@ -334,7 +332,9 @@ export async function loadAdminSupportCaseWorkbench(input: {
       const followUpState = followUpTone(row.nextFollowUpAt, todayStart, tomorrowStart);
       const target =
         row.subjectType === "SYNC_ACCOUNT"
-          ? syncAccount?.label?.trim() || syncAccount?.user.email || `Sync account ${row.subjectId.slice(0, 8)}`
+          ? syncAccount?.label?.trim()
+            ? syncAccount.label.trim()
+            : (syncAccount?.user.email ?? `Sync account ${row.subjectId.slice(0, 8)}`)
           : row.targetUser?.email ??
             row.targetUser?.name?.trim() ??
             `${subjectTypeLabel(row.subjectType)} ${row.subjectId.slice(0, 8)}`;

@@ -590,7 +590,7 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
     where: { userId },
     select: { provider: true, providerCustomerId: true },
   });
-  if (!customer || customer.provider !== "STRIPE") return false;
+  if (customer?.provider !== "STRIPE") return false;
   if (isLegacyManualSubscription(customer.providerCustomerId)) return false;
 
   const stripe = getStripeClient();
@@ -631,12 +631,12 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
   if (!stripeSubscription) return false;
 
   await db.$transaction(async (tx) => {
-    if (stripeSubscription!.status === "canceled") {
-      await handleSubscriptionDeleted(stripeSubscription!, tx);
+    if (stripeSubscription.status === "canceled") {
+      await handleSubscriptionDeleted(stripeSubscription, tx);
       return;
     }
 
-    await handleSubscriptionUpserted(stripeSubscription!, tx);
+    await handleSubscriptionUpserted(stripeSubscription, tx);
   });
 
   return true;

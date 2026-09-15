@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 
 import { getClientIp } from "~/lib/client-ip";
 import { db } from "~/server/db";
-import type { Prisma } from "../../../generated/prisma";
 
 // P21-02: canonical admin action keys. Strings (not a Prisma enum) so new actions
 // can ship without a migration; the UI maps these to labels + tones.
@@ -95,7 +94,7 @@ export async function emitAdminEvent(args: {
         action: args.action,
         targetUserId: args.targetUserId ?? null,
         targetEmail: args.targetEmail ?? null,
-        details: details as Prisma.InputJsonValue,
+        details: details,
         ipAddress: await clientIp(),
       },
     });

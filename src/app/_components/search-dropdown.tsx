@@ -172,7 +172,7 @@ export function SearchDropdown({ labelRegistry = [] }: { labelRegistry?: LabelEn
       clearAndClose();
       router.push(`/contacts/${result.id}`);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [q, router],
   );
 

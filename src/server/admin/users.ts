@@ -10,7 +10,6 @@ import {
   getLifecycleAccessPolicy,
   getUserBillingContext,
 } from "~/server/billing";
-import { listUserSupportTimeline } from "~/server/admin/support-notes";
 import { listSupportCasesForSubject } from "~/server/admin/support-cases";
 import { getSyncAccountOperationalHealth, getSyncErrorSupportBucket } from "~/server/sync-health";
 import {
@@ -495,7 +494,7 @@ export async function loadUserDetail(userId: string) {
       subscriptionStatus: sub?.status ?? "FREE",
       trialEndsAt: sub?.trialEndsAt ? fmtDate(sub.trialEndsAt) : null,
       periodEndsAt: sub?.currentPeriodEnd ? fmtDate(sub.currentPeriodEnd) : null,
-      overrideReason: user.planOverrideReason?.trim() || null,
+      overrideReason: user.planOverrideReason?.trim() ? user.planOverrideReason.trim() : null,
       overrideAt: user.planOverriddenAt ? fmtDate(user.planOverriddenAt) : null,
       scheduledDeleteAt: user.scheduledDeleteAt ? fmtDate(user.scheduledDeleteAt) : null,
       syncAllowanceUsed: syncUsed,

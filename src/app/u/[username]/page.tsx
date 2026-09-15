@@ -58,6 +58,10 @@ function CardNav() {
 function Avatar({ name, avatarUrl, size = 88 }: { name: string; avatarUrl: string | null; size?: number }) {
   if (avatarUrl) {
     return (
+      // P48-12: next/image's Image Optimization API is intentionally disabled
+      // repo-wide (images.unoptimized in next.config.js) — plain <img> is the
+      // deliberate choice.
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={avatarUrl}
         alt={name}

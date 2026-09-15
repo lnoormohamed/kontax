@@ -102,7 +102,7 @@ export async function overridePlan(input: {
     action: ADMIN_ACTIONS.USER_PLAN_OVERRIDE,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() || null },
+    details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
@@ -147,7 +147,7 @@ export async function suspendAccount(input: { userId: string; reason: string; re
     action: ADMIN_ACTIONS.USER_SUSPENDED,
     targetUserId: target.id,
     targetEmail: target.email,
-    details: { reason, reasonCategory: input.reasonCategory?.trim() || null },
+    details: { reason, reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
@@ -180,7 +180,7 @@ export async function unsuspendAccount(input: { userId: string; reason?: string;
     targetEmail: target.email,
     details: {
       reason: input.reason?.trim() ? input.reason.trim() : null,
-      reasonCategory: input.reasonCategory?.trim() || null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
     },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
@@ -223,7 +223,7 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
     details: {
       reason,
       purgeAt: scheduledDeleteAt.toISOString(),
-      reasonCategory: input.reasonCategory?.trim() || null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
     },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
@@ -533,7 +533,7 @@ export async function startImpersonation(input: { userId: string; reason: string
     details: {
       reason,
       readOnly: true,
-      reasonCategory: input.reasonCategory?.trim() || null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
       expiresInMinutes: 30,
     },
     actorContext: { tier: admin.tier, policySource: admin.policySource },

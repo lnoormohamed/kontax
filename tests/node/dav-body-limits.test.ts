@@ -17,7 +17,7 @@ import {
 const legacyExtractRequestedPropNames = (body: string) => {
   if (!body.trim()) return null;
 
-  const propMatch = body.match(/<[^>]*:?prop\b[^>]*>([\s\S]*?)<\/[^>]*:?prop>/i);
+  const propMatch = /<[^>]*:?prop\b[^>]*>([\s\S]*?)<\/[^>]*:?prop>/i.exec(body);
   const propBody = propMatch?.[1];
 
   if (!propBody) return null;

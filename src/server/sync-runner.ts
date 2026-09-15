@@ -1746,7 +1746,7 @@ export const runQueuedSyncJobs = async ({
               remoteUid: created.remoteUid,
               remoteETag: created.remoteETag,
               capabilityProfileId: capabilityProfile.id,
-              supportedFieldShadow: created.supportedFieldShadow as Prisma.InputJsonValue,
+              supportedFieldShadow: created.supportedFieldShadow,
               lastSyncedAt: created.lastSyncedAt,
             },
             update: {
@@ -1754,7 +1754,7 @@ export const runQueuedSyncJobs = async ({
               remoteUid: created.remoteUid,
               remoteETag: created.remoteETag,
               capabilityProfileId: capabilityProfile.id,
-              supportedFieldShadow: created.supportedFieldShadow as Prisma.InputJsonValue,
+              supportedFieldShadow: created.supportedFieldShadow,
               remoteDeletedAt: null,
               tombstonedAt: null,
               lastErrorCode: null,
@@ -1831,7 +1831,7 @@ export const runQueuedSyncJobs = async ({
               supportedFieldShadow: buildProviderSupportedContactShadow(
                 cardDavCardToPortable(card),
                 capabilityProfile,
-              ) as Prisma.InputJsonValue,
+              ),
               // Use the contact's actual updatedAt (set by Prisma during create) so that
               // subsequent syncs don't falsely detect all bootstrapped contacts as localChanged.
               lastSyncedAt: createdContact.updatedAt,
@@ -1906,7 +1906,7 @@ export const runQueuedSyncJobs = async ({
                     excludedFields,
                   ),
                   capabilityProfile,
-                ) as Prisma.InputJsonValue,
+                ),
                 remoteDeletedAt: null,
                 tombstonedAt: null,
                 lastErrorCode: null,
@@ -1979,7 +1979,7 @@ export const runQueuedSyncJobs = async ({
                         excludedFields,
                       ),
                       capabilityProfile,
-                    ) as Prisma.InputJsonValue,
+                    ),
                   }
                 : {}),
               lastSyncedAt: now,
@@ -2031,7 +2031,7 @@ export const runQueuedSyncJobs = async ({
               remoteUid: refresh.remoteUid,
               remoteETag: refresh.remoteETag,
               capabilityProfileId: capabilityProfile.id,
-              supportedFieldShadow: refresh.supportedFieldShadow as Prisma.InputJsonValue,
+              supportedFieldShadow: refresh.supportedFieldShadow,
               remoteDeletedAt: null,
               tombstonedAt: null,
               lastErrorCode: null,
@@ -2078,7 +2078,6 @@ export const runQueuedSyncJobs = async ({
         });
         const queueFull = openConflictCount >= MANUAL_CONFLICT_QUEUE_LIMIT;
 
-        const totalPushed = pushedLinks.length + deletedLinkIds.length;
         await tx.syncJob.update({
           where: { id: job.id },
           data: {
@@ -2210,7 +2209,11 @@ export const runQueuedSyncJobs = async ({
                   excludedFields,
                 ),
                 capabilityProfile,
-                hrefOverride: link.remoteHref || undefined,
+                // Not `link.remoteHref ?? undefined`: an empty string is a
+                // possible (if degenerate) stored value and must still be
+                // treated as "no override", same as null/undefined.
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                hrefOverride: link.remoteHref ? link.remoteHref : undefined,
                 photoBase64,
               });
               return res.etag;

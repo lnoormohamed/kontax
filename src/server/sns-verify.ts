@@ -102,6 +102,17 @@ const fetchSigningCert = async (url: string): Promise<string | null> => {
   return pem;
 };
 
+// AWS SNS message fields are always strings, but `msg` is typed as
+// Record<string, unknown> defensively. `String(value)` on a stray object
+// would silently produce the useless "[object Object]" instead of a value
+// that visibly (and correctly) fails signature verification, so numbers/
+// booleans stringify normally and anything else falls back to JSON.
+const stringifyForSigning = (value: unknown): string => {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  return JSON.stringify(value);
+};
+
 const buildStringToSign = (msg: SnsMessage, type: string): string | null => {
   const keys = SIGNABLE_KEYS[type];
   if (!keys) return null;
@@ -109,7 +120,7 @@ const buildStringToSign = (msg: SnsMessage, type: string): string | null => {
   for (const key of keys) {
     const value = msg[key];
     if (value === undefined || value === null) continue; // optional (e.g. Subject)
-    out += `${key}\n${String(value)}\n`;
+    out += `${key}\n${stringifyForSigning(value)}\n`;
   }
   return out;
 };

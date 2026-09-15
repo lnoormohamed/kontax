@@ -75,9 +75,9 @@ const config = {
   },
   // P48-12: don't advertise the framework on every response.
   poweredByHeader: false,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // P48-13: lint debt is cleared and `npm run lint` (eslint .) is now a
+  // separate, explicit CI gate (.github/workflows/repo-tests.yml) — no need
+  // for `next build` to silently swallow lint errors anymore.
   async headers() {
     return [
       {

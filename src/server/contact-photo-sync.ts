@@ -20,7 +20,6 @@ import {
 } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
-import { getAvatarThumbUrl } from "~/lib/avatar-thumb";
 import { fetchExternalImage } from "~/server/safe-image-fetch";
 
 // ── Canonical form ─────────────────────────────────────────────────────────
@@ -379,7 +378,7 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
   let canonicalLocal: NormalizedPhoto | null = null;
   let localMatchesShadow = false;
   if (hasLocalPhoto) {
-    if (shadow && avatarUrl === shadow.localAvatarUrl) {
+    if (avatarUrl === shadow?.localAvatarUrl) {
       localMatchesShadow = true;
     } else {
       const bytes = await loadAvatarBytesSafe(avatarUrl);
@@ -406,7 +405,7 @@ export async function reconcileContactPhoto(input: PhotoReconcileInput): Promise
         if (local === "changed" && remoteState === "changed" && canonicalLocal) {
           const raw = await input.loadRemoteBytes();
           const remoteNorm = raw ? await normalizeContactPhoto(raw) : null;
-          if (remoteNorm && remoteNorm.sha256 === canonicalLocal.sha256) {
+          if (remoteNorm?.sha256 === canonicalLocal.sha256) {
             return {
               action: "noop",
               shadow: {

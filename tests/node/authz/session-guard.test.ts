@@ -12,7 +12,6 @@ import {
   isSessionError,
   requireSession,
   requireUserId,
-  type SessionError,
 } from "../../../src/server/auth/require-session";
 import { DEFAULT_PREFERENCES } from "../../../src/lib/preferences-shared";
 

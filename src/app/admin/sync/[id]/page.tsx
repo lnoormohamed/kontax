@@ -79,6 +79,10 @@ export default async function AdminSyncConnectionDetailPage({
       />
       <div className="adm-content">
         <div className="ad-page">
+          {/* Boolean "is any warning signal present" across an object, a possibly-empty
+              string and an already-boolean comparison — not a `??` fallback-selection
+              chain, so `||` (truthiness across mixed types) is the correct operator. */}
+          {/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */}
           {(d.capabilityNotice || d.lastErrorMessage || d.invariants.length > 0) && (
             <div
               className={"ad-flag-banner " + (d.healthToneValue === "action" || d.invariants.length > 0 ? "ad-flag-banner--red" : "ad-flag-banner--amber")}
@@ -213,7 +217,7 @@ export default async function AdminSyncConnectionDetailPage({
                   <KV k="Retired reason" v={d.retiredReason ?? "—"} />
                   <KV k="Remote CTag" v={d.remoteCTag ?? "—"} />
                 </div>
-                {(d.lineage.replaces || d.lineage.replacedBy) && (
+                {(d.lineage.replaces ?? d.lineage.replacedBy) && (
                   <div className="ad-support-list" style={{ marginTop: 14 }}>
                     {d.lineage.replaces ? (
                       <Link href={`/admin/sync/${d.lineage.replaces.id}`} className="ad-support-list__row">

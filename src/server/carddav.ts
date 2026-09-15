@@ -631,8 +631,12 @@ const extractCardDavPhoto = (lines: VCardLine[]): CardDavRawPhoto | null => {
   const raw = photo.value.trim();
 
   const dataUri = /^data:([^;,]*)(;base64)?,(.*)$/is.exec(raw);
-  if (dataUri && dataUri[2]) {
-    return { kind: "inline", mediaType: dataUri[1] || mediaFromType, base64: dataUri[3] ?? "" };
+  if (dataUri?.[2]) {
+    // Not `dataUri[1] ?? mediaFromType`: the regex group matches an empty
+    // string for `data:;base64,...` (no media type given), which must still
+    // fall back to mediaFromType — `??` would let "" through unchanged.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    return { kind: "inline", mediaType: dataUri[1] ? dataUri[1] : mediaFromType, base64: dataUri[3] ?? "" };
   }
   if (encoding.includes("B") || encoding.includes("BASE64")) {
     return { kind: "inline", mediaType: mediaFromType, base64: raw };

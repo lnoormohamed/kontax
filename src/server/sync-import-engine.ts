@@ -276,7 +276,7 @@ export const applyRemoteToContact = async (
         remoteHref: remoteUid,
         remoteETag: etag,
         capabilityProfileId: account.capabilityProfile.id,
-        supportedFieldShadow: supportedFieldShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: supportedFieldShadow,
         remoteDeletedAt: null,
         tombstonedAt: null,
         lastErrorCode: null,
@@ -511,7 +511,7 @@ const createContact = async (
         remoteUid: item.remoteUid,
         remoteETag: item.etag,
         capabilityProfileId: account.capabilityProfile.id,
-        supportedFieldShadow: supportedFieldShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: supportedFieldShadow,
         lastSyncedAt: now,
       },
     });
@@ -693,7 +693,7 @@ export const importRemoteContactBatch = async (
       data: {
         remoteETag: item.etag,
         capabilityProfileId: account.capabilityProfile.id,
-        supportedFieldShadow: remoteSupportedShadow as Prisma.InputJsonValue,
+        supportedFieldShadow: remoteSupportedShadow,
         lastSyncedAt: now,
       },
     });

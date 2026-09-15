@@ -113,7 +113,7 @@ test("session validation cache round-trips, expires via SETEX, invalidates by sc
   // SETEX carried the 45s TTL
   const setex = commandLog.find((c) => c[0]!.toUpperCase() === "SETEX");
   assert.ok(setex, "SETEX issued");
-  assert.equal(setex![2], "45");
+  assert.equal(setex[2], "45");
 
   // targeted invalidation removes one session, leaves the other
   await writeSessionValidation("userA", "sid2", snapshot);

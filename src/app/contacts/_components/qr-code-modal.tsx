@@ -65,7 +65,7 @@ export function QrCodeModal(props: QrCodeModalProps) {
     return () => {
       active = false;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [props.contactId, isDirectUrl]);
 
   // Render the QR once we have a URL and the canvas is mounted.

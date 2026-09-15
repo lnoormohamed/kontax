@@ -430,7 +430,7 @@ export const transferTeamOwnership = async (formData: FormData) => {
       where: { id: groupId },
       select: { id: true, ownerId: true, type: true },
     });
-    if (!group || group.type !== "TEAM") throw new Error("Team not found.");
+    if (group?.type !== "TEAM") throw new Error("Team not found.");
     if (group.ownerId !== userId) {
       throw new Error("Only the owner can transfer ownership.");
     }
@@ -446,7 +446,7 @@ export const transferTeamOwnership = async (formData: FormData) => {
     }
 
     const newOwner = await tx.groupMember.findUnique({ where: { id: newOwnerMemberId } });
-    if (!newOwner || newOwner.groupId !== groupId) throw new Error("Member not found.");
+    if (newOwner?.groupId !== groupId) throw new Error("Member not found.");
     if (newOwner.inviteStatus !== "ACCEPTED" || !newOwner.userId) {
       throw new Error("The new owner must be an active team member.");
     }

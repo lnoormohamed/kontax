@@ -261,7 +261,7 @@ export async function processKontaxExportJob(jobId: string): Promise<void> {
               where: { id: jobId },
               select: { status: true },
             });
-            if (!current || current.status !== "PROCESSING") {
+            if (current?.status !== "PROCESSING") {
               throw new JobCancelledError();
             }
             await db.kontaxExportJob.update({
