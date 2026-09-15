@@ -8,14 +8,17 @@ import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { requireUserId } from "~/server/auth/require-session";
 import {
+  assertCanCreateContactsTx,
   assertCanLiveShare,
   assertCanStaticShare,
   getUserBillingContext,
+  lockUserForPlanCheck,
 } from "~/server/billing";
 import ShareInvite from "~/emails/share-invite";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { createNotification } from "~/server/notifications";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { renderEmail } from "~/server/render-email";
 
 // Notify the recipient by email (P12-06 / P20-06). No-op when SES isn't
@@ -40,9 +43,15 @@ const sendShareInviteEmail = async (opts: {
       actionUrl: dest,
     }),
   );
+  // P48-17: the sender's display name is arbitrary, user-controlled text (up
+  // to 120 chars) — it used to sit directly in the email Subject header,
+  // letting any account use Kontax's transactional sender as a relay for
+  // attacker-chosen subject lines. The name still appears, but only in the
+  // rendered HTML/text body (see ShareInvite's heading), where it renders as
+  // plain content rather than a mail header.
   await sendEmail({
     to: opts.recipientEmail,
-    subject: `${opts.ownerName} shared a contact with you on Kontax`,
+    subject: "Someone shared a contact with you on Kontax",
     html,
     text,
   });
@@ -237,6 +246,13 @@ export const createStaticShare = async (formData: FormData) => {
     throw new Error("Enter a recipient email.");
   }
 
+  // P48-17: share invites were unlimited — 20 recipients/hour caps Kontax's
+  // use as an open outbound-email relay.
+  const rl = await checkRateLimit(rateLimiters.shareEmail, `user:${userId}`);
+  if (!rl.allowed) {
+    throw new Error("You've sent a lot of share invites recently. Try again in a bit.");
+  }
+
   const [contact, owner, recipient] = await Promise.all([
     db.contact.findFirst({
       where: { id: contactId, userId },
@@ -361,6 +377,13 @@ export const acceptStaticShare = async (formData: FormData) => {
       throw new Error("Share not found or already handled.");
     }
 
+    // P48-17: this acceptance path created a contact for the recipient with
+    // no plan-cap check at all — a Free-plan recipient at their contact limit
+    // could accept unlimited shares. Lock + re-check inside this same
+    // transaction (already wrapping the whole accept flow).
+    await lockUserForPlanCheck(tx, userId);
+    await assertCanCreateContactsTx(tx, userId);
+
     const snap = share.snapshot as ShareSnapshot;
     const { ownerName, ...fields } = snap;
 
@@ -455,6 +478,13 @@ export const createLiveShare = async (formData: FormData) => {
   const recipientEmail = str(formData, "recipientEmail").toLowerCase();
   if (!contactId || !recipientEmail) {
     throw new Error("Enter a recipient email.");
+  }
+
+  // P48-17: share invites were unlimited — 20 recipients/hour caps Kontax's
+  // use as an open outbound-email relay.
+  const rl = await checkRateLimit(rateLimiters.shareEmail, `user:${userId}`);
+  if (!rl.allowed) {
+    throw new Error("You've sent a lot of share invites recently. Try again in a bit.");
   }
 
   const [contact, owner, recipient] = await Promise.all([
@@ -562,6 +592,10 @@ export const acceptLiveShare = async (formData: FormData) => {
     if (!share?.snapshot) {
       throw new Error("Share not found or already handled.");
     }
+
+    // P48-17: see acceptStaticShare — same missing plan-cap check.
+    await lockUserForPlanCheck(tx, userId);
+    await assertCanCreateContactsTx(tx, userId);
 
     const snap = share.snapshot as ShareSnapshot;
     const { ownerName, ...fields } = snap;

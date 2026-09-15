@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Prisma } from "../../../generated/prisma";
 import { safeInternalPath } from "~/lib/safe-internal-path";
 import { requireUserId } from "~/server/auth/require-session";
-import { assertCanCreateContacts } from "~/server/billing";
+import { assertCanCreateContactsTx, lockUserForPlanCheck } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 import {
   bulkAcceptHighConfidenceForUser,
@@ -584,11 +584,7 @@ export const createContact = async (formData: FormData) => {
     }
   }
 
-  if (!bookTarget) {
-    await assertCanCreateContacts(userId);
-  }
-
-  // P18-11: resolve the user's default personal book for new private contacts
+  // P48-17: resolve the user's default personal book for new private contacts
   const { getUserDefaultBook } = await import("~/server/address-books");
   const defaultBook = !bookTarget ? await getUserDefaultBook(userId) : null;
 
@@ -609,6 +605,18 @@ export const createContact = async (formData: FormData) => {
   }
 
   const createdContact = await db.$transaction(async (tx) => {
+    // P48-17: the plan-cap check used to run before this transaction (a
+    // separate round-trip), so two concurrent creates could both read
+    // "under the cap" and both insert. Lock the user row first so a second
+    // concurrent create for the same user blocks here until the first
+    // commits, then re-check the cap inside the transaction — its count read
+    // then sees the first create's committed row. Shared/team-book targets
+    // are owned by the group owner and aren't subject to the personal cap.
+    if (!bookTarget) {
+      await lockUserForPlanCheck(tx, userId);
+      await assertCanCreateContactsTx(tx, userId);
+    }
+
     const contact = await tx.contact.create({
       data: {
         userId: bookTarget?.ownerId ?? userId,

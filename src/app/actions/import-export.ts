@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUserId } from "~/server/auth/require-session";
-import { assertCanImportContacts } from "~/server/billing";
+import { assertCanImportContactsTx, lockUserForPlanCheck } from "~/server/billing";
 import { db } from "~/server/db";
 import { parseCsvContacts } from "~/server/contact-portability";
 import { csvRowCountExceedsCap, MAX_CSV_ROWS, MAX_CSV_TEXT_LENGTH } from "~/server/import/csv-bounds";
@@ -66,31 +66,43 @@ export const importContactsCsv = async (formData: FormData) => {
       throw new Error("No importable contacts were found in that CSV file.");
     }
 
-    await assertCanImportContacts(userId, parsed.contacts.length);
+    // P48-17: count-then-insert race — lock the user row so a concurrent
+    // import (or contact create) for the same user serialises against this
+    // one, then re-check both the contact and monthly-import caps inside the
+    // same transaction as the insert.
+    const created = await db.$transaction(
+      async (tx) => {
+        await lockUserForPlanCheck(tx, userId);
+        await assertCanImportContactsTx(tx, userId, parsed.contacts.length);
 
-    const created = await db.contact.createMany({
-      data: parsed.contacts.map((contact) => ({
-        userId,
-        fullName: contact.fullName,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        phoneticFirstName: contact.phoneticFirstName,
-        phoneticLastName: contact.phoneticLastName,
-        nickname: contact.nickname,
-        email: contact.email,
-        emailAddresses: getOptionalJsonArray(contact.emailAddresses),
-        phone: contact.phone,
-        phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
-        company: contact.company,
-        phoneticCompany: contact.phoneticCompany,
-        jobTitle: contact.jobTitle,
-        website: contact.website,
-        birthday: contact.birthday,
-        address: contact.address,
-        postalAddresses: getOptionalJsonArray(contact.postalAddresses),
-        notes: contact.notes,
-      })),
-    });
+        return tx.contact.createMany({
+          data: parsed.contacts.map((contact) => ({
+            userId,
+            fullName: contact.fullName,
+            firstName: contact.firstName,
+            lastName: contact.lastName,
+            phoneticFirstName: contact.phoneticFirstName,
+            phoneticLastName: contact.phoneticLastName,
+            nickname: contact.nickname,
+            email: contact.email,
+            emailAddresses: getOptionalJsonArray(contact.emailAddresses),
+            phone: contact.phone,
+            phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
+            company: contact.company,
+            phoneticCompany: contact.phoneticCompany,
+            jobTitle: contact.jobTitle,
+            website: contact.website,
+            birthday: contact.birthday,
+            address: contact.address,
+            postalAddresses: getOptionalJsonArray(contact.postalAddresses),
+            notes: contact.notes,
+          })),
+        });
+      },
+      // MAX_CSV_ROWS (50,000) can take longer than Prisma's 5s default to
+      // insert; match the generous timeout the sync commit transaction uses.
+      { timeout: 120_000 },
+    );
 
     await db.importJob.update({
       where: { id: job.id },

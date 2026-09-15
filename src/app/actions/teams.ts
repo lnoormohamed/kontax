@@ -8,15 +8,50 @@ import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { requireUserId } from "~/server/auth/require-session";
-import { getUserBillingContext } from "~/server/billing";
+import { assertCanCreateContactsTx, getUserBillingContext, lockUserForPlanCheck } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
 import { getStripeClient } from "~/server/stripe";
 import { canEditTeamBook, getTeamGraceState } from "~/server/team-access";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000;
+
+/**
+ * P48-17 — Team role matrix (design review; product intent wasn't specified
+ * beyond "decide and document" in the ticket, so this is the decision made
+ * here — owner-only for the highest-privilege transitions, admin allowed for
+ * everything that only affects MEMBERs):
+ *
+ *   Action                                  OWNER   ADMIN   MEMBER
+ *   ------------------------------------------------------------------
+ *   Invite a MEMBER                          yes     yes     no
+ *   Invite an ADMIN                          yes     NO      no
+ *   Promote MEMBER -> ADMIN                  yes     NO      no
+ *   Demote/change another ADMIN's role       yes     NO      no  (owner's
+ *                                                                  own role
+ *                                                                  can't be
+ *                                                                  changed
+ *                                                                  here either)
+ *   Remove a MEMBER                          yes     yes     no
+ *   Remove an ADMIN                          yes     NO      no
+ *   Grant/revoke canManageBilling            yes     NO      no
+ *   Manage address books / sync accounts     yes     yes     no
+ *   Accept an invite                       must match invitedEmail
+ *                                           (case-insensitive) against the
+ *                                           accepting session's own email —
+ *                                           previously any authenticated user
+ *                                           who guessed/received the token
+ *                                           could accept someone else's invite.
+ *
+ * Rationale: an ADMIN who could promote peers to ADMIN, remove other ADMINs,
+ * or grant itself billing access could escalate to de-facto ownership
+ * (including cancelling the org's subscription) without ever holding the
+ * OWNER role. Those four transitions are therefore owner-only; everything
+ * else ADMINs already did (invite/remove MEMBERs, manage books) is unchanged.
+ */
 
 const escapeHtml = (value: string) =>
   value
@@ -150,41 +185,56 @@ export const inviteTeamMember = async (formData: FormData) => {
   }
   const team = await db.group.findUnique({
     where: { id: manageable.team.id },
-    include: { members: true, owner: { select: { name: true, email: true } } },
+    include: { owner: { select: { name: true, email: true } } },
   });
   if (!team) throw new Error("Team not found.");
 
-  const activeMembers = team.members.filter((m) => m.inviteStatus !== "DECLINED").length;
-  if (activeMembers >= team.maxMembers) {
-    throw new Error(`Your team is full (${team.maxMembers} members).`);
+  const role: "ADMIN" | "MEMBER" = str(formData, "role") === "ADMIN" ? "ADMIN" : "MEMBER";
+  // P48-17: team role matrix — only the OWNER may invite a new ADMIN. An
+  // ADMIN who could mint peer ADMINs could escalate to de-facto ownership.
+  if (role === "ADMIN" && manageable.role !== "OWNER") {
+    throw new Error("Only the team owner can invite someone as an admin.");
   }
 
   const recipient = await db.user.findUnique({ where: { email }, select: { id: true } });
-  const dupe = team.members.find(
-    (m) => m.invitedEmail === email || m.userId === recipient?.id,
-  );
-  if (dupe && dupe.inviteStatus !== "DECLINED") {
-    throw new Error("That person is already invited or a member.");
-  }
-
   const token = randomBytes(24).toString("base64url");
-  const role: "ADMIN" | "MEMBER" = str(formData, "role") === "ADMIN" ? "ADMIN" : "MEMBER";
-  const data = {
-    groupId: team.id,
-    userId: recipient?.id ?? null,
-    invitedEmail: email,
-    role,
-    inviteStatus: "PENDING" as const,
-    canEdit: true,
-    inviteToken: token,
-    inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
-    invitedByUserId: userId,
-  };
-  if (dupe) {
-    await db.groupMember.update({ where: { id: dupe.id }, data });
-  } else {
-    await db.groupMember.create({ data });
-  }
+
+  // P48-17: seat-count-then-insert race — an ADMIN and the OWNER (or two
+  // ADMINs) can invite concurrently, so the User-row lock used elsewhere
+  // doesn't serialise this (different actors). Lock the team's own Group row
+  // instead: every concurrent invite for this team blocks here regardless of
+  // which manager issues it, then its own member re-read sees prior inserts.
+  await db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM "Group" WHERE id = ${team.id} FOR UPDATE`;
+
+    const members = await tx.groupMember.findMany({ where: { groupId: team.id } });
+    const activeMembers = members.filter((m) => m.inviteStatus !== "DECLINED").length;
+    if (activeMembers >= team.maxMembers) {
+      throw new Error(`Your team is full (${team.maxMembers} members).`);
+    }
+
+    const dupe = members.find((m) => m.invitedEmail === email || m.userId === recipient?.id);
+    if (dupe && dupe.inviteStatus !== "DECLINED") {
+      throw new Error("That person is already invited or a member.");
+    }
+
+    const data = {
+      groupId: team.id,
+      userId: recipient?.id ?? null,
+      invitedEmail: email,
+      role,
+      inviteStatus: "PENDING" as const,
+      canEdit: true,
+      inviteToken: token,
+      inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
+      invitedByUserId: userId,
+    };
+    if (dupe) {
+      await tx.groupMember.update({ where: { id: dupe.id }, data });
+    } else {
+      await tx.groupMember.create({ data });
+    }
+  });
 
   const inviterName = team.owner.name?.trim() ?? team.owner.email ?? "A Kontax user";
   await sendInviteEmail({
@@ -207,6 +257,15 @@ export const acceptTeamInvite = async (formData: FormData) => {
   }
   if ((member.inviteExpiresAt?.getTime() ?? Number.POSITIVE_INFINITY) < Date.now()) {
     throw new Error("This invite has expired. Ask an admin to resend it.");
+  }
+  // P48-17: bind acceptance to the invited address — previously any signed-in
+  // user who obtained the token (a forwarded email, a shared clipboard, a
+  // guessed/leaked token) could accept someone else's team invite.
+  if (member.invitedEmail) {
+    const acceptingUser = await db.user.findUnique({ where: { id: userId }, select: { email: true } });
+    if (acceptingUser?.email.toLowerCase() !== member.invitedEmail.toLowerCase()) {
+      throw new Error("This invite was sent to a different email address. Sign in as that address to accept it.");
+    }
   }
   await db.groupMember.update({
     where: { id: member.id },
@@ -265,6 +324,13 @@ export const setTeamMemberRole = async (formData: FormData) => {
   if (role === "ADMIN" && actorRole !== "OWNER") {
     throw new Error("Only the team owner can promote a member to admin.");
   }
+  // P48-17: team role matrix — an ADMIN could otherwise demote a peer ADMIN
+  // (e.g. to remove a rival) without ever holding OWNER. Any change to an
+  // existing ADMIN's role is owner-only; only MEMBER<->MEMBER-role changes
+  // (i.e. none — MEMBER is the only non-ADMIN role) reach here for an ADMIN.
+  if (member.role === "ADMIN" && actorRole !== "OWNER") {
+    throw new Error("Only the team owner can change an admin's role.");
+  }
   if (role !== "ADMIN" && role !== "MEMBER") {
     throw new Error("Unknown role.");
   }
@@ -276,9 +342,15 @@ export const removeTeamMember = async (formData: FormData) => {
   const userId = await requireUserId({ write: true });
   await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
-  const { member } = await requireManagedMember(userId, memberId);
+  const { member, actorRole } = await requireManagedMember(userId, memberId);
   if (member.role === "OWNER") {
     throw new Error("The owner can't be removed. Transfer ownership or delete the team.");
+  }
+  // P48-17: team role matrix — only the OWNER may remove an ADMIN (an ADMIN
+  // removing peer ADMINs is the same escalation-toward-de-facto-ownership
+  // risk as demoting them).
+  if (member.role === "ADMIN" && actorRole !== "OWNER") {
+    throw new Error("Only the team owner can remove an admin.");
   }
   await db.groupMember.delete({ where: { id: member.id } });
   revalidatePath("/settings/sharing/teams");
@@ -320,15 +392,22 @@ export const openTeamBillingPortal = async (formData: FormData) => {
   redirect(portal.url);
 };
 
-// Grant / revoke a member's billing-manager flag. Owner + admins can toggle
-// (DB01 §09 Q3); the owner's own access is always-on and cannot be removed.
+// Grant / revoke a member's billing-manager flag. P48-17: owner-only (was
+// owner + admins per DB01 §09 Q3 — see the role-matrix note above); the
+// owner's own access is always-on and cannot be removed.
 export const setBillingManager = async (formData: FormData) => {
   const userId = await requireUserId({ write: true });
   const memberId = str(formData, "memberId");
   const enabled = str(formData, "enabled") === "true";
-  const { member } = await requireManagedMember(userId, memberId);
+  const { member, actorRole } = await requireManagedMember(userId, memberId);
   if (member.role === "OWNER") {
     throw new Error("The owner always has billing access.");
+  }
+  // P48-17: team role matrix — this used to let an ADMIN grant itself (or any
+  // other ADMIN) canManageBilling, then cancel the org subscription. Only the
+  // OWNER can grant or revoke billing-manager access.
+  if (actorRole !== "OWNER") {
+    throw new Error("Only the team owner can change billing access.");
   }
   await db.groupMember.update({
     where: { id: member.id },
@@ -396,6 +475,13 @@ export const resendTeamInvite = async (formData: FormData) => {
   const { member, team } = await requireManagedMember(userId, memberId);
   if (member.inviteStatus !== "PENDING" || !member.invitedEmail) {
     throw new Error("That invite can't be resent.");
+  }
+  // P48-17: resend was uncapped — keyed per invite (not per manager) so a
+  // manager resending to several different pending invitees in one hour
+  // isn't blocked by someone else's resend spam on the same invite.
+  const rl = await checkRateLimit(rateLimiters.inviteResend, `team:${member.id}`);
+  if (!rl.allowed) {
+    throw new Error("That invite was resent too many times recently. Try again later.");
   }
   const owner = await db.user.findUnique({
     where: { id: team.ownerId },
@@ -629,6 +715,13 @@ export const addContactToTeamBook = async (formData: FormData) => {
   const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
 
   await db.$transaction(async (tx) => {
+    // P48-17: this acceptance path created a contact without any plan-cap
+    // check at all. Check (and serialise, via the row lock) against the
+    // book's nominal owner — the account the new contact is actually created
+    // under — not the acting member.
+    await lockUserForPlanCheck(tx, book.group.ownerId);
+    await assertCanCreateContactsTx(tx, book.group.ownerId);
+
     const copy = await tx.contact.create({
       data: {
         userId: book.group.ownerId,

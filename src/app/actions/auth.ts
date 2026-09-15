@@ -43,9 +43,16 @@ export async function requestPasswordReset(email: string): Promise<{ success: tr
       ? checkRateLimit(rateLimiters.passwordResetByIp, `ip:${ip}`)
       : { allowed: true },
   ]);
+  // P48-17: these used to log the raw email address unconditionally — PII in
+  // logs, and (for the "no account" case in particular) an operator-visible
+  // account-enumeration oracle even though the HTTP response itself never
+  // reveals it. Redact in every environment; this is a rate/volume signal for
+  // an operator, not something that needs the exact address.
+  const redactedEmail = normalised.replace(/^(.).*(@.*)$/, "$1***$2");
+
   if (!emailRl.allowed || !ipRl.allowed) {
     console.warn(
-      `[Kontax] Password reset rate-limited for ${normalised} / ${ip ?? "unknown"}`,
+      `[Kontax] Password reset rate-limited for ${redactedEmail} / ${ip ?? "unknown"}`,
     );
     return { success: true };
   }
@@ -55,7 +62,7 @@ export async function requestPasswordReset(email: string): Promise<{ success: tr
     select: { id: true },
   });
   if (!user) {
-    console.warn(`[Kontax] Password reset: no account for ${normalised}`);
+    console.warn(`[Kontax] Password reset: no account for ${redactedEmail}`);
     return { success: true };
   }
 

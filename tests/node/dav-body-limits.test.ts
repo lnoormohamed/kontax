@@ -161,20 +161,39 @@ test("a DOCTYPE'd body is never entity-expanded even if parsed", () => {
 
 // --- the DoS that motivated P48-08 -----------------------------------------
 
-test("a 300 KB pathological body parses in linear time (< 50 ms)", () => {
+test("a 300 KB pathological body parses in linear time", () => {
   // Repeated *unclosed* <d:prop> — the input that made the old regex quadratic
   // (measured 281 KB -> ~3.4 s on the regex, extrapolating to ~45 s at 1 MB).
+  // The tokenizer does it in ~12 ms in isolation, but node:test runs files in
+  // parallel and CI boxes are slow, so a tight wall-clock bound is flaky. Two
+  // checks that stay meaningful under load: an absolute ceiling far below the
+  // regex's cost, and a growth ratio between 30 KB and 300 KB that a quadratic
+  // parser (100x) cannot satisfy.
   const unit = "<d:prop>";
-  const body = `<d:propfind xmlns:d="DAV:">${unit.repeat(Math.ceil((300 * 1024) / unit.length))}`;
+  const build = (kb: number) =>
+    `<d:propfind xmlns:d="DAV:">${unit.repeat(Math.ceil((kb * 1024) / unit.length))}`;
+  const small = build(30);
+  const body = build(300);
 
   assert.ok(body.length >= 300 * 1024, "fixture is at least 300 KB");
+
+  // Warm up so JIT compilation is not attributed to the small run.
+  extractRequestedPropNames(small);
+
+  const smallStart = performance.now();
+  extractRequestedPropNames(small);
+  const smallElapsed = Math.max(performance.now() - smallStart, 0.05);
 
   const started = performance.now();
   const names = extractRequestedPropNames(body);
   const elapsed = performance.now() - started;
 
   assert.deepEqual(names, ["prop"], "every child of the first prop is another prop");
-  assert.ok(elapsed < 50, `took ${elapsed.toFixed(1)} ms, expected < 50 ms`);
+  assert.ok(elapsed < 1000, `took ${elapsed.toFixed(1)} ms, expected < 1000 ms`);
+  assert.ok(
+    elapsed < smallElapsed * 40,
+    `10x input took ${(elapsed / smallElapsed).toFixed(1)}x the time — not linear`,
+  );
   console.log(`  pathological 300 KB body parsed in ${elapsed.toFixed(2)} ms`);
 });
 
