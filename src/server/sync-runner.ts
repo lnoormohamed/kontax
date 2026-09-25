@@ -861,6 +861,8 @@ export const runQueuedSyncJobs = async ({
     pushedCreated?: number;
     pushedUpdated?: number;
     pushedDeleted?: number;
+    // P49A-01 (A-07): contacts whose push failed (error recorded on the link).
+    pushFailed?: number;
   };
   const runOAuthSyncJob = async (
     job: (typeof queuedJobs)[number],
@@ -886,18 +888,27 @@ export const runQueuedSyncJobs = async ({
       const result = await run();
       const now = new Date();
       const hasConflicts = result.conflicts > 0;
+      const pushFailed = result.pushFailed ?? 0;
       await db.$transaction([
         db.syncJob.update({
           where: { id: job.id },
           data: {
-            status: hasConflicts ? "PARTIAL" : "SUCCEEDED",
+            status: hasConflicts || pushFailed > 0 ? "PARTIAL" : "SUCCEEDED",
             completedAt: now,
             leaseExpiresAt: null,
             nextRetryAt: null,
-            errorCode: hasConflicts ? "SYNC_CONFLICTS_OPEN" : null,
+            errorCode: hasConflicts
+              ? "SYNC_CONFLICTS_OPEN"
+              : pushFailed > 0
+                ? "SYNC_PUSH_ERRORS"
+                : null,
             errorSummary: hasConflicts
               ? `${result.conflicts} sync conflicts need review before this account is fully healthy again.`
-              : null,
+              : pushFailed > 0
+                ? `${pushFailed} contacts could not be sent to the provider; they will be retried on the next sync.`
+                : null,
+            // Same column the CardDAV runner uses for deferred local changes.
+            skippedCount: pushFailed,
             createdCount: result.created,
             updatedCount: result.updated,
             deletedCount: result.deleted,
@@ -933,7 +944,7 @@ export const runQueuedSyncJobs = async ({
           },
         }),
       ]);
-      return hasConflicts ? "partial" : "succeeded";
+      return hasConflicts || pushFailed > 0 ? "partial" : "succeeded";
     } catch (error) {
       // P39-02: a deletion-threshold trip is a protective halt, not a failure.
       if (error instanceof DeletionThresholdError) {

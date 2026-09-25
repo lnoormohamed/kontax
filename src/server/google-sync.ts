@@ -20,6 +20,7 @@ import {
   parseContactStringArray,
 } from "~/server/contact-portability";
 import {
+  buildGoogleUpdatePersonFields,
   type GoogleContactSource,
   mapContactToGooglePerson,
   mapGooglePersonToContact,
@@ -47,7 +48,9 @@ import {
   isConflictQueueFull,
   isLocalChanged,
   openMutationConflict,
+  parseStoredAddressEntries,
   recordAutoResolved,
+  recordSyncLinkError,
   type RemoteContactItem,
 } from "~/server/sync-import-engine";
 import {
@@ -74,7 +77,7 @@ export const GOOGLE_CONTACTS_SCOPES = [
 
 // personFields requested on every People API call. Consumed by P27-02's mapper.
 export const GOOGLE_PERSON_FIELDS =
-  "names,emailAddresses,phoneNumbers,organizations,addresses,birthdays,urls,biographies,relations,metadata";
+  "names,nicknames,emailAddresses,phoneNumbers,organizations,addresses,birthdays,urls,biographies,relations,metadata";
 
 const ACCESS_TOKEN_REFRESH_SKEW_MS = 60_000; // refresh 60s before expiry
 
@@ -145,6 +148,18 @@ export type GoogleSyncResult = GoogleImportSummary & {
   pushedCreated: number;
   pushedUpdated: number;
   pushedDeleted: number;
+  // P49A-01 (A-07): contacts whose push failed this run (error recorded on
+  // the link); the rest of the run carried on.
+  pushFailed: number;
+};
+
+// Outbound tallies from the push phase.
+export type GooglePushTally = {
+  created: number;
+  updated: number;
+  deleted: number;
+  conflicts: number;
+  failed: number;
 };
 
 // Engine account context for Google (adds source/provider provenance).
@@ -166,11 +181,7 @@ const GOOGLE_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
 
 const normaliseGoogleError = (error: unknown): GoogleSyncError => {
   if (error instanceof GoogleSyncError) return error;
-  const status =
-    (typeof error === "object" && error !== null
-      ? ((error as { code?: unknown }).code ??
-        (error as { response?: { status?: unknown } }).response?.status)
-      : undefined) as number | string | undefined;
+  const status = googleErrorStatus(error);
   const message = error instanceof Error ? error.message : "Google sync failed.";
 
   if (
@@ -250,6 +261,110 @@ const getGoogleClientForAccount = async (account: GoogleSyncAccount) => {
   return { client, credential };
 };
 
+// People API client for an account. Tests replace the factory so no OAuth
+// client, credential or network is involved; production never sets it.
+type GooglePeopleApi = people_v1.People;
+type GooglePeopleApiFactory = (account: GoogleSyncAccount) => Promise<GooglePeopleApi>;
+let peopleApiFactoryOverride: GooglePeopleApiFactory | null = null;
+
+/** Test seam: route every People API call through a stub (null restores). */
+export const __setGooglePeopleApiFactoryForTests = (factory: GooglePeopleApiFactory | null) => {
+  peopleApiFactoryOverride = factory;
+};
+
+const getPeopleApi = async (account: GoogleSyncAccount): Promise<GooglePeopleApi> => {
+  if (peopleApiFactoryOverride) return peopleApiFactoryOverride(account);
+  const { client } = await getGoogleClientForAccount(account);
+  return people({ version: "v1", auth: client });
+};
+
+// ── Google API error classification (P49A-01 / A-22) ─────────────────────────
+// The People API reports some preconditions as 400 FAILED_PRECONDITION rather
+// than 410/409/412: an expired syncToken ("Sync token is expired. Clear local
+// cache and retry call without the sync token.", reason EXPIRED_SYNC_TOKEN) and
+// a stale person etag on update ("Request person.etag is different than the
+// current person.etag..."). Classify defensively from every place gaxios may
+// carry the status, reason and message.
+
+const googleErrorStatus = (error: unknown): number | undefined => {
+  if (typeof error !== "object" || error === null) return undefined;
+  const e = error as {
+    status?: unknown;
+    code?: unknown;
+    response?: { status?: unknown };
+  };
+  for (const candidate of [e.response?.status, e.status, e.code]) {
+    if (typeof candidate === "number") return candidate;
+    if (typeof candidate === "string" && /^\d{3}$/.test(candidate)) return Number(candidate);
+  }
+  return undefined;
+};
+
+// Every status/reason/message string the error carries, joined for matching.
+const googleErrorText = (error: unknown): string => {
+  if (typeof error === "string") return error;
+  if (typeof error !== "object" || error === null) return "";
+  const e = error as {
+    message?: unknown;
+    errors?: Array<{ reason?: unknown; message?: unknown }>;
+    response?: {
+      data?: {
+        error?: {
+          status?: unknown;
+          message?: unknown;
+          details?: Array<{ reason?: unknown }>;
+          errors?: Array<{ reason?: unknown; message?: unknown }>;
+        };
+      };
+    };
+  };
+  const apiError = e.response?.data?.error;
+  const parts: unknown[] = [
+    e.message,
+    apiError?.status,
+    apiError?.message,
+    ...(apiError?.details ?? []).map((d) => d?.reason),
+    ...(apiError?.errors ?? []).flatMap((d) => [d?.reason, d?.message]),
+    ...(Array.isArray(e.errors) ? e.errors : []).flatMap((d) => [d?.reason, d?.message]),
+  ];
+  return parts.filter((p): p is string => typeof p === "string").join(" | ");
+};
+
+// A 400 counts only when its status/reason/message names the precondition —
+// either Google's FAILED_PRECONDITION status or the specific wording — so an
+// ordinary INVALID_ARGUMENT 400 is never mistaken for one.
+const isPrecondition400 = (error: unknown, wording: RegExp): boolean => {
+  if (googleErrorStatus(error) !== 400) return false;
+  const text = googleErrorText(error);
+  if (!wording.test(text)) return false;
+  return /FAILED_PRECONDITION|failedPrecondition|expired|different|stale|mismatch/i.test(text);
+};
+
+/** Expired/invalid syncToken: the only recovery is a full re-sync. */
+export const isGoogleExpiredSyncTokenError = (error: unknown): boolean => {
+  if (googleErrorStatus(error) === 410) return true;
+  if (googleErrorStatus(error) === 400 && /EXPIRED_SYNC_TOKEN/i.test(googleErrorText(error))) {
+    return true;
+  }
+  return isPrecondition400(error, /sync\s*token/i);
+};
+
+/** The person changed on Google since our etag: refetch + conflict path. */
+export const isGoogleStaleEtagError = (error: unknown): boolean => {
+  const status = googleErrorStatus(error);
+  if (status === 409 || status === 412) return true;
+  return isPrecondition400(error, /etag/i);
+};
+
+// Failures that are about the whole account (credentials, quota) rather than
+// one contact. Per-contact push isolation re-throws these so the run stops and
+// the runner can flag the account.
+const isAccountLevelGoogleError = (error: GoogleSyncError) =>
+  error.code === "GOOGLE_AUTH_FAILED" ||
+  error.code === "GOOGLE_QUOTA_EXCEEDED" ||
+  error.code === "CREDENTIALS_MISSING" ||
+  error.code === "CREDENTIALS_UNREADABLE";
+
 // ── Contact processing (P27-02 mapping + P27-03/06 conflicts) ────────────────
 // Normalise each Person into a RemoteContactItem and hand the batch to the
 // shared import engine, which owns create/update/conflict/tombstone logic.
@@ -281,48 +396,76 @@ const finalizeImportSummary = async (
   return { ...batch, queueFull: await isConflictQueueFull(account.id) };
 };
 
+// ── Connection paging (shared by full + incremental) ─────────────────────────
+
+// Internal signal: the stored syncToken is no longer accepted by Google.
+class GoogleSyncTokenExpiredError extends Error {
+  constructor() {
+    super("Google sync token expired; a full re-sync is required.");
+    this.name = "GoogleSyncTokenExpiredError";
+  }
+}
+
+// P49A-01 (A-04): walk EVERY page of a connections.list stream, importing each
+// page as it arrives. Only the final page carries nextSyncToken, so the caller
+// persists the cursor once, after the loop; a mid-stream failure leaves the
+// old cursor in place and the next run replays the stream (imports are
+// idempotent by etag). Only the list call is error-mapped, so import-side
+// errors (e.g. DeletionThresholdError) propagate untouched.
+const walkGoogleConnections = async (
+  account: GoogleImportAccount,
+  peopleApi: GooglePeopleApi,
+  syncToken: string | undefined,
+): Promise<{ batch: ImportBatchSummary; nextSyncToken: string | null }> => {
+  let pageToken: string | undefined;
+  let nextSyncToken: string | null = null;
+  let batch = emptyImportBatch();
+
+  do {
+    let data: people_v1.Schema$ListConnectionsResponse;
+    try {
+      const response = await peopleApi.people.connections.list({
+        resourceName: "people/me",
+        pageSize: 1000,
+        personFields: GOOGLE_PERSON_FIELDS,
+        // Google requires every page request to repeat the original params.
+        ...(syncToken ? { syncToken } : {}),
+        ...(pageToken ? { pageToken } : {}),
+        requestSyncToken: true,
+      });
+      data = response.data;
+    } catch (error) {
+      if (syncToken && isGoogleExpiredSyncTokenError(error)) {
+        throw new GoogleSyncTokenExpiredError();
+      }
+      throw normaliseGoogleError(error);
+    }
+
+    batch = addImportBatch(batch, await processGoogleContacts(data.connections ?? [], account));
+    pageToken = data.nextPageToken ?? undefined;
+    if (!pageToken) nextSyncToken = data.nextSyncToken ?? null;
+  } while (pageToken);
+
+  return { batch, nextSyncToken };
+};
+
 // ── Full import ──────────────────────────────────────────────────────────────
 
 export const googleFullImport = async (
   account: GoogleImportAccount,
 ): Promise<GoogleImportSummary> => {
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
-
-  let pageToken: string | undefined;
-  let syncToken: string | undefined;
-  let batch = emptyImportBatch();
-
-  try {
-    do {
-      const response = await peopleApi.people.connections.list({
-        resourceName: "people/me",
-        pageSize: 1000,
-        personFields: GOOGLE_PERSON_FIELDS,
-        pageToken,
-        requestSyncToken: true,
-      });
-
-      batch = addImportBatch(
-        batch,
-        await processGoogleContacts(response.data.connections ?? [], account),
-      );
-      pageToken = response.data.nextPageToken ?? undefined;
-      syncToken = response.data.nextSyncToken ?? syncToken;
-    } while (pageToken);
-  } catch (error) {
-    throw normaliseGoogleError(error);
-  }
+  const peopleApi = await getPeopleApi(account);
+  const { batch, nextSyncToken } = await walkGoogleConnections(account, peopleApi, undefined);
 
   await db.syncAccount.update({
     where: { id: account.id },
-    data: { lastSyncCursor: syncToken ?? null, lastSyncedAt: new Date() },
+    data: { lastSyncCursor: nextSyncToken, lastSyncedAt: new Date() },
   });
 
   return finalizeImportSummary(account, batch);
 };
 
-// ── Incremental sync (falls back to full import on 410 expired syncToken) ─────
+// ── Incremental sync (falls back to full import on an expired syncToken) ─────
 
 export const googleIncrementalSync = async (
   account: GoogleImportAccount,
@@ -331,48 +474,35 @@ export const googleIncrementalSync = async (
     return googleFullImport(account);
   }
 
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
 
-  let response: people_v1.Schema$ListConnectionsResponse;
+  let result: { batch: ImportBatchSummary; nextSyncToken: string | null };
   try {
-    const result = await peopleApi.people.connections.list({
-      resourceName: "people/me",
-      personFields: GOOGLE_PERSON_FIELDS,
-      syncToken: account.lastSyncCursor,
-      requestSyncToken: true,
-    });
-    response = result.data;
+    result = await walkGoogleConnections(account, peopleApi, account.lastSyncCursor);
   } catch (error) {
-    const status =
-      (error as { code?: unknown }).code ??
-      (error as { response?: { status?: unknown } }).response?.status;
-    if (status === 410) {
-      // Expired syncToken — Google requires a full re-sync.
-      return googleFullImport(account);
-    }
-    throw normaliseGoogleError(error);
+    // A-22: 410 GONE or 400 FAILED_PRECONDITION "sync token expired" — Google
+    // requires a full re-sync without the token.
+    if (error instanceof GoogleSyncTokenExpiredError) return googleFullImport(account);
+    throw error;
   }
 
-  const batch = await processGoogleContacts(response.connections ?? [], account);
-
+  // Never fall back to the previous cursor: replaying it would re-walk the
+  // same stream forever. A stream that ends without a token (not expected
+  // with requestSyncToken) clears the cursor so the next run is a full import.
   await db.syncAccount.update({
     where: { id: account.id },
-    data: {
-      lastSyncCursor: response.nextSyncToken ?? account.lastSyncCursor,
-      lastSyncedAt: new Date(),
-    },
+    data: { lastSyncCursor: result.nextSyncToken, lastSyncedAt: new Date() },
   });
 
-  return finalizeImportSummary(account, batch);
+  return finalizeImportSummary(account, result.batch);
 };
 
 // ── Push phase (P27-03) ──────────────────────────────────────────────────────
-// Pushes a local contact to Google. updatePersonFields excludes read-only
-// fields (metadata/photos). On a 409/412 (remote changed since our etag) the
-// push is treated as a conflict against the freshly-fetched remote version.
-export const GOOGLE_UPDATE_PERSON_FIELDS =
-  "names,emailAddresses,phoneNumbers,organizations,addresses,birthdays,urls,biographies";
+// Pushes a local contact to Google. The update mask is derived per contact
+// from the body plus intentional clears (P49A-01 / A-01, see
+// buildGoogleUpdatePersonFields). On a stale etag (409/412, or 400
+// FAILED_PRECONDITION naming the etag) the push is treated as a conflict
+// against the freshly-fetched remote version.
 
 export type GooglePushContact = GoogleContactSource & ContactConflictSnapshotInput;
 
@@ -381,6 +511,9 @@ export type GooglePushLink = {
   contactId: string;
   remoteUid: string;
   remoteETag: string | null;
+  // Last-synced supported-field shadow: which families Google held at the last
+  // sync, so a family the user emptied in Kontax is cleared on purpose.
+  supportedFieldShadow?: unknown;
 };
 
 export type GooglePushResult =
@@ -392,17 +525,31 @@ export const pushGoogleContact = async (
   link: GooglePushLink,
   contact: GooglePushContact,
 ): Promise<GooglePushResult> => {
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
 
   // P39-03: excluded fields are stripped from the body AND withheld from the
   // update mask — Google keeps its current values for withheld families
   // instead of clearing them.
   const exclusions = account.excludedFields ?? new Set<string>();
   contact = stripExcludedPortableFields(contact, exclusions);
-  const updatePersonFields = googleUpdateFieldsFor(GOOGLE_UPDATE_PERSON_FIELDS, exclusions);
 
   const body = mapContactToGooglePerson(contact);
+  const updatePersonFields = googleUpdateFieldsFor(
+    buildGoogleUpdatePersonFields(body, link.supportedFieldShadow),
+    exclusions,
+  );
+  const localShadow = buildGooglePushShadow(contact);
+
+  if (!updatePersonFields) {
+    // Nothing to send or clear (every family empty or excluded): an empty
+    // mask is rejected by Google, so just anchor the link.
+    await db.syncContactLink.update({
+      where: { id: link.id },
+      data: { supportedFieldShadow: localShadow, lastSyncedAt: new Date() },
+    });
+    return { ok: true };
+  }
+
   // Google requires the current etag in the body for optimistic concurrency.
   body.etag = link.remoteETag ?? undefined;
 
@@ -412,22 +559,22 @@ export const pushGoogleContact = async (
       updatePersonFields,
       requestBody: body,
     });
-    const localShadow = buildGooglePushShadow(contact);
     await db.syncContactLink.update({
       where: { id: link.id },
       data: {
         remoteETag: res.data.etag ?? null,
         capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
         supportedFieldShadow: localShadow,
+        lastErrorCode: null,
+        lastErrorMessage: null,
         lastSyncedAt: new Date(),
       },
     });
     return { ok: true };
   } catch (error) {
-    const status =
-      (error as { code?: unknown }).code ??
-      (error as { response?: { status?: unknown } }).response?.status;
-    if (status !== 409 && status !== 412) {
+    // A-22: stale etag → refetch + conflict path below; anything else fails
+    // this contact (the push loop records it and moves on).
+    if (!isGoogleStaleEtagError(error)) {
       throw normaliseGoogleError(error);
     }
   }
@@ -470,18 +617,25 @@ export const pushGoogleContact = async (
     // Kontax wins — retry the push with the fresh etag to overwrite remote.
     const retryBody = mapContactToGooglePerson(contact);
     retryBody.etag = latestEtag ?? undefined;
-    const res = await peopleApi.people.updateContact({
-      resourceName: link.remoteUid,
-      updatePersonFields,
-      requestBody: retryBody,
-    });
-    const localShadow = buildGooglePushShadow(contact);
+    let retried: people_v1.Schema$Person;
+    try {
+      const res = await peopleApi.people.updateContact({
+        resourceName: link.remoteUid,
+        updatePersonFields,
+        requestBody: retryBody,
+      });
+      retried = res.data;
+    } catch (error) {
+      throw normaliseGoogleError(error);
+    }
     await db.syncContactLink.update({
       where: { id: link.id },
       data: {
-        remoteETag: res.data.etag ?? null,
+        remoteETag: retried.etag ?? null,
         capabilityProfileId: GOOGLE_CAPABILITY_PROFILE.id,
         supportedFieldShadow: localShadow,
+        lastErrorCode: null,
+        lastErrorMessage: null,
         lastSyncedAt: now,
       },
     });
@@ -540,16 +694,18 @@ const pushContactSelect = {
   department: true,
   jobTitle: true,
   website: true,
+  websiteEntries: true,
   birthday: true,
   significantDates: true,
   address: true,
   postalAddresses: true,
+  addressEntries: true,
   notes: true,
 } satisfies Prisma.ContactSelect;
 
 type PushContactRow = Prisma.ContactGetPayload<{ select: typeof pushContactSelect }>;
 
-const buildGooglePushContact = (c: PushContactRow): GooglePushContact => ({
+export const buildGooglePushContact = (c: PushContactRow): GooglePushContact => ({
   id: c.id,
   syncUid: c.syncUid,
   syncVersion: c.syncVersion,
@@ -570,9 +726,11 @@ const buildGooglePushContact = (c: PushContactRow): GooglePushContact => ({
   department: c.department,
   jobTitle: c.jobTitle,
   website: c.website,
+  websiteEntries: parseValueEntries(c.websiteEntries),
   birthday: c.birthday,
   address: c.address,
-  postalAddresses: c.postalAddresses,
+  postalAddresses: parseContactPostalAddresses(c.postalAddresses),
+  addressEntries: parseStoredAddressEntries(c.addressEntries),
   notes: c.notes,
 });
 
@@ -635,9 +793,11 @@ const buildGooglePushShadow = (contact: GooglePushContact) =>
       department: contact.department,
       jobTitle: contact.jobTitle,
       website: contact.website,
+      websiteEntries: contact.websiteEntries,
       birthday: contact.birthday,
       address: contact.address,
       postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+      addressEntries: contact.addressEntries,
       notes: contact.notes,
     },
     GOOGLE_CAPABILITY_PROFILE,
@@ -649,8 +809,7 @@ const createGoogleContactRemote = async (
   account: GoogleImportAccount,
   contact: PushContactRow,
 ): Promise<boolean> => {
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
   let created: people_v1.Schema$Person;
   // P39-03: excluded fields never reach a freshly-created remote contact.
   const pushSource = stripExcludedPortableFields(
@@ -699,15 +858,11 @@ const deleteGoogleContactRemote = async (
   account: GoogleImportAccount,
   link: { id: string; remoteUid: string },
 ): Promise<void> => {
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
   try {
     await peopleApi.people.deleteContact({ resourceName: link.remoteUid });
   } catch (error) {
-    const status =
-      (error as { code?: unknown }).code ??
-      (error as { response?: { status?: unknown } }).response?.status;
-    if (status !== 404) throw normaliseGoogleError(error);
+    if (googleErrorStatus(error) !== 404) throw normaliseGoogleError(error);
   }
   const now = new Date();
   await db.syncContactLink.update({
@@ -716,18 +871,43 @@ const deleteGoogleContactRemote = async (
   });
 };
 
+// P49A-01 (A-07): one contact's push failure must not abort the run (push
+// runs before import, so a throw here used to starve the import too). A
+// per-contact failure is recorded on its link (when it has one) and the loop
+// carries on; account-level failures — credentials, quota, missing config,
+// the deletion-safety hold — are re-thrown so the runner still stops and
+// flags the account.
+const isolateGooglePushFailure = async (
+  error: unknown,
+  target: { op: "update" | "create" | "delete"; linkId?: string; contactId: string },
+): Promise<void> => {
+  if (error instanceof DeletionThresholdError || error instanceof GoogleSyncConfigError) {
+    throw error;
+  }
+  const failure = normaliseGoogleError(error);
+  if (isAccountLevelGoogleError(failure)) throw failure;
+  console.error(
+    `[sync] Google ${target.op} failed for ${target.linkId ? `link ${target.linkId}` : `contact ${target.contactId}`} (${failure.code}):`,
+    failure.message,
+  );
+  if (target.linkId) {
+    await recordSyncLinkError(target.linkId, failure.code, failure.message);
+  }
+};
+
 export const pushLocalChangesToGoogle = async (
   account: GoogleImportAccount,
-): Promise<{ created: number; updated: number; deleted: number; conflicts: number }> => {
+): Promise<GooglePushTally> => {
   // Import-only accounts never push.
   if (account.syncDirection !== "TWO_WAY" && account.syncDirection !== "EXPORT_ONLY") {
-    return { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+    return { created: 0, updated: 0, deleted: 0, conflicts: 0, failed: 0 };
   }
 
   let created = 0;
   let updated = 0;
   let deleted = 0;
   let conflicts = 0;
+  let failed = 0;
 
   // 1) UPDATES — active, locally-edited contacts already linked to Google.
   //    Only genuine user edits (lastMutatedBy = MANUAL): a contact whose last
@@ -746,6 +926,7 @@ export const pushLocalChangesToGoogle = async (
       contactId: true,
       remoteUid: true,
       remoteETag: true,
+      supportedFieldShadow: true,
       lastSyncedAt: true,
       contact: { select: pushContactSelect },
     },
@@ -753,16 +934,28 @@ export const pushLocalChangesToGoogle = async (
   for (const link of activeLinks) {
     if (!link.remoteUid) continue;
     if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
-    const result = await pushGoogleContact(
-      account,
-      {
-        id: link.id,
+    let result: GooglePushResult;
+    try {
+      result = await pushGoogleContact(
+        account,
+        {
+          id: link.id,
+          contactId: link.contactId,
+          remoteUid: link.remoteUid,
+          remoteETag: link.remoteETag,
+          supportedFieldShadow: link.supportedFieldShadow,
+        },
+        buildGooglePushContact(link.contact),
+      );
+    } catch (error) {
+      await isolateGooglePushFailure(error, {
+        op: "update",
+        linkId: link.id,
         contactId: link.contactId,
-        remoteUid: link.remoteUid,
-        remoteETag: link.remoteETag,
-      },
-      buildGooglePushContact(link.contact),
-    );
+      });
+      failed += 1;
+      continue;
+    }
     if (result.ok) {
       await emitEvent(db, {
         userId: account.userId,
@@ -802,8 +995,14 @@ export const pushLocalChangesToGoogle = async (
     select: pushContactSelect,
   });
   for (const contact of unlinked) {
-    if (await createGoogleContactRemote(account, contact)) {
-      created += 1;
+    try {
+      if (await createGoogleContactRemote(account, contact)) {
+        created += 1;
+      }
+    } catch (error) {
+      // No link exists yet to carry the error; the next run retries the create.
+      await isolateGooglePushFailure(error, { op: "create", contactId: contact.id });
+      failed += 1;
     }
   }
 
@@ -849,11 +1048,20 @@ export const pushLocalChangesToGoogle = async (
 
   for (const link of removedLinks) {
     if (!link.remoteUid) continue;
-    await deleteGoogleContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
-    deleted += 1;
+    try {
+      await deleteGoogleContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
+      deleted += 1;
+    } catch (error) {
+      await isolateGooglePushFailure(error, {
+        op: "delete",
+        linkId: link.id,
+        contactId: link.contact?.id ?? "",
+      });
+      failed += 1;
+    }
   }
 
-  return { created, updated, deleted, conflicts };
+  return { created, updated, deleted, conflicts, failed };
 };
 
 // Runner entrypoint. Push local changes FIRST (the import re-anchors
@@ -868,9 +1076,9 @@ export const runGoogleSync = async (
   const inbound =
     account.syncDirection === "TWO_WAY" || account.syncDirection === "IMPORT_ONLY";
 
-  const push = outbound
+  const push: GooglePushTally = outbound
     ? await pushLocalChangesToGoogle(account)
-    : { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+    : { created: 0, updated: 0, deleted: 0, conflicts: 0, failed: 0 };
 
   const importSummary: GoogleImportSummary = inbound
     ? account.lastSyncCursor
@@ -900,6 +1108,7 @@ export const runGoogleSync = async (
     pushedCreated: push.created,
     pushedUpdated: push.updated + photoTally.pushed + photoTally.deletedRemote,
     pushedDeleted: push.deleted,
+    pushFailed: push.failed,
   };
 };
 
@@ -1008,8 +1217,7 @@ export const fetchGoogleRemotePhotos = async (
 ): Promise<Map<string, GoogleRemotePhoto>> => {
   const out = new Map<string, GoogleRemotePhoto>();
   if (resourceNames.length === 0) return out;
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
   for (let i = 0; i < resourceNames.length; i += 200) {
     const chunk = resourceNames.slice(i, i + 200);
     const res = await peopleApi.people.getBatchGet({
@@ -1053,8 +1261,7 @@ export const pushGooglePhoto = async (
   resourceName: string,
   base64Jpeg: string,
 ): Promise<{ etag: string | null; signal: string | null }> => {
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
   const res = await peopleApi.people.updateContactPhoto({
     resourceName,
     requestBody: { photoBytes: base64Jpeg, personFields: GOOGLE_PHOTO_PERSON_FIELDS },
@@ -1068,8 +1275,7 @@ export const deleteGooglePhoto = async (
   account: GoogleSyncAccount,
   resourceName: string,
 ): Promise<{ etag: string | null }> => {
-  const { client } = await getGoogleClientForAccount(account);
-  const peopleApi = people({ version: "v1", auth: client });
+  const peopleApi = await getPeopleApi(account);
   const res = await peopleApi.people.deleteContactPhoto({
     resourceName,
     personFields: GOOGLE_PHOTO_PERSON_FIELDS,

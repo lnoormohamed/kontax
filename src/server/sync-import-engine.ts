@@ -97,7 +97,9 @@ const parseValueEntries = (value: unknown) =>
       })
     : [];
 
-const parseAddressEntries = (value: unknown) =>
+// Stored Contact.addressEntries JSON → typed entries (also used by the Google
+// push path, which sends structured addresses).
+export const parseStoredAddressEntries = (value: unknown) =>
   Array.isArray(value)
     ? value.flatMap((entry) => {
         if (
@@ -166,7 +168,7 @@ const linkedContactToPortable = (
   birthday: contact.birthday,
   address: contact.address,
   postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-  addressEntries: parseAddressEntries(contact.addressEntries),
+  addressEntries: parseStoredAddressEntries(contact.addressEntries),
   notes: contact.notes,
 });
 
@@ -227,6 +229,7 @@ export const linkedContactSelect = {
       department: true,
       websiteEntries: true,
       addressEntries: true,
+      lastMutatedBy: true,
     },
   },
 } as const;
@@ -241,6 +244,21 @@ export const isLocalChanged = (
   contactUpdatedAt: Date | undefined,
 ): boolean =>
   lastSyncedAt == null || (contactUpdatedAt?.getTime() ?? 0) > lastSyncedAt.getTime();
+
+// P49A-01 (A-05): the link's lastSyncedAt after a sync write to the contact —
+// never earlier than the contact's updatedAt, so isLocalChanged() stays false
+// until the user actually edits it.
+const syncAnchor = (contactUpdatedAt: Date, now: Date): Date =>
+  contactUpdatedAt.getTime() > now.getTime() ? contactUpdatedAt : now;
+
+// P49A-01 (A-07): record a per-contact push failure on its link so it is
+// visible per contact; the run carries on with the next contact.
+export const recordSyncLinkError = async (linkId: string, code: string, message: string) => {
+  await db.syncContactLink.update({
+    where: { id: linkId },
+    data: { lastErrorCode: code, lastErrorMessage: message.slice(0, 1000) },
+  });
+};
 
 // Apply a mapped remote contact over the linked local contact (remote-wins).
 export const applyRemoteToContact = async (
@@ -261,7 +279,7 @@ export const applyRemoteToContact = async (
     account.capabilityProfile,
   );
   await db.$transaction(async (tx) => {
-    await tx.contact.update({
+    const updated = await tx.contact.update({
       where: { id: contactId },
       data: {
         ...data,
@@ -269,6 +287,7 @@ export const applyRemoteToContact = async (
         lastMutatedByDetail: account.label,
         syncVersion: { increment: 1 },
       },
+      select: { updatedAt: true },
     });
     await tx.syncContactLink.update({
       where: { id: linkId },
@@ -281,7 +300,10 @@ export const applyRemoteToContact = async (
         tombstonedAt: null,
         lastErrorCode: null,
         lastErrorMessage: null,
-        lastSyncedAt: now,
+        // P49A-01 (A-05): anchor to the contact's own updatedAt, which this
+        // write just bumped past `now`, or the pull itself reads as a local
+        // edit next run (false conflict). Mirrors the CardDAV runner.
+        lastSyncedAt: syncAnchor(updated.updatedAt, now),
       },
     });
     await emitEvent(tx, {
@@ -447,7 +469,7 @@ const handleTombstone = async (
   // SERVER_WINS (or DEVICE_WINS with no local edit): apply the delete as an
   // archive (soft delete — never a hard delete).
   await db.$transaction(async (tx) => {
-    await tx.contact.update({
+    const archived = await tx.contact.update({
       where: { id: contact.id },
       data: {
         archivedAt: now,
@@ -455,10 +477,16 @@ const handleTombstone = async (
         lastMutatedByDetail: account.label,
         syncVersion: { increment: 1 },
       },
+      select: { updatedAt: true },
     });
     await tx.syncContactLink.update({
       where: { id: link.id },
-      data: { remoteDeletedAt: now, tombstonedAt: now, remoteETag: null, lastSyncedAt: now },
+      data: {
+        remoteDeletedAt: now,
+        tombstonedAt: now,
+        remoteETag: null,
+        lastSyncedAt: syncAnchor(archived.updatedAt, now),
+      },
     });
     await emitEvent(tx, {
       userId: account.userId,
@@ -501,7 +529,7 @@ const createContact = async (
         lastMutatedBy: account.sourceType,
         lastMutatedByDetail: account.label,
       },
-      select: { id: true },
+      select: { id: true, updatedAt: true },
     });
     await tx.syncContactLink.create({
       data: {
@@ -512,7 +540,8 @@ const createContact = async (
         remoteETag: item.etag,
         capabilityProfileId: account.capabilityProfile.id,
         supportedFieldShadow: supportedFieldShadow,
-        lastSyncedAt: now,
+        // A-05: `now` is the batch start, earlier than this create's updatedAt.
+        lastSyncedAt: syncAnchor(created.updatedAt, now),
       },
     });
     await emitEvent(tx, {
@@ -687,14 +716,18 @@ export const importRemoteContactBatch = async (
       continue;
     }
 
-    // No remote change — anchor the link's sync marker to this pull.
+    // No remote change — anchor the link's sync marker to this pull. P49A-01
+    // (A-07): except for a user edit still waiting to be pushed (its push
+    // failed earlier in this run): anchoring it would silently drop it from
+    // the next run's push queue.
+    const pendingPush = localSupportedChanged && link.contact.lastMutatedBy === "MANUAL";
     await db.syncContactLink.update({
       where: { id: link.id },
       data: {
         remoteETag: item.etag,
         capabilityProfileId: account.capabilityProfile.id,
         supportedFieldShadow: remoteSupportedShadow,
-        lastSyncedAt: now,
+        ...(pendingPush ? {} : { lastSyncedAt: now }),
       },
     });
   }
