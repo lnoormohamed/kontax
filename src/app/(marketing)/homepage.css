@@ -47,7 +47,7 @@
 
 /* ─── Layout scaffolding (kontax.css) ─────────────────────────── */
 .hp-container { width: 100%; max-width: var(--hp-maxw); margin: 0 auto; padding-left: 48px; padding-right: 48px; }
-.hp-band { padding: 96px 0; scroll-margin-top: 64px; }
+.hp-band { padding: 96px 0; scroll-margin-top: var(--mkt-nav-h, 64px); }
 .hp-band--surface { background: var(--mkt-surface); }
 
 .hp-hero__eyebrow {
@@ -312,7 +312,7 @@
 @media (max-width: 767px) {
   .hp-container { padding-left: 20px; padding-right: 20px; }
   .hp-btn--primary, .hp-btn--green, .hp-btn--secondary, .hp-btn--ghost { width: 100%; }
-  .hp-band { padding: 64px 0; scroll-margin-top: 56px; }
+  .hp-band { padding: 64px 0; scroll-margin-top: var(--mkt-nav-h, 56px); }
   .hp-hero__inner { padding: 36px 20px 48px; gap: 36px; }
   .hp-hero__title { font-size: clamp(32px, 9.6vw, 40px); }
   .hp-hero__sub { font-size: 17px; }

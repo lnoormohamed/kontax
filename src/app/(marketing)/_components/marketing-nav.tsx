@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useSessionUser } from "~/app/_components/use-session-user";
 
+// P50-02 · Direction A header. Order follows the prototype.
 const NAV_LINKS = [
   { label: "Features",  href: "/features"  },
-  { label: "Pricing",   href: "/pricing"   },
   { label: "Security",  href: "/security"  },
+  { label: "Pricing",   href: "/pricing"   },
   { label: "Changelog", href: "/changelog" },
 ] as const;
+
+const MENU_ID = "mkt-mnav";
 
 function initials(name: string | null | undefined): string {
   if (!name) return "";
@@ -23,150 +26,160 @@ function initials(name: string | null | undefined): string {
     .join("");
 }
 
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+      {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+    </svg>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 19.5c1.2-3 3.8-4.5 7-4.5s5.8 1.5 7 4.5" />
+    </svg>
+  );
+}
+
 export function MarketingNav() {
   // P38-10: the marketing pages render statically; the session (for the
   // account chip vs Log in CTA) resolves client-side after hydration.
+  // `undefined` (still resolving) renders the signed-out default.
   const sessionUser = useSessionUser() ?? null;
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Close the menu on navigation.
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+
+  // While open: Escape closes it and returns focus to the toggle; widening
+  // past the 980px breakpoint closes it (the desktop links take over).
   useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 0);
+    if (!menuOpen) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      setMenuOpen(false);
+      menuButtonRef.current?.focus();
     }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const desktop = window.matchMedia("(min-width: 981px)");
+    function onBreakpoint() {
+      if (desktop.matches) setMenuOpen(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    desktop.addEventListener("change", onBreakpoint);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      desktop.removeEventListener("change", onBreakpoint);
+    };
+  }, [menuOpen]);
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [mobileOpen]);
-
-  // Close overlay on navigation
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  const displayName = sessionUser?.name?.trim() ?? "";
+  const userInitials = initials(displayName);
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <>
-      <header className={`mkt-nav${scrolled ? " is-scrolled" : ""}`}>
-        <div className="mkt-nav__inner">
-          <Link className="mkt-brand" href="/" aria-label="Kontax home">
-            <span className="mkt-brand__k">K</span>
-            <span className="mkt-brand__word">Kontax</span>
-          </Link>
+    <header className="mkt-nav">
+      <div className="mkt-nav__inner">
+        <Link className="mkt-brand" href="/" aria-label="Kontax home">
+          <span className="mkt-brand__k" aria-hidden="true">K</span>
+          <span className="mkt-brand__word">Kontax</span>
+        </Link>
 
-          <nav className="mkt-nav__links" aria-label="Primary">
-            {NAV_LINKS.map(({ label, href }) => (
-              <Link
-                key={href}
-                className={`mkt-nav__link${pathname === href ? " is-active" : ""}`}
-                href={href}
-                aria-current={pathname === href ? "page" : undefined}
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="mkt-nav__actions">
-            {sessionUser ? (
-              <>
-                <Link className="mkt-btn-pill mkt-btn-pill--green" href="/contacts">
-                  Go to app
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
-                  </svg>
-                </Link>
-                <Link className="mkt-nav__avatar" href="/settings/account" aria-label="Account settings">
-                  {initials(sessionUser.name)}
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link className="mkt-nav__login" href="/login">Log in</Link>
-                <Link className="mkt-btn-pill" href="/register">Get started</Link>
-              </>
-            )}
-          </div>
-
-          <button
-            className="mkt-nav__burger"
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(true)}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
-              <path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" />
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      {mobileOpen && (
-        <div
-          className="mkt-mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-          onKeyDown={(e) => e.key === "Escape" && setMobileOpen(false)}
-        >
-          <div className="mkt-mobile-menu__top">
-            <Link className="mkt-brand" href="/" aria-label="Kontax home" onClick={() => setMobileOpen(false)}>
-              <span className="mkt-brand__k">K</span>
-              <span className="mkt-brand__word">Kontax</span>
-            </Link>
-            <button
-              className="mkt-mobile-menu__close"
-              aria-label="Close menu"
-              onClick={() => setMobileOpen(false)}
+        <nav className="mkt-nav__links" aria-label="Primary">
+          {NAV_LINKS.map(({ label, href }) => (
+            <Link
+              key={href}
+              className="mkt-nav__link"
+              href={href}
+              aria-current={pathname === href ? "page" : undefined}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
-                <path d="M6 6l12 12" /><path d="M18 6L6 18" />
-              </svg>
-            </button>
-          </div>
+              {label}
+            </Link>
+          ))}
+        </nav>
 
-          <nav className="mkt-mobile-menu__body" aria-label="Primary">
-            {NAV_LINKS.map(({ label, href }) => (
+        <div className="mkt-nav__actions">
+          {sessionUser ? (
+            <>
               <Link
-                key={href}
-                className="mkt-mobile-menu__link"
-                href={href}
-                aria-current={pathname === href ? "page" : undefined}
+                className="mkt-nav__me"
+                href="/settings/account"
+                aria-label={`${displayName || "Your account"}, account settings`}
               >
-                {label}
+                <span className="mkt-nav__me-name">{displayName || "Your account"}</span>
+                <span className="mkt-av" aria-hidden="true">
+                  {userInitials || <PersonIcon />}
+                </span>
               </Link>
-            ))}
-          </nav>
-
-          <div className="mkt-mobile-menu__foot">
-            {sessionUser ? (
-              <>
-                <Link className="mkt-mobile-menu__userbar" href="/settings/account" onClick={() => setMobileOpen(false)}>
-                  <span className="mkt-mobile-menu__userav">{initials(sessionUser.name)}</span>
-                  <span>
-                    <span className="mkt-mobile-menu__username">{sessionUser.name}</span>
-                    <span className="mkt-mobile-menu__usersub">View account</span>
-                  </span>
-                </Link>
-                <Link className="mkt-mobile-menu__cta mkt-mobile-menu__cta--green" href="/contacts" onClick={() => setMobileOpen(false)}>
-                  Go to app
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
-                  </svg>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link className="mkt-mobile-menu__login" href="/login">Log in</Link>
-                <Link className="mkt-mobile-menu__cta" href="/register">Get started</Link>
-              </>
-            )}
-          </div>
+              <Link className="mkt-btn mkt-btn--pri mkt-btn--sm" href="/contacts">
+                Open Kontax
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link className="mkt-nav__login" href="/login">Log in</Link>
+              <Link className="mkt-btn mkt-btn--pri mkt-btn--sm" href="/register">
+                Get started free
+              </Link>
+            </>
+          )}
         </div>
-      )}
-    </>
+
+        <button
+          ref={menuButtonRef}
+          className="mkt-nav__menu"
+          type="button"
+          aria-label="Menu"
+          aria-expanded={menuOpen}
+          aria-controls={MENU_ID}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <MenuIcon open={menuOpen} />
+        </button>
+      </div>
+
+      <div className="mkt-mnav" id={MENU_ID} hidden={!menuOpen}>
+        <nav aria-label="Menu">
+          {NAV_LINKS.map(({ label, href }) => (
+            <Link
+              key={href}
+              className="mkt-mnav__link"
+              href={href}
+              aria-current={pathname === href ? "page" : undefined}
+              onClick={closeMenu}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="mkt-mnav__act">
+          {sessionUser ? (
+            <>
+              <Link className="mkt-btn mkt-btn--pri" href="/contacts" onClick={closeMenu}>
+                Open Kontax
+              </Link>
+              <p className="mkt-mnav__who">
+                Signed in as{" "}
+                <Link href="/settings/account" onClick={closeMenu}>
+                  {displayName || "your account"}
+                </Link>
+              </p>
+            </>
+          ) : (
+            <>
+              <Link className="mkt-btn mkt-btn--pri" href="/register" onClick={closeMenu}>
+                Get started free
+              </Link>
+              <Link className="mkt-btn mkt-btn--sec" href="/login" onClick={closeMenu}>
+                Log in
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }

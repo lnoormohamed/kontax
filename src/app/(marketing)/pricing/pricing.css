@@ -295,7 +295,7 @@
 }
 .pr-matrix thead th {
   position: sticky;
-  top: 64px;
+  top: var(--mkt-nav-h, 64px); /* below the sticky marketing header */
   z-index: 5;
   background: var(--mkt-paper);
   text-align: center;
