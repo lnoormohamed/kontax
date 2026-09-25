@@ -125,14 +125,14 @@ function VerifyTwoFaInner() {
 
   return (
     <main className="relative flex min-h-svh flex-col items-center justify-center gap-[18px] px-5 py-10">
-      <div aria-hidden className="fixed inset-0 -z-10" style={{ backgroundColor: "#eef1ec", backgroundImage: "radial-gradient(ellipse 70% 55% at 50% 36%, rgba(23,53,46,0.10) 0%, rgba(23,53,46,0) 70%)" }} />
+      <div aria-hidden className="fixed inset-0 -z-10" style={{ backgroundColor: "#fcfcfa", backgroundImage: "radial-gradient(ellipse 70% 55% at 50% 36%, rgba(23,53,46,0.10) 0%, rgba(23,53,46,0) 70%)" }} />
 
       <Link className="flex items-center gap-2.5" href="/">
         <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-[#17352e] text-[19px] font-bold text-[#dff0e7]">K</span>
         <span className="text-[20px] font-semibold tracking-[-0.018em] text-[#17352e]">Kontax</span>
       </Link>
 
-      <div className="w-full max-w-[400px] rounded-[2rem] border border-[#d8ddd6] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
+      <div className="w-full max-w-[400px] rounded-[14px] border border-[#d4d9d0] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
         {!useRecovery ? (
           <>
             <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Two-factor authentication</h1>
@@ -149,7 +149,7 @@ function VerifyTwoFaInner() {
                   <OtpInput autoFocus disabled={isPending} error={!!err} onChange={setCode} onComplete={handleTotpSubmit} value={code} />
                   {err && <p className="mt-[10px] text-[13px] text-[#9a3a23]">{err}</p>}
                   <button
-                    className="mt-5 w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+                    className="mt-5 w-full rounded-[10px] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#0f2620] disabled:cursor-default disabled:opacity-45"
                     disabled={code.length !== 6 || isPending}
                     onClick={() => handleTotpSubmit()}
                     type="button"
@@ -172,7 +172,7 @@ function VerifyTwoFaInner() {
             <div className="mt-5">
               <input
                 autoFocus
-                className="w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[16px] uppercase tracking-[0.08em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+                className="w-full rounded-[10px] border border-[#d4d9d0] bg-white px-4 py-3 font-mono text-[16px] uppercase tracking-[0.08em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
                 onChange={(e) => setRecoveryCode(e.target.value)}
                 placeholder="XXXXXXXXXX"
                 type="text"
@@ -180,7 +180,7 @@ function VerifyTwoFaInner() {
               />
               {err && <p className="mt-2 text-[13px] text-[#9a3a23]">{err}</p>}
               <button
-                className="mt-4 w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+                className="mt-4 w-full rounded-[10px] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#0f2620] disabled:cursor-default disabled:opacity-45"
                 disabled={!recoveryCode.trim() || isPending}
                 onClick={handleRecoverySubmit}
                 type="button"
@@ -202,7 +202,7 @@ function VerifyTwoFaInner() {
         </div>
       </div>
 
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
+      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>
     </main>
   );
 }

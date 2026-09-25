@@ -15,7 +15,7 @@ export default async function ForgotPasswordPage() {
         aria-hidden
         className="fixed inset-0 -z-10"
         style={{
-          backgroundColor: "#eef1ec",
+          backgroundColor: "#fcfcfa",
           backgroundImage: [
             "radial-gradient(ellipse 70% 55% at 50% 36%, rgba(23,53,46,0.10) 0%, rgba(23,53,46,0) 70%)",
             "radial-gradient(ellipse 90% 70% at 50% 110%, rgba(23,53,46,0.07) 0%, rgba(23,53,46,0) 60%)",
@@ -31,7 +31,7 @@ export default async function ForgotPasswordPage() {
         />
       </div>
       <ForgotPasswordCard />
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
+      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>
     </main>
   );
 }

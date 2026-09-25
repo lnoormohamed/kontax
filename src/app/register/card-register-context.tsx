@@ -19,14 +19,16 @@ export function CardRegisterContext({ prefillParam }: { prefillParam: string }) 
   const displayName = [prefill.firstName, prefill.lastName].filter(Boolean).join(" ");
 
   return (
+    // P50-06: Direction A tokens copied inline — see the note at the top of
+    // `~/app/_components/auth-card.tsx` for why (and the token → hex map).
     <div
       style={{
         width: "100%",
         maxWidth: 400,
         padding: "12px 16px",
-        borderRadius: 12,
+        borderRadius: 10,
         background: "#fff",
-        border: "1px solid #d8ddd6",
+        border: "1px solid #d4d9d0",
         display: "flex",
         flexDirection: "column",
         gap: 6,
@@ -40,7 +42,7 @@ export function CardRegisterContext({ prefillParam }: { prefillParam: string }) 
       </p>
       <Link
         href={`/u/${prefill.sourceCardUsername}`}
-        style={{ fontSize: 12, color: "#4158f4", marginTop: 2 }}
+        style={{ fontSize: 12, color: "#17352e", marginTop: 2 }}
       >
         ← Back to {displayName}&apos;s card
       </Link>

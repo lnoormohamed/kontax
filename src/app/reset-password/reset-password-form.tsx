@@ -51,7 +51,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   };
 
   return (
-    <div className="w-full max-w-[400px] rounded-[2rem] border border-[#d8ddd6] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
+    <div className="w-full max-w-[400px] rounded-[14px] border border-[#d4d9d0] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
       <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Set a new password</h1>
       <p className="mt-2 text-[14px] leading-[1.55] text-[#5c655e]">Choose a strong password. You&apos;ll be signed in automatically.</p>
 
@@ -62,7 +62,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
             <input
               autoComplete="new-password"
               autoFocus
-              className="w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 pr-11 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+              className="w-full rounded-[10px] border border-[#d4d9d0] bg-white px-4 py-3 pr-11 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
               minLength={8}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 8 characters"
@@ -79,7 +79,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Confirm new password</span>
           <input
             autoComplete="new-password"
-            className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:ring-[3px] focus:ring-[#edf0fe] ${mismatch ? "border-[#c98a76] focus:border-[#c98a76]" : "border-[#d8ddd6] focus:border-[#4158f4]"}`}
+            className={`mt-[6px] w-full rounded-[10px] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:ring-[3px] focus:ring-[#edf0fe] ${mismatch ? "border-[#c98a76] focus:border-[#c98a76]" : "border-[#d4d9d0] focus:border-[#4158f4]"}`}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Re-enter new password"
             required
@@ -92,7 +92,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           <p className="rounded-[12px] border border-[#ecd0c7] bg-[#f7e9e4] px-[14px] py-[11px] text-[13.5px] text-[#8f3320]">{error}</p>
         )}
         <button
-          className="w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+          className="w-full rounded-[10px] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#0f2620] disabled:cursor-default disabled:opacity-45"
           disabled={!canSubmit}
           type="submit"
         >
@@ -100,7 +100,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         </button>
       </form>
       <div className="mt-4 text-center">
-        <Link className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#4158f4]" href="/login">← Back to login</Link>
+        <Link className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#17352e]" href="/login">← Back to login</Link>
       </div>
     </div>
   );

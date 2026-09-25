@@ -5,6 +5,9 @@ import { useState, useTransition } from "react";
 
 import { requestPasswordReset } from "~/app/actions/auth";
 
+// P50-06: Direction A tokens copied inline — see the note at the top of
+// `~/app/_components/auth-card.tsx` for why (and the token → hex map).
+
 function MailIcon() {
   return (
     <svg
@@ -44,7 +47,7 @@ export function ForgotPasswordCard() {
   };
 
   return (
-    <div className="w-full max-w-[440px] rounded-[24px] border border-[#d8ddd6]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
+    <div className="w-full max-w-[440px] rounded-[14px] border border-[#d4d9d0]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
       <Link
         aria-label="Kontax home"
         className="flex items-center justify-center gap-[10px]"
@@ -62,7 +65,7 @@ export function ForgotPasswordCard() {
         </span>
       </Link>
 
-      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d8ddd6]" />
+      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d4d9d0]" />
 
       {!submitted ? (
         <>
@@ -91,7 +94,7 @@ export function ForgotPasswordCard() {
                 <input
                   autoComplete="email"
                   autoFocus
-                  className="h-11 w-full rounded-[12px] border border-[#d8ddd6] bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
+                  className="h-11 w-full rounded-[10px] border border-[#d4d9d0] bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
@@ -102,7 +105,7 @@ export function ForgotPasswordCard() {
 
               <button
                 aria-busy={isPending}
-                className="mt-2 flex h-12 w-full items-center justify-center rounded-[12px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] active:translate-y-px active:bg-[#2a3abf] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 flex h-12 w-full items-center justify-center rounded-[10px] bg-[#17352e] text-[14.5px] font-semibold text-white transition hover:bg-[#0f2620] active:translate-y-px active:bg-[#0c1f19] disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={!canSubmit || isPending}
                 type="submit"
               >
@@ -143,7 +146,7 @@ export function ForgotPasswordCard() {
           <>
             Didn&apos;t get it?{" "}
             <button
-              className="font-medium text-[#4158f4] hover:underline"
+              className="font-medium text-[#17352e] hover:underline"
               onClick={() => setSubmitted(false)}
               type="button"
             >
@@ -153,7 +156,7 @@ export function ForgotPasswordCard() {
         ) : (
           <>
             Remembered it?{" "}
-            <Link className="font-medium text-[#4158f4] hover:underline" href="/login">
+            <Link className="font-medium text-[#17352e] hover:underline" href="/login">
               Back to login
             </Link>
           </>

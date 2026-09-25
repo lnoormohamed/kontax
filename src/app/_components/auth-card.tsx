@@ -6,6 +6,19 @@ import { useRef, useState } from "react";
 
 import { safeInternalPath } from "~/lib/safe-internal-path";
 
+// P50-06: this file styles with inline Tailwind arbitrary values rather than
+// importing `src/app/(marketing)/_components/marketing.css` — that stylesheet
+// is scoped under `.mkt-wrap` and pulls in marketing-only layout rules, so it
+// doesn't compose cleanly with a signed-out auth card. The colours/radii below
+// are copied from the Direction A tokens documented at the top of that file
+// (and `roadmap/design-briefs/p50-db01-handoff/{dir-a,p50-base}.css`):
+//   #17352e / #0f2620  → --mkt-g800 / --mkt-g900 (primary buttons + links)
+//   #e8f0eb / #cfe1d6  → --mkt-g100 / --mkt-g200 (tinted callouts)
+//   #d4d9d0            → --mkt-line-strong (card + input borders)
+//   #4158f4            → --mkt-focus — kept for focus rings only, never fills
+//   10px / 14px         → --mkt-r-btn / --mkt-r-card
+// Geist itself is already loaded app-wide via next/font in the root layout.
+
 // ── Password strength ──────────────────────────────────────────────────────
 function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
   if (!pw) return { level: 0, label: "" };
@@ -20,7 +33,7 @@ function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
 }
 
 const STRENGTH_COLORS: Record<number, string> = {
-  0: "#d8ddd6",
+  0: "#d4d9d0",
   1: "#b5472f",
   2: "#bf8526",
   3: "#2f8f63",
@@ -158,10 +171,10 @@ function Field({
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={error ? "true" : undefined}
           autoComplete={autoComplete}
-          className={`h-11 w-full rounded-[12px] border bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] ${
+          className={`h-11 w-full rounded-[10px] border bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] ${
             error
               ? "border-[#b5472f] focus:border-[#b5472f] focus:shadow-[0_0_0_3px_rgba(181,71,47,0.22)]"
-              : "border-[#d8ddd6] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
+              : "border-[#d4d9d0] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
           } ${trailing ? "pr-[46px]" : ""} disabled:opacity-60`}
           disabled={disabled}
           id={id}
@@ -340,7 +353,7 @@ export function AuthCard({
   );
 
   return (
-    <div className="w-full max-w-[440px] rounded-[24px] border border-[#d8ddd6]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
+    <div className="w-full max-w-[440px] rounded-[14px] border border-[#d4d9d0]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
       {/* Brand mark — links back to the marketing homepage */}
       <Link className="flex items-center justify-center gap-[10px]" href="/" aria-label="Kontax home">
         <span
@@ -356,14 +369,14 @@ export function AuthCard({
       </Link>
 
       {/* Rule */}
-      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d8ddd6]" />
+      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d4d9d0]" />
 
       {/* Heading */}
       <h1 className="text-center text-[22px] font-semibold leading-tight tracking-[-0.015em] text-[#1d2823]">
         {isLogin ? "Log in to Kontax" : "Create your account"}
       </h1>
       <p className="mt-[7px] text-center text-[14px] text-[#5c655e]">
-        {isLogin ? "Pick up right where you left off." : "Your contacts, organized and yours."}
+        {isLogin ? "Pick up right where you left off." : "Your contacts, organised and yours."}
       </p>
 
       {/* Message banners (password-reset, email-changed) */}
@@ -391,10 +404,12 @@ export function AuthCard({
         </div>
       )}
 
-      {/* Trial callout — register with ?plan=pro */}
+      {/* Trial callout — register with ?plan=pro. Direction A tokens
+          (marketing.css): bg --mkt-g100 #e8f0eb, border --mkt-g200 #cfe1d6,
+          text --mkt-g800 #17352e — was an indigo accent before P50-06. */}
       {!isLogin && plan === "pro" ? (
-        <div className="mt-4 flex items-start gap-2.5 rounded-[1.2rem] border border-[#c5cdf9] bg-[#edf0fe] px-4 py-3 text-[13.5px] leading-[1.45] text-[#3142c4]">
-          <svg aria-hidden className="mt-px h-[17px] w-[17px] shrink-0" fill="none" stroke="#4158f4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
+        <div className="mt-4 flex items-start gap-2.5 rounded-[1.2rem] border border-[#cfe1d6] bg-[#e8f0eb] px-4 py-3 text-[13.5px] leading-[1.45] text-[#17352e]">
+          <svg aria-hidden className="mt-px h-[17px] w-[17px] shrink-0" fill="none" stroke="#17352e" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
             <path d="M12 3l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.8 6.1 20.8l1.3-6.5L2.5 9.8 9.1 9z" />
           </svg>
           <span>
@@ -432,7 +447,7 @@ export function AuthCard({
                 <span>
                   An account with this email already exists.{" "}
                   <Link
-                    className="font-semibold text-[#4158f4] hover:underline"
+                    className="font-semibold text-[#17352e] hover:underline"
                     href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
                   >
                     Log in instead →
@@ -468,7 +483,7 @@ export function AuthCard({
           {isLogin ? (
             <div className="-mt-1 flex justify-end">
               <a
-                className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#4158f4]"
+                className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#17352e]"
                 href="/forgot-password"
               >
                 Forgot password?
@@ -479,7 +494,7 @@ export function AuthCard({
           {/* CTA */}
           <button
             aria-busy={submitting}
-            className="mt-2 flex h-12 w-full items-center justify-center rounded-[12px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] active:translate-y-px active:bg-[#2a3abf] disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-2 flex h-12 w-full items-center justify-center rounded-[10px] bg-[#17352e] text-[14.5px] font-semibold text-white transition hover:bg-[#0f2620] active:translate-y-px active:bg-[#0c1f19] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!canSubmit || submitting}
             type="submit"
           >
@@ -490,11 +505,11 @@ export function AuthCard({
           {!isLogin ? (
             <p className="-mt-1 text-center text-[12px] text-[#8b938c]">
               By creating an account, you agree to our{" "}
-              <a className="text-[#5c655e] font-medium hover:text-[#4158f4] hover:underline" href="/terms">
+              <a className="text-[#5c655e] font-medium hover:text-[#17352e] hover:underline" href="/terms">
                 Terms
               </a>{" "}
               and{" "}
-              <a className="text-[#5c655e] font-medium hover:text-[#4158f4] hover:underline" href="/privacy">
+              <a className="text-[#5c655e] font-medium hover:text-[#17352e] hover:underline" href="/privacy">
                 Privacy Policy
               </a>
               .
@@ -520,7 +535,7 @@ export function AuthCard({
       <p className="mt-[22px] text-center text-[14px] text-[#5c655e]">
         {isLogin ? "Don't have an account? " : "Already have an account? "}
         <Link
-          className="font-medium text-[#4158f4] hover:underline disabled:opacity-50"
+          className="font-medium text-[#17352e] hover:underline disabled:opacity-50"
           href={switchHref}
         >
           {isLogin ? "Create one →" : "Log in →"}
