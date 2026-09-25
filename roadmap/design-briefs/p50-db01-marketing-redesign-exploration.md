@@ -1,6 +1,6 @@
 # P50-DB01 — Design brief: marketing site redesign (exploration, homepage first)
 
-Status: Ready for design · Type: **Exploration only — no build commitment** · Priority: P2
+Status: **Done — Direction A chosen 2026-09-25** (see [Phase 50](../build-phase/phase-50-marketing-redesign.md)) · Type: Exploration · Priority: P2
 Depends: — · Builds on: [P34C-DB01](p34c-db01-marketing-site-ia.md) (IA, tone),
 [P49-DB01](../build-phase/p49-db01-design-brief-homepage-refresh.md) (homepage content)
 Drafted 25 Sep 2026

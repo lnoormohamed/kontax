@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-dir="c">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontax · Direction C — Precise &amp; product-forward</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&family=Geist:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="p50-base.css">
+<link rel="stylesheet" href="dir-c.css">
+<style>a{color:var(--link)}a:hover{color:var(--link-h)}</style>
+</head>
+<body>
+<div id="hdr"></div>
+<main>
+<div data-view="home">
+<section class="hero" data-screen-label="01 Hero">
+<div class="wrap">
+<div class="hero__g">
+<div class="hero__copy">
+<span class="hero__st"><i></i>Google · iCloud · Fastmail · CardDAV</span>
+<h1>One address book. Every account. In step.</h1>
+<p class="hero__sub">Kontax merges your contacts into one clean book and serves it to the Contacts app on iPhone and Mac over CardDAV. Search it, fix it, script it.</p>
+<div class="hero__ctas"><a class="btn btn--pri" href="../auth/Login &amp; Register.html">Get started free</a><a class="btn btn--sec" href="#how">See how it works</a></div>
+<dl class="hero__spec"><dt>free</dt><dd>500 contacts · 1 source · 1 device</dd><dt>protocol</dt><dd>CardDAV, vCard, documented export</dd><dt>install</dt><dd>nothing on iPhone or Mac</dd></dl>
+</div>
+<div class="app" id="sig" role="region" aria-label="Interactive demo with sample contacts">
+<div class="app__bar"><b>Contacts</b><span>All books</span><span class="chip" aria-hidden="true"><i></i>in sync</span></div>
+<div class="app__g">
+<div class="app__l">
+<label class="app__q"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--mute)"><path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg><span class="sr-only">Search sample contacts</span><input id="q" type="search" placeholder="Search name, email, phone, company" autocomplete="off"><span class="kbd" aria-hidden="true">/</span></label>
+<div class="app__list" id="list" role="listbox" aria-label="Results"></div>
+<div class="app__keys" aria-hidden="true"><span><span class="kbd">↑</span><span class="kbd">↓</span>move</span><span><span class="kbd">/</span>search</span><span><span class="kbd">M</span>merge</span><span><span class="kbd">E</span>edit</span></div>
+</div>
+<div class="app__d" aria-live="polite">
+<div class="app__dh"><span class="av av5" id="dAv">BN</span><div><div class="app__dn" id="dN">Ben Nakamura</div><div class="sb" id="dS">Acme Ltd · Work, Suppliers</div></div></div>
+<dl style="margin:12px 0 0" id="dF"></dl>
+<div class="led"><div class="led__h"><span>sync log</span><span>this contact</span></div>
+<ol id="led">
+<li><time>09:12:04</time><b>edit · mobile · Lina’s iPhone</b><em>saved</em></li>
+<li><time>09:12:05</time><b>→ Google Contacts</b><em>pushed</em></li>
+<li><time>09:12:05</time><b>→ iCloud</b><em>pushed</em></li>
+<li><time>09:12:07</time><b>→ MacBook Air · CardDAV</b><em>pulled</em></li>
+</ol></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div id="homeRest"></div>
+</div>
+<div data-view="pricing" id="vPricing" hidden></div>
+<div data-view="security" id="vSecurity" hidden></div>
+<div data-view="sampler" id="vSampler" hidden></div>
+</main>
+<div id="ftr"></div>
+<script>
+window.P50CFG={name:'C · Precise',ctaTitle:'Connect your first account in a couple of minutes.',
+tokens:[['--ink0','Ink 0 (buttons)'],['--white','White'],['--grid','Grid surface'],['--blue','Signal blue (accent)'],['--blue-t','Blue tint'],['--signal','Sync green'],['--signal-t','Sync tint'],['--forest','Forest (logo)'],['--body','Body'],['--mute','Mute'],['--line','Grid line'],['--line-strong','Border'],['--focus','Focus']],
+type:[['Display 70','--h1','-.035em','One address book.'],['H2 44','--h2','-.028em','Why not just use iCloud?'],['H3 30','--h3','-.028em','Duplicates, found and fixed'],['H4 20','--h4','','Your team'],['Body 16','--x','','<span style="font:400 16px/1.6 var(--font-b);color:var(--body)">Kontax keeps Google, iCloud and Fastmail in step.</span>'],['Mono 12.5','--step-n','','[03] vs-built-in · 09:12:05 → iCloud pushed']],
+motif:function(){return '<div class="motif-c"><div><b>[grid]</b>Column guides run down every band, 1px, so the page reads like a spec sheet. No decoration beyond the grid.</div><div><b>keycaps</b><span class="kbd">/</span> <span class="kbd">M</span> <span class="kbd">E</span><br><br>Real shortcuts from the app, shown wherever a feature has one.</div><div><b>sync log</b>Timestamped mono rows show what synced, where and when. The recurring device across home, features and security.</div></div>'}};
+(function(){
+var P=[['BN','av5','Ben Nakamura','ben.nakamura@acme.co','+44 7700 900123','Acme Ltd','Work, Suppliers'],['AC','av1','Alex Chen','alex@acme.co','+44 7700 900871','Acme Ltd','Work'],['AO','av4','Amara Okafor','amara@orbit.health','+44 20 7946 0321','Orbit Health','Clients'],['RM','av2','Rosa Martínez','rosa.m@fastmail.com','+44 7700 900456','—','Family'],['JM','av1','James Mahmoud','james@mahmoud.me','+44 7700 900654','—','Family'],['BP','av3','Bea Price','bea@northwind.co','+44 161 496 0112','Northwind','Suppliers'],['DK','av4','Dan Kowalski','dan@kowalski.pl','+48 22 123 4567','Northwind','Work'],['SO','av3','Sara Olsen','sara.olsen@icloud.com','+47 912 34 567','—','Allotment club']];
+var q=document.getElementById('q'),list=document.getElementById('list'),sel=0,cur=[];
+function esc(s){return s.replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function hi(t,s){if(!s)return esc(t);var i=t.toLowerCase().indexOf(s);return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+s.length))+'</mark>'+esc(t.slice(i+s.length))}
+function detail(p){document.getElementById('dAv').className='av '+p[1];document.getElementById('dAv').textContent=p[0];document.getElementById('dN').textContent=p[2];document.getElementById('dS').textContent=p[5]+' · '+p[6];
+document.getElementById('dF').innerHTML=[['mobile',p[4],p[0]==='BN'],['email',p[3]],['company',p[5]],['labels',p[6]]].map(function(f){return '<div class="app__f"><dt>'+f[0]+'</dt><dd'+(f[2]?' class="chg"':'')+'>'+esc(f[1])+'</dd></div>'}).join('')}
+function render(){var s=q.value.trim().toLowerCase();cur=P.filter(function(p){return !s||(p[2]+' '+p[3]+' '+p[4]+' '+p[5]).toLowerCase().indexOf(s)>-1}).slice(0,6);if(sel>=cur.length)sel=0;
+list.innerHTML=cur.length?cur.map(function(p,i){return '<div class="app__r" role="option" id="o'+i+'" aria-selected="'+(i===sel)+'" data-i="'+i+'"><span class="av av--s '+p[1]+'">'+p[0]+'</span><div class="row__m"><div class="nm">'+hi(p[2],s)+'</div><div class="sb">'+hi(p[3],s)+'</div></div></div>'}).join(''):'<p class="app__empty">No sample contact matches “'+esc(s)+'”.</p>';
+if(cur[sel])detail(cur[sel])}
+q.addEventListener('input',function(){sel=0;render()});
+q.addEventListener('keydown',function(e){if(e.key==='ArrowDown'){sel=Math.min(sel+1,cur.length-1);render();e.preventDefault()}if(e.key==='ArrowUp'){sel=Math.max(sel-1,0);render();e.preventDefault()}});
+list.addEventListener('click',function(e){var r=e.target.closest('.app__r');if(r){sel=+r.dataset.i;render()}});
+document.addEventListener('keydown',function(e){if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&!document.getElementById('sig').closest('[hidden]')){e.preventDefault();q.focus()}});
+render();
+window.P50sig=function(){var led=document.getElementById('led');if(window.P50reduce||led.dataset.done)return;led.dataset.done=1;
+var word='ben',i=0;q.value='';render();led.classList.add('pre');
+var t=setInterval(function(){if(document.activeElement===q){clearInterval(t);return}q.value=word.slice(0,++i);render();if(i>=word.length){clearInterval(t);[].forEach.call(led.children,function(li,k){setTimeout(function(){li.classList.add('in')},450+k*420)})}},180);
+setTimeout(function(){led.classList.remove('pre');[].forEach.call(led.children,function(li){li.classList.remove('in')})},4500)};
+})();
+</script>
+<script src="p50.js"></script>
+</body>
+</html>

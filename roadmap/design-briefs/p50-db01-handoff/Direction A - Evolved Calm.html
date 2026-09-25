@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-dir="a">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontax · Direction A — Evolved calm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="p50-base.css">
+<link rel="stylesheet" href="dir-a.css">
+<style>a{color:var(--link)}a:hover{color:var(--link-h)}</style>
+</head>
+<body>
+<div id="hdr"></div>
+<main>
+<div data-view="home">
+<section class="hero" data-screen-label="01 Hero">
+<div class="wrap hero__g">
+<div><p class="hero__e">Contact management, done right</p><h1>Your contacts. Organised, synced, and always with you.</h1></div>
+<div><p class="hero__sub">One address book for your phone, your laptop and the people you share with. Kept tidy, kept private, kept yours.</p>
+<div class="hero__ctas"><a class="btn btn--pri" href="../auth/Login &amp; Register.html">Get started free</a><a class="btn btn--sec" href="#how">See how it works</a></div>
+<p class="hero__trust"><span>Free for up to 500 contacts</span><span>No card needed</span><span>No app to install</span></p></div>
+</div>
+<div class="wrap">
+<div class="sig" id="sig" role="img" aria-label="Three copies of the same contact, from Google, iCloud and Fastmail, merged into one Kontax contact that syncs to iPhone, Mac and Google.">
+<div class="sig__g" aria-hidden="true">
+<div class="sig__src">
+<div class="sc"><span class="glyph">G</span><span class="nm">Ben Nakamura</span><span class="sc__t">Google</span><span class="sc__f">ben.nakamura@acme.co</span></div>
+<div class="sc"><span class="glyph">iC</span><span class="nm">Ben N.</span><span class="sc__t">iCloud</span><span class="sc__f">+44 7700 900123</span></div>
+<div class="sc"><span class="glyph">F</span><span class="nm">B. Nakamura</span><span class="sc__t">Fastmail</span><span class="sc__f">Acme Ltd</span></div>
+</div>
+<div class="sig__wire"><svg viewBox="0 0 96 300" preserveAspectRatio="none"><path vector-effect="non-scaling-stroke" d="M0,52 C54,52 42,150 96,150"></path><path vector-effect="non-scaling-stroke" d="M0,150 L96,150"></path><path vector-effect="non-scaling-stroke" d="M0,248 C54,248 42,150 96,150"></path></svg></div>
+<div class="mc">
+<div class="mc__h"><span class="av av5">BN</span><div><div class="mc__n">Ben Nakamura</div><div class="mc__s">One contact, from three records</div></div></div>
+<dl style="margin:0">
+<div class="mc__f"><dt>Mobile</dt><dd>+44 7700 900123</dd><em>iCloud</em></div>
+<div class="mc__f"><dt>Email</dt><dd>ben.nakamura@acme.co</dd><em>Google</em></div>
+<div class="mc__f"><dt>Company</dt><dd>Acme Ltd</dd><em>Fastmail</em></div>
+<div class="mc__f"><dt>Labels</dt><dd>Work · Suppliers</dd><em>Google</em></div>
+</dl>
+<div class="mc__foot"><span>Merged just now · undo for 30 days</span><span class="vbtn">Undo</span></div>
+</div>
+<div class="sig__out">
+<p>Syncs back to</p>
+<div class="dev"><span class="glyph">K</span>iPhone Contacts<span class="ok">✓ now</span></div>
+<div class="dev"><span class="glyph">K</span>Mac Contacts<span class="ok">✓ now</span></div>
+<div class="dev"><span class="glyph">G</span>Google Contacts<span class="ok">✓ now</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div id="homeRest"></div>
+</div>
+<div data-view="pricing" id="vPricing" hidden></div>
+<div data-view="security" id="vSecurity" hidden></div>
+<div data-view="sampler" id="vSampler" hidden></div>
+</main>
+<div id="ftr"></div>
+<script>
+window.P50CFG={name:'A · Evolved calm',
+tokens:[['--g900','Green 900'],['--g800','Forest (brand)'],['--g600','Green 600'],['--g400','Green 400'],['--g200','Green 200'],['--g100','Green 100'],['--stone','Stone (warm)'],['--stone-line','Stone line'],['--ink','Ink'],['--body','Body'],['--mute','Mute'],['--line-strong','Border'],['--focus','Focus']],
+type:[['Display 80','--h1','-.04em','Your contacts. Organised.'],['H2 50','--h2','-.03em','Why not just use iCloud?'],['H3 34','--h3','-.03em','Duplicates, found and fixed'],['H4 22','--h4','','Your family'],['Body 17','--x','','<span style="font:400 17px/1.6 var(--font-b);color:var(--body)">Kontax keeps Google, iCloud and Fastmail in step with each other.</span>'],['Mono 13','--step-n','','01 — How it works']],
+motif:'<div class="motif-a"><div><b>Hairline wires</b>Thin green connectors show where data comes from and where it goes. Used in the hero, how-it-works and security diagrams.</div><div><b>Source tags</b>Small mono tags ("iCloud", "Google") mark where a value came from. Honest provenance, reused in product.</div><div><b>Stone panels</b>One warm neutral carries the signature moment and alternate bands, so green is kept for brand and action.</div></div>'};
+window.P50sig=function(){var s=document.getElementById('sig');if(!s||window.P50reduce||s.dataset.done)return;s.dataset.done=1;s.classList.add('pre');s.getBoundingClientRect();requestAnimationFrame(function(){requestAnimationFrame(function(){s.classList.remove('pre')})})};
+</script>
+<script src="p50.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P50-DB01 · Marketing redesign exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+:root{--ink:#1d2823;--body:#4e5851;--mute:#646c65;--line:#e5e8e1;--line2:#eff1ec;--surface:#f4f6f2;--green:#17352e;--green-t:#e7efe9;--accent:#4158f4;--amber:#f7efdc;--amber-ink:#6f5417}
+body{margin:0;font:400 15.5px/1.6 "Geist",system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:underline;text-underline-offset:2px}a:hover{color:var(--accent)}
+h1,h2,h3,h4,p,ul,ol{margin:0}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px}
+code,.mono{font:500 12.5px/1.5 "Geist Mono",ui-monospace,monospace}
+header.top{border-bottom:1px solid var(--line);padding:48px 0 40px}
+.kick{font:500 12.5px/1 "Geist Mono",monospace;color:var(--mute)}
+h1{margin-top:14px;font:700 clamp(32px,4vw,48px)/1.06 "Geist";letter-spacing:-.03em;text-wrap:balance}
+.lede{margin-top:14px;max-width:760px;font-size:17px;color:var(--body);text-wrap:pretty}
+.meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:6px;background:var(--surface);font-size:13px;color:var(--body)}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.toc a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:8px;text-decoration:none;font-weight:500;font-size:14px;color:var(--ink)}
+.toc a:hover{border-color:var(--green)}
+section.s{padding:64px 0;border-bottom:1px solid var(--line);scroll-margin-top:0}
+.s h2{font:700 30px/1.15 "Geist";letter-spacing:-.025em}
+.s h2 small{font:500 13px/1 "Geist Mono",monospace;color:var(--mute);display:block;margin-bottom:10px;letter-spacing:0}
+.s>.wrap>p.intro{margin-top:12px;max-width:760px;color:var(--body)}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.card{border:1px solid var(--line);border-radius:12px;padding:22px;min-width:0}
+.card h3{font:600 15px/1.3 "Geist";margin-bottom:10px}
+.card ul{padding-left:18px;display:grid;gap:6px;color:var(--body);font-size:14.5px}
+.card p{color:var(--body);font-size:14.5px}
+.card p+p{margin-top:8px}
+.frames{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;margin-top:32px;align-items:start}
+.fr{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.fr__bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);background:#fff;font:500 12px/1 "Geist Mono",monospace;color:var(--mute)}
+.fr__bar a{font-family:"Geist",sans-serif;font-size:12.5px;font-weight:600}
+.fr__vp{position:relative;overflow:hidden}
+.fr__vp iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#fff}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.links a{display:inline-flex;align-items:center;min-height:36px;padding:0 12px;border-radius:7px;background:var(--surface);text-decoration:none;font-size:13.5px;font-weight:500;color:var(--ink)}
+.links a:hover{background:var(--green-t)}
+pre{margin:0;padding:16px;border-radius:10px;background:var(--surface);overflow:auto;font:500 12px/1.6 "Geist Mono",monospace;color:var(--ink);max-height:320px}
+.rows{margin-top:28px;display:grid;gap:20px}
+.effort{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:var(--green);color:#fff;font-weight:700;font-size:13px;margin-right:8px}
+table.sc{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:24px}
+.sc th,.sc td{padding:12px 14px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.sc thead th{border-top:0;font-weight:600;font-size:13.5px;color:var(--mute)}
+.sc td.n{font:600 15px/1 "Geist Mono",monospace;text-align:center;white-space:nowrap}
+.sc tfoot td,.sc tfoot th{border-top:2px solid var(--ink);font-weight:700}
+.sc .why{font-size:13px;color:var(--body);display:block;margin-top:4px;font-weight:400}
+.rec{margin-top:28px;padding:24px;border-radius:12px;background:var(--green-t)}
+.rec h3{font:700 20px/1.25 "Geist";letter-spacing:-.015em}
+.rec p{margin-top:8px;color:var(--ink);max-width:880px}
+.note{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--amber);color:var(--amber-ink);font-size:14px}
+.cmpg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+.cmpg h4{font:600 14px/1.3 "Geist";margin-bottom:8px}
+@media (max-width:980px){.g2,.g3,.cmpg{grid-template-columns:1fr}.frames{grid-template-columns:1fr}.frames .fr--m{max-width:320px}}
+@media (max-width:640px){.wrap{padding:0 20px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<p class="kick">P50-DB01 · Exploration only, no build commitment · 25 Sep 2026</p>
+<h1>Marketing site redesign: three directions, homepage first</h1>
+<p class="lede">The P49 copy and facts stay the same in every direction. What changes is type, colour, layout, motif and one signature moment each. Every direction is a working prototype with the homepage, <code>/pricing</code>, <code>/security</code>, the header in all three states, the footer and a component sampler.</p>
+<div class="meta"><span class="pill">Builds on P34C-DB01 · P49-DB01</span><span class="pill">Logo frozen</span><span class="pill">Light only</span><span class="pill">No social proof</span><span class="pill">UK English</span></div>
+<nav class="toc" aria-label="Contents"><a href="#a">A · Evolved calm</a><a href="#b">B · Personal &amp; warm</a><a href="#c">C · Precise</a><a href="#compare">Comparison &amp; recommendation</a><a href="#shared">Shared notes</a></nav>
+</div></header>
+
+<section class="s" id="a"><div class="wrap">
+<h2><small>Direction A</small>Evolved calm</h2>
+<p class="intro">Today’s brand, done properly. Geist is loaded and set on a real scale, green becomes a family of six, and a warm stone neutral takes over the jobs green was doing badly. Layouts sit on an editorial grid: headline left, lede right, mono index numbers.</p>
+<div class="frames">
+<div class="fr"><div class="fr__bar"><span>Home · 1440</span><a href="Direction A - Evolved Calm.html">Open prototype ↗</a></div><div class="fr__vp" data-w="1440" data-h="1500"><iframe loading="lazy" title="Direction A homepage desktop" src="Direction A - Evolved Calm.html?embed=1"></iframe></div></div>
+<div class="fr fr--m"><div class="fr__bar"><span>Home · 375</span></div><div class="fr__vp" data-w="375" data-h="760"><iframe loading="lazy" title="Direction A homepage mobile" src="Direction A - Evolved Calm.html?embed=1"></iframe></div></div>
+</div>
+<div class="links"><a href="Direction A - Evolved Calm.html?view=pricing">/pricing</a><a href="Direction A - Evolved Calm.html?view=security">/security</a><a href="Direction A - Evolved Calm.html?view=sampler">Component sampler</a><a href="Direction A - Evolved Calm.html?signed=1">Signed-in header</a><a href="Direction A - Evolved Calm.html?static=1">Reduced-motion render</a></div>
+<div class="rows">
+<div class="g3">
+<div class="card"><h3>Principles</h3><ul><li>Type does the work: 80px display, tight tracking, mono index labels.</li><li>Green is for brand and action; stone is for surfaces.</li><li>Asymmetric 5/7 section heads instead of centred stacks.</li></ul></div>
+<div class="card"><h3>Keeps · changes</h3><ul><li>Keeps: palette core, dark-green footer, window mockups, whitespace.</li><li>Changes: real typeface, green family, stone neutral, hairline wires, left-aligned grid.</li></ul></div>
+<div class="card"><h3>Risks</h3><ul><li>Still the least distinctive. With the logo covered it reads as “good calm SaaS”.</li><li>The stone band and dark footer need a hairline between them. Handled here with a border.</li></ul></div>
+</div>
+<div class="g2">
+<div class="card"><h3>Signature: three into one</h3><p>The same person saved in Google, iCloud and Fastmail is wired into one Kontax contact. Each field is tagged with its source and the result syncs back to iPhone, Mac and Google. On load: the sources slide in, the wires draw, the merged card rises and its fields tick in (1.8 s, transform and opacity only, runs once).</p><p><b>Reduced motion and no JS:</b> the markup is the final frame, so nothing is hidden before the animation. The <code>.pre</code> start state is only added by JS. On mobile, one source card and a caption stand in for all three.</p></div>
+<div class="card"><h3><span class="effort">S</span>Effort · app &amp; auth</h3><p>Tokens only, plus one hero component. CSS transitions, no motion library. <code>next/font</code> Geist + Geist Mono (P49A-18).</p><p><b>App:</b> the green scale and stone map directly onto the existing app tokens. <b>Auth:</b> swap the indigo buttons for forest green, load Geist, fix “organized” → “organised”. Small.</p></div>
+</div>
+<details class="card"><summary style="cursor:pointer;font-weight:600">Tokens (CSS custom properties)</summary><pre style="margin-top:14px">--g900:#0f2620; --g800:#17352e; --g600:#2f6b52; --g400:#6f9c86; --g200:#cfe1d6; --g100:#e8f0eb;
+--stone:#f4f1ea; --stone-line:#e3ddd0; --bg:#fcfcfa; --ink:#1d2823; --head:#14231d;
+--body:#4e5851; --mute:#646c65; --line:#e5e8e1; --line-strong:#d4d9d0; --focus:#4158f4;
+--font-d/b: "Geist"; --font-m: "Geist Mono";
+--h1: 700 clamp(44px,5.6vw,80px)/1.0 (-.04em);  --h2: 700 clamp(32px,3.6vw,50px)/1.06 (-.03em);
+--h3: 650 clamp(26px,2.6vw,34px)/1.14;  --h4: 650 22px/1.25;  body 16–19px/1.55–1.6
+--r-sm:8px; --r-btn:10px; --r-card:16px; --r-win:14px; --maxw:1240px; --pad:48px (20px mobile)
+spacing: section 112 / 88 / 72 · stack 8·12·16·24·32·48·64</pre></details>
+</div>
+</div></section>
+
+<section class="s" id="b"><div class="wrap">
+<h2><small>Direction B</small>Personal &amp; warm</h2>
+<p class="intro">Built around “your address book, yours to keep”. Paper and ink replace white and green-on-white. Newsreader, a text serif, sets the headlines. Terracotta and ochre join the green. The motif is the paper address book itself: index cards, A–Z thumb tabs and stamped facts.</p>
+<div class="frames">
+<div class="fr"><div class="fr__bar"><span>Home · 1440</span><a href="Direction B - Personal and Warm.html">Open prototype ↗</a></div><div class="fr__vp" data-w="1440" data-h="1500"><iframe loading="lazy" title="Direction B homepage desktop" src="Direction B - Personal and Warm.html?embed=1"></iframe></div></div>
+<div class="fr fr--m"><div class="fr__bar"><span>Home · 375</span></div><div class="fr__vp" data-w="375" data-h="760"><iframe loading="lazy" title="Direction B homepage mobile" src="Direction B - Personal and Warm.html?embed=1"></iframe></div></div>
+</div>
+<div class="links"><a href="Direction B - Personal and Warm.html?view=pricing">/pricing</a><a href="Direction B - Personal and Warm.html?view=security">/security</a><a href="Direction B - Personal and Warm.html?view=sampler">Component sampler</a><a href="Direction B - Personal and Warm.html?signed=1">Signed-in header</a><a href="Direction B - Personal and Warm.html?static=1">Reduced-motion render</a></div>
+<div class="rows">
+<div class="g3">
+<div class="card"><h3>Principles</h3><ul><li>Human, not software: serif voice, paper surfaces, one italic accent per headline.</li><li>The product window is an index card, so product and metaphor are the same object.</li><li>Decoration is structural (tabs, rules, stamps), never figurative drawing.</li></ul></div>
+<div class="card"><h3>Keeps · changes</h3><ul><li>Keeps: forest green for actions and the footer, the logo, live mockups, the calm copy.</li><li>Changes: paper palette, serif headlines, terracotta/ochre accents, card-file hero, new headline “Your address book, yours to keep.”</li></ul></div>
+<div class="card"><h3>Risks</h3><ul><li>Can tip into twee. Guardrail: at most one italic word per headline and no illustrated people.</li><li>A serif can read as less “technical” to teams and switchers. Mitigated by the product UI and the comparison table.</li><li>Terracotta passes AA as text only at <code>#a94a24</code>; the lighter tint is decoration only.</li></ul></div>
+</div>
+<div class="g2">
+<div class="card"><h3>Signature: the card file</h3><p>A fanned stack of index cards filed under R, with an A–Z thumb-index rail. On load, the stack fans out from a neat pile, the front card (Rosa Martínez, Family book, on 4 phones) drops in, and the R tab slides out (1.3 s, transform and opacity only).</p><p><b>Reduced motion and no JS:</b> the fanned stack is the resting HTML. The whole figure has one text alternative. The A–Z rail carries into <code>/help</code> as a real jump-to-letter control.</p></div>
+<div class="card"><h3><span class="effort">M</span>Effort · app &amp; auth</h3><p>New tokens, a second font family (Newsreader variable, Latin subset, about 40 KB per style), the index-card frame, the tab label, the stamp. CSS transitions only.</p><p><b>App:</b> the serif stays on marketing only; the app keeps Geist but can borrow the paper tints for empty states and onboarding. <b>Auth:</b> paper background, serif headline, green buttons. Medium, because it has to feel like the same product.</p></div>
+</div>
+<details class="card"><summary style="cursor:pointer;font-weight:600">Tokens (CSS custom properties)</summary><pre style="margin-top:14px">--paper:#f7f2e9; --paper2:#efe7d8; --card:#fffdf8; --green:#17352e; --green-t:#e3eadf;
+--terra:#a94a24 (text, 5.1:1 on paper); --terra-l:#ecc3aa (deco); --ochre:#c99a3e (deco); --ochre-l:#f1e0b8;
+--ink:#1f2a24; --body:#50574f; --mute:#5f5e53; --line:#e4dccb; --line-strong:#d3c8b2; --focus:#4158f4;
+--font-d: "Newsreader" (opsz 6–72, 400–600 + italic); --font-b: "Geist"
+--h1: 500 clamp(48px,6vw,88px)/1.0 (-.025em); --h2: 500 clamp(34px,3.8vw,54px)/1.06;
+--h3: 500 clamp(28px,2.8vw,38px)/1.12; --h4: 500 26px/1.2; step: italic 22px
+--r-sm:6px; --r-btn:8px; --r-card:8px; --r-win:8px; --maxw:1200px</pre></details>
+</div>
+</div></section>
+
+<section class="s" id="c"><div class="wrap">
+<h2><small>Direction C</small>Precise &amp; product-forward</h2>
+<p class="intro">For switchers, power users and developers. White, ink and a visible column grid. IBM Plex Sans with Plex Mono for data, a sharper signal blue for accents, and a sync green used only for state. The hero is the product: a working search with keyboard shortcuts and a sync log. Light throughout; even the footer goes light.</p>
+<div class="frames">
+<div class="fr"><div class="fr__bar"><span>Home · 1440</span><a href="Direction C - Precise.html">Open prototype ↗</a></div><div class="fr__vp" data-w="1440" data-h="1500"><iframe loading="lazy" title="Direction C homepage desktop" src="Direction C - Precise.html?embed=1"></iframe></div></div>
+<div class="fr fr--m"><div class="fr__bar"><span>Home · 375</span></div><div class="fr__vp" data-w="375" data-h="760"><iframe loading="lazy" title="Direction C homepage mobile" src="Direction C - Precise.html?embed=1"></iframe></div></div>
+</div>
+<div class="links"><a href="Direction C - Precise.html?view=pricing">/pricing</a><a href="Direction C - Precise.html?view=security">/security</a><a href="Direction C - Precise.html?view=sampler">Component sampler</a><a href="Direction C - Precise.html?signed=1">Signed-in header</a><a href="Direction C - Precise.html?static=1">Reduced-motion render</a></div>
+<div class="rows">
+<div class="g3">
+<div class="card"><h3>Principles</h3><ul><li>Show, don’t describe: the hero can be used.</li><li>Precision from grid, mono and contrast. No dark bands.</li><li>Colour means state: blue is interactive or “us”, green is synced.</li></ul></div>
+<div class="card"><h3>Keeps · changes</h3><ul><li>Keeps: logo tile colour, honest copy, live mockups.</li><li>Changes: ink buttons, blue accent, Plex type, blueprint grid, mono spec list in the hero, light footer (removes the dark footer/CTA patch from P49), new headline “One address book. Every account. In step.”</li></ul></div>
+<div class="card"><h3>Risks</h3><ul><li>Can feel cold to families, the Family plan’s audience.</li><li>Leaning on the look of developer tools. Kept original by using contacts data and sync logs, not terminal clichés.</li><li>The interactive hero needs care: listbox semantics, focus, and a server-rendered list.</li></ul></div>
+</div>
+<div class="g2">
+<div class="card"><h3>Signature: the live console</h3><p>A real search over sample contacts (type, <span class="mono">↑/↓</span>, <span class="mono">/</span> to focus). On load it types “ben”, selects Ben Nakamura, and the sync log shows one phone-number edit being saved and pushed to Google, iCloud and a Mac. Typing yourself stops the autoplay at once.</p><p><b>Reduced motion:</b> no typing and a full log; the demo stays fully usable. <b>No JS:</b> in production the list and log are server-rendered, so the static frame still carries the message. The prototype fills the list with JS.</p></div>
+<div class="card"><h3><span class="effort">M–L</span>Effort · app &amp; auth</h3><p>Interactive client component (search, keyboard, ARIA listbox), grid system, two new families. No motion library. Budget: Plex Sans 3 weights + Plex Mono 2, subset.</p><p><b>App:</b> the biggest question. Either the app moves to Plex, or marketing and app use different fonts. The sync log reuses the Activity Log pattern. <b>Auth:</b> easiest of the three, as the auth pages are already UI. <b>Logo:</b> the wordmark must ship as SVG so Geist isn’t a third font; the prototype loads Geist 600/700 only for it.</p></div>
+</div>
+<details class="card"><summary style="cursor:pointer;font-weight:600">Tokens (CSS custom properties)</summary><pre style="margin-top:14px">--ink0:#0d1510 (buttons, headings); --white:#fff; --grid:#f5f6f4; --line:#e2e5e0; --line-strong:#c9cec7;
+--blue:#2f49e8 (links, "us", selection); --blue-t:#eceffd; --signal:#0f7a52 (synced); --signal-t:#e3f2ea;
+--forest:#17352e (logo only); --body:#3b443e; --mute:#566058; --focus:#4158f4
+--font-d/b: "IBM Plex Sans" 400/500/600; --font-m: "IBM Plex Mono" 500/600
+--h1: 600 clamp(42px,5vw,70px)/1.02 (-.035em); --h2: 600 clamp(30px,3.2vw,44px)/1.08;
+--h3: 600 clamp(24px,2.3vw,30px)/1.15; --h4: 600 20px/1.25; labels: mono 12.5px [nn] slug
+--r-sm:6px; --r-btn:6px; --r-card:8px; --r-win:10px; --maxw:1280px; --pad:40px</pre></details>
+</div>
+</div></section>
+
+<section class="s" id="compare"><div class="wrap">
+<h2><small>Comparison sheet</small>Same hero, same pricing, side by side</h2>
+<div class="cmpg">
+<div><h4>A · Evolved calm</h4><div class="fr"><div class="fr__vp" data-w="1440" data-h="900"><iframe loading="lazy" title="A hero" src="Direction A - Evolved Calm.html?embed=1&amp;static=1"></iframe></div></div></div>
+<div><h4>B · Personal &amp; warm</h4><div class="fr"><div class="fr__vp" data-w="1440" data-h="900"><iframe loading="lazy" title="B hero" src="Direction B - Personal and Warm.html?embed=1&amp;static=1"></iframe></div></div></div>
+<div><h4>C · Precise</h4><div class="fr"><div class="fr__vp" data-w="1440" data-h="900"><iframe loading="lazy" title="C hero" src="Direction C - Precise.html?embed=1&amp;static=1"></iframe></div></div></div>
+<div><div class="fr"><div class="fr__vp" data-w="1440" data-h="1000"><iframe loading="lazy" title="A pricing" src="Direction A - Evolved Calm.html?embed=1&amp;view=pricing"></iframe></div></div></div>
+<div><div class="fr"><div class="fr__vp" data-w="1440" data-h="1000"><iframe loading="lazy" title="B pricing" src="Direction B - Personal and Warm.html?embed=1&amp;view=pricing"></iframe></div></div></div>
+<div><div class="fr"><div class="fr__vp" data-w="1440" data-h="1000"><iframe loading="lazy" title="C pricing" src="Direction C - Precise.html?embed=1&amp;view=pricing"></iframe></div></div></div>
+</div>
+<table class="sc">
+<caption class="mono" style="text-align:left;color:var(--mute)">Scored 1–5 against the brief’s judging criteria. Distinctiveness is weighted ×2 because it is the core problem (“nothing is ownable”).</caption>
+<thead><tr><th scope="col">Criterion</th><th scope="col">A</th><th scope="col">B</th><th scope="col">C</th></tr></thead>
+<tbody>
+<tr><th scope="row">1 · Five-second test<span class="why">C shows the product and says “every account”. B and A need the subhead to explain sync.</span></th><td class="n">4</td><td class="n">4</td><td class="n">5</td></tr>
+<tr><th scope="row">2 · Distinctiveness (×2)<span class="why">Logo covered: B is unmistakable (card file, tabs, stamps). C is recognisable by its grid and log. A is not.</span></th><td class="n">2</td><td class="n">5</td><td class="n">4</td></tr>
+<tr><th scope="row">3 · Trust<span class="why">A and B feel private and calm. C feels competent but cooler.</span></th><td class="n">5</td><td class="n">5</td><td class="n">4</td></tr>
+<tr><th scope="row">4 · Scales (pricing, long-form, mobile, signed-in)<span class="why">A’s grid scales everywhere. B’s matrix needs its serif kept to headers. C’s mono matrix is the clearest.</span></th><td class="n">5</td><td class="n">4</td><td class="n">4</td></tr>
+<tr><th scope="row">5 · Accessible &amp; fast<span class="why">All pass AA in these tokens. A loads the least; C has the most JS.</span></th><td class="n">5</td><td class="n">4</td><td class="n">4</td></tr>
+<tr><th scope="row">6 · Buildable<span class="why">S / M / M–L</span></th><td class="n">5</td><td class="n">3</td><td class="n">3</td></tr>
+</tbody>
+<tfoot><tr><th scope="row">Weighted total (max 35)</th><td class="n">28</td><td class="n">30</td><td class="n">28</td></tr></tfoot>
+</table>
+<div class="rec"><h3>Recommendation: B, Personal &amp; warm, with C’s sync log on the product pages</h3><p>B is the only direction that solves “nothing is ownable” while strengthening the calm, private tone. For switchers and teams, borrow C’s sync-log component for <code>/features</code> and <code>/security</code>, restyled as an index card. Keep A as the low-risk fallback: its token work (Geist, green scale, a warm neutral) is also step one of B, so it isn’t wasted either way.</p></div>
+<p class="note">Before choosing, test the three heroes on 5–8 people from the target audiences (a family organiser, a switcher, a small-team admin). This exploration has had no user research.</p>
+</div></section>
+
+<section class="s" id="shared"><div class="wrap">
+<h2><small>Shared notes</small>Content, facts and build reality</h2>
+<div class="g3" style="margin-top:24px">
+<div class="card"><h3>Fact corrections vs P49 copy</h3><ul><li>Pro: “every sync source” → “up to 5 sync sources, 5 devices” (billing.ts).</li><li>Privacy fact: “no waiting period” → deletion after a 30-day grace period.</li><li>“Works on iPhone, Android and the web” → “no app to install”. Android sync isn’t in the verified fact list.</li><li>Comparison row “Syncs natively to iPhone and Android” → “Keeps Google, iCloud and Fastmail in step”.</li><li>Merge undo stated as 30 days.</li></ul></div>
+<div class="card"><h3>Honesty constraints held</h3><ul><li>No testimonials, logos, user counts, ratings or uptime, and no placeholders for them.</li><li>No backup-encryption claim and no webhooks. Outlook is not mentioned.</li><li>Prices are Stripe slots; Family/Teams limits not in the brief are shown as <code>billing.ts</code> slots on /pricing.</li></ul></div>
+<div class="card"><h3>Build reality</h3><ul><li>Same content model and component names in all three. Each direction is a token set plus a skin, which fits the <code>--mkt-*</code> plain-CSS setup.</li><li>All motion is CSS transitions on transform and opacity, triggered once. No library, no scroll-jacking.</li><li>Headers: signed-out, signed-in (review bar toggle or <code>?signed=1</code>) and the mobile menu below 980px.</li><li>Docs and legal pages would inherit the header, footer and type scale only.</li></ul></div>
+</div>
+</div></section>
+
+<script>
+function fit(){document.querySelectorAll('.fr__vp').forEach(function(v){var w=+v.dataset.w,h=+v.dataset.h,s=v.clientWidth/w,f=v.querySelector('iframe');f.style.width=w+'px';f.style.height=h+'px';f.style.transform='scale('+s+')';v.style.height=(h*s)+'px'})}
+addEventListener('resize',fit);fit();
+</script>
+</body>
+</html>
