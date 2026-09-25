@@ -123,7 +123,16 @@ export function BillingSection({
         ? "Cancelling"
         : state === "grace"
           ? "Payment failed"
-          : "Current plan";
+          : state === "teamMember"
+            ? "Via your team"
+            : state === "comp"
+              ? "Granted by Kontax"
+              : "Current plan";
+  // P49A-06/07 (Fable review): a plan the user doesn't pay for (team
+  // membership, Kontax comp) never offers "Manage billing" / "Cancel plan" for
+  // it — only the portal for a separate personal subscription they still pay.
+  const isGranted = state === "teamMember" || state === "comp";
+  const grant = surface.grant;
   const glyph =
     state === "free"
       ? "people"
@@ -212,6 +221,26 @@ export function BillingSection({
           Next billing date: {surface.renewalDate}.
         </p>
       ) : null}
+      {grant?.source === "team" ? (
+        <p className="m-0 text-[14.5px] leading-[1.55] text-[#5c655e]">
+          {grant.isOwner
+            ? `Your Teams plan is billed to ${grant.teamName}, not to you personally. Seats are managed below.`
+            : `Your Teams access comes from ${grant.teamName}. The team’s owner manages its billing — there’s nothing for you to pay.`}
+          {grant.teamState === "grace"
+            ? " The team’s plan has lapsed; it becomes read-only when its grace period ends."
+            : ""}
+        </p>
+      ) : null}
+      {grant?.source === "kontax" ? (
+        <p className="m-0 text-[14.5px] leading-[1.55] text-[#5c655e]">
+          Plan granted by Kontax. There&rsquo;s no charge for it and nothing to manage here.
+        </p>
+      ) : null}
+      {isGranted && surface.personalSubscription ? (
+        <p className="m-0 mt-2 text-[14.5px] leading-[1.55] text-[#5c655e]">
+          You also have your own {surface.personalSubscription.planLabel} subscription, billed separately.
+        </p>
+      ) : null}
       {state === "trial" ? (
         <p className="m-0 text-[14.5px] leading-[1.55] text-[#5c655e]">
           You&rsquo;re enjoying all {surface.planLabel} features free during your trial. Manage billing
@@ -270,6 +299,24 @@ export function BillingSection({
           <BillingPortalButton hasPassword={hasPassword} icon="card" label="Update payment method" variant="red" />
         ) : state === "cancel" ? (
           <BillingPortalButton hasPassword={hasPassword} icon="none" label="Keep my plan" variant="green" />
+        ) : isGranted ? (
+          <>
+            {surface.personalSubscription ? (
+              <BillingPortalButton
+                hasPassword={hasPassword}
+                label={`Manage my ${surface.personalSubscription.planLabel} subscription`}
+                variant="ghost"
+              />
+            ) : null}
+            {grant?.source === "team" && !grant.isOwner ? (
+              <Link
+                className="text-[13px] font-semibold text-[#4452c9] hover:underline"
+                href="/settings/sharing/teams"
+              >
+                View your team
+              </Link>
+            ) : null}
+          </>
         ) : (
           <>
             <BillingPortalButton hasPassword={hasPassword} label="Manage billing" variant="ghost" />
@@ -279,7 +326,10 @@ export function BillingSection({
       </div>
 
       {/* portal note (active / family) */}
-      {state === "active" || state === "familyOwner" || state === "trial" ? (
+      {state === "active" ||
+      state === "familyOwner" ||
+      state === "trial" ||
+      (isGranted && surface.personalSubscription) ? (
         <p className="mt-4 flex items-center gap-[7px] text-[12.5px] leading-[1.4] text-[#8b938c]">
           <svg className="h-[13px] w-[13px] shrink-0" fill="none" stroke="#8b938c" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24">
             <rect height="13" rx="2" width="19.5" x="2.25" y="5.5" />

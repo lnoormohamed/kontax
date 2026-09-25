@@ -58,6 +58,8 @@ export function useBillingPortal() {
     if (result.error === "RATE_LIMIT_EXCEEDED")
       return "Too many attempts. Please wait a moment and try again.";
     if (result.error === "STEP_UP_REQUIRED") return "Please enter your password.";
+    if (result.error === "NO_BILLING_ACCOUNT")
+      return "There's no paid subscription to manage on this account.";
     return "Something went wrong opening billing. Please try again.";
   }, []);
 

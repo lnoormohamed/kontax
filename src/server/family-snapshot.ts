@@ -66,6 +66,15 @@ async function uniqueBookSlug(tx: Tx, userId: string, base: string): Promise<str
 // exists, per-member on full dissolution. sourceGroupBookId is preserved so a
 // later re-subscribe can re-promote these contacts (p18-11). Returns the new
 // AddressBook id, or null if the shared book had no contacts (nothing to keep).
+//
+// Contact-cap EXCEPTION (P49A-06, Fable review): this is the one create path
+// that deliberately does NOT check `contactsLimit`. A departing / dissolved
+// member's copy of the family book is data preservation, not a new write the
+// member chose — refusing (or truncating) it at the Free cap would silently
+// destroy contacts they had access to. The member may end up over the cap;
+// every other create path then refuses further creates until they are under
+// it (nothing is ever deleted for being over). Documented in
+// roadmap/build-phase/p49a-06-entitlements-teams-caps-locks.md.
 export async function snapshotFamilyBookForUser(
   tx: Tx,
   args: { bookId: string; targetUserId: string; groupName: string },

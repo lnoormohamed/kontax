@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 
+import { isPlaceholderProviderId } from "~/server/billing-placeholders";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
 
@@ -29,9 +30,11 @@ import { getStripeClient } from "~/server/stripe";
 /** Stripe statuses we treat as already-finished — nothing left to cancel. */
 const TERMINAL_STATUSES = new Set(["CANCELED", "EXPIRED"]);
 
-/** Pre-Stripe placeholder ids (see stripe-customers.ts) — not real customers. */
-const isLegacyManualStripeCustomer = (customerId: string) =>
-  customerId.startsWith("manual_");
+/**
+ * Placeholder ids (pre-Stripe "manual_" comps, P49A-07 admin overrides, legacy
+ * "admin-override-") — nothing in Stripe; see billing-placeholders.ts.
+ */
+const isLegacyManualStripeCustomer = isPlaceholderProviderId;
 
 export type BillingCancellationOutcome = {
   /** Stripe subscription ids successfully cancelled. */
@@ -77,6 +80,14 @@ async function cancelCustomer(
   }
 
   for (const subscription of customer.subscriptions) {
+    // An admin comp row can hang off a REAL customer (overridePlanForUser
+    // reuses an existing cus_ row): its id is not a Stripe subscription.
+    if (isPlaceholderProviderId(subscription.providerSubscriptionId)) {
+      outcome.skipped.push(
+        `${label}: comp subscription ${subscription.providerSubscriptionId} — nothing in Stripe`,
+      );
+      continue;
+    }
     if (TERMINAL_STATUSES.has(subscription.status)) {
       outcome.skipped.push(
         `${label}: subscription ${subscription.providerSubscriptionId} already ${subscription.status}`,

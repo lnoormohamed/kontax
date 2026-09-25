@@ -75,3 +75,47 @@ path — web, API, CardDAV and inbound sync.
   `lastSyncCursor` when a capped user upgrades. CardDAV client sync re-offers them every run.
   (2) Billing page / surface for a Teams *member* (plan shows "Teams" with no personal
   subscription) — check on staging that no personal manage/cancel CTA is offered.
+
+## Fable review fixes (2026-09-25)
+- **Billing page for a plan the user doesn't pay for (MEDIUM; closes follow-up 2).**
+  `getBillingSurface` has two new states. `teamMember`: the effective plan comes from team
+  membership (`planSource === "team"`) — "Your Teams access comes from <team>" (the org owner of
+  an org-billed team gets "billed to <team>", seats managed below). `comp`: a personal plan with no
+  *real* Stripe subscription at that plan (admin override / legacy `manual_` comp) — "Plan granted
+  by Kontax". Neither shows price, renewal, "Manage billing" or "Cancel plan" for the granted plan;
+  if the user still pays for a separate, lower personal subscription (`personalSubscription`), only
+  that subscription's portal is offered. The surface now reads real Stripe subscriptions only
+  (`REAL_STRIPE_SUBSCRIPTION_WHERE`) and prefers the one at the effective plan. Test:
+  `billing-surface-grant.test.ts`. Not yet eyeballed in a browser — check on staging.
+- **Contact cap on the remaining create paths (MEDIUM).** Each now checks inside the inserting
+  transaction with the owner's `User` row locked first (`lockUserForPlanCheck` +
+  `assertCanCreateContactsTx`, or the new `getImportCapacityTx`):
+  REST API `POST /api/v1/contacts` (pre-check moved into the transaction; 403 `LIMIT_REACHED`);
+  sync-conflict `DUPLICATE_LOCAL` (the branch's first write, so at the cap nothing changes and the
+  conflict stays open). **Imports create only what fits** and report the rest as skipped instead
+  of failing: CSV/vCard commit (`/api/imports/contacts/commit`: first N rows created in one locked
+  transaction; response `capSkippedCount` + `limitMessage`; job COMPLETED with the cap note in
+  `errorSummary`) and Kontax archive import (`commitKontaxImport`: per 50-contact chunk, an
+  unlocked estimate before uploading photos, then the locked authoritative check in the chunk's
+  transaction). An import with no room at all, a read-only account, or one over the monthly import
+  limit is still refused up front (`getImportCapacity`). The import wizard shows the cap notice on
+  its done step.
+- **Exception: family dissolution copies are never capped.** `snapshotFamilyBookForUser` (a member
+  leaves / the family dissolves) copies the shared book into the departing member's account
+  regardless of their cap: preserving data they had access to beats the cap. They may end up over
+  it; every other create path then refuses until they are under it, and nothing is deleted.
+  Documented at the function.
+- Tests: `contact-cap-remaining-paths.test.ts` — API POST at the cap, two concurrent API POSTs at
+  499 (exactly one lands, via the lock), CSV import partial at the cap, CSV with no room, Kontax
+  import partial, `DUPLICATE_LOCAL` refused at the cap with no writes.
+- **Observed, not changed:** Free's `monthlyImportLimit: 3` is compared against the *number of
+  contacts* imported this month (`importedThisMonth` sums `importedCount`), so a Free CSV import of
+  more than 3 contacts is refused outright. Confirm whether "3" means imports or contacts.
+- **Legacy user-anchored Teams (LOW).** `resolveEffectivePlan` now credits membership of a team
+  whose OWNER holds an active personal Teams subscription (pre-P34F-03 teams, `teamsEnabled`
+  false), mirroring `isTeamLocked`'s fallback — a team that isn't locked no longer leaves its
+  members on Free. `loadEffectivePlan` selects the owner's active Teams subscription with each
+  team; seats fall back to it. The Teams settings page's "no team yet" gate reads
+  `personalPlan === "TEAMS"` instead of `entitlements.teamsEnabled`, so a member of someone else's
+  team isn't offered team setup off that team's plan. Test: `entitlements-teams-caps-locks.test.ts`
+  "legacy user-anchored team".

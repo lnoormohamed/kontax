@@ -12,6 +12,8 @@ import {
   sendPlanChangedEmail,
   sendTrialEndingEmail,
 } from "~/server/billing-emails";
+import { ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX } from "~/server/admin/plan-override";
+import { isPlaceholderProviderId, REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
 import { db } from "~/server/db";
 import {
   FAMILY_DISSOLVE_NOTICE_MS,
@@ -89,10 +91,8 @@ function planRank(plan: SubscriptionPlan): number {
 const ACTIVE_BILLING_STATUSES: SubscriptionStatus[] = ["ACTIVE", "TRIALING", "PAST_DUE"];
 
 // P49A-07: also treat the legacy "admin-override-" placeholder id as a manual
-// (never-Stripe) subscription — same reasoning as stripe-customers.ts.
-const isLegacyManualSubscription = (subscriptionId: string | null | undefined) =>
-  !!subscriptionId &&
-  (subscriptionId.startsWith("manual_") || subscriptionId.startsWith("admin-override-"));
+// (never-Stripe) id — same reasoning as stripe-customers.ts.
+const isLegacyManualSubscription = isPlaceholderProviderId;
 
 const fromUnix = (seconds: number | null | undefined) =>
   seconds ? new Date(seconds * 1000) : null;
@@ -153,15 +153,31 @@ async function ensureGraceDeadline(
 
 /**
  * The personal subscription that currently decides a user's entitlements —
- * the same query shape as `getUserBillingContext` so the webhook's idea of
- * "what plan is this user on" can never disagree with what enforcement reads.
+ * the same rule as `getUserBillingContext` (P49A-06, plan-entitlements.mjs):
+ * the HIGHEST-ranked active personal row, never "latest period end", so a paid
+ * plan and an admin comp row (P49A-07) resolve the same way here as in
+ * enforcement. Among equal-rank rows a healthy one beats PAST_DUE, so a comp
+ * row doesn't flip a paying user into GRACE and vice versa.
  */
 async function getEffectivePersonalSubscription(userId: string, tx: Tx) {
-  return tx.subscription.findFirst({
+  const rows = await tx.subscription.findMany({
     where: { userId, status: { in: ACTIVE_BILLING_STATUSES } },
     orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
     select: { plan: true, status: true },
   });
+  let best: (typeof rows)[number] | null = null;
+  for (const row of rows) {
+    if (
+      !best ||
+      planRank(row.plan) > planRank(best.plan) ||
+      (planRank(row.plan) === planRank(best.plan) &&
+        best.status === "PAST_DUE" &&
+        row.status !== "PAST_DUE")
+    ) {
+      best = row;
+    }
+  }
+  return best;
 }
 
 async function getEffectivePersonalPlan(userId: string, tx: Tx): Promise<SubscriptionPlan> {
@@ -288,14 +304,16 @@ async function upsertSubscription(
 
   // A live Stripe subscription supersedes any legacy manual (pre-Stripe) one.
   // Only when live: an abandoned / expired checkout must not cancel a comp plan.
+  // Admin plan overrides (P49A-07: "manual_admin-override-<id>", or a legacy
+  // "admin-override-" row) are NOT legacy comps: they are explicit admin grants
+  // that must survive the customer's own renewals (Fable review) — only
+  // removePlanOverrideForUser ends one. The effective plan is max-rank of both.
   if (ACTIVE_BILLING_STATUSES.includes(subscriptionData.status)) {
     await tx.subscription.updateMany({
       where: {
         userId,
-        OR: [
-          { providerSubscriptionId: { startsWith: "manual_" } },
-          { providerSubscriptionId: { startsWith: "admin-override-" } },
-        ],
+        providerSubscriptionId: { startsWith: "manual_" },
+        NOT: { providerSubscriptionId: { startsWith: ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX } },
         status: { in: ACTIVE_BILLING_STATUSES },
       },
       data: {
@@ -1079,6 +1097,8 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
       userId,
       provider: "STRIPE",
       providerSubscriptionId: { not: "" },
+      // A comp / admin-override row has no Stripe object to retrieve.
+      ...REAL_STRIPE_SUBSCRIPTION_WHERE,
     },
     orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
     select: { providerSubscriptionId: true },
