@@ -16,7 +16,9 @@ const FORMAT_VERSION = "1.0";
 const FORMAT_REPO_URL = "https://github.com/getkontax/contact-format";
 
 export const metadata: Metadata = {
-  title: "Developer docs — Kontax",
+  // Root layout's title template already appends " · Kontax" — don't repeat
+  // the brand here or the rendered title doubles up ("Developer docs — Kontax · Kontax").
+  title: "Developer docs",
   description:
     "Kontax developer documentation: the REST API at api.getkontax.com (CRUD for contacts, labels, sync) and the open Kontax Contact Export Format — a JSContact-based export format with JSON Schemas and a reference validator.",
   robots: { index: true, follow: true },

@@ -262,7 +262,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* ── Feature 5 — Public card (mock left) ── */}
-      <section className="fp-feat fp-feat--imgleft">
+      <section id="public-card" className="fp-feat fp-feat--imgleft">
         <div className="fp-feat__grid">
           <div className="fp-feat__shot" aria-hidden="true">
             <div className="fp-shot__pane fp-pm">
@@ -310,7 +310,10 @@ export default function FeaturesPage() {
               Update your number once and every card you&apos;ve ever shared
               updates with it.
             </p>
-            <Link className="fp-feat__link" href="/u/demo">
+            {/* P49A-15: /u/demo doesn't exist (no seeded demo user, and we're
+                not creating one). The static mock card is right here in this
+                section already, so point the link at it instead of a 404. */}
+            <Link className="fp-feat__link" href="/features#public-card">
               See an example{" "}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M5 12h14M13 6l6 6-6 6" />

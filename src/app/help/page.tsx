@@ -9,7 +9,9 @@ import { PublicNav } from "~/app/_components/public-nav";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
-  title: "Help — Kontax",
+  // Root layout's title template already appends " · Kontax" — don't repeat
+  // the brand here or the rendered title doubles up ("Help — Kontax · Kontax").
+  title: "Help",
   description: "Guides and documentation for using Kontax.",
   alternates: { canonical: "/help" },
 };
