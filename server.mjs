@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import Redis from "ioredis";
 import { RateLimiterMemory, RateLimiterRedis } from "rate-limiter-flexible";
 
-import { PrismaClient } from "./generated/prisma/index.js";
+import { Prisma, PrismaClient } from "./generated/prisma/index.js";
 import { getRequestIp } from "./src/server/dav/client-ip.mjs";
 import {
   DAV_BODY_LIMITS,
@@ -25,6 +25,12 @@ import {
   davCredentialRedisKey,
   davCredentialUserIndexKey,
 } from "./src/server/dav/credential-cache.mjs";
+import {
+  buildDavContactWriteData,
+  getVCardUid,
+  isGroupVCard,
+  serializeContactToVCard,
+} from "./src/server/dav/vcard.mjs";
 
 // P48-15: this process is the actual Node entrypoint (`npm start` /
 // `node server.mjs`) — log fatals instead of letting them vanish silently.
@@ -834,296 +840,8 @@ const getTeamResourceParams = (pathname) => {
 const teamResourceHref = (userId, bookId, syncUid) =>
   `/dav/addressbooks/${userId}/team-${bookId}/${encodeURIComponent(syncUid)}.vcf`;
 
-const escapeVCardValue = (value) =>
-  String(value ?? "")
-    .replaceAll("\\", "\\\\")
-    .replaceAll("\n", "\\n")
-    .replaceAll(",", "\\,")
-    .replaceAll(";", "\\;");
-
-// Fold lines at 75 octets per RFC 6350 §3.2, continuation lines start with a space.
-const foldVCardLine = (line) => {
-  const bytes = Buffer.from(line, "utf8");
-
-  if (bytes.length <= 75) {
-    return line;
-  }
-
-  const segments = [];
-  let index = 0;
-  let limit = 75;
-
-  while (index < bytes.length) {
-    // Avoid splitting a multi-byte UTF-8 sequence across a fold boundary.
-    let end = Math.min(index + limit, bytes.length);
-    while (end < bytes.length && (bytes[end] & 0xc0) === 0x80) {
-      end -= 1;
-    }
-    segments.push(bytes.subarray(index, end).toString("utf8"));
-    index = end;
-    limit = 74; // continuation lines lose one octet to the leading space
-  }
-
-  return segments.join("\r\n ");
-};
-
-const toStringArray = (value) => {
-  if (Array.isArray(value)) {
-    return value.filter((entry) => typeof entry === "string" && entry.trim().length > 0);
-  }
-
-  return [];
-};
-
-const serializeContactToVCard = (contact) => {
-  const lines = ["BEGIN:VCARD", "VERSION:3.0", `UID:${escapeVCardValue(contact.syncUid)}`];
-
-  lines.push(`FN:${escapeVCardValue(contact.fullName)}`);
-
-  if (contact.lastName || contact.firstName || contact.middleName || contact.namePrefix || contact.nameSuffix) {
-    lines.push(
-      `N:${escapeVCardValue(contact.lastName ?? "")};${escapeVCardValue(
-        contact.firstName ?? "",
-      )};${escapeVCardValue(contact.middleName ?? "")};${escapeVCardValue(
-        contact.namePrefix ?? "",
-      )};${escapeVCardValue(contact.nameSuffix ?? "")}`,
-    );
-  }
-
-  if (contact.nickname) {
-    lines.push(`NICKNAME:${escapeVCardValue(contact.nickname)}`);
-  }
-
-  if (contact.phoneticFirstName) {
-    lines.push(`X-PHONETIC-FIRST-NAME:${escapeVCardValue(contact.phoneticFirstName)}`);
-  }
-
-  if (contact.phoneticLastName) {
-    lines.push(`X-PHONETIC-LAST-NAME:${escapeVCardValue(contact.phoneticLastName)}`);
-  }
-
-  const emails = [];
-  if (contact.email) {
-    emails.push(contact.email);
-  }
-  for (const value of toStringArray(contact.emailAddresses)) {
-    if (!emails.includes(value)) {
-      emails.push(value);
-    }
-  }
-  for (const value of emails) {
-    lines.push(`EMAIL:${escapeVCardValue(value)}`);
-  }
-
-  const phones = [];
-  if (contact.phone) {
-    phones.push(contact.phone);
-  }
-  for (const value of toStringArray(contact.phoneNumbers)) {
-    if (!phones.includes(value)) {
-      phones.push(value);
-    }
-  }
-  for (const value of phones) {
-    lines.push(`TEL:${escapeVCardValue(value)}`);
-  }
-
-  if (contact.company) {
-    lines.push(`ORG:${escapeVCardValue(contact.company)}`);
-  }
-
-  if (contact.jobTitle) {
-    lines.push(`TITLE:${escapeVCardValue(contact.jobTitle)}`);
-  }
-
-  if (contact.website) {
-    lines.push(`URL:${escapeVCardValue(contact.website)}`);
-  }
-
-  if (contact.birthday) {
-    lines.push(`BDAY:${escapeVCardValue(contact.birthday)}`);
-  }
-
-  if (contact.address) {
-    lines.push(`ADR:;;${escapeVCardValue(contact.address)};;;;`);
-  }
-
-  if (contact.notes) {
-    lines.push(`NOTE:${escapeVCardValue(contact.notes)}`);
-  }
-
-  if (contact.avatarUrl) {
-    lines.push(`PHOTO;VALUE=URI:${escapeVCardValue(contact.avatarUrl)}`);
-  }
-
-  lines.push("END:VCARD");
-
-  return lines.map(foldVCardLine).join("\r\n");
-};
-
-const unfoldVCard = (value) => value.replace(/\r?\n[ \t]/g, "");
-
-const unescapeVCardValue = (value) =>
-  value
-    .replaceAll("\\n", "\n")
-    .replaceAll("\\N", "\n")
-    .replaceAll("\\,", ",")
-    .replaceAll("\\;", ";")
-    .replaceAll("\\\\", "\\")
-    .trim();
-
-const parseVCardLines = (value) =>
-  unfoldVCard(value)
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(
-      (line) =>
-        line.length > 0 &&
-        !line.toUpperCase().startsWith("BEGIN:") &&
-        !line.toUpperCase().startsWith("END:"),
-    )
-    .map((line) => {
-      const separatorIndex = line.indexOf(":");
-
-      if (separatorIndex < 0) {
-        return null;
-      }
-
-      const left = line.slice(0, separatorIndex);
-      const rawValue = line.slice(separatorIndex + 1);
-      const [rawName, ...paramParts] = left.split(";");
-      const name = rawName?.trim().toUpperCase();
-
-      if (!name) {
-        return null;
-      }
-
-      return { name, params: paramParts, value: unescapeVCardValue(rawValue) };
-    })
-    .filter(Boolean);
-
-const getVCardUid = (text) => {
-  const match = unfoldVCard(text).match(/^UID(?:;[^:]*)?:(.+)$/im);
-  return match?.[1]?.trim() ?? null;
-};
-
-const isGroupVCard = (text) => /\bKIND:group\b/i.test(unfoldVCard(text));
-
-// Parse a vCard body into a partial Contact field map. Only fields present in
-// the vCard are returned, so callers can leave unmapped fields untouched on update.
-const parseVCardToContactFields = (text) => {
-  const lines = parseVCardLines(text);
-  const fields = {};
-
-  const fnLine = lines.find((line) => line.name === "FN");
-  if (fnLine) {
-    fields.fullName = fnLine.value;
-  }
-
-  const nLine = lines.find((line) => line.name === "N");
-  if (nLine) {
-    const [lastName, firstName, middleName, namePrefix, nameSuffix] = nLine.value
-      .split(";")
-      .map((part) => unescapeVCardValue(part));
-    fields.lastName = lastName || null;
-    fields.firstName = firstName || null;
-    fields.middleName = middleName || null;
-    fields.namePrefix = namePrefix || null;
-    fields.nameSuffix = nameSuffix || null;
-  }
-
-  const nicknameLine = lines.find((line) => line.name === "NICKNAME");
-  if (nicknameLine) {
-    fields.nickname = nicknameLine.value || null;
-  }
-
-  const phoneticFirst = lines.find(
-    (line) => line.name === "X-PHONETIC-FIRST-NAME" || line.name === "X-KONTAX-PINYIN-FIRST-NAME",
-  );
-  if (phoneticFirst) {
-    fields.phoneticFirstName = phoneticFirst.value || null;
-  }
-
-  const phoneticLast = lines.find(
-    (line) => line.name === "X-PHONETIC-LAST-NAME" || line.name === "X-KONTAX-PINYIN-LAST-NAME",
-  );
-  if (phoneticLast) {
-    fields.phoneticLastName = phoneticLast.value || null;
-  }
-
-  const orgLine = lines.find((line) => line.name === "ORG");
-  if (orgLine) {
-    fields.company = orgLine.value.split(";")[0]?.trim() || null;
-  }
-
-  const titleLine = lines.find((line) => line.name === "TITLE");
-  if (titleLine) {
-    fields.jobTitle = titleLine.value || null;
-  }
-
-  const emails = [];
-  for (const line of lines.filter((entry) => entry.name === "EMAIL")) {
-    const value = line.value.trim();
-    if (value && !emails.includes(value)) {
-      emails.push(value);
-    }
-  }
-  if (lines.some((line) => line.name === "EMAIL")) {
-    fields.email = emails[0] ?? null;
-    fields.emailAddresses = emails;
-  }
-
-  const phones = [];
-  for (const line of lines.filter((entry) => entry.name === "TEL")) {
-    const value = line.value.trim();
-    if (value && !phones.includes(value)) {
-      phones.push(value);
-    }
-  }
-  if (lines.some((line) => line.name === "TEL")) {
-    fields.phone = phones[0] ?? null;
-    fields.phoneNumbers = phones;
-  }
-
-  const urlLine = lines.find((line) => line.name === "URL");
-  if (urlLine) {
-    fields.website = urlLine.value || null;
-  }
-
-  const bdayLine = lines.find((line) => line.name === "BDAY");
-  if (bdayLine) {
-    fields.birthday = bdayLine.value || null;
-  }
-
-  const adrLines = lines.filter((line) => line.name === "ADR");
-  if (adrLines.length > 0) {
-    const formatted = adrLines
-      .map((line) => {
-        const [, , street, city, region, postcode, country] = line.value
-          .split(";")
-          .map((part) => unescapeVCardValue(part));
-        return [street, city, region, postcode, country].filter(Boolean).join(", ");
-      })
-      .filter(Boolean);
-    fields.address = formatted[0] ?? null;
-    fields.postalAddresses = formatted.map((value) => ({ label: "home", formatted: value }));
-  }
-
-  const noteLines = lines.filter((line) => line.name === "NOTE");
-  if (noteLines.length > 0) {
-    fields.notes = noteLines.map((line) => line.value).filter(Boolean).join("\n\n") || null;
-  }
-
-  const photoLine = lines.find((line) => line.name === "PHOTO");
-  if (photoLine && photoLine.params.some((param) => /VALUE=URI/i.test(param))) {
-    // P48-04 follow-up: a device can put anything in PHOTO;VALUE=URI. Only keep
-    // http(s) URLs; every later fetch of this value goes through the SSRF guard.
-    const photoUri = (photoLine.value || "").trim();
-    fields.avatarUrl = /^https?:\/\//i.test(photoUri) ? photoUri : null;
-  }
-
-  return fields;
-};
+// P49A-02: vCard parse/serialize (grouped properties, full-replace PUT data,
+// year-less birthdays, escaping) lives in src/server/dav/vcard.mjs.
 
 // P18-11 / P23-07: contacts in a personal book — its own, or aggregated from
 // sourceBookIds. `book` may be null (legacy default = all of the user's contacts).
@@ -1702,11 +1420,8 @@ const handleFamilyResource = async (req, res, requestUrl) => {
       return preconditionFailed(res);
     }
 
-    const fields = parseVCardToContactFields(body);
-    if (!fields.fullName || !fields.fullName.trim()) {
-      const derived = [fields.firstName, fields.lastName].filter(Boolean).join(" ").trim();
-      fields.fullName = derived || fields.company || fields.email || "Unnamed contact";
-    }
+    // P49A-02: a PUT replaces every DAV-owned column (absent → cleared).
+    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull });
 
     if (!existing) {
       // Device added a contact to the family collection → create in the book,
@@ -1922,11 +1637,8 @@ const handleTeamResource = async (req, res, requestUrl) => {
     if (ifNoneMatch === "*" && existing && !existing.syncTombstoneAt) {
       return preconditionFailed(res);
     }
-    const fields = parseVCardToContactFields(body);
-    if (!fields.fullName || !fields.fullName.trim()) {
-      const derived = [fields.firstName, fields.lastName].filter(Boolean).join(" ").trim();
-      fields.fullName = derived || fields.company || fields.email || "Unnamed contact";
-    }
+    // P49A-02: a PUT replaces every DAV-owned column (absent → cleared).
+    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull });
 
     if (!existing) {
       const created = await prisma.$transaction(async (tx) => {
@@ -2179,13 +1891,11 @@ const handleContactResource = async (req, res, requestUrl) => {
       return preconditionFailed(res);
     }
 
-    const fields = parseVCardToContactFields(body);
-
-    if (!fields.fullName || !fields.fullName.trim()) {
-      // Derive a display name so the record always has a usable label.
-      const derived = [fields.firstName, fields.lastName].filter(Boolean).join(" ").trim();
-      fields.fullName = derived || fields.company || fields.email || "Unnamed contact";
-    }
+    // P49A-02: a PUT replaces every DAV-owned column — a property the device
+    // left out of the body clears it (it used to survive and reappear on the
+    // next fetch). Columns the mapping does not own are left untouched. The
+    // display name is always derived when FN is missing.
+    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull });
 
     if (!existing) {
       const created = await prisma.contact.create({

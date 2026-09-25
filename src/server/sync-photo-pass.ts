@@ -100,7 +100,8 @@ export async function runPhotoPass(
         if (result.avatarUrl !== undefined) {
           await tx.contact.update({
             where: { id: link.contactId },
-            data: { avatarUrl: result.avatarUrl },
+            // P49A-02 (A-18): a photo change must change the CardDAV ETag too.
+            data: { avatarUrl: result.avatarUrl, syncVersion: { increment: 1 } },
           });
         }
         const linkData: Prisma.SyncContactLinkUpdateInput = {};
