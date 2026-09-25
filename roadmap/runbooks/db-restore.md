@@ -4,8 +4,12 @@
 
 | Instance | Host | Port | Database | User | Purpose |
 |----------|------|------|----------|------|---------|
-| Staging | 10.0.0.200 | 5432 | `kontax` | `kontax` | kontax.vexon.co — smoke tests, development |
-| Production | 192.168.1.193 | 5432 | `kontax` | `kontax` | getkontax.com — live users |
+| Staging | 10.0.0.200 (LXC 131 `postgresql-staging` on Proxmox 10.0.0.10) | 5432 | `kontax` | `kontax` | kontax.vexon.co — smoke tests, development |
+| Production | 10.0.50.193 (LXC 129 `postgresql` on Proxmox 10.0.50.10) | 5432 | `kontax` | `kontax` | getkontax.com — live users |
+
+> The production network was re-addressed from `192.168.1.x` to `10.0.50.x`
+> after provisioning. References to `192.168.1.193` further down are the
+> historical provisioning record, not the current address.
 
 Both instances run **PostgreSQL 18.1** on separate database servers. Production and staging are on different hosts with no shared resources.
 
@@ -16,7 +20,7 @@ Stored in Coolify environment variables — never commit to git.
 | Instance | Coolify env var | Value |
 |----------|-----------------|-------|
 | Staging | `DATABASE_URL` (staging app) | `postgresql://kontax:<pw>@10.0.0.200:5432/kontax` |
-| Production | `DATABASE_URL` (prod app) | `postgresql://kontax:<pw>@192.168.1.193:5432/kontax` |
+| Production | `DATABASE_URL` (prod app) | `postgresql://kontax:<pw>@10.0.50.193:5432/kontax` |
 
 Passwords are stored in Coolify — not in any git-tracked file.
 
@@ -72,15 +76,36 @@ Provisioned remotely via `COPY TO PROGRAM` as the postgres superuser. No SSH req
 - **pg_dump binary**: `/usr/lib/postgresql/18/bin/pg_dump` (PostgreSQL 18.1, matches server version)
 - **Crontab**: installed under the `postgres` OS user (uid=102)
 
-Active crontab on 192.168.1.193 (postgres user):
-```
-0 2 * * *   /usr/lib/postgresql/18/bin/pg_dump -h 192.168.1.193 -U kontax -d kontax \
-              | /bin/gzip > /var/lib/postgresql/backups/kontax/kontax_$(date +\%Y\%m\%d).sql.gz \
-              2>> /var/lib/postgresql/backups/kontax/backup.log
-15 2 * * *  /usr/bin/find /var/lib/postgresql/backups/kontax -name "*.sql.gz" -mtime +30 -delete
-```
-
 First backup run manually on 2026-06-17: `/var/lib/postgresql/backups/kontax/kontax_20260617.sql.gz` — 12 KB, 3,613 SQL lines. ✅
+
+### Current nightly backup — script-based (since 2026-09-15)
+
+The original crontab was malformed (both jobs on one line with a literal
+`\n`, doubled backslashes before `%`) and pointed at the old
+`192.168.1.193` address, so it never ran after 2026-06-17. It was replaced on
+2026-09-15 by a script that lives in this repo:
+
+- **Script**: [`scripts/ops/kontax-pg-backup.sh`](../../scripts/ops/kontax-pg-backup.sh),
+  installed on LXC 129 as `/usr/local/bin/kontax-pg-backup.sh` (root-owned,
+  mode 755). It dumps over the local socket (no password needed), writes
+  `kontax_YYYYMMDD.sql.gz` via a temp file, verifies it with `gzip -t`, logs one
+  line per run to `backup.log`, and deletes dumps older than 30 days.
+- **Crontab** (`postgres` OS user, LXC 129):
+  ```
+  0 2 * * * /usr/local/bin/kontax-pg-backup.sh
+  ```
+- **Check it ran**: `tail -3 /var/lib/postgresql/backups/kontax/backup.log`
+  on LXC 129 — expect an `OK kontax_YYYYMMDD.sql.gz <bytes> bytes` line per
+  night.
+- **Update the installed copy** after changing the script in the repo:
+  ```bash
+  ssh -i ~/.ssh/claude-proxmox-uk root@10.0.50.10 'cat > /tmp/kontax-pg-backup.sh' < scripts/ops/kontax-pg-backup.sh
+  ssh -i ~/.ssh/claude-proxmox-uk root@10.0.50.10 'pct push 129 /tmp/kontax-pg-backup.sh /usr/local/bin/kontax-pg-backup.sh --perms 0755 && rm /tmp/kontax-pg-backup.sh'
+  ```
+- The previous crontab is kept at `/root/postgres.cron.bak-*` on LXC 129.
+
+Separately, Proxmox snapshots the whole LXC 129 to the NAS monthly (job
+`c02d393d`, 1st of the month 02:30, storage `pve-backup-nfs`).
 
 ### Backup encryption (P48-17)
 
@@ -115,27 +140,28 @@ age-keygen -o kontax-backup-key.txt
 - Losing the private key makes every backup encrypted with it permanently
   unreadable. Losing it is a bigger operational risk than losing a single
   backup file, so treat it with the same care as a production signing key.
-- Rotating the key: generate a new keypair, update the crontab's `-r`
-  argument to the new public key, and keep the retired private key until the
+- Rotating the key: generate a new keypair, update `AGE_RECIPIENT` in the
+  crontab to the new public key, and keep the retired private key until the
   last backup encrypted under it ages out (30 days, per the `-mtime +30
   -delete` retention job below) — old backups still need the old key to
   decrypt.
 
-**Updated crontab** (`postgres` OS user on 192.168.1.193) — pipes the gzip'd
-dump through `age` before it ever touches disk, so no unencrypted dump is
-ever written:
+**Status: not enabled** (deferred on 2026-09-25). Dumps are currently plain
+gzip. The `/security` page's "encrypted nightly backups" claim is not yet true
+until this is switched on.
 
-```
-0 2 * * *   /usr/lib/postgresql/18/bin/pg_dump -h 192.168.1.193 -U kontax -d kontax \
-              | /bin/gzip \
-              | age -r age1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqrx8p9x \
-              > /var/lib/postgresql/backups/kontax/kontax_$(date +\%Y\%m\%d).sql.gz.age \
-              2>> /var/lib/postgresql/backups/kontax/backup.log
-15 2 * * *  /usr/bin/find /var/lib/postgresql/backups/kontax -name "*.sql.gz.age" -mtime +30 -delete
+**Enabling it** — the backup script encrypts when `AGE_RECIPIENT` is set, piping
+the gzip'd dump through `age` before it touches disk:
+
+```bash
+# On LXC 129, once:
+apt-get install -y age
+# Then change the postgres crontab entry to (real public key from age-keygen):
+0 2 * * * AGE_RECIPIENT=age1... /usr/local/bin/kontax-pg-backup.sh
 ```
 
-(Replace the `-r age1...` value with the real public key from `age-keygen`
-above before installing this crontab.)
+Output files become `kontax_YYYYMMDD.sql.gz.age`; the script's retention step
+already prunes both `.sql.gz` and `.sql.gz.age` older than 30 days.
 
 **Decrypting a backup** (first step before any restore below):
 
