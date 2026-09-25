@@ -5,6 +5,7 @@ import { z } from "zod";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { countLiveSyncAccountSlots } from "~/server/billing";
+import { isEligibleForProTrial } from "~/server/billing-trial";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
 import { ensureStripeCustomer, ensureTeamStripeCustomer } from "~/server/stripe-customers";
@@ -73,13 +74,9 @@ export async function createCheckoutSession(input: {
     }
   }
 
-  // 14-day trial for first-time Pro subscribers (no previous non-incomplete Pro sub).
-  const isFirstTimePro =
-    plan === "PRO" &&
-    !(await db.subscription.findFirst({
-      where: { userId, plan: "PRO", status: { not: "INCOMPLETE" } },
-      select: { id: true },
-    }));
+  // 14-day trial for first-time subscribers only (P49A-05: a canceled Pro
+  // subscription no longer earns a second trial — see isEligibleForProTrial).
+  const isFirstTimePro = plan === "PRO" && (await isEligibleForProTrial(userId));
 
   let priceId: string;
   try {
