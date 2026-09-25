@@ -1,28 +1,146 @@
 /* ════════════════════════════════════════════════════════════════
-   Marketing site chrome — nav + footer
+   Marketing site — tokens, type scale, chrome and shared components
    Shared by all pages in the (marketing) route group.
-   Token values mirror the P34C design system.
+   Design: P50 Direction A "Evolved calm"
+   (roadmap/design-briefs/p50-db01-handoff/dir-a.css + p50-base.css).
    ════════════════════════════════════════════════════════════════ */
 
-/* ─── Tokens ─────────────────────────────────────────────────── */
+/* ─── Tokens ─────────────────────────────────────────────────────
+   Direction A tokens are namespaced --mkt-* (the prototype's bare
+   names, e.g. --g800, would leak into every page stylesheet under
+   .mkt-wrap). Prototype name → token here:
+
+     --g900 --g800 --g600 --g400 --g200 --g100 → --mkt-g900 … --mkt-g100
+     --stone / --stone-line                    → --mkt-stone / --mkt-stone-line
+     --bg / --card                             → --mkt-bg / --mkt-card
+     --ink / --head / --body / --mute          → --mkt-ink / --mkt-head / --mkt-body / --mkt-mute
+     --line / --line2 / --line-strong          → --mkt-line / --mkt-line2 / --mkt-line-strong
+     --focus / --err                           → --mkt-focus / --mkt-err
+
+   Legacy P34C names (used by every existing page stylesheet) are
+   remapped onto Direction A so those pages pick the new system up
+   without edits. Old value → new source:
+
+     --mkt-paper       #ffffff → --mkt-card        #ffffff (unchanged)
+     --mkt-surface     #f4f6f2 → --mkt-stone       #f4f1ea (warm neutral)
+     --mkt-green       #17352e → --mkt-g800        #17352e (unchanged)
+     --mkt-green-deep  #0f2419 → --mkt-g900        #0f2620
+     --mkt-ink         #1d2823 → Direction A ink   #1d2823 (unchanged)
+     --mkt-body        #5c655e → Direction A body  #4e5851 (darker)
+     --mkt-mute        #8b938c → Direction A mute  #646c65 (now passes AA)
+     --mkt-hairline    #edf0ea → --mkt-line        #e5e8e1
+     --mkt-card-border #d8ddd6 → --mkt-line-strong #d4d9d0
+     --mkt-tile-bg     #eef5ef → --mkt-g100        #e8f0eb
+     --mkt-accent      #4158f4 → --mkt-focus       #4158f4 (unchanged; focus only)
+     --mkt-bg          (was undefined; pricing.css used it) → #fcfcfa
+     --mkt-sans / --mkt-mono → next/font Geist / Geist Mono (root layout)
+
+   Text contrast (WCAG 2.x), on --mkt-bg #fcfcfa / --mkt-stone #f4f1ea:
+     head  15.87 / 14.46    ink  14.81 / 13.49    g800 12.90 / 11.74
+     body   7.20 /  6.56    g600  6.11 /  5.56    mute  5.28 /  4.80
+     focus  5.21 /  4.74    (all ≥ 4.5:1)
+     g400   3.02 /  2.75 — decorative only (wires, rules), never text.
+     Footer: --mkt-foot-ink #c3d3ca on g800 8.51; white on g800 13.25.
+   ──────────────────────────────────────────────────────────────── */
 .mkt-wrap {
-  --mkt-paper:       #ffffff;
-  --mkt-surface:     #f4f6f2;
-  --mkt-green:       #17352e;
-  --mkt-green-deep:  #0f2419;
+  /* Direction A — green family */
+  --mkt-g900: #0f2620;
+  --mkt-g800: #17352e; /* brand */
+  --mkt-g600: #2f6b52;
+  --mkt-g400: #6f9c86;
+  --mkt-g200: #cfe1d6;
+  --mkt-g100: #e8f0eb;
+  /* Direction A — neutrals */
+  --mkt-stone:       #f4f1ea;
+  --mkt-stone-line:  #e3ddd0;
+  --mkt-bg:          #fcfcfa;
+  --mkt-card:        #ffffff;
+  --mkt-head:        #14231d;
   --mkt-ink:         #1d2823;
-  --mkt-body:        #5c655e;
-  --mkt-mute:        #8b938c;
-  --mkt-hairline:    #edf0ea;
-  --mkt-card-border: #d8ddd6;
-  --mkt-tile-bg:     #eef5ef;
-  --mkt-accent:      #4158f4;
-  --mkt-sans: var(--font-sans, "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif);
-  --mkt-mono: "Geist Mono", ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  --mkt-body:        #4e5851;
+  --mkt-mute:        #646c65;
+  --mkt-line:        #e5e8e1;
+  --mkt-line2:       #eff1ec;
+  --mkt-line-strong: #d4d9d0;
+  --mkt-focus:       #4158f4;
+  --mkt-err:         #b3261e;
+  /* Footer (the one dark element) */
+  --mkt-foot-bg:   var(--mkt-g800);
+  --mkt-foot-ink:  #c3d3ca;
+  --mkt-foot-head: #ffffff;
+  --mkt-foot-line: rgba(223, 240, 231, 0.16);
+
+  /* Legacy P34C names → Direction A (see map above) */
+  --mkt-paper:       var(--mkt-card);
+  --mkt-surface:     var(--mkt-stone);
+  --mkt-green:       var(--mkt-g800);
+  --mkt-green-deep:  var(--mkt-g900);
+  --mkt-hairline:    var(--mkt-line);
+  --mkt-card-border: var(--mkt-line-strong);
+  --mkt-tile-bg:     var(--mkt-g100);
+  --mkt-accent:      var(--mkt-focus);
+
+  /* Type families (next/font variables are set on <html> by the root layout) */
+  --mkt-sans: var(--font-geist-sans, "Geist"), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --mkt-mono: var(--font-geist-mono, "Geist Mono"), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+
+  /* Type scale (Direction A). Use as `font: var(--mkt-h2); letter-spacing: var(--mkt-h2-ls)`
+     or through the .mkt-h1….mkt-h4 / .mkt-lede / .mkt-label classes below. */
+  --mkt-h1: 700 clamp(44px, 5.6vw, 80px) / 1.0 var(--mkt-sans);
+  --mkt-h1-ls: -0.04em;
+  --mkt-h2: 700 clamp(32px, 3.6vw, 50px) / 1.06 var(--mkt-sans);
+  --mkt-h2-ls: -0.03em;
+  --mkt-h3: 650 clamp(26px, 2.6vw, 34px) / 1.14 var(--mkt-sans);
+  --mkt-h3-ls: -0.03em;
+  --mkt-h4: 650 22px / 1.25 var(--mkt-sans);
+  --mkt-lede-size: 18px;      /* 16.5px below 768px */
+  --mkt-hero-sub-size: 19px;  /* 17px below 768px */
+  --mkt-label: 500 13px / 1 var(--mkt-mono);
+
+  /* Shape and layout */
+  --mkt-r-sm: 8px;
+  --mkt-r-btn: 10px;
+  --mkt-r-card: 14px; /* Direction A skin: cards, plans, tables */
+  --mkt-r-win: 14px;
+  --mkt-r-lg: 16px;
+  --mkt-maxw: 1240px;
+  --mkt-pad: 48px;    /* gutter; 20px below 768px */
+  --mkt-nav-h: 68px;  /* 60px below 768px */
+  --mkt-section: 112px; /* 88px ≤ 980px, 72px below 768px */
+
   font-family: var(--mkt-sans);
   -webkit-font-smoothing: antialiased;
-  background: #ffffff; /* explicit white — prevents dark-mode bleed-through */
-  color: #1d2823;
+  text-rendering: optimizeLegibility;
+  background: var(--mkt-bg); /* explicit light background — no dark-mode bleed-through */
+  color: var(--mkt-ink);
+  color-scheme: light;
+}
+@media (max-width: 980px) {
+  .mkt-wrap { --mkt-section: 88px; }
+}
+@media (max-width: 767px) {
+  .mkt-wrap {
+    --mkt-pad: 20px;
+    --mkt-nav-h: 60px;
+    --mkt-section: 72px;
+    --mkt-lede-size: 16.5px;
+    --mkt-hero-sub-size: 17px;
+  }
+}
+
+/* ─── Type scale utilities ──────────────────────────────────────── */
+.mkt-h1 { margin: 0; font: var(--mkt-h1); letter-spacing: var(--mkt-h1-ls); color: var(--mkt-head); text-wrap: balance; }
+.mkt-h2 { margin: 0; font: var(--mkt-h2); letter-spacing: var(--mkt-h2-ls); color: var(--mkt-head); text-wrap: balance; }
+.mkt-h3 { margin: 0; font: var(--mkt-h3); letter-spacing: var(--mkt-h3-ls); color: var(--mkt-head); text-wrap: balance; }
+.mkt-h4 { margin: 0; font: var(--mkt-h4); color: var(--mkt-head); }
+.mkt-lede { margin: 0; font-size: var(--mkt-lede-size); line-height: 1.6; color: var(--mkt-body); text-wrap: pretty; }
+.mkt-body { margin: 0; font-size: 16px; line-height: 1.6; color: var(--mkt-body); }
+.mkt-body-lg { margin: 0; font-size: 17px; line-height: 1.6; color: var(--mkt-body); text-wrap: pretty; }
+.mkt-label { margin: 0; font: var(--mkt-label); color: var(--mkt-g600); }
+.mkt-mono { font-family: var(--mkt-mono); }
+.mkt-sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
 
 /* ─── Nav ────────────────────────────────────────────────────── */

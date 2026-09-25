@@ -1,12 +1,33 @@
 import "~/styles/globals.css";
 
 import { type Metadata, type Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 
 import { ImpersonationBanner } from "~/app/_components/impersonation-banner";
 import { MotionPreference } from "~/app/_components/motion-preference";
 import { PwaRegister } from "~/app/_components/pwa-register";
 import { WebVitalsReporter } from "~/app/_components/web-vitals-reporter";
 import { SITE_URL } from "~/lib/site-url";
+
+// P50-01: Geist + Geist Mono, self-hosted by next/font at build time (no
+// runtime request to Google). Exposed as CSS variables on <html>:
+//   --font-geist-sans → the app's Tailwind --font-sans (globals.css @theme)
+//                       and the marketing --mkt-sans (marketing.css)
+//   --font-geist-mono → the marketing --mkt-mono
+// Geist ships as one variable file (next/font cannot clip the wght axis, so
+// the 400–700 we use come from the full axis). Mono is a single 500 cut, the
+// only weight Direction A's labels use.
+const geistSans = Geist({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-geist-sans",
+});
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  weight: "500",
+  display: "swap",
+  variable: "--font-geist-mono",
+});
 
 const DESCRIPTION =
   "One address book, always up to date — synced across every device over CardDAV, with full import, activity history, and sharing. Free for up to 500 contacts.";
@@ -57,7 +78,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <WebVitalsReporter />
         <MotionPreference />

@@ -22,7 +22,9 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mkt-wrap" style={{ background: "#fff", color: "#1d2823", colorScheme: "light" }}>
+    // Background, text colour and color-scheme: light come from the
+    // Direction A tokens on .mkt-wrap (marketing.css).
+    <div className="mkt-wrap">
       <MarketingNav />
       <main>{children}</main>
       <MarketingFooter />
