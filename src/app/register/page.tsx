@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
+import { PageViewBeacon } from "~/app/_components/page-view-beacon";
 import { safeInternalPath } from "~/lib/safe-internal-path";
 import { auth } from "~/server/auth";
 import { CardRegisterContext } from "./card-register-context";
@@ -64,6 +65,9 @@ export default async function RegisterPage({
           }}
         />
       </div>
+      {/* P50A-08: cookieless register-conversion beacon — only reached for
+          signed-out visitors (see the redirect() above). */}
+      <PageViewBeacon path="/register" />
       {prefillParam && <CardRegisterContext prefillParam={prefillParam} />}
       <AuthCard mode="register" next={next} plan={plan} />
       <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>

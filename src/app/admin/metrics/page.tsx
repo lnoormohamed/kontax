@@ -6,6 +6,7 @@ import {
   adminAttentionMeta,
 } from "~/server/admin/attention";
 import { loadPlatformMetrics } from "~/server/admin/metrics";
+import { loadPageViewSummary } from "~/server/page-view-metrics";
 import { AdminHeader } from "../_components/admin-header";
 import { AD, AdIcon } from "../_components/admin-icons";
 
@@ -68,6 +69,9 @@ export default async function AdminMetricsPage() {
   const m = await loadPlatformMetrics();
   const total = m.plans.reduce((s, p) => s + p.count, 0) || 1;
   const h = healthBanner(m.worst);
+  // P50A-08: cookieless page-view counts (guides/compare/help/for/features)
+  // and the /register conversion proxy, over the last 7 days.
+  const pv = await loadPageViewSummary(7);
 
   return (
     <>
@@ -147,6 +151,45 @@ export default async function AdminMetricsPage() {
               );
             })}
           </div>
+
+          <div className="ad-section-label">Page views — last {pv.days} days (P50A-08)</div>
+          <div className="ad-stat-grid">
+            <div className="ad-stat">
+              <div className="ad-stat-value tnum">{pv.totalViews.toLocaleString()}</div>
+              <div className="ad-stat-label">Content page views</div>
+            </div>
+            <div className="ad-stat">
+              <div className="ad-stat-value tnum">{pv.registerConversions.toLocaleString()}</div>
+              <div className="ad-stat-label">Register views (conversion proxy)</div>
+            </div>
+            <div className="ad-stat">
+              <div className="ad-stat-value tnum">
+                {Object.keys(pv.categoryTotals).length
+                  ? Object.entries(pv.categoryTotals)
+                      .map(([category, count]) => `${category} ${count}`)
+                      .join(" · ")
+                  : "—"}
+              </div>
+              <div className="ad-stat-label">By section</div>
+            </div>
+          </div>
+          <section className="ad-card">
+            <div className="ad-card-head">
+              <h3 className="ad-card-title">Top content pages</h3>
+            </div>
+            {!pv.redisConfigured ? (
+              <p className="ad-pv-empty">Redis is not configured — page-view counts aren&apos;t available.</p>
+            ) : pv.topPaths.length === 0 ? (
+              <p className="ad-pv-empty">No page views recorded yet.</p>
+            ) : (
+              pv.topPaths.map((p) => (
+                <div key={p.path} className="ad-pv-row">
+                  <span className="ad-pv-path">{p.path}</span>
+                  <span className="ad-pv-count tnum">{p.count.toLocaleString()}</span>
+                </div>
+              ))
+            )}
+          </section>
         </div>
       </div>
     </>
