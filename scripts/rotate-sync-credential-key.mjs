@@ -46,6 +46,9 @@ const { PrismaClient } = await import("../generated/prisma/index.js");
 const { rotateSyncCredential, getSyncCredentialEncryptionStatus } = await import(
   "~/server/sync-credentials"
 );
+const { decryptDisplayToken, displayTokenKeyStatus, encryptDisplayToken, hashToken } = await import(
+  "../src/server/capability-tokens.ts"
+);
 const { decryptTotp, encryptTotp, isTotpCiphertextStale } = await import(
   "~/server/totp-crypto"
 );
@@ -59,6 +62,8 @@ if (args.includes("--help") || args.includes("-h")) {
       "",
       "  --apply   Persist the re-encrypted values (default is a dry run).",
       "  --totp    Also rotate stored TOTP secrets (User.totpSecret).",
+      "  (Calendar and share-link display copies are always rotated — they share",
+      "   the sync credential keys; see P48-18.)",
       "",
       "Reads keys from SYNC_CREDENTIAL_ENCRYPTION_KEYS / TOTP_ENCRYPTION_KEYS",
       "(or the single-key SYNC_CREDENTIAL_ENCRYPTION_KEY / TOTP_ENCRYPTION_KEY).",
@@ -130,6 +135,75 @@ async function rotateSyncAccounts() {
   return counts;
 }
 
+// P48-18: calendar and share-link display copies are encrypted with the sync
+// credential keyring, so they rotate with it. Each re-encrypted value is checked
+// against the row's stored hash and written compare-and-set on the old
+// ciphertext, so a concurrent regenerate is never overwritten. Tokens are never
+// printed.
+async function rotateDisplayTokens() {
+  const counts = { total: 0, rotated: 0, current: 0, failed: 0 };
+
+  const rotateOne = async ({ label, id, encrypted, storedHash, write }) => {
+    counts.total += 1;
+    const status = displayTokenKeyStatus(encrypted);
+    if (status === "current") {
+      counts.current += 1;
+      return;
+    }
+    const plain = status === "stale" ? decryptDisplayToken(encrypted) : null;
+    if (!plain || (storedHash && hashToken(plain) !== storedHash)) {
+      counts.failed += 1;
+      console.error(`  ✗ ${label} ${id} — display copy unreadable or does not match its hash`);
+      return;
+    }
+    counts.rotated += 1;
+    console.log(`  ${apply ? "→" : "·"} ${label} ${id} display copy`);
+    if (apply) {
+      const result = await write(encryptDisplayToken(plain));
+      if (result.count !== 1) console.log(`    (skipped ${label} ${id}: changed since it was read)`);
+    }
+  };
+
+  const users = await db.user.findMany({
+    where: { calTokenEncrypted: { not: null } },
+    select: { id: true, calTokenEncrypted: true, calTokenHash: true },
+  });
+  for (const u of users) {
+    await rotateOne({
+      label: "User calendar token",
+      id: u.id,
+      encrypted: u.calTokenEncrypted,
+      storedHash: u.calTokenHash,
+      write: (next) =>
+        db.user.updateMany({
+          where: { id: u.id, calTokenEncrypted: u.calTokenEncrypted },
+          data: { calTokenEncrypted: next },
+        }),
+    });
+  }
+
+  const shares = await db.contactShare.findMany({
+    where: { tokenEncrypted: { not: null } },
+    select: { id: true, tokenEncrypted: true, tokenHash: true },
+  });
+  for (const sh of shares) {
+    await rotateOne({
+      label: "ContactShare link",
+      id: sh.id,
+      encrypted: sh.tokenEncrypted,
+      storedHash: sh.tokenHash,
+      write: (next) =>
+        db.contactShare.updateMany({
+          where: { id: sh.id, tokenEncrypted: sh.tokenEncrypted },
+          data: { tokenEncrypted: next },
+        }),
+    });
+  }
+
+  report("Display tokens (calendar + share links)", counts);
+  return counts;
+}
+
 async function rotateTotpSecrets() {
   const users = await db.user.findMany({
     where: { totpSecret: { not: null } },
@@ -184,13 +258,14 @@ async function main() {
   if (!apply) console.log("No changes will be written. Re-run with --apply to persist.\n");
 
   const sync = await rotateSyncAccounts();
+  const display = await rotateDisplayTokens();
   const totp = includeTotp ? await rotateTotpSecrets() : null;
 
   if (!includeTotp) {
     console.log("\nTOTP secrets were not touched — pass --totp to rotate them too.");
   }
 
-  const failed = sync.failed + (totp?.failed ?? 0);
+  const failed = sync.failed + display.failed + (totp?.failed ?? 0);
   if (failed > 0) {
     console.error(
       `\n${failed} row(s) could not be decrypted. Keep every retired key in the keyring until this reaches 0.`,

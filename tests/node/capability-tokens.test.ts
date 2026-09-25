@@ -5,6 +5,7 @@ import { test } from "node:test";
 import {
   calTokenColumns,
   decryptDisplayToken,
+  displayTokenKeyStatus,
   encryptDisplayToken,
   findMemberByInviteToken,
   findShareByToken,
@@ -230,4 +231,27 @@ test("lookup helpers short-circuit on empty or oversized tokens without querying
   assert.equal(await findUserByCalToken(undefined, finder.find), null);
   assert.equal(await findUserByCalToken("a".repeat(257), finder.find), null);
   assert.deepEqual(finder.calls, []);
+});
+
+test("displayTokenKeyStatus tracks key rotation: current → stale → unreadable", () => {
+  const written = withEnv({ SYNC_CREDENTIAL_ENCRYPTION_KEYS: `k1:${K1}` }, () => {
+    const enc = encryptDisplayToken("cal-token-abc");
+    assert.equal(displayTokenKeyStatus(enc), "current");
+    return enc;
+  });
+
+  withEnv({ SYNC_CREDENTIAL_ENCRYPTION_KEYS: `k2:${K2},k1:${K1}` }, () => {
+    // k1 retired but still configured: readable, needs re-encryption.
+    assert.equal(displayTokenKeyStatus(written), "stale");
+    const reencrypted = encryptDisplayToken(decryptDisplayToken(written)!);
+    assert.equal(displayTokenKeyStatus(reencrypted), "current");
+    assert.equal(decryptDisplayToken(reencrypted), "cal-token-abc");
+  });
+
+  withEnv({ SYNC_CREDENTIAL_ENCRYPTION_KEYS: `k2:${K2}` }, () => {
+    // k1 removed before rotation: the old copy can no longer be opened.
+    assert.equal(displayTokenKeyStatus(written), "unreadable");
+  });
+
+  assert.equal(displayTokenKeyStatus("not-an-envelope"), "unreadable");
 });

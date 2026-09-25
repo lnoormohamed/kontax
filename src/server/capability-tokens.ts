@@ -96,6 +96,30 @@ export const decryptDisplayToken = (encrypted: string | null | undefined): strin
   }
 };
 
+/**
+ * Key-rotation support (used by scripts/rotate-sync-credential-key.mjs).
+ * Display copies share the sync credential keyring, so rotating that keyring
+ * must re-encrypt them too, or retiring the old key turns every affected link
+ * into a "Regenerate link" state.
+ *
+ * - "current": encrypted under the keyring's current key — nothing to do
+ * - "stale": readable, but under an older key — re-encrypt
+ * - "unreadable": no configured key can open it (or it is malformed)
+ */
+export const displayTokenKeyStatus = (
+  encrypted: string,
+): "current" | "stale" | "unreadable" => {
+  if (!encrypted.startsWith(`${DISPLAY_ENVELOPE_PREFIX}:`)) return "unreadable";
+  try {
+    const keyring = buildSyncCredentialKeyring();
+    if (!keyring) return "unreadable";
+    const { keyId } = decryptEnvelope(keyring, DISPLAY_ENVELOPE_PREFIX, DISPLAY_HKDF_INFO, encrypted);
+    return keyId === keyring.current.id ? "current" : "stale";
+  } catch {
+    return "unreadable";
+  }
+};
+
 export type DisplayToken =
   | { status: "ok"; token: string }
   /** A token exists but cannot be shown — offer "Regenerate link". */
