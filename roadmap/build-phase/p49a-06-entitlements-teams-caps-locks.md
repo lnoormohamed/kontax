@@ -111,3 +111,11 @@ path — web, API, CardDAV and inbound sync.
 - **Observed, not changed:** Free's `monthlyImportLimit: 3` is compared against the *number of
   contacts* imported this month (`importedThisMonth` sums `importedCount`), so a Free CSV import of
   more than 3 contacts is refused outright. Confirm whether "3" means imports or contacts.
+- **Legacy user-anchored Teams (LOW).** `resolveEffectivePlan` now credits membership of a team
+  whose OWNER holds an active personal Teams subscription (pre-P34F-03 teams, `teamsEnabled`
+  false), mirroring `isTeamLocked`'s fallback — a team that isn't locked no longer leaves its
+  members on Free. `loadEffectivePlan` selects the owner's active Teams subscription with each
+  team; seats fall back to it. The Teams settings page's "no team yet" gate reads
+  `personalPlan === "TEAMS"` instead of `entitlements.teamsEnabled`, so a member of someone else's
+  team isn't offered team setup off that team's plan. Test: `entitlements-teams-caps-locks.test.ts`
+  "legacy user-anchored team".

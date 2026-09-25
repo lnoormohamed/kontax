@@ -14,10 +14,12 @@
 //     user can hold more than one (e.g. a paid plan plus an admin comp plan,
 //     P49A-07), so this is max-by-rank, never "latest period end"; and
 //   · Teams, when the user is an accepted member of a TEAM group whose org
-//     entitlement is on (`teamsEnabled`) or still inside its lapse grace
-//     window (`teamsGraceEndsAt` in the future). Teams billing is org-anchored
-//     (Subscription.userId = null, groupId set), so it never shows up in
-//     `user.subscriptions`.
+//     entitlement is on (`teamsEnabled`), whose OWNER still holds a legacy
+//     user-anchored personal Teams subscription (pre-P34F-03 teams; the same
+//     fallback `isTeamLocked` applies), or that is still inside its lapse
+//     grace window (`teamsGraceEndsAt` in the future). Teams billing is
+//     org-anchored (Subscription.userId = null, groupId set), so it never
+//     shows up in `user.subscriptions`.
 // Family is NOT inherited by family members: a member of someone else's
 // Family group keeps their own personal plan (the owner's plan covers the
 // shared book, whose contacts are owned by the owner). Decision recorded in
@@ -140,6 +142,7 @@ export const PLAN_DEFAULTS = {
  * @property {Date | null} teamsGraceEndsAt
  * @property {number | null} [memberSlotsLimit]
  * @property {Array<{ memberSlotsLimit: number | null }>} [subscriptions]  The org's active Teams subscription(s).
+ * @property {{ subscriptions?: Array<{ memberSlotsLimit: number | null }> }} [owner]  The owner's active PERSONAL Teams subscription(s) — legacy user-anchored teams.
  */
 
 /**
@@ -161,15 +164,18 @@ export const PLAN_DEFAULTS = {
 
 /**
  * Is this team's org entitlement live for its members right now? `teamsEnabled`
- * (paid) or inside the post-lapse grace window. A pending team (never paid:
- * teamsEnabled false, no grace date) grants nothing.
+ * (paid), the owner's legacy user-anchored personal Teams subscription (teams
+ * not yet on org billing, P34F-03 — mirrors `isTeamLocked`'s fallback), or
+ * inside the post-lapse grace window. A pending team (never paid:
+ * teamsEnabled false, no grace date, no legacy owner plan) grants nothing.
  *
- * @param {{ teamsEnabled: boolean, teamsGraceEndsAt: Date | null }} group
+ * @param {{ teamsEnabled: boolean, teamsGraceEndsAt: Date | null, owner?: { subscriptions?: unknown[] } }} group
  * @param {Date} [now]
  * @returns {"active" | "grace" | null}
  */
 export const teamEntitlementState = (group, now = new Date()) => {
   if (group.teamsEnabled) return "active";
+  if ((group.owner?.subscriptions?.length ?? 0) > 0) return "active";
   if (group.teamsGraceEndsAt != null && group.teamsGraceEndsAt > now) return "grace";
   return null;
 };
@@ -207,7 +213,11 @@ export const resolveEffectivePlan = ({ userId, subscriptions, teamGroups, now = 
   for (const group of teamGroups) {
     const state = teamEntitlementState(group, now);
     if (!state) continue;
-    const slots = group.subscriptions?.[0]?.memberSlotsLimit ?? group.memberSlotsLimit ?? null;
+    const slots =
+      group.subscriptions?.[0]?.memberSlotsLimit ??
+      group.owner?.subscriptions?.[0]?.memberSlotsLimit ??
+      group.memberSlotsLimit ??
+      null;
     const better =
       !team ||
       (state === "active" && team.state === "grace") ||
@@ -268,6 +278,17 @@ const effectivePlanUserSelect = {
             orderBy: { createdAt: "desc" },
             take: 1,
             select: { memberSlotsLimit: true },
+          },
+          // Legacy user-anchored Teams: the owner's own active Teams plan.
+          owner: {
+            select: {
+              subscriptions: {
+                where: { plan: "TEAMS", status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
+                orderBy: { createdAt: "desc" },
+                take: 1,
+                select: { memberSlotsLimit: true },
+              },
+            },
           },
         },
       },
