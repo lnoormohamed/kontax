@@ -1,13 +1,9 @@
 // P49 · Homepage icon sprite (design P49-DB01). Rendered once at the top of
 // the page; every icon below is a <use> reference into it, so the page ships
-// each path once and no icon dependency is needed. Shared by server sections
-// and the client hero demo (no hooks, no "use client").
+// each path once and no icon dependency is needed. Check, arrow and plus come
+// from the shared mkt-ui icons (P50-02).
 
 export type HomeIconName =
-  | "check"
-  | "arrow"
-  | "down"
-  | "plus"
   | "search"
   | "tag"
   | "card"
@@ -29,18 +25,6 @@ export function HomeIconSprite() {
   return (
     <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
       <defs>
-        <symbol id="hp-i-check" viewBox="0 0 24 24">
-          <path d="M5 12.5l4.5 4.5L19 7.5" {...stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </symbol>
-        <symbol id="hp-i-arrow" viewBox="0 0 24 24">
-          <path d="M5 12h13M13 6l6 6-6 6" {...stroke} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-        </symbol>
-        <symbol id="hp-i-down" viewBox="0 0 24 24">
-          <path d="M12 5v13M6 12l6 6 6-6" {...stroke} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-        </symbol>
-        <symbol id="hp-i-plus" viewBox="0 0 24 24">
-          <path d="M12 5v14M5 12h14" {...stroke} strokeWidth="1.8" strokeLinecap="round" />
-        </symbol>
         <symbol id="hp-i-search" viewBox="0 0 24 24">
           <path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" {...stroke} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </symbol>
