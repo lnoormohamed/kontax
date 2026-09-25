@@ -75,7 +75,7 @@ const sections: GuideSection[] = [
             label: "Sharing",
             cells: [
               "Send a card with Share Contact, AirDrop or NameDrop.",
-              "Share a contact by link; a shared address book on Family (up to 6 people) and Teams (up to 25).",
+              "Share a contact by link; a shared address book on Family (up to 6 people) and Teams (per seat).",
             ],
           },
           {

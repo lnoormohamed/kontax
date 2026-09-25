@@ -56,7 +56,7 @@ export function HowItWorks() {
                   <span className="hp-glyph">
                     <Icon name="file" size={14} />
                   </span>
-                  CSV / vCard
+                  CSV / Kontax archive
                 </div>
               </div>
             </WindowFrame>
@@ -64,7 +64,7 @@ export function HowItWorks() {
           <Step
             n={2}
             title="Kontax tidies them up"
-            body="Duplicates found and merged, phone numbers formatted for their country, names sorted properly in any script."
+            body="Duplicates found and merged, phone numbers formatted for their country, names in many scripts sorted sensibly."
           >
             <WindowFrame>
               <p className="hp-nm hp-merge__t">

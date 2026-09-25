@@ -75,7 +75,7 @@ const sections: GuideSection[] = [
             label: "Sharing",
             cells: [
               "Work and school (Google Workspace) accounts can delegate contacts to people in the same organisation, on a computer.",
-              "Share a contact by link; a shared address book on Family (up to 6 people) and Teams (up to 25).",
+              "Share a contact by link; a shared address book on Family (up to 6 people) and Teams (per seat).",
             ],
           },
           {
@@ -166,7 +166,7 @@ const sections: GuideSection[] = [
           <>
             <strong>To copy once:</strong> on contacts.google.com, select your contacts, choose More actions →
             Export → Google CSV, and import the file into Kontax, which recognises Google’s CSV layout (Free
-            allows three imports a month). See{" "}
+            has a monthly import allowance; see <Link href="/pricing">pricing</Link>). See{" "}
             <Link href="/help/import-export/import-from-google-icloud">import from Google or iCloud</Link>.
           </>,
           <>

@@ -37,7 +37,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What happens to the shared contacts if the Family plan ends?",
-    a: "Nothing disappears straight away. Members keep access to the shared book for 7 days after the plan lapses, with a notice to export if they want to. After that, every member — including the owner — automatically gets their own private copy of the shared contacts; the shared book itself is retired.",
+    a: "Nothing disappears straight away. Members keep access to the shared book for 7 days after the plan lapses, with a notice to export if they want to. After that, each member gets their own private copy of the shared contacts, the owner keeps the book's contacts, and the shared book itself is retired.",
   },
   {
     q: "Can a member remove themselves later?",
@@ -140,7 +140,7 @@ export default function ForFamiliesPage() {
             </li>
             <li>
               <h3>Add Kontax as a contacts account</h3>
-              <p>On iPhone or Mac: Settings → Accounts → Add Account → Other/CardDAV, using the Kontax server address, the member&apos;s email, and the app password.</p>
+              <p>On iPhone: Settings → Apps → Contacts → Contacts Accounts → Add Account → Other → Add CardDAV Account. On a Mac: System Settings → Internet Accounts → Add Account → Other Accounts → CardDAV account. Use the Kontax server address, the member&apos;s email and the app password.</p>
             </li>
             <li>
               <h3>The shared book appears automatically</h3>
@@ -165,7 +165,7 @@ export default function ForFamiliesPage() {
               "When the Family plan lapses — cancelled, a failed payment that isn't fixed, or downgraded — members keep their current access to the shared book for 7 more days, with an in-app and email notice.",
               "During those 7 days, new invites are paused, but existing members can still use and export the shared book as normal.",
               "If the owner re-subscribes within the 7 days, the family book continues and nothing changes for members.",
-              "After the 7 days, every member — including the owner — automatically receives their own private copy of the shared contacts. No one needs to do anything to keep them.",
+              "After the 7 days, each member automatically gets their own private copy of the shared contacts, and the owner keeps the book's contacts. No one needs to do anything to keep them.",
             ]}
           />
         </div>

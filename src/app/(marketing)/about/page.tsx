@@ -95,7 +95,7 @@ export default function AboutPage() {
             keeps a change history — what changed, when, and who or what changed it. Family plans
             add one shared address book for up to 6 people, alongside everyone&rsquo;s own private
             contacts; Teams plans add shared address books with roles, per-book permissions and a
-            full audit log, for up to 25 people. A developer REST API is available on Pro and
+            full audit log, paid per seat. A developer REST API is available on Pro and
             Teams. Sign-in supports two-factor authentication, and each connected device uses its
             own revocable app password rather than your account password, with sync credentials
             encrypted at rest.

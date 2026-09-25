@@ -9,13 +9,14 @@ import "../../_components/content-page.css";
 // P50A-07 · Use-case page. Lives under /for/ (not /teams — that route is the
 // signed-in team workspace). Facts verified against src/server/dav/plan-entitlements.mjs,
 // src/server/team-access.ts, src/server/team-audit.ts,
-// src/app/settings/sharing/teams/page.tsx and roadmap/build-phase/lifecycle-policies.md
-// (§3e, the 30-day read-only grace on Teams → Pro) — see the report for the
-// ticket for the exact references.
+// src/app/settings/sharing/teams/page.tsx and src/server/stripe-handlers.ts
+// (TEAMS_GRACE_MS: 14 days after the paid period ends, then the team is locked
+// read-only — isTeamLocked). Team size is the number of seats bought
+// (src/app/actions/billing.ts: minimum 3).
 
 const TITLE = "Contacts that stay with the business — Kontax";
 const DESCRIPTION =
-  "Shared address books with roles, per-book permissions and a full audit log for up to 25 people. Works in iPhone Contacts, no app needed; API on Teams.";
+  "Shared address books with roles, per-book permissions and a full audit log, paid per seat. Works in iPhone Contacts, no app needed; API on Teams.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -40,7 +41,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What happens to the books if we downgrade from Teams?",
-    a: "Team books become read-only for 30 days. The owner can export everything, or migrate one book into their personal library, during that window. After 30 days, any books not migrated are archived.",
+    a: "The team keeps working for 14 days after your paid period ends, so export any books you need. After that, members can still view the team's books but nobody can edit them.",
   },
 ];
 
@@ -109,7 +110,7 @@ export default function ForTeamsPage() {
           />
           <Ticks
             items={[
-              "Create as many shared address books as the team needs — one per client segment, department or region — for up to 25 members.",
+              "Create as many shared address books as the team needs — one per client segment, department or region — with as many members as seats you buy (minimum 3).",
               "Every member holds a role: Owner, Admin, or Member. Owners and Admins can edit every book; a Member's access to each book is set individually to edit, view-only, or no access.",
               "Every create, edit, archive, restore, merge and sync event on a team book is recorded in the audit log, attributed to the member who did it — filterable by member, book, event type and date.",
               "Shared books appear in each member's iPhone or Mac Contacts app over CardDAV, the same as a personal address book — nothing extra to install.",
@@ -122,7 +123,7 @@ export default function ForTeamsPage() {
       {/* ── Setup ── */}
       <section className="mkt-band mkt-band--stone" id="setup">
         <div className="mkt-container">
-          <SectionHead index="02" label="Setup" title="Getting a team of 25 onto shared books" />
+          <SectionHead index="02" label="Setup" title="Getting your team onto shared books" />
           <ol className="cp-steps" style={{ marginTop: 32 }}>
             <li>
               <h3>Upgrade to Teams</h3>

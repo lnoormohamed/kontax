@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   if (!isActivityLogEnabled(billing.entitlements)) {
     return Response.json({ message: "Upgrade required", gated: true }, { status: 403 });
   }
-  // Retention window by tier: Pro 90d, Family 365d, Teams unlimited (null).
+  // Retention window by tier: Pro 365d, Family 90d, Teams unlimited (null).
   const retentionDays = billing.entitlements.activityLogRetentionDays;
 
   const url = new URL(request.url);

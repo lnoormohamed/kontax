@@ -68,7 +68,7 @@ export default function FeaturesPage() {
           </h1>
           <p className="fp-hero__sub">
             From search to sync to sharing — Kontax keeps your contacts
-            organised, backed up, and always up to date.
+            organised, synced and always up to date.
           </p>
         </div>
       </section>
@@ -240,10 +240,9 @@ export default function FeaturesPage() {
             <h2 className="fp-feat__h">Share with family or your team</h2>
             <p className="fp-feat__body">
               Invite the people you trust into a shared address book and
-              everyone sees the same up-to-date contacts. Assign roles — owner,
-              editor, or viewer — so you control who can change what. Updates
-              appear live, so when one person fixes a number, it&apos;s fixed
-              for everyone.
+              everyone sees the same up-to-date contacts. You decide who can
+              edit and who can only view, and when one person fixes a number,
+              the change reaches everyone&apos;s devices on the next sync.
             </p>
           </div>
           <div className="fp-feat__shot" aria-hidden="true">
@@ -352,10 +351,10 @@ export default function FeaturesPage() {
           <div className="fp-feat__copy">
             <h2 className="fp-feat__h">A developer API built for automation</h2>
             <p className="fp-feat__body">
-              Every contact, label, and address book is available through a
-              clean REST API. Authenticate with a scoped key, then read or write
-              contacts straight from your own tools, scripts, and integrations.
-              Rate limits are generous and every response is plain JSON.
+              Your contacts are available through a clean REST API.
+              Authenticate with a scoped key, then read or write contacts
+              straight from your own tools, scripts, and integrations. Every
+              response is plain JSON.
             </p>
             <Link className="fp-feat__link" href="/developers">
               Read the API docs{" "}

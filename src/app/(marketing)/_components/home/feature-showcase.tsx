@@ -93,7 +93,7 @@ const GRID: { icon: HomeIconName; title: string; body: string }[] = [
   { icon: "tag", title: "Labels", body: "Group contacts your way and filter in one tap." },
   { icon: "card", title: "Public card", body: "A shareable page with the details you choose to publish." },
   { icon: "clock", title: "Change history", body: "See what changed on each contact, when, and from where." },
-  { icon: "file", title: "Open export format", body: "A documented format that keeps labels, notes and history." },
+  { icon: "file", title: "Open export format", body: "A documented format that keeps labels, notes, custom fields and photos." },
   { icon: "code", title: "Developer API", body: "Read and write your contacts from your own tools. Pro and Teams." },
 ];
 
@@ -128,7 +128,7 @@ export function FeatureShowcase() {
             kicker="Clean-up"
             title="Duplicates, found and fixed"
             body="Kontax spots the same person saved twice across your accounts, shows you both records side by side, and lets you pick what to keep. Every merge can be undone for 30 days."
-            points={["Phone numbers formatted for their country", "Names in any script sorted correctly"]}
+            points={["Phone numbers formatted for their country", "Names in many scripts sorted sensibly"]}
           >
             <WindowFrame title="Review merge">
               <div className="hp-mg">

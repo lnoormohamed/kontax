@@ -21,11 +21,13 @@ const COMPARE_ROWS: CompareRow[] = [
   // iPhone Contacts has detected duplicates since iOS 16, not just the Mac app.
   { feature: "Finds and merges duplicates", kontax: true, google: true, icloud: "Apple devices only" },
   { feature: "Change history for each contact", kontax: true, google: false, icloud: false },
+  // Google exports vCard or Google CSV and iCloud exports vCard: portable, but
+  // not a documented format that keeps labels, custom fields and photos.
   {
-    feature: "Export with labels, notes and history in a documented format",
+    feature: "Export with labels, notes, custom fields and photos in a documented format",
     kontax: true,
-    google: false,
-    icloud: false,
+    google: "vCard / Google CSV",
+    icloud: "vCard",
   },
 ];
 
@@ -153,7 +155,7 @@ const AUDIENCES: { plan: string; title: string; body: string; get: string; cta: 
     plan: "Free · Pro",
     title: "Just you",
     body: "Every account you’ve ever saved a number in, finally agreeing with each other.",
-    get: "sync, clean-up and change history on all your devices.",
+    get: "sync and clean-up, with more devices and full change history on Pro.",
     cta: "See Free and Pro",
   },
   {
@@ -167,7 +169,7 @@ const AUDIENCES: { plan: string; title: string; body: string; get: string; cta: 
     plan: "Teams",
     title: "Your team",
     body: "Clients and suppliers that stay with the business when people move on.",
-    get: "shared books with roles, an audit log and the API, for up to 25 people.",
+    get: "shared books with roles, an audit log and the API, paid per seat.",
     cta: "See Teams",
   },
 ];

@@ -35,7 +35,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "What if I merge the wrong two contacts?",
-    a: "Undo the merge from the contact's history within 30 days and Kontax restores both original records.",
+    a: "Open Contacts → Duplicates → Merged contacts within 30 days and choose Undo. Kontax restores both original records.",
   },
   {
     q: "Does it catch names in different scripts or spellings?",
@@ -94,8 +94,8 @@ export default function DuplicatesFeaturePage() {
             items={[
               "Matching looks at exact and near-exact email and phone, exact and fuzzy name matching, phonetic name similarity, and company plus name proximity — including names written in different scripts or romanised spellings.",
               "Where two contacts genuinely conflict — different birthdays, or a different surname on an otherwise close match — that's surfaced too, so a false match doesn't get merged by mistake.",
-              "The merge review lets you choose which record to keep as the base and pick a value per field where they differ; values you don't choose between, like multiple phone numbers, are kept on both.",
-              "Every completed merge stays reversible for 30 days from the contact's history — after that the merge is final.",
+              "The merge review lets you choose which record to keep as the base and pick a value per field where they differ; values you don't choose between, like multiple phone numbers, are kept from both.",
+              "Every completed merge stays reversible for 30 days under Contacts → Duplicates → Merged contacts — after that the merge is final.",
             ]}
           />
         </div>

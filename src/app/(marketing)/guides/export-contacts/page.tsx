@@ -9,7 +9,8 @@ import { SRC } from "../_content/sources";
 // plan, vCard 4.0 on Pro+ (src/app/_components/export-card.tsx,
 // assertCanUsePremiumExport in src/server/billing.ts); archive = JSContact
 // (RFC 9553) documents + manifest + media (src/app/developers/page.tsx);
-// Free = 3 imports a month (monthlyImportLimit).
+// Free has a monthly import allowance (monthlyImportLimit; semantics not yet
+// decided by the owner, so no number is quoted).
 
 const page = getGuidePage("/guides/export-contacts");
 
@@ -167,7 +168,7 @@ const sections: GuideSection[] = [
           </li>
         </ul>
         <p>
-          The format reference is in the <Link href="/developers#export-format">developer documentation</Link>,
+          The format reference is in the <Link href="/developers/export-format">developer documentation</Link>,
           and the everyday steps are in <Link href="/help/import-export/export-your-contacts">export your contacts</Link>
           . For everything in your account, not just contacts, see{" "}
           <Link href="/help/import-export/download-full-account-export">download a full account export</Link>.
@@ -176,7 +177,8 @@ const sections: GuideSection[] = [
           <p>
             Kontax imports CSV files (it recognises Google’s CSV layout) and Kontax Archives, and highlights
             people you already have before anything is added. It doesn’t import vCard files; to bring in iCloud
-            contacts, connect iCloud instead. The Free plan includes three imports a month. See{" "}
+            contacts, connect iCloud instead. Free has a monthly import allowance (see{" "}
+            <Link href="/pricing">pricing</Link>). See{" "}
             <Link href="/help/import-export/import-from-google-icloud">import from Google or iCloud</Link>.
           </p>
         </Callout>

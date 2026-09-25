@@ -12,8 +12,8 @@ import { ArrowIcon, PlanCard, SectionHead } from "../mkt-ui";
 // formatted like the Free column on /pricing (catalog currency, else GBP).
 
 // Limits from the verified fact list (src/server/billing.ts).
-const FREE_POINTS = ["Up to 500 contacts", "1 sync source", "1 phone or Mac over CardDAV", "CSV export"];
-const PRO_POINTS = ["Unlimited contacts", "Up to 5 sync sources", "5 devices", "Developer API", "vCard and Kontax export"];
+const FREE_POINTS = ["Up to 500 contacts", "1 sync source", "1 phone or Mac over CardDAV", "CSV and Kontax archive export"];
+const PRO_POINTS = ["Unlimited contacts", "Up to 5 sync sources", "5 devices", "Developer API", "vCard export"];
 
 export async function PricingTeaser() {
   const prices = await fetchStripePrices();

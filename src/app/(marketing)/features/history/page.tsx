@@ -36,7 +36,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Is per-contact history the same as the account activity feed?",
-    a: "No — they're related but different. Per-contact history is what you see on one contact's own History tab. The account-wide activity feed is a single timeline across your whole address book, and it's a separate plan feature: none on Free, 365 days on Pro, 90 days on Family, and no retention limit on Teams.",
+    a: "No — they're related but different. Per-contact history is what you see on one contact's own History tab. The account-wide activity feed is a single timeline across your whole address book, and it's a separate plan feature: it shows the last 365 days on Pro, the last 90 days on Family and all activity on Teams, and isn't included on Free.",
   },
   {
     q: "Who gets credited for changes in a shared book?",
@@ -106,9 +106,9 @@ export default function HistoryFeaturePage() {
             </thead>
             <tbody>
               <tr><th scope="row">Free</th><td>Last 3 events</td><td>Not included</td></tr>
-              <tr><th scope="row">Pro</th><td>Full history</td><td>365 days</td></tr>
-              <tr><th scope="row">Family</th><td>Full history</td><td>90 days</td></tr>
-              <tr><th scope="row">Teams</th><td>Full history</td><td>No retention limit</td></tr>
+              <tr><th scope="row">Pro</th><td>Full history</td><td>Last 365 days</td></tr>
+              <tr><th scope="row">Family</th><td>Full history</td><td>Last 90 days</td></tr>
+              <tr><th scope="row">Teams</th><td>Full history</td><td>All activity</td></tr>
             </tbody>
           </table>
           <p className="mkt-note">
