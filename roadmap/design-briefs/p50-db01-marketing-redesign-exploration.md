@@ -1,6 +1,6 @@
 # P50-DB01 — Design brief: marketing site redesign (exploration, homepage first)
 
-Status: Not started · Type: **Exploration only — no build commitment** · Priority: P2
+Status: Ready for design · Type: **Exploration only — no build commitment** · Priority: P2
 Depends: — · Builds on: [P34C-DB01](p34c-db01-marketing-site-ia.md) (IA, tone),
 [P49-DB01](../build-phase/p49-db01-design-brief-homepage-refresh.md) (homepage content)
 Drafted 25 Sep 2026
@@ -90,8 +90,8 @@ the copy (every claim traced to code); live HTML product mockups instead of scre
 - Docs-style pages (`/help`, `/developers`) and legal pages — show only how the header,
   footer and type would apply.
 - Auth pages — flag how they'd be brought in line; don't design them yet.
-- Logo redesign — keep the current "K" monogram and wordmark unless the owner opts in
-  (see Decisions). A direction may *propose* a logo evolution as an appendix.
+- Logo — **frozen** (owner decision 2). Use the current "K" monogram and wordmark as they
+  are; no logo proposals.
 - Copywriting rewrite — use the P49 copy deck as the baseline (see Content).
 
 ## Directions to explore
@@ -117,13 +117,20 @@ families and teams, not twee.
 ### C. Precise & product-forward
 For the switching, power-user and developer audience. Crisp, dense, product UI front and
 centre (an interactive or animated hero mockup, keyboard shortcuts, sync status in mono),
-tight grid, stronger contrast, a sharper accent. May use one dark band or a dark hero if it
-earns it (see Decisions: this breaks the P34C "no dark theme" rule). Feels fast and
-engineered, in the vein of well-made developer tools, without copying any of them.
+tight grid, stronger contrast, a sharper accent. **Stays light** — no dark hero or dark
+bands (owner decision 3); get the precision from ink, grid, mono type and the product UI
+itself. Feels fast and engineered, in the vein of well-made developer tools, without copying
+any of them.
 
 For each direction, include one **signature moment** — the thing someone would remember or
-screenshot (a hero interaction, a motif, a layout device). It must work without motion
-(reduced-motion users) and without JavaScript for the core message.
+screenshot (a hero interaction, a motif, a layout device). Motion is allowed for this moment
+(owner decision 5): keep it to one purposeful animation per page, GPU-cheap (transform and
+opacity), no scroll-jacking or parallax, and give it a complete static fallback for
+reduced-motion users and a no-JavaScript render that still carries the message.
+
+Illustration is on the table (owner decision 4): each direction may define an illustration or
+iconography style (people, relationships, devices, sync). Keep it vector/CSS, light on
+weight, and consistent with the direction; no stock photography.
 
 ## Content baseline
 
@@ -158,9 +165,15 @@ UK English throughout ("organised", "centre"). Tone rules from P34C still apply.
 - **Build reality:** Next.js 15 app router with plain CSS (`--mkt-*` tokens, no Tailwind on
   marketing pages, no UI framework). Designs should be expressible as tokens + a handful of
   components; say so where something would need new tooling (e.g. a motion library).
-- **Theming:** light-first. Dark sections are allowed only as a deliberate choice argued in
-  the direction (Decision 3). No full dark mode.
-- **Honesty:** no fake logos, stats, testimonials or "trusted by" claims.
+- **Theming:** light only — **no dark theme, dark hero or dark bands** (owner decision 3).
+  The existing dark-green footer is the one dark element; a direction may restyle the footer
+  but must not add more dark sections.
+- **Honesty — no social proof exists yet** (owner decision 6: Kontax is new; there are no
+  customers, quotes, logos or usage numbers). Designs must work without testimonials,
+  "trusted by" strips, logo walls, ratings, user counts or uptime figures, and must not use
+  placeholders for them. Build trust from verifiable product facts instead: open standards
+  (CardDAV, vCard, documented export format), the privacy facts, transparent pricing, the
+  public changelog, and "export or delete any time".
 - **Responsive:** design at 1440 and 375, and check 768 and 1024 don't break.
 
 ## How directions will be judged
@@ -192,23 +205,24 @@ Delivered as a handoff bundle like P49 (HTML/CSS prototypes + a spec page):
 2. **Comparison sheet:** the three directions side by side on the same hero and the same
    pricing section, scored against the judging criteria, with a recommendation.
 
-## Decisions needed from the owner (before or during exploration)
+## Owner decisions (answered 2026-09-25)
 
-1. **Appetite for change:** evolution of the current identity, or open to a new identity?
-   (Shapes how far B and C may go.)
-2. **Logo:** frozen, or may a direction propose an evolution?
-3. **Dark sections:** keep P34C's "no dark theme on marketing pages", or allow dark bands /
-   a dark hero? (The dark-green footer is already an exception.)
-4. **Illustration:** is commissioned or in-house illustration on the table, or should
-   directions stick to type, colour, UI mockups and simple geometric motifs?
-5. **Motion:** P34C ruled out scroll-triggered animation. Keep that rule, or allow a
-   restrained signature interaction?
-6. **Social proof:** can we collect a handful of real quotes or a founder note before
-   launch? If not, directions must work without them.
+1. **Appetite for change: either.** Directions may range from an evolution of today's look
+   (A) to a clearly new identity (B, C), as long as the logo and core tone survive.
+2. **Logo: frozen.** Keep the current "K" monogram and wordmark as is; no logo proposals.
+3. **Dark theme: no.** Light only — no dark hero, no dark bands. The existing dark-green
+   footer is the only dark element (it may be restyled, not multiplied).
+4. **Illustration: yes.** Directions may introduce an illustration/iconography style
+   (vector/CSS, no stock photography).
+5. **Motion: try it.** One restrained signature animation per page is allowed, with a full
+   reduced-motion fallback (this relaxes P34C's "no scroll-triggered animation" rule for the
+   signature moment only).
+6. **Social proof: none.** Kontax is a new product with no customers, quotes or numbers yet;
+   designs must earn trust without testimonials or "trusted by" content.
 
 ## Out of scope for this brief
 
-Building anything; app UI; logo redesign (unless Decision 2 opens it); new copy beyond
+Building anything; app UI; logo redesign; new copy beyond
 headline proposals; SEO restructuring; new pages. The P49 homepage stays as the live
 homepage until a direction is chosen and built.
 
