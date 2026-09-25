@@ -4,6 +4,7 @@
 // their source by tests/node/help-centre.test.ts (it reads the source text), so
 // the help centre can't drift from the product silently.
 
+import { TEAMS_SEAT_MIN } from "~/app/_components/plan-data";
 import { PLAN_DEFAULTS } from "~/server/dav/plan-entitlements.mjs";
 import { DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE, MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
 
@@ -25,7 +26,10 @@ export const FACTS = {
   proActivityDays: need(PLAN_DEFAULTS.PRO.activityLogRetentionDays, "Pro activity retention"),
   familyActivityDays: need(PLAN_DEFAULTS.FAMILY.activityLogRetentionDays, "Family activity retention"),
   familyMembers: need(PLAN_DEFAULTS.FAMILY.memberSlotsLimit, "Family member slots"),
-  teamsMembers: need(PLAN_DEFAULTS.TEAMS.memberSlotsLimit, "Teams member slots"),
+  /** Teams is per seat: the team size is the number of seats bought, from this
+   *  minimum (src/app/actions/billing.ts, pinned by pricing-plan-data.test.ts).
+   *  PLAN_DEFAULTS.TEAMS.memberSlotsLimit is only a fallback default. */
+  teamsMinSeats: TEAMS_SEAT_MIN,
 
   // ── Sync (src/server/sync-health.ts) ──
   conflictQueueLimit: MANUAL_CONFLICT_QUEUE_LIMIT,

@@ -137,20 +137,34 @@ weight, and consistent with the direction; no stock photography.
 Use the P49 homepage content (sections, headlines, verified facts) as the starting point.
 Directions may reorder, merge or cut sections and propose better headlines, but **every
 factual claim must stay true to the product**. Product facts to rely on (checked against
-`src/server/billing.ts`, 2026-09-25):
+`src/server/dav/plan-entitlements.mjs` and the code paths named below; re-checked
+2026-09-25 in the P49A-14 / P50A fact-check):
 
-- Free: up to **500 contacts**, **1** sync source, **1** phone or Mac over CardDAV, CSV export.
-- Pro: unlimited contacts, **up to 5** sync sources, **5** devices, developer API,
-  vCard/Kontax export. Family: shared book, up to 6 members, no API. Teams: shared books,
-  up to 25 members, audit log, API.
+- Free: up to **500 contacts**, **1** sync source of any kind (Google included), **1** phone
+  or Mac over CardDAV, two-way sync, a monthly import allowance (don't quote a number — the
+  semantics aren't decided).
+- Pro: unlimited contacts, **up to 5** sync sources, **5** devices, developer API, bulk vCard
+  export. Family: shared book, up to 6 members, edit or view per member, no API. Teams:
+  **per seat (minimum 3)** — never "up to 25" or "unlimited" — shared books, roles, audit
+  log, API.
+- Export: CSV and the **Kontax Archive on every plan**; exporting the whole library as vCard
+  is **Pro and above** (Free can still download one contact as .vcf, and the full data
+  export includes contacts.vcf). Import: CSV and Kontax archive only — **no vCard import**.
+- History: per-contact history shows **all changes on paid plans** (last 3 on Free). The
+  Activity *feed* **shows** the last 365 days on Pro, 90 on Family and everything on Teams
+  (say "shows", not "keeps").
+- Developer API: **1,000 requests/hour for a read-only token, 200/hour for a read/write
+  token** (per token, same on Pro and Teams). No outbound webhooks.
 - Sync: Google, iCloud and Fastmail (and any CardDAV server). **Outlook is not enabled in
   production** — don't feature it unless marked "coming soon".
 - Kontax appears in the iPhone and Mac Contacts apps over CardDAV; no app to install.
-- Duplicate merge with 30-day undo; per-contact change history; 2FA; sync credentials
-  encrypted (AES-256-GCM); no ads or tracking; export or delete any time (deletion after a
-  30-day grace period).
+- Duplicate merge with 30-day undo (on every plan); 2FA; sync credentials and 2FA secrets
+  encrypted at rest (AES-256-GCM), everything in transit over TLS; no ads or tracking; export
+  or delete any time (deletion after a 30-day grace period). Trial: none on sign-up; a
+  14-day trial on the first Pro subscription, started at checkout with a card.
 - **Not claimable:** backup encryption (deferred), uptime figures, user counts,
-  testimonials (none collected yet), outbound webhooks (not built).
+  testimonials (none collected yet), outbound webhooks (not built), "hosted in the EU",
+  support tiers (email support on every plan).
 
 UK English throughout ("organised", "centre"). Tone rules from P34C still apply.
 

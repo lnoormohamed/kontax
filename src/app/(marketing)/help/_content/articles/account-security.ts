@@ -64,16 +64,16 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
         { text: "On the two-factor screen, choose **Use a recovery code instead**." },
         { text: "Enter one of your 10-character recovery codes and choose **Verify recovery code**." },
         {
-          text: "Once you're in, set up two-factor authentication again on your new phone so you get a fresh set of codes.",
+          text: "Once you're in, get a fresh set of codes: in **Settings → Security**, choose **View or regenerate**, then **Regenerate recovery codes**. The old codes stop working.",
           details: [
-            "In **Settings → Security**, choose **Disable 2FA** — you'll need your password and a current authenticator code, so do this from the old app if you still have it.",
-            "Then follow [Set up two-factor authentication](/help/account-security/set-up-two-factor-authentication) again.",
+            "To move two-factor authentication to a new phone you have to turn it off first with **Disable 2FA**, which needs your password and a current authenticator code — so do it from the old app while you still have it.",
+            "Then follow [Set up two-factor authentication](/help/account-security/set-up-two-factor-authentication) again on the new phone.",
           ],
         },
       ],
       whatToExpect: [
         "A recovery code is used up as soon as it signs you in. Cross it off wherever you keep them.",
-        `You get ${FACTS.recoveryCodes} codes when you turn on two-factor authentication. **Settings → Security** shows how many remain.`,
+        `You get ${FACTS.recoveryCodes} codes when you turn on two-factor authentication or regenerate them. **Settings → Security** shows how many remain.`,
         "After 5 wrong attempts Kontax pauses sign-in attempts for 15 minutes.",
       ],
       ifItDoesntWork: [
@@ -169,7 +169,7 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
           list: [
             "A sign-in from a device and an IP address that have never been used on your account before (not on your very first sign-in).",
             "More than 5 failed sign-in attempts within an hour.",
-            "10 or more contacts deleted within a minute.",
+            "10 or more contacts archived or deleted in one bulk action.",
           ],
         },
       ],
@@ -198,7 +198,7 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
       keywords: ["delete account", "close account", "cancel account", "erasure"],
       steps: [
         { text: "Export anything you want to keep first — see [Export your contacts](/help/import-export/export-your-contacts) and [Download a full copy of your account data](/help/import-export/download-full-account-export)." },
-        { text: "If you own a Family or Teams group, delete it or hand it over first — Kontax won't close an account that still owns one." },
+        { text: "Delete your Family group, or transfer or delete your team, first — Kontax won't close an account that still owns one." },
         { text: "If you pay for a plan and don't want another renewal during the grace period, cancel it in **Settings → Plan & billing**." },
         { text: "Open **Settings → Security**, scroll to **Danger zone** and choose **Delete my account**." },
         { text: "Type your email address to confirm, choose **Delete my account**, then enter your password and choose **Continue**." },

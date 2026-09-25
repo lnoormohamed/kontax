@@ -81,11 +81,11 @@ export const FAMILY_TEAMS: HelpCategoryContent = {
           table: {
             head: ["", "Family", "Teams"],
             rows: [
-              ["People", `Up to ${FACTS.familyMembers}`, `Up to ${FACTS.teamsMembers}`],
+              ["People", `Up to ${FACTS.familyMembers}`, `One per seat (minimum ${FACTS.teamsMinSeats})`],
               ["Shared address books", "One", "As many as you need"],
               ["Access control", "Can edit or View only per member", "Owner, Admin and Member roles, plus Edit, View or None per book"],
               ["Audit log", "—", "Yes, kept indefinitely"],
-              ["Activity history", `${FACTS.familyActivityDays} days`, "Unlimited"],
+              ["Activity feed shows", `Last ${FACTS.familyActivityDays} days`, "All activity"],
               ["Developer API", "—", "Included"],
             ],
           },
@@ -118,11 +118,11 @@ export const FAMILY_TEAMS: HelpCategoryContent = {
       whatToExpect: [
         "Owners and admins always have full access to every book.",
         "New members get Edit access to books by default.",
-        `A team can have up to ${FACTS.teamsMembers} members and any number of shared books. Invitations expire after ${FACTS.inviteHours} hours.`,
+        `A team can have as many members as the seats you've bought (minimum ${FACTS.teamsMinSeats}) and any number of shared books. Invitations expire after ${FACTS.inviteHours} hours.`,
         "Members who choose **Leave team** don't keep a copy of the team's contacts.",
       ],
       ifItDoesntWork: [
-        "Can't see an invite option? Only the owner can invite people and promote admins.",
+        "Can't see an invite option? The owner or an admin can invite people; only the owner can make someone an admin.",
       ],
       related: ["family-teams/teams-audit-log", "family-teams/family-vs-teams", "family-teams/downgrade-consequences"],
       lastReviewed: REVIEWED,

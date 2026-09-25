@@ -65,6 +65,7 @@ const APP_ROUTES = new Set([
   "/privacy",
   "/developers",
   "/developers#export-format",
+  "/developers/export-format",
   "/format/spec.md",
 ]);
 
@@ -167,16 +168,29 @@ test("Outlook only appears in content gated behind Microsoft sync", () => {
 });
 
 test("no help content promises an automatic or no-card trial", () => {
-  // New accounts don't get a trial (src/server/billing-trial.ts only applies
-  // one to a first Pro checkout), so help may say "not a trial" but must never
-  // offer one on sign-up.
-  const promise = /\d+-day[^.]*trial|free trial (is )?included|trial[^.]*(automatic|no card|without a card)|(automatic|no card|without a card)[^.]*trial/i;
+  // New accounts don't get a trial: src/app/actions/billing.ts only sets
+  // trial_period_days on a first Pro checkout, where a card is collected. Help
+  // may say "doesn't start a trial" / "not a trial", and may describe the Pro
+  // checkout trial, but must never offer one on sign-up or without a card.
+  const denies = /doesn't start a trial|not a trial|isn't a trial/i;
+  const promisesTrial = (text: string): boolean =>
+    text
+      .split(/(?<=[.!?])\s+/)
+      .filter((sentence) => /trial/i.test(sentence) && !denies.test(sentence))
+      .some(
+        (sentence) =>
+          /automatic|no card|without a card|on sign-?up|free trial (is )?included/i.test(sentence) ||
+          (/\d+-day/.test(sentence) && !/subscribe to Pro|checkout/i.test(sentence)),
+      );
   for (const a of allArticles()) {
-    for (const t of articleText(a)) assert.doesNotMatch(t, promise, `${a.slug} promises a trial`);
+    for (const t of articleText(a)) assert.ok(!promisesTrial(t), `${a.slug} promises a trial: ${t}`);
   }
   for (const c of HELP_CATEGORIES) {
-    for (const s of c.shortAnswers) assert.doesNotMatch(s.a, promise, `${c.id}: "${s.q}" promises a trial`);
+    for (const s of c.shortAnswers) assert.ok(!promisesTrial(s.a), `${c.id}: "${s.q}" promises a trial`);
   }
+  // The regression the old wording had: a no-card trial on sign-up.
+  assert.ok(promisesTrial("Every new account gets a 14-day Pro trial automatically, no card needed."));
+  assert.ok(!promisesTrial("Kontax doesn't start a trial when you sign up, and Free needs no card."));
 });
 
 test("mirrored product facts match their source", () => {

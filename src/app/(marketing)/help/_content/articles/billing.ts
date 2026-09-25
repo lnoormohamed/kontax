@@ -15,7 +15,7 @@ export const BILLING: HelpCategoryContent = {
       category: "billing",
       audience: "Anyone deciding whether to upgrade",
       plans: ["Free", "Pro"],
-      summary: `Free covers up to ${FACTS.freeContactLimit} contacts with ${FACTS.freeSyncAccounts} sync account and ${FACTS.freeDevicePasswords} device; Pro removes the contact limit and adds more connections, vCard export, the activity log, contact sharing and the API.`,
+      summary: `Free covers up to ${FACTS.freeContactLimit} contacts with ${FACTS.freeSyncAccounts} sync account and ${FACTS.freeDevicePasswords} device; Pro removes the contact limit and adds more connections, vCard export, the Activity feed, contact sharing and the API.`,
       keywords: ["pro", "free", "upgrade", "compare plans", "what does pro add"],
       steps: [],
       sections: [
@@ -25,7 +25,8 @@ export const BILLING: HelpCategoryContent = {
             "Unlimited contacts and no monthly import cap.",
             `Up to ${FACTS.proSyncAccounts} sync accounts and ${FACTS.proDevicePasswords} device app passwords.`,
             "vCard 4.0 export alongside CSV and the Kontax Archive.",
-            `The Activity feed and full per-contact history, kept for ${FACTS.proActivityDays} days.`,
+            `The Activity feed, showing the last ${FACTS.proActivityDays} days.`,
+            "Every change in each contact's history (Free shows the most recent few).",
             "Sharing contacts with other Kontax users, as static copies or live shares.",
             "vCard share links that don't expire.",
             "The developer API.",
@@ -64,7 +65,7 @@ export const BILLING: HelpCategoryContent = {
         "Payments are handled by Stripe; Kontax doesn't store your card details.",
       ],
       ifItDoesntWork: [
-        "If you're a Family member or on a team, billing is managed by the plan's owner, so you won't see **Manage billing**.",
+        "If you're a Family member or on a team, billing is managed by the plan's owner (on Teams, also anyone the owner has given billing access), so you may not see **Manage billing**.",
         "See [What happens when you downgrade or cancel](/help/family-teams/downgrade-consequences) before cancelling a Family or Teams plan.",
       ],
       related: ["family-teams/downgrade-consequences", "billing/failed-payment-grace-period", "billing/free-vs-pro-plan"],
@@ -76,14 +77,14 @@ export const BILLING: HelpCategoryContent = {
       category: "billing",
       audience: "Anyone whose card payment didn't go through",
       plans: PAID,
-      summary: `If a renewal payment fails, everything keeps working while you update your payment method — Kontax shows a banner and emails you, and you have ${FACTS.paymentGraceDays} days to sort it out.`,
+      summary: `If a renewal payment fails, everything keeps working except file imports while you update your payment method. Kontax shows a banner, emails you, and asks you to update it within ${FACTS.paymentGraceDays} days.`,
       keywords: ["payment failed", "card declined", "grace period", "billing problem", "past due"],
       steps: [
         { text: "Look for the banner “Payment failed. Update your payment method to keep your plan.” or the email “Action required: your Kontax payment failed”." },
         { text: "Choose **Update payment method** and enter a working card in the Stripe billing portal." },
       ],
       whatToExpect: [
-        "Your plan and all its features keep working while the payment is sorted out.",
+        "Everything keeps working except file imports while the payment is sorted out.",
         "If the payment still can't be taken, the subscription ends and your account moves to the Free plan. Your contacts are never deleted.",
         "Family members see a notice that the plan owner needs to update their payment method.",
       ],
@@ -108,14 +109,14 @@ export const BILLING: HelpCategoryContent = {
           heading: "Who pays for what",
           list: [
             "The owner subscribes to Family and manages billing in **Settings → Plan & billing**.",
-            `The owner gets Pro's personal limits (without the developer API, and with ${FACTS.familyActivityDays} days of activity history) plus the shared family book.`,
+            `The owner gets Pro's personal limits (without the developer API, and with the Activity feed showing the last ${FACTS.familyActivityDays} days) plus the shared family book.`,
             "Members join for free. Their personal contacts stay on their own plan — Free unless they subscribe themselves.",
           ],
         },
         {
           heading: "If the owner cancels or a payment fails for good",
           list: [
-            `Members get ${FACTS.familyNoticeDays} days' notice, then each keeps a private copy of the family contacts.`,
+            `Members get ${FACTS.familyNoticeDays} days' notice, then each member gets a private copy of the family contacts and the owner keeps the book's contacts.`,
           ],
         },
       ],
@@ -132,7 +133,7 @@ export const BILLING: HelpCategoryContent = {
   shortAnswers: [
     {
       q: "Is there a free trial?",
-      a: "Kontax doesn't start a trial when you sign up. The Free plan has no time limit and needs no card. If a trial applies when you first subscribe to Pro, checkout shows it before you pay.",
+      a: "Kontax doesn't start a trial when you sign up, and Free needs no card. The first time you subscribe to Pro you get a 14-day free trial. It starts at checkout, where you add a card, and you can cancel before it ends.",
       more: "getting-started/understand-free-plan-limits",
     },
     {

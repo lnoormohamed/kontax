@@ -183,14 +183,14 @@ export const CONTACTS: HelpCategoryContent = {
       ],
       sections: [
         {
-          heading: "How far back history goes",
+          heading: "What each plan shows",
           table: {
-            head: ["Plan", "Per-contact history", "Activity feed"],
+            head: ["Plan", "Per-contact history", "Activity feed shows"],
             rows: [
-              ["Free", `Last ${FACTS.freeHistoryShown} changes shown`, "—"],
-              ["Pro", `${FACTS.proActivityDays} days`, `${FACTS.proActivityDays} days`],
-              ["Family", `${FACTS.familyActivityDays} days`, `${FACTS.familyActivityDays} days`],
-              ["Teams", "Unlimited", "Unlimited"],
+              ["Free", `Last ${FACTS.freeHistoryShown} changes`, "—"],
+              ["Pro", "All changes", `Last ${FACTS.proActivityDays} days`],
+              ["Family", "All changes", `Last ${FACTS.familyActivityDays} days`],
+              ["Teams", "All changes", "All activity"],
             ],
           },
         },
@@ -211,8 +211,8 @@ export const CONTACTS: HelpCategoryContent = {
       a: "Use the **Compact** / **Cozy** switch above your contact list: Compact fits more rows, Cozy adds space and avatars.",
     },
     {
-      q: "Which plans include the activity log?",
-      a: `Pro keeps ${FACTS.proActivityDays} days, Family ${FACTS.familyActivityDays} days and Teams keeps everything. On Free, each contact's history shows its last ${FACTS.freeHistoryShown} changes.`,
+      q: "Which plans include the Activity feed?",
+      a: `Pro, Family and Teams. It shows the last ${FACTS.proActivityDays} days on Pro, the last ${FACTS.familyActivityDays} days on Family and all activity on Teams. Each contact's own history shows every change on paid plans and the last ${FACTS.freeHistoryShown} changes on Free.`,
       more: "contacts/contact-history-and-activity",
     },
   ],

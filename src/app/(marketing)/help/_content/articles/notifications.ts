@@ -52,7 +52,8 @@ export const NOTIFICATIONS: HelpCategoryContent = {
         { text: "In your calendar app, add a subscribed calendar (sometimes called “From URL”) and paste the link." },
       ],
       whatToExpect: [
-        "The feed includes birthdays, anniversaries, lunar birthdays and other saved dates, and updates as you edit contacts.",
+        "The feed includes birthdays, anniversaries and other saved dates, and updates as you edit contacts.",
+        "Every date repeats on the same calendar date each year. A date labelled “Lunar birthday” is not converted from the lunar calendar, so it appears on the date you saved.",
         "How often it refreshes is up to your calendar app.",
         "The calendar feed is available on every plan.",
       ],

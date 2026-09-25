@@ -42,7 +42,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
       whatToExpect: [
         "Rows that match an existing contact by email or phone are flagged in the preview so you can spot duplicates.",
         "Rows in the same file that share an email or phone must be fixed before the import can go ahead.",
-        "Files can be up to 10 MB and 50,000 rows.",
+        "CSV files can be up to 10 MB and 50,000 rows.",
         "Every import appears in **Import history**. Choose **Undo** there to archive everything that import added.",
         "Free has a monthly import allowance; Pro, Family and Teams have none. Syncing a connected account doesn't count as importing.",
       ],
@@ -168,7 +168,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
         {
           heading: "An open, documented format",
           paragraphs: [
-            "The format is published with its specification, JSON schemas, example files and a validator on the [developer page](/developers#export-format) — see the [specification](/format/spec.md). Kontax-specific fields use a clearly namespaced extension, so standard JSContact readers can ignore them.",
+            "The format is published with its specification, JSON schemas, example files and a validator on the [developer page](/developers/export-format) — see the [specification](/format/spec.md). Kontax-specific fields use a clearly namespaced extension, so standard JSContact readers can ignore them.",
           ],
         },
       ],
@@ -207,7 +207,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
               ["`contacts.csv`", "The same contacts as a spreadsheet."],
               ["`activity.json`", "Your activity history."],
               ["`billing-summary.txt`", "Your plan and billing summary."],
-              ["`account.json`", "Your profile and account settings."],
+              ["`account.json`", "Your account details (email, name, sign-up date, plan)."],
             ],
           },
         },
@@ -287,7 +287,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
     },
     {
       q: "Is vCard export available on Free?",
-      a: "No — the vCard 4.0 export option is part of Pro, Family and Teams. On Free you can export CSV or a Kontax Archive at any time.",
+      a: "Exporting your whole library as vCard is part of Pro, Family and Teams. On Free you can export CSV or a Kontax Archive at any time and download a single contact as a .vcf file, and the full data export includes a contacts.vcf file.",
       more: "import-export/export-your-contacts",
     },
   ],
