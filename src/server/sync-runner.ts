@@ -58,6 +58,7 @@ import {
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
+import { enqueueMergeSuggestionRefresh } from "~/server/merge-suggestion-refresh-queue";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
 import {
   createSyncLeaseKeeper,
@@ -639,14 +640,21 @@ const buildDeletionGuardContext = (
 
 // P27-08: best-effort post-import dedup. Never throws — the sync job has
 // already succeeded; a dedup failure must not flip it to failed.
-const runPostImportDedupSafely = async (
+// P49A-09: enqueued as a background merge-suggestion refresh (one per user at
+// a time; failures are logged by the queue) instead of scoring the whole book
+// inline in the sync runner.
+const runPostImportDedupSafely = (
   userId: string,
   syncAccountId: string,
   syncJobId: string,
   source: string,
 ) => {
   try {
-    await runPostImportDeduplication({ userId, syncAccountId, syncJobId, source });
+    enqueueMergeSuggestionRefresh(userId, {
+      source,
+      dedupeKey: `sync-import:${syncJobId}`,
+      run: () => runPostImportDeduplication({ userId, syncAccountId, syncJobId, source }),
+    });
   } catch {
     // swallow — dedup is advisory; the import already committed.
   }
@@ -1105,7 +1113,7 @@ export const runQueuedSyncJobs = async ({
       );
       summary[outcome] += 1;
       if (wasFullImport && outcome !== "failed") {
-        await runPostImportDedupSafely(job.syncAccount.userId, job.syncAccountId, job.id, "google-import");
+        runPostImportDedupSafely(job.syncAccount.userId, job.syncAccountId, job.id, "google-import");
       }
       continue;
     }
@@ -1132,7 +1140,7 @@ export const runQueuedSyncJobs = async ({
       );
       summary[outcome] += 1;
       if (wasFullImport && outcome !== "failed") {
-        await runPostImportDedupSafely(job.syncAccount.userId, job.syncAccountId, job.id, "outlook-import");
+        runPostImportDedupSafely(job.syncAccount.userId, job.syncAccountId, job.id, "outlook-import");
       }
       continue;
     }

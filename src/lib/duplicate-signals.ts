@@ -1,7 +1,7 @@
 // Pure helpers for duplicate-detection signals (P10-08).
 // Kept dependency-free and side-effect-free so they're easy to unit test.
 
-import { normalizePhoneExactKey, normalizePhoneLooseKey } from "./phone-normalization";
+import { normalizePhoneCandidate } from "./phone-normalization";
 
 /**
  * Wagner-Fischer Levenshtein distance, capped at maxDist to short-circuit
@@ -72,10 +72,16 @@ export const getFamilyName = (value: string | null | undefined) => getNameTokens
  *   "+44 7700 900111", "07700 900111", "447700900111" → all share "7700900111".
  * Returns "" for anything too short to be a real phone number.
  */
-export const normalizePhoneKey = (value: string | null | undefined) => {
-  const exact = normalizePhoneExactKey(value);
-  return exact ? exact.replace(/^\+/, "") : normalizePhoneLooseKey(value);
-};
+export const normalizePhoneKey = (value: string | null | undefined) =>
+  phoneKeyFromCandidate(normalizePhoneCandidate(value));
+
+/**
+ * The same key as `normalizePhoneKey`, from an already-parsed candidate, so a
+ * caller that also needs the candidate's `exactKey` parses the number once
+ * (P49A-09).
+ */
+export const phoneKeyFromCandidate = (candidate: { exactKey: string; looseKey: string }) =>
+  candidate.exactKey ? candidate.exactKey.replace(/^\+/, "") : candidate.looseKey;
 
 /**
  * The domain part of an email address, lowercased. "" when absent/malformed.
@@ -149,19 +155,30 @@ export const phoneticToken = (value: string) => {
  * Phonetic key for a full name: per-token phonetic codes joined, sorted so word
  * order doesn't matter ("John Smith" vs "Smith John"). "" when empty.
  */
-export const phoneticNameKey = (value: string | null | undefined) => {
-  const tokens = getNameTokens(value).map(phoneticToken).filter(Boolean);
+export const phoneticNameKey = (value: string | null | undefined) =>
+  phoneticKeyFromTokens(getNameTokens(value));
+
+/** `phoneticNameKey` from already-normalized name tokens (P49A-09). */
+export const phoneticKeyFromTokens = (nameTokens: readonly string[]) => {
+  const tokens = nameTokens.map(phoneticToken).filter(Boolean);
   if (tokens.length === 0) {
     return "";
   }
-  return [...tokens].sort().join(" ");
+  return tokens.sort().join(" ");
 };
 
 /**
  * True when two name tokens could plausibly be spellings of the same name:
  * equal, initial-vs-full, a one-edit variant, or phonetically equivalent.
  */
-const nameTokensCompatible = (leftToken: string, rightToken: string) => {
+export const nameTokensCompatible = (
+  leftToken: string,
+  rightToken: string,
+  // P49A-09: a caller scoring many pairs passes each token's precomputed
+  // phoneticToken() so it isn't recomputed per pair. Same result either way.
+  leftPhonetic?: string,
+  rightPhonetic?: string,
+) => {
   if (!leftToken || !rightToken) {
     return true;
   }
@@ -183,8 +200,8 @@ const nameTokensCompatible = (leftToken: string, rightToken: string) => {
   ) {
     return true;
   }
-  const leftPhonetic = phoneticToken(leftToken);
-  return Boolean(leftPhonetic && leftPhonetic === phoneticToken(rightToken));
+  const leftKey = leftPhonetic ?? phoneticToken(leftToken);
+  return Boolean(leftKey && leftKey === (rightPhonetic ?? phoneticToken(rightToken)));
 };
 
 /**
@@ -204,9 +221,11 @@ export const familyNamesCompatible = (left: string | null | undefined, right: st
  * e.g. "J. Smith" ~ "John Smith": same family name and the given names share a
  * first initial (one may be just the initial).
  */
-export const givenInitialMatch = (left: string | null | undefined, right: string | null | undefined) => {
-  const leftGiven = getGivenName(left);
-  const rightGiven = getGivenName(right);
+export const givenInitialMatch = (left: string | null | undefined, right: string | null | undefined) =>
+  givenTokensInitialMatch(getGivenName(left), getGivenName(right));
+
+/** `givenInitialMatch` on already-extracted given-name tokens (P49A-09). */
+export const givenTokensInitialMatch = (leftGiven: string, rightGiven: string) => {
   if (!leftGiven || !rightGiven) {
     return false;
   }

@@ -1,28 +1,82 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+// P49A-09: the rescan runs as a background job. POST answers 202 + jobId, then
+// we poll the job until it finishes and reload the duplicates tab.
+const POLL_INTERVAL_MS = 1500;
+const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+
+type RefreshStatus = "queued" | "running" | "succeeded" | "failed" | "unknown";
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export function MergeSuggestionRefreshButton() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  const fail = (message: string) => {
+    if (!mounted.current) return;
+    setError(message);
+    setIsRefreshing(false);
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     setError("");
 
-    const response = await fetch("/api/merge-suggestions/refresh", {
-      method: "POST",
-    });
-
-    const data = (await response.json().catch(() => null)) as { message?: string } | null;
-
-    if (!response.ok) {
-      setError(data?.message ?? "Duplicate scan failed.");
-      setIsRefreshing(false);
+    let jobId: string;
+    try {
+      const response = await fetch("/api/merge-suggestions/refresh", { method: "POST" });
+      const data = (await response.json().catch(() => null)) as
+        | { message?: string; jobId?: string }
+        | null;
+      if (!response.ok || !data?.jobId) {
+        fail(data?.message ?? "Duplicate scan failed.");
+        return;
+      }
+      jobId = data.jobId;
+    } catch {
+      fail("Duplicate scan failed.");
       return;
     }
 
-    window.location.href = "/contacts?tab=duplicates&mergeSuggestionsRefreshed=1";
+    const deadline = Date.now() + POLL_TIMEOUT_MS;
+    while (mounted.current && Date.now() < deadline) {
+      await sleep(POLL_INTERVAL_MS);
+      let status: RefreshStatus | undefined;
+      try {
+        const response = await fetch(
+          `/api/merge-suggestions/refresh?jobId=${encodeURIComponent(jobId)}`,
+          { cache: "no-store" },
+        );
+        const data = (await response.json().catch(() => null)) as { status?: RefreshStatus } | null;
+        status = response.ok ? data?.status : undefined;
+      } catch {
+        // Transient network error: keep polling until the deadline.
+        continue;
+      }
+      if (status === "failed") {
+        fail("Duplicate scan failed.");
+        return;
+      }
+      // "unknown": the job finished long enough ago to be forgotten (or the
+      // server restarted) — show whatever suggestions are stored now.
+      if (status === "succeeded" || status === "unknown") {
+        window.location.href = "/contacts?tab=duplicates&mergeSuggestionsRefreshed=1";
+        return;
+      }
+    }
+
+    fail("The duplicate scan is still running. Check back in a few minutes.");
   };
 
   return (
