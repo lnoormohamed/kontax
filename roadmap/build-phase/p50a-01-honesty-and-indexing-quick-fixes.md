@@ -12,6 +12,8 @@ submitted to Search Console.
   centre. Outlook is not configured in production.
 - **Webhooks:** `pricing/page.tsx:147` row and `pricing/_faq.tsx:37`. Not built.
 - **Backups:** `security/page.tsx:188` "Nightly backups are encrypted" — deferred.
+- **Developer API on Family:** `/developers` says the API is on Pro, Family and Teams; Family has
+  had no API access since the P49 decision (2026-09-25). Say Pro and Teams.
 - **Changelog:** v3.0–v3.3 entries dated April–May 2026, before the first commit (6 June 2026).
 - **Sitemap** (`src/app/sitemap.ts`): lists `/login` (:30); every user's public card (:47) incl.
   a QA card `/u/p47qa`; `lastModified = new Date()` for static pages (:62).
