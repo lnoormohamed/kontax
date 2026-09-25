@@ -451,6 +451,59 @@ export const HELP_FAQ: HelpFaqSection[] = [
   },
 ];
 
+// P50A-01: Outlook only appears once Microsoft sync is configured. HELP_FAQ
+// above is the raw source of truth (kept simple to read/edit); this pure
+// function derives the gated view actually rendered and put into JSON-LD, so
+// they can never drift apart. The boolean is computed server-side (see
+// ~/lib/microsoft-sync-flag) and passed in, because HELP_FAQ is also
+// consumed by a client component ("use client" help-faq.tsx) that must not
+// import server-only env access itself.
+export function getHelpFaqSections(microsoftSyncEnabled: boolean): HelpFaqSection[] {
+  if (microsoftSyncEnabled) return HELP_FAQ;
+
+  return HELP_FAQ.map((section) => {
+    if (section.id === "sync-oauth") {
+      return {
+        ...section,
+        title: "Google sync",
+        items: section.items
+          .filter((item) => item.q !== "How do I sync with Outlook / Microsoft 365?")
+          .map((item): HelpFaqItem => {
+            if (item.q === "What contact fields does Google/Outlook sync support?") {
+              return {
+                q: "What contact fields does Google sync support?",
+                a: "Name, phones, emails, addresses, company, job title, birthday, website, and notes are synced both ways. Kontax-specific structures such as labels, books, and product-only metadata stay local. Additional dates beyond birthday may also stay local if the provider does not preserve that field family.",
+              };
+            }
+            if (item.q === "What is the difference between Google/Outlook sync and CardDAV sync?") {
+              return {
+                q: "What is the difference between Google sync and CardDAV sync?",
+                a: "CardDAV connects directly to an address book server using a standard protocol and an app password — great for iCloud, Nextcloud, and Fastmail. Google sync uses its own OAuth sign-in — you log in with your Google account and no separate password is needed. Both give two-way sync; the difference is how they connect.",
+              };
+            }
+            return item;
+          }),
+      };
+    }
+
+    if (section.id === "activity") {
+      return {
+        ...section,
+        items: section.items.map((item): HelpFaqItem =>
+          item.q === "What do the source badges mean?"
+            ? {
+                q: item.q,
+                a: "Each activity entry has a source badge: Web (changed in the Kontax web or mobile app), Sync (came from a CardDAV or Google sync), Import (added via a CSV or vCard import), API (changed by a connected integration), or Share (a live share update pushed by the contact owner).",
+              }
+            : item,
+        ),
+      };
+    }
+
+    return section;
+  });
+}
+
 // Help-link targets used by empty states / tooltips. Maps a logical key to the
 // FAQ section anchor on /help.
 export const HELP_ANCHORS = {

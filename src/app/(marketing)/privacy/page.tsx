@@ -4,6 +4,7 @@
 // Reviewer: [NAME] · Review date: [DATE]
 
 import type { Metadata } from "next";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import "../_components/doc.css";
 
 // P48-13: was declared but never read — the date below was a hardcoded
@@ -41,6 +42,11 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
+  // P50A-01: Outlook only appears once Microsoft sync is configured — see
+  // ~/lib/microsoft-sync-flag. This page has no dynamic API, so it's
+  // statically prerendered (build-time read, per that helper's doc comment).
+  const outlookLive = isMicrosoftSyncEnabled();
+
   return (
     <div className="doc-wrap">
       <h1 className="doc-title">Privacy Policy</h1>
@@ -68,7 +74,7 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Sync credentials:</strong> CardDAV app passwords (hashed)
-            and Google and Outlook OAuth tokens (encrypted). Stored solely to
+            and Google{outlookLive ? " and Outlook" : ""} OAuth tokens (encrypted). Stored solely to
             provide the sync service.
           </li>
           <li>
@@ -167,10 +173,12 @@ export default function PrivacyPage() {
             API on your behalf, governed by your Google account&apos;s privacy
             policy.
           </li>
-          <li>
-            <strong>Microsoft Corporation</strong> — only when you connect an
-            Outlook account, under the same conditions.
-          </li>
+          {outlookLive && (
+            <li>
+              <strong>Microsoft Corporation</strong> — only when you connect an
+              Outlook account, under the same conditions.
+            </li>
+          )}
         </ul>
 
         <h2>6. Your rights</h2>

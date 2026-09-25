@@ -1,4 +1,5 @@
 import { HELP_PROVIDER_GUIDES } from "~/app/_components/help-provider-guides-data";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 
 function GuideList({
   title,
@@ -20,6 +21,13 @@ function GuideList({
 }
 
 export function HelpProviderGuides() {
+  // P50A-01: the Microsoft Outlook guide only appears once Microsoft sync is
+  // configured — see ~/lib/microsoft-sync-flag. This component has no
+  // dynamic API of its own; it's statically prerendered as part of /help.
+  const guides = isMicrosoftSyncEnabled()
+    ? HELP_PROVIDER_GUIDES
+    : HELP_PROVIDER_GUIDES.filter((guide) => guide.id !== "provider-microsoft");
+
   return (
     <section className="help-guides" aria-labelledby="provider-guides">
       <div className="help-guides__head">
@@ -34,7 +42,7 @@ export function HelpProviderGuides() {
       </div>
 
       <div className="help-guides__rail">
-        {HELP_PROVIDER_GUIDES.map((guide) => (
+        {guides.map((guide) => (
           <a key={guide.id} className="help-guide-pill" href={`#${guide.id}`}>
             {guide.name}
           </a>
@@ -42,7 +50,7 @@ export function HelpProviderGuides() {
       </div>
 
       <div className="help-guides__grid">
-        {HELP_PROVIDER_GUIDES.map((guide) => (
+        {guides.map((guide) => (
           <article key={guide.id} id={guide.id} className="help-guide-card">
             <div className="help-guide-card__head">
               <div>
