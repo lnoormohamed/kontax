@@ -39,7 +39,7 @@ export function HowItWorks() {
           title="From three address books to one, in an afternoon"
         />
         <ol className="hp-steps">
-          <Step n={1} title="Bring your contacts in" body="Connect Google, iCloud or Fastmail, or import a CSV or vCard file.">
+          <Step n={1} title="Bring your contacts in" body="Connect Google, iCloud or Fastmail, or import a CSV file or a Kontax archive.">
             <WindowFrame>
               <p className="hp-vl">Add a source</p>
               <div className="hp-srcg">

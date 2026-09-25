@@ -77,6 +77,9 @@ test("isPublicPath: P50A SEO sections are public, app workspaces stay private", 
   assert.equal(isPublicPath("/for/families"), true);
   assert.equal(isPublicPath("/for/teams"), true);
   assert.equal(isPublicPath("/glossary"), true);
+  assert.equal(isPublicPath("/guides"), true);
+  assert.equal(isPublicPath("/compare"), true);
+  assert.equal(isPublicPath("/api/metrics/pv"), true);
   assert.equal(isPublicPath("/help/sync/connect-icloud-contacts"), true);
   // Signed-in workspaces that share a word with the new sections.
   assert.equal(isPublicPath("/family"), false);
