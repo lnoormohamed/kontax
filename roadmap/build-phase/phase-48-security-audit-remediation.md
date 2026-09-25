@@ -91,6 +91,7 @@ policy, credential key rotation, and residual hardening including making the
 | [P48-15](p48-15-runtime-image-hardening.md) | Runtime image hardening: non-root, pruned, no `src`/`scripts`/`generated`, HEALTHCHECK | G | P1 | P48-12 |
 | [P48-16](p48-16-rate-limit-policy-env-key-rotation.md) | Rate-limit outage policy, required prod env, sync-credential key rotation | G | P1 | — |
 | [P48-17](p48-17-residual-hardening-security-page.md) | Residual hardening & `/security` page truth | G | P2 | P48-01 |
+| [P48-18](p48-18-hash-capability-tokens-at-rest.md) | Hash calendar, share and invite tokens at rest (split from P48-14 item 6) | G | P2 | P48-14, P48-16 |
 
 ---
 
