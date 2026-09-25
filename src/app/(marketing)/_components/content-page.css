@@ -1,0 +1,110 @@
+/* ════════════════════════════════════════════════════════════════
+   P50A-07 · Shared utility classes for the use-case, feature-detail
+   and glossary pages (/for/*, /features/duplicates, /features/history,
+   /glossary). Built entirely from the --mkt-* tokens in marketing.css —
+   import this alongside a page's own stylesheet, never instead of it.
+   Prefix: cp- (content page)
+   ════════════════════════════════════════════════════════════════ */
+
+/* Numbered step list ("Setup steps"). */
+.cp-steps {
+  display: grid;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: cp-step;
+}
+.cp-steps li {
+  position: relative;
+  padding-left: 46px;
+}
+.cp-steps li::before {
+  counter-increment: cp-step;
+  content: counter(cp-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--mkt-g100);
+  color: var(--mkt-g800);
+  font: 700 14px/30px var(--mkt-mono);
+  text-align: center;
+}
+.cp-steps h3 {
+  margin: 0 0 4px;
+  font: var(--mkt-h4);
+  font-size: 17px;
+  color: var(--mkt-head);
+}
+.cp-steps p {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--mkt-body);
+}
+
+/* Two-column responsive grid (problem/solution, term pairs, etc). */
+.cp-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 40px;
+  align-items: start;
+}
+@media (max-width: 767px) {
+  .cp-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* Quick-jump chips (glossary "on this page"). */
+.cp-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.cp-jump a {
+  display: inline-flex;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--mkt-g100);
+  color: var(--mkt-g800);
+  font: 600 13.5px/1 var(--mkt-sans);
+  text-decoration: none;
+}
+.cp-jump a:hover { background: var(--mkt-g200); }
+
+/* Glossary term entries. */
+.cp-term {
+  padding: 26px 0;
+  border-top: 1px solid var(--mkt-line);
+  scroll-margin-top: calc(var(--mkt-nav-h) + 16px);
+}
+.cp-term:first-of-type { border-top: none; padding-top: 0; }
+.cp-term__title {
+  margin: 0 0 10px;
+  font: var(--mkt-h4);
+  font-size: 19px;
+  color: var(--mkt-head);
+}
+.cp-term p {
+  margin: 0 0 10px;
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--mkt-body);
+}
+.cp-term p:last-child { margin-bottom: 0; }
+
+/* Small trailing note with a link. */
+.cp-note {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--mkt-mute);
+}
+.cp-note a { color: var(--mkt-g800); font-weight: 600; text-decoration: none; }
+.cp-note a:hover { text-decoration: underline; }
