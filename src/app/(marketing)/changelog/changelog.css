@@ -91,7 +91,11 @@
 
 .chg-entry {
   display: grid;
-  grid-template-columns: 160px 1fr;
+  /* minmax(0, 1fr), not 1fr: a bare 1fr track's automatic minimum size is its
+     content's min-content width, so nowrap children deeper in the tree (e.g.
+     the release-figure rows) can force this track — and the whole page — wider
+     than the viewport. minmax(0, …) removes that automatic minimum. */
+  grid-template-columns: 160px minmax(0, 1fr);
   gap: 0;
   padding: 52px 0;
   border-bottom: 1px solid var(--mkt-hairline);
@@ -311,14 +315,16 @@
 
 /* ─── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 939px) {
-  .chg-entry__content--fig { grid-template-columns: 1fr; gap: 26px; }
+  .chg-entry__content--fig { grid-template-columns: minmax(0, 1fr); gap: 26px; }
   .chg-entry__aside .chg-fig { margin-top: 0; max-width: 480px; }
 }
 @media (max-width: 767px) {
   .chg-hero { padding: 52px 0 32px; }
   .chg-hero__title { font-size: 32px; }
-  .chg-entry { grid-template-columns: 1fr; padding: 42px 0; }
-  .chg-entry__content--fig { grid-template-columns: 1fr; gap: 4px; }
+  /* minmax(0, 1fr): see the note on the base .chg-entry rule above — the
+     collapsed single-column layout hits the same auto-min-size overflow. */
+  .chg-entry { grid-template-columns: minmax(0, 1fr); padding: 42px 0; }
+  .chg-entry__content--fig { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .chg-entry__date { display: none; }
   .chg-entry__date--mobile {
     display: block;
@@ -330,4 +336,25 @@
   }
   .chg-entry__title { font-size: 21px; }
   .chg-fig { max-width: none; }
+
+  /* The release-figure rows (chg-fig__row) pack a fixed-width icon plus
+     several no-wrap text spans (name, email/count, status). At 375px there
+     isn't room for all of it on one line; let the middle "identity" column
+     shrink and ellipsize instead of forcing the row — and with it .chg-fig,
+     .chg-entry__aside's grid track, and the page itself — wider than the
+     viewport. */
+  .chg-fig__row,
+  .chg-fig__head { min-width: 0; }
+  .chg-fig__row > span:not(.chg-av):not(.chg-yicn):not(.chg-role):not(.chg-ystatus):not(.chg-dot),
+  .chg-fig__head > span:not(.chg-fig__bk) {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .chg-fig__sub,
+  .chg-nm,
+  .chg-ynm,
+  .chg-ysub {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }

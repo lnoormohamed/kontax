@@ -1,62 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-// Static assets + auth endpoints — always allowed, bypass all session gating
-// (these must load even for restricted sessions, e.g. CSS/JS for the 2FA page).
-const ALWAYS_ALLOW = [
-  "/_next",
-  "/favicon.ico",
-  "/manifest.webmanifest",
-  "/sw.js",
-  "/offline.html",
-  "/api/auth",
-  "/api/pwa-icon",
-  "/robots.txt", // P26-08
-  "/sitemap.xml", // P26-08
-  "/opengraph-image.png", // P26-07 — default OG card (static file in /public)
-];
-
-// Public content pages — viewable while logged out. The page component itself
-// decides what to render based on session (e.g. "/" shows the marketing landing
-// when logged out, the dashboard when logged in). "/" is matched exactly because
-// it cannot be a startsWith prefix (that would match every route).
-const PUBLIC_PREFIXES = [
-  "/login",
-  "/register",
-  "/forgot-password", // P18-05
-  "/reset-password", // P18-05
-  "/verify-email",
-  // P48-03: the "this wasn't me" link from the email-change notice. Must work
-  // signed-out — the person clicking it may have just lost access to the
-  // account, and the page authenticates the single-use token, not a session.
-  "/revert-email",
-  "/account-deleted", // P18-09
-  "/share/", // vCard share public links (P12-02) — trailing slash so it
-  // matches /share/<token> but NOT the authenticated /shares page
-  "/pricing", // marketing
-  "/features", // marketing
-  "/security", // marketing
-  "/changelog", // marketing
-  "/help", // P26-12: public FAQ / help centre
-  "/privacy", // legal
-  "/terms", // legal
-  "/api/register", // Account creation
-  // P38-10: read-only session peeks for statically-rendered public pages.
-  // Both call auth() themselves and return a null-ish payload when logged
-  // out, so let them run instead of redirecting the fetch to /login.
-  "/api/impersonation",
-  "/api/billing/plan",
-  "/api/cron", // Protected separately by CRON_SECRET
-  "/api/stripe/webhook", // Authenticated by Stripe signature, not session
-  "/api/ses/events", // SNS bounce/complaint webhook (P20-10)
-  "/api/calendar", // P22-11: iCal feed authenticated by per-user calToken
-  "/api/v1", // P29-06: REST API — authenticated by Bearer token in withApiAuth
-  "/api/card", // P30-01: public card click-tracking (unauthenticated)
-  "/api/health", // uptime monitoring — no auth required
-  "/developers", // P29-07: public API documentation page
-  "/format/", // P45-07: public export-format artifacts (schemas, examples,
-  // validator, spec) linked from /developers — no login required
-  "/u/", // P30-01: public contact cards — no login required
-];
+import { isAlwaysAllowed, isPublicPath } from "~/server/public-paths";
 
 const hasAuthSessionCookie = (req: NextRequest) =>
   req.cookies
@@ -151,7 +95,7 @@ export default function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // 1. Assets + auth API: never gated.
-  if (ALWAYS_ALLOW.some((p) => pathname.startsWith(p))) {
+  if (isAlwaysAllowed(pathname)) {
     return NextResponse.next();
   }
 
@@ -162,7 +106,7 @@ export default function middleware(req: NextRequest) {
 
   // 2. Public content: pass through; the page self-selects logged-out vs
   //    logged-in content.
-  if (pathname === "/" || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+  if (isPublicPath(pathname)) {
     // Public user cards get the stricter nonce-based CSP (SEC-02).
     if (pathname.startsWith("/u/")) {
       return withStrictCardCsp(req);
