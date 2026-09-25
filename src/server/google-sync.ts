@@ -535,7 +535,7 @@ export const pushGoogleContact = async (
 
   const body = mapContactToGooglePerson(contact);
   const updatePersonFields = googleUpdateFieldsFor(
-    buildGoogleUpdatePersonFields(body, link.supportedFieldShadow),
+    buildGoogleUpdatePersonFields(body, link.supportedFieldShadow, contact),
     exclusions,
   );
   const localShadow = buildGooglePushShadow(contact);

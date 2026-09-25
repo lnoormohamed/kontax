@@ -133,7 +133,7 @@ test("mask never names a family missing from the body when nothing was cleared",
   const body = mapContactToGooglePerson(sparse);
   // No shadow (legacy link) and a shadow that matches the body: same mask.
   for (const shadow of [null, { firstName: "Sparse", emailEntries: [{ value: "s@example.com" }] }]) {
-    const mask = maskOf(buildGoogleUpdatePersonFields(body, shadow));
+    const mask = maskOf(buildGoogleUpdatePersonFields(body, shadow, sparse));
     assert.deepEqual([...mask].sort(), ["emailAddresses", "names"]);
     for (const family of mask) {
       assert.ok(googlePersonFamiliesPresent(body).has(family as never), `${family} masked but absent`);
@@ -162,7 +162,7 @@ test("mask adds an intentional clear only for families Google held at the last s
     addressEntries: [],
   };
   const body = mapContactToGooglePerson(edited);
-  const mask = maskOf(buildGoogleUpdatePersonFields(body, lastSynced));
+  const mask = maskOf(buildGoogleUpdatePersonFields(body, lastSynced, edited));
 
   assert.equal(body.urls, undefined);
   assert.equal(body.addresses, undefined);
@@ -174,10 +174,33 @@ test("mask adds an intentional clear only for families Google held at the last s
 });
 
 test("excluded families are withheld from the mask even when cleared", () => {
-  const body = mapContactToGooglePerson({ fullName: "X", firstName: "X" });
+  const source: GoogleContactSource = { fullName: "X", firstName: "X" };
+  const body = mapContactToGooglePerson(source);
   const mask = googleUpdateFieldsFor(
-    buildGoogleUpdatePersonFields(body, { firstName: "X", address: "old", notes: "old" }),
+    buildGoogleUpdatePersonFields(body, { firstName: "X", address: "old", notes: "old" }, source),
     new Set(["ADR", "NOTE"]),
   );
   assert.deepEqual([...maskOf(mask)].sort(), ["names"]);
+});
+
+test("a birthday the body can't express is not masked as a clear; an emptied one is", () => {
+  const lastSynced = { firstName: "Ada", birthday: "1815-12-10" };
+
+  // A legacy free-text birthday: parseBirthdayToGoogle can't convert it, so
+  // the body has no birthdays — but Kontax still has a value.
+  const freeText: GoogleContactSource = { fullName: "Ada", firstName: "Ada", birthday: "10 Dec 1815" };
+  const freeTextBody = mapContactToGooglePerson(freeText);
+  assert.equal(freeTextBody.birthdays, undefined);
+  assert.ok(
+    !maskOf(buildGoogleUpdatePersonFields(freeTextBody, lastSynced, freeText)).has("birthdays"),
+    "Google keeps its birthday",
+  );
+
+  // The user actually removed the birthday in Kontax → intentional clear.
+  const emptied: GoogleContactSource = { fullName: "Ada", firstName: "Ada", birthday: null };
+  assert.ok(
+    maskOf(buildGoogleUpdatePersonFields(mapContactToGooglePerson(emptied), lastSynced, emptied)).has(
+      "birthdays",
+    ),
+  );
 });

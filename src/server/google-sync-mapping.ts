@@ -437,6 +437,10 @@ export const googleFamiliesInShadow = (shadow: unknown): Set<GooglePushPersonFam
  *   - the families present in the body, plus
  *   - intentional clears: families that held data at the last sync (the
  *     link's supportedFieldShadow) and are now empty in Kontax.
+ * "Empty in Kontax" is read off the source contact, not the body: a value the
+ * body could not express (e.g. a free-text birthday that isn't ISO) is absent
+ * from the body but is not a deletion, so it is left out of the mask and
+ * Google keeps its value (Fable review).
  * With no shadow (legacy link) nothing is cleared: a field the user emptied
  * survives on Google, which is the safe failure mode.
  * `withheld` families (P39-03 field exclusions) are never masked.
@@ -444,11 +448,16 @@ export const googleFamiliesInShadow = (shadow: unknown): Set<GooglePushPersonFam
 export const buildGoogleUpdatePersonFields = (
   body: people_v1.Schema$Person,
   previousShadow: unknown,
+  source: GoogleContactSource,
   withheld: ReadonlySet<string> = new Set(),
 ): string => {
   const inBody = googlePersonFamiliesPresent(body);
   const previously = googleFamiliesInShadow(previousShadow);
+  // Same contact-shaped keys as the shadow, so the same reader applies.
+  const inKontax = googleFamiliesInShadow(source);
   return GOOGLE_PUSH_PERSON_FAMILIES.filter(
-    (family) => !withheld.has(family) && (inBody.has(family) || previously.has(family)),
+    (family) =>
+      !withheld.has(family) &&
+      (inBody.has(family) || (previously.has(family) && !inKontax.has(family))),
   ).join(",");
 };
