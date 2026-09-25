@@ -10,6 +10,8 @@ import { db } from "~/server/db";
 export const ADMIN_ACTIONS = {
   USER_VIEWED: "user.view",
   USER_PLAN_OVERRIDE: "plan.override",
+  // P49A-07: "remove override" — cancels the comp row without touching a real subscription.
+  USER_PLAN_OVERRIDE_REMOVED: "plan.override.remove",
   USER_SUSPENDED: "account.suspend",
   USER_UNSUSPENDED: "account.unlock",
   USER_DELETION_SCHEDULED: "account.delete.schedule",

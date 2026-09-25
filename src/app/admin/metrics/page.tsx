@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { assertAdmin } from "~/server/admin/guard";
+import { assertAdmin, requireAdminCapability } from "~/server/admin/guard";
 import {
   adminAttentionForErrorRate,
   adminAttentionMeta,
@@ -57,6 +57,10 @@ export default async function AdminMetricsPage() {
   let admin;
   try {
     admin = await assertAdmin();
+    // P49A-07 (admin hardening): metrics had no capability gate at all — any
+    // admin tier (including SUPPORT_OPS) could load it. Sync ops and
+    // governance are the tiers that actually own this surface.
+    requireAdminCapability(admin, "sync.view");
   } catch {
     redirect("/contacts");
   }

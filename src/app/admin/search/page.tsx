@@ -52,7 +52,7 @@ export default async function AdminSearchPage({
 
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q : "";
-  const results = await searchAdminEntities(q);
+  const results = await searchAdminEntities(q, admin.capabilities);
 
   return (
     <>

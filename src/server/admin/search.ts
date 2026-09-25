@@ -1,6 +1,7 @@
 import "server-only";
 
 import { buildAdminAuditHref, loadAuditSearchTargets } from "~/server/admin/audit";
+import type { AdminCapabilityMap } from "~/server/admin/capabilities";
 import {
   adminSupportCaseSeverityLabel,
   adminSupportCaseStatusLabel,
@@ -52,9 +53,18 @@ function sortRanked(items: Array<RankedSearchResult | null>, limit = 8) {
     .map(({ score: _score, ...item }) => item);
 }
 
-export async function searchAdminEntities(query: string) {
+/**
+ * `capabilities` gates which sections are queried/returned — currently only
+ * audit pivots, which require `audit.view` (P49A-07 admin hardening: a
+ * SUPPORT_OPS-tier admin must not see audit-log entries surfaced through
+ * global search just because they can hit `/admin/search`). Omitting it
+ * keeps the old "show everything" behavior for any caller that hasn't been
+ * updated yet — every real caller should pass the acting admin's capabilities.
+ */
+export async function searchAdminEntities(query: string, capabilities?: AdminCapabilityMap) {
   const q = query.trim();
   const needle = normalize(q);
+  const canViewAudit = capabilities ? !!capabilities["audit.view"] : true;
   if (!needle) {
     return {
       query: "",
@@ -191,7 +201,7 @@ export async function searchAdminEntities(query: string) {
           purpose: true,
         },
       }),
-      loadAuditSearchTargets(q, 12),
+      canViewAudit ? loadAuditSearchTargets(q, 12) : Promise.resolve([]),
     ]);
 
   const userResults = sortRanked(

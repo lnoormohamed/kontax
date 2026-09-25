@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 
 import { assertAdmin, requireAdminCapability } from "~/server/admin/guard";
 import { exportAdminAudit } from "~/server/admin/audit";
-
-function csvEscape(value: string) {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
+// P49A-07 (admin hardening): the export previously only CSV-quoted a cell —
+// it never guarded against formula injection, so an admin action's `details`
+// blob (which can carry attacker-influenced text, e.g. a support note or a
+// broadcast title) could open as an executable formula in Excel/Sheets. Reuse
+// the same guard already used for contact exports rather than reimplementing it.
+import { escapeCsvCell as csvEscape } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
   let admin;

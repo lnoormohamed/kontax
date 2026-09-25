@@ -88,8 +88,11 @@ function planRank(plan: SubscriptionPlan): number {
  */
 const ACTIVE_BILLING_STATUSES: SubscriptionStatus[] = ["ACTIVE", "TRIALING", "PAST_DUE"];
 
+// P49A-07: also treat the legacy "admin-override-" placeholder id as a manual
+// (never-Stripe) subscription — same reasoning as stripe-customers.ts.
 const isLegacyManualSubscription = (subscriptionId: string | null | undefined) =>
-  !!subscriptionId && subscriptionId.startsWith("manual_");
+  !!subscriptionId &&
+  (subscriptionId.startsWith("manual_") || subscriptionId.startsWith("admin-override-"));
 
 const fromUnix = (seconds: number | null | undefined) =>
   seconds ? new Date(seconds * 1000) : null;
@@ -289,7 +292,10 @@ async function upsertSubscription(
     await tx.subscription.updateMany({
       where: {
         userId,
-        providerSubscriptionId: { startsWith: "manual_" },
+        OR: [
+          { providerSubscriptionId: { startsWith: "manual_" } },
+          { providerSubscriptionId: { startsWith: "admin-override-" } },
+        ],
         status: { in: ACTIVE_BILLING_STATUSES },
       },
       data: {
