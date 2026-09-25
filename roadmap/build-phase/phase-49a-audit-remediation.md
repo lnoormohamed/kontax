@@ -48,6 +48,7 @@ Every ticket below was checked against production before it was written:
 | [P49A-16](p49a-16-runtime-ops-and-sync-performance.md) | Runtime & ops: Dockerfile, timeouts, health split, DAV/sync perf, export blobs | P1 | A-29, A-30, A-38–A-42 | P49A-04 |
 | [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, focus, loading states — **deferred: reassess after Phase 50** | P1 | A-43–A-47 | P50-06, P50-07 |
 | [P49A-18](p49a-18-hardening-and-debt-backlog.md) | Hardening & debt backlog | P2 | P2 list | — |
+| [P49A-19](p49a-19-bugs-found-during-content-work.md) | Bugs found while writing help/guides (2FA recovery codes, manual merge, …) | P0/P1 | — | — |
 
 ## Suggested delivery order
 1. P49A-15 (S) — can ship with the pending P49 homepage release.
