@@ -10,8 +10,10 @@ import { join } from "path";
 import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+import type { Prisma } from "../../../generated/prisma";
 import { db } from "~/server/db";
 import { createNotification } from "~/server/notifications";
+import { beginInFlightWork, isShuttingDown } from "~/server/process-lifecycle";
 import {
   contactsToVCard,
   type ContactAddressEntryInput,
@@ -201,6 +203,57 @@ export async function createKontaxArchiveJob(userId: string, input: CreateArchiv
   return job;
 }
 
+// P49A-04: a PROCESSING job heartbeats through onProgress (every 25 contacts
+// bumps progressCount and so updatedAt). No heartbeat for this long means the
+// process running it died (deploy, crash) — the job would otherwise spin in
+// the UI forever. Generous, because the final upload has no heartbeat.
+export const KONTAX_EXPORT_STALL_TIMEOUT_MS = 30 * 60 * 1000;
+export const KONTAX_EXPORT_INTERRUPTED_SUMMARY =
+  "Interrupted — the export stopped before it finished (server restart).";
+
+export const stalledKontaxExportWhere = (now: Date) =>
+  ({
+    status: "PROCESSING",
+    updatedAt: { lt: new Date(now.getTime() - KONTAX_EXPORT_STALL_TIMEOUT_MS) },
+  }) satisfies Prisma.KontaxExportJobWhereInput;
+
+/** P49A-04: fail PROCESSING archive jobs with no heartbeat past the timeout. */
+export async function reclaimStalledKontaxExportJobs(now: Date = new Date()): Promise<number> {
+  const stalled = await db.kontaxExportJob.findMany({
+    where: stalledKontaxExportWhere(now),
+    select: { id: true, userId: true },
+    take: 100,
+  });
+  let reclaimed = 0;
+  for (const job of stalled) {
+    // Re-check the stall condition in the write so a job that just heartbeat
+    // (or finished) is never clobbered.
+    const result = await db.kontaxExportJob.updateMany({
+      where: { id: job.id, ...stalledKontaxExportWhere(now) },
+      data: {
+        status: "FAILED",
+        errorSummary: KONTAX_EXPORT_INTERRUPTED_SUMMARY,
+        completedAt: now,
+      },
+    });
+    if (result.count !== 1) continue;
+    reclaimed += 1;
+    await createNotification({
+      userId: job.userId,
+      category: "PRODUCT_UPDATES",
+      title: "Export didn't finish",
+      body: "Something interrupted the archive export — your contacts are untouched. Try again from the export page.",
+      actionUrl: "/import-export",
+    }).catch(() => undefined);
+  }
+  if (reclaimed > 0) {
+    console.warn(
+      `[Kontax] reclaimed ${reclaimed} archive export job(s) stuck in PROCESSING; marked FAILED.`,
+    );
+  }
+  return reclaimed;
+}
+
 /** Atomically claim the job (PENDING → PROCESSING); false if already claimed. */
 async function claimJob(jobId: string): Promise<boolean> {
   const result = await db.kontaxExportJob.updateMany({
@@ -211,7 +264,20 @@ async function claimJob(jobId: string): Promise<boolean> {
 }
 
 export async function processKontaxExportJob(jobId: string): Promise<void> {
+  // P49A-04: a draining process claims nothing new; the job stays PENDING for
+  // the cron seam on the replacement container.
+  if (isShuttingDown()) return;
   if (!(await claimJob(jobId))) return;
+  // Registered so graceful shutdown waits (bounded) for the archive to finish.
+  const releaseInFlight = beginInFlightWork(`kontax-export:${jobId}`);
+  try {
+    await runClaimedKontaxExportJob(jobId);
+  } finally {
+    releaseInFlight();
+  }
+}
+
+async function runClaimedKontaxExportJob(jobId: string): Promise<void> {
   const job = await db.kontaxExportJob.findUniqueOrThrow({ where: { id: jobId } });
 
   try {
@@ -309,6 +375,8 @@ export async function processKontaxExportJob(jobId: string): Promise<void> {
       },
     });
 
+    // P49A-04: the job is COMPLETED at this point — a failed "ready" notice is
+    // logged, never allowed to reach the catch below and flip it to FAILED.
     const sizeMb = Math.max(1, Math.round(result.byteLength / (1024 * 1024)));
     await createNotification({
       userId: job.userId,
@@ -316,6 +384,8 @@ export async function processKontaxExportJob(jobId: string): Promise<void> {
       title: "Your Kontax Archive is ready",
       body: `${result.contactCount.toLocaleString()} contacts (${sizeMb} MB). The download link is valid for 7 days.`,
       actionUrl: "/import-export",
+    }).catch((error: unknown) => {
+      console.error("[Kontax] archive export completed but the notification failed", error);
     });
   } catch (error) {
     if (error instanceof JobCancelledError) return;
@@ -348,6 +418,7 @@ class JobCancelledError extends Error {
 
 /** Cron seam: claim + process the oldest pending job; true if one was processed. */
 export async function processNextKontaxExportJob(): Promise<boolean> {
+  if (isShuttingDown()) return false;
   const next = await db.kontaxExportJob.findFirst({
     where: { status: "PENDING" },
     orderBy: { createdAt: "asc" },
