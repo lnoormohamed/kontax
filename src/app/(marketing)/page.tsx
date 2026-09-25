@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 
 import { HOMEPAGE_FAQ } from "~/app/_components/help-faq-data";
@@ -10,27 +9,32 @@ import {
   websiteSchema,
 } from "~/app/_components/json-ld";
 import { env } from "~/env";
-import { auth } from "~/server/auth";
 
 import { FeatureShowcase } from "./_components/home/feature-showcase";
-import { HeroSearchDemo } from "./_components/home/hero-search-demo";
 import { HomeFaq } from "./_components/home/home-faq";
+import { ClosingCta, HeroEyebrow, HeroPrimaryCta } from "./_components/home/home-session";
 import { HowItWorks } from "./_components/home/how-it-works";
-import { HomeIconSprite, Icon } from "./_components/home/icons";
+import { HomeIconSprite } from "./_components/home/icons";
 import { PricingTeaser } from "./_components/home/pricing-teaser";
+import { ThreeIntoOne } from "./_components/home/three-into-one";
 import { AudienceCards, CompareTable, SecurityFacts } from "./_components/home/why-kontax";
 
 import "./homepage.css";
 
+// P50A-04 · ≤ 60-char title (absolute: the marketing layout's "%s" template
+// and the root "%s · Kontax" template are both bypassed) and ≤ 160-char
+// description.
+const TITLE = "Kontax — One address book for iCloud, Google and Fastmail";
+const DESCRIPTION =
+  "Kontax keeps your iCloud, Google and Fastmail contacts in step and shows up in your iPhone Contacts app. No app to install. Free for up to 500 contacts.";
+
 export const metadata: Metadata = {
-  title: { absolute: "Kontax — Your contacts, organised and synced" },
-  description:
-    "Manage your address book across every device. Search, labels, CardDAV sync, Google Contacts, shared books, and a public contact card.",
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Kontax — Your contacts, organised and synced",
-    description:
-      "Manage your address book across every device. Search, labels, CardDAV sync, Google Contacts, shared books, and a public contact card.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: "/",
     siteName: "Kontax",
     type: "website",
@@ -38,13 +42,19 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kontax — Your contacts, organised and synced",
-    description:
-      "Manage your address book across every device. Search, labels, CardDAV sync, Google Contacts, shared books, and a public contact card.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
 };
 
-// P49-02 · "Works with" strip lists only connectors that are live on this
+// P50A-02 · Static with hourly ISR, like /pricing: no per-request auth().
+// The HTML is the signed-out page; the signed-in differences (hero eyebrow and
+// primary button, closing band) are client islands in home-session.tsx that
+// swap in place after hydration. Revalidation also refreshes the Stripe price
+// in the pricing teaser and the works-with list below.
+export const revalidate = 3600;
+
+// P49-02 · "Works with" lists only connectors that are live on this
 // deployment: Outlook appears once the Microsoft connector is configured
 // (same check as isMicrosoftSyncConfigured in ~/server/microsoft-sync).
 function worksWith(): string[] {
@@ -57,18 +67,15 @@ function worksWith(): string[] {
     "iCloud",
     "Fastmail",
     ...(outlookLive ? ["Outlook"] : []),
-    "any CardDAV app",
+    "any CardDAV server",
   ];
 }
 
-// P49 · Homepage refresh (design P49-DB01). Ten sections: show → differentiate
-// → reassure → ask. Everything is server-rendered except the hero search
-// typing effect (HeroSearchDemo). Signed-in visitors get the "Welcome back"
-// copy in the hero; the rest of the page is the same for everyone.
-export default async function HomePage() {
-  const session = await auth();
-  const firstName = session?.user?.name?.split(/\s+/)[0] ?? null;
-
+// P50-03 · Homepage in Direction A (roadmap/design-briefs/p50-db01-handoff,
+// ?view=home). P49's section order and verified copy: hero + "three into one"
+// signature → works with → 01 how it works → 02 features → 03 comparison →
+// 04 privacy → 05 who it's for → 06 pricing → 07 FAQ → closing CTA.
+export default function HomePage() {
   return (
     <div className="hp">
       <JsonLd
@@ -81,61 +88,39 @@ export default async function HomePage() {
       />
       <HomeIconSprite />
 
-      {/* ═══════════════════════════ 1 · HERO ═══════════════════════════ */}
+      {/* ═══════════════════════════ HERO + SIGNATURE ═══════════════════════════ */}
       <section className="hp-hero">
-        <div className="hp-hero__inner">
-          <div className="hp-hero__copy">
-            {session ? (
-              <>
-                <p className="hp-hero__eyebrow">Welcome back</p>
-                <h1 className="hp-hero__title">
-                  {firstName ? `Welcome back, ${firstName}.` : "Pick up where you left off."}
-                </h1>
-                <p className="hp-hero__sub">Your contacts are waiting.</p>
-                <div className="hp-hero__ctas">
-                  {/* P46: returning users land on the contact list, not Overview */}
-                  <Link className="hp-btn--green" href="/contacts">
-                    Open Kontax
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
-                    </svg>
-                  </Link>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="hp-hero__eyebrow">Contact management, done right</p>
-                <h1 className="hp-hero__title">
-                  Your contacts. Organised, synced, and always with you.
-                </h1>
-                <p className="hp-hero__sub">
-                  One address book for your phone, your laptop and the people you share with.
-                  Kept tidy, kept private, kept yours.
-                </p>
-                <div className="hp-hero__ctas">
-                  <Link className="hp-btn--primary" href="/register">
-                    Get started free
-                  </Link>
-                  <a className="hp-btn--secondary" href="#how">
-                    See how it works
-                    <Icon name="down" size={16} />
-                  </a>
-                </div>
-                <p className="hp-hero__trust">
-                  <span>Free for up to 500 contacts</span>
-                  <span>No card needed</span>
-                  <span>Works on iPhone, Android and the web</span>
-                </p>
-              </>
-            )}
+        <div className="mkt-container hp-hero__g">
+          <div>
+            <HeroEyebrow />
+            <h1 className="hp-hero__h1">Your contacts. Organised, synced, and always with you.</h1>
           </div>
-          <HeroSearchDemo />
+          <div>
+            <p className="hp-hero__sub">
+              One address book for your phone, your laptop and the people you share with. Kept
+              tidy, kept private, kept yours.
+            </p>
+            <div className="hp-hero__ctas">
+              <HeroPrimaryCta />
+              <a className="mkt-btn mkt-btn--sec" href="#how">
+                See how it works
+              </a>
+            </div>
+            <p className="hp-hero__trust">
+              <span>Free for up to 500 contacts</span>
+              <span>No card needed</span>
+              <span>No app to install</span>
+            </p>
+          </div>
+        </div>
+        <div className="mkt-container">
+          <ThreeIntoOne />
         </div>
       </section>
 
-      {/* ═══════════════════════════ 2 · WORKS WITH ═══════════════════════════ */}
+      {/* ═══════════════════════════ WORKS WITH ═══════════════════════════ */}
       <section className="hp-works" aria-label="Works with">
-        <p className="hp-works__inner">
+        <p className="mkt-container hp-works__in">
           <b>Works with</b>
           {worksWith().map((name) => (
             <span key={name}>{name}</span>
@@ -143,7 +128,6 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* ═══════════════════════════ 3–9 ═══════════════════════════ */}
       <HowItWorks />
       <FeatureShowcase />
       <CompareTable />
@@ -151,39 +135,7 @@ export default async function HomePage() {
       <AudienceCards />
       <PricingTeaser />
       <HomeFaq />
-
-      {/* ═══════════════════════════ 10 · CTA ═══════════════════════════ */}
-      <section className="hp-cta-band">
-        <div className="hp-cta-band__inner">
-          {session ? (
-            <>
-              <h2 className="hp-cta-band__title">Your contacts are waiting.</h2>
-              <p className="hp-cta-band__sub">Pick up where you left off.</p>
-              <div className="hp-cta-band__btns">
-                <Link className="hp-btn--primary" href="/contacts">
-                  Open Kontax
-                </Link>
-                <Link className="hp-btn--ghost" href="/pricing">
-                  Compare plans
-                </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="hp-cta-band__title">Ready to get started?</h2>
-              <p className="hp-cta-band__sub">Free for up to 500 contacts. No card needed.</p>
-              <div className="hp-cta-band__btns">
-                <Link className="hp-btn--primary" href="/register">
-                  Get started free
-                </Link>
-                <Link className="hp-btn--ghost" href="/pricing">
-                  Compare plans
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
+      <ClosingCta />
     </div>
   );
 }

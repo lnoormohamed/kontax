@@ -1,11 +1,11 @@
 import Link from "next/link";
 
+import { ArrowIcon, CheckIcon, SectionHead, Ticks, WindowFrame } from "../mkt-ui";
 import { Icon, type HomeIconName } from "./icons";
-import { MktWindow } from "./window";
 
-// P49-03 · §4 Feature showcase — replaces the six equal tiles. Three
-// alternating rows for the reasons people switch, then a chrome-less 3×2
-// grid (2 columns below 980px).
+// P49-03 / P50-03 · §02 Feature showcase — three alternating rows for the
+// reasons people switch (copy 5 / picture 7, flipped on the middle row), then
+// a chrome-less 3×2 grid (2 columns below 980px).
 
 function FeatureRow({
   kicker,
@@ -23,31 +23,68 @@ function FeatureRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`hp-frow${flip ? " hp-frow--flip" : ""} hp-rise`}>
-      <div className="hp-frow__text">
-        <p className="hp-frow__kicker">{kicker}</p>
-        <h3 className="hp-frow__title">{title}</h3>
-        <p className="hp-frow__body">{body}</p>
-        <ul className="hp-frow__list">
-          {points.map((point) => (
-            <li key={point}>
-              <Icon name="check" size={16} />
-              {point}
-            </li>
-          ))}
-        </ul>
+    <div className={`hp-frow${flip ? " hp-frow--f" : ""}`}>
+      <div>
+        <p className="hp-frow__k">{kicker}</p>
+        <h3 className="hp-frow__t">{title}</h3>
+        <p className="hp-frow__b">{body}</p>
+        <Ticks items={points} />
       </div>
-      <div className="hp-frow__media">{children}</div>
+      <div className="hp-frow__m">{children}</div>
     </div>
   );
 }
 
-function SyncedAt({ when }: { when: string }) {
+function Connection({ glyph, name, sub, when }: { glyph: React.ReactNode; name: string; sub: string; when: string }) {
   return (
-    <span className="hp-ok">
-      <Icon name="check" size={13} />
-      <span className="hp-vmono">{when}</span>
-    </span>
+    <div className="hp-row">
+      <span className="hp-glyph">{glyph}</span>
+      <div className="hp-row__m">
+        <div className="hp-nm">{name}</div>
+        <div className="hp-sb">{sub}</div>
+      </div>
+      <span className="hp-ok">
+        <CheckIcon size={13} />
+        {when}
+      </span>
+    </div>
+  );
+}
+
+function MergeField({ on = false, label, value }: { on?: boolean; label: string; value: string }) {
+  return (
+    <div className="hp-mg__f">
+      <span className={`hp-radio${on ? " hp-radio--on" : ""}`} />
+      <div>
+        <div className="hp-mg__k">{label}</div>
+        <div className="hp-mg__v">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function Member({
+  initials,
+  tone,
+  name,
+  sub,
+  canEdit,
+}: {
+  initials: string;
+  tone: string;
+  name: string;
+  sub: string;
+  canEdit: boolean;
+}) {
+  return (
+    <div className="hp-row">
+      <span className={`hp-av ${tone}`}>{initials}</span>
+      <div className="hp-row__m">
+        <div className="hp-nm">{name}</div>
+        <div className="hp-sb">{sub}</div>
+      </div>
+      <span className={`hp-role${canEdit ? " hp-role--e" : ""}`}>{canEdit ? "Can edit" : "Can view"}</span>
+    </div>
   );
 }
 
@@ -57,136 +94,96 @@ const GRID: { icon: HomeIconName; title: string; body: string }[] = [
   { icon: "card", title: "Public card", body: "A shareable page with the details you choose to publish." },
   { icon: "clock", title: "Change history", body: "See what changed on each contact, when, and from where." },
   { icon: "file", title: "Open export format", body: "A documented format that keeps labels, notes and history." },
-  { icon: "code", title: "Developer API", body: "Read and write your contacts from your own tools." },
+  { icon: "code", title: "Developer API", body: "Read and write your contacts from your own tools. Pro and Teams." },
 ];
 
 export function FeatureShowcase() {
   return (
-    <section className="hp-band" id="features">
-      <div className="hp-container">
-        <div className="hp-section-head hp-section-head--center">
-          <p className="hp-section-kicker">Why people switch</p>
-          <h2 className="hp-section-title">The things your built-in address book never quite did</h2>
+    <section className="mkt-band" id="features">
+      <div className="mkt-container">
+        <SectionHead
+          index="02"
+          label="Why people switch"
+          title="The things your built-in address book never quite did"
+        />
+
+        <div className="hp-frows">
+          <FeatureRow
+            kicker="Sync"
+            title="One address book, on every device"
+            body="Connect Google, iCloud and Fastmail and Kontax brings them into one address book, syncing both ways. On iPhone and Mac it appears in the Contacts app you already use."
+            points={["Two-way sync, not a one-off import", "No app to install on iPhone or Mac"]}
+          >
+            <WindowFrame title="Settings · Sync">
+              <p className="hp-vl">Connections</p>
+              <Connection glyph="G" name="Google Contacts" sub="lina@gmail.com" when="4 min ago" />
+              <Connection glyph="iC" name="iCloud" sub="lina@icloud.com" when="4 min ago" />
+              <Connection glyph="F" name="Fastmail" sub="lina@fastmail.com" when="4 min ago" />
+              <Connection glyph={<Icon name="card" size={15} />} name="Lina’s iPhone" sub="CardDAV · app password" when="just now" />
+            </WindowFrame>
+          </FeatureRow>
+
+          <FeatureRow
+            flip
+            kicker="Clean-up"
+            title="Duplicates, found and fixed"
+            body="Kontax spots the same person saved twice across your accounts, shows you both records side by side, and lets you pick what to keep. Every merge can be undone for 30 days."
+            points={["Phone numbers formatted for their country", "Names in any script sorted correctly"]}
+          >
+            <WindowFrame title="Review merge">
+              <div className="hp-mg">
+                <div className="hp-mg__c">
+                  <div className="hp-mg__h">
+                    <span className="hp-av hp-av--s hp-av5">BN</span>
+                    <span className="hp-nm">Ben Nakamura</span>
+                  </div>
+                  <MergeField on label="Phone" value="+44 7700 900123" />
+                  <MergeField label="Email" value="ben@acme.co" />
+                  <MergeField on label="Company" value="Acme Ltd" />
+                </div>
+                <div className="hp-mg__c">
+                  <div className="hp-mg__h">
+                    <span className="hp-av hp-av--s hp-av5">BN</span>
+                    <span className="hp-nm">Ben N.</span>
+                  </div>
+                  <MergeField label="Phone" value="07700900123" />
+                  <MergeField on label="Email" value="ben.nakamura@acme.co" />
+                  <MergeField label="Company" value="—" />
+                </div>
+              </div>
+              <div className="hp-mg__foot">
+                <span className="hp-sb">From Google and iCloud · undo for 30 days</span>
+                <span className="hp-vbtn hp-vbtn--s">Merge</span>
+              </div>
+            </WindowFrame>
+          </FeatureRow>
+
+          <FeatureRow
+            kicker="Sharing"
+            title="Share a book with family or your team"
+            body="Keep the plumber, the school and the grandparents in one shared book. Everyone sees the same numbers, and you decide who can edit."
+            points={["Edit or view-only roles for each member", "Shared books sync to everyone’s phones"]}
+          >
+            <WindowFrame title="Books · Family">
+              <div className="hp-row hp-book__h">
+                <span className="hp-glyph hp-glyph--tint">F</span>
+                <div className="hp-row__m">
+                  <div className="hp-nm">Family</div>
+                  <div className="hp-sb">86 contacts · 4 members</div>
+                </div>
+                <span className="hp-stack">
+                  <span className="hp-av hp-av--s hp-av4">LM</span>
+                  <span className="hp-av hp-av--s hp-av1">JM</span>
+                  <span className="hp-av hp-av--s hp-av2">SM</span>
+                  <span className="hp-av hp-av--s hp-av3">RM</span>
+                </span>
+              </div>
+              <Member initials="LM" tone="hp-av4" name="Lina M. (you)" sub="Owner" canEdit />
+              <Member initials="JM" tone="hp-av1" name="James M." sub="Joined 12 Aug" canEdit />
+              <Member initials="RM" tone="hp-av3" name="Rosa M." sub="Joined 3 Sep" canEdit={false} />
+            </WindowFrame>
+          </FeatureRow>
         </div>
-
-        <FeatureRow
-          kicker="Sync"
-          title="One address book, on every device"
-          body="Connect Google, iCloud and Fastmail and Kontax brings them into one address book, syncing both ways. On iPhone and Mac it appears in the Contacts app you already use."
-          points={["Two-way sync, not a one-off import", "No app to install on iPhone or Mac"]}
-        >
-          <MktWindow bar="Settings · Sync">
-            <p className="hp-v-label">Connections</p>
-            <div className="hp-vrow">
-              <span className="hp-glyph">G</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">Google Contacts</div>
-                <div className="hp-vsub">lina@gmail.com</div>
-              </div>
-              <SyncedAt when="4 min ago" />
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-glyph">iC</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">iCloud</div>
-                <div className="hp-vsub">lina@icloud.com</div>
-              </div>
-              <SyncedAt when="4 min ago" />
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-glyph">
-                <Icon name="card" size={15} />
-              </span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">Lina&apos;s iPhone</div>
-                <div className="hp-vsub">CardDAV · app password</div>
-              </div>
-              <SyncedAt when="just now" />
-            </div>
-          </MktWindow>
-        </FeatureRow>
-
-        <FeatureRow
-          flip
-          kicker="Clean-up"
-          title="Duplicates, found and fixed"
-          body="Kontax spots the same person saved twice across your accounts, shows you both records side by side, and lets you pick what to keep. Every merge can be undone."
-          points={["Phone numbers formatted for their country", "Names in any script sorted correctly"]}
-        >
-          <MktWindow bar="Review merge">
-            <div className="hp-mg">
-              <div className="hp-mg__col">
-                <div className="hp-mg__head">
-                  <span className="hp-av hp-av--sm hp-av-e">BN</span>
-                  <span className="hp-vname">Ben Nakamura</span>
-                </div>
-                <MergeField on label="Phone" value="+44 7700 900 123" />
-                <MergeField label="Email" value="ben@acme.co" />
-                <MergeField on label="Company" value="Acme Corp" />
-              </div>
-              <div className="hp-mg__col">
-                <div className="hp-mg__head">
-                  <span className="hp-av hp-av--sm hp-av-e">BN</span>
-                  <span className="hp-vname">Ben N.</span>
-                </div>
-                <MergeField label="Phone" value="07700900123" />
-                <MergeField on label="Email" value="ben.nakamura@acme.co" />
-                <MergeField label="Company" value="—" />
-              </div>
-            </div>
-            <div className="hp-mg__foot">
-              <span className="hp-vsub">From Google and iCloud</span>
-              <span className="hp-vbtn hp-vbtn--solid">Merge</span>
-            </div>
-          </MktWindow>
-        </FeatureRow>
-
-        <FeatureRow
-          kicker="Sharing"
-          title="Share a book with family or your team"
-          body="Keep the plumber, the school and the grandparents in one shared book. Everyone sees the same numbers, and you decide who can edit."
-          points={["Edit or view-only roles for each member", "Shared books sync to everyone's phones"]}
-        >
-          <MktWindow bar="Books · Family">
-            <div className="hp-book-h">
-              <span className="hp-glyph">F</span>
-              <div>
-                <div className="hp-vname">Family</div>
-                <div className="hp-vsub">86 contacts · shared with 4</div>
-              </div>
-              <span className="hp-stack">
-                <span className="hp-av hp-av--sm hp-av-d">LM</span>
-                <span className="hp-av hp-av--sm hp-av-a">JM</span>
-                <span className="hp-av hp-av--sm hp-av-b">SM</span>
-                <span className="hp-av hp-av--sm hp-av-c">RM</span>
-              </span>
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-av hp-av-d">LM</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">Lina M. (you)</div>
-                <div className="hp-vsub">Owner</div>
-              </div>
-              <span className="hp-role hp-role--edit">Can edit</span>
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-av hp-av-a">JM</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">James M.</div>
-                <div className="hp-vsub">Joined 12 Aug</div>
-              </div>
-              <span className="hp-role hp-role--edit">Can edit</span>
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-av hp-av-c">RM</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">Rosa M.</div>
-                <div className="hp-vsub">Joined 3 Sep</div>
-              </div>
-              <span className="hp-role">Can view</span>
-            </div>
-          </MktWindow>
-        </FeatureRow>
 
         <div className="hp-sgrid">
           {GRID.map((item) => (
@@ -198,24 +195,12 @@ export function FeatureShowcase() {
           ))}
         </div>
         <div className="hp-sgrid-foot">
-          <Link className="hp-more-link" href="/features">
+          <Link className="mkt-more" href="/features">
             See all features
-            <Icon name="arrow" size={16} />
+            <ArrowIcon />
           </Link>
         </div>
       </div>
     </section>
-  );
-}
-
-function MergeField({ on = false, label, value }: { on?: boolean; label: string; value: string }) {
-  return (
-    <div className="hp-mg__field">
-      <span className={`hp-radio${on ? " hp-radio--on" : ""}`} />
-      <div className="hp-tx">
-        <div className="hp-k">{label}</div>
-        <div className="hp-v">{value}</div>
-      </div>
-    </div>
   );
 }
