@@ -1,11 +1,12 @@
 import { type Metadata } from "next";
 
 import { HelpFaq } from "~/app/_components/help-faq";
-import { HELP_FAQ } from "~/app/_components/help-faq-data";
+import { getHelpFaqSections } from "~/app/_components/help-faq-data";
 import { HelpProviderGuides } from "~/app/_components/help-provider-guides";
 import { breadcrumbSchema, faqPageSchema, JsonLd } from "~/app/_components/json-ld";
 import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
@@ -18,6 +19,12 @@ export const metadata: Metadata = {
 
 // P26-12 · public /help FAQ page.
 export default function HelpPage() {
+  // P50A-01: Outlook FAQ content is only shown once Microsoft sync is
+  // configured — see ~/lib/microsoft-sync-flag. This page has no dynamic
+  // API, so it's statically prerendered (build-time read, per that helper's
+  // doc comment). The visible FAQ and its FAQPage JSON-LD are built from the
+  // same gated `sections`, so they can't drift apart.
+  const sections = getHelpFaqSections(isMicrosoftSyncEnabled());
 
   return (
     <div className="kx">
@@ -27,7 +34,7 @@ export default function HelpPage() {
             { name: "Home", path: "/" },
             { name: "Help & FAQ", path: "/help" },
           ]),
-          faqPageSchema(HELP_FAQ.flatMap((s) => s.items)),
+          faqPageSchema(sections.flatMap((s) => s.items)),
         ]}
       />
       <PublicNav />
@@ -43,7 +50,7 @@ export default function HelpPage() {
           </div>
 
           <HelpProviderGuides />
-          <HelpFaq />
+          <HelpFaq sections={sections} />
 
           <div className="help-foot">
             <span className="help-foot__k">K</span>

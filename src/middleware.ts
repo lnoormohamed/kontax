@@ -1,11 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { isProductionRuntime } from "~/lib/site-url";
 import { isAlwaysAllowed, isPublicPath } from "~/server/public-paths";
 
 const hasAuthSessionCookie = (req: NextRequest) =>
   req.cookies
     .getAll()
     .some(({ name }) => name.includes("authjs.session-token"));
+
+// P50A-01: staging (kontax.vexon.co) and any other non-production deploy must
+// never be indexed, even if robots.txt is somehow bypassed or cached stale —
+// belt-and-braces alongside robots.ts's `Disallow: /`. Applied to every
+// response this middleware returns; production responses are untouched.
+// Same production check as robots.ts / src/lib/site-url.ts.
+const applyRobotsTag = (res: NextResponse): NextResponse => {
+  if (!isProductionRuntime()) {
+    res.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  return res;
+};
 
 // SEC-02: public contact cards (/u/*) render user-controlled JSON-LD (display
 // name, company, etc.). They are the one surface where a non-nonced inline
@@ -89,14 +102,14 @@ export default function middleware(req: NextRequest) {
     if (!url.pathname.startsWith("/api/")) {
       url.pathname = `/api${url.pathname}`;
     }
-    return NextResponse.rewrite(url);
+    return applyRobotsTag(NextResponse.rewrite(url));
   }
 
   const { pathname } = req.nextUrl;
 
   // 1. Assets + auth API: never gated.
   if (isAlwaysAllowed(pathname)) {
-    return NextResponse.next();
+    return applyRobotsTag(NextResponse.next());
   }
 
   // Build redirect base from APP_URL so reverse-proxy doesn't leak the
@@ -109,9 +122,9 @@ export default function middleware(req: NextRequest) {
   if (isPublicPath(pathname)) {
     // Public user cards get the stricter nonce-based CSP (SEC-02).
     if (pathname.startsWith("/u/")) {
-      return withStrictCardCsp(req);
+      return applyRobotsTag(withStrictCardCsp(req));
     }
-    return NextResponse.next();
+    return applyRobotsTag(NextResponse.next());
   }
 
   // 3. Everything else requires a session cookie.
@@ -122,7 +135,7 @@ export default function middleware(req: NextRequest) {
   if (!hasAuthSessionCookie(req)) {
     const loginUrl = new URL("/login", appOrigin);
     loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
+    return applyRobotsTag(NextResponse.redirect(loginUrl));
   }
 
   // Cookie present — pass to the Node.js page handler for the real auth check.
@@ -130,7 +143,7 @@ export default function middleware(req: NextRequest) {
   // redirect to /login themselves.
   const res = NextResponse.next();
   res.headers.set("x-pathname", pathname);
-  return res;
+  return applyRobotsTag(res);
 }
 
 export const config = {

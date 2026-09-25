@@ -124,18 +124,31 @@ function getToggleSavingsLabel(prices: StripePrices): string | null {
   return min === max ? `Save ${max}%` : `Save up to ${max}%`;
 }
 
-function buildPlans(stripePrices: StripePrices | null): Plan[] {
+function buildPlans(stripePrices: StripePrices | null, outlookLive: boolean): Plan[] {
   const p = stripePrices ?? FALLBACK_PRICES;
   return BASE_PLANS.map((base) => ({
     ...base,
     price: base.id === "free" ? "free" : (p[base.id as keyof StripePrices] as { monthly: number; annual: number }),
+    // P50A-01: Outlook only listed once Microsoft sync is configured — the
+    // flag is computed server-side in pricing/page.tsx and passed down,
+    // since this is a client component and can't read server env itself.
+    features:
+      base.id === "pro"
+        ? base.features.map((f) =>
+            f.text === "Google + Outlook sync"
+              ? { text: outlookLive ? "Google + Outlook sync" : "Google Contacts sync" }
+              : f,
+          )
+        : base.features,
   }));
 }
 
 export function PricingToggle({
   stripePrices,
+  outlookLive = false,
 }: {
   stripePrices?: StripePrices | null;
+  outlookLive?: boolean;
 }) {
   // P38-10: the page renders statically; highlight the visitor's current
   // plan after hydration instead of forcing the whole page dynamic.
@@ -153,7 +166,7 @@ export function PricingToggle({
     };
   }, []);
   const prices = stripePrices ?? FALLBACK_PRICES;
-  const PLANS = buildPlans(prices);
+  const PLANS = buildPlans(prices, outlookLive);
   const currencySymbol = sym(prices.currency);
   const toggleSavingsLabel = getToggleSavingsLabel(prices);
   const [annual, setAnnual] = useState(false);

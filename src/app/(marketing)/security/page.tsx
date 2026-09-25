@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import "./security.css";
 
 export const metadata: Metadata = {
@@ -25,6 +26,13 @@ export const metadata: Metadata = {
 };
 
 export default function SecurityPage() {
+  // P50A-01: Outlook only appears once Microsoft sync is configured. This
+  // page has no dynamic API, so it's statically prerendered — see
+  // ~/lib/microsoft-sync-flag for why a build-time read is correct here.
+  const outlookLive = isMicrosoftSyncEnabled();
+  const syncProviders = ["Google", ...(outlookLive ? ["Outlook"] : []), "CardDAV"];
+  const syncProvidersLabel = syncProviders.join(", ");
+
   return (
     <>
       {/* ── Hero ── */}
@@ -100,7 +108,7 @@ export default function SecurityPage() {
           <div
             className="sp-flow"
             role="img"
-            aria-label="Data protection flow: your devices connect over TLS 1.2+ to Kontax, which encrypts sensitive secrets — 2FA and sync credentials — with AES-256-GCM, and syncs to Google, Outlook, and CardDAV using encrypted credentials."
+            aria-label={`Data protection flow: your devices connect over TLS 1.2+ to Kontax, which encrypts sensitive secrets — 2FA and sync credentials — with AES-256-GCM, and syncs to ${syncProvidersLabel} using encrypted credentials.`}
           >
             <div className="sp-flow__node">
               <div className="sp-flow__icon" aria-hidden="true">
@@ -149,7 +157,7 @@ export default function SecurityPage() {
                   <path d="M4 13a8 8 0 0 0 14.3 3.7M20 19v-3h-3" />
                 </svg>
               </div>
-              <div className="sp-flow__label">Google · Outlook · CardDAV</div>
+              <div className="sp-flow__label">{syncProviders.join(" · ")}</div>
               <div className="sp-flow__sub">OAuth tokens &amp; scoped app passwords</div>
             </div>
           </div>
@@ -183,14 +191,12 @@ export default function SecurityPage() {
               <p className="sp-scard__p">
                 Your contacts live in a PostgreSQL database on our own servers — not a
                 third-party managed database. Your most sensitive secrets go further: your
-                2FA secret and your sync credentials (CardDAV, Google, Outlook) are each sealed
+                2FA secret and your sync credentials ({syncProvidersLabel}) are each sealed
                 with <code>AES-256-GCM</code> before they ever touch disk, so they&apos;re
-                never readable from a raw database or backup copy. Nightly backups are encrypted
-                too.
+                never readable from a raw database copy.
               </p>
               <div className="sp-scard__chips">
                 <span className="sp-techchip"><span className="sp-techchip__dot" />AES-256-GCM secrets</span>
-                <span className="sp-techchip"><span className="sp-techchip__dot" />Encrypted nightly backups</span>
               </div>
             </article>
             <article className="sp-scard">
@@ -263,7 +269,7 @@ export default function SecurityPage() {
               </div>
               <h3 className="sp-scard__h">Sync credentials, handled with care</h3>
               <p className="sp-scard__p">
-                OAuth tokens for Google and Outlook are encrypted before storage and used only for
+                OAuth tokens for {outlookLive ? "Google and Outlook" : "Google"} are encrypted before storage and used only for
                 the accounts you link. For CardDAV you issue scoped app passwords instead of your
                 main password — revoke one and that client is cut off on its very next request.
               </p>

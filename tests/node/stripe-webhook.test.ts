@@ -570,6 +570,80 @@ describe("billing lifecycle (A-24)", () => {
   });
 });
 
+// ─── Admin comp durability (P49A-07, Fable review) ────────────────────────────
+
+describe("admin plan override vs the customer's own Stripe billing", () => {
+  const activePersonalPlans = (userId = "user_1") =>
+    fake
+      .rows("subscription")
+      .filter((s) => s.userId === userId && ["ACTIVE", "TRIALING", "PAST_DUE"].includes(s.status as string))
+      .map((s) => ({ plan: s.plan as "FREE" | "PRO" | "FAMILY" | "TEAMS", memberSlotsLimit: null }));
+
+  test("comp PRO → TEAMS on a paying user survives renewals: row stays ACTIVE, plan stays TEAMS, no downgrade", async () => {
+    // A paying Pro customer who owns a (legacy, user-anchored) team, with two
+    // sync accounts and a live share — everything applyDowngrade would touch.
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "PRO" });
+    fake.seed("group", { id: "team_1", ownerId: "user_1", type: "TEAM", name: "Acme", teamsGraceEndsAt: null });
+    fake.seed("syncAccount", { id: "sa_1", userId: "user_1", status: "ACTIVE", createdAt: new Date(1) });
+    fake.seed("syncAccount", { id: "sa_2", userId: "user_1", status: "ACTIVE", createdAt: new Date(2) });
+    fake.seed("contactShare", {
+      id: "share_1",
+      ownerUserId: "user_1",
+      recipientUserId: "user_2",
+      recipientContactId: null,
+      shareType: "LIVE_SYNC",
+      status: "ACTIVE",
+    });
+
+    const { overridePlanForUser } = await import("../../src/server/admin/plan-override");
+    const { resolveEffectivePlan } = await import("../../src/server/dav/plan-entitlements.mjs");
+    const override = await overridePlanForUser(fake.client as never, { targetUserId: "user_1", plan: "TEAMS" });
+    assert.equal(override.providerSubscriptionId, "manual_admin-override-user_1");
+    assert.equal(override.providerCustomerId, "cus_1", "the real customer row is reused, untouched");
+
+    // Renewal: the paid Pro subscription rolls into a new period.
+    const renewed = stripeSub("sub_1", { periodEnd: PERIOD_END_S + 30 * 24 * 60 * 60 });
+    stripeNow(renewed);
+    await processStripeWebhookEvent(event("customer.subscription.updated", renewed), deps);
+    await processStripeWebhookEvent(event("invoice.payment_succeeded", invoice("sub_1")), deps);
+
+    assert.equal(subRow("manual_admin-override-user_1")?.status, "ACTIVE", "the comp row is not swept");
+    assert.equal(subRow("sub_1")?.status, "ACTIVE");
+    assert.equal(resolveEffectivePlan({ userId: "user_1", subscriptions: activePersonalPlans(), teamGroups: [] }).plan, "TEAMS");
+    // No applyDowngrade: sync accounts, shares and the owned team untouched.
+    assert.deepEqual(
+      fake.rows("syncAccount").map((s) => s.status),
+      ["ACTIVE", "ACTIVE"],
+    );
+    assert.equal(fake.rows("contactShare")[0]!.shareType, "LIVE_SYNC");
+    assert.equal(fake.rows("group")[0]!.teamsGraceEndsAt, null, "no Teams grace opened on the owned team");
+    assert.equal(effectsRun, 0, "no plan-changed email: the effective plan never moved");
+    assert.equal(user().lifecycleState, "ACTIVE");
+  });
+
+  test("a live Stripe subscription still supersedes a genuine legacy manual_ comp plan", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "manual_comp", plan: "PRO", status: "ACTIVE", currentPeriodEnd: null });
+    stripeNow(stripeSub("sub_new"));
+
+    await processStripeWebhookEvent(event("customer.subscription.created", stripeSub("sub_new")), deps);
+
+    assert.equal(subRow("sub_new")?.status, "ACTIVE");
+    assert.equal(subRow("manual_comp")?.status, "CANCELED");
+  });
+
+  test("a legacy admin-override- row is an admin grant too and is not swept", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "admin-override-user_1", plan: "FAMILY", currentPeriodEnd: null });
+    stripeNow(stripeSub("sub_new"));
+
+    await processStripeWebhookEvent(event("customer.subscription.created", stripeSub("sub_new")), deps);
+
+    assert.equal(subRow("admin-override-user_1")?.status, "ACTIVE");
+  });
+});
+
 // ─── Family plan end-of-life: 7-day notice (lifecycle-policies.md §1a / §3a) ──
 
 describe("Family 7-day notice before dissolution", () => {

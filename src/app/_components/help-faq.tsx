@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { HELP_FAQ } from "~/app/_components/help-faq-data";
+import type { HelpFaqSection } from "~/app/_components/help-faq-data";
 
 // P26-12 · searchable FAQ for /help (design P26-DB07 §4). Live, case-insensitive
 // filter over question + answer; sections with no matches are hidden; a clear
@@ -10,11 +10,15 @@ import { HELP_FAQ } from "~/app/_components/help-faq-data";
 // the deep-link anchors (#carddav / #import / #security / #sharing / #billing etc.)
 //
 // P32-02 · Added section nav (Browse by topic) above search, hidden while searching.
-export function HelpFaq() {
+//
+// P50A-01: sections are now passed in (from help/page.tsx's
+// getHelpFaqSections) rather than imported directly — that gate reads a
+// server-only env var, which this "use client" component must not bundle.
+export function HelpFaq({ sections: allSections }: { sections: HelpFaqSection[] }) {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
 
-  const sections = HELP_FAQ.map((sec) => ({
+  const sections = allSections.map((sec) => ({
     ...sec,
     items: query
       ? sec.items.filter((it) => (it.q + " " + it.a).toLowerCase().includes(query))
@@ -26,7 +30,7 @@ export function HelpFaq() {
       {/* Browse by topic nav — hidden while a search query is active */}
       {!query && (
         <nav className="help-topic-nav" aria-label="Browse by topic">
-          {HELP_FAQ.map((sec) => (
+          {allSections.map((sec) => (
             <a key={sec.id} href={`#${sec.id}`} className="help-topic-pill">
               {sec.title}
             </a>

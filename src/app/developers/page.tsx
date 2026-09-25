@@ -337,8 +337,8 @@ export default function DevelopersPage() {
           <Section id="introduction" title="Introduction">
             <P>
               The Kontax REST API allows you to list, create, update, and delete contacts from
-              external scripts, automations, and integrations. API access is available on Pro,
-              Family, and Teams plans.
+              external scripts, automations, and integrations. API access is available on Pro
+              and Teams plans.
             </P>
             <P>
               All requests must include a valid <Code>Authorization</Code> header. The API returns

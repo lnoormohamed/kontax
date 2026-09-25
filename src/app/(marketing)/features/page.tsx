@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import "./features.css";
 
 export const metadata: Metadata = {
@@ -26,6 +27,12 @@ export const metadata: Metadata = {
 };
 
 export default function FeaturesPage() {
+  // P50A-01: Outlook is only shown once Microsoft sync is configured on this
+  // deployment (see ~/lib/microsoft-sync-flag). This page has no dynamic API,
+  // so it's statically prerendered — see that helper's doc comment for why a
+  // build-time read is correct here rather than making the page dynamic.
+  const outlookLive = isMicrosoftSyncEnabled();
+
   return (
     <>
       <JsonLd
@@ -185,22 +192,35 @@ export default function FeaturesPage() {
                   <span className="fp-dot fp-dot--ok" />Synced 6m ago
                 </span>
               </div>
-              <div className="fp-ym__row">
-                <span className="fp-ym__icn" style={{ background: "#0a6ed1" }}>O</span>
-                <span>
-                  <span className="fp-ym__nm">Outlook</span>
-                  <span className="fp-ym__sub">elena@outlook.com · 318 contacts</span>
-                </span>
-                <span className="fp-ym__status fp-st--busy">
-                  <span className="fp-dot fp-dot--busy" />Syncing…
-                </span>
-              </div>
+              {outlookLive ? (
+                <div className="fp-ym__row">
+                  <span className="fp-ym__icn" style={{ background: "#0a6ed1" }}>O</span>
+                  <span>
+                    <span className="fp-ym__nm">Outlook</span>
+                    <span className="fp-ym__sub">elena@outlook.com · 318 contacts</span>
+                  </span>
+                  <span className="fp-ym__status fp-st--busy">
+                    <span className="fp-dot fp-dot--busy" />Syncing…
+                  </span>
+                </div>
+              ) : (
+                <div className="fp-ym__row">
+                  <span className="fp-ym__icn" style={{ background: "#3a3a3c" }}>A</span>
+                  <span>
+                    <span className="fp-ym__nm">iCloud</span>
+                    <span className="fp-ym__sub">CardDAV · contacts.icloud.com</span>
+                  </span>
+                  <span className="fp-ym__status fp-st--ok">
+                    <span className="fp-dot fp-dot--ok" />Synced 4m ago
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           <div className="fp-feat__copy">
             <h2 className="fp-feat__h">One address book, every device</h2>
             <p className="fp-feat__body">
-              Connect Google Contacts, Outlook, and any CardDAV account —
+              Connect Google Contacts{outlookLive ? ", Outlook," : ""} and any CardDAV account —
               iCloud, Fastmail, Nextcloud — and Kontax keeps them all in step.
               Edits sync both ways on a schedule, with a clear status on every
               connection so you always know what&apos;s current. One address

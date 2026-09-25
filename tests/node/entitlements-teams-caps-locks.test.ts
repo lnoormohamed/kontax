@@ -24,6 +24,8 @@ type TeamGroup = {
   teamsGraceEndsAt: Date | null;
   memberSlotsLimit: number | null;
   subscriptions: Array<{ memberSlotsLimit: number | null }>;
+  /** Legacy user-anchored teams: the owner's personal Teams subscription(s). */
+  owner?: { subscriptions: Array<{ memberSlotsLimit: number | null }> };
 };
 type UserState = { subscriptions: Sub[]; teamGroups: TeamGroup[] };
 
@@ -214,6 +216,42 @@ describe("A-10 effective plan", () => {
       now,
     });
     assert.equal(pending.plan, "FREE");
+  });
+
+  test("legacy user-anchored team: members are credited while the OWNER holds a personal Teams plan (Fable review)", async () => {
+    const legacy = team({
+      teamsEnabled: false,
+      teamsGraceEndsAt: null,
+      subscriptions: [],
+      memberSlotsLimit: 4,
+      owner: { subscriptions: [{ memberSlotsLimit: 8 }] },
+    });
+    state.users.set("member_1", { subscriptions: [], teamGroups: [legacy] });
+
+    const ctx = await billing.getUserBillingContext("member_1");
+    assert.equal(ctx.plan, "TEAMS");
+    assert.equal(ctx.planSource, "team");
+    assert.deepEqual(ctx.teamEntitlement, { groupId: "team_1", ownerId: "owner_1", state: "active" });
+    assert.equal(ctx.entitlements.memberSlotsLimit, 8, "seats from the owner's legacy subscription");
+    assert.equal(ctx.entitlements.contactsLimit, null);
+    assert.equal(billing.canRunOwnTeam(ctx, "member_1"), false);
+
+    // Same rule as isTeamLocked: a past grace date doesn't lock a team whose
+    // owner still pays personally — so it doesn't strip its members either.
+    const pastGrace = entitlements.resolveEffectivePlan({
+      userId: "member_1",
+      subscriptions: [],
+      teamGroups: [{ ...legacy, teamsGraceEndsAt: new Date(Date.now() - DAY) }],
+    });
+    assert.equal(pastGrace.plan, "TEAMS");
+
+    // Owner's personal Teams plan gone → nothing (a pending / lapsed team).
+    const gone = entitlements.resolveEffectivePlan({
+      userId: "member_1",
+      subscriptions: [],
+      teamGroups: [{ ...legacy, owner: { subscriptions: [] } }],
+    });
+    assert.equal(gone.plan, "FREE");
   });
 
   test("two active personal subscriptions resolve to the higher plan, whatever their order", async () => {

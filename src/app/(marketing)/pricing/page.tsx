@@ -5,6 +5,7 @@ import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
 import { fetchStripePrices, formatCurrencyAmount } from "./_prices";
 import type { StripePrices } from "./_pricing-toggle";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import "./pricing.css";
 
 const DEFAULT_STRIPE_PRICES: StripePrices = {
@@ -63,6 +64,10 @@ export const revalidate = 3600;
 
 export default async function PricingPage() {
   const stripePrices = await fetchStripePrices();
+  // P50A-01: Outlook only appears once Microsoft sync is configured (this
+  // page re-renders on ISR's hourly revalidation, so it reflects the live
+  // env — see ~/lib/microsoft-sync-flag).
+  const outlookLive = isMicrosoftSyncEnabled();
 
   return (
     <>
@@ -81,7 +86,7 @@ export default async function PricingPage() {
       </section>
 
       {/* ── Billing toggle + Plan cards (client interactive) ── */}
-      <PricingToggle stripePrices={stripePrices} />
+      <PricingToggle stripePrices={stripePrices} outlookLive={outlookLive} />
 
       {/* ── Feature matrix ── */}
       <section className="pr-matrix-sec">
@@ -128,7 +133,9 @@ export default async function PricingPage() {
                 <tr className="pr-cat"><td colSpan={5}>Sync</td></tr>
                 <tr className="pr-row"><td>CardDAV accounts</td><td><Cell text="1 account" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td></tr>
                 <tr className="pr-row"><td>Google Contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Outlook</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                {outlookLive && (
+                  <tr className="pr-row"><td>Outlook</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                )}
                 <tr className="pr-row"><td>iCloud (via CardDAV)</td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td></tr>
                 <tr className="pr-row"><td>Two-way sync</td><td><Cell text="CardDAV" /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
 
@@ -144,7 +151,6 @@ export default async function PricingPage() {
                 {/* DEVELOPER */}
                 <tr className="pr-cat"><td colSpan={5}>Developer</td></tr>
                 <tr className="pr-row"><td>REST API</td><td><Cell /></td><td><Cell yes /></td><td><Cell /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Webhooks</td><td><Cell /></td><td><Cell yes /></td><td><Cell /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>API rate limit</td><td><Cell /></td><td><Cell text="5k / day" /></td><td><Cell /></td><td><Cell text="20k / day" /></td></tr>
 
                 {/* SUPPORT */}

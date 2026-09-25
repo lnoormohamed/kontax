@@ -13,72 +13,14 @@ const CATEGORY_BADGE_CLASS: Record<ChangelogCategoryLabel, string> = {
 // Hand-drawn release-figure mocks for headline releases — presentational
 // only, so they stay here rather than in the shared _entries.ts data. Keyed
 // by ChangelogEntry.id.
-const FIGURES: Record<string, React.ReactNode> = {
-  "v3.2": (
-    <div
-      className="chg-fig"
-      role="img"
-      aria-label="A shared address book with three members and Owner, Editor, and Viewer role badges"
-    >
-      <div className="chg-fig__head">
-        <span className="chg-fig__bk" aria-hidden="true">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
-          </svg>
-        </span>
-        <span>
-          <span className="chg-fig__title">Morales Family</span>
-          <span className="chg-fig__sub">3 members · 248 shared contacts</span>
-        </span>
-      </div>
-      <div className="chg-fig__row chg-fig__row--first">
-        <span className="chg-av" style={{ background: "var(--mkt-green)" }}>EM</span>
-        <span className="chg-nm">Elena Morales</span>
-        <span className="chg-role chg-role--owner">Owner</span>
-      </div>
-      <div className="chg-fig__row">
-        <span className="chg-av" style={{ background: "#6b7cf6" }}>DK</span>
-        <span className="chg-nm">David Kaur</span>
-        <span className="chg-role chg-role--editor">Editor</span>
-      </div>
-      <div className="chg-fig__row">
-        <span className="chg-av" style={{ background: "#c98a3a" }}>TN</span>
-        <span className="chg-nm">Theo Nakamura</span>
-        <span className="chg-role chg-role--viewer">Viewer</span>
-      </div>
-    </div>
-  ),
-  "v3.1": (
-    <div
-      className="chg-fig"
-      role="img"
-      aria-label="Sync connections showing Google Contacts and Outlook both synced"
-    >
-      <div className="chg-fig__row chg-fig__row--first">
-        <span className="chg-yicn" style={{ background: "#4285f4" }}>G</span>
-        <span>
-          <span className="chg-ynm">Google Contacts</span>
-          <span className="chg-ysub">elena@gmail.com · 1,204 contacts</span>
-        </span>
-        <span className="chg-ystatus">
-          <span className="chg-dot" />
-          Synced 2m ago
-        </span>
-      </div>
-      <div className="chg-fig__row">
-        <span className="chg-yicn" style={{ background: "#0a6ed1" }}>O</span>
-        <span>
-          <span className="chg-ynm">Outlook</span>
-          <span className="chg-ysub">elena@outlook.com · 318 contacts</span>
-        </span>
-        <span className="chg-ystatus">
-          <span className="chg-dot" />
-          Synced 5m ago
-        </span>
-      </div>
-    </div>
-  ),
-};
+//
+// P50A-01: the two release figures that used to live here (a shared address
+// book mock and a Google+Outlook sync mock) were tied to the fabricated
+// v3.1/v3.2 entries removed from _entries.ts — the sync one also showed
+// Outlook, which isn't live in production. No current entry sets
+// `hasFigure: true`; add a new mock here (keyed by the entry's `id`) if a
+// future release should get one.
+const FIGURES: Record<string, React.ReactNode> = {};
 
 export const metadata: Metadata = {
   title: "Changelog — Kontax",
