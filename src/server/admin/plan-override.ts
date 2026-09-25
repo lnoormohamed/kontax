@@ -9,9 +9,11 @@ import type { PrismaClient, SubscriptionPlan } from "../../../generated/prisma";
 // subscriptions for). This module implements the override as a comp
 // *personal* Subscription row using the SAME placeholder convention the
 // pre-Stripe "manual_" comps already use (see stripe-customers.ts /
-// stripe-handlers.ts): a "manual_" - prefixed id never reaches Stripe, is
-// swept away the moment a real subscription goes active, and is skipped by
-// `syncStripeBillingState`.
+// stripe-handlers.ts): a "manual_" - prefixed id never reaches Stripe and is
+// skipped by `syncStripeBillingState`. Unlike a pre-Stripe comp, an override
+// row is NOT swept away when a real subscription goes active — an explicit
+// admin grant must survive the customer's own renewals (Fable review); see
+// `isAdminOverrideProviderId`.
 //
 // It never edits `getUserBillingContext` (billing.ts) — that function is
 // being changed separately (P49A-06) to resolve the user's *highest-ranked*
@@ -31,9 +33,25 @@ export function isPlaceholderProviderId(id: string | null | undefined): boolean 
   return !!id && (id.startsWith("manual_") || id.startsWith("admin-override-"));
 }
 
+/** Prefix of the comp Subscription row an admin plan override writes. */
+export const ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX = "manual_admin-override-";
+
+/**
+ * Is this provider subscription id an admin plan override — a current
+ * `manual_admin-override-<userId>` row or a legacy `admin-override-` one?
+ * Unlike a pre-Stripe `manual_` comp, an override is an explicit admin grant:
+ * the webhook's "a live Stripe subscription supersedes a legacy manual one"
+ * sweep skips it, and only `removePlanOverrideForUser` ends it.
+ */
+export function isAdminOverrideProviderId(id: string | null | undefined): boolean {
+  return (
+    !!id && (id.startsWith(ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX) || id.startsWith("admin-override-"))
+  );
+}
+
 /** The single, deterministic placeholder id used for one user's comp override row. */
 function overrideProviderId(userId: string): string {
-  return `manual_admin-override-${userId}`;
+  return `${ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX}${userId}`;
 }
 
 export type OverrideDb = Pick<PrismaClient, "subscriptionCustomer" | "subscription">;

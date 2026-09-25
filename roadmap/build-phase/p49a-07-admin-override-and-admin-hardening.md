@@ -33,3 +33,16 @@ actions fully cut off access where they intend to.
 - Test: overriding a paying PRO user does not reduce their entitlements.
 - Test: after schedule-deletion, a cached DAV credential is rejected immediately.
 - Test: SUPPORT_OPS admin search returns no audit rows; CSV cell `-2+2` is exported as `'-2+2`.
+
+## Fable review fixes (2026-09-25)
+- **Admin comp no longer swept by Stripe webhooks (HIGH).** The override is stored as a comp
+  personal Subscription row `manual_admin-override-<userId>`, and `upsertSubscription`'s "a live
+  Stripe subscription supersedes a legacy manual one" sweep cancelled every `manual_*` row on any
+  active-status event — so a comp PRO→TEAMS on a paying user vanished at the next renewal (and
+  `applyDowngrade` opened a Teams grace on their team). The sweep now skips admin overrides
+  (`manual_admin-override-*`, and legacy `admin-override-*`: `isAdminOverrideProviderId`); genuine
+  pre-Stripe `manual_` comps are still superseded. Only `removePlanOverrideForUser` ends an override.
+  The webhook's own "effective personal plan" (`reconcileUserPlan`) now resolves max-rank like
+  `getUserBillingContext` instead of "latest period end", so the comp row and the paid row can't
+  disagree about before/after. Test: `stripe-webhook.test.ts` "admin plan override vs the
+  customer's own Stripe billing".
