@@ -96,11 +96,15 @@ export async function requestPasswordReset(email: string): Promise<{ success: tr
   // Render synchronously, then fire-and-forget the send so a slow SES response
   // never blocks the HTTP response (and never reveals account existence).
   const { html, text } = await renderEmail(PasswordReset({ resetUrl }));
+  // P49A-08: password reset is account-recovery mail — a bounce/complaint
+  // suppression on this address must never be the thing that locks the user
+  // out of recovering their own account.
   void sendEmail({
     to: normalised,
     subject: "Reset your Kontax password",
     html,
     text,
+    bypassSuppression: true,
   });
 
   return { success: true };

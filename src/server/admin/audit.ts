@@ -21,6 +21,8 @@ export const ADMIN_ACTIONS = {
   SUPPORT_CASE_UPDATED: "support.case.update",
   PRODUCT_BROADCAST: "product.broadcast",
   PRODUCT_BROADCAST_RETRACTED: "product.broadcast.retract",
+  // P49A-08: admin clears a bounce/complaint suppression back to OK.
+  USER_EMAIL_STATUS_RESET: "email.status.reset",
 } as const;
 
 export type AdminActionKey = (typeof ADMIN_ACTIONS)[keyof typeof ADMIN_ACTIONS];

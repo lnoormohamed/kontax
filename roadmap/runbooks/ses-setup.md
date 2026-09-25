@@ -74,6 +74,9 @@ Generate an access key pair and store it as the env vars in §4.
    `{APP_URL}/api/ses/events` — the endpoint lands in **P20-10**. (Confirm the
    subscription after that endpoint is deployed; SNS sends a one-time
    confirmation request the endpoint must echo back.)
+4. Copy the topic's ARN (SNS console → the topic → **ARN** field, e.g.
+   `arn:aws:sns:{region}:{account-id}:kontax-email-events`) — you need it for
+   `SES_SNS_TOPIC_ARN` in §4.
 
 ## 4. Application env vars
 
@@ -89,6 +92,32 @@ EMAIL_FROM=no-reply@getkontax.com    # must be on the verified domain
 
 Validation: start the app. With the vars set you should **not** see
 `[email] SES not configured` in the logs.
+
+### `SES_SNS_TOPIC_ARN` — required for the bounce/complaint webhook (P49A-08)
+
+```
+SES_SNS_TOPIC_ARN=arn:aws:sns:us-east-1:123456789012:kontax-email-events
+```
+
+Comma-separated allow-list (supports more than one topic, e.g. across
+regions/accounts) of the SNS TopicArn(s) the `/api/ses/events` webhook will
+accept. `TopicArn` is covered by the SNS message signature, so the route
+verifies the signature first, then checks `TopicArn` against this list — a
+validly-signed message from any *other* SNS topic (including one an attacker
+controls) is rejected with 403 before it can confirm a subscription or touch
+any user's `emailStatus`.
+
+This var is **optional at boot** — it is intentionally not in
+`assertProductionEnv()`'s required list, so a missing value never takes the
+site down — but the route **fails closed**: while it's unset, every SNS
+message is rejected (logged once as a warning) and bounce/complaint
+suppression silently does nothing. That means:
+
+- **Ops action required:** set `SES_SNS_TOPIC_ARN` on both **staging and
+  production** once the SNS topic exists (§3 above gives you the ARN). This is
+  a manual ops step — it is not set automatically by this change.
+- Until it's set in an environment, SES bounces/complaints there are simply
+  ignored (no suppression, no admin visibility) rather than causing an outage.
 
 ## 5. Sandbox → production lift
 
@@ -126,4 +155,7 @@ radius is limited to sending mail. Rotate keys ~every 90 days:
       `EMAIL_FROM` documented in `.env.example` and set in the deploy environment.
 - [ ] SNS topic `kontax-email-events` created; SES bounce/complaint feedback
       points at it.
+- [ ] `SES_SNS_TOPIC_ARN` set to that topic's ARN in **staging and production**
+      (ops step — the `/api/ses/events` webhook rejects every message until
+      this is set; see the section above).
 - [ ] Test email sent from the SES console to a verified address in sandbox.

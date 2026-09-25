@@ -27,6 +27,15 @@ export const env = createEnv({
     AWS_SECRET_ACCESS_KEY: z.string().optional(),
     AWS_SES_REGION: z.string().optional(),
     EMAIL_FROM: z.string().email().optional(),
+    // P49A-08: comma-separated allow-list of SNS TopicArns the SES bounce/
+    // complaint webhook (src/app/api/ses/events/route.ts) will accept.
+    // Deliberately optional and NOT asserted in assertProductionEnv() below —
+    // prod does not set this today, and a required-at-boot var here would take
+    // the whole site down. Instead the route fails CLOSED: when this is unset,
+    // every SNS message is rejected (see the route for the one-time warning).
+    // Must be set on staging and prod for the webhook to do anything (ops step
+    // — see roadmap/runbooks/ses-setup.md).
+    SES_SNS_TOPIC_ARN: z.string().optional(),
     APP_URL: z.string().url().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -110,6 +119,7 @@ export const env = createEnv({
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_SES_REGION: process.env.AWS_SES_REGION,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    SES_SNS_TOPIC_ARN: process.env.SES_SNS_TOPIC_ARN,
     APP_URL: process.env.APP_URL,
     NODE_ENV: process.env.NODE_ENV,
     REDIS_URL: process.env.REDIS_URL,
