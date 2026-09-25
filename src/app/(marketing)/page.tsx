@@ -9,7 +9,7 @@ import {
   softwareApplicationSchema,
   websiteSchema,
 } from "~/app/_components/json-ld";
-import { env } from "~/env";
+import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import { auth } from "~/server/auth";
 
 import { FeatureShowcase } from "./_components/home/feature-showcase";
@@ -46,17 +46,14 @@ export const metadata: Metadata = {
 
 // P49-02 · "Works with" strip lists only connectors that are live on this
 // deployment: Outlook appears once the Microsoft connector is configured
-// (same check as isMicrosoftSyncConfigured in ~/server/microsoft-sync).
+// (P50A-01: shared gate — see ~/lib/microsoft-sync-flag).
 function worksWith(): string[] {
-  const outlookLive = Boolean(
-    env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET && env.MICROSOFT_REDIRECT_URI,
-  );
   return [
     "Apple Contacts",
     "Google Contacts",
     "iCloud",
     "Fastmail",
-    ...(outlookLive ? ["Outlook"] : []),
+    ...(isMicrosoftSyncEnabled() ? ["Outlook"] : []),
     "any CardDAV app",
   ];
 }

@@ -34,7 +34,7 @@ const FAQS = [
   },
   {
     q: "Can I use the API on the Free plan?",
-    a: "The developer REST API and webhooks are available on Pro and Teams. Free accounts can still sync over open CardDAV, which works with any standards-compliant client.",
+    a: "The developer REST API is available on Pro and Teams. Free accounts can still sync over open CardDAV, which works with any standards-compliant client.",
   },
 ];
 
