@@ -123,6 +123,15 @@ export function checkMarketingTitles(rootDir) {
     const rel = path.relative(rootDir, file);
     const source = readFileSync(file, "utf8");
 
+    // Pages whose metadata comes from a helper call (e.g. the P50A-06 guides:
+    // `export const metadata = guideMetadata(page)`) or from generateMetadata
+    // can't be read statically; their titles/descriptions are checked by their
+    // own content tests (tests/node/guides-and-comparisons.test.ts).
+    if (/export\s+const\s+metadata\s*(?::\s*Metadata\s*)?=\s*[A-Za-z_][A-Za-z0-9_]*\(/.test(source)
+      || /export\s+(?:async\s+)?function\s+generateMetadata/.test(source)) {
+      continue;
+    }
+
     const titleField = extractMetadataField(source, "title");
     const descriptionField = extractMetadataField(source, "description");
 

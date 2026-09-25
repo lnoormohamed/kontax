@@ -9,8 +9,18 @@ import { buildPersonSchema, getPublicCard } from "~/server/public-card/get-card"
 import { recordCardView } from "~/server/public-card/analytics";
 import { SITE_URL } from "~/lib/site-url";
 import { AddToKontaxButton } from "./add-to-kontax";
+import type { PublicCardData } from "~/server/public-card/types";
 
 import "~/app/_components/public-site.css";
+
+// P50A-01: a card with no fields beyond the display name is thin content —
+// noindex it rather than let every empty username claim get indexed. Shared
+// between generateMetadata (below) and the PublicCard component so the
+// visible "no fields" empty state and the indexing decision can never drift
+// apart.
+function hasVisibleFields(card: Pick<PublicCardData, "emails" | "phones" | "websites">): boolean {
+  return card.emails.length > 0 || card.phones.length > 0 || card.websites.length > 0;
+}
 
 export async function generateMetadata({
   params,
@@ -27,7 +37,7 @@ export async function generateMetadata({
   return {
     title: `${card.displayName}'s contact card — Kontax`,
     description: `Add ${card.displayName} to your contacts in one tap.`,
-    robots: { index: true, follow: true },
+    robots: hasVisibleFields(card) ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       title: `${card.displayName}'s contact card`,
       description: `Add ${card.displayName} to your contacts in one tap.`,
@@ -168,8 +178,6 @@ const GlobeIcon = () => (
 );
 
 // ── Public card component ─────────────────────────────────────────────────────
-import type { PublicCardData } from "~/server/public-card/types";
-
 function PublicCard({
   card,
   isLoggedIn,
@@ -179,8 +187,7 @@ function PublicCard({
   isLoggedIn: boolean;
   isOwnCard: boolean;
 }) {
-  const hasFields =
-    card.emails.length > 0 || card.phones.length > 0 || card.websites.length > 0;
+  const hasFields = hasVisibleFields(card);
 
   return (
     <div

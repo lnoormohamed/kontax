@@ -31,7 +31,14 @@ type KontaxRecognition =
   | { kind: "unsupported-version"; formatVersion: string; major: number; container: "archive" | "document"; fileName: string; size: number }
   | { kind: "unrecognized"; fileName: string; size: number };
 
-type KontaxImportResult = { importedCount: number; skippedCount: number; jobId: string };
+type KontaxImportResult = {
+  importedCount: number;
+  skippedCount: number;
+  jobId: string;
+  /** P49A-06: set when some contacts were left out at the plan's contact cap. */
+  capSkippedCount?: number;
+  limitMessage?: string | null;
+};
 
 type MatchedPreset = {
   id: string;
@@ -333,6 +340,8 @@ export function ImportPreviewForm({
   const [nearDismissed, setNearDismissed] = useState(false);
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
   const [importedCount, setImportedCount] = useState(0);
+  // P49A-06: contacts left out because the plan's contact cap was reached.
+  const [capNotice, setCapNotice] = useState<{ count: number; message: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [confirmUndo, setConfirmUndo] = useState(false);
@@ -360,6 +369,7 @@ export function ImportPreviewForm({
     setKontaxFile(null);
     setKontaxInfo(null);
     setKontaxResult(null);
+    setCapNotice(null);
     setError("");
   };
 
@@ -415,6 +425,11 @@ export function ImportPreviewForm({
     }
     setKontaxResult(data);
     setImportedCount(data.importedCount);
+    setCapNotice(
+      data.limitMessage && data.capSkippedCount
+        ? { count: data.capSkippedCount, message: data.limitMessage }
+        : null,
+    );
     setStep(4);
   };
 
@@ -472,13 +487,26 @@ export function ImportPreviewForm({
         columnMappings: resolvedMappings.length > 0 ? resolvedMappings : undefined,
       }),
     });
-    const data = (await res.json().catch(() => null)) as { importedCount?: number; message?: string } | null;
+    const data = (await res.json().catch(() => null)) as {
+      importedCount?: number;
+      message?: string;
+      capSkippedCount?: number;
+      limitMessage?: string | null;
+    } | null;
     setBusy(false);
     if (!res.ok) {
       setError(data?.message ?? "Import failed.");
       return;
     }
     setImportedCount(data?.importedCount ?? preview.contacts.length);
+    setCapNotice(
+      data?.limitMessage && data.capSkippedCount
+        ? { count: data.capSkippedCount, message: data.limitMessage }
+        : null,
+    );
+    if (data?.capSkippedCount) {
+      setPreview({ ...preview, skippedCount: preview.skippedCount + data.capSkippedCount });
+    }
     setStep(4);
   };
 
@@ -899,6 +927,15 @@ export function ImportPreviewForm({
                 <span className="font-semibold text-[#bf8526]">
                   {kontaxResult?.skippedCount ?? preview?.skippedCount} skipped
                 </span>
+              </div>
+            ) : null}
+            {capNotice ? (
+              <div className="mt-1 text-[14px] text-[#7a5a1a]">
+                {capNotice.count} {capNotice.count === 1 ? "contact wasn\u2019t" : "contacts weren\u2019t"} imported —{" "}
+                {capNotice.message}{" "}
+                <a className="font-semibold text-[#4452c9] hover:underline" href="/pricing">
+                  Upgrade
+                </a>
               </div>
             ) : null}
           </div>

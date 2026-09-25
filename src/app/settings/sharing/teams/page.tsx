@@ -153,7 +153,9 @@ export default async function TeamSettingsPage() {
   // ── No team yet ──
   if (!ctx) {
     const billing = await getUserBillingContext(userId);
-    if (!billing.entitlements.teamsEnabled) {
+    // P49A-06 (Fable review): "may set up a team" is the user's OWN Teams plan,
+    // not Teams entitlements borrowed from membership of someone else's team.
+    if (billing.personalPlan !== "TEAMS") {
       return (
         <>
           <SettingsPageHead title="Team management" sub="Share multiple address books with up to 25 people." />

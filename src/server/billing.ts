@@ -425,6 +425,65 @@ export const assertCanCreateContactsTx = async (
   return summary;
 };
 
+/**
+ * P49A-06 (Fable review): file imports (CSV/vCard commit, Kontax archive)
+ * create only what fits under the contact cap and report the rest as skipped,
+ * instead of failing the whole import. Checks the account can write and the
+ * monthly import limit (for the contacts that will actually be created), and
+ * throws `ContactLimitReachedError` only when not even one contact fits.
+ */
+export type ImportCapacity = {
+  /** How many of the incoming contacts to create (the first N). */
+  toCreate: number;
+  /** Incoming contacts left out because the contact cap was reached. */
+  capSkipped: number;
+  /** User-facing cap message when `capSkipped > 0`, else null. */
+  limitMessage: string | null;
+};
+
+const planImportCapacity = (
+  summary: Awaited<ReturnType<typeof getUserPlanSummary>>,
+  incomingCount: number,
+): ImportCapacity => {
+  assertWritableAccount(summary);
+
+  const contactsLimit = summary.entitlements.contactsLimit;
+  const remaining = summary.contactsRemaining;
+  const incoming = Math.max(incomingCount, 0);
+  const toCreate = remaining === null ? incoming : Math.min(incoming, remaining);
+  if (contactsLimit !== null && incoming > 0 && toCreate === 0) {
+    throw new ContactLimitReachedError(summary.planLabel, contactsLimit);
+  }
+
+  const importLimit = summary.entitlements.monthlyImportLimit;
+  if (importLimit !== null && summary.importedThisMonth + toCreate > importLimit) {
+    throw new Error(
+      `${summary.planLabel} plan import limit reached. You can import up to ${importLimit} contacts per month on this plan.`,
+    );
+  }
+
+  const capSkipped = incoming - toCreate;
+  return {
+    toCreate,
+    capSkipped,
+    limitMessage:
+      capSkipped > 0 && contactsLimit !== null
+        ? contactLimitMessage(summary.planLabel, contactsLimit)
+        : null,
+  };
+};
+
+/** Unlocked pre-check for an import (cheap, before parsing). See `ImportCapacity`. */
+export const getImportCapacity = async (userId: string, incomingCount: number) =>
+  planImportCapacity(await getUserPlanSummary(userId), incomingCount);
+
+/**
+ * Authoritative import capacity inside the inserting transaction — call after
+ * `lockUserForPlanCheck(tx, userId)`, then create only the first `toCreate`.
+ */
+export const getImportCapacityTx = async (tx: TxClient, userId: string, incomingCount: number) =>
+  planImportCapacity(await getUserPlanSummaryTx(tx, userId), incomingCount);
+
 /** Transactional twin of `assertCanImportContacts` — call after `lockUserForPlanCheck`. */
 export const assertCanImportContactsTx = async (
   tx: TxClient,

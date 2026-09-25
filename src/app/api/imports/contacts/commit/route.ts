@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
-import { assertCanImportContacts } from "~/server/billing";
+import { getImportCapacity, getImportCapacityTx, lockUserForPlanCheck } from "~/server/billing";
 import { parseCsvContacts } from "~/server/contact-portability";
 import {
   approximateCsvRowCount,
@@ -112,8 +112,11 @@ export async function POST(request: Request) {
     // import shouldn't pay for a parse it can't commit anyway. The exact
     // check against preview.contacts.length below still runs (skipped rows
     // only ever make the real count lower than this estimate).
+    // P49A-06 (Fable review): over the contact cap is no longer a failure —
+    // only what fits is created (below) — so this rejects only a read-only
+    // account, the monthly import limit, or an account with no room at all.
     try {
-      await assertCanImportContacts(userId, approximateCsvRowCount(parsedBody.data.csvText) - 1);
+      await getImportCapacity(userId, approximateCsvRowCount(parsedBody.data.csvText) - 1);
     } catch (error) {
       throw new KnownCommitError(
         error instanceof Error ? error.message : "Import limit reached.",
@@ -145,43 +148,56 @@ export async function POST(request: Request) {
       throw new KnownCommitError("No importable contacts were found in that CSV file.");
     }
 
-    try {
-      await assertCanImportContacts(userId, preview.contacts.length);
-    } catch (error) {
-      throw new KnownCommitError(
-        error instanceof Error ? error.message : "Import limit reached.",
-      );
-    }
-
-    const created = await db.contact.createMany({
-      data: preview.contacts.map((contact) => ({
-        userId,
-        importJobId: job.id,
-        fullName: contact.fullName,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        phoneticFirstName: contact.phoneticFirstName,
-        phoneticLastName: contact.phoneticLastName,
-        nickname: contact.nickname,
-        email: contact.email,
-        emailAddresses: getOptionalJsonArray(contact.emailAddresses),
-        phone: contact.phone,
-        phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
-        company: contact.company,
-        phoneticCompany: contact.phoneticCompany,
-        jobTitle: contact.jobTitle,
-        website: contact.website,
-        birthday: contact.birthday,
-        address: contact.address,
-        postalAddresses: getOptionalJsonArray(contact.postalAddresses),
-        notes: contact.notes,
-        customFields: contact.customFields ?? undefined,
-        sourceType: "IMPORT_CSV" as const,
-        sourceDetail: sourceFileName,
-        lastMutatedBy: "IMPORT_CSV" as const,
-        lastMutatedByDetail: sourceFileName,
-      })),
-    });
+    // P49A-06 (Fable review): the cap is enforced inside the inserting
+    // transaction with the User row locked (a concurrent import / create for
+    // the same account serialises here), and only the first contacts that fit
+    // are created — the rest are reported as skipped, never failing the import.
+    const { created, capacity } = await db.$transaction(
+      async (tx) => {
+        await lockUserForPlanCheck(tx, userId);
+        let capacity: Awaited<ReturnType<typeof getImportCapacityTx>>;
+        try {
+          capacity = await getImportCapacityTx(tx, userId, preview.contacts.length);
+        } catch (error) {
+          throw new KnownCommitError(
+            error instanceof Error ? error.message : "Import limit reached.",
+          );
+        }
+        const created = await tx.contact.createMany({
+          data: preview.contacts.slice(0, capacity.toCreate).map((contact) => ({
+            userId,
+            importJobId: job.id,
+            fullName: contact.fullName,
+            firstName: contact.firstName,
+            lastName: contact.lastName,
+            phoneticFirstName: contact.phoneticFirstName,
+            phoneticLastName: contact.phoneticLastName,
+            nickname: contact.nickname,
+            email: contact.email,
+            emailAddresses: getOptionalJsonArray(contact.emailAddresses),
+            phone: contact.phone,
+            phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
+            company: contact.company,
+            phoneticCompany: contact.phoneticCompany,
+            jobTitle: contact.jobTitle,
+            website: contact.website,
+            birthday: contact.birthday,
+            address: contact.address,
+            postalAddresses: getOptionalJsonArray(contact.postalAddresses),
+            notes: contact.notes,
+            customFields: contact.customFields ?? undefined,
+            sourceType: "IMPORT_CSV" as const,
+            sourceDetail: sourceFileName,
+            lastMutatedBy: "IMPORT_CSV" as const,
+            lastMutatedByDetail: sourceFileName,
+          })),
+        });
+        return { created, capacity };
+      },
+      // MAX_CSV_ROWS (50,000) can take longer than Prisma's 5s default to
+      // insert; same generous timeout as the in-app CSV import.
+      { timeout: 120_000 },
+    );
 
     // P10-02: one CONTACT_IMPORTED event per created contact (batch insert).
     const importedContacts = await db.contact.findMany({
@@ -211,16 +227,20 @@ export async function POST(request: Request) {
         rowCount: preview.totalRows,
         previewContactCount: preview.contacts.length,
         importedCount: created.count,
-        skippedCount: preview.skippedCount,
+        skippedCount: preview.skippedCount + capacity.capSkipped,
         errorCount,
         warningCount,
         errorSummary:
-          preview.issues.length > 0
-            ? preview.issues
-                .slice(0, 5)
-                .map((issue) => `Row ${issue.rowNumber}: ${issue.message}`)
-                .join(" | ")
-            : null,
+          [
+            capacity.limitMessage
+              ? `${capacity.capSkipped} contact${capacity.capSkipped === 1 ? "" : "s"} not imported: ${capacity.limitMessage}`
+              : null,
+            ...preview.issues
+              .slice(0, 5)
+              .map((issue) => `Row ${issue.rowNumber}: ${issue.message}`),
+          ]
+            .filter(Boolean)
+            .join(" | ") || null,
         previewedAt: existingJob?.previewedAt ?? job.previewedAt ?? null,
         committedAt: new Date(),
         completedAt: new Date(),
@@ -229,7 +249,10 @@ export async function POST(request: Request) {
 
     return Response.json({
       importedCount: created.count,
-      skippedCount: preview.skippedCount,
+      skippedCount: preview.skippedCount + capacity.capSkipped,
+      // P49A-06: contacts left out because the plan's contact cap was reached.
+      capSkippedCount: capacity.capSkipped,
+      limitMessage: capacity.limitMessage,
       issueCount: preview.issues.length,
     });
   } catch (error) {

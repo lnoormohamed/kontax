@@ -10,6 +10,7 @@ import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateContactsTx, getUserBillingContext, lockUserForPlanCheck } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
+import { REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
 import { isTeamLocked } from "~/server/dav/plan-entitlements.mjs";
 import {
   clearedInviteTokenColumns,
@@ -906,8 +907,15 @@ export const updateTeamSeats = async (formData: FormData) => {
   }
 
   // Verify caller owns a TEAMS subscription.
+  // A comp / admin-override Teams row is not a Stripe subscription (no seats
+  // to change there) and its id must never reach the Stripe API.
   const sub = await db.subscription.findFirst({
-    where: { userId, plan: "TEAMS", status: { in: ["ACTIVE", "TRIALING"] } },
+    where: {
+      userId,
+      plan: "TEAMS",
+      status: { in: ["ACTIVE", "TRIALING"] },
+      ...REAL_STRIPE_SUBSCRIPTION_WHERE,
+    },
     select: { id: true, providerSubscriptionId: true, memberSlotsLimit: true },
   });
   if (!sub) throw new Error("No active Teams subscription found.");

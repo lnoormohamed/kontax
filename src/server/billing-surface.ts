@@ -1,6 +1,7 @@
 import { type SubscriptionPlan, type SubscriptionStatus } from "../../generated/prisma";
 
-import { getUserBillingContext, getUserPlanSummary } from "~/server/billing";
+import { getUserBillingContext, getUserPlanSummary, PLAN_LABELS } from "~/server/billing";
+import { REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
 import { db } from "~/server/db";
 import { getStripeCatalog } from "~/server/stripe-catalog";
 
@@ -19,7 +20,15 @@ export type BillingSurfaceState =
   | "trial"
   | "cancel"
   | "familyOwner"
-  | "grace";
+  | "grace"
+  // P49A-06/07 (Fable review): the plan is not paid for by this user —
+  | "teamMember" // Teams via membership of an org-billed team
+  | "comp"; // granted by Kontax (admin override / legacy comp), no Stripe subscription behind it
+
+/** Where a plan this user doesn't pay for comes from (teamMember / comp states). */
+export type BillingGrant =
+  | { source: "team"; teamName: string; isOwner: boolean; teamState: "active" | "grace" }
+  | { source: "kontax" };
 
 export type BillingUsageRow = {
   label: string;
@@ -52,6 +61,14 @@ export type BillingSurface = {
   graceDeadline: string | null;
   members: { used: number; total: number } | null;
   usage: BillingUsageRow[] | null;
+  /** teamMember / comp only: who grants the plan. */
+  grant: BillingGrant | null;
+  /**
+   * teamMember / comp only: a real, lower personal Stripe subscription the user
+   * still pays for (e.g. their own Pro while on a team). The UI offers the
+   * portal for it — never a "cancel plan" for the granted plan.
+   */
+  personalSubscription: { planLabel: string } | null;
 };
 
 const PLAN_PRICE: Record<SubscriptionPlan, { price: string | null; per: string | null }> = {
@@ -112,10 +129,20 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
   const summary = await getUserPlanSummary(userId);
   const { plan, planLabel, entitlements, lifecycleState } = summary;
 
-  const subscription = await db.subscription.findFirst({
-    where: { userId, status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] }, plan: { not: "FREE" } },
+  // Real Stripe subscriptions only (P49A-07 Fable review): a comp /
+  // admin-override row has no interval, renewal, trial or portal behind it.
+  // Prefer the real subscription AT the effective plan (a user can hold more
+  // than one row; the effective plan is max-rank, P49A-06).
+  const realSubscriptions = await db.subscription.findMany({
+    where: {
+      userId,
+      status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] },
+      plan: { not: "FREE" },
+      ...REAL_STRIPE_SUBSCRIPTION_WHERE,
+    },
     orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
     select: {
+      plan: true,
       status: true,
       interval: true,
       currentPeriodEnd: true,
@@ -125,6 +152,49 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       canceledAt: true,
     },
   });
+  const subscription =
+    realSubscriptions.find((row) => row.plan === plan) ?? realSubscriptions[0] ?? null;
+
+  // Fable review (P49A-06/07): a plan this user doesn't pay for — Teams via
+  // membership of an org-billed team, or a plan granted by Kontax with no real
+  // subscription at that plan — gets a grant view: no price, renewal, "Manage
+  // billing" or "Cancel plan" for the granted plan (the portal would open the
+  // wrong customer, or a placeholder one, and cancelling can't end it).
+  if (plan !== "FREE") {
+    let grant: BillingGrant | null = null;
+    if (summary.planSource === "team" && summary.teamEntitlement) {
+      const team = await db.group.findUnique({
+        where: { id: summary.teamEntitlement.groupId },
+        select: { name: true },
+      });
+      grant = {
+        source: "team",
+        teamName: team?.name ?? "your team",
+        isOwner: summary.teamEntitlement.ownerId === userId,
+        teamState: summary.teamEntitlement.state,
+      };
+    } else if (summary.planSource === "personal" && subscription?.plan !== plan) {
+      grant = { source: "kontax" };
+    }
+    if (grant) {
+      return {
+        state: grant.source === "team" ? "teamMember" : "comp",
+        plan,
+        planLabel,
+        status: null,
+        intervalLabel: null,
+        price: null,
+        per: null,
+        renewalDate: null,
+        trial: null,
+        graceDeadline: null,
+        members: null,
+        usage: buildUsage(summary),
+        grant,
+        personalSubscription: subscription ? { planLabel: PLAN_LABELS[subscription.plan] } : null,
+      };
+    }
+  }
 
   const intervalLabel = subscription
     ? subscription.interval === "YEARLY"
@@ -148,6 +218,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       graceDeadline: null,
       members: null,
       usage: buildUsage(summary),
+      grant: null,
+      personalSubscription: null,
     };
   }
 
@@ -169,6 +241,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       graceDeadline: deadline ? formatDate(deadline) : null,
       members: null,
       usage: null,
+      grant: null,
+      personalSubscription: null,
     };
   }
 
@@ -190,6 +264,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       graceDeadline: null,
       members: null,
       usage: null,
+      grant: null,
+      personalSubscription: null,
     };
   }
 
@@ -216,6 +292,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       graceDeadline: null,
       members: null,
       usage: null,
+      grant: null,
+      personalSubscription: null,
     };
   }
 
@@ -241,6 +319,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
         total: membership?.group.memberSlotsLimit ?? entitlements.memberSlotsLimit,
       },
       usage: null,
+      grant: null,
+      personalSubscription: null,
     };
   }
 
@@ -258,6 +338,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
     graceDeadline: null,
     members: null,
     usage: buildUsage(summary),
+    grant: null,
+    personalSubscription: null,
   };
 };
 

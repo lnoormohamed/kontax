@@ -1,3 +1,4 @@
+import { isPlaceholderProviderId } from "~/server/billing-placeholders";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
 
@@ -6,8 +7,7 @@ import { getStripeClient } from "~/server/stripe";
 // "admin-override-" ids the admin plan-override path used before this ticket
 // (prod has none, but a stale row from before the migration would otherwise
 // slip through as if it were a real `cus_...` id).
-const isLegacyManualStripeCustomer = (customerId: string) =>
-  customerId.startsWith("manual_") || customerId.startsWith("admin-override-");
+const isLegacyManualStripeCustomer = isPlaceholderProviderId;
 
 export async function ensureStripeCustomer(userId: string): Promise<string> {
   const stripe = getStripeClient();
