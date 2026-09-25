@@ -93,7 +93,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const updated = await db.$transaction(async (tx) => {
       const contact = await tx.contact.update({
         where: { id },
-        data: patch,
+        // P49A-02 (A-18): syncVersion is the CardDAV ETag. Without the bump a
+        // device never refetches the API edit and later overwrites it.
+        data: { ...patch, syncVersion: { increment: 1 } },
         select: API_CONTACT_SELECT,
       });
       if (movedBookId) await movePrimaryMembership(tx, id, movedBookId);
@@ -155,7 +157,8 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     await db.$transaction(async (tx) => {
       await tx.contact.update({
         where: { id },
-        data: { archivedAt: new Date(), lastMutatedBy: "API" },
+        // P49A-02 (A-18): bump the CardDAV ETag so devices see the change.
+        data: { archivedAt: new Date(), lastMutatedBy: "API", syncVersion: { increment: 1 } },
       });
       await emitEvent(tx, {
         userId,
