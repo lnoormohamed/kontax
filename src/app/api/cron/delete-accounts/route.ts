@@ -5,6 +5,11 @@ import { cancelBillingForDeletedUser } from "~/server/billing-lifecycle";
 import { assertCronSecret } from "~/server/cron-guard";
 import { db } from "~/server/db";
 import { sendAccountDeletionConfirmationEmail } from "~/server/deletion-notifications";
+import {
+  type AfterCommit,
+  runAfterCommit,
+  sweepDueFamilyDissolutions,
+} from "~/server/stripe-handlers";
 
 export const dynamic = "force-dynamic";
 
@@ -58,5 +63,20 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ deleted, errors, scanned: due.length });
+  // P49A-05: this nightly lifecycle job also dissolves lapsed Family groups
+  // whose 7-day notice period has run out (no extra crontab entry needed).
+  // Idempotent; an owner that fails is reported and retried tomorrow (and on
+  // the owner's next Stripe webhook). Runs after the deletions so a group
+  // whose owner was just hard-deleted (cascaded away) isn't swept.
+  const familyEffects: AfterCommit = [];
+  let family: { owners: number; removed: number; errors: string[] };
+  try {
+    family = await sweepDueFamilyDissolutions(db, familyEffects);
+  } catch (err) {
+    console.error("[Kontax] Family dissolution sweep failed:", err);
+    family = { owners: 0, removed: 0, errors: [err instanceof Error ? err.message : String(err)] };
+  }
+  await runAfterCommit(familyEffects);
+
+  return NextResponse.json({ deleted, errors, scanned: due.length, family });
 }

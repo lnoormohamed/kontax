@@ -27,13 +27,14 @@ import {
 //   · Order-independence (A-24): subscription and invoice events apply the
 //     subscription as it is in Stripe *now* (re-fetched below), never the event
 //     payload, so an old event delivered late cannot regress newer state.
-//   · Heavy follow-up work runs after the commit (Fable review): a Family lapse
-//     commits the subscription/entitlement change first, then dissolves the
-//     family group member by member (reconcileFamilyLapseForCustomer, each
-//     member in its own transaction). That step is idempotent and
-//     state-driven; if it fails, the event row gets its error back and the
-//     500 makes Stripe retry — the retry re-applies the (unchanged) state and
-//     re-runs the dissolution for the members still left.
+//   · Family follow-up runs after the commit (Fable review): a Family lapse
+//     commits the subscription/entitlement change first, then
+//     reconcileFamilyLapseForCustomer starts the group's 7-day notice period
+//     (or clears it on a re-subscribe) and dissolves any group whose notice has
+//     already run out, member by member, each in its own transaction. That step
+//     is idempotent and state-driven; if it fails, the event row gets its error
+//     back and the 500 makes Stripe retry — the retry re-applies the
+//     (unchanged) state and re-runs it for whatever is still left.
 
 type Tx = Prisma.TransactionClient;
 
@@ -51,7 +52,7 @@ export type WebhookOutcome =
   | { status: "skipped" }
   | { status: "failed"; error: string };
 
-/** State changes only — Family dissolution runs post-commit in its own transactions. */
+/** State changes only — the Family follow-up runs post-commit in its own transactions. */
 const TX_TIMEOUT_MS = 30_000;
 const MAX_ERROR_LENGTH = 2000;
 
@@ -247,9 +248,9 @@ export async function processStripeWebhookEvent(
     try {
       await reconcileFamilyLapseForCustomer(db, customerId, effects);
     } catch (err) {
-      // The state change is committed; only the dissolution is incomplete.
+      // The state change is committed; only the family follow-up is incomplete.
       // Put the error back on the event so Stripe's retry reprocesses it.
-      console.error(`[stripe-webhook] post-commit family dissolution failed for ${event.id}:`, err);
+      console.error(`[stripe-webhook] post-commit family reconcile failed for ${event.id}:`, err);
       const message = `post-commit: ${String(err)}`.slice(0, MAX_ERROR_LENGTH);
       await markPostCommitFailure(db, event, message);
       outcome = { status: "failed", error: message };

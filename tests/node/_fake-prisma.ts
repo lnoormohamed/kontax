@@ -5,9 +5,10 @@
 // findFirst/findMany/count/create/update/updateMany/upsert/delete/deleteMany,
 // scalar `where` filters (equals, in, notIn, not, startsWith, lt/lte/gt/gte,
 // AND/OR/NOT), `orderBy` with Postgres null ordering, top-level scalar
-// `select`, and `$transaction(fn)` with rollback on throw. Relation filters
-// and nested selects are NOT supported — a relation filter throws so a test
-// can't silently pass on an unmatched query.
+// `select`, compound-unique selectors (`{ userId_slug: { userId, slug } }`),
+// and `$transaction(fn)` with rollback on throw. Relation filters and nested
+// selects are NOT supported — a relation filter throws so a test can't
+// silently pass on an unmatched query.
 
 type Row = Record<string, unknown>;
 type Where = Record<string, unknown>;
@@ -81,6 +82,15 @@ function matchField(value: unknown, filter: unknown): boolean {
   return true;
 }
 
+// `{ a_b: { a, b } }` — Prisma's compound-unique selector — is an AND of its parts.
+function isCompoundUnique(row: Row, key: string, filter: unknown): filter is Where {
+  if (key in row || typeof filter !== "object" || filter === null) return false;
+  if (filter instanceof Date || Array.isArray(filter)) return false;
+  const parts = key.split("_");
+  const keys = Object.keys(filter);
+  return parts.length > 1 && keys.length === parts.length && keys.every((k) => parts.includes(k));
+}
+
 export function matchWhere(row: Row, where: Where | undefined): boolean {
   if (!where) return true;
   for (const [key, filter] of Object.entries(where)) {
@@ -93,6 +103,8 @@ export function matchWhere(row: Row, where: Where | undefined): boolean {
     } else if (key === "NOT") {
       const list = Array.isArray(filter) ? filter : [filter];
       if (list.some((w) => matchWhere(row, w as Where))) return false;
+    } else if (isCompoundUnique(row, key, filter)) {
+      if (!matchWhere(row, filter)) return false;
     } else if (!matchField(row[key], filter)) {
       return false;
     }

@@ -18,6 +18,10 @@ process.env.STRIPE_PRICE_ID_FAMILY_MONTHLY = "price_family_m";
 process.env.STRIPE_PRICE_ID_TEAMS_MONTHLY = "price_teams_m";
 
 const { processStripeWebhookEvent } = await import("../../src/server/stripe-webhook");
+const { sweepDueFamilyDissolutions } = await import("../../src/server/stripe-handlers");
+const { familyInviteBlockedReason, familyJoinBlockedReason } = await import(
+  "../../src/server/family-lifecycle"
+);
 const { isEligibleForProTrial } = await import("../../src/server/billing-trial");
 
 type WebhookDeps = Parameters<typeof processStripeWebhookEvent>[1];
@@ -31,6 +35,8 @@ const PERIOD_END_S = NOW_S + 20 * 24 * 60 * 60;
 let fake: ReturnType<typeof createFakePrisma>;
 let stripeSubs: Map<string, Stripe.Subscription>;
 let effectsRun: number;
+/** Labels of queued effects (family notices carry `family:<kind>:<userId>`). */
+let effectLabels: string[];
 let deps: WebhookDeps;
 let eventSeq = 0;
 
@@ -47,7 +53,12 @@ function newFake() {
         cancelAtPeriodEnd: false,
       },
       user: { lifecycleState: "ACTIVE" },
-      group: { teamsEnabled: false, teamsGraceEndsAt: null, subscriptionId: null },
+      group: {
+        teamsEnabled: false,
+        teamsGraceEndsAt: null,
+        subscriptionId: null,
+        familyDissolveAt: null,
+      },
     },
   });
 }
@@ -56,6 +67,7 @@ beforeEach(() => {
   fake = newFake();
   stripeSubs = new Map();
   effectsRun = 0;
+  effectLabels = [];
   const stripe = {
     subscriptions: {
       retrieve: async (id: string) => {
@@ -75,6 +87,7 @@ beforeEach(() => {
     stripe,
     afterCommit: (effects) => {
       effectsRun += effects.length;
+      effectLabels.push(...effects.map((e) => (e as { label?: string }).label ?? "other"));
     },
   };
 });
@@ -85,6 +98,7 @@ type SubOpts = {
   customer?: string;
   quantity?: number;
   periodEnd?: number;
+  cancelAtPeriodEnd?: boolean;
 };
 
 function stripeSub(id: string, opts: SubOpts = {}): Stripe.Subscription {
@@ -93,7 +107,7 @@ function stripeSub(id: string, opts: SubOpts = {}): Stripe.Subscription {
     object: "subscription",
     customer: opts.customer ?? "cus_1",
     status: opts.status ?? "active",
-    cancel_at_period_end: false,
+    cancel_at_period_end: opts.cancelAtPeriodEnd ?? false,
     cancel_at: null,
     canceled_at: opts.status === "canceled" ? NOW_S : null,
     ended_at: opts.status === "canceled" ? NOW_S : null,
@@ -160,6 +174,7 @@ const subRow = (providerSubscriptionId: string) =>
   fake.rows("subscription").find((s) => s.providerSubscriptionId === providerSubscriptionId);
 const webhookRow = (stripeEventId: string) =>
   fake.rows("stripeWebhookEvent").find((r) => r.stripeEventId === stripeEventId);
+const familyNotices = () => effectLabels.filter((l) => l.startsWith("family:"));
 
 // ─── A-09: retry after failure ────────────────────────────────────────────────
 
@@ -383,30 +398,19 @@ describe("billing lifecycle (A-24)", () => {
     assert.equal(subRow("manual_comp")?.status, "ACTIVE");
   });
 
-  test("Family lapse dissolves the family group: members get a copy and are removed", async () => {
-    seedUser();
-    seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY" });
-    fake.seed("group", { id: "fam_1", ownerId: "user_1", type: "FAMILY", name: "Smith Family", defaultAddressBookId: "gab_1" });
-    fake.seed("groupMember", { id: "gm_owner", groupId: "fam_1", userId: "user_1", role: "OWNER", inviteStatus: "ACCEPTED" });
-    fake.seed("groupMember", { id: "gm_2", groupId: "fam_1", userId: "user_2", role: "MEMBER", inviteStatus: "ACCEPTED" });
-    fake.seed("groupMember", { id: "gm_3", groupId: "fam_1", userId: null, invitedEmail: "x@example.invalid", role: "MEMBER", inviteStatus: "PENDING" });
-    stripeNow(stripeSub("sub_1", { status: "canceled", price: "price_family_m" }));
-
-    await processStripeWebhookEvent(event("customer.subscription.deleted", stripeSub("sub_1")), deps);
-
-    assert.deepEqual(fake.rows("groupMember").map((m) => m.id), ["gm_owner"]);
-    assert.equal(fake.rows("group").length, 1, "group + book stay with the owner");
-    const snapshotReads = fake.calls.filter(
-      (c) => c.model === "groupContact" && c.op === "findMany",
-    );
-    assert.equal(snapshotReads.length, 1, "one snapshot for the one accepted member");
-    assert.equal(effectsRun, 1, "the removed member is notified after commit");
-  });
-
   test("Family lapse commits even when a member copy fails; the retry finishes without re-copying", async () => {
     seedUser();
     seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY" });
-    fake.seed("group", { id: "fam_1", ownerId: "user_1", type: "FAMILY", name: "Smith Family", defaultAddressBookId: "gab_1" });
+    // The notice period already ran out (e.g. the nightly sweep hasn't run
+    // yet): the webhook dissolves opportunistically.
+    fake.seed("group", {
+      id: "fam_1",
+      ownerId: "user_1",
+      type: "FAMILY",
+      name: "Smith Family",
+      defaultAddressBookId: "gab_1",
+      familyDissolveAt: new Date(Date.now() - DAY),
+    });
     fake.seed("groupMember", { id: "gm_owner", groupId: "fam_1", userId: "user_1", role: "OWNER", inviteStatus: "ACCEPTED" });
     fake.seed("groupMember", { id: "gm_2", groupId: "fam_1", userId: "user_2", role: "MEMBER", inviteStatus: "ACCEPTED" });
     fake.seed("groupMember", { id: "gm_3", groupId: "fam_1", userId: "user_3", role: "MEMBER", inviteStatus: "ACCEPTED" });
@@ -442,19 +446,20 @@ describe("billing lifecycle (A-24)", () => {
       "gm_2 is done; gm_3's removal rolled back with its failed copy",
     );
     assert.equal(copies.length, 1);
-    assert.equal(effectsRun, 1, "gm_2's notice still goes out");
+    assert.deepEqual(familyNotices(), ["family:dissolved:user_2"], "gm_2's notice still goes out");
 
     const retry = await processStripeWebhookEvent(evt, deps);
     assert.equal(retry.status, "processed");
     assert.equal(webhookRow(evt.id)!.error, null);
     assert.deepEqual(fake.rows("groupMember").map((m) => m.id), ["gm_owner"]);
     assert.equal(copies.length, 2, "one copy per member — gm_2 is not copied again");
-    assert.equal(effectsRun, 2);
+    assert.deepEqual(familyNotices(), ["family:dissolved:user_2", "family:dissolved:user_3"]);
+    assert.equal(fake.rows("group")[0]!.familyDissolveAt, null, "marker cleared once everyone is out");
 
     assert.equal((await processStripeWebhookEvent(evt, deps)).status, "skipped");
   });
 
-  test("a lapse already applied elsewhere (billing-return sync) still dissolves on the webhook", async () => {
+  test("a lapse already applied elsewhere (billing-return sync) still starts the notice on the webhook", async () => {
     seedUser();
     // State already says Free — the webhook sees no plan transition.
     seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FREE", status: "CANCELED" });
@@ -464,10 +469,11 @@ describe("billing lifecycle (A-24)", () => {
     stripeNow(stripeSub("sub_1", { status: "canceled", price: "price_family_m" }));
 
     await processStripeWebhookEvent(event("customer.subscription.deleted", stripeSub("sub_1")), deps);
-    assert.deepEqual(fake.rows("groupMember").map((m) => m.id), ["gm_owner"]);
+    assert.ok(fake.rows("group")[0]!.familyDissolveAt instanceof Date);
+    assert.equal(fake.rows("groupMember").length, 2, "nobody removed yet");
   });
 
-  test("Family → paused also dissolves; Family → Teams does not", async () => {
+  test("Family → paused starts the notice; Family → Teams does not", async () => {
     seedUser();
     seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY" });
     fake.seed("group", { id: "fam_1", ownerId: "user_1", type: "FAMILY", name: "F", defaultAddressBookId: null });
@@ -476,13 +482,14 @@ describe("billing lifecycle (A-24)", () => {
 
     stripeNow(stripeSub("sub_1", { price: "price_teams_m", quantity: 3 }));
     await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
-    assert.equal(fake.rows("groupMember").length, 2, "upgrade keeps the family");
+    assert.equal(fake.rows("group")[0]!.familyDissolveAt, null, "upgrade keeps the family");
 
     stripeNow(stripeSub("sub_1", { price: "price_family_m" }));
     await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
     stripeNow(stripeSub("sub_1", { price: "price_family_m", status: "paused" }));
     await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
-    assert.deepEqual(fake.rows("groupMember").map((m) => m.id), ["gm_owner"]);
+    assert.ok(fake.rows("group")[0]!.familyDissolveAt instanceof Date);
+    assert.equal(fake.rows("groupMember").length, 2);
   });
 
   test("Teams lapse (org-anchored, paused) disables the team and opens a 14-day grace", async () => {
@@ -560,6 +567,195 @@ describe("billing lifecycle (A-24)", () => {
     assert.equal(subRow("sub_1")?.status, "ACTIVE");
     assert.equal(subRow("sub_1")?.graceEndsAt, null);
     assert.equal(user().lifecycleState, "ACTIVE");
+  });
+});
+
+// ─── Family plan end-of-life: 7-day notice (lifecycle-policies.md §1a / §3a) ──
+
+describe("Family 7-day notice before dissolution", () => {
+  /** Owner user_1 on Family; accepted member user_2; a pending invite. */
+  function seedFamilyOwner(subOverrides: Record<string, unknown> = {}) {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY", ...subOverrides });
+    fake.seed("group", {
+      id: "fam_1",
+      ownerId: "user_1",
+      type: "FAMILY",
+      name: "Smith Family",
+      defaultAddressBookId: "gab_1",
+    });
+    fake.seed("groupMember", { id: "gm_owner", groupId: "fam_1", userId: "user_1", role: "OWNER", inviteStatus: "ACCEPTED" });
+    fake.seed("groupMember", { id: "gm_2", groupId: "fam_1", userId: "user_2", role: "MEMBER", inviteStatus: "ACCEPTED" });
+    fake.seed("groupMember", { id: "gm_3", groupId: "fam_1", userId: null, invitedEmail: "x@example.invalid", role: "MEMBER", inviteStatus: "PENDING" });
+  }
+
+  const group = () => fake.rows("group").find((g) => g.id === "fam_1")!;
+  const memberIds = () => fake.rows("groupMember").map((m) => m.id);
+
+  async function lapse() {
+    stripeNow(stripeSub("sub_1", { status: "canceled", price: "price_family_m" }));
+    return processStripeWebhookEvent(event("customer.subscription.deleted", stripeSub("sub_1")), deps);
+  }
+
+  /** The shared book holds one contact; the snapshot copies it for real. */
+  function stubSharedBook() {
+    const groupContact = (fake.client as Record<string, { findMany: (a: unknown) => Promise<unknown> }>)
+      .groupContact!;
+    groupContact.findMany = async () => [{ contact: { fullName: "Ann Smith", email: "ann@example.invalid" } }];
+  }
+
+  const sweep = async (now: Date) => {
+    const effects: Parameters<typeof sweepDueFamilyDissolutions>[1] = [];
+    const result = await sweepDueFamilyDissolutions(
+      fake.client as unknown as Parameters<typeof sweepDueFamilyDissolutions>[0],
+      effects,
+      now,
+    );
+    effectLabels.push(...effects.map((e) => (e as { label?: string }).label ?? "other"));
+    return result;
+  };
+
+  test("scheduling cancellation notifies accepted members once; a retry doesn't re-notify", async () => {
+    seedFamilyOwner();
+    stripeNow(stripeSub("sub_1", { price: "price_family_m", cancelAtPeriodEnd: true }));
+    const evt = event("customer.subscription.updated", stripeSub("sub_1", { price: "price_family_m" }));
+
+    // First delivery fails inside the transaction (after the flip was
+    // written): everything rolls back, nothing is sent.
+    const events = (fake.client as Record<string, { create: (a: { data: { error?: string } }) => Promise<unknown> }>)
+      .stripeWebhookEvent!;
+    const create = events.create.bind(events);
+    let blip = true;
+    events.create = async (a) => {
+      if (blip && !a.data.error) {
+        blip = false;
+        throw new Error("db blip");
+      }
+      return create(a);
+    };
+    assert.equal((await processStripeWebhookEvent(evt, deps)).status, "failed");
+    assert.equal(subRow("sub_1")?.cancelAtPeriodEnd, false, "rolled back");
+    assert.deepEqual(familyNotices(), []);
+
+    assert.equal((await processStripeWebhookEvent(evt, deps)).status, "processed");
+    assert.equal(subRow("sub_1")?.cancelAtPeriodEnd, true);
+    assert.deepEqual(
+      familyNotices(),
+      ["family:ending-scheduled:user_2"],
+      "the accepted member only — not the owner, not the pending invite",
+    );
+
+    // Replays, and later events carrying the same state, notify nobody again.
+    assert.equal((await processStripeWebhookEvent(evt, deps)).status, "skipped");
+    await processStripeWebhookEvent(event("invoice.payment_succeeded", invoice("sub_1")), deps);
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    assert.deepEqual(familyNotices(), ["family:ending-scheduled:user_2"]);
+    assert.equal(group().familyDissolveAt, null, "still active until period end");
+    assert.deepEqual(memberIds(), ["gm_owner", "gm_2", "gm_3"]);
+
+    // The owner resumes: a short "continues" notice, once.
+    stripeNow(stripeSub("sub_1", { price: "price_family_m", cancelAtPeriodEnd: false }));
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    assert.deepEqual(familyNotices(), ["family:ending-scheduled:user_2", "family:ending-cancelled:user_2"]);
+  });
+
+  test("a lapse starts a 7-day notice: date set, nobody removed, members told once", async () => {
+    seedFamilyOwner({ cancelAtPeriodEnd: true });
+    const before = Date.now();
+    await lapse();
+
+    assert.equal(subRow("sub_1")?.plan, "FREE", "the owner's own plan drops immediately");
+    const dissolveAt = group().familyDissolveAt as Date;
+    assert.ok(dissolveAt instanceof Date);
+    assert.ok(Math.abs(dissolveAt.getTime() - (before + 7 * DAY)) < 60_000);
+    assert.deepEqual(memberIds(), ["gm_owner", "gm_2", "gm_3"], "nobody removed");
+    assert.deepEqual(familyNotices(), ["family:lapsed:user_2"]);
+
+    // Later events for the owner neither move the date nor re-notify.
+    stripeNow(stripeSub("sub_1", { status: "canceled", price: "price_family_m" }));
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    assert.equal((group().familyDissolveAt as Date).getTime(), dissolveAt.getTime());
+    assert.deepEqual(familyNotices(), ["family:lapsed:user_2"]);
+  });
+
+  test("during the window members keep access, the sweep waits, and invites/joins are blocked", async () => {
+    seedFamilyOwner();
+    assert.equal(familyInviteBlockedReason(group() as { familyDissolveAt: Date | null }, "FAMILY"), null);
+    assert.equal(familyJoinBlockedReason(group() as { familyDissolveAt: Date | null }), null);
+
+    await lapse();
+
+    // Family book access is membership-based (web: family-access.ts, CardDAV:
+    // getFamilyBookForUser in server.mjs) — the accepted row and book stay.
+    const member = fake.rows("groupMember").find((m) => m.id === "gm_2")!;
+    assert.equal(member.inviteStatus, "ACCEPTED");
+    assert.equal(group().defaultAddressBookId, "gab_1");
+
+    const early = await sweep(new Date(Date.now() + 6 * DAY));
+    assert.equal(early.removed, 0, "not due yet");
+    assert.deepEqual(memberIds(), ["gm_owner", "gm_2", "gm_3"]);
+
+    const windingDown = group() as { familyDissolveAt: Date | null };
+    assert.match(familyInviteBlockedReason(windingDown, "FREE") ?? "", /closes on/);
+    assert.match(familyInviteBlockedReason(windingDown, "FAMILY") ?? "", /closes on/);
+    assert.ok(familyJoinBlockedReason(windingDown));
+    assert.ok(familyInviteBlockedReason({ familyDissolveAt: null }, "PRO"), "no invites without Family");
+  });
+
+  test("re-subscribing within 7 days clears the notice and nobody is removed", async () => {
+    seedFamilyOwner();
+    await lapse();
+    assert.ok(group().familyDissolveAt);
+
+    stripeNow(stripeSub("sub_2", { price: "price_family_m" }));
+    await processStripeWebhookEvent(event("customer.subscription.created", stripeSub("sub_2")), deps);
+
+    assert.equal(group().familyDissolveAt, null);
+    assert.deepEqual(familyNotices(), ["family:lapsed:user_2", "family:continues:user_2"]);
+
+    const late = await sweep(new Date(Date.now() + 8 * DAY));
+    assert.equal(late.removed, 0);
+    assert.deepEqual(memberIds(), ["gm_owner", "gm_2", "gm_3"]);
+  });
+
+  test("the sweep clears a stale date if the owner is entitled again (missed webhook)", async () => {
+    seedFamilyOwner();
+    group().familyDissolveAt = new Date(Date.now() - DAY); // owner still on Family
+
+    const result = await sweep(new Date());
+    assert.equal(result.removed, 0);
+    assert.equal(group().familyDissolveAt, null);
+    assert.deepEqual(memberIds(), ["gm_owner", "gm_2", "gm_3"]);
+  });
+
+  test("after 7 days the sweep dissolves: copies made, members removed; re-running is a no-op", async () => {
+    seedFamilyOwner();
+    await lapse();
+    stubSharedBook();
+
+    const result = await sweep(new Date(Date.now() + 7 * DAY + 60_000));
+    assert.deepEqual(result, { owners: 1, removed: 2, errors: [] });
+    assert.deepEqual(memberIds(), ["gm_owner"], "member removed, pending invite withdrawn");
+    assert.equal(fake.rows("group").length, 1, "group + book stay with the owner");
+    assert.equal(group().familyDissolveAt, null, "nothing pending any more");
+
+    const books = fake.rows("addressBook");
+    assert.equal(books.length, 1, "one private copy, for the accepted member");
+    assert.equal(books[0]!.userId, "user_2");
+    assert.equal(books[0]!.sourceGroupBookId, "gab_1");
+    assert.equal(books[0]!.name, "Smith Family");
+    const copies = fake.rows("contact");
+    assert.equal(copies.length, 1);
+    assert.equal(copies[0]!.userId, "user_2");
+    assert.equal(copies[0]!.bookId, books[0]!.id);
+    assert.equal(copies[0]!.fullName, "Ann Smith");
+    assert.deepEqual(familyNotices(), ["family:lapsed:user_2", "family:dissolved:user_2"]);
+
+    const again = await sweep(new Date(Date.now() + 8 * DAY));
+    assert.deepEqual(again, { owners: 0, removed: 0, errors: [] });
+    assert.equal(fake.rows("addressBook").length, 1, "no second copy");
+    assert.deepEqual(familyNotices(), ["family:lapsed:user_2", "family:dissolved:user_2"]);
   });
 });
 

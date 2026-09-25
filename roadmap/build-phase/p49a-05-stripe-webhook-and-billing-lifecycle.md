@@ -40,13 +40,28 @@ entitlements consistent.
   the user's *effective* plan (same query as `getUserBillingContext`) before/after, so a lapse on
   the same price (paused / incomplete_expired / canceled) runs it, and a late event for a
   superseded subscription does not.
-- Family lapse: members get `snapshotFamilyBookForUser` copies and are removed; pending invites
-  withdrawn; group + book stay with the owner. (Fable review) This runs post-commit, one
-  transaction per member (`reconcileFamilyLapseForCustomer`), state-driven: after every
-  personal subscription/invoice event, if the owner is below Family but still owns a FAMILY
-  group with members, the remaining members are processed. A failure flags the event row with
-  an error and returns 500, so Stripe's retry re-runs it; members already removed are skipped. Deviations from lifecycle-policies §3a: no 7-day
-  advance notice (in-app notice at dissolution) and the book is not archived.
+- Family lapse (7-day notice, owner decision 2026-09-25): a lapse no longer dissolves at once.
+  Post-commit, state-driven (`reconcileFamilyLapseForCustomer`, after every personal
+  subscription/invoice event and the billing-return sync): if the owner is below Family and
+  still owns a FAMILY group with other members, `Group.familyDissolveAt` (migration
+  `20260925120000_family_dissolve_at`, nullable, additive) is stamped now + 7 days with a
+  conditional update, and accepted members get an in-app + email notice once. Members keep
+  access meanwhile (family access is membership-based — web and CardDAV never read the owner's
+  plan); invites, resends and invite acceptance are blocked (`family-lifecycle.ts`). A
+  re-subscribe (Family or Teams) clears the date and tells members the group continues.
+- Dissolution, once the date has passed and the owner is still below Family: members get
+  `snapshotFamilyBookForUser` copies and are removed, pending invites withdrawn, group + book
+  stay with the owner, the date is cleared. One transaction per member that re-checks plan +
+  date, snapshots, then claims the row by delete (rolled back if already removed). Runs from
+  the nightly `/api/cron/delete-accounts` (`sweepDueFamilyDissolutions`, no new crontab entry)
+  and opportunistically from the owner's next webhook; a webhook failure flags the event row
+  and returns 500 so Stripe retries, a sweep failure is reported and retried next night.
+- Scheduled cancellation (`cancelAtPeriodEnd` false→true on an active Family subscription):
+  accepted members are notified with the period-end date and an export link; a flip back sends
+  "your family plan will continue". The flip is claimed with a conditional update inside the
+  webhook transaction, so retries, replays and the billing-return sync notify once.
+- Remaining deviation from lifecycle-policies §3a: the shared book is not archived (it is the
+  owner's only view of those contacts).
 - Webhooks never change a `LOCKED` lifecycle. Emails/notifications run only after commit.
 - `graceEndsAt`: stamped once on entering PAST_DUE (retries no longer extend it), cleared on any
   non-PAST_DUE state; read by `billing-surface.ts` (settings + banner). Not enforced on

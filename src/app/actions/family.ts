@@ -20,6 +20,7 @@ import {
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
+import { familyInviteBlockedReason, familyJoinBlockedReason } from "~/server/family-lifecycle";
 import { snapshotFamilyBookForUser } from "~/server/family-snapshot";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
@@ -133,6 +134,9 @@ export const inviteFamilyMember = async (formData: FormData) => {
   if (!group) {
     throw new Error("Create a family group first.");
   }
+  // P49A-05: no new members while the plan is lapsed / the group winds down.
+  const blocked = familyInviteBlockedReason(group, (await getUserBillingContext(userId)).plan);
+  if (blocked) throw new Error(blocked);
 
   const recipient = await db.user.findUnique({ where: { email }, select: { id: true } });
   const token = randomBytes(24).toString("base64url");
@@ -197,7 +201,10 @@ export const acceptFamilyInvite = async (formData: FormData) => {
   const member = await findMemberByInviteToken(token, (where) =>
     db.groupMember.findUnique({
       where,
-      include: { user: { select: { email: true } } },
+      include: {
+        user: { select: { email: true } },
+        group: { select: { familyDissolveAt: true } },
+      },
     }),
   );
   if (member?.inviteStatus !== "PENDING") {
@@ -206,6 +213,8 @@ export const acceptFamilyInvite = async (formData: FormData) => {
   if ((member.inviteExpiresAt?.getTime() ?? Number.POSITIVE_INFINITY) < Date.now()) {
     throw new Error("This invite has expired. Ask the owner to resend it.");
   }
+  const joinBlocked = familyJoinBlockedReason(member.group);
+  if (joinBlocked) throw new Error(joinBlocked);
 
   await db.groupMember.update({
     where: { id: member.id },
@@ -487,6 +496,8 @@ export const resendFamilyInvite = async (formData: FormData) => {
     include: { owner: { select: { name: true, email: true } } },
   });
   if (!group) throw new Error("Group not found.");
+  const blocked = familyInviteBlockedReason(group, (await getUserBillingContext(userId)).plan);
+  if (blocked) throw new Error(blocked);
 
   const token = randomBytes(24).toString("base64url");
   await db.groupMember.update({

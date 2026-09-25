@@ -6,6 +6,7 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { findMemberByInviteToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
+import { familyJoinBlockedReason } from "~/server/family-lifecycle";
 
 function JoinCard({ children }: { children: React.ReactNode }) {
   return (
@@ -91,7 +92,11 @@ export default async function FamilyJoinPage({
     member?.inviteStatus === "PENDING" &&
     (member.inviteExpiresAt?.getTime() ?? Number.POSITIVE_INFINITY) >= Date.now();
 
-  if (!valid || !member) {
+  // P49A-05: the owner's Family plan has lapsed — the group is in its 7-day
+  // notice period and takes no new members (acceptFamilyInvite enforces it).
+  const joinBlocked = valid && member ? familyJoinBlockedReason(member.group) : null;
+
+  if (!valid || !member || joinBlocked) {
     return (
       <JoinCard>
         {/* Amber warning crest */}
@@ -100,8 +105,8 @@ export default async function FamilyJoinPage({
         </span>
         <h1 className="text-[20px] font-semibold">This invite is no longer valid</h1>
         <p className="mx-auto mt-2 max-w-sm text-[13.5px] leading-[1.6] text-[#5c655e]">
-          Family invitations expire after 48 hours, and this one has passed its window or
-          already been used. Ask the family owner to send a fresh invite.
+          {joinBlocked ??
+            "Family invitations expire after 48 hours, and this one has passed its window or already been used. Ask the family owner to send a fresh invite."}
         </p>
         <Link
           className="mt-6 flex items-center justify-center rounded-[10px] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"

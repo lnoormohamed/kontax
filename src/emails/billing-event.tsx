@@ -37,11 +37,20 @@ type BillingEventProps =
       settingsUrl: string;
     }
   | { type: "account-deletion"; scheduledDeleteDate: string; cancelUrl: string }
-  | { type: "account-suspended"; reason: string; supportUrl: string };
+  | { type: "account-suspended"; reason: string; supportUrl: string }
+  | {
+      // P49A-05: Family plan ending / ended / continuing — sent to members.
+      type: "family-notice";
+      heading: string;
+      body: string;
+      ctaLabel: string;
+      ctaUrl: string;
+    };
 
 /**
  * Billing & account-lifecycle emails (P20-08): payment failure, trial ending,
- * plan upgrade / downgrade, scheduled account deletion, and account suspension.
+ * plan upgrade / downgrade, scheduled account deletion, account suspension, and
+ * (P49A-05) Family plan notices to group members.
  * One template, keyed off `type`.
  */
 export default function BillingEvent(props: BillingEventProps) {
@@ -113,6 +122,19 @@ export default function BillingEvent(props: BillingEventProps) {
         </EmailText>
         <EmailBulletList items={props.changes} />
         <EmailTextLink href={props.settingsUrl}>View settings →</EmailTextLink>
+      </EmailLayout>
+    );
+  }
+
+  if (props.type === "family-notice") {
+    return (
+      <EmailLayout preview={props.heading}>
+        <EmailHeading>{props.heading}</EmailHeading>
+        <EmailText>{props.body}</EmailText>
+        <EmailButton href={props.ctaUrl}>{props.ctaLabel} →</EmailButton>
+        <EmailFootnote>
+          Your own contacts are never affected by changes to a family plan.
+        </EmailFootnote>
       </EmailLayout>
     );
   }

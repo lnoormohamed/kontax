@@ -192,3 +192,32 @@ export async function sendAccountSuspendedEmail(params: {
     bypassSuppression: true,
   });
 }
+
+/**
+ * P49A-05: a Family plan notice to one group member (plan ending, ended with a
+ * 7-day window, continuing, or dissolved). Copy comes from family-lifecycle.ts
+ * so the email and the in-app notification always say the same thing.
+ */
+export async function sendFamilyNoticeEmail(params: {
+  userId: string;
+  subject: string;
+  heading: string;
+  body: string;
+  ctaLabel: string;
+  /** App-relative path, e.g. "/settings/data/export". */
+  ctaPath: string;
+}): Promise<void> {
+  const to = await emailFor(params.userId);
+  if (!to) return;
+
+  const { html, text } = await renderEmail(
+    BillingEvent({
+      type: "family-notice",
+      heading: params.heading,
+      body: params.body,
+      ctaLabel: params.ctaLabel,
+      ctaUrl: `${appUrl()}${params.ctaPath}`,
+    }),
+  );
+  await sendEmail({ to, subject: params.subject, html, text });
+}

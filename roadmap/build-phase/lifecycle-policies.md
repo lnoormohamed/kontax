@@ -97,7 +97,13 @@ Stripe fires `customer.subscription.deleted` (or `customer.subscription.updated`
 
 ### 3a. Owner cancels subscription (Family plan)
 
-See Section 1a. Summary: 7-day member notice at cancellation time → dissolution at `currentPeriodEnd`.
+See Section 1a. Summary: member notice at cancellation time → plan lapses at `currentPeriodEnd` → **7-day post-lapse notice period** → dissolution.
+
+**Post-lapse 7-day notice period (owner decision 2026-09-25, implemented in P49A-05):**
+- When the Family plan lapses — cancel at period end, payment retries exhausted (§2d), paused / expired, or a downgrade to Pro/Free (§3b/§3c) — the group is **not** dissolved immediately. `Group.familyDissolveAt` is set to lapse time + 7 days.
+- During those 7 days members keep their current access to the shared book (web and CardDAV); the group is treated as active even though the owner's plan is below Family. The owner's own personal entitlements drop to the new plan immediately. **New invites and invite acceptances are blocked.**
+- If the owner regains Family (or Teams) entitlement before the date, `familyDissolveAt` is cleared and members are told the group continues.
+- Once the date passes and the owner is still below Family, the group is dissolved (data fate below) by the nightly sweep in `/api/cron/delete-accounts`, or earlier by the owner's next Stripe webhook.
 
 **Data fate on dissolution:**
 - Each member (including the owner) automatically receives a **personal `AddressBook`** containing a copy of all the shared contacts they had access to. This personal book is named after the group (e.g. "Smith Family") with `sourceGroupBookId` set to the original `GroupAddressBook.id` for re-subscription continuity. See `p18-11-personal-address-books.md` for the model.
@@ -107,8 +113,9 @@ See Section 1a. Summary: 7-day member notice at cancellation time → dissolutio
 - The `GroupAddressBook` is archived (`archivedAt` set). The `dissolvedToBookId` field on it points to the owner's personal book, preserving the link for re-subscription.
 
 **Notifications sent:**
-1. At cancellation confirmation: email + in-app to all members: "Your family plan will end on [date]. Export shared contacts before then: [Export →]"
-2. At dissolution: email + in-app to all members: "Your family group has ended. Your personal contacts are unaffected."
+1. At cancellation confirmation: email + in-app to all members: "Your family plan will end on [date]. Export shared contacts before then: [Export →]" (If the owner resumes the plan before it ends: "Your family plan will continue.")
+2. At lapse (start of the 7-day notice period): email + in-app to all members: "Your family plan has ended. The shared address book stays available until [date]; after that each member gets their own copy. [Export →]" (If the owner re-subscribes within the 7 days: "Your family group continues.")
+3. At dissolution: email + in-app to all members: "Your family group has ended. Your personal contacts are unaffected."
 
 ### 3b. Owner downgrades Family → Pro
 

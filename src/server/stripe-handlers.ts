@@ -13,6 +13,11 @@ import {
   sendTrialEndingEmail,
 } from "~/server/billing-emails";
 import { db } from "~/server/db";
+import {
+  FAMILY_DISSOLVE_NOTICE_MS,
+  type FamilyNoticeKind,
+  notifyFamilyMember,
+} from "~/server/family-lifecycle";
 import { snapshotFamilyBookForUser } from "~/server/family-snapshot";
 import { createNotification } from "~/server/notifications";
 import { getStripeClient } from "~/server/stripe";
@@ -225,8 +230,19 @@ async function upsertSubscription(
     select: { id: true },
   });
 
+  // P49A-05: did *this* write flip the scheduled-cancellation flag? true =
+  // now ending at period end, false = resumed, null = unchanged. Claimed with a
+  // conditional update so a retry, a replay, or a concurrent billing-return
+  // sync that already applied the flip sees count 0 and notifies nobody.
+  let endingFlip: boolean | null = null;
   let rowId: string;
   if (existing) {
+    const ending = subscriptionData.cancelAtPeriodEnd;
+    const { count } = await tx.subscription.updateMany({
+      where: { id: existing.id, cancelAtPeriodEnd: !ending },
+      data: { cancelAtPeriodEnd: ending },
+    });
+    if (count > 0) endingFlip = ending;
     await tx.subscription.update({
       where: { id: existing.id },
       data: subscriptionData,
@@ -247,8 +263,25 @@ async function upsertSubscription(
       select: { id: true },
     });
     rowId = created.id;
+    if (subscriptionData.cancelAtPeriodEnd) endingFlip = true;
   }
   await ensureGraceDeadline(rowId, subscriptionData.status, tx);
+
+  // Family owner scheduled (or withdrew) cancellation: tell the members now,
+  // not at period end (lifecycle-policies.md §1a / §3a notification 1).
+  if (
+    endingFlip !== null &&
+    planInfo.plan === "FAMILY" &&
+    ACTIVE_BILLING_STATUSES.includes(subscriptionData.status)
+  ) {
+    await queueFamilyNotices(
+      userId,
+      endingFlip ? "ending-scheduled" : "ending-cancelled",
+      subscriptionData.currentPeriodEnd,
+      tx,
+      effects,
+    );
+  }
 
   // A live Stripe subscription supersedes any legacy manual (pre-Stripe) one.
   // Only when live: an abandoned / expired checkout must not cancel a comp plan.
@@ -331,11 +364,20 @@ async function applyDowngrade(
     });
   }
 
-  // 5. Family lapse → the family group is dissolved AFTER this transaction
-  // commits, by reconcileFamilyLapseForCustomer (Fable review of P49A-05):
-  // copying a large shared book per member used to run in here and could time
-  // out the whole webhook transaction, rolling back the lapse itself.
+  // 5. Family lapse → the family group gets a 7-day notice period AFTER this
+  // transaction commits (reconcileFamilyLapseForCustomer), then dissolves.
+  // Copying a large shared book per member used to run in here and could
+  // time out the whole webhook transaction, rolling back the lapse itself.
 }
+
+// ─── Family plan end-of-life (P49A-05) ────────────────────────────────────────
+//
+// lifecycle-policies.md §1a / §3a. A lapsed Family group is not dissolved on
+// the spot: `Group.familyDissolveAt` is stamped now + 7 days and members are
+// told; they keep the shared book until then (family access is membership
+// based and never reads the owner's plan). Re-subscribing clears the date. The
+// nightly sweep (sweepDueFamilyDissolutions, run by /api/cron/delete-accounts)
+// and every later webhook for the owner dissolve groups whose date has passed.
 
 /** Per-member dissolution transaction: one member's book copy + removal. */
 const FAMILY_MEMBER_TX_TIMEOUT_MS = 60_000;
@@ -349,114 +391,197 @@ export type FamilyLapseDb = Pick<PrismaClient, "$transaction">;
 /** Family or above keeps the family group (Family → Teams is an upgrade, not a lapse). */
 const hasFamilyEntitlement = (plan: SubscriptionPlan) => planRank(plan) >= planRank("FAMILY");
 
-/**
- * Family plan lapsed (canceled, paused, expired, or moved to a lower plan):
- * every other member gets a private copy of the shared book
- * (`snapshotFamilyBookForUser`, the same copy they'd get by leaving) and is
- * removed; pending invites are withdrawn. The group, its book and the shared
- * contacts stay with the owner — they already own those contacts — so
- * re-subscribing to Family only needs members to be re-invited.
- *
- * Runs post-commit, outside the webhook transaction, and is state-driven rather
- * than transition-driven: it acts whenever the customer's owner is no longer
- * effectively on Family but still owns a FAMILY group with other members. So it
- * is safe to re-run on any later event or retry:
- *   · each member is handled in its own transaction that first re-checks the
- *     owner's plan (a re-subscribe in between stops it), then claims the member
- *     row by deleting it (count 0 → already handled by a concurrent run → skip),
- *     then copies the book — a failed copy rolls the removal back with it, so a
- *     member is either removed-with-copy or untouched, never copied twice;
- *   · a failing member doesn't stop the others; the failures are rethrown at
- *     the end so the caller can log and have the event retried.
- *
- * Differs from lifecycle-policies.md §3a in two deliberate ways, recorded in
- * P49A-05: no 7-day advance member notice (nothing schedules it yet — members
- * get an in-app notice at dissolution instead), and the book is not archived
- * (it is the owner's only view of those contacts).
- */
-export async function reconcileFamilyLapseForCustomer(
-  database: FamilyLapseDb,
-  stripeCustomerId: string,
-  effects: AfterCommit,
-): Promise<{ removed: number }> {
-  const pending = await database.$transaction(async (tx) => {
-    const customer = await findStripeCustomer(stripeCustomerId, tx);
-    // Teams (org) customers have no personal family group.
-    if (!customer?.userId || customer.groupId) return null;
-    const ownerId = customer.userId;
-    if (hasFamilyEntitlement(await getEffectivePersonalPlan(ownerId, tx))) return null;
+type FamilyGroupRef = { id: string; name: string; defaultAddressBookId: string | null };
 
-    const groups = await tx.group.findMany({
-      where: { ownerId, type: "FAMILY" },
-      select: { id: true, name: true, defaultAddressBookId: true },
-    });
-    const members = groups.length
-      ? await tx.groupMember.findMany({
-          where: { groupId: { in: groups.map((g) => g.id) }, role: { not: "OWNER" } },
-          select: { id: true, groupId: true, userId: true, inviteStatus: true },
-        })
-      : [];
-    return { ownerId, groups, members: members.filter((m) => m.userId !== ownerId) };
+/** A queued member notice. `label` lets tests see what was queued without running it. */
+function familyNoticeEffect(
+  userId: string,
+  kind: FamilyNoticeKind,
+  groupName: string,
+  date: Date | null,
+) {
+  return Object.assign(() => notifyFamilyMember({ userId, kind, groupName, date }), {
+    label: `family:${kind}:${userId}`,
   });
-  if (!pending || pending.members.length === 0) return { removed: 0 };
+}
 
-  const { ownerId } = pending;
-  const groupById = new Map(pending.groups.map((g) => [g.id, g]));
+/** Accepted non-owner members of one family group. */
+async function acceptedFamilyMembers(groupId: string, ownerId: string, tx: Tx) {
+  const rows = await tx.groupMember.findMany({
+    where: { groupId, inviteStatus: "ACCEPTED", role: { not: "OWNER" } },
+    select: { userId: true },
+  });
+  return rows.flatMap((m) => (m.userId && m.userId !== ownerId ? [m.userId] : []));
+}
+
+/** Queue a notice for every accepted member of the owner's family group(s). */
+async function queueFamilyNotices(
+  ownerId: string,
+  kind: FamilyNoticeKind,
+  date: Date | null,
+  tx: Tx,
+  effects: AfterCommit,
+): Promise<void> {
+  const groups = await tx.group.findMany({
+    where: { ownerId, type: "FAMILY" },
+    select: { id: true, name: true },
+  });
+  for (const group of groups) {
+    for (const userId of await acceptedFamilyMembers(group.id, ownerId, tx)) {
+      effects.push(familyNoticeEffect(userId, kind, group.name, date));
+    }
+  }
+}
+
+/**
+ * Bring one owner's family group(s) in line with their current plan, in one
+ * short transaction:
+ *   · entitled (Family or above) → clear any pending dissolution and tell the
+ *     members the group continues;
+ *   · not entitled, group still has members, no date yet → start the notice
+ *     period and tell the members when it ends;
+ *   · not entitled and the date has passed → returned as due for dissolution.
+ * Each stamp/clear is a conditional update, so a retry or a concurrent run
+ * finds nothing left to change and queues no second notice.
+ */
+async function reconcileFamilyNoticeForOwner(
+  ownerId: string,
+  now: Date,
+  tx: Tx,
+  effects: AfterCommit,
+): Promise<FamilyGroupRef[]> {
+  const entitled = hasFamilyEntitlement(await getEffectivePersonalPlan(ownerId, tx));
+  const groups = await tx.group.findMany({
+    where: { ownerId, type: "FAMILY" },
+    select: { id: true, name: true, defaultAddressBookId: true, familyDissolveAt: true },
+  });
+  const due: FamilyGroupRef[] = [];
+
+  for (const group of groups) {
+    const { familyDissolveAt, ...ref } = group;
+    if (entitled) {
+      if (familyDissolveAt === null) continue;
+      const { count } = await tx.group.updateMany({
+        where: { id: group.id, familyDissolveAt: { not: null } },
+        data: { familyDissolveAt: null },
+      });
+      if (count === 0) continue;
+      for (const userId of await acceptedFamilyMembers(group.id, ownerId, tx)) {
+        effects.push(familyNoticeEffect(userId, "continues", group.name, null));
+      }
+      continue;
+    }
+
+    if (familyDissolveAt !== null) {
+      if (familyDissolveAt.getTime() <= now.getTime()) due.push(ref);
+      continue;
+    }
+    // Pending invites count too: they are withdrawn at dissolution.
+    const others = await tx.groupMember.findMany({
+      where: { groupId: group.id, role: { not: "OWNER" } },
+      select: { userId: true },
+    });
+    if (!others.some((m) => m.userId !== ownerId)) continue;
+    const dissolveAt = new Date(now.getTime() + FAMILY_DISSOLVE_NOTICE_MS);
+    const { count } = await tx.group.updateMany({
+      where: { id: group.id, familyDissolveAt: null },
+      data: { familyDissolveAt: dissolveAt },
+    });
+    if (count === 0) continue;
+    for (const userId of await acceptedFamilyMembers(group.id, ownerId, tx)) {
+      effects.push(familyNoticeEffect(userId, "lapsed", group.name, dissolveAt));
+    }
+  }
+  return due;
+}
+
+/**
+ * Dissolve one family group whose notice period is over: every other member
+ * gets a private copy of the shared book (`snapshotFamilyBookForUser`, the
+ * same copy they'd get by leaving) and is removed; pending invites are
+ * withdrawn. The group, its book and the shared contacts stay with the owner —
+ * they already own those contacts — so re-subscribing to Family only needs
+ * members to be re-invited.
+ *
+ * Idempotent and safe to re-run:
+ *   · each member is handled in its own transaction that first re-checks the
+ *     owner's plan and the group's date (a re-subscribe in between stops it),
+ *     snapshots the book while the membership row still exists (the P48-07
+ *     projection reads the member's sharingPolicy from it), then claims the
+ *     member by deleting it — count 0 means a concurrent run got there first,
+ *     and the copy is rolled back, so a member is removed-with-copy or
+ *     untouched, never copied twice;
+ *   · a failing member doesn't stop the others; failures are rethrown at the
+ *     end so the caller can log / retry.
+ * Once no members are left the date is cleared (null = nothing pending), so a
+ * later lapse after a re-subscribe starts a fresh notice period.
+ *
+ * Differs from lifecycle-policies.md §3a in one deliberate way, recorded in
+ * P49A-05: the book is not archived (it is the owner's only view of those
+ * contacts).
+ */
+async function dissolveFamilyGroup(
+  database: FamilyLapseDb,
+  ownerId: string,
+  group: FamilyGroupRef,
+  now: Date,
+  effects: AfterCommit,
+): Promise<number> {
+  const members = await database.$transaction((tx) =>
+    tx.groupMember.findMany({
+      where: { groupId: group.id, role: { not: "OWNER" } },
+      select: { id: true, userId: true, inviteStatus: true },
+    }),
+  );
+
   const failures: unknown[] = [];
   let removed = 0;
-
-  for (const member of pending.members) {
-    const group = groupById.get(member.groupId);
-    if (!group) continue;
+  for (const member of members) {
+    if (member.userId === ownerId) continue;
     const memberUserId = member.userId;
     const accepted = member.inviteStatus === "ACCEPTED" && memberUserId !== null;
     try {
-      const done = await database.$transaction(
-        async (tx) => {
-          if (hasFamilyEntitlement(await getEffectivePersonalPlan(ownerId, tx))) return false;
-          // Snapshot while the membership row still exists: the P48-07
-          // projection reads the member's own sharingPolicy from it (same
-          // order as the leave flow). The delete then claims the member; if
-          // another run already removed it, roll the copy back.
-          const stillMember = await tx.groupMember.findFirst({
-            where: { id: member.id, groupId: group.id },
-            select: { id: true },
-          });
-          if (!stillMember) return false;
-          if (accepted && group.defaultAddressBookId) {
-            await snapshotFamilyBookForUser(tx, {
-              bookId: group.defaultAddressBookId,
-              targetUserId: memberUserId,
-              groupName: group.name,
+      const done = await database
+        .$transaction(
+          async (tx) => {
+            if (hasFamilyEntitlement(await getEffectivePersonalPlan(ownerId, tx))) return false;
+            const stillDue = await tx.group.findFirst({
+              where: { id: group.id, familyDissolveAt: { lte: now } },
+              select: { id: true },
             });
-          }
-          const { count } = await tx.groupMember.deleteMany({
-            where: { id: member.id, groupId: group.id },
-          });
-          if (count === 0) throw new FamilyMemberAlreadyRemoved();
-          return true;
-        },
-        { timeout: FAMILY_MEMBER_TX_TIMEOUT_MS },
-      ).catch((err: unknown) => {
-        if (err instanceof FamilyMemberAlreadyRemoved) return false;
-        throw err;
-      });
+            if (!stillDue) return false;
+            const stillMember = await tx.groupMember.findFirst({
+              where: { id: member.id, groupId: group.id },
+              select: { id: true },
+            });
+            if (!stillMember) return false;
+            if (accepted && group.defaultAddressBookId) {
+              await snapshotFamilyBookForUser(tx, {
+                bookId: group.defaultAddressBookId,
+                targetUserId: memberUserId,
+                groupName: group.name,
+              });
+            }
+            const { count } = await tx.groupMember.deleteMany({
+              where: { id: member.id, groupId: group.id },
+            });
+            if (count === 0) throw new FamilyMemberAlreadyRemoved();
+            return true;
+          },
+          { timeout: FAMILY_MEMBER_TX_TIMEOUT_MS },
+        )
+        .catch((err: unknown) => {
+          if (err instanceof FamilyMemberAlreadyRemoved) return false;
+          throw err;
+        });
       if (!done) continue;
       removed++;
       if (accepted) {
-        effects.push(() =>
-          createNotification({
-            userId: memberUserId,
-            category: "BILLING",
-            title: "Your family group has ended",
-            body: `The ${group.name} family plan is no longer active. A copy of the shared contacts has been added to your library.`,
-            actionUrl: "/contacts",
-          }),
-        );
+        effects.push(familyNoticeEffect(memberUserId, "dissolved", group.name, null));
       }
     } catch (err) {
       console.error(
-        `[stripe] family dissolution failed for member ${member.id} of group ${group.id}:`,
+        `[family] dissolution failed for member ${member.id} of group ${group.id}:`,
         err,
       );
       failures.push(err);
@@ -466,10 +591,109 @@ export async function reconcileFamilyLapseForCustomer(
   if (failures.length > 0) {
     throw new AggregateError(
       failures,
-      `Family dissolution incomplete for owner ${ownerId}: ${failures.length} member(s) failed`,
+      `Family dissolution incomplete for group ${group.id}: ${failures.length} member(s) failed`,
     );
   }
+
+  // Everyone is out: clear the marker (only if nobody slipped back in).
+  await database.$transaction(async (tx) => {
+    const left = await tx.groupMember.count({
+      where: { groupId: group.id, role: { not: "OWNER" } },
+    });
+    if (left > 0) return;
+    await tx.group.updateMany({
+      where: { id: group.id, familyDissolveAt: { lte: now } },
+      data: { familyDissolveAt: null },
+    });
+  });
+  return removed;
+}
+
+/**
+ * The owner-level step shared by the webhook and the sweep: reconcile the
+ * notice period (one transaction; its notices are queued only once it
+ * commits), then dissolve any group whose date has passed.
+ */
+async function reconcileFamilyForOwner(
+  database: FamilyLapseDb,
+  ownerId: string,
+  now: Date,
+  effects: AfterCommit,
+): Promise<{ removed: number }> {
+  const queued: AfterCommit = [];
+  const due = await database.$transaction((tx) =>
+    reconcileFamilyNoticeForOwner(ownerId, now, tx, queued),
+  );
+  effects.push(...queued);
+
+  const failures: unknown[] = [];
+  let removed = 0;
+  for (const group of due) {
+    try {
+      removed += await dissolveFamilyGroup(database, ownerId, group, now, effects);
+    } catch (err) {
+      failures.push(err);
+    }
+  }
+  if (failures.length > 0) {
+    throw new AggregateError(failures, `Family dissolution incomplete for owner ${ownerId}`);
+  }
   return { removed };
+}
+
+/**
+ * Post-commit step after every personal subscription/invoice event (and the
+ * billing-return sync): state-driven, so it is safe on any event, retry or
+ * replay. A lapse starts the 7-day notice period (members are NOT removed); a
+ * re-subscribe ends it; a notice period that has already run out is
+ * dissolved here too, without waiting for the nightly sweep. A failure is
+ * rethrown so the webhook flags the event and Stripe retries it.
+ */
+export async function reconcileFamilyLapseForCustomer(
+  database: FamilyLapseDb,
+  stripeCustomerId: string,
+  effects: AfterCommit,
+  now: Date = new Date(),
+): Promise<{ removed: number }> {
+  const ownerId = await database.$transaction(async (tx) => {
+    const customer = await findStripeCustomer(stripeCustomerId, tx);
+    // Teams (org) customers have no personal family group.
+    return customer?.userId && !customer.groupId ? customer.userId : null;
+  });
+  if (!ownerId) return { removed: 0 };
+  return reconcileFamilyForOwner(database, ownerId, now, effects);
+}
+
+/**
+ * Nightly sweep (run from /api/cron/delete-accounts): dissolve every family
+ * group whose notice period has run out while its owner is still below
+ * Family. An owner found entitled again (a re-subscribe whose webhook never
+ * landed) has the date cleared instead. One owner's failure doesn't stop the
+ * rest; it is reported and retried on the next run.
+ */
+export async function sweepDueFamilyDissolutions(
+  database: FamilyLapseDb,
+  effects: AfterCommit,
+  now: Date = new Date(),
+): Promise<{ owners: number; removed: number; errors: string[] }> {
+  const due = await database.$transaction((tx) =>
+    tx.group.findMany({
+      where: { type: "FAMILY", familyDissolveAt: { lte: now } },
+      select: { ownerId: true },
+    }),
+  );
+  const owners = [...new Set(due.map((g) => g.ownerId))];
+  const errors: string[] = [];
+  let removed = 0;
+  for (const ownerId of owners) {
+    try {
+      removed += (await reconcileFamilyForOwner(database, ownerId, now, effects)).removed;
+    } catch (err) {
+      console.error(`[family] dissolution sweep failed for owner ${ownerId}:`, err);
+      errors.push(`${ownerId}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  return { owners: owners.length, removed, errors };
 }
 
 // ─── Org-anchored upsert (P34F-02) ────────────────────────────────────────────
@@ -865,12 +1089,12 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
 
   const effects: AfterCommit = [];
   await db.$transaction((tx) => applySubscriptionState(current, tx, effects));
-  // A lapse applied here (rather than by the webhook) still dissolves the
-  // family group; a failure is logged and healed by the webhook's own run.
+  // A lapse applied here (rather than by the webhook) still starts the family
+  // notice period; a failure is logged and healed by the webhook's own run.
   try {
     await reconcileFamilyLapseForCustomer(db, customer.providerCustomerId, effects);
   } catch (err) {
-    console.error(`[stripe] family dissolution after billing sync failed for ${userId}:`, err);
+    console.error(`[stripe] family reconcile after billing sync failed for ${userId}:`, err);
   }
   void runAfterCommit(effects);
 

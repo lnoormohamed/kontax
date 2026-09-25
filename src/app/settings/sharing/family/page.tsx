@@ -17,6 +17,7 @@ import {
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
+import { familyInviteBlockedReason, formatFamilyDate } from "~/server/family-lifecycle";
 
 const fmtDate = (value: Date | null) =>
   value
@@ -110,6 +111,15 @@ export default async function FamilySettingsPage() {
           }
         />
         <div className="grid gap-[18px]">
+          {memberOf.group.familyDissolveAt ? (
+            <p className="rounded-xl bg-[#f6edd9] px-4 py-3 text-[13.5px] text-[#7c5511]">
+              This family plan has ended. The shared address book stays available until{" "}
+              {formatFamilyDate(memberOf.group.familyDissolveAt)}; after that you get your own copy.{" "}
+              <Link className="font-semibold underline" href="/settings/data/export">
+                Export contacts
+              </Link>
+            </p>
+          ) : null}
           <SettingsCard className="flex flex-wrap items-center gap-4">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#e7efe9] text-[#17352e]">
               <WorkspaceIcon name="users" size={24} />
@@ -235,6 +245,8 @@ export default async function FamilySettingsPage() {
   const pending = ownedGroup.members.filter((m) => m.role !== "OWNER" && m.inviteStatus !== "ACCEPTED");
   const activeCount = ownedGroup.members.filter((m) => m.inviteStatus !== "DECLINED").length;
   const full = activeCount >= ownedGroup.maxMembers;
+  // P49A-05: lapsed plan (notice period) or no Family entitlement → no invites.
+  const inviteBlocked = familyInviteBlockedReason(ownedGroup, billing.plan);
 
   return (
     <>
@@ -438,7 +450,11 @@ export default async function FamilySettingsPage() {
           <p className="mt-1 text-[13.5px] text-[#5c655e]">
             They get an email with a link to join {ownedGroup.name}. They keep their own private contacts.
           </p>
-          {full ? (
+          {inviteBlocked ? (
+            <p className="mt-3 rounded-xl bg-[#f6edd9] px-3.5 py-2.5 text-[13.5px] text-[#7c5511]">
+              {inviteBlocked}
+            </p>
+          ) : full ? (
             <p className="mt-3 rounded-xl bg-[#f6edd9] px-3.5 py-2.5 text-[13.5px] text-[#7c5511]">
               Your family is full ({ownedGroup.maxMembers} members). Remove someone to invite another.
             </p>

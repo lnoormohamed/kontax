@@ -1379,6 +1379,11 @@ model Group {
   // Mirrors the existing teamsGraceEndsAt-on-Group pattern. Read by the team
   // active/grace paths (team-access, teams/page, welcome/[plan]) — see P34F §08.
   teamsEnabled          Boolean                          @default(false)
+  // P49A-05: set when the owner's Family plan lapses; the family group dissolves
+  // (members get a private copy and are removed) 7 days later. null = active (or
+  // re-subscribed, or already dissolved). Non-null + future = notice period:
+  // members keep access, new invites are blocked. Non-null + past = due.
+  familyDissolveAt      DateTime?
   createdAt             DateTime                         @default(now())
   updatedAt             DateTime                         @updatedAt
   owner                 User                             @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
