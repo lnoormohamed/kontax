@@ -70,3 +70,17 @@ test("isAlwaysAllowed still bypasses gating for static assets and auth endpoints
   assert.equal(isAlwaysAllowed("/api/auth/session"), true);
   assert.equal(isAlwaysAllowed("/contact"), false);
 });
+
+test("isPublicPath: P50A SEO sections are public, app workspaces stay private", () => {
+  assert.equal(isPublicPath("/guides/sync-icloud-and-google-contacts"), true);
+  assert.equal(isPublicPath("/compare/kontax-vs-icloud-contacts"), true);
+  assert.equal(isPublicPath("/for/families"), true);
+  assert.equal(isPublicPath("/for/teams"), true);
+  assert.equal(isPublicPath("/glossary"), true);
+  assert.equal(isPublicPath("/help/sync/connect-icloud-contacts"), true);
+  // Signed-in workspaces that share a word with the new sections.
+  assert.equal(isPublicPath("/family"), false);
+  assert.equal(isPublicPath("/teams"), false);
+  assert.equal(isPublicPath("/guidesx"), false);
+  assert.equal(isPublicPath("/format"), false);
+});

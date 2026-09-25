@@ -28,7 +28,7 @@ for a new UK product with no social proof yet.
 | [P50A-04](p50a-04-on-page-titles-and-sections.md) | On-page: titles, descriptions, H1s, missing feature sections, internal links | P1 | S–M | built in P50-03/04/05 |
 | [P50A-05](p50a-05-help-centre-split.md) | Help centre: hub → categories → one URL per article, template, migration | P1 | M–L | P50-02 |
 | [P50A-06](p50a-06-guides-and-comparisons.md) | Guides and honest comparisons (sync, duplicates, CardDAV, export, vs iCloud/Google) | P2 | L | P50A-05 |
-| [P50A-07](p50a-07-use-case-and-trust-pages.md) | Use-case and trust pages: /family, /teams, feature pages, glossary, about, export format | P2 | M–L | P50-02 |
+| [P50A-07](p50a-07-use-case-and-trust-pages.md) | Use-case and trust pages: /for/families, /for/teams, feature pages, glossary, about, export format | P2 | M–L | P50-02 |
 | [P50A-08](p50a-08-search-console-and-measurement.md) | Search Console, sitemap submission, cookieless measurement, content cadence | P1 | S | P50A-01 |
 
 ## Order

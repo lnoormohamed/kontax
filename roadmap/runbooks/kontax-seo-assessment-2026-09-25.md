@@ -65,8 +65,8 @@ Clay, Covve) — different promise.
 3. `/guides/merge-duplicate-contacts-iphone` (own the "why" and "undo" angles) — M
 4. `/compare/kontax-vs-icloud-contacts` — M
 5. `/compare/kontax-vs-google-contacts` — M
-6. `/family` use-case page — M
-7. `/teams` use-case page — M
+6. `/for/families` use-case page — M
+7. `/for/teams` use-case page — M
 8. `/guides/what-is-carddav` — S–M
 9. `/features/duplicates`, `/features/history` — S each
 10. `/guides/export-contacts` — M
