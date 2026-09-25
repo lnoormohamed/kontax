@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import { BottomNav } from "~/app/_components/bottom-nav";
 import { AppBannerStack } from "~/app/_components/app-banner-stack";
 import { OfflineChip } from "~/app/_components/connection-banner";
@@ -88,17 +89,17 @@ const getSyncHelpHref = (account: {
   provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
   providerBrandKey: string | null;
 }) => {
-  if (account.provider === "GOOGLE") return "/help#provider-google";
-  if (account.provider === "MICROSOFT") return "/help#provider-microsoft";
+  // P50A-05: provider guides are help-centre articles now. There's no public
+  // Outlook article while Microsoft sync is off, so it gets the general guide.
+  if (account.provider === "GOOGLE") return HELP_LINKS.connectGoogle;
+  if (account.provider === "MICROSOFT") return HELP_LINKS.fixSyncNotWorking;
   switch (account.providerBrandKey) {
     case "icloud":
-      return "/help#provider-icloud";
+      return HELP_LINKS.connectIcloud;
     case "fastmail":
-      return "/help#provider-fastmail";
-    case "nextcloud":
-      return "/help#provider-carddav";
+      return HELP_LINKS.connectFastmail;
     default:
-      return "/help#provider-carddav";
+      return HELP_LINKS.connectCardDavServer;
   }
 };
 

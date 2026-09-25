@@ -24,6 +24,7 @@ import {
   resumeSyncAllowDeletions,
   resumeSyncWithoutDeletions,
 } from "~/app/actions/sync";
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import type { DeletionHoldReview } from "~/server/sync-deletion-resume";
 import { ConfirmDialog } from "~/app/_components/confirm-dialog";
 import { OfflineWriteNote } from "~/app/_components/connection-banner";
@@ -327,6 +328,18 @@ const HEALTH_DETAIL: Record<VisualHealth, (a: SyncAccountData) => string> = {
         : "Auto-paused after repeated failures. Fix the issue, then Resume.",
   never: () => "This account has not synced yet. Click Sync now to start.",
   syncing: () => "Sync in progress…",
+};
+
+// P50A-05: "Learn more" from an unhealthy connection to the matching help article.
+const getHealthHelpHref = (health: VisualHealth, a: SyncAccountData): string | null => {
+  if (health === "auth") {
+    return a.provider === "CARDDAV" ? HELP_LINKS.appPasswordProblems : HELP_LINKS.syncPausedOrNeedsReauth;
+  }
+  if (health === "safety") {
+    return a.conflictQueueFull ? HELP_LINKS.resolveSyncConflicts : HELP_LINKS.syncPausedOrNeedsReauth;
+  }
+  if (health === "error" || health === "warning") return HELP_LINKS.fixSyncNotWorking;
+  return null;
 };
 
 const getAccountRailSubtitle = (
@@ -1304,7 +1317,10 @@ function DuplicatesBanner({ count }: { count: number }) {
         <strong>
           {count} potential duplicate{count === 1 ? "" : "s"}
         </strong>{" "}
-        found from this import.
+        found from this import.{" "}
+        <Link href={HELP_LINKS.duplicateFloodAfterFirstSync} style={{ color: "#7a5a1a", textDecoration: "underline" }}>
+          Why?
+        </Link>
       </div>
       <Link
         href="/contacts?tab=duplicates"
@@ -2548,6 +2564,15 @@ function AccountHeader({
       </div>
       <div style={{ fontSize: 13, color: T.ink2, marginTop: 8, maxWidth: 520 }}>
         {HEALTH_DETAIL[vHealth](account)}
+        {((href) =>
+          href ? (
+            <>
+              {" "}
+              <Link href={href} style={{ color: T.blue, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
+                Learn more
+              </Link>
+            </>
+          ) : null)(getHealthHelpHref(vHealth, account))}
       </div>
       {isRetired && (
         <div style={{ fontSize: 13, color: T.ink2, marginTop: 6, maxWidth: 520, lineHeight: 1.5 }}>
@@ -3337,7 +3362,7 @@ function AddAccountForm({
           <label style={{ display: "block" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Server URL
-              <HelpTooltip learnHref="/help#carddav" place="bottom">
+              <HelpTooltip learnHref={HELP_LINKS.connectCardDavServer} place="bottom">
                 Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app&apos;s account settings.
               </HelpTooltip>
             </span>
@@ -3381,7 +3406,7 @@ function AddAccountForm({
           <div>
             <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Password
-              <HelpTooltip learnHref="/help#carddav" place="bottom">
+              <HelpTooltip learnHref={HELP_LINKS.appPasswordProblems} place="bottom">
                 Generate an app-specific password in your account&apos;s security settings — your normal password won&apos;t work for CardDAV.
               </HelpTooltip>
             </label>
@@ -3537,10 +3562,10 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       >
         Connect an account →
       </button>
-      {/* P26-13: link to the CardDAV explainer on /help */}
+      {/* P26-13 / P50A-05: link to the CardDAV explainer in the help centre */}
       <div style={{ marginTop: 14 }}>
         <a
-          href="/help#carddav"
+          href={HELP_LINKS.whatIsCardDav}
           style={{ fontSize: 13, fontWeight: 500, color: T.blue, textDecoration: "none" }}
         >
           Learn about CardDAV →

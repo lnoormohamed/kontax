@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   FieldMappingStep,
@@ -935,6 +936,9 @@ export function ImportPreviewForm({
                 {capNotice.message}{" "}
                 <a className="font-semibold text-[#4452c9] hover:underline" href="/pricing">
                   Upgrade
+                </a>{" "}
+                <a className="text-[#4452c9] hover:underline" href={HELP_LINKS.contactLimitReached}>
+                  Learn more
                 </a>
               </div>
             ) : null}
