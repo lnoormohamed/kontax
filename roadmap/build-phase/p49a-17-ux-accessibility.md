@@ -1,7 +1,13 @@
 # P49A-17 — UX & accessibility: confirmations, labels, 2FA inputs, focus, loading states
 
-**Phase:** 49A · **Priority:** P1 · **Depends on:** — · **Effort:** M
+**Phase:** 49A · **Priority:** P1 · **Status:** Deferred — reassess after Phase 50 · **Depends on:** P50-06, P50-07 · **Effort:** M
 **Audit IDs:** A-43, A-44, A-45, A-46, A-47 (UX-12…UX-18)
+
+## Deferral (2026-09-25, owner decision)
+Reassess this ticket after the Phase 50 marketing redesign lands. Most items are in the signed-in
+app and are not changed by P50; the 2FA sign-in screen is restyled by P50-06 (auth alignment),
+and P50-07 audits accessibility on the marketing pages. After P50: re-run the UX/accessibility
+audit on the app and auth screens, drop anything P50 fixed, and rewrite the steps below.
 
 ## Objective
 No accidental irreversible actions, and the core forms work with screen readers, keyboards and

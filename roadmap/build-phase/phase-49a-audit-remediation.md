@@ -46,7 +46,7 @@ Every ticket below was checked against production before it was written:
 | [P49A-14](p49a-14-pricing-truth-from-plan-data.md) | Pricing matrix rendered from plan data; correct false claims | P1 | A-31–A-34 | — |
 | [P49A-15](p49a-15-public-site-fixes.md) | Public site: /about & /contact public, dead links, mobile, titles | P1 | A-35–A-37 | — |
 | [P49A-16](p49a-16-runtime-ops-and-sync-performance.md) | Runtime & ops: Dockerfile, timeouts, health split, DAV/sync perf, export blobs | P1 | A-29, A-30, A-38–A-42 | P49A-04 |
-| [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, focus, loading states | P1 | A-43–A-47 | — |
+| [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, focus, loading states — **deferred: reassess after Phase 50** | P1 | A-43–A-47 | P50-06, P50-07 |
 | [P49A-18](p49a-18-hardening-and-debt-backlog.md) | Hardening & debt backlog | P2 | P2 list | — |
 
 ## Suggested delivery order
@@ -54,7 +54,7 @@ Every ticket below was checked against production before it was written:
 2. P49A-01, -02, -04, -05, -08 — small, stop ongoing loss/stalls.
 3. P49A-06, -07, -09, -11.
 4. P49A-10 → -03 → -12 (data model first).
-5. P49A-13, -14, -16, -17, then -18.
+5. P49A-13, -14, -16, then -18. P49A-17 is reassessed after Phase 50.
 
 Model roles: Opus/Sonnet implement; Fable reviews every P0 ticket and all security tickets.
 Each ticket lands on `staging` first; nothing reaches `main` without an explicit go-ahead.
