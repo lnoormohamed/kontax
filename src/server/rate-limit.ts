@@ -171,6 +171,10 @@ export const rateLimiters = {
   // per user, so one owner can't be locked out of resending to different
   // pending invitees, but repeatedly re-sending the SAME invite is capped.
   inviteResend: makeLimiter(5, 60 * 60, "rl:invite-resend"),
+
+  // P49A-09: duplicate rescans score the whole address book — 3 per user per
+  // hour (was unlimited).
+  mergeSuggestionRefresh: makeLimiter(3, 60 * 60, "rl:merge-refresh"),
 } as const;
 
 export interface RateLimitResult {

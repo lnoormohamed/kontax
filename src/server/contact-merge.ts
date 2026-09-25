@@ -3,14 +3,13 @@ import { emitEvent } from "~/lib/activity";
 import { propagateLiveShares } from "~/server/contact-shares";
 import {
   emailDomain,
-  familyNamesCompatible,
-  getFamilyName as getFamilyNameKey,
-  givenInitialMatch,
-  givenNamesCompatible,
+  givenTokensInitialMatch,
   levenshtein,
+  nameTokensCompatible,
   normalizeName as normalizeNameKey,
-  normalizePhoneKey,
-  phoneticNameKey,
+  phoneKeyFromCandidate,
+  phoneticKeyFromTokens,
+  phoneticToken,
 } from "~/lib/duplicate-signals";
 import {
   comparableNameKey,
@@ -28,7 +27,7 @@ import {
   normalizePhoneCandidate,
 } from "~/lib/phone-normalization";
 
-type MergeCandidateContact = {
+export type MergeCandidateContact = {
   id: string;
   fullName: string;
   firstName?: string | null;
@@ -417,18 +416,6 @@ const normalizeValue = (value: string | null | undefined) =>
 // accented names normalize to comparable tokens instead of being mangled.
 const normalizeName = (value: string) => normalizeNameKey(value);
 
-const getNameTokens = (value: string) => normalizeName(value).split(" ").filter(Boolean);
-
-const getFamilyName = (value: string) => {
-  const tokens = getNameTokens(value);
-  return tokens.at(-1) ?? "";
-};
-
-const getGivenName = (value: string) => {
-  const tokens = getNameTokens(value);
-  return tokens[0] ?? "";
-};
-
 const buildPairKey = (leftContactId: string, rightContactId: string) =>
   [leftContactId, rightContactId].sort().join("::");
 
@@ -756,31 +743,135 @@ const pickFieldValue = ({
   return primaryValue?.trim() ?? secondaryValue?.trim() ?? null;
 };
 
+// ---------------------------------------------------------------------------
+// P49A-09: per-contact features, computed ONCE per contact instead of once per
+// pair. The old scorer re-folded names, re-parsed phones and re-romanized
+// inside the O(n²) pair loop (~110 µs/pair: 58 s of blocking CPU for 1,000
+// contacts). Every pair function below takes precomputed features and must
+// stay semantically identical to the pre-P49A-09 scorer, which
+// tests/node/_legacy-merge-suggestions.ts keeps as a frozen oracle.
+
+type NameTokenParts = {
+  given: string;
+  family: string;
+  givenPhonetic: string;
+  familyPhonetic: string;
+};
+
+type NameFeatures = NameTokenParts & {
+  /** normalizeName(fullName) */
+  norm: string;
+  /** phoneticNameKey(fullName) */
+  phonetic: string;
+  /** hasNonLatinLetters(fullName) */
+  nonLatin: boolean;
+  /** comparableNameKey(fullName) */
+  comparable: string;
+  // Lazily derived — only a few pairs ever need them.
+  comparableParts?: NameTokenParts;
+  givenNameFeatures?: NameFeatures;
+};
+
+type ContactFeatures = {
+  contact: MergeCandidateContact;
+  name: NameFeatures;
+  email: string;
+  emailDomain: string;
+  publicEmailDomain: boolean;
+  /** normalizeValue(phone) — the raw-format comparison */
+  phone: string;
+  phoneExact: string;
+  /** normalizePhoneKey(phone) */
+  phoneKey: string;
+  company: string;
+  birthday: string;
+  sourceKind: "manual" | "imported";
+};
+
+const PUBLIC_EMAIL_DOMAIN = /^(gmail|yahoo|hotmail|outlook|icloud|aol|proton(mail)?)\./;
+
+const tokenPartsOf = (tokens: string[]): NameTokenParts => {
+  const given = tokens[0] ?? "";
+  const family = tokens.at(-1) ?? "";
+  return {
+    given,
+    family,
+    givenPhonetic: phoneticToken(given),
+    familyPhonetic: phoneticToken(family),
+  };
+};
+
+const computeNameFeatures = (raw: string): NameFeatures => {
+  const norm = normalizeName(raw);
+  const tokens = norm.split(" ").filter(Boolean);
+  return {
+    ...tokenPartsOf(tokens),
+    norm,
+    phonetic: phoneticKeyFromTokens(tokens),
+    nonLatin: hasNonLatinLetters(raw),
+    comparable: comparableNameKey(raw),
+  };
+};
+
+const comparablePartsOf = (features: NameFeatures) =>
+  (features.comparableParts ??= tokenPartsOf(
+    normalizeName(features.comparable).split(" ").filter(Boolean),
+  ));
+
+const givenNameFeaturesOf = (features: NameFeatures) =>
+  (features.givenNameFeatures ??= computeNameFeatures(features.given));
+
+const computeContactFeatures = (contact: MergeCandidateContact): ContactFeatures => {
+  const phone = normalizePhoneCandidate(contact.phone);
+  const domain = emailDomain(contact.email);
+  const declaredSourceKind = (contact as { sourceKind?: "manual" | "imported" }).sourceKind;
+  return {
+    contact,
+    name: computeNameFeatures(contact.fullName),
+    email: normalizeValue(contact.email),
+    emailDomain: domain,
+    publicEmailDomain: PUBLIC_EMAIL_DOMAIN.test(`${domain}.`),
+    phone: normalizeValue(contact.phone),
+    phoneExact: phone.exactKey,
+    phoneKey: phoneKeyFromCandidate(phone),
+    company: normalizeValue(contact.company),
+    birthday: normalizeValue(contact.birthday),
+    sourceKind: declaredSourceKind ?? (contact.importJobId ? "imported" : "manual"),
+  };
+};
+
+// givenNamesCompatible / familyNamesCompatible on precomputed tokens.
+const givenPartsCompatible = (left: NameTokenParts, right: NameTokenParts) =>
+  nameTokensCompatible(left.given, right.given, left.givenPhonetic, right.givenPhonetic);
+
+const familyPartsCompatible = (left: NameTokenParts, right: NameTokenParts) =>
+  nameTokensCompatible(left.family, right.family, left.familyPhonetic, right.familyPhonetic);
+
 // P46-20: cross-script comparison via romanization (陈志强 ≡ 陳志強 ≡
 // "chen zhi qiang", Ольга ≡ "Olga"). Lossy, so it's a supporting signal
 // only — never a hard match — and it's consulted only when at least one
 // side has non-Latin letters; Latin-only pairs use the normal name signals.
 const romanizedComparison = (
-  leftFullName: string,
-  rightFullName: string,
+  left: NameFeatures,
+  right: NameFeatures,
 ): "equal" | "fuzzy" | "none" => {
-  if (!hasNonLatinLetters(leftFullName) && !hasNonLatinLetters(rightFullName)) {
+  if (!left.nonLatin && !right.nonLatin) {
     return "none";
   }
-  const leftKey = comparableNameKey(leftFullName);
-  const rightKey = comparableNameKey(rightFullName);
+  const leftKey = left.comparable;
+  const rightKey = right.comparable;
   if (!leftKey || !rightKey) {
     return "none";
   }
   if (leftKey === rightKey) {
     return "equal";
   }
-  if (
-    levenshtein(leftKey, rightKey, 2) <= 2 &&
-    givenNamesCompatible(leftKey, rightKey) &&
-    familyNamesCompatible(leftKey, rightKey)
-  ) {
-    return "fuzzy";
+  if (levenshtein(leftKey, rightKey, 2) <= 2) {
+    const leftParts = comparablePartsOf(left);
+    const rightParts = comparablePartsOf(right);
+    if (givenPartsCompatible(leftParts, rightParts) && familyPartsCompatible(leftParts, rightParts)) {
+      return "fuzzy";
+    }
   }
   return "none";
 };
@@ -788,90 +879,65 @@ const romanizedComparison = (
 // Names "genuinely differ" only beyond spelling variance: not equal, not within
 // fuzzy edit distance, not phonetically equivalent, and not the same name
 // written in two scripts. "Katherine"/"Catherine" is a variant, not a conflict.
-const namesGenuinelyDiffer = (leftFullName: string, rightFullName: string) => {
-  const leftName = normalizeName(leftFullName);
-  const rightName = normalizeName(rightFullName);
-  if (!leftName || !rightName || leftName === rightName) {
+const namesGenuinelyDiffer = (left: NameFeatures, right: NameFeatures) => {
+  if (!left.norm || !right.norm || left.norm === right.norm) {
     return false;
   }
   if (
-    levenshtein(leftName, rightName, 2) <= 2 &&
-    givenNamesCompatible(leftFullName, rightFullName) &&
-    familyNamesCompatible(leftFullName, rightFullName)
+    levenshtein(left.norm, right.norm, 2) <= 2 &&
+    givenPartsCompatible(left, right) &&
+    familyPartsCompatible(left, right)
   ) {
     return false;
   }
-  if (romanizedComparison(leftFullName, rightFullName) !== "none") {
+  if (romanizedComparison(left, right) !== "none") {
     return false;
   }
-  const leftPhonetic = phoneticNameKey(leftFullName);
-  return !(leftPhonetic && leftPhonetic === phoneticNameKey(rightFullName));
+  return !(left.phonetic && left.phonetic === right.phonetic);
 };
 
-const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) => {
+const edgeCaseWarningsFromFeatures = (left: ContactFeatures, right: ContactFeatures) => {
   const warnings: string[] = [];
-  const leftEmail = normalizeValue(left.email);
-  const rightEmail = normalizeValue(right.email);
-  const leftPhone = normalizePhoneKey(left.phone);
-  const rightPhone = normalizePhoneKey(right.phone);
-  const leftFamilyName = getFamilyName(left.fullName);
-  const rightFamilyName = getFamilyName(right.fullName);
-  const leftGivenName = getGivenName(left.fullName);
-  const rightGivenName = getGivenName(right.fullName);
-  const leftCompany = normalizeValue(left.company);
-  const rightCompany = normalizeValue(right.company);
-  const leftSource = left.sourceKind ?? getSourceKind(left);
-  const rightSource = right.sourceKind ?? getSourceKind(right);
+  const leftName = left.name;
+  const rightName = right.name;
 
   if (
-    leftEmail &&
-    rightEmail &&
-    leftEmail === rightEmail &&
-    leftFamilyName &&
-    rightFamilyName &&
-    !familyNamesCompatible(left.fullName, right.fullName) &&
-    romanizedComparison(left.fullName, right.fullName) === "none"
+    left.email &&
+    right.email &&
+    left.email === right.email &&
+    leftName.family &&
+    rightName.family &&
+    !familyPartsCompatible(leftName, rightName) &&
+    romanizedComparison(leftName, rightName) === "none"
   ) {
     warnings.push(
       "Shared email with different family names detected. This could be a household address or shared inbox, so review carefully before merging.",
     );
   }
 
-  if (
-    leftPhone &&
-    rightPhone &&
-    leftPhone === rightPhone &&
-    namesGenuinelyDiffer(left.fullName, right.fullName)
-  ) {
+  const samePhoneKey = Boolean(left.phoneKey && right.phoneKey && left.phoneKey === right.phoneKey);
+
+  if (samePhoneKey && namesGenuinelyDiffer(leftName, rightName)) {
     warnings.push(
       "Shared phone with different names detected. This could be an assistant line, family number, or front-desk number rather than a true duplicate.",
     );
   }
 
-  if (
-    leftPhone &&
-    rightPhone &&
-    leftPhone === rightPhone &&
-    leftCompany &&
-    rightCompany &&
-    leftCompany !== rightCompany
-  ) {
+  if (samePhoneKey && left.company && right.company && left.company !== right.company) {
     warnings.push(
       "The same phone number appears across different companies. Treat this as review-first rather than an obvious duplicate.",
     );
   }
 
-  const leftBirthday = normalizeValue(left.birthday);
-  const rightBirthday = normalizeValue(right.birthday);
-  if (leftBirthday && rightBirthday && leftBirthday !== rightBirthday) {
+  if (left.birthday && right.birthday && left.birthday !== right.birthday) {
     warnings.push(
       "The two records have different birthdays. That usually means two different people, so review carefully before merging.",
     );
   }
 
   if (
-    (leftSource === "imported" || rightSource === "imported") &&
-    ((!left.email && !left.phone) || (!right.email && !right.phone))
+    (left.sourceKind === "imported" || right.sourceKind === "imported") &&
+    ((!left.contact.email && !left.contact.phone) || (!right.contact.email && !right.contact.phone))
   ) {
     warnings.push(
       "One side is a sparse imported record without a strong identifier. Imported sparse records should be merged cautiously.",
@@ -879,13 +945,13 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
   }
 
   if (
-    leftGivenName &&
-    rightGivenName &&
-    namesGenuinelyDiffer(leftGivenName, rightGivenName) &&
-    leftFamilyName &&
-    rightFamilyName &&
-    leftFamilyName === rightFamilyName &&
-    ((leftEmail && leftEmail === rightEmail) || (leftPhone && leftPhone === rightPhone))
+    leftName.given &&
+    rightName.given &&
+    leftName.family &&
+    rightName.family &&
+    leftName.family === rightName.family &&
+    ((left.email && left.email === right.email) || (left.phoneKey && left.phoneKey === right.phoneKey)) &&
+    namesGenuinelyDiffer(givenNameFeaturesOf(leftName), givenNameFeaturesOf(rightName))
   ) {
     warnings.push(
       "Names differ while surnames and identifiers overlap. This could be a nickname, transliteration, or different member of the same household.",
@@ -895,23 +961,29 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
   return warnings;
 };
 
-const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateContact) => {
-  const leftEmail = normalizeValue(left.email);
-  const rightEmail = normalizeValue(right.email);
-  const leftPhone = normalizePhoneCandidate(left.phone);
-  const rightPhone = normalizePhoneCandidate(right.phone);
-  const leftPhoneExact = leftPhone.exactKey;
-  const rightPhoneExact = rightPhone.exactKey;
-  const leftPhoneKey = normalizePhoneKey(left.phone);
-  const rightPhoneKey = normalizePhoneKey(right.phone);
-  const rawPhonesMatch = Boolean(
-    normalizeValue(left.phone) && normalizeValue(left.phone) === normalizeValue(right.phone),
-  );
-  const leftName = normalizeName(left.fullName);
-  const rightName = normalizeName(right.fullName);
-  const leftCompany = normalizeValue(left.company);
-  const rightCompany = normalizeValue(right.company);
+const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
+  edgeCaseWarningsFromFeatures(computeContactFeatures(left), computeContactFeatures(right));
+
+const signalDetailsFromFeatures = (leftFeatures: ContactFeatures, rightFeatures: ContactFeatures) => {
+  const left = leftFeatures.contact;
+  const right = rightFeatures.contact;
+  const leftEmail = leftFeatures.email;
+  const rightEmail = rightFeatures.email;
+  const leftPhoneExact = leftFeatures.phoneExact;
+  const rightPhoneExact = rightFeatures.phoneExact;
+  const leftPhoneKey = leftFeatures.phoneKey;
+  const rightPhoneKey = rightFeatures.phoneKey;
+  const rawPhonesMatch = Boolean(leftFeatures.phone && leftFeatures.phone === rightFeatures.phone);
+  const leftNameFeatures = leftFeatures.name;
+  const rightNameFeatures = rightFeatures.name;
+  const leftName = leftNameFeatures.norm;
+  const rightName = rightNameFeatures.norm;
+  const leftCompany = leftFeatures.company;
+  const rightCompany = rightFeatures.company;
   const sameCompany = Boolean(leftCompany && rightCompany && leftCompany === rightCompany);
+  const surnameKeysMatch = Boolean(
+    leftNameFeatures.family && leftNameFeatures.family === rightNameFeatures.family,
+  );
 
   const contributions: SignalContribution[] = [];
   let hardMatch = false;
@@ -939,15 +1011,15 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
 
   // --- Name signals ------------------------------------------------------------
   const exactName = Boolean(leftName && rightName && leftName === rightName);
-  const nameDist = leftName && rightName ? levenshtein(leftName, rightName, 2) : 3;
   // Whole-name edit distance alone over-matches short names ("Thảo Nguyễn" is
   // 2 edits from "Hải Nguyễn", "Priya Khan" is 2 from "Priya Shah") — both the
   // given names and the family names must also be plausible variants.
   const fuzzyName =
     !exactName &&
-    nameDist <= 2 &&
-    givenNamesCompatible(left.fullName, right.fullName) &&
-    familyNamesCompatible(left.fullName, right.fullName);
+    Boolean(leftName && rightName) &&
+    levenshtein(leftName, rightName, 2) <= 2 &&
+    givenPartsCompatible(leftNameFeatures, rightNameFeatures) &&
+    familyPartsCompatible(leftNameFeatures, rightNameFeatures);
 
   if (exactName) {
     add("exact-name", `Same full name: ${left.fullName}`, 80);
@@ -964,9 +1036,8 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
     }
   } else if (
     sameCompany &&
-    getFamilyNameKey(left.fullName) &&
-    getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName) &&
-    givenInitialMatch(left.fullName, right.fullName)
+    surnameKeysMatch &&
+    givenTokensInitialMatch(leftNameFeatures.given, rightNameFeatures.given)
   ) {
     add(
       "name-and-company-proximity",
@@ -980,7 +1051,7 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   // "Chen Zhi Qiang") matches via romanized keys when the in-script
   // signals can't see it.
   if (!exactName && !fuzzyName) {
-    const romanized = romanizedComparison(left.fullName, right.fullName);
+    const romanized = romanizedComparison(leftNameFeatures, rightNameFeatures);
     if (romanized === "equal") {
       add(
         "romanized-name",
@@ -998,9 +1069,7 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
 
   // --- Phonetic name (supporting signal only — never a hard match) -------------
   if (!exactName && !fuzzyName) {
-    const leftPhonetic = phoneticNameKey(left.fullName);
-    const rightPhonetic = phoneticNameKey(right.fullName);
-    if (leftPhonetic && leftPhonetic === rightPhonetic) {
+    if (leftNameFeatures.phonetic && leftNameFeatures.phonetic === rightNameFeatures.phonetic) {
       add(
         "phonetic-name",
         `Names sound alike: ${left.fullName} ≈ ${right.fullName}`,
@@ -1011,16 +1080,14 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
 
   // --- Shared email domain + similar name (weak / LOW) -------------------------
   if (!(leftEmail && rightEmail && leftEmail === rightEmail)) {
-    const leftDomain = emailDomain(left.email);
-    const rightDomain = emailDomain(right.email);
-    const commonDomain = leftDomain && leftDomain === rightDomain;
-    const isPublicDomain = /^(gmail|yahoo|hotmail|outlook|icloud|aol|proton(mail)?)\./.test(
-      `${leftDomain}.`,
-    );
-    const surnameMatch =
-      getFamilyNameKey(left.fullName) &&
-      getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName);
-    if (commonDomain && !isPublicDomain && (surnameMatch || givenInitialMatch(left.fullName, right.fullName))) {
+    const leftDomain = leftFeatures.emailDomain;
+    const commonDomain = leftDomain && leftDomain === rightFeatures.emailDomain;
+    if (
+      commonDomain &&
+      !leftFeatures.publicEmailDomain &&
+      (surnameKeysMatch ||
+        givenTokensInitialMatch(leftNameFeatures.given, rightNameFeatures.given))
+    ) {
       add("email-domain-and-name", `Same email domain and similar name: @${leftDomain}`, 15);
     }
   }
@@ -1034,11 +1101,7 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   const hasPositiveSignal = contributions.some((contribution) => contribution.score > 0);
 
   if (hardMatch) {
-    const surnameKeysMatch = Boolean(
-      getFamilyNameKey(left.fullName) &&
-        getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName),
-    );
-    const namesConflict = namesGenuinelyDiffer(left.fullName, right.fullName);
+    const namesConflict = namesGenuinelyDiffer(leftNameFeatures, rightNameFeatures);
 
     if (namesConflict && !surnameKeysMatch) {
       add(
@@ -1046,7 +1109,10 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
         `Names don't match: ${left.fullName} vs ${right.fullName}`,
         -40,
       );
-    } else if (namesConflict && !givenInitialMatch(left.fullName, right.fullName)) {
+    } else if (
+      namesConflict &&
+      !givenTokensInitialMatch(leftNameFeatures.given, rightNameFeatures.given)
+    ) {
       add(
         "conflicting-given-name",
         `Same surname but different first names: ${left.fullName} vs ${right.fullName}`,
@@ -1090,8 +1156,8 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   // Different recorded birthdays is near-decisive counter-evidence regardless
   // of what matched — the same person doesn't have two birthdays. Applies to
   // fuzzy/name-based matches too, not just hard identifier matches.
-  const leftBirthday = normalizeValue(left.birthday);
-  const rightBirthday = normalizeValue(right.birthday);
+  const leftBirthday = leftFeatures.birthday;
+  const rightBirthday = rightFeatures.birthday;
   if (hasPositiveSignal && leftBirthday && rightBirthday && leftBirthday !== rightBirthday) {
     add(
       "conflicting-birthday",
@@ -1112,6 +1178,9 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
     hardMatch,
   };
 };
+
+const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateContact) =>
+  signalDetailsFromFeatures(computeContactFeatures(left), computeContactFeatures(right));
 
 // Confidence tier from the total score. HIGH is reserved for hard identifier
 // matches only; name/company evidence can still surface a pair for review, but
@@ -1157,59 +1226,370 @@ const parseContributions = (value: unknown): SignalContribution[] => {
   });
 };
 
-export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) => {
-  const suggestions: MergeSuggestionPreview[] = [];
+// ---------------------------------------------------------------------------
+// P49A-09 — candidate generation ("blocking").
+//
+// A pair is only ever suggested when deriveConfidence() is not "low", i.e. it
+// is a hard match (same email, or same phone by exact or loose key) or its
+// score reaches 50. Enumerating the positive signals, every such pair shares
+// at least one of these keys:
+//
+//   e  normalised email                        → exact-email (hard)
+//   x  phone exactKey / k  phone loose key     → exact/normalized-phone (hard)
+//   n  normalised full name, and the romanized
+//      comparable key                          → exact-name (80), romanized-name (70)
+//   p  phonetic name key                       → any combination that includes
+//                                                phonetic-name (25/40)
+//   c  company + family name + given initial   → name-and-company-proximity (60)
+//   fuzzy key, scoped to a company or to a
+//      non-public email domain                 → fuzzy-name-company (65),
+//                                                fuzzy-name (40) + email-domain (15),
+//                                                romanized-fuzzy (40) + email-domain (15)
+//
+// Every other positive signal is < 50 on its own and no other combination
+// reaches 50 (fuzzy-name excludes the romanized/phonetic/proximity branches;
+// phonetic 25 + email-domain 15 = 40). Negative signals only lower a score.
+//
+// The fuzzy key must cover "edit distance ≤ 2" (levenshtein over UTF-16 code
+// units) between the normalised names or the romanized keys, within a group:
+//   - strings of length ≤ 10: the ≤2-deletion neighbourhood (two strings within
+//     2 edits always share a string reachable by ≤2 deletions from each),
+//     hashed to 30-bit ints — a collision only adds a candidate, never loses one;
+//   - strings of length ≥ 9: pigeonhole segments (PassJoin): split into 3
+//     parts; ≤2 edits leave one part intact in the other string, shifted by
+//     at most 2 positions.
+// Lengths within 2 edits differ by ≤ 2, so a pair whose shorter name is ≤ 8
+// long has both lengths ≤ 10 (deletion scheme), and one whose shorter name is
+// ≥ 9 has both ≥ 9 (segment scheme).
+//
+// The equivalence test (tests/node/merge-suggestion-equivalence.test.ts) runs
+// this engine and a frozen copy of the old O(n²) scan side by side.
 
-  for (let leftIndex = 0; leftIndex < contacts.length; leftIndex += 1) {
-    const left = contacts[leftIndex];
-    if (!left) {
-      continue;
+const MAX_MERGE_SUGGESTIONS = 500;
+const DELETION_SCHEME_MAX_LENGTH = 10;
+const SEGMENT_SCHEME_MIN_LENGTH = 9;
+const FUZZY_EDIT_DISTANCE = 2;
+const HASH_BASE = 0x01000193;
+const HASH_MASK = 0x3fffffff; // keep Map keys in V8's small-integer range
+
+type Block = number | number[];
+
+const addToBlock = <K>(blocks: Map<K, Block>, key: K, index: number) => {
+  const existing = blocks.get(key);
+  if (existing === undefined) {
+    blocks.set(key, index);
+  } else if (typeof existing === "number") {
+    if (existing !== index) {
+      blocks.set(key, [existing, index]);
     }
+  } else if (existing[existing.length - 1] !== index) {
+    existing.push(index);
+  }
+};
 
-    for (let rightIndex = leftIndex + 1; rightIndex < contacts.length; rightIndex += 1) {
-      const right = contacts[rightIndex];
-      if (!right) {
-        continue;
-      }
+// Hashes of every string reachable from `value` by at most two deletions,
+// via a polynomial rolling hash (mod 2^32) so no substring is allocated.
+const deletionNeighbourhoodHashes = (value: string, out: number[]) => {
+  const length = value.length;
+  const prefix = new Uint32Array(length + 1);
+  const power = new Uint32Array(length + 1);
+  power[0] = 1;
+  for (let index = 0; index < length; index += 1) {
+    prefix[index + 1] = (Math.imul(prefix[index]!, HASH_BASE) + value.charCodeAt(index)) >>> 0;
+    power[index + 1] = Math.imul(power[index]!, HASH_BASE) >>> 0;
+  }
+  const range = (from: number, to: number) =>
+    (prefix[to]! - Math.imul(prefix[from]!, power[to - from]!)) >>> 0;
+  const concat = (head: number, tail: number, tailLength: number) =>
+    (Math.imul(head, power[tailLength]!) + tail) >>> 0;
 
-      const { signals, reasons, contributions, score, hardMatch } = getSignalDetails(left, right);
-      const edgeCaseWarnings = getEdgeCaseWarnings(
-        {
-          ...left,
-          notes: null,
-          archivedAt: null,
-        },
-        {
-          ...right,
-          notes: null,
-          archivedAt: null,
-        },
-      );
-
-      if (signals.length === 0) {
-        continue;
-      }
-
-      const confidence = deriveConfidence(score, hardMatch, edgeCaseWarnings.length > 0);
-      if (confidence === "low") {
-        continue;
-      }
-
-      suggestions.push({
-        pairKey: buildPairKey(left.id, right.id),
-        leftContact: left,
-        rightContact: right,
-        confidence,
-        score,
-        reasons: [...reasons, ...edgeCaseWarnings],
-        signals,
-        contributions,
-        hardMatch,
-      });
+  out.push(prefix[length]!);
+  for (let first = 0; first < length; first += 1) {
+    const head = prefix[first]!;
+    out.push(concat(head, range(first + 1, length), length - first - 1));
+    for (let second = first + 1; second < length; second += 1) {
+      const middle = concat(head, range(first + 1, second), second - first - 1);
+      out.push(concat(middle, range(second + 1, length), length - second - 1));
     }
   }
+};
 
-  return suggestions.sort((left, right) => right.score - left.score).slice(0, 500);
+// PassJoin partition: 3 contiguous segments, lengths differing by at most 1.
+const segmentBounds = (length: number, segment: number) => {
+  const base = Math.floor(length / 3);
+  const longSegments = length % 3; // the last `longSegments` parts get +1
+  const shortSegments = 3 - longSegments;
+  const start =
+    segment <= shortSegments
+      ? segment * base
+      : shortSegments * base + (segment - shortSegments) * (base + 1);
+  const size = segment < shortSegments ? base : base + 1;
+  return { start, size };
+};
+
+const segmentKey = (group: number, length: number, segment: number, text: string) =>
+  `${group}\u0000${length}\u0000${segment}\u0000${text}`;
+
+type FuzzyProbe = { groups: number[]; strings: string[] };
+
+function* mergeSuggestionEngine(
+  contacts: MergeCandidateContact[],
+): Generator<undefined, MergeSuggestionPreview[], undefined> {
+  const count = contacts.length;
+
+  // 1. Features, once per contact.
+  const features: Array<ContactFeatures | null> = new Array<ContactFeatures | null>(count).fill(null);
+  for (let index = 0; index < count; index += 1) {
+    const contact = contacts[index];
+    if (contact) {
+      features[index] = computeContactFeatures(contact);
+    }
+    yield;
+  }
+
+  // 2. Fuzzy-name groups (company, non-public email domain) with ≥ 2 members.
+  const companyGroupOf = (feature: ContactFeatures) =>
+    feature.company ? `c\u0000${feature.company}` : "";
+  const domainGroupOf = (feature: ContactFeatures) =>
+    feature.emailDomain && !feature.publicEmailDomain ? `d\u0000${feature.emailDomain}` : "";
+  const groupSizes = new Map<string, number>();
+  for (const feature of features) {
+    if (!feature) continue;
+    for (const group of [companyGroupOf(feature), domainGroupOf(feature)]) {
+      if (group) groupSizes.set(group, (groupSizes.get(group) ?? 0) + 1);
+    }
+  }
+  const groupIds = new Map<string, number>();
+  for (const [group, size] of groupSizes) {
+    if (size >= 2) groupIds.set(group, groupIds.size);
+  }
+  yield;
+
+  // 3. Blocking index.
+  const exactBlocks = new Map<string, Block>();
+  const deletionBlocks = new Map<number, Block>();
+  const segmentBlocks = new Map<string, Block>();
+  const fuzzyProbes: Array<FuzzyProbe | null> = new Array<FuzzyProbe | null>(count).fill(null);
+  const hashes: number[] = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const feature = features[index];
+    if (!feature) {
+      yield;
+      continue;
+    }
+    const { name } = feature;
+    if (feature.email) addToBlock(exactBlocks, `e\u0000${feature.email}`, index);
+    if (feature.phoneExact) addToBlock(exactBlocks, `x\u0000${feature.phoneExact}`, index);
+    if (feature.phoneKey) addToBlock(exactBlocks, `k\u0000${feature.phoneKey}`, index);
+    if (name.norm) addToBlock(exactBlocks, `n\u0000${name.norm}`, index);
+    if (name.comparable) addToBlock(exactBlocks, `n\u0000${name.comparable}`, index);
+    if (name.phonetic) addToBlock(exactBlocks, `p\u0000${name.phonetic}`, index);
+    if (feature.company && name.family && name.given) {
+      addToBlock(
+        exactBlocks,
+        `c\u0000${feature.company}\u0000${name.family}\u0000${name.given.charAt(0)}`,
+        index,
+      );
+    }
+
+    const groups: number[] = [];
+    for (const group of [companyGroupOf(feature), domainGroupOf(feature)]) {
+      const id = group ? groupIds.get(group) : undefined;
+      if (id !== undefined) groups.push(id);
+    }
+    const strings = [name.norm, name.comparable].filter(
+      (value, position, all) => value && all.indexOf(value) === position,
+    );
+    if (groups.length > 0 && strings.length > 0) {
+      fuzzyProbes[index] = { groups, strings };
+      for (const value of strings) {
+        if (value.length <= DELETION_SCHEME_MAX_LENGTH) {
+          hashes.length = 0;
+          deletionNeighbourhoodHashes(value, hashes);
+          for (const group of groups) {
+            const salt = Math.imul(group + 1, 0x9e3779b1);
+            for (const hash of hashes) {
+              addToBlock(deletionBlocks, ((hash ^ salt) >>> 0) & HASH_MASK, index);
+            }
+          }
+        }
+        if (value.length >= SEGMENT_SCHEME_MIN_LENGTH) {
+          for (const group of groups) {
+            for (let segment = 0; segment < 3; segment += 1) {
+              const { start, size } = segmentBounds(value.length, segment);
+              addToBlock(
+                segmentBlocks,
+                segmentKey(group, value.length, segment, value.slice(start, start + size)),
+                index,
+              );
+            }
+          }
+        }
+      }
+    }
+    yield;
+  }
+
+  // Each contact's multi-member blocks (singletons can't form a pair).
+  const memberBlocks: Array<number[][] | null> = new Array<number[][] | null>(count).fill(null);
+  let visited = 0;
+  for (const blocks of [exactBlocks.values(), deletionBlocks.values()]) {
+    for (const block of blocks) {
+      if (typeof block !== "number") {
+        for (const member of block) {
+          (memberBlocks[member] ??= []).push(block);
+        }
+      }
+      visited += 1;
+      if ((visited & 1023) === 0) yield;
+    }
+  }
+  yield;
+
+  // 4. Score each candidate pair once, in the same (left, right) index order as
+  //    the old full scan so the final stable sort is identical.
+  const suggestions: MergeSuggestionPreview[] = [];
+  const seenBy = new Int32Array(count).fill(-1);
+  const partners: number[] = [];
+
+  const collect = (index: number, other: number) => {
+    if (other > index && seenBy[other] !== index) {
+      seenBy[other] = index;
+      partners.push(other);
+    }
+  };
+
+  for (let index = 0; index < count; index += 1) {
+    const left = features[index];
+    if (!left) {
+      yield;
+      continue;
+    }
+    partners.length = 0;
+
+    for (const block of memberBlocks[index] ?? []) {
+      // Blocks list members in ascending index order.
+      for (let position = block.length - 1; position >= 0; position -= 1) {
+        const other = block[position]!;
+        if (other <= index) break;
+        collect(index, other);
+      }
+    }
+
+    const probe = fuzzyProbes[index];
+    if (probe) {
+      for (const value of probe.strings) {
+        if (value.length < SEGMENT_SCHEME_MIN_LENGTH) continue;
+        for (
+          let partnerLength = Math.max(SEGMENT_SCHEME_MIN_LENGTH, value.length - FUZZY_EDIT_DISTANCE);
+          partnerLength <= value.length + FUZZY_EDIT_DISTANCE;
+          partnerLength += 1
+        ) {
+          for (let segment = 0; segment < 3; segment += 1) {
+            const { start, size } = segmentBounds(partnerLength, segment);
+            for (let shift = -FUZZY_EDIT_DISTANCE; shift <= FUZZY_EDIT_DISTANCE; shift += 1) {
+              const from = start + shift;
+              if (from < 0 || from + size > value.length) continue;
+              const text = value.slice(from, from + size);
+              for (const group of probe.groups) {
+                const block = segmentBlocks.get(segmentKey(group, partnerLength, segment, text));
+                if (block === undefined) continue;
+                if (typeof block === "number") {
+                  collect(index, block);
+                } else {
+                  for (const other of block) collect(index, other);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    partners.sort((a, b) => a - b);
+
+    for (let position = 0; position < partners.length; position += 1) {
+      const right = features[partners[position]!]!;
+      const { signals, reasons, contributions, score, hardMatch } = signalDetailsFromFeatures(
+        left,
+        right,
+      );
+      if (signals.length > 0) {
+        const edgeCaseWarnings = edgeCaseWarningsFromFeatures(left, right);
+        const confidence = deriveConfidence(score, hardMatch, edgeCaseWarnings.length > 0);
+        if (confidence !== "low") {
+          suggestions.push({
+            pairKey: buildPairKey(left.contact.id, right.contact.id),
+            leftContact: left.contact,
+            rightContact: right.contact,
+            confidence,
+            score,
+            reasons: [...reasons, ...edgeCaseWarnings],
+            signals,
+            contributions,
+            hardMatch,
+          });
+        }
+      }
+      if ((position & 63) === 63) yield;
+    }
+    yield;
+  }
+
+  return suggestions
+    .sort((left, right) => right.score - left.score)
+    .slice(0, MAX_MERGE_SUGGESTIONS);
+}
+
+/**
+ * Synchronous driver — same result as the async one, but blocks until done.
+ * Fine for tests and small inputs; request/sync paths use the async driver.
+ */
+export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) => {
+  const engine = mergeSuggestionEngine(contacts);
+  let step = engine.next();
+  while (!step.done) {
+    step = engine.next();
+  }
+  return step.value;
+};
+
+export type MergeSuggestionBuildOptions = {
+  /** Longest synchronous slice before yielding to the event loop (ms). */
+  sliceBudgetMs?: number;
+  /** Test hook: called with each synchronous slice's duration (ms). */
+  onSlice?: (durationMs: number) => void;
+};
+
+const DEFAULT_SLICE_BUDGET_MS = 8;
+
+const yieldToEventLoop = () => new Promise<void>((resolve) => setImmediate(resolve));
+
+/**
+ * P49A-09: the scorer, run in short synchronous slices with a macrotask yield
+ * between them, so a large address book never blocks the single Node process
+ * that also serves web + CardDAV + sync.
+ */
+export const buildContactMergeSuggestionsAsync = async (
+  contacts: MergeCandidateContact[],
+  options: MergeSuggestionBuildOptions = {},
+) => {
+  const budget = options.sliceBudgetMs ?? DEFAULT_SLICE_BUDGET_MS;
+  const engine = mergeSuggestionEngine(contacts);
+  let sliceStart = performance.now();
+  let step = engine.next();
+  while (!step.done) {
+    const now = performance.now();
+    if (now - sliceStart >= budget) {
+      options.onSlice?.(now - sliceStart);
+      await yieldToEventLoop();
+      sliceStart = performance.now();
+    }
+    step = engine.next();
+  }
+  options.onSlice?.(performance.now() - sliceStart);
+  return step.value;
 };
 
 export const buildMergedContactPreview = (
@@ -1611,7 +1991,8 @@ export const refreshMergeSuggestionsForUser = async (
     },
   });
 
-  const suggestions = buildContactMergeSuggestions(contacts);
+  // P49A-09: chunked — yields to the event loop between ~8 ms slices.
+  const suggestions = await buildContactMergeSuggestionsAsync(contacts);
   const pairKeys = suggestions.map((suggestion) => suggestion.pairKey);
 
   for (const suggestion of suggestions) {
