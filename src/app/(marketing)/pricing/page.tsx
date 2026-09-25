@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
+import { JsonLd, breadcrumbSchema, pricingSoftwareApplicationSchema } from "~/app/_components/json-ld";
 import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
 import { fetchStripePrices, formatCurrencyAmount } from "./_prices";
@@ -23,15 +23,19 @@ function getMatrixPriceLabel(
   return `${formatCurrencyAmount(prices.currency, prices[plan].monthly)}/mo`;
 }
 
+// P50A-04 · ≤ 60-char title (the marketing layout's title template is "%s",
+// so this string is never suffixed again) and ≤ 160-char description.
+const TITLE = "Kontax pricing — Free, Pro, Family and Teams";
+const DESCRIPTION =
+  "Compare Free, Pro, Family and Teams. Start free with 500 contacts; upgrade for unlimited contacts, sync accounts and the API.";
+
 export const metadata: Metadata = {
-  title: "Pricing — Kontax",
-  description:
-    "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, more sync accounts, and the developer API.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/pricing" },
   openGraph: {
-    title: "Pricing",
-    description:
-      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, more sync accounts, and the developer API.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: "/pricing",
     siteName: "Kontax",
     type: "website",
@@ -39,9 +43,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pricing — Kontax",
-    description:
-      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, more sync accounts, and the developer API.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
 };
 
@@ -67,10 +70,13 @@ export default async function PricingPage() {
   return (
     <>
       <JsonLd
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Pricing", path: "/pricing" },
-        ])}
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Pricing", path: "/pricing" },
+          ]),
+          pricingSoftwareApplicationSchema(stripePrices),
+        ]}
       />
       {/* ── Hero ── */}
       <section className="pr-hero">

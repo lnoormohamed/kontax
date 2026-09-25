@@ -18,6 +18,7 @@ import { HomeIconSprite } from "./_components/home/icons";
 import { PricingTeaser } from "./_components/home/pricing-teaser";
 import { ThreeIntoOne } from "./_components/home/three-into-one";
 import { AudienceCards, CompareTable, SecurityFacts } from "./_components/home/why-kontax";
+import { fetchStripePrices } from "./pricing/_prices";
 
 import "./homepage.css";
 
@@ -75,13 +76,19 @@ function worksWith(): string[] {
 // ?view=home). P49's section order and verified copy: hero + "three into one"
 // signature → works with → 01 how it works → 02 features → 03 comparison →
 // 04 privacy → 05 who it's for → 06 pricing → 07 FAQ → closing CTA.
-export default function HomePage() {
+export default async function HomePage() {
+  // P50A-03 · same live Stripe read /pricing and the pricing teaser use, so
+  // the SoftwareApplication Offer never disagrees with what's rendered. The
+  // process-level catalog cache (getStripeCatalog, 5 min TTL) means this and
+  // PricingTeaser's own fetch below don't double-hit Stripe.
+  const stripePrices = await fetchStripePrices();
+
   return (
     <div className="hp">
       <JsonLd
         data={[
           organizationSchema(),
-          softwareApplicationSchema(),
+          softwareApplicationSchema(stripePrices),
           websiteSchema(),
           faqPageSchema(HOMEPAGE_FAQ),
         ]}
