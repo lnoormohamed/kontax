@@ -46,5 +46,5 @@
     // entry; any future route under a dot-directory needs the same treatment.
     "src/app/.well-known/**/*.ts"
   ],
-  "exclude": ["node_modules", "generated"]
+  "exclude": ["node_modules", "generated", "roadmap", ".claude"]
 }

@@ -12,7 +12,7 @@ export default tseslint.config(
 		// `eslint .` needs its own ignores for everything that was never meant
 		// to be linted: build output, the generated Prisma client (never
 		// committed — see .gitignore), coverage, and Playwright's own output.
-		ignores: ['.next', '.next-*/**', 'generated/**', 'coverage/**', 'test-results/**', 'next-env.d.ts']
+		ignores: ['.next', '.next-*/**', 'generated/**', 'coverage/**', 'test-results/**', 'next-env.d.ts', 'roadmap/**', '.claude/**']
 	},
   ...compat.extends("next/core-web-vitals"),
   {
