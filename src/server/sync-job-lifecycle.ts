@@ -4,7 +4,10 @@
 // - lease reclaim: a RUNNING job whose lease lapsed was orphaned by a killed
 //   or crashed worker; it is failed as retryable so the account runs again;
 // - lease keeper: renews the lease of the job this process is running and
-//   registers it as in-flight work for graceful shutdown;
+//   registers it as in-flight work for graceful shutdown; a renewal that finds
+//   the job no longer RUNNING flags it, and the run stops at its checkpoint;
+// - conditional settle: a run's final status write only matches a job still
+//   RUNNING, so it can never overwrite a reclaim (runningSyncJobWhere);
 // - scheduled-retry gate: a FAILED run's nextRetryAt is honoured before the
 //   scheduler enqueues the account again;
 // - open-conflict dedup: one OPEN SyncConflict per sync link, refreshed in
@@ -60,6 +63,35 @@ export const leaseExpiredFailureData = (now: Date) =>
       "Interrupted — the worker running this sync stopped (restart or crash) before it finished. It will be retried automatically.",
   }) satisfies Prisma.SyncJobUpdateManyMutationInput;
 
+/**
+ * Where-clause for a job's final status write (Fable review of P49A-04): only
+ * a job this worker still holds as RUNNING may be settled. If the lease lapsed
+ * and reclaimExpiredSyncJobs already failed it (and the retry may be running),
+ * the write matches 0 rows and must not overwrite that state.
+ */
+export const runningSyncJobWhere = (jobId: string) =>
+  ({ id: jobId, status: "RUNNING" }) satisfies Prisma.SyncJobWhereInput;
+
+export const warnSyncJobReclaimed = (jobId: string, outcome: string) =>
+  console.warn(
+    `[sync] job ${jobId} was reclaimed (lease expired) while still running; not overwriting it with ${outcome}.`,
+  );
+
+/** Thrown at a run checkpoint once the job is known to have been reclaimed. */
+export class SyncJobReclaimedError extends Error {
+  readonly code = "SYNC_JOB_RECLAIMED";
+  constructor(jobId: string) {
+    super(`Sync job ${jobId} was reclaimed after its lease expired; stopping this run.`);
+  }
+}
+
+const updatedCount = (result: unknown): number | null =>
+  typeof result === "object" &&
+  result !== null &&
+  typeof (result as { count?: unknown }).count === "number"
+    ? (result as { count: number }).count
+    : null;
+
 export type SyncLeaseKeeper = {
   /**
    * Iterate the jobs of one drain. Stops yielding once the process is shutting
@@ -71,6 +103,10 @@ export type SyncLeaseKeeper = {
   hold(jobId: string): void;
   /** Ids currently held (for tests / diagnostics). */
   held(): string[];
+  /** True once a renewal found the job no longer RUNNING (it was reclaimed). */
+  isLost(jobId: string): boolean;
+  /** Run checkpoint: throws SyncJobReclaimedError if the job was reclaimed. */
+  assertLive(jobId: string): void;
 };
 
 export const createSyncLeaseKeeper = ({
@@ -78,11 +114,16 @@ export const createSyncLeaseKeeper = ({
   intervalMs = SYNC_LEASE_RENEW_INTERVAL_MS,
   onError = (error: unknown) => console.error("[sync] lease renewal failed", error),
 }: {
+  /**
+   * Extend the lease of `jobIds` (only while still RUNNING). Resolving to an
+   * `updateMany` result lets the keeper notice a job that was reclaimed.
+   */
   renew: (jobIds: string[], leaseExpiresAt: Date) => Promise<unknown>;
   intervalMs?: number;
   onError?: (error: unknown) => void;
 }): SyncLeaseKeeper => {
   const holds = new Map<string, () => void>();
+  const lost = new Set<string>();
   let timer: ReturnType<typeof setInterval> | null = null;
 
   const stopTimer = () => {
@@ -95,13 +136,24 @@ export const createSyncLeaseKeeper = ({
   const releaseAll = () => {
     for (const release of holds.values()) release();
     holds.clear();
+    lost.clear();
     stopTimer();
   };
 
+  // One renewal per held job (normally exactly one), so a 0-row result
+  // pinpoints the job that is no longer RUNNING.
   const tick = () => {
-    const ids = [...holds.keys()];
-    if (ids.length === 0) return;
-    renew(ids, nextSyncLeaseExpiry()).catch(onError);
+    for (const id of holds.keys()) {
+      if (lost.has(id)) continue;
+      renew([id], nextSyncLeaseExpiry())
+        .then((result) => {
+          if (updatedCount(result) === 0 && holds.has(id)) {
+            lost.add(id);
+            console.warn(`[sync] job ${id} is no longer RUNNING (reclaimed); stopping at the next checkpoint.`);
+          }
+        })
+        .catch(onError);
+    }
   };
 
   return {
@@ -125,6 +177,10 @@ export const createSyncLeaseKeeper = ({
       }
     },
     held: () => [...holds.keys()],
+    isLost: (jobId) => lost.has(jobId),
+    assertLive(jobId) {
+      if (lost.has(jobId)) throw new SyncJobReclaimedError(jobId);
+    },
   };
 };
 

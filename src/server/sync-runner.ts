@@ -66,6 +66,8 @@ import {
   leaseExpiredFailureData,
   nextSyncLeaseExpiry,
   recordOpenSyncConflict,
+  runningSyncJobWhere,
+  warnSyncJobReclaimed,
 } from "~/server/sync-job-lifecycle";
 import {
   buildProviderCapabilityDiagnostics,
@@ -484,9 +486,12 @@ const markJobFailed = async ({
     ? `Auto-paused after ${failureStreak} consecutive failures. Kontax stopped retrying to avoid hammering the server. Last error: ${errorCode}.`
     : errorSummary;
 
-  await db.$transaction([
-    db.syncJob.update({
-      where: { id: jobId },
+  // Fable review (P49A-04): settle the job only if it is still RUNNING. A job
+  // reclaimed after its lease expired is already FAILED/LEASE_EXPIRED (and its
+  // retry may be running) — leave it and the account alone.
+  const settled = await db.$transaction(async (tx) => {
+    const { count } = await tx.syncJob.updateMany({
+      where: runningSyncJobWhere(jobId),
       data: {
         status: "FAILED",
         completedAt: now,
@@ -498,8 +503,9 @@ const markJobFailed = async ({
         errorCode,
         errorSummary: jobErrorSummary,
       },
-    }),
-    db.syncAccount.update({
+    });
+    if (count === 0) return false;
+    await tx.syncAccount.update({
       where: { id: syncAccountId },
       data: {
         status: finalStatus,
@@ -510,8 +516,13 @@ const markJobFailed = async ({
         lastErrorCode: shouldAutoPause ? SYNC_AUTO_PAUSED_CODE : errorCode,
         lastErrorMessage: accountErrorSummary,
       },
-    }),
-  ]);
+    });
+    return true;
+  });
+  if (!settled) {
+    warnSyncJobReclaimed(jobId, `FAILED/${errorCode}`);
+    return;
+  }
 
   // P22-DB05 / P39-05: notify on the transition into an attention-needed state
   // (re-auth required or auto-paused) — not on every transient retry. The
@@ -573,9 +584,9 @@ const markJobHalted = async ({
   });
   const notifyOnFailure = settingsRow?.notifyOnFailure ?? true;
 
-  await db.$transaction([
-    db.syncJob.update({
-      where: { id: jobId },
+  const settled = await db.$transaction(async (tx) => {
+    const { count } = await tx.syncJob.updateMany({
+      where: runningSyncJobWhere(jobId),
       data: {
         status: "HALTED",
         completedAt: now,
@@ -584,8 +595,9 @@ const markJobHalted = async ({
         errorCode: DELETION_THRESHOLD_EXCEEDED_CODE,
         errorSummary: `Halted before commit · ${hold.total} pending removal${hold.total !== 1 ? "s" : ""}`,
       },
-    }),
-    db.syncAccount.update({
+    });
+    if (count === 0) return false;
+    await tx.syncAccount.update({
       where: { id: syncAccountId },
       data: {
         status: "PAUSED",
@@ -595,8 +607,13 @@ const markJobHalted = async ({
         deletionHold: hold,
         deletionHoldAt: now,
       },
-    }),
-  ]);
+    });
+    return true;
+  });
+  if (!settled) {
+    warnSyncJobReclaimed(jobId, "HALTED");
+    return;
+  }
 
   await notifySyncDeletionPause({
     userId,
@@ -889,9 +906,10 @@ export const runQueuedSyncJobs = async ({
       const now = new Date();
       const hasConflicts = result.conflicts > 0;
       const pushFailed = result.pushFailed ?? 0;
-      await db.$transaction([
-        db.syncJob.update({
-          where: { id: job.id },
+      // Settle only a job still RUNNING (see runningSyncJobWhere).
+      const settled = await db.$transaction(async (tx) => {
+        const { count } = await tx.syncJob.updateMany({
+          where: runningSyncJobWhere(job.id),
           data: {
             status: hasConflicts || pushFailed > 0 ? "PARTIAL" : "SUCCEEDED",
             completedAt: now,
@@ -917,8 +935,9 @@ export const runQueuedSyncJobs = async ({
             pushedUpdatedCount: result.pushedUpdated ?? 0,
             pushedDeletedCount: result.pushedDeleted ?? 0,
           },
-        }),
-        db.syncAccount.update({
+        });
+        if (count === 0) return false;
+        await tx.syncAccount.update({
           where: { id: job.syncAccountId },
           data: {
             status: result.queueFull ? "PAUSED" : "ACTIVE",
@@ -942,8 +961,12 @@ export const runQueuedSyncJobs = async ({
                 ? `${result.conflicts} sync conflicts need review before the account is fully healthy again.`
                 : null,
           },
-        }),
-      ]);
+        });
+        return true;
+      });
+      if (!settled) {
+        warnSyncJobReclaimed(job.id, hasConflicts || pushFailed > 0 ? "PARTIAL" : "SUCCEEDED");
+      }
       return hasConflicts || pushFailed > 0 ? "partial" : "succeeded";
     } catch (error) {
       // P39-02: a deletion-threshold trip is a protective halt, not a failure.
@@ -1018,8 +1041,8 @@ export const runQueuedSyncJobs = async ({
       select: { id: true },
     });
     if (siblingRunning) {
-      await db.syncJob.update({
-        where: { id: job.id },
+      await db.syncJob.updateMany({
+        where: runningSyncJobWhere(job.id),
         data: { status: "QUEUED", startedAt: null, workerId: null, leaseExpiresAt: null },
       });
       summary.skipped += 1;
@@ -1162,8 +1185,8 @@ export const runQueuedSyncJobs = async ({
       settings.bookAllowlist.length > 0 &&
       !settings.bookAllowlist.includes(job.syncAccount.addressBookUrl)
     ) {
-      await db.syncJob.update({
-        where: { id: job.id },
+      await db.syncJob.updateMany({
+        where: runningSyncJobWhere(job.id),
         data: {
           status: "SUCCEEDED",
           completedAt: new Date(),
@@ -1635,6 +1658,10 @@ export const runQueuedSyncJobs = async ({
           ),
         );
       }
+
+      // Checkpoint before anything is written: if a lease renewal found this
+      // job reclaimed (its retry may already be running), stop here.
+      leaseKeeper.assertLive(job.id);
 
       // Execute outbound writes to CardDAV (outside the DB transaction — network I/O).
       const pushedLinks: Array<{ linkId: string; newETag: string | null; newHref: string }> = [];
@@ -2153,8 +2180,8 @@ export const runQueuedSyncJobs = async ({
         });
         const queueFull = openConflictCount >= MANUAL_CONFLICT_QUEUE_LIMIT;
 
-        await tx.syncJob.update({
-          where: { id: job.id },
+        const settledJob = await tx.syncJob.updateMany({
+          where: runningSyncJobWhere(job.id),
           data: {
             status: conflictEntries.length > 0 ? "PARTIAL" : "SUCCEEDED",
             completedAt: new Date(),
@@ -2193,6 +2220,12 @@ export const runQueuedSyncJobs = async ({
             })(),
           },
         });
+        // Reclaimed mid-run: the links/contacts above still commit (the
+        // remote pushes already happened), but the job row keeps its reclaimed
+        // FAILED/LEASE_EXPIRED state instead of being overwritten.
+        if (settledJob.count === 0) {
+          warnSyncJobReclaimed(job.id, conflictEntries.length > 0 ? "PARTIAL" : "SUCCEEDED");
+        }
 
         await tx.syncAccount.update({
           where: { id: job.syncAccountId },

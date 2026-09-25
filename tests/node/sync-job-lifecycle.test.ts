@@ -14,8 +14,10 @@ import {
   isSyncLeaseExpired,
   leaseExpiredFailureData,
   recordOpenSyncConflict,
+  runningSyncJobWhere,
   SYNC_JOB_IN_FLIGHT_PREFIX,
   SYNC_LEASE_EXPIRED_CODE,
+  SyncJobReclaimedError,
 } from "../../src/server/sync-job-lifecycle";
 import { staleDataExportWhere } from "../../src/server/data-export/jobs";
 import { stalledKontaxExportWhere } from "../../src/server/export-format/jobs";
@@ -118,6 +120,52 @@ test("a RUNNING job with an expired lease is reclaimed and the account is enqueu
 test("a live lease is not reclaimed", () => {
   const live = job({ status: "RUNNING", leaseExpiresAt: at(12 * MIN) });
   assert.equal(matchesWhere(live, expiredSyncLeaseWhere(at(11 * MIN))), false);
+});
+
+test("a still-live run's final write cannot overwrite a job that was reclaimed", () => {
+  // The worker was stalled past its lease (renewals failing), the next drain
+  // reclaimed the job, and then the stalled run finished.
+  const row = job({ id: "slow", status: "RUNNING", leaseExpiresAt: at(10 * MIN) });
+  const reclaimAt = at(11 * MIN);
+  if (matchesWhere(row, expiredSyncLeaseWhere(reclaimAt))) Object.assign(row, leaseExpiredFailureData(reclaimAt));
+  assert.equal(row.status, "FAILED");
+
+  // The runner's settle is updateMany({ where: runningSyncJobWhere(id) }).
+  const settle = (data: Partial<JobRow>) => {
+    const where = runningSyncJobWhere(row.id);
+    if (!matchesWhere(row, where)) return { count: 0 };
+    Object.assign(row, data);
+    return { count: 1 };
+  };
+  assert.deepEqual(settle({ status: "SUCCEEDED", errorCode: null, nextRetryAt: null }), { count: 0 });
+  assert.equal(row.status, "FAILED", "the reclaimed state stands");
+  assert.equal(row.errorCode, SYNC_LEASE_EXPIRED_CODE);
+  assert.equal(row.nextRetryAt?.getTime(), reclaimAt.getTime(), "its retry is still scheduled");
+
+  // A job this worker still holds settles normally.
+  const held = job({ id: "held", status: "RUNNING" });
+  assert.equal(matchesWhere(held, runningSyncJobWhere("held")), true);
+});
+
+test("lease keeper flags a job whose renewal finds it no longer RUNNING, and stops it at the checkpoint", async () => {
+  const running = new Set(["a"]);
+  const keeper = createSyncLeaseKeeper({
+    renew: async (ids) => ({ count: ids.filter((id) => running.has(id)).length }),
+    intervalMs: 5,
+  });
+
+  for (const id of keeper.iterate(["a"])) {
+    keeper.hold(id);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal(keeper.isLost(id), false, "a renewed job is live");
+    keeper.assertLive(id);
+
+    running.delete(id); // reclaimed by another drain
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal(keeper.isLost(id), true);
+    assert.throws(() => keeper.assertLive(id), SyncJobReclaimedError);
+  }
+  assert.equal(keeper.isLost("a"), false, "state is dropped with the hold");
 });
 
 test("decideScheduledRun honours nextRetryAt", () => {
