@@ -366,6 +366,14 @@ model User {
   // collide in a unique index); the constraint only forbids two users sharing
   // the same live token. Run scripts/precheck-p48-14-uniqueness.mjs first.
   calToken                         String?                           @unique
+  // P48-18: the calendar token is stored as sha256(token) hex for lookup, plus
+  // an encrypted display copy (src/server/capability-tokens.ts) so Settings can
+  // show the subscribe URL again. `calToken` above is legacy: app code never
+  // writes a value to it any more; the dual-read fallback reads it and the
+  // backfill (scripts/backfill-p48-18-token-hashes.mjs) nulls it. Dropped in a
+  // follow-up migration.
+  calTokenHash                     String?                           @unique
+  calTokenEncrypted                String?
   // P22-04: repeated failed-login detection
   failedLoginAttempts              FailedLoginAttempt[]
   // P26-04: first-run onboarding checklist state
@@ -1438,6 +1446,10 @@ model GroupMember {
   // src/lib/sharing-policy.ts. Each member controls their own policy per book.
   sharingPolicy          Json?
   inviteToken            String?           @unique
+  // P48-18: sha256(invite token) hex. `inviteToken` above is legacy (dual-read
+  // only, nulled by the backfill). No display copy — the token is only ever
+  // emailed, and resend issues a new one.
+  inviteTokenHash        String?           @unique
   inviteExpiresAt        DateTime?
   invitedAt              DateTime          @default(now())
   invitedByUserId        String?
@@ -1613,6 +1625,11 @@ model ContactShare {
   contactId          String?
   shareType          ShareType
   token              String?        @unique
+  // P48-18: sha256(token) hex for lookup + encrypted display copy for the
+  // sharing panel. `token` above is legacy (dual-read only, nulled by the
+  // backfill).
+  tokenHash          String?        @unique
+  tokenEncrypted     String?
   recipientUserId    String?
   recipientEmail     String?
   recipientContactId String?

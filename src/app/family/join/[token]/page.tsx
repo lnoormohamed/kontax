@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { acceptFamilyInvite, declineFamilyInvite } from "~/app/actions/family";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
+import { findMemberByInviteToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 
 function JoinCard({ children }: { children: React.ReactNode }) {
@@ -34,12 +35,16 @@ export default async function FamilyJoinPage({
 }) {
   const { token } = await params;
 
-  const member = await db.groupMember.findUnique({
-    where: { inviteToken: token },
-    include: {
-      group: { include: { owner: { select: { name: true, email: true } } } },
-    },
-  });
+  // P48-18: hash-first lookup; invites emailed before the deploy still resolve
+  // through the legacy plaintext fallback.
+  const member = await findMemberByInviteToken(token, (where) =>
+    db.groupMember.findUnique({
+      where,
+      include: {
+        group: { include: { owner: { select: { name: true, email: true } } } },
+      },
+    }),
+  );
 
   const session = await auth();
 

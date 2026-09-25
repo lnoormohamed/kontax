@@ -10,6 +10,11 @@ import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateContactsTx, getUserBillingContext, lockUserForPlanCheck } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
+import {
+  clearedInviteTokenColumns,
+  findMemberByInviteToken,
+  inviteTokenColumns,
+} from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -225,7 +230,8 @@ export const inviteTeamMember = async (formData: FormData) => {
       role,
       inviteStatus: "PENDING" as const,
       canEdit: true,
-      inviteToken: token,
+      // P48-18: hash only — the token itself exists only in the invite email.
+      ...inviteTokenColumns(token),
       inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
       invitedByUserId: userId,
     };
@@ -251,7 +257,9 @@ export const inviteTeamMember = async (formData: FormData) => {
 export const acceptTeamInvite = async (formData: FormData) => {
   const userId = await requireUserId({ write: true });
   const token = str(formData, "token");
-  const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
+  const member = await findMemberByInviteToken(token, (where) =>
+    db.groupMember.findUnique({ where }),
+  );
   if (member?.inviteStatus !== "PENDING") {
     throw new Error("This invite is no longer valid.");
   }
@@ -273,7 +281,7 @@ export const acceptTeamInvite = async (formData: FormData) => {
       userId,
       inviteStatus: "ACCEPTED",
       joinedAt: new Date(),
-      inviteToken: null,
+      ...clearedInviteTokenColumns(),
       inviteExpiresAt: null,
     },
   });
@@ -285,11 +293,13 @@ export const acceptTeamInvite = async (formData: FormData) => {
 export const declineTeamInvite = async (formData: FormData) => {
   await requireUserId({ write: true });
   const token = str(formData, "token");
-  const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
+  const member = await findMemberByInviteToken(token, (where) =>
+    db.groupMember.findUnique({ where }),
+  );
   if (member?.inviteStatus === "PENDING") {
     await db.groupMember.update({
       where: { id: member.id },
-      data: { inviteStatus: "DECLINED", inviteToken: null, inviteExpiresAt: null },
+      data: { inviteStatus: "DECLINED", ...clearedInviteTokenColumns(), inviteExpiresAt: null },
     });
   }
   revalidatePath("/settings/sharing/teams");
@@ -490,7 +500,8 @@ export const resendTeamInvite = async (formData: FormData) => {
   const token = randomBytes(24).toString("base64url");
   await db.groupMember.update({
     where: { id: member.id },
-    data: { inviteToken: token, inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS) },
+    // P48-18: also nulls a legacy plaintext token, so the old link dies.
+    data: { ...inviteTokenColumns(token), inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS) },
   });
   const recipient = await db.user.findUnique({
     where: { email: member.invitedEmail },

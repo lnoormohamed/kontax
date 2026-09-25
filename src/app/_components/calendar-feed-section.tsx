@@ -7,15 +7,24 @@ import { ensureCalTokenAction, regenerateCalTokenAction } from "~/app/actions/no
 /**
  * P22-11: calendar-feed token management. Generate the subscribable .ics URL,
  * copy it, or regenerate (revoking the old token). Lives in /settings/notifications.
+ *
+ * P48-18: `initialUnavailable` means a token exists but its encrypted display
+ * copy could not be decrypted (e.g. the key was retired) — the old URL may
+ * still work for existing subscribers, but it can't be shown, so the only
+ * offer is "Regenerate link".
  */
 export function CalendarFeedSection({
   baseUrl,
   initialToken,
+  initialUnavailable = false,
 }: {
   baseUrl: string;
   initialToken: string | null;
+  initialUnavailable?: boolean;
 }) {
   const [token, setToken] = useState(initialToken);
+  const [unavailable, setUnavailable] = useState(!initialToken && initialUnavailable);
+  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -23,13 +32,25 @@ export function CalendarFeedSection({
 
   const generate = () =>
     startTransition(async () => {
-      setToken(await ensureCalTokenAction());
+      setError(null);
+      try {
+        setToken(await ensureCalTokenAction());
+      } catch {
+        // The only expected failure is an existing token that can't be shown.
+        setUnavailable(true);
+      }
     });
 
   const regenerate = () =>
     startTransition(async () => {
-      setToken(await regenerateCalTokenAction());
-      setCopied(false);
+      setError(null);
+      try {
+        setToken(await regenerateCalTokenAction());
+        setUnavailable(false);
+        setCopied(false);
+      } catch {
+        setError("Couldn't regenerate the calendar link. Try again.");
+      }
     });
 
   const copy = async () => {
@@ -80,6 +101,22 @@ export function CalendarFeedSection({
               {pending ? "Regenerating…" : "Regenerate link (revokes the old one)"}
             </button>
           </>
+        ) : unavailable ? (
+          <>
+            <p className="mt-4 rounded-lg border border-[#ecd9cf] bg-[#fbf4f0] px-3 py-2.5 text-[13px] leading-5 text-[#7a3a26]">
+              Your calendar link can&apos;t be displayed any more. Existing subscriptions may keep
+              working, but to copy the link again you need to regenerate it — this revokes the old
+              one.
+            </p>
+            <button
+              className="mt-3 h-10 rounded-lg bg-[#17352e] px-4 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-50"
+              disabled={pending}
+              onClick={regenerate}
+              type="button"
+            >
+              {pending ? "Regenerating…" : "Regenerate link"}
+            </button>
+          </>
         ) : (
           <button
             className="mt-4 h-10 rounded-lg bg-[#17352e] px-4 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-50"
@@ -90,6 +127,11 @@ export function CalendarFeedSection({
             {pending ? "Generating…" : "Generate calendar URL"}
           </button>
         )}
+        {error ? (
+          <p className="mt-2 text-[12.5px] text-[#b5472f]" role="alert">
+            {error}
+          </p>
+        ) : null}
       </section>
     </div>
   );

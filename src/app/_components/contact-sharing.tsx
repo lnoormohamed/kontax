@@ -10,6 +10,7 @@ import {
   createLiveShare,
   createStaticShare,
   createVcardShareLink,
+  regenerateVcardShareLink,
   revokeShare,
   unlinkLiveShare,
 } from "~/app/actions/shares";
@@ -25,6 +26,7 @@ export type ShareItem = {
 
 export type VcardLinkItem = {
   id: string;
+  /** P48-18: the decrypted display token, or null when it can't be shown. */
   token: string | null;
   downloadCount: number;
   expiresAt: string | null;
@@ -623,15 +625,38 @@ export function ContactSharing({
             <div className="grid gap-3">
               {vcardLinks.map((link) => (
                 <div key={link.id}>
-                  <CopyField
-                    helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
-                      link.maxDownloads != null ? ` · one-time use` : ""
-                    }${
-                      link.expiresAt ? ` · expires ${formatDate(link.expiresAt)}` : link.maxDownloads == null ? " · no expiry" : ""
-                    }`}
-                    label="Share link"
-                    value={`${shareOrigin}/share/${link.token}`}
-                  />
+                  {link.token ? (
+                    <CopyField
+                      helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
+                        link.maxDownloads != null ? ` · one-time use` : ""
+                      }${
+                        link.expiresAt ? ` · expires ${formatDate(link.expiresAt)}` : link.maxDownloads == null ? " · no expiry" : ""
+                      }`}
+                      label="Share link"
+                      value={`${shareOrigin}/share/${link.token}`}
+                    />
+                  ) : (
+                    // P48-18: the link's encrypted display copy can't be
+                    // decrypted (key retired). It may still work for whoever
+                    // already has it, but it can't be shown — offer an explicit
+                    // regenerate (revokes it and issues a replacement).
+                    <div className="rounded-[9px] border border-[#ecd9cf] bg-[#fbf4f0] px-3 py-2.5">
+                      <p className="text-[13px] leading-5 text-[#7a3a26]">
+                        This share link can&apos;t be displayed any more. Regenerate it to get a new
+                        link — the old one will stop working.
+                      </p>
+                      <form action={regenerateVcardShareLink}>
+                        <input name="shareId" type="hidden" value={link.id} />
+                        <input name="contactId" type="hidden" value={contactId} />
+                        <button
+                          className="mt-1.5 text-[13px] font-semibold text-[#17352e] hover:underline"
+                          type="submit"
+                        >
+                          Regenerate link
+                        </button>
+                      </form>
+                    </div>
+                  )}
                   <form action={revokeShare}>
                     <input name="shareId" type="hidden" value={link.id} />
                     <input name="contactId" type="hidden" value={contactId} />

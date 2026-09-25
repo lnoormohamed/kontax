@@ -3,6 +3,7 @@ import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { CalendarFeedSection } from "~/app/_components/calendar-feed-section";
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
+import { calDisplayToken, calTokenDisplaySelect } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { appUrl } from "~/server/email";
 import { getNotificationSettings } from "~/server/notifications";
@@ -94,9 +95,12 @@ export default async function NotificationSettingsPage() {
   const prefs = await getNotificationSettings(session.user.id);
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { reminderLeadDays: true, calToken: true },
+    select: { reminderLeadDays: true, ...calTokenDisplaySelect },
   });
   const leadDays = user?.reminderLeadDays ?? 7;
+  // P48-18: decrypt the display copy (or use a not-yet-backfilled legacy
+  // token). Never throws — an undecryptable copy becomes "Regenerate link".
+  const calendarToken = calDisplayToken(user);
 
   return (
     <>
@@ -207,7 +211,11 @@ export default async function NotificationSettingsPage() {
           </SettingsCard>
         </div>
 
-        <CalendarFeedSection baseUrl={appUrl()} initialToken={user?.calToken ?? null} />
+        <CalendarFeedSection
+          baseUrl={appUrl()}
+          initialToken={calendarToken.status === "ok" ? calendarToken.token : null}
+          initialUnavailable={calendarToken.status === "unavailable"}
+        />
 
         <div>
           <button
