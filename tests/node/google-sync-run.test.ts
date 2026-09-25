@@ -370,3 +370,26 @@ test("400 FAILED_PRECONDITION on a stale etag refetches and opens a conflict", a
   assert.equal(fake.conflicts[0]?.status, "OPEN");
   assert.equal(fake.conflicts[0]?.remoteETag, "e1-remote");
 });
+
+test("an unresolved stale-etag conflict is refreshed on the next run, not duplicated (A-06)", async () => {
+  await seedFromGoogle([person(1)]);
+  await fake.editContact(fake.contactByRemoteUid("people/c1")!.id, { nickname: "Mine" });
+
+  api.onUpdate = () => {
+    throw googleError(
+      400,
+      "FAILED_PRECONDITION",
+      "Request person.etag is different than the current person.etag. Clear local cache and get the latest person.",
+    );
+  };
+  api.onGet = (resourceName) => ({ data: person(1, { resourceName, etag: "e1-remote", nicknames: [{ value: "Theirs" }] }) });
+  api.onList = () => ({ data: { connections: [], nextSyncToken: "t1" } });
+
+  await runSync();
+  api.onGet = (resourceName) => ({ data: person(1, { resourceName, etag: "e2-remote", nicknames: [{ value: "Theirs" }] }) });
+  await runSync();
+
+  const open = fake.conflicts.filter((row) => row.status === "OPEN");
+  assert.equal(open.length, 1);
+  assert.equal(open[0]?.remoteETag, "e2-remote");
+});

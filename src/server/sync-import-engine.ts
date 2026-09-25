@@ -33,6 +33,7 @@ import {
   stripExcludedPortableFields,
 } from "~/server/sync-field-exclusions";
 import { MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
+import { recordOpenSyncConflict } from "~/server/sync-job-lifecycle";
 import {
   buildProviderCapabilityDiagnostics,
   buildProviderSupportedContactShadow,
@@ -322,29 +323,29 @@ export const applyRemoteToContact = async (
 };
 
 // Record a MANUAL-policy local↔remote mutation conflict for the review queue.
+// P49A-04 (A-06): one OPEN conflict per link — a divergence that is still
+// unresolved on the next run refreshes the existing row instead of stacking a
+// duplicate. Returns true only when a new conflict was opened.
 export const openMutationConflict = async (
   account: ImportEngineAccount,
   link: { id: string },
   contact: ContactConflictSnapshotInput,
   remoteSnapshot: Prisma.InputJsonValue,
   etag: string | null,
-) => {
-  await db.$transaction(async (tx) => {
-    const conflict = await tx.syncConflict.create({
-      data: {
-        syncAccountId: account.id,
-        syncContactLinkId: link.id,
-        contactId: contact.id,
-        conflictType: "LOCAL_REMOTE_MUTATION",
-        status: "OPEN",
-        localSyncVersion: contact.syncVersion,
-        remoteETag: etag,
-        localSnapshot: buildLocalConflictSnapshot(contact),
-        remoteSnapshot,
-        resolutionNotes: `Both Kontax and ${account.providerName} changed this contact since the last sync.`,
-      },
-      select: { id: true },
+): Promise<boolean> =>
+  db.$transaction(async (tx) => {
+    const conflict = await recordOpenSyncConflict(tx, {
+      syncAccountId: account.id,
+      syncContactLinkId: link.id,
+      contactId: contact.id,
+      conflictType: "LOCAL_REMOTE_MUTATION",
+      localSyncVersion: contact.syncVersion,
+      remoteETag: etag,
+      localSnapshot: buildLocalConflictSnapshot(contact),
+      remoteSnapshot,
+      resolutionNotes: `Both Kontax and ${account.providerName} changed this contact since the last sync.`,
     });
+    if (conflict.outcome !== "created") return false;
     await emitEvent(tx, {
       userId: account.userId,
       contactId: contact.id,
@@ -357,8 +358,8 @@ export const openMutationConflict = async (
         remoteETag: etag ?? undefined,
       },
     });
+    return true;
   });
-};
 
 // Write an AUTO_RESOLVED audit row for a policy-resolved mutation conflict.
 export const recordAutoResolved = async (
@@ -411,22 +412,19 @@ const handleTombstone = async (
   const localChanged = isLocalChanged(link.lastSyncedAt, contact.updatedAt);
 
   if (account.conflictPolicy === "MANUAL") {
-    await db.$transaction(async (tx) => {
-      const conflict = await tx.syncConflict.create({
-        data: {
-          syncAccountId: account.id,
-          syncContactLinkId: link.id,
-          contactId: contact.id,
-          conflictType: "DELETE_CONFLICT",
-          status: "OPEN",
-          localSyncVersion: contact.syncVersion,
-          remoteETag: null,
-          localSnapshot: buildLocalConflictSnapshot(contact),
-          remoteSnapshot: { deleted: true, remoteUid },
-          resolutionNotes: `Contact deleted on ${account.providerName} while it still exists in Kontax.`,
-        },
-        select: { id: true },
+    const opened = await db.$transaction(async (tx) => {
+      const conflict = await recordOpenSyncConflict(tx, {
+        syncAccountId: account.id,
+        syncContactLinkId: link.id,
+        contactId: contact.id,
+        conflictType: "DELETE_CONFLICT",
+        localSyncVersion: contact.syncVersion,
+        remoteETag: null,
+        localSnapshot: buildLocalConflictSnapshot(contact),
+        remoteSnapshot: { deleted: true, remoteUid },
+        resolutionNotes: `Contact deleted on ${account.providerName} while it still exists in Kontax.`,
       });
+      if (conflict.outcome !== "created") return false;
       await emitEvent(tx, {
         userId: account.userId,
         contactId: contact.id,
@@ -435,8 +433,9 @@ const handleTombstone = async (
         actorDetail: account.label,
         payload: { conflictId: conflict.id, conflictType: "DELETE_CONFLICT" },
       });
+      return true;
     });
-    summary.conflicts += 1;
+    if (opened) summary.conflicts += 1;
     return;
   }
 
@@ -692,8 +691,9 @@ export const importRemoteContactBatch = async (
         // Keep local; a future push carries it. Do not apply remote or advance etag.
         await recordAutoResolved(account, link, link.contact, item.remoteSnapshot, item.etag, "KEEP_LOCAL", now);
       } else {
-        await openMutationConflict(account, link, link.contact, item.remoteSnapshot, item.etag);
-        summary.conflicts += 1;
+        if (await openMutationConflict(account, link, link.contact, item.remoteSnapshot, item.etag)) {
+          summary.conflicts += 1;
+        }
       }
       continue;
     }

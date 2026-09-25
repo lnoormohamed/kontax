@@ -151,6 +151,16 @@ export const createFakeSyncDb = () => {
       },
       count: async ({ where }: { where?: Where }) =>
         conflicts.filter((row) => matches(row, where)).length,
+      findFirst: async ({ where }: { where?: Where }) => {
+        const row = conflicts.filter((candidate) => matches(candidate, where)).at(-1);
+        return row ? { ...row } : null;
+      },
+      update: async ({ where, data }: { where: { id: string }; data: Record<string, unknown> }) => {
+        const row = conflicts.find((candidate) => candidate.id === where.id);
+        if (!row) throw new Error(`fake db: conflict ${where.id} not found`);
+        applyData(row, data);
+        return { ...row };
+      },
     },
     activityEvent: {
       create: async ({ data }: { data: Record<string, unknown> }) => {
