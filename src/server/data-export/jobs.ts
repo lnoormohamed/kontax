@@ -1,13 +1,48 @@
+import type { Prisma } from "../../../generated/prisma";
 import { db } from "~/server/db";
 
-export async function getActiveDataExportJob(userId: string) {
+// P49A-04: the cron route that builds an export is capped at 5 minutes
+// (maxDuration); a job still PROCESSING long after that was orphaned by a
+// restart or crash. Left alone it counts as "active" forever and blocks every
+// new export request for that user.
+export const DATA_EXPORT_PROCESSING_TIMEOUT_MS = 30 * 60 * 1000;
+export const DATA_EXPORT_INTERRUPTED_MESSAGE =
+  "Interrupted — the export stopped before it finished (server restart). Request a new export.";
+
+export const staleDataExportWhere = (now: Date) =>
+  ({
+    status: "PROCESSING",
+    OR: [
+      { startedAt: { lt: new Date(now.getTime() - DATA_EXPORT_PROCESSING_TIMEOUT_MS) } },
+      { startedAt: null },
+    ],
+  }) satisfies Prisma.DataExportJobWhereInput;
+
+export async function getActiveDataExportJob(userId: string, now: Date = new Date()) {
   return db.dataExportJob.findFirst({
     where: {
       userId,
       status: { in: ["PENDING", "PROCESSING", "READY"] },
+      // P49A-04: a stale PROCESSING row is not "active" even before the cron
+      // reclaims it — never let it block a fresh request.
+      NOT: staleDataExportWhere(now),
     },
     orderBy: { requestedAt: "desc" },
   });
+}
+
+/** P49A-04: fail PROCESSING jobs orphaned past the timeout; returns the count. */
+export async function reclaimStaleDataExportJobs(now: Date = new Date()) {
+  const result = await db.dataExportJob.updateMany({
+    where: staleDataExportWhere(now),
+    data: { status: "FAILED", completedAt: now, errorMessage: DATA_EXPORT_INTERRUPTED_MESSAGE },
+  });
+  if (result.count > 0) {
+    console.warn(
+      `[data-export] reclaimed ${result.count} export job(s) stuck in PROCESSING; marked FAILED.`,
+    );
+  }
+  return result.count;
 }
 
 export async function createDataExportJob(userId: string, includeArchived = false) {

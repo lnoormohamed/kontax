@@ -1,4 +1,5 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { constants as osConstants } from "node:os";
 
 const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
 const nodeEnv = (process.env.NODE_ENV ?? "").trim().toLowerCase();
@@ -208,5 +209,37 @@ if (schemaMode === "migrate") {
   console.log("[startup] Skipping schema step before boot.");
 }
 
+// P49A-04: this script is PID 1 in the container. It used to finish with
+// `spawnSync("npm", ["start"])`, leaving the real server (`node server.mjs`,
+// what `npm start` runs) two levels down while PID 1 sat blocked with no
+// signal handler — so `docker stop` never reached server.mjs's graceful
+// shutdown and every deploy ended in SIGKILL mid-sync. Spawn the server
+// directly (asynchronously, so this process stays responsive), forward the
+// stop signals to it, and exit with its exit status.
 console.log("[startup] Starting Kontax.");
-run("npm", ["start"]);
+const server = spawn(process.execPath, ["server.mjs"], {
+  stdio: "inherit",
+  env: process.env,
+});
+
+for (const signal of ["SIGTERM", "SIGINT"]) {
+  process.on(signal, () => {
+    if (server.exitCode !== null || server.signalCode !== null) return;
+    console.log(`[startup] Received ${signal}; forwarding to the Kontax server (pid ${server.pid}).`);
+    server.kill(signal);
+  });
+}
+
+server.on("error", (error) => {
+  console.error("[startup] Could not start the Kontax server:", error);
+  process.exit(1);
+});
+
+server.on("exit", (code, signal) => {
+  if (signal) {
+    console.log(`[startup] Kontax server terminated by ${signal}.`);
+    process.exit(128 + (osConstants.signals[signal] ?? 0));
+  }
+  console.log(`[startup] Kontax server exited with code ${code}.`);
+  process.exit(code ?? 1);
+});

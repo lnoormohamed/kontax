@@ -2352,13 +2352,88 @@ server.listen(port, hostname, () => {
   console.log(`Kontax server ready on http://${hostname}:${port}`);
 });
 
-const shutdown = async () => {
-  await prisma.$disconnect().catch(() => undefined);
-  if (davRedis) {
-    davRedis.disconnect();
-  }
-  process.exit(0);
+// P49A-04: graceful shutdown. On SIGTERM (forwarded by
+// scripts/runtime/start-production.mjs, PID 1 in the container):
+//   1. flag the process as shutting down — the Next side (sync-runner's lease
+//      keeper, the export jobs) checks the flag before claiming new work;
+//   2. stop accepting connections (server.close) and drop idle keep-alives;
+//   3. wait up to SHUTDOWN_GRACE_MS for in-flight jobs and requests;
+//   4. disconnect and exit. Work still running at the deadline is abandoned;
+//      its sync job is reclaimed once its lease lapses (reclaimExpiredSyncJobs).
+// The flag lives on globalThis under the key src/server/process-lifecycle.ts
+// uses, because this file and the Next bundle load separate module instances.
+const SHUTDOWN_GRACE_MS = (() => {
+  const parsed = Number.parseInt(process.env.SHUTDOWN_GRACE_MS ?? "", 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 20_000;
+})();
+
+const getProcessLifecycle = () => {
+  const key = Symbol.for("kontax.processLifecycle");
+  globalThis[key] ??= { shuttingDown: false, inFlight: new Map() };
+  return globalThis[key];
 };
 
-process.on("SIGTERM", () => void shutdown());
-process.on("SIGINT", () => void shutdown());
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let shutdownPromise = null;
+
+const shutdown = (signal) => {
+  // Idempotent: Ctrl-C delivers SIGINT to the whole process group, so the
+  // server can see it both directly and forwarded by the start script.
+  if (shutdownPromise) return shutdownPromise;
+
+  shutdownPromise = (async () => {
+    const startedAt = Date.now();
+    const deadline = startedAt + SHUTDOWN_GRACE_MS;
+    const lifecycle = getProcessLifecycle();
+    lifecycle.shuttingDown = true;
+    console.log(
+      `[Kontax] ${signal} received — draining: no new connections or job claims; waiting up to ${Math.round(SHUTDOWN_GRACE_MS / 1000)} s for in-flight work.`,
+    );
+
+    let httpClosed = false;
+    server.close(() => {
+      httpClosed = true;
+    });
+
+    while (Date.now() < deadline && (lifecycle.inFlight.size > 0 || !httpClosed)) {
+      // Keep-alive sockets that go idle mid-drain would hold close() open.
+      server.closeIdleConnections();
+      await delay(200);
+    }
+
+    if (lifecycle.inFlight.size > 0 || !httpClosed) {
+      const running = [...lifecycle.inFlight.values()];
+      console.warn(
+        `[Kontax] shutdown grace period (${Math.round(SHUTDOWN_GRACE_MS / 1000)} s) elapsed; exiting with ${running.length} job(s) still running${running.length ? ` (${running.join(", ")})` : ""} and HTTP ${httpClosed ? "closed" : "connections still open"}. Interrupted sync jobs are reclaimed when their lease expires.`,
+      );
+      server.closeAllConnections();
+      // Expire the abandoned sync jobs' leases now, so the next drain (on the
+      // replacement container) reclaims them at once instead of ~10 min later.
+      const abandonedSyncJobIds = running
+        .filter((label) => label.startsWith("sync-job:"))
+        .map((label) => label.slice("sync-job:".length));
+      if (abandonedSyncJobIds.length > 0) {
+        await prisma.syncJob
+          .updateMany({
+            where: { id: { in: abandonedSyncJobIds }, status: "RUNNING" },
+            data: { leaseExpiresAt: new Date() },
+          })
+          .catch((error) => console.error("[Kontax] could not release abandoned sync leases", error));
+      }
+    } else {
+      console.log(`[Kontax] drained cleanly in ${Date.now() - startedAt} ms.`);
+    }
+
+    await prisma.$disconnect().catch(() => undefined);
+    if (davRedis) {
+      davRedis.disconnect();
+    }
+    process.exit(0);
+  })();
+
+  return shutdownPromise;
+};
+
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
+process.on("SIGINT", () => void shutdown("SIGINT"));

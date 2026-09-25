@@ -60,6 +60,14 @@ import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
 import {
+  createSyncLeaseKeeper,
+  decideScheduledRun,
+  expiredSyncLeaseWhere,
+  leaseExpiredFailureData,
+  nextSyncLeaseExpiry,
+  recordOpenSyncConflict,
+} from "~/server/sync-job-lifecycle";
+import {
   buildProviderCapabilityDiagnostics,
   buildProviderSupportedContactShadow,
   type ProviderCapabilityDiagnostics,
@@ -627,6 +635,25 @@ const runPostImportDedupSafely = async (
   }
 };
 
+// P49A-04: a RUNNING job whose lease lapsed was orphaned by a worker that died
+// (deploy SIGKILL, crash, OOM). Left alone it blocks its account forever —
+// enqueueDueSyncJobs skips accounts with a RUNNING job and the runner's
+// same-account guard reverts every new claim. Fail it as retryable instead; a
+// live worker renews its lease (createSyncLeaseKeeper), so only dead claims
+// lapse. Runs at the start of every enqueue and drain; cheap when idle.
+export const reclaimExpiredSyncJobs = async (now: Date = new Date()): Promise<number> => {
+  const result = await db.syncJob.updateMany({
+    where: expiredSyncLeaseWhere(now),
+    data: leaseExpiredFailureData(now),
+  });
+  if (result.count > 0) {
+    console.warn(
+      `[sync] reclaimed ${result.count} sync job(s) with an expired lease (orphaned by a stopped worker); marked FAILED/LEASE_EXPIRED for retry.`,
+    );
+  }
+  return result.count;
+};
+
 // P34D-03: enqueue a SCHEDULED sync for every ACTIVE account that is due per its
 // effective frequency. Skips manual-only accounts and accounts that already have
 // a QUEUED/RUNNING job (so ticks don't pile up). The cron route runs the queue
@@ -636,6 +663,7 @@ export const enqueueDueSyncJobs = async (): Promise<{
   skipped: number;
   deferred: number;
 }> => {
+  await reclaimExpiredSyncJobs();
   const now = Date.now();
   const accounts = await db.syncAccount.findMany({
     // P36-DB02: skip accounts awaiting initial setup (setupCompletedAt null) — the
@@ -675,6 +703,23 @@ export const enqueueDueSyncJobs = async (): Promise<{
       !account.lastSyncedAt || now - account.lastSyncedAt.getTime() >= freqMinutes * 60_000;
     if (!due) {
       skipped += 1;
+      continue;
+    }
+
+    // P49A-04: honour the backoff a failed run scheduled (nextRetryAt) instead
+    // of re-running a failing account on every tick; a due retry carries the
+    // next attempt number so the backoff ladder advances.
+    const latestOutcome = await db.syncJob.findFirst({
+      where: {
+        syncAccountId: account.id,
+        status: { in: ["SUCCEEDED", "PARTIAL", "FAILED"] },
+      },
+      orderBy: [{ createdAt: "desc" }],
+      select: { status: true, nextRetryAt: true, attemptCount: true, maxAttempts: true },
+    });
+    const decision = decideScheduledRun(latestOutcome, new Date(now));
+    if (decision.action === "defer") {
+      deferred += 1;
       continue;
     }
 
@@ -724,7 +769,7 @@ export const enqueueDueSyncJobs = async (): Promise<{
         status: "QUEUED",
         trigger: "SCHEDULED",
         syncDirection: account.syncDirection,
-        attemptCount: 1,
+        attemptCount: decision.attemptCount,
         maxAttempts: 5,
         nextRetryAt: new Date(),
         idempotencyKey: `${account.id}:scheduled:${now}`,
@@ -740,6 +785,7 @@ export const runQueuedSyncJobs = async ({
   limit = 5,
   syncAccountId,
 }: { limit?: number; syncAccountId?: string } = {}) => {
+  await reclaimExpiredSyncJobs();
   const queuedJobs = await db.syncJob.findMany({
     where: {
       status: "QUEUED",
@@ -914,8 +960,19 @@ export const runQueuedSyncJobs = async ({
     }
   };
 
-  for (const job of queuedJobs) {
-    const leaseExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  // P49A-04: renews the lease of the job being run and registers it as
+  // in-flight work; iterate() stops claiming once the process is shutting down
+  // and releases the hold whichever way an iteration ends.
+  const leaseKeeper = createSyncLeaseKeeper({
+    renew: (jobIds, leaseExpiresAt) =>
+      db.syncJob.updateMany({
+        where: { id: { in: jobIds }, status: "RUNNING" },
+        data: { leaseExpiresAt },
+      }),
+  });
+
+  for (const job of leaseKeeper.iterate(queuedJobs)) {
+    const leaseExpiresAt = nextSyncLeaseExpiry();
     const claim = await db.syncJob.updateMany({
       where: {
         id: job.id,
@@ -933,6 +990,7 @@ export const runQueuedSyncJobs = async ({
       summary.skipped += 1;
       continue;
     }
+    leaseKeeper.hold(job.id);
 
     // Guard against same-account concurrent runs. A "Sync now" inline run may
     // claim and execute an older QUEUED job for an account while the cron
@@ -1678,6 +1736,9 @@ export const runQueuedSyncJobs = async ({
       }
 
       await db.$transaction(async (tx) => {
+        // P49A-04: conflicts newly opened by this run (re-detected ones only
+        // refresh their existing OPEN row).
+        let openedConflictCount = 0;
         for (const entry of matchedEntries) {
           const contact = contactByUid.get(entry.uid)!;
 
@@ -1934,20 +1995,23 @@ export const runQueuedSyncJobs = async ({
         }
 
         for (const conflictEntry of conflictEntries) {
-          await tx.syncConflict.create({
-            data: {
-              syncAccountId: job.syncAccountId,
-              syncContactLinkId: conflictEntry.linkId,
-              contactId: conflictEntry.contactId,
-              conflictType: conflictEntry.type,
-              status: "OPEN",
-              localSyncVersion: conflictEntry.localSyncVersion,
-              remoteETag: conflictEntry.remoteETag,
-              localSnapshot: conflictEntry.localSnapshot,
-              remoteSnapshot: conflictEntry.remoteSnapshot as Prisma.InputJsonValue,
-              resolutionNotes: conflictEntry.resolutionNotes,
-            },
+          // P49A-04 (A-06): one OPEN conflict per link. The same unresolved
+          // divergence is detected again on every run; refresh the existing
+          // row instead of stacking a new one (which auto-paused the account
+          // once MANUAL_CONFLICT_QUEUE_LIMIT duplicates piled up).
+          const recorded = await recordOpenSyncConflict(tx, {
+            syncAccountId: job.syncAccountId,
+            syncContactLinkId: conflictEntry.linkId,
+            contactId: conflictEntry.contactId,
+            conflictType: conflictEntry.type,
+            localSyncVersion: conflictEntry.localSyncVersion,
+            remoteETag: conflictEntry.remoteETag,
+            localSnapshot: conflictEntry.localSnapshot,
+            remoteSnapshot: conflictEntry.remoteSnapshot as Prisma.InputJsonValue,
+            resolutionNotes: conflictEntry.resolutionNotes,
           });
+          if (recorded.outcome !== "created") continue;
+          openedConflictCount += 1;
 
           await emitEvent(tx, {
             userId: job.syncAccount.userId,
@@ -2109,7 +2173,9 @@ export const runQueuedSyncJobs = async ({
               if (pushedLinks.length > 0) parts.push(`pushed ${pushedLinks.length} local update${pushedLinks.length !== 1 ? "s" : ""}`);
               if (deletedLinkIds.length > 0) parts.push(`deleted ${deletedLinkIds.length} remote`);
               if (deferredLocalChangesCount > 0) parts.push(`deferred ${deferredLocalChangesCount} local change${deferredLocalChangesCount !== 1 ? "s" : ""}`);
-              if (conflictEntries.length > 0) parts.push(`opened ${conflictEntries.length} conflict${conflictEntries.length !== 1 ? "s" : ""}`);
+              if (openedConflictCount > 0) parts.push(`opened ${openedConflictCount} conflict${openedConflictCount !== 1 ? "s" : ""}`);
+              const stillOpen = conflictEntries.length - openedConflictCount;
+              if (stillOpen > 0) parts.push(`${stillOpen} conflict${stillOpen !== 1 ? "s" : ""} still awaiting review`);
               return parts.length > 0
                 ? `Synced: ${parts.join(", ")}.`
                 : `Sync complete — no changes.`;
