@@ -1,6 +1,7 @@
 import { cache } from "react";
 
 import { db } from "~/server/db";
+import { isTeamLocked } from "~/server/dav/plan-entitlements.mjs";
 
 export type TeamGraceState = "active" | "grace" | "locked";
 
@@ -82,16 +83,21 @@ export const getAccessibleTeamBooks = cache(async (
     .filter((b) => b.permission !== "NONE");
 });
 
-// Can the user EDIT this team book right now? (membership + not archived + EDIT)
+// Can the user EDIT this team book right now? (membership + not archived + EDIT
+// + P49A-06: the team is not locked after its Teams plan lapsed past grace)
 export const canEditTeamBook = async (userId: string, bookId: string): Promise<boolean> => {
   const membership = await getUserTeamMembership(userId);
   if (!membership) return false;
   const book = await db.groupAddressBook.findFirst({
     where: { id: bookId, groupId: membership.groupId, archivedAt: null },
-    select: { id: true },
+    select: {
+      id: true,
+      group: { select: { ownerId: true, teamsEnabled: true, teamsGraceEndsAt: true } },
+    },
   });
   if (!book) return false;
-  return resolveBookPermission(membership, bookId) === "EDIT";
+  if (resolveBookPermission(membership, bookId) !== "EDIT") return false;
+  return !(await isTeamLocked(db, book.group));
 };
 
 // The team-book context for a contact, if it lives in a TEAM book.

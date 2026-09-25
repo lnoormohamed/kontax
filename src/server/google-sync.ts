@@ -1089,6 +1089,7 @@ export const runGoogleSync = async (
         updated: 0,
         deleted: 0,
         conflicts: 0,
+        capSkipped: 0,
         queueFull: await isConflictQueueFull(account.id),
       };
 
@@ -1102,6 +1103,7 @@ export const runGoogleSync = async (
     updated: importSummary.updated + photoTally.pulled + photoTally.deletedLocal,
     deleted: importSummary.deleted,
     conflicts: importSummary.conflicts + push.conflicts,
+    capSkipped: importSummary.capSkipped,
     // A push that opened a MANUAL conflict may have filled the queue.
     queueFull:
       push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,

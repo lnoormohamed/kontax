@@ -3,38 +3,44 @@ import { cache } from "react";
 import { type Prisma, type SubscriptionPlan } from "../../generated/prisma";
 
 import { db } from "~/server/db";
+import {
+  assertContactCapacityTx,
+  ContactLimitReachedError,
+  contactLimitMessage,
+  type EffectivePlan,
+  getContactCapacity,
+  loadEffectivePlan,
+  lockUserRowForPlanCheck,
+  PLAN_DEFAULTS,
+  PLAN_LABELS,
+  PLAN_RANK,
+  type PlanEntitlements,
+  type TeamEntitlement,
+} from "~/server/dav/plan-entitlements.mjs";
 import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
+
+// P49A-06: the plan matrix (PLAN_DEFAULTS) and effective-plan resolution live
+// in src/server/dav/plan-entitlements.mjs so the plain-ESM CardDAV server
+// (server.mjs) enforces the same limits. Re-exported for app code.
+export { ContactLimitReachedError, contactLimitMessage, PLAN_DEFAULTS, PLAN_LABELS, PLAN_RANK };
 
 export type BillingLifecycleState = "ACTIVE" | "TRIALING" | "GRACE" | "CANCELED" | "LOCKED";
 
-type PlanEntitlements = {
-  contactsLimit: number | null;
-  monthlyImportLimit: number | null;
-  syncAccountsLimit: number;
-  appPasswordsLimit: number;
-  advancedMergeEnabled: boolean;
-  premiumExportEnabled: boolean;
-  cardDavSyncEnabled: boolean;
-  familyGroupEnabled: boolean;
-  teamsEnabled: boolean;
-  sharedAddressBooksLimit: number | null;
-  memberSlotsLimit: number | null;
-  activityLogRetentionDays: number | null;
-  // Floor: the N most recent events per contact that are always KEPT (survive
-  // pruning), even beyond the retention window (P11-05). Free keeps 10.
-  historyFloorPerContact: number;
-  // Per-contact History tab display cap. null = show all retained events (paid).
-  // Free SHOWS fewer than it keeps (keeps 10, shows 3) as an upgrade teaser.
-  historyDisplayCap: number | null;
-  liveShareEnabled: boolean;
-  staticShareEnabled: boolean;
-  apiAccessEnabled: boolean;
-};
-
 type BillingContext = {
   lifecycleState: BillingLifecycleState;
+  /** Effective plan: the highest of the user's personal plans and a live Teams membership. */
   plan: SubscriptionPlan;
   planLabel: string;
+  /**
+   * P49A-06: the highest plan from the user's OWN subscriptions (FREE if none).
+   * Use this, not `plan` / `entitlements.teamsEnabled`, for "may this user run
+   * their own team / legacy user-anchored Teams" checks: membership of someone
+   * else's team grants Teams entitlements, not team ownership.
+   */
+  personalPlan: SubscriptionPlan;
+  planSource: EffectivePlan["planSource"];
+  /** Set when the effective Teams plan comes from a team membership. */
+  teamEntitlement: TeamEntitlement | null;
   entitlements: PlanEntitlements;
 };
 
@@ -120,91 +126,6 @@ const LIFECYCLE_ACCESS_POLICIES: Record<BillingLifecycleState, LifecycleAccessPo
   },
 };
 
-// Per-plan default entitlements (P11-01 matrix). NOTE: contactsLimit /
-// monthlyImportLimit / syncAccountsLimit remain numeric ceilings here; the
-// matrix's "null = unlimited" semantics for paid tiers are applied in
-// enforcement during P11-03. Family/Teams mirror Pro's personal-library limits
-// (their group/sharing entitlements are the net-new flags below).
-const PRO_PERSONAL = {
-  contactsLimit: null,
-  monthlyImportLimit: null,
-  syncAccountsLimit: 5,
-  appPasswordsLimit: 5,
-  advancedMergeEnabled: true,
-  premiumExportEnabled: true,
-  cardDavSyncEnabled: true,
-  historyFloorPerContact: 20,
-  historyDisplayCap: null,
-  liveShareEnabled: true,
-  staticShareEnabled: true,
-  apiAccessEnabled: true,
-} as const;
-
-const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
-  FREE: {
-    contactsLimit: 500,
-    monthlyImportLimit: 3,
-    // Free includes 1 CardDAV sync account; Pro+ raises the cap to 5. The whole
-    // feature is enabled (cardDavSyncEnabled) and the ceiling is enforced by
-    // syncAccountsLimit, so the UI shows a 1-account cap with an upgrade nudge
-    // rather than a blanket upsell.
-    syncAccountsLimit: 1,
-    appPasswordsLimit: 1,
-    // Merge (field-level, bulk, 30-day undo) is included on every plan.
-    advancedMergeEnabled: true,
-    premiumExportEnabled: false,
-    cardDavSyncEnabled: true,
-    familyGroupEnabled: false,
-    teamsEnabled: false,
-    sharedAddressBooksLimit: 0,
-    memberSlotsLimit: null,
-    activityLogRetentionDays: 0,
-    historyFloorPerContact: 10,
-    historyDisplayCap: 3,
-    liveShareEnabled: false,
-    staticShareEnabled: false,
-    apiAccessEnabled: false,
-  },
-  PRO: {
-    ...PRO_PERSONAL,
-    familyGroupEnabled: false,
-    teamsEnabled: false,
-    sharedAddressBooksLimit: 0,
-    memberSlotsLimit: null,
-    activityLogRetentionDays: 365,
-  },
-  FAMILY: {
-    ...PRO_PERSONAL,
-    // The developer API is a Pro/Teams feature; Family inherits Pro's personal
-    // limits but not API access (P49 decision, 2026-09-25).
-    apiAccessEnabled: false,
-    familyGroupEnabled: true,
-    teamsEnabled: false,
-    sharedAddressBooksLimit: 1,
-    memberSlotsLimit: 6,
-    // Retention is the one exception to "everything in Pro per member": Family
-    // personal history is 90d vs Pro's 365d (per-seat economics). Family's value
-    // is seats + the shared book, not retention depth. The last-20-per-contact
-    // floor (PRO_PERSONAL) still applies, so recent history is never lost.
-    activityLogRetentionDays: 90,
-  },
-  TEAMS: {
-    ...PRO_PERSONAL,
-    familyGroupEnabled: false,
-    teamsEnabled: true,
-    sharedAddressBooksLimit: null,
-    memberSlotsLimit: 25,
-    activityLogRetentionDays: null,
-  },
-};
-
-const PLAN_LABELS: Record<SubscriptionPlan, string> = {
-  FREE: "Free",
-  PRO: "Pro",
-  FAMILY: "Family",
-  TEAMS: "Teams",
-};
-
 export const getLifecycleAccessPolicy = (state: BillingLifecycleState) =>
   LIFECYCLE_ACCESS_POLICIES[state];
 
@@ -213,52 +134,47 @@ const getMonthStart = () => {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
 };
 
+const toBillingContext = (
+  effective: Awaited<ReturnType<typeof loadEffectivePlan>>,
+): BillingContext => {
+  if (!effective) {
+    throw new Error("User account could not be found.");
+  }
+  return {
+    lifecycleState: effective.lifecycleState,
+    plan: effective.plan,
+    planLabel: effective.planLabel,
+    personalPlan: effective.personalPlan,
+    planSource: effective.planSource,
+    teamEntitlement: effective.teamEntitlement,
+    entitlements: effective.entitlements,
+  };
+};
+
 // P38-04: read-only per-user context getters used by both pages and
 // layout-level slots (BillingBannerSlot etc.) are wrapped in React cache()
 // so one request computes them once. cache() scopes per RSC render / server
 // action invocation, so a mutation followed by revalidation reads fresh.
 // Do NOT call these after a write inside the same action — audit note in
 // roadmap/build-phase/p38-04-request-scoped-billing-context-cache.md.
-export const getUserBillingContext = cache(async (userId: string): Promise<BillingContext> => {
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: {
-      lifecycleState: true,
-      subscriptions: {
-        where: {
-          status: {
-            in: ["ACTIVE", "TRIALING", "PAST_DUE"],
-          },
-        },
-        orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
-        take: 1,
-        select: { plan: true, memberSlotsLimit: true },
-      },
-    },
-  });
+//
+// P49A-06 (A-10): the effective plan is the max rank of EVERY active personal
+// subscription (a paid plan and an admin comp row resolve to the higher) and a
+// live Teams membership (Teams billing is org-anchored, so it never appears in
+// user.subscriptions). See src/server/dav/plan-entitlements.mjs.
+export const getUserBillingContext = cache(
+  async (userId: string): Promise<BillingContext> =>
+    toBillingContext(await loadEffectivePlan(db, userId)),
+);
 
-  if (!user) {
-    throw new Error("User account could not be found.");
-  }
-
-  const subscription = user.subscriptions[0];
-  const plan = subscription?.plan ?? "FREE";
-
-  // Entitlements are tier-driven: the frozen P11-01 matrix (PLAN_DEFAULTS) is the
-  // single source of truth. Exception: TEAMS memberSlotsLimit is per-seat and
-  // stored on the subscription row from the Stripe quantity; override it here.
-  const entitlements = { ...PLAN_DEFAULTS[plan] };
-  if (plan === "TEAMS" && subscription?.memberSlotsLimit != null) {
-    entitlements.memberSlotsLimit = subscription.memberSlotsLimit;
-  }
-
-  return {
-    lifecycleState: user.lifecycleState,
-    plan,
-    planLabel: PLAN_LABELS[plan],
-    entitlements,
-  };
-});
+/**
+ * P49A-06: true when the user's OWN billing lets them run a team — a personal
+ * (legacy user-anchored) Teams subscription, or an active Teams org they own.
+ * Being a member of someone else's team grants Teams entitlements but not this.
+ */
+export const canRunOwnTeam = (context: BillingContext, userId: string) =>
+  context.personalPlan === "TEAMS" ||
+  (context.teamEntitlement?.ownerId === userId && context.teamEntitlement.state === "active");
 
 const assertWritableAccount = (context: BillingContext) => {
   const policy = getLifecycleAccessPolicy(context.lifecycleState);
@@ -436,40 +352,30 @@ type TxClient = Prisma.TransactionClient;
  * cap check and the insert — see the note above.
  */
 export const lockUserForPlanCheck = (tx: TxClient, userId: string) =>
-  tx.$queryRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+  lockUserRowForPlanCheck(tx, userId);
 
-const getUserBillingContextTx = async (tx: TxClient, userId: string): Promise<BillingContext> => {
-  const user = await tx.user.findUnique({
-    where: { id: userId },
-    select: {
-      lifecycleState: true,
-      subscriptions: {
-        where: { status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] } },
-        orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
-        take: 1,
-        select: { plan: true, memberSlotsLimit: true },
-      },
-    },
-  });
+/**
+ * P49A-06 (A-25): remaining contact capacity for the account contacts are
+ * created UNDER (null = unlimited). Plan + count only (no import/sync/app-password
+ * aggregates), for bulk create paths (sync import). Unlocked read by default;
+ * pass `{ lock: true }` as the first statement of the inserting transaction.
+ */
+export const getContactCapacityFor = (
+  client: TxClient | typeof db,
+  userId: string,
+  options?: { lock?: boolean },
+) => getContactCapacity(client, userId, options);
 
-  if (!user) {
-    throw new Error("User account could not be found.");
-  }
+/**
+ * P49A-06 (A-25): lock + cap check inside the inserting transaction; throws
+ * `ContactLimitReachedError` when `incoming` more contacts would exceed the cap.
+ * Unlike `assertCanCreateContactsTx` it does not check account lifecycle.
+ */
+export const assertContactCapacityForTx = (tx: TxClient, userId: string, incoming = 1) =>
+  assertContactCapacityTx(tx, userId, incoming);
 
-  const subscription = user.subscriptions[0];
-  const plan = subscription?.plan ?? "FREE";
-  const entitlements = { ...PLAN_DEFAULTS[plan] };
-  if (plan === "TEAMS" && subscription?.memberSlotsLimit != null) {
-    entitlements.memberSlotsLimit = subscription.memberSlotsLimit;
-  }
-
-  return {
-    lifecycleState: user.lifecycleState,
-    plan,
-    planLabel: PLAN_LABELS[plan],
-    entitlements,
-  };
-};
+const getUserBillingContextTx = async (tx: TxClient, userId: string): Promise<BillingContext> =>
+  toBillingContext(await loadEffectivePlan(tx, userId));
 
 const getUserPlanSummaryTx = async (tx: TxClient, userId: string) => {
   const context = await getUserBillingContextTx(tx, userId);

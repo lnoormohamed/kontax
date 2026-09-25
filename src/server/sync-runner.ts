@@ -11,6 +11,7 @@ import {
 } from "~/server/carddav";
 import type { PortableContactInput } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import { contactLimitMessage, getContactCapacityFor } from "~/server/billing";
 import { emitEvent } from "~/lib/activity";
 import { PHOTO_SYNC_ENABLED } from "~/lib/photo-sync-flags";
 import {
@@ -24,6 +25,8 @@ import { runPhotoPass, type PhotoPassLink } from "~/server/sync-photo-pass";
 import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
 import {
   CONFLICT_QUEUE_FULL_CODE,
+  CONTACT_LIMIT_REACHED_CODE,
+  settleOAuthSyncJob,
   DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE,
   MANUAL_CONFLICT_QUEUE_LIMIT,
   SYNC_AUTO_PAUSED_CODE,
@@ -93,6 +96,18 @@ const createRetrySchedule = (attemptNumber: number) => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+// P49A-06 (A-25): inbound sync stops creating contacts at the plan's contact
+// cap (never deletes); the job settles PARTIAL with CONTACT_LIMIT_REACHED and
+// this warning.
+const contactCapWarning = async (userId: string, skipped: number) => {
+  const capacity = await getContactCapacityFor(db, userId);
+  const reason =
+    capacity.limit !== null
+      ? contactLimitMessage(capacity.planLabel, capacity.limit)
+      : "Plan contact limit reached.";
+  return `${reason} ${skipped} new contact${skipped === 1 ? " was" : "s were"} not imported (nothing was deleted). Upgrade your plan to import the rest.`;
+};
 
 // Shape of a contact row as selected in existingLinks (fields needed for push).
 type SyncContactRow = {
@@ -880,6 +895,8 @@ export const runQueuedSyncJobs = async ({
     pushedDeleted?: number;
     // P49A-01 (A-07): contacts whose push failed (error recorded on the link).
     pushFailed?: number;
+    // P49A-06 (A-25): new remote contacts not imported (plan contact cap).
+    capSkipped?: number;
   };
   const runOAuthSyncJob = async (
     job: (typeof queuedJobs)[number],
@@ -905,28 +922,29 @@ export const runQueuedSyncJobs = async ({
       const result = await run();
       const now = new Date();
       const hasConflicts = result.conflicts > 0;
-      const pushFailed = result.pushFailed ?? 0;
+      // P49A-06: a run that hit the contact cap settles PARTIAL with a
+      // readable CONTACT_LIMIT_REACHED warning (see settleOAuthSyncJob).
+      const capSkipped = result.capSkipped ?? 0;
+      const settlement = settleOAuthSyncJob({
+        conflicts: result.conflicts,
+        pushFailed: result.pushFailed,
+        capSkipped,
+        capWarning:
+          capSkipped > 0 ? await contactCapWarning(job.syncAccount.userId, capSkipped) : null,
+      });
+      const isPartial = settlement.status === "PARTIAL";
       // Settle only a job still RUNNING (see runningSyncJobWhere).
       const settled = await db.$transaction(async (tx) => {
         const { count } = await tx.syncJob.updateMany({
           where: runningSyncJobWhere(job.id),
           data: {
-            status: hasConflicts || pushFailed > 0 ? "PARTIAL" : "SUCCEEDED",
+            status: settlement.status,
             completedAt: now,
             leaseExpiresAt: null,
             nextRetryAt: null,
-            errorCode: hasConflicts
-              ? "SYNC_CONFLICTS_OPEN"
-              : pushFailed > 0
-                ? "SYNC_PUSH_ERRORS"
-                : null,
-            errorSummary: hasConflicts
-              ? `${result.conflicts} sync conflicts need review before this account is fully healthy again.`
-              : pushFailed > 0
-                ? `${pushFailed} contacts could not be sent to the provider; they will be retried on the next sync.`
-                : null,
-            // Same column the CardDAV runner uses for deferred local changes.
-            skippedCount: pushFailed,
+            errorCode: settlement.errorCode,
+            errorSummary: settlement.errorSummary,
+            skippedCount: settlement.skippedCount,
             createdCount: result.created,
             updatedCount: result.updated,
             deletedCount: result.deleted,
@@ -965,9 +983,9 @@ export const runQueuedSyncJobs = async ({
         return true;
       });
       if (!settled) {
-        warnSyncJobReclaimed(job.id, hasConflicts || pushFailed > 0 ? "PARTIAL" : "SUCCEEDED");
+        warnSyncJobReclaimed(job.id, isPartial ? "PARTIAL" : "SUCCEEDED");
       }
-      return hasConflicts || pushFailed > 0 ? "partial" : "succeeded";
+      return isPartial ? "partial" : "succeeded";
     } catch (error) {
       // P39-02: a deletion-threshold trip is a protective halt, not a failure.
       if (error instanceof DeletionThresholdError) {
@@ -1773,7 +1791,30 @@ export const runQueuedSyncJobs = async ({
         }
       }
 
+      // P49A-06 (A-25): set inside the transaction below — how many of the
+      // unmatched remote cards fit under the plan's contact cap.
+      let cardsToCreate = unmatchedCards;
+      let capSkippedCount = 0;
+      let capWarning: string | null = null;
+
       await db.$transaction(async (tx) => {
+        // P49A-06 (A-25): lock the account the contacts are created under
+        // (the team owner for a team sync) FIRST, as every create path does
+        // (P48-17), then create only as many new contacts as fit under the
+        // plan's cap. The rest are left unlinked (never deleted) and are
+        // offered again on the next sync.
+        if (unmatchedCards.length > 0) {
+          const capacity = await getContactCapacityFor(tx, scopeUserId, { lock: true });
+          if (capacity.remaining !== null && capacity.remaining < unmatchedCards.length) {
+            cardsToCreate = unmatchedCards.slice(0, capacity.remaining);
+            capSkippedCount = unmatchedCards.length - cardsToCreate.length;
+            capWarning =
+              capacity.limit !== null
+                ? `${contactLimitMessage(capacity.planLabel, capacity.limit)} ${capSkippedCount} new contact${capSkippedCount === 1 ? " was" : "s were"} not imported (nothing was deleted). Upgrade your plan to import the rest.`
+                : null;
+          }
+        }
+
         // P49A-04: conflicts newly opened by this run (re-detected ones only
         // refresh their existing OPEN row).
         let openedConflictCount = 0;
@@ -1863,7 +1904,7 @@ export const runQueuedSyncJobs = async ({
           });
         }
 
-        for (const card of unmatchedCards) {
+        for (const card of cardsToCreate) {
           // P39-03: excluded fields are dropped from the imported contact.
           const createdContact = await tx.contact.create({
             data: omitExcludedContactWriteData({
@@ -2183,13 +2224,13 @@ export const runQueuedSyncJobs = async ({
         const settledJob = await tx.syncJob.updateMany({
           where: runningSyncJobWhere(job.id),
           data: {
-            status: conflictEntries.length > 0 ? "PARTIAL" : "SUCCEEDED",
+            status: conflictEntries.length > 0 || capSkippedCount > 0 ? "PARTIAL" : "SUCCEEDED",
             completedAt: new Date(),
             leaseExpiresAt: null,
             nextRetryAt: null,
             // Inbound (remote -> Kontax). Remote deletions surface as conflicts
             // rather than auto-applied deletes, so the inbound delete count is 0.
-            createdCount: unmatchedCards.length,
+            createdCount: cardsToCreate.length,
             updatedCount: matchedEntries.length + remoteApplyCandidates.length,
             deletedCount: 0,
             conflictCount: conflictEntries.length,
@@ -2198,13 +2239,18 @@ export const runQueuedSyncJobs = async ({
             pushedCreatedCount: createdLinks.length,
             pushedUpdatedCount: pushedLinks.length,
             pushedDeletedCount: deletedLinkIds.length,
-            skippedCount: deferredLocalChangesCount,
+            skippedCount: deferredLocalChangesCount + capSkippedCount,
             cursorBefore: job.syncAccount.remoteCTag ?? job.cursorBefore ?? job.syncAccount.addressBookUrl,
             cursorAfter: String(remoteEntries.length),
-            errorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
+            errorCode:
+              conflictEntries.length > 0
+                ? "SYNC_CONFLICTS_OPEN"
+                : capSkippedCount > 0
+                  ? CONTACT_LIMIT_REACHED_CODE
+                  : null,
             errorSummary: (() => {
               const parts: string[] = [];
-              if (unmatchedCards.length > 0) parts.push(`imported ${unmatchedCards.length} new`);
+              if (cardsToCreate.length > 0) parts.push(`imported ${cardsToCreate.length} new`);
               const pulled = matchedEntries.length + remoteApplyCandidates.length;
               if (pulled > 0) parts.push(`pulled ${pulled} remote update${pulled !== 1 ? "s" : ""}`);
               if (createdLinks.length > 0) parts.push(`created ${createdLinks.length} remote contact${createdLinks.length !== 1 ? "s" : ""}`);
@@ -2214,9 +2260,9 @@ export const runQueuedSyncJobs = async ({
               if (openedConflictCount > 0) parts.push(`opened ${openedConflictCount} conflict${openedConflictCount !== 1 ? "s" : ""}`);
               const stillOpen = conflictEntries.length - openedConflictCount;
               if (stillOpen > 0) parts.push(`${stillOpen} conflict${stillOpen !== 1 ? "s" : ""} still awaiting review`);
-              return parts.length > 0
-                ? `Synced: ${parts.join(", ")}.`
-                : `Sync complete — no changes.`;
+              const synced =
+                parts.length > 0 ? `Synced: ${parts.join(", ")}.` : `Sync complete — no changes.`;
+              return capWarning ? `${synced} ${capWarning}` : synced;
             })(),
           },
         });
@@ -2224,7 +2270,10 @@ export const runQueuedSyncJobs = async ({
         // remote pushes already happened), but the job row keeps its reclaimed
         // FAILED/LEASE_EXPIRED state instead of being overwritten.
         if (settledJob.count === 0) {
-          warnSyncJobReclaimed(job.id, conflictEntries.length > 0 ? "PARTIAL" : "SUCCEEDED");
+          warnSyncJobReclaimed(
+            job.id,
+            conflictEntries.length > 0 || capSkippedCount > 0 ? "PARTIAL" : "SUCCEEDED",
+          );
         }
 
         await tx.syncAccount.update({

@@ -33,7 +33,10 @@ export async function loadOwnedTeam(userId: string) {
 
   // P34F-02 §08: team-active off the Group's own entitlement, falling back to
   // the owner's personal entitlement for teams not yet on org billing.
-  const teamsActive = ownedTeam.teamsEnabled || billing.entitlements.teamsEnabled;
+  // P49A-06: `personalPlan`, not `entitlements.teamsEnabled` — the latter now
+  // also reflects Teams membership (incl. this team during its grace window),
+  // which would hide the grace/locked state.
+  const teamsActive = ownedTeam.teamsEnabled || billing.personalPlan === "TEAMS";
   // A group created at checkout that hasn't been paid yet.
   const pendingSetup = !teamsActive && ownedTeam.teamsGraceEndsAt === null;
   const teamState = getTeamGraceState(ownedTeam.teamsGraceEndsAt, teamsActive);

@@ -8,6 +8,11 @@ import type { ConflictPolicy, Prisma, SourceType } from "../../generated/prisma"
 
 import { emitEvent } from "~/lib/activity";
 import {
+  assertContactCapacityForTx,
+  ContactLimitReachedError,
+  getContactCapacityFor,
+} from "~/server/billing";
+import {
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -199,6 +204,10 @@ export type ImportBatchSummary = {
   updated: number;
   deleted: number;
   conflicts: number;
+  // P49A-06 (A-25): new remote contacts NOT created because the account is at
+  // its plan's contact cap. Nothing is deleted; the runner flags the job
+  // PARTIAL with CONTACT_LIMIT_REACHED.
+  capSkipped: number;
 };
 
 export const emptyImportBatch = (): ImportBatchSummary => ({
@@ -206,6 +215,7 @@ export const emptyImportBatch = (): ImportBatchSummary => ({
   updated: 0,
   deleted: 0,
   conflicts: 0,
+  capSkipped: 0,
 });
 
 export const addImportBatch = (a: ImportBatchSummary, b: ImportBatchSummary): ImportBatchSummary => ({
@@ -213,6 +223,7 @@ export const addImportBatch = (a: ImportBatchSummary, b: ImportBatchSummary): Im
   updated: a.updated + b.updated,
   deleted: a.deleted + b.deleted,
   conflicts: a.conflicts + b.conflicts,
+  capSkipped: a.capSkipped + b.capSkipped,
 });
 
 export const linkedContactSelect = {
@@ -506,11 +517,15 @@ const handleTombstone = async (
 // Create a brand-new local contact + link from a remote item. syncUid is left
 // to default (cuid) — the remote id is only unique within the account, so it
 // lives on SyncContactLink.remoteUid, not the globally-unique Contact.syncUid.
+// P49A-06 (A-25): `capped` = the account has a finite contact cap, so the
+// create re-checks it inside the transaction (after locking the user row, as
+// every other create path does); throws ContactLimitReachedError at the cap.
 const createContact = async (
   account: ImportEngineAccount,
   item: RemoteContactItem,
   mapped: MappedContact,
   now: Date,
+  capped: boolean,
 ) => {
   // P39-03: excluded fields are not imported on create either.
   const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped), exclusionsOf(account));
@@ -519,6 +534,7 @@ const createContact = async (
     account.capabilityProfile,
   );
   await db.$transaction(async (tx) => {
+    if (capped) await assertContactCapacityForTx(tx, account.userId);
     const created = await tx.contact.create({
       data: {
         userId: account.userId,
@@ -623,6 +639,13 @@ export const importRemoteContactBatch = async (
     }
   }
 
+  // P49A-06 (A-25): the Free contact cap applies to inbound sync too. Read the
+  // capacity once per batch (no lock); unlimited plans skip per-create checks.
+  // Once the cap is hit, the rest of the batch's new contacts are counted as
+  // capSkipped — never created, and nothing existing is touched or deleted.
+  const capped = (await getContactCapacityFor(db, account.userId)).remaining !== null;
+  let capReached = false;
+
   for (const item of items) {
     if (!item.remoteUid) continue;
 
@@ -643,8 +666,18 @@ export const importRemoteContactBatch = async (
 
     // New contact.
     if (!link) {
-      await createContact(account, item, item.mapped, now);
-      summary.created += 1;
+      if (capReached) {
+        summary.capSkipped += 1;
+        continue;
+      }
+      try {
+        await createContact(account, item, item.mapped, now, capped);
+        summary.created += 1;
+      } catch (error) {
+        if (!(error instanceof ContactLimitReachedError)) throw error;
+        capReached = true;
+        summary.capSkipped += 1;
+      }
       continue;
     }
     // Defensive: link row without a contact shouldn't occur (cascade delete),

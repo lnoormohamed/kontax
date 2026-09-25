@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { inviteFamilyMember } from "~/app/actions/family";
 import { inviteTeamMember } from "~/app/actions/teams";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
-import { getUserBillingContext } from "~/server/billing";
+import { canRunOwnTeam, getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 
 // P26-14: batch action for the Family/Teams getting-started wizard. The wizard
@@ -35,10 +35,12 @@ export async function completeUpgradeOnboarding(input: {
   }
 
   const billing = await getUserBillingContext(userId);
+  // P49A-06: Teams entitlements also flow from membership of someone else's
+  // team — that must not let a member set up (own) a team of their own.
   const entitled =
     input.plan === "FAMILY"
       ? billing.entitlements.familyGroupEnabled
-      : billing.entitlements.teamsEnabled;
+      : canRunOwnTeam(billing, userId);
   // Guard against the webhook race — the plan may not be active yet.
   if (!entitled) return { ok: false, error: "PLAN_NOT_READY" };
 
