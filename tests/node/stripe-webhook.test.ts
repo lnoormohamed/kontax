@@ -403,6 +403,70 @@ describe("billing lifecycle (A-24)", () => {
     assert.equal(effectsRun, 1, "the removed member is notified after commit");
   });
 
+  test("Family lapse commits even when a member copy fails; the retry finishes without re-copying", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY" });
+    fake.seed("group", { id: "fam_1", ownerId: "user_1", type: "FAMILY", name: "Smith Family", defaultAddressBookId: "gab_1" });
+    fake.seed("groupMember", { id: "gm_owner", groupId: "fam_1", userId: "user_1", role: "OWNER", inviteStatus: "ACCEPTED" });
+    fake.seed("groupMember", { id: "gm_2", groupId: "fam_1", userId: "user_2", role: "MEMBER", inviteStatus: "ACCEPTED" });
+    fake.seed("groupMember", { id: "gm_3", groupId: "fam_1", userId: "user_3", role: "MEMBER", inviteStatus: "ACCEPTED" });
+    stripeNow(stripeSub("sub_1", { status: "canceled", price: "price_family_m" }));
+
+    // snapshotFamilyBookForUser reads the shared book once per member copy;
+    // the second copy (gm_3) fails once — e.g. a timeout on a big book.
+    const groupContact = (fake.client as Record<string, { findMany: (a: unknown) => Promise<unknown> }>)
+      .groupContact!;
+    const copies: number[] = [];
+    let reads = 0;
+    let failNext = 2;
+    groupContact.findMany = async () => {
+      reads++;
+      if (reads === failNext) {
+        failNext = -1;
+        throw new Error("copy timed out");
+      }
+      copies.push(reads);
+      return [];
+    };
+
+    const evt = event("customer.subscription.deleted", stripeSub("sub_1"));
+    const first = await processStripeWebhookEvent(evt, deps);
+
+    assert.equal(first.status, "failed", "Stripe is asked to retry");
+    assert.equal(subRow("sub_1")?.status, "CANCELED", "the lapse itself is committed");
+    assert.equal(subRow("sub_1")?.plan, "FREE", "the owner does not keep Family");
+    assert.match(webhookRow(evt.id)!.error as string, /post-commit/);
+    assert.deepEqual(
+      fake.rows("groupMember").map((m) => m.id),
+      ["gm_owner", "gm_3"],
+      "gm_2 is done; gm_3's removal rolled back with its failed copy",
+    );
+    assert.equal(copies.length, 1);
+    assert.equal(effectsRun, 1, "gm_2's notice still goes out");
+
+    const retry = await processStripeWebhookEvent(evt, deps);
+    assert.equal(retry.status, "processed");
+    assert.equal(webhookRow(evt.id)!.error, null);
+    assert.deepEqual(fake.rows("groupMember").map((m) => m.id), ["gm_owner"]);
+    assert.equal(copies.length, 2, "one copy per member — gm_2 is not copied again");
+    assert.equal(effectsRun, 2);
+
+    assert.equal((await processStripeWebhookEvent(evt, deps)).status, "skipped");
+  });
+
+  test("a lapse already applied elsewhere (billing-return sync) still dissolves on the webhook", async () => {
+    seedUser();
+    // State already says Free — the webhook sees no plan transition.
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FREE", status: "CANCELED" });
+    fake.seed("group", { id: "fam_1", ownerId: "user_1", type: "FAMILY", name: "F", defaultAddressBookId: null });
+    fake.seed("groupMember", { id: "gm_owner", groupId: "fam_1", userId: "user_1", role: "OWNER", inviteStatus: "ACCEPTED" });
+    fake.seed("groupMember", { id: "gm_2", groupId: "fam_1", userId: "user_2", role: "MEMBER", inviteStatus: "ACCEPTED" });
+    stripeNow(stripeSub("sub_1", { status: "canceled", price: "price_family_m" }));
+
+    await processStripeWebhookEvent(event("customer.subscription.deleted", stripeSub("sub_1")), deps);
+    assert.deepEqual(fake.rows("groupMember").map((m) => m.id), ["gm_owner"]);
+  });
+
   test("Family → paused also dissolves; Family → Teams does not", async () => {
     seedUser();
     seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY" });

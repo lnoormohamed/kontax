@@ -8,6 +8,7 @@ import {
   handleInvoicePaymentFailed,
   handleInvoicePaymentSucceeded,
   handleTrialWillEnd,
+  reconcileFamilyLapseForCustomer,
   runAfterCommit,
 } from "~/server/stripe-handlers";
 
@@ -26,6 +27,13 @@ import {
 //   · Order-independence (A-24): subscription and invoice events apply the
 //     subscription as it is in Stripe *now* (re-fetched below), never the event
 //     payload, so an old event delivered late cannot regress newer state.
+//   · Heavy follow-up work runs after the commit (Fable review): a Family lapse
+//     commits the subscription/entitlement change first, then dissolves the
+//     family group member by member (reconcileFamilyLapseForCustomer, each
+//     member in its own transaction). That step is idempotent and
+//     state-driven; if it fails, the event row gets its error back and the
+//     500 makes Stripe retry — the retry re-applies the (unchanged) state and
+//     re-runs the dissolution for the members still left.
 
 type Tx = Prisma.TransactionClient;
 
@@ -43,7 +51,7 @@ export type WebhookOutcome =
   | { status: "skipped" }
   | { status: "failed"; error: string };
 
-/** Enough headroom for a Family dissolution copying a large shared book. */
+/** State changes only — Family dissolution runs post-commit in its own transactions. */
 const TX_TIMEOUT_MS = 30_000;
 const MAX_ERROR_LENGTH = 2000;
 
@@ -173,6 +181,18 @@ async function recordFailure(db: WebhookDb, event: Stripe.Event, message: string
   }
 }
 
+/** A committed event whose post-commit step failed: flag it for reprocessing. */
+async function markPostCommitFailure(db: WebhookDb, event: Stripe.Event, message: string) {
+  try {
+    await db.stripeWebhookEvent.updateMany({
+      where: { stripeEventId: event.id },
+      data: { error: message, processedAt: new Date() },
+    });
+  } catch (err) {
+    console.error(`[stripe-webhook] could not record post-commit failure for ${event.id}:`, err);
+  }
+}
+
 async function isAlreadyProcessed(db: WebhookDb, eventId: string): Promise<boolean> {
   const row = await db.stripeWebhookEvent.findUnique({
     where: { stripeEventId: eventId },
@@ -195,11 +215,13 @@ export async function processStripeWebhookEvent(
   if (existing?.error === null) return { status: "skipped" };
 
   const effects: AfterCommit = [];
+  let current: Stripe.Subscription | null = null;
   try {
-    const current = await loadCurrentSubscription(event, deps.stripe);
+    current = await loadCurrentSubscription(event, deps.stripe);
+    const subscription = current;
     await db.$transaction(
       async (tx) => {
-        await applyWebhookEvent(event, current, tx, effects);
+        await applyWebhookEvent(event, subscription, tx, effects);
         await markProcessed(tx, event, existing !== null);
       },
       { timeout: TX_TIMEOUT_MS },
@@ -219,10 +241,27 @@ export async function processStripeWebhookEvent(
     return { status: "failed", error: message };
   }
 
+  let outcome: WebhookOutcome = { status: "processed" };
+  const customerId = current ? idOf(current.customer) : null;
+  if (customerId) {
+    try {
+      await reconcileFamilyLapseForCustomer(db, customerId, effects);
+    } catch (err) {
+      // The state change is committed; only the dissolution is incomplete.
+      // Put the error back on the event so Stripe's retry reprocesses it.
+      console.error(`[stripe-webhook] post-commit family dissolution failed for ${event.id}:`, err);
+      const message = `post-commit: ${String(err)}`.slice(0, MAX_ERROR_LENGTH);
+      await markPostCommitFailure(db, event, message);
+      outcome = { status: "failed", error: message };
+    }
+  }
+
+  // Effects queued so far belong to committed work (the state change, and each
+  // member removed before any failure), so they run either way.
   if (deps.afterCommit) {
     deps.afterCommit(effects);
   } else {
     void runAfterCommit(effects);
   }
-  return { status: "processed" };
+  return outcome;
 }

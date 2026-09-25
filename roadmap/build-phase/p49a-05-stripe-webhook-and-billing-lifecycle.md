@@ -41,7 +41,11 @@ entitlements consistent.
   the same price (paused / incomplete_expired / canceled) runs it, and a late event for a
   superseded subscription does not.
 - Family lapse: members get `snapshotFamilyBookForUser` copies and are removed; pending invites
-  withdrawn; group + book stay with the owner. Deviations from lifecycle-policies §3a: no 7-day
+  withdrawn; group + book stay with the owner. (Fable review) This runs post-commit, one
+  transaction per member (`reconcileFamilyLapseForCustomer`), state-driven: after every
+  personal subscription/invoice event, if the owner is below Family but still owns a FAMILY
+  group with members, the remaining members are processed. A failure flags the event row with
+  an error and returns 500, so Stripe's retry re-runs it; members already removed are skipped. Deviations from lifecycle-policies §3a: no 7-day
   advance notice (in-app notice at dissolution) and the book is not archived.
 - Webhooks never change a `LOCKED` lifecycle. Emails/notifications run only after commit.
 - `graceEndsAt`: stamped once on entering PAST_DUE (retries no longer extend it), cleared on any
