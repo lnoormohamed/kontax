@@ -106,10 +106,10 @@ for (const [label, catalog] of [
   });
 }
 
-test("pricingOffers falls back to the same numbers the page falls back to when the catalogue is unavailable", () => {
+test("pricingOffers publishes only the free plan when the catalogue is unavailable", () => {
   const offers = pricingOffers(null);
+  assert.equal(offers.length, 1);
   const free = offerFor(offers, "Free");
   assert.equal(free.priceCurrency, "GBP");
-  const proMonthly = offerFor(offers, "Pro (billed monthly)");
-  assert.equal(proMonthly.price, "5");
+  assert.equal(free.price, "0");
 });

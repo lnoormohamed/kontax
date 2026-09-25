@@ -52,15 +52,10 @@ export type StripePriceCatalog = {
   teams: { monthly: number; annual: number };
 };
 
-// Mirrors the FALLBACK_PRICES used by the pricing page/toggle for when the
-// Stripe catalog can't be read — same numbers, so the schema never disagrees
-// with what a visitor sees rendered.
-const FALLBACK_PRICE_CATALOG: StripePriceCatalog = {
-  currency: "gbp",
-  pro: { monthly: 5, annual: 48 },
-  family: { monthly: 8, annual: 72 },
-  teams: { monthly: 12, annual: 120 },
-};
+// When the Stripe catalogue can't be read, publish only the free plan: the
+// page's own placeholder prices are not real prices and must never reach
+// search engines. The site sells in GBP (owner decision, 2026-09-25).
+const DEFAULT_CURRENCY = "gbp";
 
 const freeOffer = (currency: string): Record<string, unknown> => ({
   "@type": "Offer",
@@ -86,12 +81,13 @@ const paidOffer = (
 
 // One Offer per paid plan and billing interval, plus the free plan, all in
 // the same currency as the Stripe catalogue. `catalog` should come straight
-// from `fetchStripePrices()` — pass `null` (catalog unavailable) to fall back
-// to the same numbers the page itself falls back to.
+// from `fetchStripePrices()`; with `null` (catalogue unavailable) only the
+// free plan is published.
 export const pricingOffers = (
   catalog: StripePriceCatalog | null,
 ): Record<string, unknown>[] => {
-  const c = catalog ?? FALLBACK_PRICE_CATALOG;
+  if (!catalog) return [freeOffer(DEFAULT_CURRENCY)];
+  const c = catalog;
   return [
     freeOffer(c.currency),
     paidOffer("Pro", c.currency, c.pro.monthly, "monthly"),
@@ -118,14 +114,27 @@ export const pricingSoftwareApplicationSchema = (
   offers: pricingOffers(catalog),
 });
 
-// Homepage · Organization + WebSite + SoftwareApplication. `catalog` (or
-// `null` for the same fallback numbers the pricing page uses) drives the
-// offers so the homepage never hard-codes a price: free plan + the cheapest
-// paid plan, both in the catalogue's currency.
+// Homepage · Organization + WebSite + SoftwareApplication. `catalog` drives
+// the offers so the homepage never hard-codes a price: free plan + the
+// cheapest paid plan, in the catalogue's currency; free plan only when the
+// catalogue is unavailable.
 export const softwareApplicationSchema = (
   catalog: StripePriceCatalog | null = null,
 ): Record<string, unknown> => {
-  const c = catalog ?? FALLBACK_PRICE_CATALOG;
+  if (!catalog) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Kontax",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web, iOS, Android",
+      url: SITE_URL,
+      description:
+        "Kontax keeps your contacts in sync across every device and app via CardDAV — private, portable, no lock-in.",
+      offers: [freeOffer(DEFAULT_CURRENCY)],
+    };
+  }
+  const c = catalog;
   const planIds = ["pro", "family", "teams"] as const;
   const cheapestPaid = planIds.reduce<(typeof planIds)[number]>(
     (min, id) => (c[id].monthly < c[min].monthly ? id : min),
