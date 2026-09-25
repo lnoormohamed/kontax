@@ -1420,8 +1420,9 @@ const handleFamilyResource = async (req, res, requestUrl) => {
       return preconditionFailed(res);
     }
 
-    // P49A-02: a PUT replaces every DAV-owned column (absent → cleared).
-    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull });
+    // P49A-02: core DAV columns are replaced (absent → cleared); extended ones
+    // only when present. See src/server/dav/vcard.mjs.
+    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull, existing });
 
     if (!existing) {
       // Device added a contact to the family collection → create in the book,
@@ -1637,8 +1638,9 @@ const handleTeamResource = async (req, res, requestUrl) => {
     if (ifNoneMatch === "*" && existing && !existing.syncTombstoneAt) {
       return preconditionFailed(res);
     }
-    // P49A-02: a PUT replaces every DAV-owned column (absent → cleared).
-    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull });
+    // P49A-02: core DAV columns are replaced (absent → cleared); extended ones
+    // only when present. See src/server/dav/vcard.mjs.
+    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull, existing });
 
     if (!existing) {
       const created = await prisma.$transaction(async (tx) => {
@@ -1891,11 +1893,14 @@ const handleContactResource = async (req, res, requestUrl) => {
       return preconditionFailed(res);
     }
 
-    // P49A-02: a PUT replaces every DAV-owned column — a property the device
+    // P49A-02: a PUT replaces every CORE DAV column — a property the device
     // left out of the body clears it (it used to survive and reappear on the
-    // next fetch). Columns the mapping does not own are left untouched. The
-    // display name is always derived when FN is missing.
-    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull });
+    // next fetch). EXTENDED columns (nickname, phonetic names, department) are
+    // only written when the body carries them, so a client that doesn't model
+    // them can't wipe them. Stored per-entry metadata (phone e164 etc.) is kept
+    // for unchanged entries. Columns the mapping does not own are left
+    // untouched. The display name is always derived when FN is missing.
+    const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull, existing });
 
     if (!existing) {
       const created = await prisma.contact.create({

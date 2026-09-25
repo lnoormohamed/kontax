@@ -5,10 +5,18 @@
 // with JSDoc types instead of TypeScript. It was extracted from `server.mjs` so
 // the device-facing vCard mapping is unit-testable (`tests/node/dav-vcard.test.ts`).
 //
-// The mapping owns a fixed set of Contact columns (`DAV_OWNED_FIELDS`). A PUT is
-// a full replacement of those columns: a property the device left out of the
-// body clears the column. Columns outside the mapping (tags, significant dates,
-// related people, custom fields, favourites, …) are never written by a PUT.
+// The mapping owns a fixed set of Contact columns (`DAV_OWNED_FIELDS`), in two
+// tiers (Fable review of P49A-02):
+//   · CORE (`DAV_CORE_FIELDS`: FN/N, EMAIL, TEL, ADR, URL, NOTE, BDAY, ORG
+//     company, TITLE) — every CardDAV client models these, so a PUT is a full
+//     replacement: a property the device left out clears the column (that is
+//     how a deletion on an iPhone arrives).
+//   · EXTENDED (`DAV_EXTENDED_FIELDS`: NICKNAME, X-PHONETIC-*, the ORG
+//     department component) — less-capable clients (Thunderbird, many Android
+//     apps) drop these on every save, so they are only written when the body
+//     carries them; absent means untouched.
+// Columns outside the mapping (tags, significant dates, related people, custom
+// fields, favourites, …) are never written by a PUT.
 //
 // Both representations of multi-value fields are written from the same parse:
 // the typed `*Entries` columns (what the web app reads first) and the legacy
@@ -73,21 +81,28 @@ import { Buffer } from "node:buffer";
  */
 
 /**
- * Contact columns the DAV mapping owns. A PUT writes every one of these
- * (absent → null / empty); `avatarUrl` is the exception, see `parseVCardToContactFields`.
+ * Extended columns: written by a PUT only when the body carries the property
+ * (see `presentExtendedFields`); absent leaves the stored value untouched.
  */
-export const DAV_OWNED_FIELDS = /** @type {const} */ ([
+export const DAV_EXTENDED_FIELDS = /** @type {const} */ ([
+  "nickname",
+  "phoneticFirstName",
+  "phoneticLastName",
+  "department",
+]);
+
+/**
+ * Core columns: a PUT writes every one of these (absent → null / empty);
+ * `avatarUrl` is the exception, see `parseVCardToContactFields`.
+ */
+export const DAV_CORE_FIELDS = /** @type {const} */ ([
   "fullName",
   "firstName",
   "middleName",
   "lastName",
   "namePrefix",
   "nameSuffix",
-  "nickname",
-  "phoneticFirstName",
-  "phoneticLastName",
   "company",
-  "department",
   "jobTitle",
   "email",
   "emailAddresses",
@@ -103,6 +118,9 @@ export const DAV_OWNED_FIELDS = /** @type {const} */ ([
   "addressEntries",
   "notes",
 ]);
+
+/** Every Contact column the DAV mapping owns (core + extended). */
+export const DAV_OWNED_FIELDS = /** @type {const} */ ([...DAV_CORE_FIELDS, ...DAV_EXTENDED_FIELDS]);
 
 /** Json columns among the owned fields — written as `jsonNull` when empty. */
 const JSON_FIELDS = new Set([
@@ -467,6 +485,12 @@ const typesForLabel = (property, label) => {
 
 // --- value entries ----------------------------------------------------------
 
+/** @param {string} value */
+const valueKey = (value) => value.trim().toLowerCase();
+
+/** @param {string} label @param {string} value */
+const entryKey = (label, value) => `${label.trim().toLowerCase()}\u0000${valueKey(value)}`;
+
 /**
  * @param {VCardLine[]} lines
  * @param {string} property
@@ -481,11 +505,15 @@ const parseValueEntries = (lines, property, fallbackLabel) => {
   for (const line of lines) {
     if (line.name !== property) continue;
     const value = line.value.trim();
-    const key = value.toLowerCase();
-    if (!value || seen.has(key)) continue;
+    if (!value) continue;
+    const label = resolveLabel(lines, line, fallbackLabel);
+    // Same value under two labels (a shared line as Home and Work) stays two
+    // entries; only an exact value + label repeat is a duplicate.
+    const key = entryKey(label, value);
+    if (seen.has(key)) continue;
     seen.add(key);
     entries.push({
-      label: resolveLabel(lines, line, fallbackLabel),
+      label,
       value,
       isPrimary: false,
       preferred: isPreferred(line),
@@ -611,6 +639,23 @@ export const serializeVCardBirthday = (birthday) => {
 const orNull = (value) => (value?.trim() ? value.trim() : null);
 
 /**
+ * Legacy flat arrays: one value each, even when two labelled entries share it.
+ *
+ * @param {DavValueEntry[]} entries
+ */
+const distinctValues = (entries) => {
+  const seen = new Set();
+  return entries
+    .map((entry) => entry.value)
+    .filter((value) => {
+      const key = valueKey(value);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
+
+/**
  * Parse a vCard body into every Contact column the DAV mapping owns. Absent
  * properties come back as null / [] so the PUT clears them.
  *
@@ -621,8 +666,13 @@ const orNull = (value) => (value?.trim() ? value.trim() : null);
  * @param {string} text
  * @returns {DavContactFields}
  */
-export const parseVCardToContactFields = (text) => {
-  const lines = parseVCardLines(text);
+export const parseVCardToContactFields = (text) => fieldsFromLines(parseVCardLines(text));
+
+/**
+ * @param {VCardLine[]} lines
+ * @returns {DavContactFields}
+ */
+const fieldsFromLines = (lines) => {
   /** @param {string} name */
   const first = (name) => lines.find((line) => line.name === name);
 
@@ -665,10 +715,10 @@ export const parseVCardToContactFields = (text) => {
     department: orNull(department),
     jobTitle: orNull(first("TITLE")?.value),
     email: primaryOf(emailEntries)?.value ?? null,
-    emailAddresses: emailEntries.map((entry) => entry.value),
+    emailAddresses: distinctValues(emailEntries),
     emailEntries,
     phone: primaryOf(phoneEntries)?.value ?? null,
-    phoneNumbers: phoneEntries.map((entry) => entry.value),
+    phoneNumbers: distinctValues(phoneEntries),
     phoneEntries,
     website: primaryOf(websiteEntries)?.value ?? null,
     websiteEntries,
@@ -691,22 +741,105 @@ export const parseVCardToContactFields = (text) => {
 };
 
 /**
- * Prisma write data for a device PUT: every owned column, with empty Json
- * columns written as `jsonNull` (pass `Prisma.DbNull`; Prisma rejects a bare
- * `null` for a Json column) and a display name always present.
+ * Extended fields the body actually carries. NICKNAME and the phonetic names
+ * count when their property is present (even empty, which is how a client that
+ * models them sends a deletion); the department counts when ORG has a second
+ * component (`ORG:Acme;` clears it, `ORG:Acme` leaves it alone).
+ *
+ * @param {VCardLine[]} lines
+ * @returns {Set<string>}
+ */
+const presentExtendedFields = (lines) => {
+  const names = new Set(lines.map((line) => line.name));
+  const present = new Set();
+  if (names.has("NICKNAME")) present.add("nickname");
+  if (names.has("X-PHONETIC-FIRST-NAME") || names.has("X-KONTAX-PINYIN-FIRST-NAME")) {
+    present.add("phoneticFirstName");
+  }
+  if (names.has("X-PHONETIC-LAST-NAME") || names.has("X-KONTAX-PINYIN-LAST-NAME")) {
+    present.add("phoneticLastName");
+  }
+  const orgLine = lines.find((line) => line.name === "ORG");
+  if (orgLine && splitVCardComponents(orgLine.rawValue).length >= 2) present.add("department");
+  return present;
+};
+
+/**
+ * Carry stored per-entry metadata (phone `e164` / validation, any other extra
+ * keys) over to the parsed entry with the same value, so a device round-trip
+ * doesn't strip it. The device's label / value / primacy win. Matches on value
+ * + label first, then value alone; each stored entry is used at most once.
+ *
+ * @param {DavValueEntry[]} incoming
+ * @param {unknown} stored
+ * @returns {Array<Record<string, unknown>>}
+ */
+export const mergeStoredEntryMetadata = (incoming, stored) => {
+  const pool = Array.isArray(stored) ? stored.filter(isRecord) : [];
+  if (pool.length === 0) return incoming;
+
+  /** @type {Set<number>} */
+  const used = new Set();
+  /** @type {Array<Record<string, unknown> | null>} */
+  const matches = incoming.map(() => null);
+  /** @param {(candidate: unknown, entry: DavValueEntry) => boolean} same */
+  const pass = (same) => {
+    incoming.forEach((entry, index) => {
+      if (matches[index]) return;
+      const found = pool.findIndex((candidate, i) => !used.has(i) && same(candidate, entry));
+      if (found < 0) return;
+      used.add(found);
+      matches[index] = /** @type {Record<string, unknown>} */ (pool[found]);
+    });
+  };
+  pass(
+    (candidate, entry) =>
+      entryKey(stringField(candidate, "label"), stringField(candidate, "value")) ===
+      entryKey(entry.label, entry.value),
+  );
+  pass((candidate, entry) => valueKey(stringField(candidate, "value")) === valueKey(entry.value));
+
+  return incoming.map((entry, index) => {
+    const match = matches[index];
+    return match ? { ...match, label: entry.label, value: entry.value, isPrimary: entry.isPrimary } : entry;
+  });
+};
+
+/**
+ * Prisma write data for a device PUT, with empty Json columns written as
+ * `jsonNull` (pass `Prisma.DbNull`; Prisma rejects a bare `null` for a Json
+ * column) and a display name always present.
+ *
+ * Core columns are always written (absent → cleared); extended columns only
+ * when the body carries them. Pass the stored contact as `existing` to keep
+ * per-entry metadata on unchanged phone / email / website entries.
  *
  * @template [J=null]
  * @param {string} text
- * @param {{ jsonNull?: J }} [options]
+ * @param {{ jsonNull?: J, existing?: Record<string, unknown> | null }} [options]
  * @returns {Record<string, unknown> & { fullName: string }}
  */
 export const buildDavContactWriteData = (text, options = {}) => {
-  const fields = parseVCardToContactFields(text);
+  const lines = parseVCardLines(text);
+  const fields = fieldsFromLines(lines);
   const jsonNull = "jsonNull" in options ? options.jsonNull : null;
+  const existing = options.existing ?? null;
+  const presentExtended = presentExtendedFields(lines);
 
   /** @type {Record<string, unknown>} */
+  const merged = { ...fields };
+  if (existing) {
+    merged.phoneEntries = mergeStoredEntryMetadata(fields.phoneEntries, existing.phoneEntries);
+    merged.emailEntries = mergeStoredEntryMetadata(fields.emailEntries, existing.emailEntries);
+    merged.websiteEntries = mergeStoredEntryMetadata(fields.websiteEntries, existing.websiteEntries);
+  }
+
+  /** @type {ReadonlySet<string>} */
+  const extended = new Set(DAV_EXTENDED_FIELDS);
+  /** @type {Record<string, unknown>} */
   const data = {};
-  for (const [key, value] of Object.entries(fields)) {
+  for (const [key, value] of Object.entries(merged)) {
+    if (extended.has(key) && !presentExtended.has(key)) continue;
     data[key] = JSON_FIELDS.has(key) && Array.isArray(value) && value.length === 0 ? jsonNull : value;
   }
 
@@ -763,9 +896,11 @@ const resolveValueEntries = (entries, scalar, legacy) => {
     resolved = values.map((value, index) => ({ label: "", value: value.trim(), isPrimary: index === 0 }));
   }
 
+  // Dedupe on value + label, matching the parser: two labels for one value are
+  // two entries the device must see, or its next PUT would drop one.
   const seen = new Set();
   return resolved.filter((entry) => {
-    const key = entry.value.toLowerCase();
+    const key = entryKey(entry.label, entry.value);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;

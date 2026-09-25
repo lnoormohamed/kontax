@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  DAV_CORE_FIELDS,
+  DAV_EXTENDED_FIELDS,
   DAV_OWNED_FIELDS,
   buildDavContactWriteData,
   parseVCardToContactFields,
@@ -345,9 +347,9 @@ test("PUT write data: removing a property clears it; unowned columns are untouch
 
   const data = buildDavContactWriteData(withoutEmailOrAddress, { jsonNull: DB_NULL });
 
-  // Every owned column is present, so the update overwrites it.
-  for (const key of DAV_OWNED_FIELDS) {
-    assert.ok(key in data, `missing owned field ${key}`);
+  // Every core column is present, so the update overwrites it.
+  for (const key of DAV_CORE_FIELDS) {
+    assert.ok(key in data, `missing core field ${key}`);
   }
 
   assert.equal(data.email, null);
@@ -359,7 +361,8 @@ test("PUT write data: removing a property clears it; unowned columns are untouch
   assert.equal(data.birthday, null);
   assert.equal(data.notes, null);
   assert.equal(data.company, null);
-  assert.equal(data.department, null);
+  // Department is extended: with no ORG line at all it is left untouched.
+  assert.ok(!("department" in data));
 
   // Still-present values are written in both shapes.
   assert.equal(data.phone, "+1 (555) 010-0100");
@@ -370,6 +373,123 @@ test("PUT write data: removing a property clears it; unowned columns are untouch
   for (const key of ["labels", "significantDates", "relatedPeople", "customFields", "isFavorite", "phoneticCompany", "avatarUrl"]) {
     assert.ok(!(key in data), `unowned field ${key} must not be written`);
   }
+});
+
+test("PUT write data: a Thunderbird-style minimal card keeps nickname, phonetics and department", () => {
+  // Thunderbird / many Android apps don't model NICKNAME, X-PHONETIC-* or the
+  // ORG department — they send back only what they understand.
+  const thunderbird = crlf([
+    "BEGIN:VCARD",
+    "VERSION:4.0",
+    "PRODID:-//Thunderbird//EN",
+    "UID:tb-uid-1",
+    "FN:Jane Appleseed",
+    "N:Appleseed;Jane;;;",
+    "EMAIL;PREF=1:jane@example.com",
+    "TEL;TYPE=cell:+1 555 010 0100",
+    "ORG:Acme",
+    "TITLE:Chief Scientist",
+    "END:VCARD",
+  ]);
+
+  const data = buildDavContactWriteData(thunderbird);
+  for (const key of DAV_EXTENDED_FIELDS) {
+    assert.ok(!(key in data), `extended field ${key} must be left untouched`);
+  }
+  assert.equal(data.company, "Acme");
+  assert.equal(data.jobTitle, "Chief Scientist");
+  // Core fields the card omits are still cleared.
+  assert.equal(data.notes, null);
+  assert.equal(data.birthday, null);
+  assert.equal(data.addressEntries, null);
+
+  // A client that does model them sends the deletion explicitly.
+  const apple = buildDavContactWriteData(
+    crlf(["BEGIN:VCARD", "VERSION:3.0", "FN:J", "NICKNAME:", "ORG:Acme;", "X-PHONETIC-FIRST-NAME:JAY-n", "END:VCARD"]),
+  );
+  assert.equal(apple.nickname, null);
+  assert.equal(apple.department, null);
+  assert.equal(apple.phoneticFirstName, "JAY-n");
+  assert.ok(!("phoneticLastName" in apple));
+  assert.deepEqual([...DAV_OWNED_FIELDS].sort(), [...DAV_CORE_FIELDS, ...DAV_EXTENDED_FIELDS].sort());
+});
+
+test("PUT write data: iPhone email deletion still clears it; phone metadata survives the round-trip", () => {
+  const existing = {
+    email: "jane@example.com",
+    emailEntries: [
+      { label: "Home", value: "jane@example.com", isPrimary: true },
+      { label: "Work", value: "jane@work.example", isPrimary: false },
+    ],
+    phoneEntries: [
+      {
+        label: "Mobile",
+        value: "+1 (555) 010-0100",
+        isPrimary: true,
+        e164: "+15550100100",
+        validationStatus: "valid",
+        source: "user",
+      },
+      { label: "Gym", value: "+1 555 010 0199", isPrimary: false, e164: "+15550100199" },
+    ],
+  };
+  const iphone = crlf([
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    "FN:Jane",
+    "item1.EMAIL;type=INTERNET;type=HOME;type=pref:jane@example.com",
+    // The Work email was deleted on the phone; the Mobile phone relabelled.
+    "TEL;type=WORK;type=VOICE;type=pref:+1 (555) 010-0100",
+    "TEL;type=CELL:+1 555 010 0222",
+    "UID:ios-uid-1",
+    "END:VCARD",
+  ]);
+
+  const data = buildDavContactWriteData(iphone, { existing });
+
+  assert.deepEqual(data.emailEntries, [{ label: "Home", value: "jane@example.com", isPrimary: true }]);
+  assert.deepEqual(data.emailAddresses, ["jane@example.com"]);
+  assert.deepEqual(data.phoneEntries, [
+    {
+      label: "Work",
+      value: "+1 (555) 010-0100",
+      isPrimary: true,
+      e164: "+15550100100",
+      validationStatus: "valid",
+      source: "user",
+    },
+    // New number: no stored metadata to carry. Removed Gym number: gone.
+    { label: "Mobile", value: "+1 555 010 0222", isPrimary: false },
+  ]);
+});
+
+test("one value under two labels stays two entries through serialize and parse", () => {
+  const stored = {
+    syncUid: "uid-shared-line",
+    fullName: "Shared",
+    phoneEntries: [
+      { label: "Home", value: "+44 20 7946 0000", isPrimary: true, e164: "+442079460000" },
+      { label: "Work", value: "+44 20 7946 0000", isPrimary: false, e164: "+442079460000" },
+    ],
+  };
+  const vcard = serializeContactToVCard(stored);
+  assert.equal(vcard.match(/\r\nTEL/g)?.length, 2);
+
+  const fields = parseVCardToContactFields(vcard);
+  assert.deepEqual(
+    fields.phoneEntries.map((entry) => entry.label),
+    ["Home", "Work"],
+  );
+  assert.deepEqual(fields.phoneNumbers, ["+44 20 7946 0000"]);
+
+  const data = buildDavContactWriteData(vcard, { existing: stored });
+  assert.deepEqual(data.phoneEntries, stored.phoneEntries);
+
+  // An exact value + label repeat is still a duplicate.
+  const dup = parseVCardToContactFields(
+    crlf(["BEGIN:VCARD", "VERSION:3.0", "FN:D", "TEL;TYPE=HOME:1", "TEL;TYPE=HOME:1", "END:VCARD"]),
+  );
+  assert.equal(dup.phoneEntries.length, 1);
 });
 
 test("PUT write data: display name derived when FN is missing; URI photo handling kept", () => {
