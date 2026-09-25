@@ -109,7 +109,10 @@ server-side counts, consistent with "no tracking").
   page plan in order; Search Console setup and sitemap submission at launch.
 
 ## 5. Decisions for the owner
-1. **Currency:** Stripe prices are USD ($2.99 / $3.99) while copy and designs say pounds. Charge in
-   GBP, USD, or show both?
+1. **Currency: decided 2026-09-25 — GBP.** The owner is switching Stripe prices to GBP (UK-focused);
+   the site displays whatever currency Stripe returns.
 2. **Public cards in search:** index only cards whose owner opts in (recommended), or none?
 3. **Changelog history:** OK to rebuild it from the real release history (phases since June 2026)?
+
+
+Tickets: [Phase 50A](../build-phase/phase-50a-seo.md) (P50A-01..08).
