@@ -93,16 +93,16 @@ export const PLAN_MATRIX: FeatureGroup[] = [
       {
         id: "export",
         label: "Export formats",
-        vals: { Free: "CSV, vCard", Pro: "All formats", Family: "All formats", Teams: "All formats" },
+        vals: { Free: "CSV", Pro: "All formats", Family: "All formats", Teams: "All formats" },
       },
       {
         id: "merge",
         label: "Duplicate merge",
         vals: {
-          Free: "Basic suggestions",
-          Pro: { v: "Advanced", note: "field-level, bulk, 30-day undo" },
-          Family: "Advanced",
-          Teams: "Advanced",
+          Free: { v: "Included", note: "field-level, bulk, 30-day undo" },
+          Pro: "Included",
+          Family: "Included",
+          Teams: "Included",
         },
       },
     ],
@@ -295,18 +295,6 @@ export const UPGRADE_GATES: UpgradeGate[] = [
     billing: "vCard export is available on the Pro plan.",
   },
   {
-    id: "merge",
-    icon: "merge",
-    featureRow: "merge",
-    unlock: "Pro",
-    form: "locked",
-    title: "Advanced merge",
-    lockedTitle: "Advanced merge is a Pro feature",
-    value:
-      "Choose the winning value field-by-field, accept duplicates in bulk, and undo within 30 days.",
-    billing: "Field-level merge, bulk accept and 30-day undo are available on the Pro plan.",
-  },
-  {
     id: "feed",
     icon: "clock",
     featureRow: "feed",
@@ -399,7 +387,6 @@ export const DOWNGRADE_COPY: Record<string, DowngradeCopy> = {
       "The activity feed is locked; per-contact history shows only the last 3 events.",
       "Extra sync accounts and device app passwords beyond 1 stop syncing.",
       "Live shares you receive convert to static snapshots.",
-      "Advanced merge, bulk accept and 30-day undo are no longer available.",
     ],
   },
   "Family>Pro": {

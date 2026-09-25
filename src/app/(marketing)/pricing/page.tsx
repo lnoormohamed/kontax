@@ -26,12 +26,12 @@ function getMatrixPriceLabel(
 export const metadata: Metadata = {
   title: "Pricing — Kontax",
   description:
-    "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+    "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, more sync accounts, and the developer API.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "Pricing",
     description:
-      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, more sync accounts, and the developer API.",
     url: "/pricing",
     siteName: "Kontax",
     type: "website",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Pricing — Kontax",
     description:
-      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, more sync accounts, and the developer API.",
   },
 };
 
@@ -122,7 +122,7 @@ export default async function PricingPage() {
                 <tr className="pr-row"><td>Global activity feed</td><td><Cell /></td><td><Cell text="365 days" /></td><td><Cell text="90 days" /></td><td><Cell text="Unlimited" /></td></tr>
                 <tr className="pr-row"><td>Minimum events kept</td><td><Cell text="3 events" /></td><td><Cell text="25 events" /></td><td><Cell text="10 events" /></td><td><Cell text="All events" /></td></tr>
                 <tr className="pr-row"><td>Per-contact history</td><td><Cell text="Last 3 shown" /></td><td><Cell text="Full · 365 days" /></td><td><Cell text="Full · 90 days" /></td><td><Cell text="Full · unlimited" /></td></tr>
-                <tr className="pr-row"><td>Merge duplicates</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><td>Merge duplicates</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
 
                 {/* SYNC */}
                 <tr className="pr-cat"><td colSpan={5}>Sync</td></tr>

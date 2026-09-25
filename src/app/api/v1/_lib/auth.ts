@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { ApiTokenScope } from "~/server/api-tokens";
 import { validateApiToken } from "~/server/api-tokens";
 import { checkApiRateLimit } from "~/server/api-rate-limit";
+import { getUserBillingContext } from "~/server/billing";
 import { corsHeaders } from "~/lib/api-cors";
 
 export async function withApiAuth(
@@ -25,6 +26,16 @@ export async function withApiAuth(
     return NextResponse.json(
       { error: "INVALID_TOKEN", message: "The provided API token is invalid or revoked." },
       { status: 401, headers: corsHeaders },
+    );
+  }
+
+  // Token creation is plan-gated, but a token outlives the plan that minted it
+  // (downgrade to Free, or Family losing API access), so check on every call.
+  const billing = await getUserBillingContext(identity.userId);
+  if (!billing.entitlements.apiAccessEnabled) {
+    return NextResponse.json(
+      { error: "UPGRADE_REQUIRED", message: "API access is not included in your current plan." },
+      { status: 403, headers: corsHeaders },
     );
   }
 

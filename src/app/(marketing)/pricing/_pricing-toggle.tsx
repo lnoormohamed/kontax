@@ -82,7 +82,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     sublabel: { monthly: "billed monthly", annual: "billed annually" },
     cta: { label: "Choose Family", href: "/register?plan=family", variant: "filled" },
     features: [
-      { text: <><strong>Unlimited</strong> contacts &amp; sync</> },
+      { text: <><strong>Unlimited</strong> contacts, up to 5 sync accounts</> },
       { text: "Family shared address book" },
       { text: <>Up to <strong>6 members</strong></> },
       { text: "Shared labels & live edits" },

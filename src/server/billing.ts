@@ -150,7 +150,8 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
     // rather than a blanket upsell.
     syncAccountsLimit: 1,
     appPasswordsLimit: 1,
-    advancedMergeEnabled: false,
+    // Merge (field-level, bulk, 30-day undo) is included on every plan.
+    advancedMergeEnabled: true,
     premiumExportEnabled: false,
     cardDavSyncEnabled: true,
     familyGroupEnabled: false,
@@ -174,6 +175,9 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
   },
   FAMILY: {
     ...PRO_PERSONAL,
+    // The developer API is a Pro/Teams feature; Family inherits Pro's personal
+    // limits but not API access (P49 decision, 2026-09-25).
+    apiAccessEnabled: false,
     familyGroupEnabled: true,
     teamsEnabled: false,
     sharedAddressBooksLimit: 1,
