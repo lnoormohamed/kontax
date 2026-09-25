@@ -33,9 +33,13 @@ type Limiter = RateLimiterRedis | RateLimiterMemory;
  * future store-backed limiter added without one).
  */
 
-const isProductionDeploy =
-  process.env.NODE_ENV === "production" ||
-  process.env.KONTAX_DEPLOY_ENV === "production";
+// KONTAX_DEPLOY_ENV decides when set (staging runs NODE_ENV=production but is
+// not production); NODE_ENV only when it is unset. Same rule as
+// scripts/runtime/start-production.mjs.
+const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
+const isProductionDeploy = deployEnv
+  ? deployEnv === "production"
+  : process.env.NODE_ENV === "production";
 
 // P48-16: production must use the shared store. The in-memory fallback is a dev
 // convenience — in production it silently turns cluster-wide limits into

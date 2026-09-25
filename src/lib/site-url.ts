@@ -27,9 +27,13 @@ const DEV_FALLBACK_ORIGIN = "http://localhost:3000";
 const stripTrailingSlash = (value: string) => value.replace(/\/$/, "");
 
 /** True when this process is a production deployment (runtime, not build). */
-const isProductionRuntime = () =>
-  process.env.NODE_ENV === "production" ||
-  process.env.KONTAX_DEPLOY_ENV === "production";
+// KONTAX_DEPLOY_ENV decides when set (staging runs NODE_ENV=production but is
+// not production); NODE_ENV only when it is unset. Same rule as
+// scripts/runtime/start-production.mjs.
+const isProductionRuntime = () => {
+  const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
+  return deployEnv ? deployEnv === "production" : process.env.NODE_ENV === "production";
+};
 
 /**
  * The public origin to use when building an absolute URL for a user (email

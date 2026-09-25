@@ -173,9 +173,13 @@ export const env = createEnv({
  * per-process rate limits.
  */
 export function assertProductionEnv() {
-  const isProductionDeploy =
-    process.env.NODE_ENV === "production" ||
-    process.env.KONTAX_DEPLOY_ENV === "production";
+  const isProductionDeploy = (() => {
+    // KONTAX_DEPLOY_ENV decides when set (staging runs NODE_ENV=production but
+    // is not production); NODE_ENV only when it is unset. Same rule as
+    // scripts/runtime/start-production.mjs.
+    const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
+    return deployEnv ? deployEnv === "production" : process.env.NODE_ENV === "production";
+  })();
 
   if (!isProductionDeploy) return;
 
