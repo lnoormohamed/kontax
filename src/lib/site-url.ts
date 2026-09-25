@@ -26,11 +26,16 @@ const DEV_FALLBACK_ORIGIN = "http://localhost:3000";
 
 const stripTrailingSlash = (value: string) => value.replace(/\/$/, "");
 
-/** True when this process is a production deployment (runtime, not build). */
-// KONTAX_DEPLOY_ENV decides when set (staging runs NODE_ENV=production but is
-// not production); NODE_ENV only when it is unset. Same rule as
-// scripts/runtime/start-production.mjs.
-const isProductionRuntime = () => {
+/**
+ * True when this process is a production deployment (runtime, not build).
+ * KONTAX_DEPLOY_ENV decides when set (staging runs NODE_ENV=production but is
+ * not production); NODE_ENV only when it is unset. Same rule as
+ * scripts/runtime/start-production.mjs and assertProductionEnv() in
+ * src/env.js. Exported (P50A-01) so robots.ts and middleware.ts gate
+ * non-production deploys (noindex, X-Robots-Tag) with the exact same check
+ * used everywhere else, rather than a fourth copy of this logic.
+ */
+export const isProductionRuntime = () => {
   const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
   return deployEnv ? deployEnv === "production" : process.env.NODE_ENV === "production";
 };
