@@ -327,6 +327,11 @@
 .fp-role--owner  { background: var(--mkt-green); color: #fff; }
 .fp-role--editor { background: var(--mkt-tile-bg); color: var(--mkt-green); }
 .fp-role--viewer { background: var(--mkt-surface); color: var(--mkt-body); border: 1px solid var(--mkt-card-border); }
+.fp-role--undo   { background: var(--mkt-tile-bg); color: var(--mkt-accent); }
+
+/* ─── Change-history mock ─── */
+.fp-hi__row { gap: 12px; }
+.fp-hi__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mkt-green); flex: 0 0 auto; }
 
 /* ─── Public card mock ─── */
 .fp-pm {

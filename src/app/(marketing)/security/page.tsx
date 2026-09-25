@@ -2,15 +2,19 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import "./security.css";
 
+// P50A-04 · ≤ 60-char title (the marketing layout's title template is "%s",
+// so this string is never suffixed again) and ≤ 160-char description.
+const TITLE = "Security and privacy — how Kontax protects your contacts";
+const DESCRIPTION =
+  "How Kontax protects your contacts: TLS in transit, encrypted secrets at rest, 2FA, and full export or deletion whenever you want.";
+
 export const metadata: Metadata = {
-  title: "Security — Kontax",
-  description:
-    "How Kontax protects your data: TLS encryption, bcrypt passwords, 2FA, encrypted sync credentials, and GDPR compliance.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/security" },
   openGraph: {
-    title: "Security",
-    description:
-      "How Kontax protects your data: TLS encryption, bcrypt passwords, 2FA, encrypted sync credentials, and GDPR compliance.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: "/security",
     siteName: "Kontax",
     type: "website",
@@ -18,9 +22,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Security — Kontax",
-    description:
-      "How Kontax protects your data: TLS encryption, bcrypt passwords, 2FA, encrypted sync credentials, and GDPR compliance.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
 };
 

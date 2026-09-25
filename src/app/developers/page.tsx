@@ -19,8 +19,11 @@ export const metadata: Metadata = {
   // Root layout's title template already appends " · Kontax" — don't repeat
   // the brand here or the rendered title doubles up ("Developer docs — Kontax · Kontax").
   title: "Developer docs",
+  // P50A-04: kept ≤ 160 chars (script-checked, see
+  // scripts/check-marketing-titles.mjs) — trimmed from a longer draft that
+  // repeated detail already on the page itself.
   description:
-    "Kontax developer documentation: the REST API at api.getkontax.com (CRUD for contacts, labels, sync) and the open Kontax Contact Export Format — a JSContact-based export format with JSON Schemas and a reference validator.",
+    "Developer docs for the Kontax REST API (contacts, labels, sync) and the open Kontax Contact Export Format, with JSON Schemas and a reference validator.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/developers" },
 };

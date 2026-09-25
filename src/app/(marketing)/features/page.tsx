@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
+import { PageViewBeacon } from "~/app/_components/page-view-beacon";
 import "./features.css";
 
 export const metadata: Metadata = {
@@ -34,6 +35,8 @@ export default function FeaturesPage() {
           { name: "Features", path: "/features" },
         ])}
       />
+      {/* P50A-08: cookieless page-view beacon — see page-view-beacon.tsx */}
+      <PageViewBeacon path="/features" />
       {/* ── Hero ── */}
       <section className="fp-hero">
         <div className="fp-hero__inner">
@@ -54,7 +57,7 @@ export default function FeaturesPage() {
             Every feature, up close
           </span>
           <h1 className="fp-hero__title">
-            Everything your address book has been missing
+            Contact sync, clean-up and sharing, in one private address book
           </h1>
           <p className="fp-hero__sub">
             From search to sync to sharing — Kontax keeps your contacts
@@ -392,6 +395,155 @@ export default function FeaturesPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Feature 7 — Merge with 30-day undo (mock left) ── */}
+      <section className="fp-feat fp-feat--imgleft">
+        <div className="fp-feat__grid">
+          <div className="fp-feat__shot" aria-hidden="true">
+            <div className="fp-shot__pane">
+              <div className="fp-hm__card">
+                <div className="fp-hm__head">
+                  <span className="fp-hm__bk">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 4a5 5 0 0 0-5 5v2H7a5 5 0 0 0 0 10h1" />
+                      <path d="M7 20a5 5 0 0 0 5-5v-2h5a5 5 0 0 0 0-10h-1" />
+                    </svg>
+                  </span>
+                  <span>
+                    <span className="fp-hm__title">Merged contacts</span>
+                    <span className="fp-hm__cnt">2 duplicates cleaned up</span>
+                  </span>
+                </div>
+                {(
+                  [
+                    { initials: "JW", color: "fp-av--g", name: "James Whitfield", email: "kept · merged Jamie W.", days: 27 },
+                    { initials: "RP", color: "fp-av--p", name: "Rosa Pérez",      email: "kept · merged R. Perez", days: 12 },
+                  ] as const
+                ).map(({ initials, color, name, email, days }) => (
+                  <div key={name} className="fp-hm__row">
+                    <span className={`fp-av fp-av--36 ${color}`}>{initials}</span>
+                    <span>
+                      <span className="fp-hm__nm">{name}</span>
+                      <span className="fp-hm__em">{email}</span>
+                    </span>
+                    <span className="fp-role fp-role--undo">Undo · {days}d left</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="fp-feat__copy">
+            <h2 className="fp-feat__h">Merge duplicates, with 30 days to change your mind</h2>
+            <p className="fp-feat__body">
+              Kontax spots likely duplicates and merges them once you approve — combining phone
+              numbers, emails, and notes onto one contact. Every merge stays fully reversible for
+              30 days, so an accidental merge is never permanent.
+            </p>
+            <Link className="fp-feat__link" href="/features/duplicates">
+              See how merging works{" "}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Feature 8 — Change history (mock right) ── */}
+      <section className="fp-feat fp-feat--alt fp-feat--imgright">
+        <div className="fp-feat__grid">
+          <div className="fp-feat__copy">
+            <h2 className="fp-feat__h">Every change, remembered</h2>
+            <p className="fp-feat__body">
+              Every contact keeps its own history — who changed a phone number, added a label, or
+              merged in a duplicate, and when. If something looks wrong, you can see exactly what
+              happened instead of guessing.
+            </p>
+            <Link className="fp-feat__link" href="/features/history">
+              See your change history{" "}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+          </div>
+          <div className="fp-feat__shot" aria-hidden="true">
+            <div className="fp-shot__pane">
+              <div className="fp-lm__list fp-hi__list">
+                {(
+                  [
+                    { label: "Phone number updated", meta: "2 days ago" },
+                    { label: "Label added: VIP", meta: "1 week ago" },
+                    { label: "Merged with duplicate", meta: "3 weeks ago" },
+                    { label: "Contact created", meta: "4 months ago" },
+                  ] as const
+                ).map(({ label, meta }) => (
+                  <div key={label} className="fp-lm__row fp-hi__row">
+                    <span className="fp-hi__dot" aria-hidden="true" />
+                    <span>
+                      <span className="fp-lm__nm">{label}</span>
+                      <span className="fp-sm__meta">{meta}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Feature 9 — Appears in iPhone and Mac Contacts (mock left) ── */}
+      <section className="fp-feat fp-feat--imgleft">
+        <div className="fp-feat__grid">
+          <div className="fp-feat__shot" aria-hidden="true">
+            <div className="fp-shot__pane fp-ym">
+              <div className="fp-ym__row">
+                <span className="fp-ym__icn" style={{ background: "var(--mkt-ink)" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="7" y="2" width="10" height="20" rx="2" />
+                    <path d="M11 18h2" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="fp-ym__nm">iPhone Contacts</span>
+                  <span className="fp-ym__sub">Built-in app · over CardDAV</span>
+                </span>
+                <span className="fp-ym__status fp-st--ok">
+                  <span className="fp-dot fp-dot--ok" />Synced
+                </span>
+              </div>
+              <div className="fp-ym__row">
+                <span className="fp-ym__icn" style={{ background: "var(--mkt-green)" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="13" rx="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </svg>
+                </span>
+                <span>
+                  <span className="fp-ym__nm">Mac Contacts</span>
+                  <span className="fp-ym__sub">Built-in app · over CardDAV</span>
+                </span>
+                <span className="fp-ym__status fp-st--ok">
+                  <span className="fp-dot fp-dot--ok" />Synced
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="fp-feat__copy">
+            <h2 className="fp-feat__h">Appears in iPhone and Mac Contacts</h2>
+            <p className="fp-feat__body">
+              No separate app to open. Add your Kontax address book to the Contacts app you
+              already use on iPhone and Mac over CardDAV, and every edit flows both ways —
+              no extra step to remember.
+            </p>
+            <Link className="fp-feat__link" href="/help/sync/connect-icloud-contacts">
+              Connect iCloud Contacts{" "}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
