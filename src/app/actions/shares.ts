@@ -177,10 +177,13 @@ export const regenerateVcardShareLink = async (formData: FormData) => {
     });
     if (!share?.contactId) return null;
 
-    await tx.contactShare.update({
-      where: { id: share.id },
+    // Compare-and-set on ACTIVE: of two concurrent regenerates only one revokes
+    // the link, so only one replacement is ever created.
+    const revoked = await tx.contactShare.updateMany({
+      where: { id: share.id, status: "ACTIVE" },
       data: { status: "REVOKED", revokedAt: new Date() },
     });
+    if (revoked.count !== 1) return null;
     await tx.contactShare.create({
       data: {
         ownerUserId: userId,

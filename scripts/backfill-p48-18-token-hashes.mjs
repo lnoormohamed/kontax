@@ -54,7 +54,10 @@ if (!process.env.KONTAX_P48_18_BOOTSTRAPPED) {
 }
 
 const { PrismaClient } = await import("../generated/prisma/index.js");
-const { encryptDisplayToken, hashToken } = await import("~/server/capability-tokens");
+const { decryptDisplayToken, encryptDisplayToken, hashToken } = await import(
+  "~/server/capability-tokens"
+);
+const { getSyncCredentialEncryptionStatus } = await import("~/server/sync-credentials");
 
 const BATCH_SIZE = 200;
 
@@ -66,6 +69,10 @@ if (args.includes("--help") || args.includes("-h")) {
       "Usage: node scripts/backfill-p48-18-token-hashes.mjs [--apply]",
       "",
       "  --apply   Persist the changes (default is a dry run that writes nothing).",
+      "  --prefer-plaintext",
+      "            Resolve conflict rows (plaintext AND a different hash, which only a",
+      "            rollback to the pre-P48-18 build can produce) in favour of the",
+      "            plaintext token — the one the user was shown most recently.",
       "",
       "Hashes User.calToken, ContactShare.token and GroupMember.inviteToken,",
       "stores an encrypted display copy for calendar/share tokens, and nulls the",
@@ -76,6 +83,7 @@ if (args.includes("--help") || args.includes("-h")) {
 }
 
 const apply = args.includes("--apply");
+const preferPlaintext = args.includes("--prefer-plaintext");
 
 const db = new PrismaClient();
 
@@ -186,11 +194,17 @@ async function backfillTable(table) {
       counts.scanned += 1;
 
       if (row.hash && row.hash !== hashToken(row.plaintext)) {
-        counts.conflicts += 1;
-        console.error(
-          `  ✗ ${table.label} row ${row.id}: already has a hash for a different token — left untouched`,
-        );
-        continue;
+        if (!preferPlaintext) {
+          counts.conflicts += 1;
+          console.error(
+            `  ✗ ${table.label} row ${row.id}: already has a hash for a different token — left untouched (re-run with --prefer-plaintext to resolve)`,
+          );
+          continue;
+        }
+        // The plaintext was written by the pre-P48-18 build during a rollback
+        // window, so it is the token the user saw last: it wins, and the older
+        // hashed token stops resolving once this row is converted.
+        console.log(`  ! ${table.label} row ${row.id}: conflict resolved in favour of the plaintext token`);
       }
 
       if (!apply) {
@@ -239,6 +253,38 @@ async function main() {
         error instanceof Error ? error.message : String(error)
       }`,
     );
+  }
+
+  // A wrong key would still "work" here — and then write display copies the app
+  // cannot open, after the plaintext is gone. Two guards:
+  // 1. production must use the dedicated key, never the AUTH_SECRET fallback;
+  // 2. if the running app has already written any display copy, this process
+  //    must be able to decrypt it, i.e. it holds the app's key.
+  const status = getSyncCredentialEncryptionStatus();
+  const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
+  console.log(`Display-token key: "${status.keyRef}" (${status.mode})`);
+  if (deployEnv === "production" && status.mode !== "dedicated") {
+    throw new Error(
+      "Refusing to run in production with the AUTH_SECRET fallback key. Export the app's SYNC_CREDENTIAL_ENCRYPTION_KEY(S) first.",
+    );
+  }
+  const sample =
+    (await db.user.findFirst({
+      where: { calTokenEncrypted: { not: null } },
+      select: { calTokenEncrypted: true },
+    }))?.calTokenEncrypted ??
+    (await db.contactShare.findFirst({
+      where: { tokenEncrypted: { not: null } },
+      select: { tokenEncrypted: true },
+    }))?.tokenEncrypted ??
+    null;
+  if (sample && decryptDisplayToken(sample) === null) {
+    throw new Error(
+      "This process cannot decrypt a display copy the app already wrote — it does not hold the app's key. Nothing was changed.",
+    );
+  }
+  if (!sample) {
+    console.log("(no display copy written by the app yet — key match could not be cross-checked)");
   }
 
   console.log(`${apply ? "APPLY" : "DRY RUN"} — P48-18 capability-token backfill (batch ${BATCH_SIZE})`);

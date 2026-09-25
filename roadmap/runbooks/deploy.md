@@ -148,7 +148,14 @@ build ignores the new columns. The new build stores only hashes (+ an encrypted
 display copy) and still *reads* the legacy plaintext columns until the backfill
 has run. Background: [docs/capability-token-storage.md](../../docs/capability-token-storage.md).
 
-Run in this order on **staging first, then production**:
+Run in this order on **staging first, then production**.
+
+> **Steps 1 and 2 must run back to back.** Production boots in
+> `KONTAX_SCHEMA_MODE=validate`, and the drift check refuses to start any build
+> whose `schema.prisma` differs from the database. Once the migration is applied,
+> the *previous* image no longer passes that check, so if the old container
+> restarts between step 1 and step 2 (health-check restart, host reboot, a
+> redeploy of the same image) it crash-loops until the new image lands.
 
 ```bash
 # 1. migrate (out of band — production runs KONTAX_SCHEMA_MODE=validate)
@@ -159,10 +166,18 @@ DATABASE_URL=<target> npm run db:migrate
 #    Notifications shows the calendar URL; a contact's Sharing tab shows its
 #    share link; an existing /share/<token> link and calendar subscription work.
 
-# 3. backfill, from a full checkout (scripts/ is not in the runtime image — see
+# 3. SOAK the new build for 24–48 h before the backfill. The dual-read code is
+#    correct without it, and until the backfill runs a rollback loses nothing.
+#
+#    backfill, from a full checkout (scripts/ is not in the runtime image — see
 #    "Image layout" below). SYNC_CREDENTIAL_ENCRYPTION_KEYS must be EXACTLY the
 #    app's value (same current key): the display copies are encrypted under it,
 #    and a copy the app can't decrypt shows as "Regenerate link" in the UI.
+#    Guards: in KONTAX_DEPLOY_ENV=production it refuses the AUTH_SECRET
+#    fallback key, and it aborts before writing if it cannot decrypt a display
+#    copy the app has already written (i.e. it was given the wrong key). Read the
+#    values straight from the app container's env into shell variables; never
+#    paste them.
 DATABASE_URL=<target> SYNC_CREDENTIAL_ENCRYPTION_KEYS=<app value> \
   node scripts/backfill-p48-18-token-hashes.mjs            # dry run: prints counts per table
 DATABASE_URL=<target> SYNC_CREDENTIAL_ENCRYPTION_KEYS=<app value> \
@@ -179,24 +194,35 @@ Notes:
 
 - The backfill exits non-zero if any row needs attention. A **conflict** (a row
   that already has a hash for a *different* token than its plaintext) is left
-  untouched and listed by row id — inspect it; no app path produces one. The
-  script never prints tokens.
+  untouched and listed by row id. The only way to produce one is a rollback to
+  the pre-P48-18 build followed by a roll-forward: during the rollback the old
+  code wrote a new plaintext token (e.g. the user pressed "Regenerate"), so the
+  plaintext is the newer credential and the one the user was last shown. Resolve
+  with `--prefer-plaintext`, which re-hashes from the plaintext; the older hashed
+  token then stops resolving. The script never prints tokens.
 - Re-running `--apply` is safe; a clean second run reports `0 plaintext row(s)`
   for every table.
 - Then re-check step 2's smoke test: pre-deploy calendar subscriptions, share
   links and still-pending invite links must keep working (they now resolve by
   hash).
-- **Rollback:** the previous image runs against the migrated schema, but it
-  only knows the plaintext columns — after the backfill it would no longer
-  resolve converted links (they'd 401/404 until regenerated). Roll forward
-  instead; if you must roll back, do it before step 3.
+- **Rollback:** the previous image will **not** boot in `validate` mode against
+  the migrated schema (see the note above). Redeploy it with
+  `KONTAX_SCHEMA_MODE=skip`, as in the P48-14 rollback section. Before step 3
+  a rollback loses nothing, but it only reads the plaintext columns: any token
+  the new build issued in the meantime (hash-only) will 401/404 under the old
+  build, and pressing "Regenerate" there does not revoke the hashed token. After
+  rolling forward again, run the backfill with `--prefer-plaintext` to settle
+  those rows. After step 3, every converted link 401/404s under the old build,
+  so roll forward instead. Calendar and share tokens could be restored to
+  plaintext from their display copies in an emergency; invites (48 h TTL) could
+  not. Write a reverse script rather than improvising SQL.
 - **Follow-up** (separate ticket, once step 4 is 0 in every environment):
   delete the `LEGACY` fallbacks in `src/server/capability-tokens.ts` and drop
   the three plaintext columns.
-- **Key rotation:** the display copies share the sync credential keyring.
-  `scripts/rotate-sync-credential-key.mjs` does not re-encrypt them yet, so keep
-  a retired key in `SYNC_CREDENTIAL_ENCRYPTION_KEYS` until display copies are
-  re-encrypted (or accept that affected users see "Regenerate link").
+- **Key rotation:** the display copies share the sync credential keyring, and
+  `scripts/rotate-sync-credential-key.mjs` re-encrypts them along with the sync
+  credentials (checking each against its stored hash). Keep a retired key in
+  `SYNC_CREDENTIAL_ENCRYPTION_KEYS` until that script reports 0 unreadable.
 
 ---
 

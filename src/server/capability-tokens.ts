@@ -49,8 +49,16 @@ const DISPLAY_HKDF_INFO = "kontax:display-tokens:v1";
 /** Generated tokens are 32 chars; anything much longer is not one of ours. */
 const MAX_TOKEN_LENGTH = 256;
 
+// Every generator is base64url of random bytes (older rows may be hex), so
+// restrict to that alphabet: malformed input (e.g. a %00 in /share/<token>)
+// is rejected before any query instead of surfacing as a Postgres 500.
+const TOKEN_SHAPE = /^[A-Za-z0-9_-]+$/;
+
 const isPlausibleToken = (token: string | null | undefined): token is string =>
-  typeof token === "string" && token.length > 0 && token.length <= MAX_TOKEN_LENGTH;
+  typeof token === "string" &&
+  token.length >= 16 &&
+  token.length <= MAX_TOKEN_LENGTH &&
+  TOKEN_SHAPE.test(token);
 
 // ── Hashing ──────────────────────────────────────────────────────────────────
 
@@ -142,7 +150,9 @@ export const resolveDisplayToken = (stored: {
 }): DisplayToken => {
   if (stored.encrypted) {
     const token = decryptDisplayToken(stored.encrypted);
-    if (token && (!stored.hash || hashToken(token) === stored.hash)) {
+    // Only show a copy that provably belongs to this row's lookup hash; a copy
+    // without a hash (manual DB edit) could display a link that cannot resolve.
+    if (token && stored.hash && hashToken(token) === stored.hash) {
       return { status: "ok", token };
     }
   }

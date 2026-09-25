@@ -187,22 +187,22 @@ const fakeFinder = <Row extends Record<string, unknown>>(rows: Row[]) => {
 };
 
 test("lookup helpers try the hash column first and fall back to the legacy plaintext column", async () => {
-  const hashed = { id: "hashed", calTokenHash: hashToken("new-token"), calToken: null };
-  const legacy = { id: "legacy", calTokenHash: null, calToken: "old-token" };
+  const hashed = { id: "hashed", calTokenHash: hashToken("new-token-xxxxxxxxxxxxxxxxxxxxxx"), calToken: null };
+  const legacy = { id: "legacy", calTokenHash: null, calToken: "old-token-xxxxxxxxxxxxxxxxxxxxxx" };
 
   const byHash = fakeFinder([hashed, legacy]);
-  assert.equal((await findUserByCalToken("new-token", byHash.find))?.id, "hashed");
-  assert.deepEqual(byHash.calls, [{ calTokenHash: hashToken("new-token") }]);
+  assert.equal((await findUserByCalToken("new-token-xxxxxxxxxxxxxxxxxxxxxx", byHash.find))?.id, "hashed");
+  assert.deepEqual(byHash.calls, [{ calTokenHash: hashToken("new-token-xxxxxxxxxxxxxxxxxxxxxx") }]);
 
   const byLegacy = fakeFinder([hashed, legacy]);
-  assert.equal((await findUserByCalToken("old-token", byLegacy.find))?.id, "legacy");
+  assert.equal((await findUserByCalToken("old-token-xxxxxxxxxxxxxxxxxxxxxx", byLegacy.find))?.id, "legacy");
   assert.deepEqual(byLegacy.calls, [
-    { calTokenHash: hashToken("old-token") },
-    { calToken: "old-token" },
+    { calTokenHash: hashToken("old-token-xxxxxxxxxxxxxxxxxxxxxx") },
+    { calToken: "old-token-xxxxxxxxxxxxxxxxxxxxxx" },
   ]);
 
   const miss = fakeFinder([hashed, legacy]);
-  assert.equal(await findUserByCalToken("wrong", miss.find), null);
+  assert.equal(await findUserByCalToken("wrong-xxxxxxxxxxxxxxxxxxxxxxxxxx", miss.find), null);
 
   // The hash itself is not a usable credential: presenting it is hashed again.
   const hashAsToken = fakeFinder([hashed]);
@@ -210,18 +210,18 @@ test("lookup helpers try the hash column first and fall back to the legacy plain
 });
 
 test("share and invite lookups use their own columns", async () => {
-  const share = fakeFinder([{ id: "s1", tokenHash: hashToken("s-new"), token: null }, { id: "s2", tokenHash: null, token: "s-old" }]);
-  assert.equal((await findShareByToken("s-new", share.find))?.id, "s1");
-  assert.equal((await findShareByToken("s-old", share.find))?.id, "s2");
-  assert.deepEqual(share.calls.at(-1), { token: "s-old" });
+  const share = fakeFinder([{ id: "s1", tokenHash: hashToken("s-new-xxxxxxxxxxxxxxxxxxxxxxxxxx"), token: null }, { id: "s2", tokenHash: null, token: "s-old-xxxxxxxxxxxxxxxxxxxxxxxxxx" }]);
+  assert.equal((await findShareByToken("s-new-xxxxxxxxxxxxxxxxxxxxxxxxxx", share.find))?.id, "s1");
+  assert.equal((await findShareByToken("s-old-xxxxxxxxxxxxxxxxxxxxxxxxxx", share.find))?.id, "s2");
+  assert.deepEqual(share.calls.at(-1), { token: "s-old-xxxxxxxxxxxxxxxxxxxxxxxxxx" });
 
   const invite = fakeFinder([
-    { id: "m1", inviteTokenHash: hashToken("i-new"), inviteToken: null },
-    { id: "m2", inviteTokenHash: null, inviteToken: "i-old" },
+    { id: "m1", inviteTokenHash: hashToken("i-new-xxxxxxxxxxxxxxxxxxxxxxxxxx"), inviteToken: null },
+    { id: "m2", inviteTokenHash: null, inviteToken: "i-old-xxxxxxxxxxxxxxxxxxxxxxxxxx" },
   ]);
-  assert.equal((await findMemberByInviteToken("i-new", invite.find))?.id, "m1");
-  assert.equal((await findMemberByInviteToken("i-old", invite.find))?.id, "m2");
-  assert.deepEqual(invite.calls.at(-1), { inviteToken: "i-old" });
+  assert.equal((await findMemberByInviteToken("i-new-xxxxxxxxxxxxxxxxxxxxxxxxxx", invite.find))?.id, "m1");
+  assert.equal((await findMemberByInviteToken("i-old-xxxxxxxxxxxxxxxxxxxxxxxxxx", invite.find))?.id, "m2");
+  assert.deepEqual(invite.calls.at(-1), { inviteToken: "i-old-xxxxxxxxxxxxxxxxxxxxxxxxxx" });
 });
 
 test("lookup helpers short-circuit on empty or oversized tokens without querying", async () => {
@@ -230,6 +230,11 @@ test("lookup helpers short-circuit on empty or oversized tokens without querying
   assert.equal(await findUserByCalToken(null, finder.find), null);
   assert.equal(await findUserByCalToken(undefined, finder.find), null);
   assert.equal(await findUserByCalToken("a".repeat(257), finder.find), null);
+  // Shape: real tokens are base64url (or legacy hex), >= 16 chars. Anything else
+  // is rejected before a query, so a NUL byte cannot reach Postgres as a 500.
+  assert.equal(await findUserByCalToken("abc", finder.find), null);
+  assert.equal(await findUserByCalToken(`${"a".repeat(20)}\u0000`, finder.find), null);
+  assert.equal(await findUserByCalToken(`${"a".repeat(20)}/../x`, finder.find), null);
   assert.deepEqual(finder.calls, []);
 });
 
