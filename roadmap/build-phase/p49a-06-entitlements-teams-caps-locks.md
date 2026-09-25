@@ -75,3 +75,15 @@ path — web, API, CardDAV and inbound sync.
   `lastSyncCursor` when a capped user upgrades. CardDAV client sync re-offers them every run.
   (2) Billing page / surface for a Teams *member* (plan shows "Teams" with no personal
   subscription) — check on staging that no personal manage/cancel CTA is offered.
+
+## Fable review fixes (2026-09-25)
+- **Billing page for a plan the user doesn't pay for (MEDIUM; closes follow-up 2).**
+  `getBillingSurface` has two new states. `teamMember`: the effective plan comes from team
+  membership (`planSource === "team"`) — "Your Teams access comes from <team>" (the org owner of
+  an org-billed team gets "billed to <team>", seats managed below). `comp`: a personal plan with no
+  *real* Stripe subscription at that plan (admin override / legacy `manual_` comp) — "Plan granted
+  by Kontax". Neither shows price, renewal, "Manage billing" or "Cancel plan" for the granted plan;
+  if the user still pays for a separate, lower personal subscription (`personalSubscription`), only
+  that subscription's portal is offered. The surface now reads real Stripe subscriptions only
+  (`REAL_STRIPE_SUBSCRIPTION_WHERE`) and prefers the one at the effective plan. Test:
+  `billing-surface-grant.test.ts`. Not yet eyeballed in a browser — check on staging.
