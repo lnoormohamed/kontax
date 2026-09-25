@@ -5,7 +5,7 @@ import { useState } from "react";
 const FAQS = [
   {
     q: "Can I try Kontax before I buy?",
-    a: "Yes — the Free plan is free forever, no credit card required. It holds up to 100 contacts with full search, labels, one CardDAV connection and a public card, so you can run your day-to-day before deciding whether to upgrade.",
+    a: "Yes — the Free plan is free forever, no credit card required. It holds up to 500 contacts with full search, labels, one CardDAV connection and a public card, so you can run your day-to-day before deciding whether to upgrade.",
     defaultOpen: true,
   },
   {

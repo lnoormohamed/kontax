@@ -53,12 +53,12 @@ function getMatrixPriceLabel(
 export const metadata: Metadata = {
   title: "Pricing — Kontax",
   description:
-    "Start free with 100 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+    "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "Pricing",
     description:
-      "Start free with 100 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
     url: "/pricing",
     siteName: "Kontax",
     type: "website",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Pricing — Kontax",
     description:
-      "Start free with 100 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+      "Start free with 500 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
   },
 };
 
@@ -141,7 +141,7 @@ export default async function PricingPage() {
               <tbody>
                 {/* CORE */}
                 <tr className="pr-cat"><td colSpan={5}>Core</td></tr>
-                <tr className="pr-row"><td>Contacts</td><td>100</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+                <tr className="pr-row"><td>Contacts</td><td>500</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
                 <tr className="pr-row"><td>Advanced search</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>Labels</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>Import (CSV, vCard)</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>

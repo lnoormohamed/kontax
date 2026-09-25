@@ -398,7 +398,7 @@ export default function FeaturesPage() {
         <div className="mkt-cta-band__inner">
           <h2 className="mkt-cta-band__title">Ready to tidy your address book?</h2>
           <p className="mkt-cta-band__sub">
-            Free forever for up to 100 contacts. Upgrade whenever you&apos;re ready.
+            Free forever for up to 500 contacts. Upgrade whenever you&apos;re ready.
           </p>
           <Link className="mkt-cta-band__btn" href="/register">
             Get started free{" "}

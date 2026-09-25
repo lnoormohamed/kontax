@@ -53,7 +53,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     sublabel: null,
     cta: { label: "Get started free", href: "/register", variant: "filled" },
     features: [
-      { text: <>Up to <strong>100 contacts</strong></> },
+      { text: <>Up to <strong>500 contacts</strong></> },
       { text: "Labels & advanced search" },
       { text: "1 CardDAV account" },
       { text: "Public contact card" },
