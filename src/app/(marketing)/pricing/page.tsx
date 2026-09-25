@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
 import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
-import { getStripeCatalog } from "~/server/stripe-catalog";
+import { fetchStripePrices, formatCurrencyAmount } from "./_prices";
 import type { StripePrices } from "./_pricing-toggle";
 import "./pricing.css";
 
@@ -13,33 +13,6 @@ const DEFAULT_STRIPE_PRICES: StripePrices = {
   family: { monthly: 8, annual: 72 },
   teams: { monthly: 12, annual: 120 },
 };
-
-async function fetchStripePrices(): Promise<StripePrices | null> {
-  try {
-    const catalog = await getStripeCatalog();
-    if (!catalog) return null;
-    const currency = catalog.pro.monthly.currency;
-    return {
-      currency,
-      pro:    { monthly: catalog.pro.monthly.unitAmount / 100,    annual: catalog.pro.annual.unitAmount / 100 },
-      family: { monthly: catalog.family.monthly.unitAmount / 100, annual: catalog.family.annual.unitAmount / 100 },
-      teams:  { monthly: catalog.teams.monthly.unitAmount / 100,  annual: catalog.teams.annual.unitAmount / 100 },
-    };
-  } catch {
-    return null;
-  }
-}
-
-function formatCurrencyAmount(currency: string, amount: number): string {
-  const normalizedCurrency = currency.toUpperCase();
-  const hasFraction = amount % 1 !== 0;
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: normalizedCurrency,
-    minimumFractionDigits: hasFraction ? 2 : 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
 
 function getMatrixPriceLabel(
   plan: "free" | "pro" | "family" | "teams",
