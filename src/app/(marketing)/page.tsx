@@ -155,16 +155,33 @@ export default async function HomePage() {
       {/* ═══════════════════════════ 10 · CTA ═══════════════════════════ */}
       <section className="hp-cta-band">
         <div className="hp-cta-band__inner">
-          <h2 className="hp-cta-band__title">Ready to get started?</h2>
-          <p className="hp-cta-band__sub">Free for up to 500 contacts. No card needed.</p>
-          <div className="hp-cta-band__btns">
-            <Link className="hp-btn--primary" href="/register">
-              Get started free
-            </Link>
-            <Link className="hp-btn--ghost" href="/pricing">
-              Compare plans
-            </Link>
-          </div>
+          {session ? (
+            <>
+              <h2 className="hp-cta-band__title">Your contacts are waiting.</h2>
+              <p className="hp-cta-band__sub">Pick up where you left off.</p>
+              <div className="hp-cta-band__btns">
+                <Link className="hp-btn--primary" href="/contacts">
+                  Open Kontax
+                </Link>
+                <Link className="hp-btn--ghost" href="/pricing">
+                  Compare plans
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="hp-cta-band__title">Ready to get started?</h2>
+              <p className="hp-cta-band__sub">Free for up to 500 contacts. No card needed.</p>
+              <div className="hp-cta-band__btns">
+                <Link className="hp-btn--primary" href="/register">
+                  Get started free
+                </Link>
+                <Link className="hp-btn--ghost" href="/pricing">
+                  Compare plans
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </div>

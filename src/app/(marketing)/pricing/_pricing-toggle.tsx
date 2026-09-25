@@ -68,7 +68,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     cta: { label: "Choose Pro", href: "/register?plan=pro", variant: "outline" },
     features: [
       { text: <><strong>Unlimited</strong> contacts</> },
-      { text: "Unlimited CardDAV accounts" },
+      { text: "Up to 5 CardDAV accounts" },
       { text: "Google + Outlook sync" },
       { text: "Contact sharing" },
       { text: "Developer API access" },

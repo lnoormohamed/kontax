@@ -126,7 +126,7 @@ export default async function PricingPage() {
 
                 {/* SYNC */}
                 <tr className="pr-cat"><td colSpan={5}>Sync</td></tr>
-                <tr className="pr-row"><td>CardDAV accounts</td><td><Cell text="1 account" /></td><td><Cell text="Unlimited" /></td><td><Cell text="Unlimited" /></td><td><Cell text="Unlimited" /></td></tr>
+                <tr className="pr-row"><td>CardDAV accounts</td><td><Cell text="1 account" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td></tr>
                 <tr className="pr-row"><td>Google Contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>Outlook</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>iCloud (via CardDAV)</td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td></tr>
