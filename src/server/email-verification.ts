@@ -67,7 +67,10 @@ export async function sendVerificationEmail(
     }),
   );
 
-  await sendEmail({ to: email, subject, html, text });
+  // P49A-08: email verification (signup / email-change) is security mail —
+  // it's how a user proves and recovers access to their own address, so a
+  // bounce/complaint suppression must never block it.
+  await sendEmail({ to: email, subject, html, text, bypassSuppression: true });
 }
 
 /**

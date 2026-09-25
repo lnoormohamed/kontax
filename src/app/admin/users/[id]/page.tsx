@@ -371,13 +371,16 @@ export default async function AdminUserDetailPage({
               overriddenLabel={overriddenLabel}
               suspended={d.suspended}
               deletionScheduled={d.deletionScheduled}
+              emailStatus={d.overview.emailStatus}
               permissions={{
                 canPlanOverride: admin.capabilities["plan.override"],
                 canLifecycle: admin.capabilities["account.lifecycle"],
                 canImpersonate: admin.capabilities.impersonation,
+                canResetEmailStatus: admin.capabilities["support.manage"],
                 planOverrideReason: "Plan overrides are limited to billing ops and governance admins.",
                 lifecycleReason: "Suspensions and deletion schedules are limited to billing ops and governance admins.",
                 impersonationReason: "Impersonation is limited to governance admins.",
+                resetEmailStatusReason: "Limited to support ops and higher.",
               }}
             />
           </div>

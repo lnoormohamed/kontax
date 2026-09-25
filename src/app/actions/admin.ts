@@ -189,6 +189,48 @@ export async function unsuspendAccount(input: { userId: string; reason?: string;
   return { success: true };
 }
 
+// P49A-08: clear a bounce/complaint suppression (User.emailStatus) back to OK,
+// e.g. after a support ticket confirms the address is deliverable again. Uses
+// support.manage — the same capability as the rest of the support console —
+// rather than account.lifecycle, since this doesn't touch login/session state.
+export async function resetEmailStatus(input: {
+  userId: string;
+  reason?: string;
+  reasonCategory?: string;
+}): Promise<Result> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+  if (!admin.capabilities["support.manage"]) return { error: "FORBIDDEN" };
+
+  const target = await loadTarget(input.userId);
+  if (!target) return { error: "USER_NOT_FOUND" };
+
+  await db.user.update({
+    where: { id: target.id },
+    data: { emailStatus: "OK" },
+  });
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.USER_EMAIL_STATUS_RESET,
+    targetUserId: target.id,
+    targetEmail: target.email,
+    details: {
+      reason: input.reason?.trim() ? input.reason.trim() : null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
+    },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
+  });
+
+  revalidatePath(`/admin/users/${target.id}`);
+  return { success: true };
+}
+
 export async function adminDeleteAccount(input: { userId: string; reason: string; reasonCategory?: string }): Promise<Result> {
   let admin;
   try {

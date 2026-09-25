@@ -10,6 +10,7 @@ import { useToast } from "../../_components/toast";
 import {
   adminDeleteAccount,
   overridePlan,
+  resetEmailStatus,
   startImpersonation,
   suspendAccount,
   unsuspendAccount,
@@ -45,7 +46,7 @@ export function Collapsible({
 
 // ─── Action panel + confirmation dialogs ──────────────────────────────────────
 
-type DialogKind = "override" | "suspend" | "unsuspend" | "delete" | "impersonate";
+type DialogKind = "override" | "suspend" | "unsuspend" | "delete" | "impersonate" | "resetEmailStatus";
 
 const DIALOGS: Record<
   DialogKind,
@@ -92,6 +93,14 @@ const DIALOGS: Record<
     ok: "Started",
     tone: "imp",
   },
+  resetEmailStatus: {
+    title: "Reset email status?",
+    body: "Clears the bounce/complaint suppression on this address so future email sends to this user resume.",
+    confirm: "Reset to OK",
+    busy: "Resetting…",
+    ok: "Reset",
+    tone: "primary",
+  },
 };
 
 const ERROR_LABELS: Record<string, string> = {
@@ -110,6 +119,7 @@ const REASON_OPTIONS: Record<DialogKind, string[]> = {
   unsuspend: ["issue resolved", "manual recovery", "support follow-up"],
   delete: ["user request", "fraud cleanup", "admin cleanup"],
   impersonate: ["billing investigation", "sync investigation", "support reproduction"],
+  resetEmailStatus: ["delivery issue resolved", "support recovery", "manual correction"],
 };
 
 export function UserActions({
@@ -120,6 +130,7 @@ export function UserActions({
   overriddenLabel,
   suspended,
   deletionScheduled,
+  emailStatus,
   permissions,
 }: {
   userId: string;
@@ -129,13 +140,16 @@ export function UserActions({
   overriddenLabel: string | null;
   suspended: boolean;
   deletionScheduled: boolean;
+  emailStatus: string;
   permissions: {
     canPlanOverride: boolean;
     canLifecycle: boolean;
     canImpersonate: boolean;
+    canResetEmailStatus: boolean;
     planOverrideReason: string;
     lifecycleReason: string;
     impersonationReason: string;
+    resetEmailStatusReason: string;
   };
 }) {
   const [dialog, setDialog] = useState<DialogKind | null>(null);
@@ -205,6 +219,23 @@ export function UserActions({
           {!permissions.canLifecycle ? <div className="ad-action-note">{permissions.lifecycleReason}</div> : null}
         </div>
 
+        <div className="ad-action-block">
+          <button
+            className="ad-btn ad-btn--secondary ad-btn--full"
+            onClick={() => setDialog("resetEmailStatus")}
+            disabled={emailStatus === "OK" || !permissions.canResetEmailStatus}
+          >
+            Reset email status
+          </button>
+          <div className="ad-action-note">
+            {!permissions.canResetEmailStatus
+              ? permissions.resetEmailStatusReason
+              : emailStatus === "OK"
+                ? "Current: OK"
+                : `Current: ${emailStatus} — clears the suppression so mail resumes.`}
+          </div>
+        </div>
+
         <div className="ad-actions-rule" />
 
         <div className="ad-action-block" style={{ marginBottom: 0 }}>
@@ -267,7 +298,7 @@ function ConfirmDialog({
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose, phase]);
 
-  const needsReason = kind !== "unsuspend" && !reason.trim();
+  const needsReason = kind !== "unsuspend" && kind !== "resetEmailStatus" && !reason.trim();
   const needsTypedConfirm = kind === "suspend" || kind === "delete" || kind === "impersonate";
   const typedConfirmValid = !needsTypedConfirm || confirmValue.trim().toLowerCase() === user.email.toLowerCase();
 
@@ -281,6 +312,8 @@ function ConfirmDialog({
     else if (kind === "suspend") res = await suspendAccount({ userId, reason, reasonCategory });
     else if (kind === "unsuspend") res = await unsuspendAccount({ userId, reason: reason.trim() || undefined, reasonCategory });
     else if (kind === "delete") res = await adminDeleteAccount({ userId, reason, reasonCategory });
+    else if (kind === "resetEmailStatus")
+      res = await resetEmailStatus({ userId, reason: reason.trim() || undefined, reasonCategory });
     else res = await startImpersonation({ userId, reason, reasonCategory });
 
     if ("error" in res) {
@@ -296,6 +329,7 @@ function ConfirmDialog({
       unsuspend: `Unlocked ${user.email}`,
       delete: `Deletion scheduled for ${user.email}`,
       impersonate: `Impersonating ${user.email}`,
+      resetEmailStatus: `Reset email status for ${user.email}`,
     };
     setTimeout(() => onDone(kind, messages[kind]), 650);
   };

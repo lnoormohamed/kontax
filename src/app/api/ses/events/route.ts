@@ -1,8 +1,40 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { env } from "~/env";
 import { db } from "~/server/db";
 import { getRedis } from "~/server/rate-limit";
 import { isSnsHttpsUrl, verifySnsSignature } from "~/server/sns-verify";
+
+// P49A-08: bind this webhook to Kontax's own SNS topic(s) — without this, a
+// validly-signed message from ANY SNS topic in ANY AWS account (attacker's own
+// included) would be processed, since the signature only proves "genuinely
+// from SNS", not "from our topic". SES_SNS_TOPIC_ARN is a comma-separated
+// allow-list; deliberately optional in src/env.js and NOT required at boot —
+// prod doesn't set it today, and a required-at-boot var here would take the
+// whole site down. So this fails CLOSED instead: unset means every message is
+// rejected, logged once, rather than "accept anything, unchecked".
+const ALLOWED_SNS_TOPIC_ARNS = new Set(
+  (env.SES_SNS_TOPIC_ARN ?? "")
+    .split(",")
+    .map((arn) => arn.trim())
+    .filter(Boolean),
+);
+
+let warnedMissingTopicAllowlist = false;
+
+function isAllowedSnsTopic(topicArn: unknown): boolean {
+  if (ALLOWED_SNS_TOPIC_ARNS.size === 0) {
+    if (!warnedMissingTopicAllowlist) {
+      warnedMissingTopicAllowlist = true;
+      console.warn(
+        "[ses-events] SES_SNS_TOPIC_ARN is not set — rejecting every SNS message " +
+          "until it's configured (see roadmap/runbooks/ses-setup.md).",
+      );
+    }
+    return false;
+  }
+  return typeof topicArn === "string" && ALLOWED_SNS_TOPIC_ARNS.has(topicArn);
+}
 
 // P48-17: SNS is at-least-once delivery and can also legitimately redeliver a
 // message it never got an ack for — signature + Timestamp freshness
@@ -40,6 +72,7 @@ interface SnsEnvelope {
   SubscribeURL?: string;
   Message?: string;
   MessageId?: string;
+  TopicArn?: string;
 }
 
 interface SesBounceNotification {
@@ -84,6 +117,18 @@ export async function POST(req: NextRequest) {
   const authentic = await verifySnsSignature(body);
   if (!authentic) {
     return NextResponse.json({ error: "signature verification failed" }, { status: 403 });
+  }
+
+  // P49A-08: TopicArn is part of the signed payload (see SIGNABLE_KEYS in
+  // sns-verify.ts), so it's trustworthy now that the signature has verified —
+  // this check MUST run after verifySnsSignature, never before. Reject before
+  // the SubscribeURL fetch and before touching any Bounce/Complaint data, so a
+  // validly-signed message from a topic that isn't ours never confirms a
+  // subscription or writes to the DB. No PII in the log — TopicArn is an ARN,
+  // never an email address.
+  if (!isAllowedSnsTopic(body.TopicArn)) {
+    console.warn(`[ses-events] rejected: TopicArn not in allow-list (type=${body.Type ?? "unknown"})`);
+    return NextResponse.json({ error: "topic not allowed" }, { status: 403 });
   }
 
   // P48-17: dedupe by MessageId (signature-covered) so a genuine SNS
