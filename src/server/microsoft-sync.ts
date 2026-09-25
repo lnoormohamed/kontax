@@ -50,6 +50,7 @@ import {
   isLocalChanged,
   openMutationConflict,
   recordAutoResolved,
+  recordSyncLinkError,
   type RemoteContactItem,
 } from "~/server/sync-import-engine";
 import {
@@ -179,6 +180,8 @@ export type MicrosoftSyncResult = MicrosoftImportSummary & {
   pushedCreated: number;
   pushedUpdated: number;
   pushedDeleted: number;
+  // P49A-01 (A-07): contacts whose push failed this run (error on the link).
+  pushFailed: number;
 };
 
 // Engine account context for Microsoft (adds source/provider provenance).
@@ -200,9 +203,22 @@ const MICROSOFT_CAPABILITY_PROFILE = resolveSyncProviderCapabilityProfile({
 
 // ── token acquisition (refresh via MSAL token cache) ─────────────────────────
 
+// Test seam: tests supply a token directly so no MSAL client or stored
+// credential is involved; production never sets it.
+let accessTokenProviderOverride: ((account: MicrosoftSyncAccount) => Promise<string>) | null =
+  null;
+
+/** Test seam: bypass MSAL token acquisition (null restores). */
+export const __setMicrosoftAccessTokenProviderForTests = (
+  provider: ((account: MicrosoftSyncAccount) => Promise<string>) | null,
+) => {
+  accessTokenProviderOverride = provider;
+};
+
 // Returns a valid Graph access token, refreshing via acquireTokenSilent and
 // persisting the rotated token cache back to the SyncAccount when it changes.
 const getMicrosoftAccessToken = async (account: MicrosoftSyncAccount): Promise<string> => {
+  if (accessTokenProviderOverride) return accessTokenProviderOverride(account);
   if (!account.credentialReference) {
     throw new MicrosoftSyncError(
       "CREDENTIALS_MISSING",
@@ -452,6 +468,8 @@ export const pushMicrosoftContact = async (
         remoteETag: patched.etag,
         capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
         supportedFieldShadow: localShadow,
+        lastErrorCode: null,
+        lastErrorMessage: null,
         lastSyncedAt: new Date(),
       },
     });
@@ -501,6 +519,8 @@ export const pushMicrosoftContact = async (
         remoteETag: retry.etag,
         capabilityProfileId: MICROSOFT_CAPABILITY_PROFILE.id,
         supportedFieldShadow: localShadow,
+        lastErrorCode: null,
+        lastErrorMessage: null,
         lastSyncedAt: now,
       },
     });
@@ -737,17 +757,56 @@ const deleteMicrosoftContactRemote = async (
   });
 };
 
+// Outbound tallies from the push phase.
+export type MicrosoftPushTally = {
+  created: number;
+  updated: number;
+  deleted: number;
+  conflicts: number;
+  failed: number;
+};
+
+// P49A-01 (A-07): one contact's push failure must not abort the run (push
+// runs before import). A per-contact failure is recorded on its link (when it
+// has one) and the loop carries on; account-level failures — credentials,
+// quota, missing config, the deletion-safety hold — are re-thrown.
+const isolateMicrosoftPushFailure = async (
+  error: unknown,
+  target: { op: "update" | "create" | "delete"; linkId?: string; contactId: string },
+): Promise<void> => {
+  if (error instanceof DeletionThresholdError || error instanceof MicrosoftSyncConfigError) {
+    throw error;
+  }
+  const failure = normaliseMicrosoftError(error);
+  if (
+    failure.code === "MICROSOFT_AUTH_FAILED" ||
+    failure.code === "MICROSOFT_QUOTA_EXCEEDED" ||
+    failure.code === "CREDENTIALS_MISSING" ||
+    failure.code === "CREDENTIALS_UNREADABLE"
+  ) {
+    throw failure;
+  }
+  console.error(
+    `[sync] Outlook ${target.op} failed for ${target.linkId ? `link ${target.linkId}` : `contact ${target.contactId}`} (${failure.code}):`,
+    failure.message,
+  );
+  if (target.linkId) {
+    await recordSyncLinkError(target.linkId, failure.code, failure.message);
+  }
+};
+
 export const pushLocalChangesToMicrosoft = async (
   account: MicrosoftImportAccount,
-): Promise<{ created: number; updated: number; deleted: number; conflicts: number }> => {
+): Promise<MicrosoftPushTally> => {
   if (account.syncDirection !== "TWO_WAY" && account.syncDirection !== "EXPORT_ONLY") {
-    return { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+    return { created: 0, updated: 0, deleted: 0, conflicts: 0, failed: 0 };
   }
 
   let created = 0;
   let updated = 0;
   let deleted = 0;
   let conflicts = 0;
+  let failed = 0;
 
   // 1) UPDATES — active, locally-edited contacts already linked. Only genuine
   //    user edits (lastMutatedBy = MANUAL) to avoid the push/import feedback loop.
@@ -770,16 +829,27 @@ export const pushLocalChangesToMicrosoft = async (
   for (const link of activeLinks) {
     if (!link.remoteUid) continue;
     if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
-    const result = await pushMicrosoftContact(
-      account,
-      {
-        id: link.id,
+    let result: MicrosoftPushResult;
+    try {
+      result = await pushMicrosoftContact(
+        account,
+        {
+          id: link.id,
+          contactId: link.contactId,
+          remoteUid: link.remoteUid,
+          remoteETag: link.remoteETag,
+        },
+        buildMicrosoftPushContact(link.contact),
+      );
+    } catch (error) {
+      await isolateMicrosoftPushFailure(error, {
+        op: "update",
+        linkId: link.id,
         contactId: link.contactId,
-        remoteUid: link.remoteUid,
-        remoteETag: link.remoteETag,
-      },
-      buildMicrosoftPushContact(link.contact),
-    );
+      });
+      failed += 1;
+      continue;
+    }
     if (result.ok) {
       await emitEvent(db, {
         userId: account.userId,
@@ -818,8 +888,14 @@ export const pushLocalChangesToMicrosoft = async (
     select: pushContactSelect,
   });
   for (const contact of unlinked) {
-    if (await createMicrosoftContactRemote(account, contact)) {
-      created += 1;
+    try {
+      if (await createMicrosoftContactRemote(account, contact)) {
+        created += 1;
+      }
+    } catch (error) {
+      // No link exists yet to carry the error; the next run retries the create.
+      await isolateMicrosoftPushFailure(error, { op: "create", contactId: contact.id });
+      failed += 1;
     }
   }
 
@@ -863,11 +939,20 @@ export const pushLocalChangesToMicrosoft = async (
 
   for (const link of removedLinks) {
     if (!link.remoteUid) continue;
-    await deleteMicrosoftContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
-    deleted += 1;
+    try {
+      await deleteMicrosoftContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
+      deleted += 1;
+    } catch (error) {
+      await isolateMicrosoftPushFailure(error, {
+        op: "delete",
+        linkId: link.id,
+        contactId: link.contact?.id ?? "",
+      });
+      failed += 1;
+    }
   }
 
-  return { created, updated, deleted, conflicts };
+  return { created, updated, deleted, conflicts, failed };
 };
 
 // Runner entrypoint. Push local changes first, then pull; direction gates each
@@ -880,9 +965,9 @@ export const runMicrosoftSync = async (
   const inbound =
     account.syncDirection === "TWO_WAY" || account.syncDirection === "IMPORT_ONLY";
 
-  const push = outbound
+  const push: MicrosoftPushTally = outbound
     ? await pushLocalChangesToMicrosoft(account)
-    : { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+    : { created: 0, updated: 0, deleted: 0, conflicts: 0, failed: 0 };
 
   const importSummary: MicrosoftImportSummary = inbound
     ? account.lastSyncCursor
@@ -906,6 +991,7 @@ export const runMicrosoftSync = async (
     pushedCreated: push.created,
     pushedUpdated: push.updated,
     pushedDeleted: push.deleted,
+    pushFailed: push.failed,
   };
 };
 
