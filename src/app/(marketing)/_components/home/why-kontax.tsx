@@ -107,7 +107,7 @@ export function CompareTable() {
 const FACTS: { icon: HomeIconName; title: string; body: string }[] = [
   {
     icon: "key",
-    title: "Two-factor sign-in, and a separate app password for each device",
+    title: "Two-factor sign-in, and app passwords you can revoke",
     body: "Lose a phone? Revoke its password without touching anything else.",
   },
   {
@@ -195,10 +195,10 @@ export function AudienceCards() {
           <h2 className="hp-section-title">One address book, however many people use it</h2>
         </div>
         <div className="hp-who">
-          {AUDIENCES.map((a) => (
-            <Link className="hp-who__card" href="/pricing" key={a.title}>
+          {AUDIENCES.map((a, i) => (
+            <Link className="hp-who__card" href="/pricing" key={a.title} aria-labelledby={`hp-who-${i}`}>
               <span className="hp-who__plan">{a.plan}</span>
-              <h3>{a.title}</h3>
+              <h3 id={`hp-who-${i}`}>{a.title}</h3>
               <p>{a.body}</p>
               <p className="hp-who__get">
                 <b>You get</b> {a.get}

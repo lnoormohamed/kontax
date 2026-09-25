@@ -357,7 +357,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "What does Pro add?",
-        a: "Pro removes all contact, sync, and device limits and gives you: the full activity log (90-day history), live and static contact sharing, smart lists, bulk edit, keyboard shortcuts, the iCal birthday feed, and priority support.",
+        a: "Pro removes the contact limit, raises you to 5 sync accounts and 5 connected devices, and gives you: the full activity log (365-day history), live and static contact sharing, smart lists, bulk edit, keyboard shortcuts, the iCal birthday feed, and priority support.",
       },
       {
         q: "Is there a free trial for Pro?",
@@ -441,7 +441,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "How far back does the activity log go?",
-        a: "Free accounts see the last 3 changes per contact. Pro accounts keep 90 days of history per contact. Family accounts keep 365 days. Teams accounts keep 365 days with the full audit trail across all members. History older than the retention window is pruned automatically.",
+        a: "Free accounts see the last 3 changes per contact. Pro accounts keep 365 days of history per contact. Family accounts keep 90 days. Teams accounts keep full history with no time limit, with the audit trail across all members. History older than the retention window is pruned automatically.",
       },
       {
         q: "Can I filter the activity log?",

@@ -130,7 +130,7 @@ export default async function PricingPage() {
                 <tr className="pr-row"><td>Google Contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>Outlook</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><td>iCloud (via CardDAV)</td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td></tr>
-                <tr className="pr-row"><td>Two-way sync</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><td>Two-way sync</td><td><Cell text="CardDAV" /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
 
                 {/* SHARING */}
                 <tr className="pr-cat"><td colSpan={5}>Sharing</td></tr>
