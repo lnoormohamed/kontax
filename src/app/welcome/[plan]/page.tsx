@@ -31,7 +31,9 @@ export default async function WelcomePage({
       where: { ownerId: userId, type: "TEAM" },
       select: { teamsEnabled: true },
     });
-    entitled = (team?.teamsEnabled ?? false) || billing.entitlements.teamsEnabled;
+    // P49A-06: the fallback is the user's OWN Teams subscription — Teams
+    // entitlements inherited from membership of another team don't count.
+    entitled = (team?.teamsEnabled ?? false) || billing.personalPlan === "TEAMS";
   }
   // Webhook race: if the subscription hasn't activated yet, fall back to settings
   // (the success banner shows there); the user can re-enter setup from there.

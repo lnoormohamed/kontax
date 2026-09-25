@@ -31,6 +31,13 @@ import {
   isGroupVCard,
   serializeContactToVCard,
 } from "./src/server/dav/vcard.mjs";
+// P49A-06: the same plan matrix / contact cap / team lock rules as the web app
+// (src/server/billing.ts wraps this module).
+import {
+  assertContactCapacityTx,
+  ContactLimitReachedError,
+  isTeamLocked,
+} from "./src/server/dav/plan-entitlements.mjs";
 
 // P48-15: this process is the actual Node entrypoint (`npm start` /
 // `node server.mjs`) — log fatals instead of letting them vanish silently.
@@ -229,6 +236,32 @@ const unsupportedMediaType = (res) =>
   send(res, 415, "Unsupported media type", {
     "Content-Type": "text/plain; charset=utf-8",
   });
+
+// P49A-06 (A-25): the account the contact would be created under is at its
+// plan's contact cap. 507 Insufficient Storage (RFC 4918 §11.5) is what
+// CardDAV clients expect for a quota refusal; the body is human-readable.
+const insufficientStorage = (res, message) =>
+  send(res, 507, `${message} Upgrade your Kontax plan to add more contacts.`, {
+    "Content-Type": "text/plain; charset=utf-8",
+  });
+
+// P49A-06 (A-25): run a DAV create transaction with the plan's contact cap
+// checked (and serialised via the owner's User row lock) inside it. Returns
+// the created contact, or null after answering 507 when the cap is reached.
+const createWithinContactCap = async (res, capOwnerId, create) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      await assertContactCapacityTx(tx, capOwnerId);
+      return create(tx);
+    });
+  } catch (error) {
+    if (error instanceof ContactLimitReachedError) {
+      insufficientStorage(res, error.message);
+      return null;
+    }
+    throw error;
+  }
+};
 
 const vcardResponse = (res, body, etag) =>
   send(res, 200, body, {
@@ -916,7 +949,11 @@ const emitFamilyDavEvent = async (userId, contactId, eventType) => {
 const getTeamBookAccess = async (userId, bookId) => {
   const book = await prisma.groupAddressBook.findFirst({
     where: { id: bookId, archivedAt: null, group: { type: "TEAM" } },
-    include: { group: { select: { id: true, name: true, ownerId: true } } },
+    include: {
+      group: {
+        select: { id: true, name: true, ownerId: true, teamsEnabled: true, teamsGraceEndsAt: true },
+      },
+    },
   });
   if (!book) {
     return null;
@@ -934,12 +971,15 @@ const getTeamBookAccess = async (userId, bookId) => {
   if (perm === "NONE") {
     return null;
   }
+  // P49A-06 (A-26): a team whose Teams plan lapsed past its grace window is
+  // read-only for everyone, devices included (PUT/DELETE → 403).
+  const locked = perm === "EDIT" ? await isTeamLocked(prisma, book.group) : false;
   return {
     bookId,
     name: book.name,
     teamName: book.group.name,
     ownerId: book.group.ownerId,
-    canEdit: perm === "EDIT",
+    canEdit: perm === "EDIT" && !locked,
   };
 };
 
@@ -1427,7 +1467,8 @@ const handleFamilyResource = async (req, res, requestUrl) => {
     if (!existing) {
       // Device added a contact to the family collection → create in the book,
       // owned (nominally) by the group owner, linked via GroupContact.
-      const created = await prisma.$transaction(async (tx) => {
+      // P49A-06: capped against the book owner (the contact's nominal owner).
+      const created = await createWithinContactCap(res, familyBook.ownerId, async (tx) => {
         const contact = await tx.contact.create({
           data: {
             userId: familyBook.ownerId,
@@ -1443,6 +1484,7 @@ const handleFamilyResource = async (req, res, requestUrl) => {
         });
         return contact;
       });
+      if (!created) return true;
       await emitFamilyDavEvent(userId, created.id, "CONTACT_CREATED");
       return send(res, 201, null, { ETag: etagForContact(created) });
     }
@@ -1643,7 +1685,8 @@ const handleTeamResource = async (req, res, requestUrl) => {
     const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull, existing });
 
     if (!existing) {
-      const created = await prisma.$transaction(async (tx) => {
+      // P49A-06: capped against the team owner (the contact's nominal owner).
+      const created = await createWithinContactCap(res, access.ownerId, async (tx) => {
         const contact = await tx.contact.create({
           data: {
             userId: access.ownerId,
@@ -1659,6 +1702,7 @@ const handleTeamResource = async (req, res, requestUrl) => {
         });
         return contact;
       });
+      if (!created) return true;
       await emitTeamDavEvent(userId, created.id, "CONTACT_CREATED", label);
       return send(res, 201, null, { ETag: etagForContact(created) });
     }
@@ -1903,15 +1947,19 @@ const handleContactResource = async (req, res, requestUrl) => {
     const fields = buildDavContactWriteData(body, { jsonNull: Prisma.DbNull, existing });
 
     if (!existing) {
-      const created = await prisma.contact.create({
-        data: {
-          userId,
-          syncUid: uid,
-          syncVersion: 1,
-          bookId: book.id, // P18-11
-          ...fields,
-        },
-      });
+      // P49A-06 (A-25): the plan's contact cap now holds over CardDAV too.
+      const created = await createWithinContactCap(res, userId, (tx) =>
+        tx.contact.create({
+          data: {
+            userId,
+            syncUid: uid,
+            syncVersion: 1,
+            bookId: book.id, // P18-11
+            ...fields,
+          },
+        }),
+      );
+      if (!created) return true;
 
       return send(res, 201, null, { ETag: etagForContact(created) });
     }

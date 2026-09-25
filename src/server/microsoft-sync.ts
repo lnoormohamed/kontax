@@ -978,6 +978,7 @@ export const runMicrosoftSync = async (
         updated: 0,
         deleted: 0,
         conflicts: 0,
+        capSkipped: 0,
         queueFull: await isConflictQueueFull(account.id),
       };
 
@@ -986,6 +987,7 @@ export const runMicrosoftSync = async (
     updated: importSummary.updated,
     deleted: importSummary.deleted,
     conflicts: importSummary.conflicts + push.conflicts,
+    capSkipped: importSummary.capSkipped,
     queueFull:
       push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,
     pushedCreated: push.created,

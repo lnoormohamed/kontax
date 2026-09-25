@@ -610,12 +610,14 @@ export const createContact = async (formData: FormData) => {
     // "under the cap" and both insert. Lock the user row first so a second
     // concurrent create for the same user blocks here until the first
     // commits, then re-check the cap inside the transaction — its count read
-    // then sees the first create's committed row. Shared/team-book targets
-    // are owned by the group owner and aren't subject to the personal cap.
-    if (!bookTarget) {
-      await lockUserForPlanCheck(tx, userId);
-      await assertCanCreateContactsTx(tx, userId);
-    }
+    // then sees the first create's committed row.
+    // P49A-06 (A-25): shared family/team-book targets used to skip the cap
+    // entirely. Check (and serialise on) the book's nominal owner — the account
+    // the contact is created under — matching addContactToFamilyBook /
+    // addContactToTeamBook.
+    const capOwnerId = bookTarget?.ownerId ?? userId;
+    await lockUserForPlanCheck(tx, capOwnerId);
+    await assertCanCreateContactsTx(tx, capOwnerId);
 
     const contact = await tx.contact.create({
       data: {
@@ -648,7 +650,12 @@ export const createContact = async (formData: FormData) => {
       contactId: contact.id,
       eventType: "CONTACT_CREATED",
       actor: "USER",
-      payload: bookTarget ? { sharedBook: bookTarget.label } : {},
+      // P49A-06: CONTACT_CREATED's payload schema is strict-empty, so the old
+      // `{ sharedBook }` payload made emitEvent throw (ZodError) and rolled back
+      // EVERY create into a family/team book. The book label rides on
+      // actorDetail instead (the contact's sourceDetail carries it too).
+      ...(bookTarget ? { actorDetail: bookTarget.label } : {}),
+      payload: {},
     });
     return contact;
   });

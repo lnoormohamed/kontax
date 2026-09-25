@@ -13,6 +13,49 @@ export const SYNC_AUTO_PAUSED_CODE = "SYNC_AUTO_PAUSED";
 export const MANUAL_CONFLICT_QUEUE_LIMIT = 50;
 // lastErrorCode set on the account when it auto-pauses for a full conflict queue.
 export const CONFLICT_QUEUE_FULL_CODE = "SYNC_CONFLICT_QUEUE_FULL";
+// P49A-06 (A-25): SyncJob.errorCode when inbound sync stopped creating contacts
+// at the plan's contact cap (nothing deleted; the job settles PARTIAL).
+export const CONTACT_LIMIT_REACHED_CODE = "CONTACT_LIMIT_REACHED";
+
+/**
+ * P49A-06: how an OAuth (Google / Microsoft) sync job settles, from the
+ * connector's tallies. Conflicts outrank the contact-cap warning, which
+ * outranks push errors, for the single error code; the summary carries all.
+ */
+export const settleOAuthSyncJob = (result: {
+  conflicts: number;
+  pushFailed?: number;
+  capSkipped?: number;
+  capWarning?: string | null;
+}) => {
+  const hasConflicts = result.conflicts > 0;
+  const pushFailed = result.pushFailed ?? 0;
+  const capSkipped = result.capSkipped ?? 0;
+  const partial = hasConflicts || pushFailed > 0 || capSkipped > 0;
+  const summary = [
+    hasConflicts
+      ? `${result.conflicts} sync conflicts need review before this account is fully healthy again.`
+      : null,
+    capSkipped > 0 ? (result.capWarning ?? `${capSkipped} new contacts were not imported (plan contact limit reached).`) : null,
+    pushFailed > 0
+      ? `${pushFailed} contacts could not be sent to the provider; they will be retried on the next sync.`
+      : null,
+  ].filter((part): part is string => part !== null);
+  return {
+    status: partial ? ("PARTIAL" as const) : ("SUCCEEDED" as const),
+    errorCode: hasConflicts
+      ? "SYNC_CONFLICTS_OPEN"
+      : capSkipped > 0
+        ? CONTACT_LIMIT_REACHED_CODE
+        : pushFailed > 0
+          ? "SYNC_PUSH_ERRORS"
+          : null,
+    errorSummary: summary.length > 0 ? summary.join(" ") : null,
+    // Same column the CardDAV runner uses for deferred local changes; plus
+    // contacts skipped at the plan cap.
+    skippedCount: pushFailed + capSkipped,
+  };
+};
 
 export type SyncAccountStatus = SyncAccountLifecycleStatus;
 export type SyncJobStatus =

@@ -31,6 +31,10 @@ export const createFakeSyncDb = () => {
   const conflicts: Row[] = [];
   const events: Row[] = [];
   const accountUpdates: Array<{ id: string; data: Record<string, unknown> }> = [];
+  const userPlan: {
+    subscriptions: Array<{ plan: string; memberSlotsLimit: number | null }>;
+    groupMemberships: unknown[];
+  } = { subscriptions: [], groupMemberships: [] };
 
   const relationFor = (row: Row, key: string): unknown => {
     if (key === "contact" && typeof row.contactId === "string") {
@@ -108,7 +112,21 @@ export const createFakeSyncDb = () => {
       },
       findMany: async ({ where }: { where?: Where }) =>
         [...contacts.values()].filter((row) => matches(row, where)).map((row) => ({ ...row })),
+      count: async ({ where }: { where?: Where } = {}) =>
+        [...contacts.values()].filter((row) => matches(row, where)).length,
     },
+    // P49A-06: the plan loader (plan-entitlements.mjs loadEffectivePlan) reads
+    // the user's active subscriptions + team memberships in one nested query.
+    // Every user resolves to `userPlan` (default: no subscriptions → FREE).
+    user: {
+      findUnique: async ({ where }: { where: { id: string } }) => ({
+        id: where.id,
+        lifecycleState: "ACTIVE",
+        subscriptions: userPlan.subscriptions,
+        groupMemberships: userPlan.groupMemberships,
+      }),
+    },
+    $queryRaw: async () => [],
     syncContactLink: {
       findUnique: async ({ where }: { where: Where }) => {
         const key = where.syncAccountId_remoteUid as { syncAccountId: string; remoteUid: string } | undefined;
@@ -191,12 +209,15 @@ export const createFakeSyncDb = () => {
     conflicts,
     events,
     accountUpdates,
+    userPlan,
     reset() {
       contacts.clear();
       links.clear();
       conflicts.length = 0;
       events.length = 0;
       accountUpdates.length = 0;
+      userPlan.subscriptions = [];
+      userPlan.groupMemberships = [];
     },
     linkByRemoteUid(remoteUid: string) {
       return [...links.values()].find((link) => link.remoteUid === remoteUid);

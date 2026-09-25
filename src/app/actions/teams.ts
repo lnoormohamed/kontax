@@ -10,6 +10,7 @@ import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateContactsTx, getUserBillingContext, lockUserForPlanCheck } from "~/server/billing";
 import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
+import { isTeamLocked } from "~/server/dav/plan-entitlements.mjs";
 import {
   clearedInviteTokenColumns,
   findMemberByInviteToken,
@@ -20,7 +21,7 @@ import { appUrl, sendEmail } from "~/server/email";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { recordSharedBookPermissionAudit } from "~/server/shared-book-permission-audit";
 import { getStripeClient } from "~/server/stripe";
-import { canEditTeamBook, getTeamGraceState } from "~/server/team-access";
+import { canEditTeamBook } from "~/server/team-access";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000;
 
@@ -94,20 +95,16 @@ const getManageableTeam = async (userId: string) => {
   return member ? { team: member.group, role: member.role } : null;
 };
 
-// Throws if the user's team is locked (grace period expired, plan downgraded).
+// Throws if the caller's team is locked (grace period expired, plan downgraded).
+// P49A-06 (A-26): resolve the team the caller MANAGES (owner or admin). This used
+// to look up only a team the caller owns, so a team ADMIN found nothing and
+// bypassed the lock entirely. isTeamLocked reads the org's own entitlement
+// first (P34F-02 §08) and falls back to the OWNER's personal Teams subscription
+// for teams not yet on org billing (P34F-03).
 const requireTeamNotLocked = async (userId: string) => {
-  const team = await db.group.findFirst({
-    where: { ownerId: userId, type: "TEAM" },
-    select: { teamsEnabled: true, teamsGraceEndsAt: true },
-  });
-  if (!team) return;
-  // P34F-02 §08: read the org's own entitlement first. Fall back to the owner's
-  // personal plan for teams not yet migrated to org billing (P34F-03).
-  if (team.teamsEnabled) return; // active org Teams plan — nothing to check
-  const billing = await getUserBillingContext(userId);
-  if (billing.entitlements.teamsEnabled) return; // legacy user-anchored Teams
-  const state = getTeamGraceState(team.teamsGraceEndsAt, false);
-  if (state === "locked") {
+  const manageable = await getManageableTeam(userId);
+  if (!manageable) return;
+  if (await isTeamLocked(db, manageable.team)) {
     throw new Error("This team is read-only. Upgrade to the Teams plan to make changes.");
   }
 };
@@ -119,7 +116,9 @@ export const createTeam = async (formData: FormData) => {
   const description = str(formData, "description") || null;
 
   const billing = await getUserBillingContext(userId);
-  if (!billing.entitlements.teamsEnabled) {
+  // P49A-06: the user's OWN Teams plan — Teams entitlements inherited from
+  // membership of someone else's team don't entitle creating a team.
+  if (billing.personalPlan !== "TEAMS") {
     throw new Error("A Teams plan is required to create a team.");
   }
   const existing = await db.group.findFirst({
