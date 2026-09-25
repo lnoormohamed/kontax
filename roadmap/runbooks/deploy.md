@@ -138,6 +138,68 @@ PR. Do not apply schema changes to production with `db push` any more.
 
 ---
 
+## P48-18 deploy order — capability-token hashes
+
+`20260925090000_p48_18_token_hashes` adds `User.calTokenHash` /
+`calTokenEncrypted`, `ContactShare.tokenHash` / `tokenEncrypted` and
+`GroupMember.inviteTokenHash` (all nullable, unique indexes on the three hash
+columns, `IF NOT EXISTS` throughout). It is purely additive: the previous app
+build ignores the new columns. The new build stores only hashes (+ an encrypted
+display copy) and still *reads* the legacy plaintext columns until the backfill
+has run. Background: [docs/capability-token-storage.md](../../docs/capability-token-storage.md).
+
+Run in this order on **staging first, then production**:
+
+```bash
+# 1. migrate (out of band — production runs KONTAX_SCHEMA_MODE=validate)
+DATABASE_URL=<target> npx prisma migrate status
+DATABASE_URL=<target> npm run db:migrate
+
+# 2. push main → Coolify deploys the dual-read code. Smoke-test: Settings →
+#    Notifications shows the calendar URL; a contact's Sharing tab shows its
+#    share link; an existing /share/<token> link and calendar subscription work.
+
+# 3. backfill, from a full checkout (scripts/ is not in the runtime image — see
+#    "Image layout" below). SYNC_CREDENTIAL_ENCRYPTION_KEYS must be EXACTLY the
+#    app's value (same current key): the display copies are encrypted under it,
+#    and a copy the app can't decrypt shows as "Regenerate link" in the UI.
+DATABASE_URL=<target> SYNC_CREDENTIAL_ENCRYPTION_KEYS=<app value> \
+  node scripts/backfill-p48-18-token-hashes.mjs            # dry run: prints counts per table
+DATABASE_URL=<target> SYNC_CREDENTIAL_ENCRYPTION_KEYS=<app value> \
+  node scripts/backfill-p48-18-token-hashes.mjs --apply    # batches of 200; idempotent
+
+# 4. verify — every count must be 0
+psql "<target>" -c 'SELECT
+  (SELECT count(*) FROM "User"         WHERE "calToken"    IS NOT NULL) AS cal_plain,
+  (SELECT count(*) FROM "ContactShare" WHERE "token"       IS NOT NULL) AS share_plain,
+  (SELECT count(*) FROM "GroupMember"  WHERE "inviteToken" IS NOT NULL) AS invite_plain;'
+```
+
+Notes:
+
+- The backfill exits non-zero if any row needs attention. A **conflict** (a row
+  that already has a hash for a *different* token than its plaintext) is left
+  untouched and listed by row id — inspect it; no app path produces one. The
+  script never prints tokens.
+- Re-running `--apply` is safe; a clean second run reports `0 plaintext row(s)`
+  for every table.
+- Then re-check step 2's smoke test: pre-deploy calendar subscriptions, share
+  links and still-pending invite links must keep working (they now resolve by
+  hash).
+- **Rollback:** the previous image runs against the migrated schema, but it
+  only knows the plaintext columns — after the backfill it would no longer
+  resolve converted links (they'd 401/404 until regenerated). Roll forward
+  instead; if you must roll back, do it before step 3.
+- **Follow-up** (separate ticket, once step 4 is 0 in every environment):
+  delete the `LEGACY` fallbacks in `src/server/capability-tokens.ts` and drop
+  the three plaintext columns.
+- **Key rotation:** the display copies share the sync credential keyring.
+  `scripts/rotate-sync-credential-key.mjs` does not re-encrypt them yet, so keep
+  a retired key in `SYNC_CREDENTIAL_ENCRYPTION_KEYS` until display copies are
+  re-encrypted (or accept that affected users see "Regenerate link").
+
+---
+
 ## Normal state
 
 - Coolify shows the service as **Running** with a green indicator.

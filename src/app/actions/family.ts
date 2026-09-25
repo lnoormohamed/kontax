@@ -12,6 +12,11 @@ import {
   getUserBillingContext,
   lockUserForPlanCheck,
 } from "~/server/billing";
+import {
+  clearedInviteTokenColumns,
+  findMemberByInviteToken,
+  inviteTokenColumns,
+} from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
@@ -160,7 +165,8 @@ export const inviteFamilyMember = async (formData: FormData) => {
       role: "MEMBER" as const,
       inviteStatus: "PENDING" as const,
       canEdit: true,
-      inviteToken: token,
+      // P48-18: hash only — the token itself exists only in the invite email.
+      ...inviteTokenColumns(token),
       inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS),
       invitedByUserId: userId,
     };
@@ -188,10 +194,12 @@ export const acceptFamilyInvite = async (formData: FormData) => {
   const userId = await requireUserId({ write: true });
   const token = str(formData, "token");
 
-  const member = await db.groupMember.findUnique({
-    where: { inviteToken: token },
-    include: { user: { select: { email: true } } },
-  });
+  const member = await findMemberByInviteToken(token, (where) =>
+    db.groupMember.findUnique({
+      where,
+      include: { user: { select: { email: true } } },
+    }),
+  );
   if (member?.inviteStatus !== "PENDING") {
     throw new Error("This invite is no longer valid.");
   }
@@ -205,7 +213,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
       userId,
       inviteStatus: "ACCEPTED",
       joinedAt: new Date(),
-      inviteToken: null,
+      ...clearedInviteTokenColumns(),
       inviteExpiresAt: null,
     },
   });
@@ -218,11 +226,13 @@ export const acceptFamilyInvite = async (formData: FormData) => {
 export const declineFamilyInvite = async (formData: FormData) => {
   await requireUserId({ write: true });
   const token = str(formData, "token");
-  const member = await db.groupMember.findUnique({ where: { inviteToken: token } });
+  const member = await findMemberByInviteToken(token, (where) =>
+    db.groupMember.findUnique({ where }),
+  );
   if (member?.inviteStatus === "PENDING") {
     await db.groupMember.update({
       where: { id: member.id },
-      data: { inviteStatus: "DECLINED", inviteToken: null, inviteExpiresAt: null },
+      data: { inviteStatus: "DECLINED", ...clearedInviteTokenColumns(), inviteExpiresAt: null },
     });
   }
   revalidatePath("/settings/sharing/family");
@@ -481,7 +491,8 @@ export const resendFamilyInvite = async (formData: FormData) => {
   const token = randomBytes(24).toString("base64url");
   await db.groupMember.update({
     where: { id: member.id },
-    data: { inviteToken: token, inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS) },
+    // P48-18: also nulls a legacy plaintext token, so the old link dies.
+    data: { ...inviteTokenColumns(token), inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS) },
   });
   const recipient = await db.user.findUnique({
     where: { email: member.invitedEmail },

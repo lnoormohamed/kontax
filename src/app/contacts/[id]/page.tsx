@@ -34,6 +34,7 @@ import {
 import { addContactToFamilyBook } from "~/app/actions/family";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
+import { shareDisplayToken, shareTokenDisplaySelect } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { listMemberships } from "~/server/contact-book-membership";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
@@ -399,7 +400,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           select: {
             id: true,
             shareType: true,
-            token: true,
+            // P48-18: hash + encrypted display copy (+ legacy plaintext for
+            // not-yet-backfilled rows).
+            ...shareTokenDisplaySelect,
             status: true,
             expiresAt: true,
             downloadCount: true,
@@ -412,9 +415,21 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         })
       : Promise.resolve([]),
   ]);
-  const vcardLinks = contactShares.filter(
-    (share) => share.shareType === "VCARD_LINK" && share.status === "ACTIVE",
-  );
+  // P48-18: resolve each active link's displayable token server-side; a link
+  // whose display copy can't be decrypted gets `token: null`, which the
+  // sharing panel renders as a "Regenerate link" state.
+  const vcardLinks = contactShares
+    .filter((share) => share.shareType === "VCARD_LINK" && share.status === "ACTIVE")
+    .map((share) => {
+      const display = shareDisplayToken(share);
+      return {
+        id: share.id,
+        downloadCount: share.downloadCount,
+        expiresAt: share.expiresAt,
+        maxDownloads: share.maxDownloads,
+        token: display.status === "ok" ? display.token : null,
+      };
+    });
   const staticShares = contactShares.filter((share) => share.shareType === "STATIC_COPY");
   const liveShares = contactShares.filter((share) => share.shareType === "LIVE_SYNC");
   const staticShareEnabled = shellPlan.entitlements.staticShareEnabled;

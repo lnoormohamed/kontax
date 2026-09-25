@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 
 import { requestPasswordReset } from "~/app/actions/auth";
 import { requireSession, requireUserId } from "~/server/auth/require-session";
+import {
+  calDisplayToken,
+  calTokenColumns,
+  calTokenDisplaySelect,
+  noCalTokenWhere,
+} from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { generateCalToken } from "~/server/ical";
 import {
@@ -61,16 +67,44 @@ export const fetchSecurityAlertAction = async (
   return getSecurityAlert(userId, alertId);
 };
 
-/** P22-11: create the iCal token if absent, returning it. Idempotent. */
+const CAL_TOKEN_UNAVAILABLE =
+  'Your calendar link can\'t be displayed any more. Use "Regenerate link" to issue a new one.';
+
+/**
+ * P22-11: create the iCal token if absent, returning it. Idempotent.
+ *
+ * P48-18: the token is stored as a hash + encrypted display copy. If a token
+ * exists but its display copy can't be decrypted (key retired), this refuses
+ * rather than silently rotating — the Settings page shows "Regenerate link",
+ * which calls `regenerateCalTokenAction` explicitly.
+ */
 export const ensureCalTokenAction = async (): Promise<string> => {
   const userId = await requireUserId({ write: true });
-  const existing = await db.user.findUnique({
-    where: { id: userId },
-    select: { calToken: true },
-  });
-  if (existing?.calToken) return existing.calToken;
+
+  const readExisting = async () => {
+    const row = await db.user.findUnique({
+      where: { id: userId },
+      select: calTokenDisplaySelect,
+    });
+    return calDisplayToken(row);
+  };
+
+  const existing = await readExisting();
+  if (existing.status === "ok") return existing.token;
+  if (existing.status === "unavailable") throw new Error(CAL_TOKEN_UNAVAILABLE);
+
   const token = generateCalToken();
-  await db.user.update({ where: { id: userId }, data: { calToken: token } });
+  // Only issue while the user still has no token (hashed or legacy), so two
+  // concurrent calls can't leave the UI holding a token the DB doesn't match.
+  const { count } = await db.user.updateMany({
+    where: { id: userId, ...noCalTokenWhere },
+    data: calTokenColumns(token),
+  });
+  if (count === 0) {
+    const raced = await readExisting();
+    if (raced.status === "ok") return raced.token;
+    throw new Error(CAL_TOKEN_UNAVAILABLE);
+  }
   revalidatePath("/settings/notifications");
   return token;
 };
@@ -79,7 +113,9 @@ export const ensureCalTokenAction = async (): Promise<string> => {
 export const regenerateCalTokenAction = async (): Promise<string> => {
   const userId = await requireUserId({ write: true });
   const token = generateCalToken();
-  await db.user.update({ where: { id: userId }, data: { calToken: token } });
+  // calTokenColumns also nulls the legacy plaintext column, so a pre-P48-18
+  // subscription URL stops working here too.
+  await db.user.update({ where: { id: userId }, data: calTokenColumns(token) });
   revalidatePath("/settings/notifications");
   return token;
 };

@@ -14,6 +14,11 @@ import {
   getUserBillingContext,
   lockUserForPlanCheck,
 } from "~/server/billing";
+import {
+  shareDisplayToken,
+  shareTokenColumns,
+  shareTokenDisplaySelect,
+} from "~/server/capability-tokens";
 import ShareInvite from "~/emails/share-invite";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
@@ -58,6 +63,9 @@ const sendShareInviteEmail = async (opts: {
 };
 
 const FREE_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Unchanged entropy (P48-18 only changes how the token is stored).
+const newShareToken = () => randomBytes(24).toString("base64url");
 
 const str = (formData: FormData, key: string) => {
   const value = formData.get(key);
@@ -138,7 +146,8 @@ export const createVcardShareLink = async (formData: FormData) => {
       ownerUserId: userId,
       contactId,
       shareType: "VCARD_LINK",
-      token: randomBytes(24).toString("base64url"),
+      // P48-18: stored as sha256 hash + encrypted display copy, never plaintext.
+      ...shareTokenColumns(newShareToken()),
       status: "ACTIVE",
       expiresAt,
       maxDownloads: singleUse ? 1 : null,
@@ -146,6 +155,48 @@ export const createVcardShareLink = async (formData: FormData) => {
   });
 
   revalidatePath(`/contacts/${contactId}`);
+};
+
+// P48-18: the sharing panel shows "Regenerate link" for an active link whose
+// display copy can no longer be decrypted (key retired). This revokes that link
+// and issues a replacement with the same single-use setting and the plan's
+// current expiry — an explicit, user-initiated rotation.
+export const regenerateVcardShareLink = async (formData: FormData) => {
+  const userId = await requireUserId({ write: true });
+  const shareId = str(formData, "shareId");
+  const contactId = str(formData, "contactId");
+
+  const billing = await getUserBillingContext(userId);
+  const expiresAt =
+    billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
+
+  const replaced = await db.$transaction(async (tx) => {
+    const share = await tx.contactShare.findFirst({
+      where: { id: shareId, ownerUserId: userId, shareType: "VCARD_LINK", status: "ACTIVE" },
+      select: { id: true, contactId: true, maxDownloads: true },
+    });
+    if (!share?.contactId) return null;
+
+    await tx.contactShare.update({
+      where: { id: share.id },
+      data: { status: "REVOKED", revokedAt: new Date() },
+    });
+    await tx.contactShare.create({
+      data: {
+        ownerUserId: userId,
+        contactId: share.contactId,
+        shareType: "VCARD_LINK",
+        ...shareTokenColumns(newShareToken()),
+        status: "ACTIVE",
+        expiresAt,
+        maxDownloads: share.maxDownloads,
+      },
+    });
+    return share.contactId;
+  });
+
+  const target = replaced ?? contactId;
+  if (target) revalidatePath(`/contacts/${target}`);
 };
 
 // P28-06: return a usable vCard share URL for the QR modal — reusing the
@@ -165,7 +216,10 @@ export const getOrCreateVcardShareLink = async (
     throw new Error("Contact not found.");
   }
 
-  const existing = await db.contactShare.findFirst({
+  // P48-18: reuse an existing active link by decrypting its display copy (or,
+  // for a not-yet-backfilled row, its legacy plaintext token). Newest first;
+  // the first one we can show wins.
+  const existing = await db.contactShare.findMany({
     where: {
       contactId,
       ownerUserId: userId,
@@ -174,26 +228,39 @@ export const getOrCreateVcardShareLink = async (
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     },
     orderBy: { createdAt: "desc" },
-    select: { token: true, expiresAt: true },
+    take: 20,
+    select: { ...shareTokenDisplaySelect, expiresAt: true },
   });
 
-  if (existing?.token) {
-    return {
-      url: `${appUrl()}/share/${existing.token}`,
-      expiresAt: existing.expiresAt?.toISOString() ?? null,
-    };
+  for (const share of existing) {
+    const display = shareDisplayToken(share);
+    if (display.status === "ok") {
+      return {
+        url: `${appUrl()}/share/${display.token}`,
+        expiresAt: share.expiresAt?.toISOString() ?? null,
+      };
+    }
+  }
+
+  // An active link exists but none can be displayed: never mint a second
+  // active link behind the user's back — they regenerate it explicitly from
+  // the sharing panel.
+  if (existing.some((share) => shareDisplayToken(share).status === "unavailable")) {
+    throw new Error(
+      'This contact\'s share link can\'t be displayed any more. Open the Sharing tab and choose "Regenerate link".',
+    );
   }
 
   const billing = await getUserBillingContext(userId);
   const expiresAt = billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
-  const token = randomBytes(24).toString("base64url");
+  const token = newShareToken();
 
   await db.contactShare.create({
     data: {
       ownerUserId: userId,
       contactId,
       shareType: "VCARD_LINK",
-      token,
+      ...shareTokenColumns(token),
       status: "ACTIVE",
       expiresAt,
     },

@@ -1,3 +1,4 @@
+import { findShareByToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 
 // P26-10: shared, read-only resolver for the public vCard share link (P12-02),
@@ -10,24 +11,27 @@ export type ShareDisplay =
   | { status: "notfound" | "revoked" | "expired" };
 
 export async function resolveShareForDisplay(token: string): Promise<ShareDisplay> {
-  const share = await db.contactShare.findUnique({
-    where: { token },
-    select: {
-      shareType: true,
-      status: true,
-      expiresAt: true,
-      contact: {
-        select: {
-          fullName: true,
-          firstName: true,
-          lastName: true,
-          nickname: true,
-          company: true,
-          jobTitle: true,
+  // P48-18: hash-first lookup with the legacy plaintext fallback.
+  const share = await findShareByToken(token, (where) =>
+    db.contactShare.findUnique({
+      where,
+      select: {
+        shareType: true,
+        status: true,
+        expiresAt: true,
+        contact: {
+          select: {
+            fullName: true,
+            firstName: true,
+            lastName: true,
+            nickname: true,
+            company: true,
+            jobTitle: true,
+          },
         },
       },
-    },
-  });
+    }),
+  );
 
   if (share?.shareType !== "VCARD_LINK") return { status: "notfound" };
   if (share.status === "REVOKED") return { status: "revoked" };

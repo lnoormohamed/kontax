@@ -1,5 +1,6 @@
 import { type NextRequest } from "next/server";
 
+import { findUserByCalToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { buildVCalendar } from "~/server/ical";
 
@@ -16,11 +17,11 @@ export async function GET(req: NextRequest) {
     return new Response("Missing calToken", { status: 401 });
   }
 
-  // calToken is a random 32-char token; uniqueness is guaranteed at generation.
-  const user = await db.user.findFirst({
-    where: { calToken },
-    select: { id: true },
-  });
+  // P48-18: looked up by sha256(calToken); pre-deploy tokens still resolve via
+  // the legacy plaintext fallback until the backfill has run.
+  const user = await findUserByCalToken(calToken, (where) =>
+    db.user.findUnique({ where, select: { id: true } }),
+  );
   if (!user) {
     return new Response("Invalid or revoked token", { status: 401 });
   }

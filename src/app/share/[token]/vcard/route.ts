@@ -4,7 +4,42 @@ import {
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
+import { findShareByToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
+
+import type { Prisma } from "../../../../../generated/prisma";
+
+const VCARD_SHARE_SELECT = {
+  id: true,
+  shareType: true,
+  status: true,
+  expiresAt: true,
+  downloadCount: true,
+  maxDownloads: true,
+  contact: {
+    select: {
+      fullName: true,
+      firstName: true,
+      lastName: true,
+      phoneticFirstName: true,
+      phoneticLastName: true,
+      nickname: true,
+      email: true,
+      emailAddresses: true,
+      phone: true,
+      phoneNumbers: true,
+      company: true,
+      phoneticCompany: true,
+      jobTitle: true,
+      website: true,
+      birthday: true,
+      significantDates: true,
+      address: true,
+      postalAddresses: true,
+      notes: true,
+    },
+  },
+} satisfies Prisma.ContactShareSelect;
 
 // Public, unauthenticated vCard download for a share link (P12-02).
 // /share/{token}/vcard → resolves the token, validates the share, serves a .vcf.
@@ -12,40 +47,10 @@ import { db } from "~/server/db";
 export async function GET(_request: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
 
-  const share = await db.contactShare.findUnique({
-    where: { token },
-    select: {
-      id: true,
-      shareType: true,
-      status: true,
-      expiresAt: true,
-      downloadCount: true,
-      maxDownloads: true,
-      contact: {
-        select: {
-          fullName: true,
-          firstName: true,
-          lastName: true,
-          phoneticFirstName: true,
-          phoneticLastName: true,
-          nickname: true,
-          email: true,
-          emailAddresses: true,
-          phone: true,
-          phoneNumbers: true,
-          company: true,
-          phoneticCompany: true,
-          jobTitle: true,
-          website: true,
-          birthday: true,
-          significantDates: true,
-          address: true,
-          postalAddresses: true,
-          notes: true,
-        },
-      },
-    },
-  });
+  // P48-18: hash-first lookup with the legacy plaintext fallback.
+  const share = await findShareByToken(token, (where) =>
+    db.contactShare.findUnique({ where, select: VCARD_SHARE_SELECT }),
+  );
 
   if (share?.shareType !== "VCARD_LINK") {
     return new Response("Share link not found.", { status: 404 });
