@@ -87,3 +87,27 @@ path — web, API, CardDAV and inbound sync.
   that subscription's portal is offered. The surface now reads real Stripe subscriptions only
   (`REAL_STRIPE_SUBSCRIPTION_WHERE`) and prefers the one at the effective plan. Test:
   `billing-surface-grant.test.ts`. Not yet eyeballed in a browser — check on staging.
+- **Contact cap on the remaining create paths (MEDIUM).** Each now checks inside the inserting
+  transaction with the owner's `User` row locked first (`lockUserForPlanCheck` +
+  `assertCanCreateContactsTx`, or the new `getImportCapacityTx`):
+  REST API `POST /api/v1/contacts` (pre-check moved into the transaction; 403 `LIMIT_REACHED`);
+  sync-conflict `DUPLICATE_LOCAL` (the branch's first write, so at the cap nothing changes and the
+  conflict stays open). **Imports create only what fits** and report the rest as skipped instead
+  of failing: CSV/vCard commit (`/api/imports/contacts/commit`: first N rows created in one locked
+  transaction; response `capSkippedCount` + `limitMessage`; job COMPLETED with the cap note in
+  `errorSummary`) and Kontax archive import (`commitKontaxImport`: per 50-contact chunk, an
+  unlocked estimate before uploading photos, then the locked authoritative check in the chunk's
+  transaction). An import with no room at all, a read-only account, or one over the monthly import
+  limit is still refused up front (`getImportCapacity`). The import wizard shows the cap notice on
+  its done step.
+- **Exception: family dissolution copies are never capped.** `snapshotFamilyBookForUser` (a member
+  leaves / the family dissolves) copies the shared book into the departing member's account
+  regardless of their cap: preserving data they had access to beats the cap. They may end up over
+  it; every other create path then refuses until they are under it, and nothing is deleted.
+  Documented at the function.
+- Tests: `contact-cap-remaining-paths.test.ts` — API POST at the cap, two concurrent API POSTs at
+  499 (exactly one lands, via the lock), CSV import partial at the cap, CSV with no room, Kontax
+  import partial, `DUPLICATE_LOCAL` refused at the cap with no writes.
+- **Observed, not changed:** Free's `monthlyImportLimit: 3` is compared against the *number of
+  contacts* imported this month (`importedThisMonth` sums `importedCount`), so a Free CSV import of
+  more than 3 contacts is refused outright. Confirm whether "3" means imports or contacts.

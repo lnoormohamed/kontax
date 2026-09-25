@@ -7,7 +7,12 @@ import { createId } from "@paralleldrive/cuid2";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
-import { assertCanImportContacts } from "~/server/billing";
+import {
+  contactLimitMessage,
+  getContactCapacityFor,
+  getImportCapacity,
+  lockUserForPlanCheck,
+} from "~/server/billing";
 import { db } from "~/server/db";
 import { normalizeContactPhoto } from "~/server/contact-photo-sync";
 import type { ImportedCardContact } from "./parse";
@@ -137,6 +142,10 @@ export type KontaxImportResult = {
   jobId: string;
   /** Human-readable per-contact warnings for photos that could not be imported. */
   photoWarnings: string[];
+  /** P49A-06: contacts left out because the plan's contact cap was reached (included in skippedCount). */
+  capSkippedCount: number;
+  /** User-facing cap message when capSkippedCount > 0, else null. */
+  limitMessage: string | null;
 };
 
 const MAX_REPORTED_PHOTO_WARNINGS = 50;
@@ -166,7 +175,7 @@ export async function commitKontaxImport(
   },
 ): Promise<KontaxImportResult> {
   const sourceFileName = options?.sourceFileName ?? sourceDetail;
-  const skippedCount = options?.skippedCount ?? 0;
+  const parseSkippedCount = options?.skippedCount ?? 0;
 
   // ImportFormat has only CSV_GENERIC and ImportSourceProfile has no Kontax
   // value (both enums are role-locked, see KontaxExportKind note in the
@@ -180,7 +189,7 @@ export async function commitKontaxImport(
       sourceProfile: "GENERIC",
       sourceFileName,
       sourceFileSizeBytes: options?.sourceFileSizeBytes,
-      rowCount: contacts.length + skippedCount,
+      rowCount: contacts.length + parseSkippedCount,
       previewContactCount: contacts.length,
       startedAt: new Date(),
     },
@@ -191,8 +200,12 @@ export async function commitKontaxImport(
       throw new KontaxImportError("No importable contacts were found in that file.");
     }
 
+    // P49A-06 (Fable review): over the contact cap no longer fails the import
+    // — only what fits is created (enforced per chunk below, inside the insert
+    // transaction) — so this rejects only a read-only account, the monthly
+    // import limit, or an account with no room at all.
     try {
-      await assertCanImportContacts(userId, contacts.length);
+      await getImportCapacity(userId, contacts.length);
     } catch (error) {
       // billing.ts throws plain Error with a curated, user-safe plan-limit
       // message — safe to surface, but re-tagged so the route can tell it
@@ -268,8 +281,27 @@ export async function commitKontaxImport(
     // createMany can't carry per-contact photo URLs, so: upload photos for a
     // chunk, then create that chunk's contacts in one transaction.
     let importedCount = 0;
+    let capSkippedCount = 0;
+    let capLimit: { planLabel: string; limit: number } | null = null;
     const photoWarnings: string[] = [];
-    for (const group of chunk(contacts, CHUNK_SIZE)) {
+    for (const fullGroup of chunk(contacts, CHUNK_SIZE)) {
+      // P49A-06 (Fable review): create only what fits under the contact cap.
+      // An unlocked read first so photos aren't uploaded for contacts that
+      // can't land; the locked re-check inside the insert transaction below is
+      // authoritative (a concurrent create may have used the room meanwhile).
+      if (capLimit) {
+        capSkippedCount += fullGroup.length;
+        continue;
+      }
+      const estimate = await getContactCapacityFor(db, userId);
+      const group =
+        estimate.remaining === null ? fullGroup : fullGroup.slice(0, estimate.remaining);
+      if (group.length < fullGroup.length && estimate.limit !== null) {
+        capLimit = { planLabel: estimate.planLabel, limit: estimate.limit };
+        capSkippedCount += fullGroup.length - group.length;
+      }
+      if (group.length === 0) continue;
+
       const avatarUrls: Array<string | null> = [];
       for (const contact of group) {
         if (!contact.photo) {
@@ -285,9 +317,18 @@ export async function commitKontaxImport(
         }
       }
 
-      const created = await db.$transaction(
-        group.map((contact, index) =>
-          db.contact.create({
+      const created = await db.$transaction(async (tx) => {
+        await lockUserForPlanCheck(tx, userId);
+        const capacity = await getContactCapacityFor(tx, userId);
+        const fits =
+          capacity.remaining === null ? group.length : Math.min(group.length, capacity.remaining);
+        if (fits < group.length && capacity.limit !== null) {
+          capLimit = { planLabel: capacity.planLabel, limit: capacity.limit };
+          capSkippedCount += group.length - fits;
+        }
+        const rows: Array<{ id: string }> = [];
+        for (const [index, contact] of group.slice(0, fits).entries()) {
+          rows.push(await tx.contact.create({
             data: {
               userId,
               importJobId: job.id,
@@ -330,15 +371,21 @@ export async function commitKontaxImport(
               lastMutatedByDetail: sourceDetail,
             },
             select: { id: true },
-          }),
-        ),
-      );
+          }));
+        }
+        return rows;
+      }, { timeout: 60_000 });
       created.forEach((row, index) => {
         const source = group[index]!;
         landed.push({ id: row.id, source, primaryBookId: resolveBookId(source) });
       });
-      importedCount += group.length;
+      importedCount += created.length;
     }
+    const skippedCount = parseSkippedCount + capSkippedCount;
+    const limitMessage =
+      capSkippedCount > 0 && capLimit
+        ? contactLimitMessage(capLimit.planLabel, capLimit.limit)
+        : null;
 
     // Mirror the CSV commit route: one CONTACT_IMPORTED event per contact.
     if (landed.length > 0) {
@@ -374,6 +421,9 @@ export async function commitKontaxImport(
         status: "COMPLETED",
         importedCount,
         skippedCount,
+        errorSummary: limitMessage
+          ? `${capSkippedCount} contact${capSkippedCount === 1 ? "" : "s"} not imported: ${limitMessage}`
+          : undefined,
         committedAt: new Date(),
         completedAt: new Date(),
       },
@@ -383,7 +433,14 @@ export async function commitKontaxImport(
       photoWarnings.length >= MAX_REPORTED_PHOTO_WARNINGS
         ? [...photoWarnings, "Additional photo warnings were omitted."]
         : photoWarnings;
-    return { importedCount, skippedCount, jobId: job.id, photoWarnings: cappedWarnings };
+    return {
+      importedCount,
+      skippedCount,
+      jobId: job.id,
+      photoWarnings: cappedWarnings,
+      capSkippedCount,
+      limitMessage,
+    };
   } catch (error) {
     await db.importJob.update({
       where: { id: job.id },

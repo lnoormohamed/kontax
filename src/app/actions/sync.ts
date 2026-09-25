@@ -11,6 +11,7 @@ import {
   sessionErrorMessage,
 } from "~/server/auth/require-session";
 import {
+  assertCanCreateContactsTx,
   assertCanCreateSyncAccount,
   assertCanCreateSyncAccountTx,
   assertCanUseCardDavSync,
@@ -1900,29 +1901,39 @@ export const resolveSyncConflict = async (formData: FormData) => {
       );
     }
 
-    await db.contact.create({
-      data: {
-        userId,
-        fullName: conflict.contact.fullName,
-        firstName: conflict.contact.firstName,
-        middleName: conflict.contact.middleName,
-        lastName: conflict.contact.lastName,
-        namePrefix: conflict.contact.namePrefix,
-        nameSuffix: conflict.contact.nameSuffix,
-        nickname: conflict.contact.nickname,
-        email: conflict.contact.email,
-        emailAddresses: parseContactStringArray(conflict.contact.emailAddresses),
-        phone: conflict.contact.phone,
-        phoneNumbers: parseContactStringArray(conflict.contact.phoneNumbers),
-        company: conflict.contact.company,
-        jobTitle: conflict.contact.jobTitle,
-        website: conflict.contact.website,
-        birthday: conflict.contact.birthday,
-        significantDates: parseContactDateEntries(conflict.contact.significantDates),
-        address: conflict.contact.address,
-        postalAddresses: parseContactPostalAddresses(conflict.contact.postalAddresses),
-        notes: conflict.contact.notes,
-      },
+    // P49A-06 (Fable review): duplicating creates a contact, so it is capped
+    // like every other create path — checked inside the inserting transaction
+    // with the User row locked. This is the branch's first write, so at the
+    // cap the resolution is refused before anything changes and the conflict
+    // stays open (the user can keep local/remote instead).
+    const localContact = conflict.contact;
+    await db.$transaction(async (tx) => {
+      await lockUserForPlanCheck(tx, userId);
+      await assertCanCreateContactsTx(tx, userId);
+      await tx.contact.create({
+        data: {
+          userId,
+          fullName: localContact.fullName,
+          firstName: localContact.firstName,
+          middleName: localContact.middleName,
+          lastName: localContact.lastName,
+          namePrefix: localContact.namePrefix,
+          nameSuffix: localContact.nameSuffix,
+          nickname: localContact.nickname,
+          email: localContact.email,
+          emailAddresses: parseContactStringArray(localContact.emailAddresses),
+          phone: localContact.phone,
+          phoneNumbers: parseContactStringArray(localContact.phoneNumbers),
+          company: localContact.company,
+          jobTitle: localContact.jobTitle,
+          website: localContact.website,
+          birthday: localContact.birthday,
+          significantDates: parseContactDateEntries(localContact.significantDates),
+          address: localContact.address,
+          postalAddresses: parseContactPostalAddresses(localContact.postalAddresses),
+          notes: localContact.notes,
+        },
+      });
     });
 
     if (conflict.contactId) {

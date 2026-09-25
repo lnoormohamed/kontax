@@ -2,7 +2,7 @@
 // Base URL when created: https://api.getkontax.com/v1
 import { type NextRequest, NextResponse } from "next/server";
 
-import { assertCanCreateContacts } from "~/server/billing";
+import { assertCanCreateContactsTx, lockUserForPlanCheck } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
@@ -101,16 +101,6 @@ export async function POST(req: NextRequest) {
       throw err;
     }
 
-    try {
-      await assertCanCreateContacts(userId);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      return NextResponse.json(
-        { error: "LIMIT_REACHED", message: msg },
-        { status: 403 },
-      );
-    }
-
     // P40-06: every personal contact lives in a book. A null bookId historically
     // meant "the default book"; make that explicit so the membership read cutover
     // shows the contact, and dual-write the primary membership.
@@ -120,7 +110,17 @@ export async function POST(req: NextRequest) {
     const bookId = resolvedBook.bookId;
     data.bookId = bookId;
 
-    const contact = await db.$transaction(async (tx) => {
+    // P49A-06 (Fable review): the plan-cap check runs inside the inserting
+    // transaction with the owner's User row locked, like every other create
+    // path — a pre-check outside it let concurrent API POSTs all read "under
+    // the cap" and all insert.
+    const outcome = await db.$transaction(async (tx) => {
+      await lockUserForPlanCheck(tx, userId);
+      try {
+        await assertCanCreateContactsTx(tx, userId);
+      } catch (err) {
+        return { refused: err instanceof Error ? err.message : "Plan limit reached." } as const;
+      }
       const created = await tx.contact.create({ data, select: API_CONTACT_SELECT });
       await setPrimaryMembership(tx, created.id, bookId);
       await emitEvent(tx, {
@@ -130,9 +130,13 @@ export async function POST(req: NextRequest) {
         actor: "API",
         payload: {},
       });
-      return created;
+      return { created } as const;
     });
 
-    return NextResponse.json(formatContactForApi(contact), { status: 201 });
+    if ("refused" in outcome) {
+      return NextResponse.json({ error: "LIMIT_REACHED", message: outcome.refused }, { status: 403 });
+    }
+
+    return NextResponse.json(formatContactForApi(outcome.created), { status: 201 });
   });
 }
