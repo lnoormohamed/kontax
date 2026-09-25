@@ -46,3 +46,14 @@ actions fully cut off access where they intend to.
   `getUserBillingContext` instead of "latest period end", so the comp row and the paid row can't
   disagree about before/after. Test: `stripe-webhook.test.ts` "admin plan override vs the
   customer's own Stripe billing".
+- **Placeholder ids never reach Stripe (MEDIUM).** `createBillingPortalSession` returned the portal
+  for whatever `SubscriptionCustomer.providerCustomerId` held — including the
+  `manual_admin-override-<id>` placeholder the override creates for a user with no customer yet.
+  It now answers `NO_BILLING_ACCOUNT` for any placeholder (`manual_*`, `admin-override-*`); the
+  portal hook shows a readable message. The same rule, from one helper
+  (`src/server/billing-placeholders.ts`: `isPlaceholderProviderId`,
+  `REAL_STRIPE_SUBSCRIPTION_WHERE`), now covers every other Stripe call site that reads a stored id:
+  checkout's "already subscribed → portal" check (a comp row found first no longer hides a paid
+  sub), `updateTeamSeats`, `syncStripeBillingState`'s local lookup, and account deletion
+  (`cancelBillingForDeletedUser` skips a comp subscription hanging off a real `cus_` customer and
+  a legacy `admin-override-` customer). Test: `billing-placeholder-ids.test.ts`.

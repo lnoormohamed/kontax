@@ -13,6 +13,7 @@ import {
   sendTrialEndingEmail,
 } from "~/server/billing-emails";
 import { ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX } from "~/server/admin/plan-override";
+import { isPlaceholderProviderId, REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
 import { db } from "~/server/db";
 import {
   FAMILY_DISSOLVE_NOTICE_MS,
@@ -90,10 +91,8 @@ function planRank(plan: SubscriptionPlan): number {
 const ACTIVE_BILLING_STATUSES: SubscriptionStatus[] = ["ACTIVE", "TRIALING", "PAST_DUE"];
 
 // P49A-07: also treat the legacy "admin-override-" placeholder id as a manual
-// (never-Stripe) subscription — same reasoning as stripe-customers.ts.
-const isLegacyManualSubscription = (subscriptionId: string | null | undefined) =>
-  !!subscriptionId &&
-  (subscriptionId.startsWith("manual_") || subscriptionId.startsWith("admin-override-"));
+// (never-Stripe) id — same reasoning as stripe-customers.ts.
+const isLegacyManualSubscription = isPlaceholderProviderId;
 
 const fromUnix = (seconds: number | null | undefined) =>
   seconds ? new Date(seconds * 1000) : null;
@@ -1098,6 +1097,8 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
       userId,
       provider: "STRIPE",
       providerSubscriptionId: { not: "" },
+      // A comp / admin-override row has no Stripe object to retrieve.
+      ...REAL_STRIPE_SUBSCRIPTION_WHERE,
     },
     orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
     select: { providerSubscriptionId: true },

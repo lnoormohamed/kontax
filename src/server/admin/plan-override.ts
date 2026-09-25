@@ -2,6 +2,8 @@ import "server-only";
 
 import type { PrismaClient, SubscriptionPlan } from "../../../generated/prisma";
 
+import { isPlaceholderProviderId } from "~/server/billing-placeholders";
+
 // P49A-07 (A-11): an admin plan override must never poison Stripe. Before this
 // ticket, `overridePlan` upserted `SubscriptionCustomer.providerCustomerId =
 // "admin-override-<userId>"` — a fake id that checkout/portal then handed
@@ -28,10 +30,9 @@ import type { PrismaClient, SubscriptionPlan } from "../../../generated/prisma";
  * comp convention, and the legacy "admin-override-" ids this ticket replaces
  * (prod has none today, but a future migration or backfill could reintroduce
  * one, so every placeholder check treats both prefixes as equivalent).
+ * Shared with the billing paths in src/server/billing-placeholders.ts.
  */
-export function isPlaceholderProviderId(id: string | null | undefined): boolean {
-  return !!id && (id.startsWith("manual_") || id.startsWith("admin-override-"));
-}
+export { isPlaceholderProviderId };
 
 /** Prefix of the comp Subscription row an admin plan override writes. */
 export const ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX = "manual_admin-override-";

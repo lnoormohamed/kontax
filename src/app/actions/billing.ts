@@ -5,6 +5,7 @@ import { z } from "zod";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { countLiveSyncAccountSlots } from "~/server/billing";
+import { isPlaceholderProviderId, REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
 import { isEligibleForProTrial } from "~/server/billing-trial";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
@@ -18,8 +19,9 @@ const CheckoutInputSchema = z.object({
   seats: z.number().int().min(3).max(500).optional(),
 });
 
-const isLegacyManualSubscription = (subscriptionId: string | null | undefined) =>
-  !!subscriptionId && subscriptionId.startsWith("manual_");
+// Comp / admin-override rows (manual_*, admin-override-*) are not Stripe
+// subscriptions: they never block a checkout and never reach the Stripe API.
+const isLegacyManualSubscription = isPlaceholderProviderId;
 
 export async function createCheckoutSession(input: {
   plan: string;
@@ -61,11 +63,14 @@ export async function createCheckoutSession(input: {
       }
     }
   } else {
+    // Real Stripe subscriptions only: a comp / admin-override row found first
+    // must not hide a paid one (which would allow a second, duplicate checkout).
     const activeSub = await db.subscription.findFirst({
       where: {
         userId,
         status: { in: ["ACTIVE", "TRIALING"] },
         plan: { not: "FREE" },
+        ...REAL_STRIPE_SUBSCRIPTION_WHERE,
       },
       select: { id: true, providerSubscriptionId: true },
     });
@@ -214,7 +219,13 @@ export async function createBillingPortalSession(
     where: { userId },
     select: { providerCustomerId: true },
   });
-  if (!customer) return { error: "NO_BILLING_ACCOUNT" };
+  // Fable review (P49A-07): a comp / admin-override placeholder customer
+  // ("manual_…", legacy "admin-override-…") has nothing in Stripe — never hand
+  // it to the portal API. There is no billing to manage until the user checks
+  // out (ensureStripeCustomer then provisions a real customer).
+  if (!customer || isPlaceholderProviderId(customer.providerCustomerId)) {
+    return { error: "NO_BILLING_ACCOUNT" };
+  }
 
   let stripe: ReturnType<typeof getStripeClient>;
   try {
