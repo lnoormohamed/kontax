@@ -340,6 +340,10 @@ async function applyDowngrade(
 /** Per-member dissolution transaction: one member's book copy + removal. */
 const FAMILY_MEMBER_TX_TIMEOUT_MS = 60_000;
 
+// Thrown inside a member's transaction to roll back its book copy when the
+// membership was already removed by a concurrent or earlier run.
+class FamilyMemberAlreadyRemoved extends Error {}
+
 export type FamilyLapseDb = Pick<PrismaClient, "$transaction">;
 
 /** Family or above keeps the family group (Family → Teams is an upgrade, not a lapse). */
@@ -410,10 +414,15 @@ export async function reconcileFamilyLapseForCustomer(
       const done = await database.$transaction(
         async (tx) => {
           if (hasFamilyEntitlement(await getEffectivePersonalPlan(ownerId, tx))) return false;
-          const { count } = await tx.groupMember.deleteMany({
+          // Snapshot while the membership row still exists: the P48-07
+          // projection reads the member's own sharingPolicy from it (same
+          // order as the leave flow). The delete then claims the member; if
+          // another run already removed it, roll the copy back.
+          const stillMember = await tx.groupMember.findFirst({
             where: { id: member.id, groupId: group.id },
+            select: { id: true },
           });
-          if (count === 0) return false;
+          if (!stillMember) return false;
           if (accepted && group.defaultAddressBookId) {
             await snapshotFamilyBookForUser(tx, {
               bookId: group.defaultAddressBookId,
@@ -421,10 +430,17 @@ export async function reconcileFamilyLapseForCustomer(
               groupName: group.name,
             });
           }
+          const { count } = await tx.groupMember.deleteMany({
+            where: { id: member.id, groupId: group.id },
+          });
+          if (count === 0) throw new FamilyMemberAlreadyRemoved();
           return true;
         },
         { timeout: FAMILY_MEMBER_TX_TIMEOUT_MS },
-      );
+      ).catch((err: unknown) => {
+        if (err instanceof FamilyMemberAlreadyRemoved) return false;
+        throw err;
+      });
       if (!done) continue;
       removed++;
       if (accepted) {

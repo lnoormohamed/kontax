@@ -38,3 +38,11 @@ sent them — nothing silently dropped, deletions honoured, and no device overwr
   custom-labelled phones, year-less birthday all round-trip; removing a property removes it.
 - API PATCH changes the DAV ETag; a stale-ETag PUT gets 412.
 - Staging: edit a contact's address on an iPhone connected to staging; it shows in the web app.
+
+## Known limitation (Fable review, 2026-09-25)
+Core properties (N/FN, EMAIL, TEL, ADR, URL, NOTE, BDAY, ORG company, TITLE) are full-replace, so a
+deletion on any device clears them. Extended properties (NICKNAME, X-PHONETIC-*, ORG department)
+are only written when present, so clients that don't model them (Thunderbird, GNOME, older
+Android) can't wipe them. Trade-off: iOS omits a cleared nickname/phonetic name/department instead
+of sending it empty, so clearing one of those four on an iPhone does not clear it in Kontax —
+edit it in the web app instead.
