@@ -126,6 +126,8 @@ const ERRORS: Record<string, string> = {
   FORBIDDEN: "You don't have permission to manage broadcasts.",
   TITLE_REQUIRED: "Enter a title.",
   BODY_REQUIRED: "Enter a message body.",
+  TITLE_TOO_LONG: "Title is too long (120 characters max).",
+  BODY_TOO_LONG: "Message body is too long (2000 characters max).",
   USER_NOT_FOUND: "That broadcast could not be found anymore.",
   SCHEDULE_REQUIRED: "Choose a schedule time before saving a scheduled broadcast.",
   SCHEDULE_INVALID: "That schedule time could not be understood.",

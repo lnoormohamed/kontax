@@ -6,6 +6,7 @@ import { safeInternalPath } from "~/lib/safe-internal-path";
 import { assertAdmin, AdminForbiddenError } from "~/server/admin/guard";
 import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
+import { overridePlanForUser, removePlanOverrideForUser } from "~/server/admin/plan-override";
 import { db } from "~/server/db";
 import { invalidateSessionValidation } from "~/server/session-validation-cache";
 import { invalidateDavCredentialCacheForUser } from "~/server/app-passwords";
@@ -33,6 +34,12 @@ type Result = { success: true } | { error: string };
 
 const PLANS: SubscriptionPlan[] = ["FREE", "PRO", "FAMILY", "TEAMS"];
 const MIN_BROADCAST_SCHEDULE_LEAD_MS = 5 * 60 * 1000;
+// P49A-07 (admin hardening): the UI already caps these (120 / 280 chars) but
+// nothing enforced it server-side — a direct call could send an arbitrarily
+// long title/body to every matched user. The client's body cap is tighter;
+// 2000 is the hard server-side ceiling.
+const MAX_BROADCAST_TITLE_LENGTH = 120;
+const MAX_BROADCAST_BODY_LENGTH = 2000;
 
 async function loadTarget(userId: string) {
   return db.user.findUnique({
@@ -41,7 +48,19 @@ async function loadTarget(userId: string) {
   });
 }
 
-// ─── P21-04: Plan override (local only, never touches Stripe) ──────────────────
+// ─── P21-04 / P49A-07: Plan override ────────────────────────────────────────
+//
+// The override is a comp *personal* Subscription row using the same
+// "manual_" placeholder-id convention as the pre-Stripe comp subscriptions
+// (see src/server/admin/plan-override.ts) — never a fake "cus_..." /
+// "admin-override-..." id handed to the Stripe API, and never a write to an
+// existing real SubscriptionCustomer row. Checkout/portal already treat a
+// "manual_" customer id as a placeholder and provision a real Stripe customer
+// on demand (stripe-customers.ts); `syncStripeBillingState` already skips it.
+// Which plan wins when the user also has a real paid subscription is decided
+// by `getUserBillingContext` (billing.ts, P49A-06) picking the
+// highest-ranked active personal subscription — this action never touches
+// that function or a real subscription row.
 
 export async function overridePlan(input: {
   userId: string;
@@ -66,31 +85,7 @@ export async function overridePlan(input: {
   const target = await loadTarget(input.userId);
   if (!target) return { error: "USER_NOT_FOUND" };
 
-  // Ensure a billing customer exists, then upsert a local override subscription.
-  const customer = await db.subscriptionCustomer.upsert({
-    where: { userId: target.id },
-    update: {},
-    create: {
-      userId: target.id,
-      provider: "STRIPE",
-      providerCustomerId: `admin-override-${target.id}`,
-    },
-    select: { id: true },
-  });
-
-  const providerSubscriptionId = `admin-override-${target.id}`;
-  await db.subscription.upsert({
-    where: { provider_providerSubscriptionId: { provider: "STRIPE", providerSubscriptionId } },
-    update: { plan, status: "ACTIVE" },
-    create: {
-      userId: target.id,
-      subscriptionCustomerId: customer.id,
-      provider: "STRIPE",
-      providerSubscriptionId,
-      plan,
-      status: "ACTIVE",
-    },
-  });
+  await overridePlanForUser(db, { targetUserId: target.id, plan });
 
   await db.user.update({
     where: { id: target.id },
@@ -103,6 +98,49 @@ export async function overridePlan(input: {
     targetUserId: target.id,
     targetEmail: target.email,
     details: { to: plan, reason, reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null },
+    actorContext: { tier: admin.tier, policySource: admin.policySource },
+  });
+
+  revalidatePath(`/admin/users/${target.id}`);
+  return { success: true };
+}
+
+/** Cancel a standing plan override (the comp row) without touching any real subscription. */
+export async function removePlanOverride(input: {
+  userId: string;
+  reason?: string;
+  reasonCategory?: string;
+}): Promise<Result> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  if (!admin.capabilities["plan.override"]) return { error: "FORBIDDEN" };
+
+  const target = await loadTarget(input.userId);
+  if (!target) return { error: "USER_NOT_FOUND" };
+
+  const removed = await removePlanOverrideForUser(db, { targetUserId: target.id });
+  if (!removed) return { error: "NO_ACTIVE_OVERRIDE" };
+
+  await db.user.update({
+    where: { id: target.id },
+    data: { planOverriddenAt: null, planOverrideReason: null },
+  });
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.USER_PLAN_OVERRIDE_REMOVED,
+    targetUserId: target.id,
+    targetEmail: target.email,
+    details: {
+      reason: input.reason?.trim() ? input.reason.trim() : null,
+      reasonCategory: input.reasonCategory?.trim() ? input.reasonCategory.trim() : null,
+    },
     actorContext: { tier: admin.tier, policySource: admin.policySource },
   });
 
@@ -256,6 +294,10 @@ export async function adminDeleteAccount(input: { userId: string; reason: string
   });
   // P38-09: the lock must beat the 45s validation cache
   await invalidateSessionValidation(target.id);
+  // P49A-07 (A-27): same as the suspend path above — without this a cached
+  // CardDAV credential keeps a scheduled-for-deletion account's devices
+  // syncing for up to 10 minutes after the lock.
+  await invalidateDavCredentialCacheForUser(target.id);
 
   await emitAdminEvent({
     adminId: admin.adminId,
@@ -675,6 +717,8 @@ export async function saveProductBroadcast(input: {
   if (!admin.capabilities["broadcast.manage"]) return { error: "FORBIDDEN" };
   if (!title) return { error: "TITLE_REQUIRED" };
   if (!body) return { error: "BODY_REQUIRED" };
+  if (title.length > MAX_BROADCAST_TITLE_LENGTH) return { error: "TITLE_TOO_LONG" };
+  if (body.length > MAX_BROADCAST_BODY_LENGTH) return { error: "BODY_TOO_LONG" };
 
   const status: Extract<AdminBroadcastStatus, "DRAFT" | "SCHEDULED"> =
     input.status === "SCHEDULED" ? "SCHEDULED" : "DRAFT";
