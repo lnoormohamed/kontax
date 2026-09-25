@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import { confirmTotpEnrolment, startTotpEnrolment } from "~/app/actions/totp";
 
 // ── 6-digit OTP input ─────────────────────────────────────────────────────────
@@ -193,7 +194,11 @@ export function TwoFactorModal({
             <div className="mt-4 flex items-start gap-2.5 rounded-[14px] border border-[#e6d3a3] bg-[#f6edd9] px-[15px] py-[13px]">
               <svg fill="none" height="17" stroke="#7c5511" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.9" style={{ flexShrink: 0, marginTop: 1 }} viewBox="0 0 24 24" width="17"><path d="M10.3 3.9 1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" /></svg>
               <span className="text-[13.5px] leading-[1.5] text-[#7c5511]">
-                Save your recovery codes somewhere safe. If you lose your authenticator app, these are the <strong className="font-semibold">only</strong> way to recover your account.
+                Save your recovery codes somewhere safe. If you lose your authenticator app, these are the <strong className="font-semibold">only</strong> way to recover your account.{" "}
+                {/* P50A-05: new tab, so the codes on screen aren't lost. */}
+                <a className="font-semibold underline" href={HELP_LINKS.twoFactorRecoveryCodes} rel="noopener" target="_blank">
+                  Learn more
+                </a>
               </span>
             </div>
             <div className="mt-[14px] grid grid-cols-2 gap-2 rounded-[14px] border border-[#e9ece7] bg-[#f8faf8] p-[14px]">

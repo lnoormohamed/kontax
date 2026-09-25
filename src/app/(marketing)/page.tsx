@@ -65,7 +65,7 @@ function worksWith(): string[] {
     "iCloud",
     "Fastmail",
     ...(isMicrosoftSyncEnabled() ? ["Outlook"] : []),
-    "any CardDAV app",
+    "any CardDAV server",
   ];
 }
 

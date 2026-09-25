@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import { ActivityFeed, ActivityLocked } from "~/app/_components/activity-feed";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
 import { EmptyState } from "~/app/_components/empty-state";
@@ -120,6 +121,10 @@ type ContactDashboardProps = {
   healthPrompt?: { count: number; href: string } | null;
   visiblePeopleCount: number;
 };
+
+// P50A-05: from this many open suggestions, the Duplicates toolbar links to the
+// "duplicates after your first sync" help article.
+const DUPLICATE_FLOOD_HINT_AT = 20;
 
 const getInitials = (value: string) =>
   value
@@ -641,7 +646,10 @@ export function ContactDashboard({
                 <span aria-hidden>📈</span>
                 <span className="flex-1">
                   {planSummary.contactsRemaining} of {planSummary.contactsLimit} contacts remaining on the{" "}
-                  {planSummary.planLabel} plan. Upgrade for unlimited.
+                  {planSummary.planLabel} plan. Upgrade for unlimited.{" "}
+                  <Link className="underline" href={HELP_LINKS.contactLimitReached}>
+                    Learn more
+                  </Link>
                 </span>
                 <Link className="shrink-0 font-semibold underline" href="/settings">
                   Upgrade
@@ -677,6 +685,15 @@ export function ContactDashboard({
           ) : (
             <>
               <span className="text-[13.5px] font-semibold text-[#1d2823]">{countLabel}</span>
+              {/* P50A-05: a long suggestion list usually follows a first sync. */}
+              {counts.duplicates >= DUPLICATE_FLOOD_HINT_AT ? (
+                <Link
+                  className="text-[12.5px] font-medium text-[#4158f4] hover:underline"
+                  href={HELP_LINKS.duplicateFloodAfterFirstSync}
+                >
+                  Lots of duplicates after a sync? Learn more
+                </Link>
+              ) : null}
               <div className="ml-auto flex items-center gap-2">
                 {/* P46-17 / DB07 T6: Merge review left the settings nav — the
                     duplicates view is the tool's home entry point. */}

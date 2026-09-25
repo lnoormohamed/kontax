@@ -9,42 +9,55 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-
     /* Strictness */
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
-
     /* Bundled projects */
-    "lib": ["dom", "dom.iterable", "ES2022"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES2022"
+    ],
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "preserve",
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "incremental": true,
-
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
     ".next-verify/types/**/*.ts",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
     // P48-13: TypeScript's glob matching skips any path with a dot-prefixed
     // segment by default, so the bare "**/*.ts" pattern above silently never
     // covered the CardDAV well-known redirect route — `tsc` type-checked
     // around it and typed-lint rules (via ESLint's projectService) failed to
     // parse it ("was not found by the project service"). Needs an explicit
     // entry; any future route under a dot-directory needs the same treatment.
-    "src/app/.well-known/**/*.ts"
+    "src/app/.well-known/**/*.ts",
+    ".next-p50all/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "generated", "roadmap", ".claude"]
+  "exclude": [
+    "node_modules",
+    "generated",
+    "roadmap",
+    ".claude"
+  ]
 }

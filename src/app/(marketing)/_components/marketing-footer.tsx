@@ -9,6 +9,8 @@ const FOOTER_COLUMNS = [
       { label: "Pricing",   href: "/pricing"   },
       { label: "Security",  href: "/security"  },
       { label: "Changelog", href: "/changelog" },
+      { label: "For families", href: "/for/families" },
+      { label: "For teams", href: "/for/teams" },
     ],
   },
   {
@@ -22,6 +24,9 @@ const FOOTER_COLUMNS = [
     title: "Resources",
     links: [
       { label: "Help centre", href: "/help"       },
+      { label: "Guides",      href: "/guides"     },
+      { label: "Compare",     href: "/compare"    },
+      { label: "Glossary",    href: "/glossary"   },
       { label: "Developers",  href: "/developers" },
     ],
   },

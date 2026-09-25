@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import { useOffline } from "~/app/_components/connectivity";
 import { UpsellCard } from "~/app/_components/mobile-variance";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -234,8 +235,8 @@ export function MobileSyncScreen({
                 Connect iCloud, Google, or any CardDAV account to keep your contacts in sync.
               </div>
             </div>
-            {/* P26-13: link to the CardDAV explainer on /help */}
-            <Link href="/help#carddav" style={{ fontSize: 13, fontWeight: 500, color: "#4158f4", textDecoration: "none" }}>
+            {/* P26-13 / P50A-05: link to the CardDAV explainer in the help centre */}
+            <Link href={HELP_LINKS.whatIsCardDav} style={{ fontSize: 13, fontWeight: 500, color: "#4158f4", textDecoration: "none" }}>
               Learn about CardDAV →
             </Link>
           </div>
