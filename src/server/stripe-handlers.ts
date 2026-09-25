@@ -386,6 +386,10 @@ const FAMILY_MEMBER_TX_TIMEOUT_MS = 60_000;
 // membership was already removed by a concurrent or earlier run.
 class FamilyMemberAlreadyRemoved extends Error {}
 
+// Thrown when the owner regained Family while a member's copy was being made:
+// the copy is rolled back and the member stays.
+class FamilyDissolutionCancelled extends Error {}
+
 export type FamilyLapseDb = Pick<PrismaClient, "$transaction">;
 
 /** Family or above keeps the family group (Family → Teams is an upgrade, not a lapse). */
@@ -562,6 +566,17 @@ async function dissolveFamilyGroup(
                 groupName: group.name,
               });
             }
+            // The copy can take a while; a re-subscribe that committed
+            // meanwhile must still stop the removal (READ COMMITTED sees it
+            // now). Roll the copy back rather than remove the member.
+            if (hasFamilyEntitlement(await getEffectivePersonalPlan(ownerId, tx))) {
+              throw new FamilyDissolutionCancelled();
+            }
+            const stillDueNow = await tx.group.findFirst({
+              where: { id: group.id, familyDissolveAt: { lte: now } },
+              select: { id: true },
+            });
+            if (!stillDueNow) throw new FamilyDissolutionCancelled();
             const { count } = await tx.groupMember.deleteMany({
               where: { id: member.id, groupId: group.id },
             });
@@ -571,7 +586,9 @@ async function dissolveFamilyGroup(
           { timeout: FAMILY_MEMBER_TX_TIMEOUT_MS },
         )
         .catch((err: unknown) => {
-          if (err instanceof FamilyMemberAlreadyRemoved) return false;
+          if (err instanceof FamilyMemberAlreadyRemoved || err instanceof FamilyDissolutionCancelled) {
+            return false;
+          }
           throw err;
         });
       if (!done) continue;

@@ -226,6 +226,29 @@ Notes:
 
 ---
 
+## P49A deploy order — Family notice column, SES topic, graceful shutdown
+
+The P49A batch (P49A-01/-02/-04/-05/-08/-15) adds one migration,
+`20260925120000_family_dissolve_at` (`ALTER TABLE "Group" ADD COLUMN IF NOT EXISTS
+"familyDissolveAt" TIMESTAMP(3)` — nullable, no backfill).
+
+1. **Set `SES_SNS_TOPIC_ARN`** on the prod app in Coolify (comma-separated allow-list of our SES
+   notification topic ARNs). Without it `/api/ses/events` fails closed: every bounce/complaint is
+   rejected with 403 and suppression stops updating. The app still boots.
+2. **Confirm Stripe dunning** ends in *cancel*, not *mark unpaid* (`unpaid` maps to PAST_DUE and
+   keeps paid entitlements).
+3. **Apply the migration out of band** on the prod DB (same procedure as P48-14), then record it in
+   `_prisma_migrations` so `migrate status` is clean. The currently running (old) image is
+   unaffected by the extra nullable column while it keeps running.
+4. **Push `main`.** Coolify stops the old container with its default 30 s grace; the new
+   `start-production.mjs` forwards SIGTERM to `server.mjs`, which drains for up to 20 s
+   (`[Kontax] drained cleanly …` in the logs).
+5. Smoke: `/api/health`, `/about`, `/contact`, `/changelog.xml` → 200; `/contacts` → 307 to login.
+
+**Rollback:** the previous image refuses to boot in `validate` mode against the migrated schema
+(drift). Roll back with `KONTAX_SCHEMA_MODE=skip` on the app, as in the P48-14 section; the column
+can stay (nothing in the old code reads it). Restore `validate` after rolling forward again.
+
 ## Normal state
 
 - Coolify shows the service as **Running** with a green indicator.
