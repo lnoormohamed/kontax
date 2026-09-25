@@ -31,3 +31,16 @@ Confirmed in origin/main and on getkontax.com/pricing:
 ## Acceptance
 - Test fails if any pricing number diverges from `billing.ts`.
 - No public page mentions webhooks, "5k/day" or an automatic no-card trial unless implemented.
+
+## Resolution (2026-09-25, feat/p50-marketing-redesign)
+- `/pricing` matrix and plan-card bullets render from `PLAN_MATRIX` / `planCardFeatures` in
+  `plan-data.ts`, whose limits read `PLAN_DEFAULTS` (plan-entitlements.mjs). Values that live in
+  server-only modules (Teams seat bounds, Free share-link TTL, API rate limits) are mirrored
+  constants pinned by `tests/node/pricing-plan-data.test.ts`.
+- Webhooks and "Minimum events kept" rows removed; API limit is per token (1,000/hr read-only,
+  200/hr read/write); Teams members = per seat (min. 3, checkout max 500); Google sync and two-way
+  sync on every plan; import is CSV or Kontax archive (no vCard import).
+- No placeholder prices: without the Stripe catalogue the paid plans show no amount.
+- Support: "Email support" on every plan (no tiers in code). Trial: first Pro subscription only,
+  started at checkout with a card (help + FAQ say so). iCal / smart lists / bulk edit: not
+  claimed as plan features on the pricing page.

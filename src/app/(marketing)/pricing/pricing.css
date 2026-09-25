@@ -351,6 +351,7 @@
 .pr-matrix tbody tr.pr-row:nth-of-type(even) td:nth-child(4) { background: rgba(231, 242, 233, 0.75); }
 .pr-cell-yes { display: inline-flex; color: var(--mkt-green); }
 .pr-cell-no { color: var(--mkt-mute); }
+.pr-cell-note { color: var(--mkt-mute); }
 
 /* ─── FAQ ─────────────────────────────────────────────────────── */
 .pr-faq-sec {

@@ -1,9 +1,38 @@
 // Canonical plan matrix, gate definitions, delta helpers, and downgrade copy.
 // All other pricing/upgrade components derive from this module.
-// Data frozen from p11-01; numbers remain £X placeholders per commercial policy.
+//
+// P49A-14 · the public comparison matrix (/pricing) and the plan-card bullets
+// are rendered from PLAN_MATRIX / planCardFeatures below. Every limit is read
+// from the entitlement matrix the product enforces
+// (src/server/dav/plan-entitlements.mjs → PLAN_DEFAULTS), never typed by hand;
+// values that live in modules which can't be imported here (server actions,
+// the API rate limiter) are mirrored as constants and pinned to their source
+// by tests/node/pricing-plan-data.test.ts.
+
+import { PLAN_DEFAULTS, type PlanEntitlements } from "~/server/dav/plan-entitlements.mjs";
 
 export const PLAN_ORDER = ["Free", "Pro", "Family", "Teams"] as const;
 export type PlanKey = (typeof PLAN_ORDER)[number];
+
+/** Plan key → entitlement row (the product's source of truth). */
+export const PLAN_ENTITLEMENTS: Record<PlanKey, PlanEntitlements> = {
+  Free: PLAN_DEFAULTS.FREE,
+  Pro: PLAN_DEFAULTS.PRO,
+  Family: PLAN_DEFAULTS.FAMILY,
+  Teams: PLAN_DEFAULTS.TEAMS,
+};
+
+// ── Mirrored constants (pinned by tests/node/pricing-plan-data.test.ts) ──────
+/** src/app/actions/billing.ts — checkout `seats` bounds (Teams is per seat). */
+export const TEAMS_SEAT_MIN = 3;
+export const TEAMS_SEAT_MAX = 500;
+/** src/app/actions/shares.ts — FREE_LINK_TTL_MS */
+export const FREE_SHARE_LINK_DAYS = 7;
+/** src/server/api-rate-limit.ts — API_RATE_LIMITS (per token, every plan with API) */
+export const API_READ_ONLY_PER_HOUR = 1_000;
+export const API_READ_WRITE_PER_HOUR = 200;
+
+const fmt = (n: number) => n.toLocaleString("en-GB");
 
 export type PlanInfo = {
   name: PlanKey;
@@ -38,7 +67,7 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
   },
   Family: {
     name: "Family",
-    who: "Households, up to 6 members",
+    who: `Households, up to ${PLAN_DEFAULTS.FAMILY.memberSlotsLimit} members`,
     price: "£X",
     period: "per month",
     annualPrice: "£X",
@@ -47,7 +76,7 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
   },
   Teams: {
     name: "Teams",
-    who: "Organisations, up to 25",
+    who: `Organisations, per seat (min. ${TEAMS_SEAT_MIN})`,
     price: "£X",
     period: "per seat / month",
     annualPrice: "£X",
@@ -63,6 +92,8 @@ export type FeatureRow = {
   id: string;
   label: string;
   vals: Record<PlanKey, CellValue>;
+  /** Only shown when Microsoft (Outlook) sync is configured (P50A-01). */
+  requiresOutlook?: true;
 };
 
 export type FeatureGroup = {
@@ -71,39 +102,60 @@ export type FeatureGroup = {
   rows: FeatureRow[];
 };
 
+/** Build a row's four cells from each plan's entitlements. */
+const perPlan = (cell: (e: PlanEntitlements, plan: PlanKey) => CellValue): Record<PlanKey, CellValue> => ({
+  Free: cell(PLAN_ENTITLEMENTS.Free, "Free"),
+  Pro: cell(PLAN_ENTITLEMENTS.Pro, "Pro"),
+  Family: cell(PLAN_ENTITLEMENTS.Family, "Family"),
+  Teams: cell(PLAN_ENTITLEMENTS.Teams, "Teams"),
+});
+const every = (v: CellValue) => perPlan(() => v);
+
+/** "500" / "Unlimited" */
+const limit = (n: number | null) => (n === null ? "Unlimited" : fmt(n));
+/** "1" / "Up to 5" */
+const upTo = (n: number) => (n === 1 ? "1" : `Up to ${fmt(n)}`);
+
+const API_LIMIT_CELL = `${fmt(API_READ_ONLY_PER_HOUR)}/hr read-only · ${fmt(API_READ_WRITE_PER_HOUR)}/hr read/write`;
+
 export const PLAN_MATRIX: FeatureGroup[] = [
   {
-    cat: "Contacts",
+    cat: "Core",
     rows: [
-      {
-        id: "contacts",
-        label: "Contacts",
-        vals: {
-          Free: "500",
-          Pro: "Unlimited",
-          Family: { v: "Unlimited", note: "per member" },
-          Teams: { v: "Unlimited", note: "per member" },
-        },
-      },
+      { id: "contacts", label: "Contacts", vals: perPlan((e) => limit(e.contactsLimit)) },
+      { id: "search", label: "Advanced search", vals: every(true) },
+      { id: "labels", label: "Labels", vals: every(true) },
+      { id: "merge", label: "Merge duplicates (30-day undo)", vals: perPlan((e) => e.advancedMergeEnabled) },
+      { id: "import", label: "Import (CSV, Kontax archive)", vals: every(true) },
       {
         id: "imports",
-        label: "Monthly imports",
-        vals: { Free: "3 / mo", Pro: "Unlimited", Family: "Unlimited", Teams: "Unlimited" },
+        label: "Imports per month",
+        vals: perPlan((e) => (e.monthlyImportLimit === null ? "Unlimited" : "Monthly allowance")),
+      },
+      { id: "kontaxexport", label: "Export (CSV, Kontax archive)", vals: every(true) },
+      { id: "export", label: "vCard export (whole library)", vals: perPlan((e) => e.premiumExportEnabled) },
+    ],
+  },
+  {
+    cat: "History",
+    rows: [
+      {
+        id: "history",
+        label: "Per-contact history",
+        vals: perPlan((e) =>
+          e.historyDisplayCap === null ? "All changes" : `Last ${fmt(e.historyDisplayCap)} changes`,
+        ),
       },
       {
-        id: "export",
-        label: "Export formats",
-        vals: { Free: "CSV", Pro: "All formats", Family: "All formats", Teams: "All formats" },
-      },
-      {
-        id: "merge",
-        label: "Duplicate merge",
-        vals: {
-          Free: { v: "Included", note: "field-level, bulk, 30-day undo" },
-          Pro: "Included",
-          Family: "Included",
-          Teams: "Included",
-        },
+        id: "feed",
+        label: "Activity feed",
+        vals: perPlan((e) =>
+          e.activityLogRetentionDays === 0
+            ? false
+            : e.activityLogRetentionDays === null
+              ? "All activity"
+              : `Last ${fmt(e.activityLogRetentionDays)} days`,
+        ),
       },
     ],
   },
@@ -112,113 +164,134 @@ export const PLAN_MATRIX: FeatureGroup[] = [
     rows: [
       {
         id: "sync",
-        label: "CardDAV sync accounts",
-        vals: {
-          Free: "1",
-          Pro: "5",
-          Family: { v: "5", note: "per member" },
-          Teams: { v: "5", note: "per member" },
-        },
+        label: "Sync sources (Google, iCloud, any CardDAV server)",
+        vals: perPlan((e) => upTo(e.syncAccountsLimit)),
       },
+      { id: "outlook", label: "Outlook", vals: perPlan((e) => e.syncAccountsLimit > 0), requiresOutlook: true },
+      { id: "twoway", label: "Two-way sync", vals: every(true) },
       {
         id: "devices",
-        label: "Device app passwords",
-        vals: { Free: "1", Pro: "5", Family: "5", Teams: "5" },
-      },
-      {
-        id: "teamsync",
-        label: "Team-level CardDAV sync",
-        vals: { Free: false, Pro: false, Family: false, Teams: true },
+        label: "iPhones and Macs (CardDAV)",
+        vals: perPlan((e) => upTo(e.appPasswordsLimit)),
       },
     ],
   },
   {
     cat: "Sharing",
     rows: [
+      { id: "card", label: "Public contact card", vals: every(true) },
       {
-        id: "vcardlink",
-        label: "vCard share links",
-        vals: {
-          Free: "Expire after 7 days",
-          Pro: "No expiry, revocable",
-          Family: "No expiry, revocable",
-          Teams: "No expiry, revocable",
-        },
-      },
-      {
-        id: "static",
-        label: "Static contact sharing",
-        vals: { Free: false, Pro: true, Family: true, Teams: true },
-      },
-      {
-        id: "live",
-        label: "Live contact sharing",
-        vals: { Free: false, Pro: true, Family: true, Teams: true },
-      },
-    ],
-  },
-  {
-    cat: "Collaboration",
-    note: "shared books — Phase 13+",
-    rows: [
-      {
-        id: "members",
-        label: "Members",
-        vals: { Free: false, Pro: false, Family: "Up to 6", Teams: "Up to 25" },
+        id: "share",
+        label: "Share individual contacts",
+        vals: perPlan((e) =>
+          e.liveShareEnabled && e.staticShareEnabled
+            ? "Link, copy or live"
+            : `Link, ${FREE_SHARE_LINK_DAYS} days`,
+        ),
       },
       {
         id: "books",
         label: "Shared address books",
-        vals: { Free: false, Pro: false, Family: "1 shared book", Teams: "Multiple" },
+        vals: perPlan((e) =>
+          e.sharedAddressBooksLimit === 0
+            ? false
+            : e.sharedAddressBooksLimit === null
+              ? "Multiple"
+              : e.sharedAddressBooksLimit === 1
+                ? "1 shared book"
+                : `Up to ${fmt(e.sharedAddressBooksLimit)}`,
+        ),
+      },
+      {
+        id: "members",
+        label: "Members",
+        vals: perPlan((e, plan) =>
+          plan === "Teams"
+            ? `Per seat (min. ${TEAMS_SEAT_MIN})`
+            : e.familyGroupEnabled && e.memberSlotsLimit !== null
+              ? `Up to ${fmt(e.memberSlotsLimit)}`
+              : false,
+        ),
       },
       {
         id: "roles",
-        label: "Roles & admin controls",
-        vals: { Free: false, Pro: false, Family: "Admin controls", Teams: "Roles per book" },
+        label: "Roles & permissions",
+        vals: perPlan((e) =>
+          e.teamsEnabled
+            ? "Admins, members, access per book"
+            : e.familyGroupEnabled
+              ? "Edit or view per member"
+              : false,
+        ),
       },
-      {
-        id: "audit",
-        label: "Audit log",
-        vals: {
-          Free: false,
-          Pro: false,
-          Family: false,
-          Teams: { v: "Full", note: "unlimited retention" },
-        },
-      },
+      { id: "audit", label: "Audit log", vals: perPlan((e) => e.teamsEnabled) },
     ],
   },
   {
-    cat: "Activity",
+    cat: "Developer",
     rows: [
+      { id: "api", label: "REST API", vals: perPlan((e) => e.apiAccessEnabled) },
       {
-        id: "feed",
-        label: "Global activity feed",
-        vals: { Free: false, Pro: "365 days", Family: "90 days", Teams: "Unlimited" },
-      },
-      {
-        id: "history",
-        label: "Per-contact history",
-        vals: {
-          Free: "Last 3 shown",
-          Pro: "Full · 365 days",
-          Family: "Full · 90 days",
-          Teams: "Full · unlimited",
-        },
+        id: "apilimit",
+        label: "API rate limit (per token)",
+        vals: perPlan((e) => (e.apiAccessEnabled ? API_LIMIT_CELL : false)),
       },
     ],
   },
   {
     cat: "Support",
     rows: [
-      {
-        id: "support",
-        label: "Support",
-        vals: { Free: "Community", Pro: "Priority", Family: "Priority", Teams: "Dedicated manager" },
-      },
+      { id: "help", label: "Help centre", vals: every(true) },
+      { id: "support", label: "Email support", vals: every(true) },
     ],
   },
 ];
+
+// ── Plan-card bullets (/pricing) ─────────────────────────────────────────────
+// Short summaries for the four plan cards, built from the same entitlements.
+// Rendered as `pre` + <strong>{strong}</strong> + `text`.
+
+export type CardFeature = { pre?: string; strong?: string; text?: string };
+
+export function planCardFeatures(outlookLive: boolean): Record<PlanKey, CardFeature[]> {
+  const e = PLAN_ENTITLEMENTS;
+  const sources = outlookLive ? "Google, iCloud, Outlook or CardDAV" : "Google, iCloud or any CardDAV server";
+  const syncSources = (n: number) => (n === 1 ? "1 sync source" : `up to ${fmt(n)} sync sources`);
+  const devices = (n: number) => (n === 1 ? "1 iPhone or Mac" : `up to ${fmt(n)} iPhones or Macs`);
+  const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const contacts = (n: number | null): CardFeature =>
+    n === null ? { strong: "Unlimited", text: " contacts" } : { pre: "Up to ", strong: `${fmt(n)} contacts` };
+  return {
+    Free: [
+      contacts(e.Free.contactsLimit),
+      { text: `${cap(syncSources(e.Free.syncAccountsLimit))}: ${sources}` },
+      { text: cap(devices(e.Free.appPasswordsLimit)) },
+      { text: "Labels, search and duplicate merge" },
+      { text: "Export any time (CSV, Kontax archive)" },
+    ],
+    Pro: [
+      contacts(e.Pro.contactsLimit),
+      { text: `${cap(syncSources(e.Pro.syncAccountsLimit))}, ${devices(e.Pro.appPasswordsLimit)}` },
+      { text: "Share contacts as a copy or live" },
+      { text: "vCard export" },
+      { text: "Developer API" },
+    ],
+    Family: [
+      contacts(e.Family.contactsLimit),
+      { text: "Family shared address book" },
+      { pre: "Up to ", strong: `${fmt(e.Family.memberSlotsLimit ?? 0)} members` },
+      { text: "Edit or view per member" },
+      { text: "One bill for the whole family" },
+    ],
+    Teams: [
+      contacts(e.Teams.contactsLimit),
+      { text: "Shared team address books" },
+      { pre: "Minimum ", strong: `${TEAMS_SEAT_MIN} seats` },
+      { text: "Roles & permissions, audit log" },
+      { text: "Developer API" },
+    ],
+  };
+}
 
 // Flat row lookup keyed by id
 export const PLAN_ROWS: Record<string, FeatureRow & { cat: string }> = {};
@@ -309,7 +382,7 @@ export const UPGRADE_GATES: UpgradeGate[] = [
   {
     id: "live",
     icon: "signal",
-    featureRow: "live",
+    featureRow: "share",
     unlock: "Pro",
     form: "locked",
     title: "Live sharing",

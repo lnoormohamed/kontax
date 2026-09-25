@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Fragment } from "react";
+import { PLAN_INFO, PLAN_MATRIX, type CellValue, type PlanKey } from "~/app/_components/plan-data";
 import { JsonLd, breadcrumbSchema, pricingSoftwareApplicationSchema } from "~/app/_components/json-ld";
 import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
@@ -8,20 +10,15 @@ import type { StripePrices } from "./_pricing-toggle";
 import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import "./pricing.css";
 
-const DEFAULT_STRIPE_PRICES: StripePrices = {
-  currency: "gbp",
-  pro: { monthly: 5, annual: 48 },
-  family: { monthly: 8, annual: 72 },
-  teams: { monthly: 12, annual: 120 },
-};
-
+// P49A-14 · no placeholder prices: when the Stripe catalogue is unavailable
+// the paid columns show no price at all (like the homepage pricing teaser).
 function getMatrixPriceLabel(
   plan: "free" | "pro" | "family" | "teams",
   stripePrices: StripePrices | null,
-): string {
-  const prices = stripePrices ?? DEFAULT_STRIPE_PRICES;
-  if (plan === "free") return formatCurrencyAmount(prices.currency, 0);
-  return `${formatCurrencyAmount(prices.currency, prices[plan].monthly)}/mo`;
+): string | null {
+  if (plan === "free") return formatCurrencyAmount(stripePrices?.currency ?? "gbp", 0);
+  if (!stripePrices) return null;
+  return `${formatCurrencyAmount(stripePrices.currency, stripePrices[plan].monthly)}/mo`;
 }
 
 // P50A-04 · ≤ 60-char title (the marketing layout's title template is "%s",
@@ -55,11 +52,23 @@ const CHECK = (
   </svg>
 );
 
-function Cell({ yes, text }: { yes?: boolean; text?: string }) {
-  if (yes) return <span className="pr-cell-yes" aria-label="Included">{CHECK}</span>;
-  if (text) return <>{text}</>;
-  return <span className="pr-cell-no" aria-label="Not included">—</span>;
+function Cell({ value }: { value: CellValue }) {
+  if (value === true) return <span className="pr-cell-yes" aria-label="Included">{CHECK}</span>;
+  if (value === false) return <span className="pr-cell-no" aria-label="Not included">—</span>;
+  if (typeof value === "string") return <>{value}</>;
+  return (
+    <>
+      {value.v} <span className="pr-cell-note">({value.note})</span>
+    </>
+  );
 }
+
+const MATRIX_COLUMNS = [
+  { plan: "Free", price: "free" },
+  { plan: "Pro", price: "pro" },
+  { plan: "Family", price: "family" },
+  { plan: "Teams", price: "teams" },
+] as const satisfies ReadonlyArray<{ plan: PlanKey; price: "free" | "pro" | "family" | "teams" }>;
 
 // P38-10: statically rendered with hourly ISR for the Stripe price fetch;
 // the visitor's current plan resolves client-side inside PricingToggle.
@@ -104,66 +113,35 @@ export default async function PricingPage() {
               <thead>
                 <tr>
                   <th scope="col"></th>
-                  <th scope="col">
-                    <span className="pr-mh-name">Free</span>
-                    <span className="pr-mh-price">{getMatrixPriceLabel("free", stripePrices)}</span>
-                  </th>
-                  <th scope="col">
-                    <span className="pr-mh-name">Pro</span>
-                    <span className="pr-mh-price">{getMatrixPriceLabel("pro", stripePrices)}</span>
-                  </th>
-                  <th scope="col">
-                    <span className="pr-mh-name">Family</span>
-                    <span className="pr-mh-price">{getMatrixPriceLabel("family", stripePrices)}</span>
-                  </th>
-                  <th scope="col">
-                    <span className="pr-mh-name">Teams</span>
-                    <span className="pr-mh-price">{getMatrixPriceLabel("teams", stripePrices)}</span>
-                  </th>
+                  {MATRIX_COLUMNS.map(({ plan, price }) => {
+                    const label = getMatrixPriceLabel(price, stripePrices);
+                    return (
+                      <th key={plan} scope="col">
+                        <span className="pr-mh-name">{PLAN_INFO[plan].name}</span>
+                        {label ? <span className="pr-mh-price">{label}</span> : null}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
-                {/* CORE */}
-                <tr className="pr-cat"><td colSpan={5}>Core</td></tr>
-                <tr className="pr-row"><td>Contacts</td><td>500</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
-                <tr className="pr-row"><td>Advanced search</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Labels</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Import (CSV, vCard)</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Export (GDPR)</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Global activity feed</td><td><Cell /></td><td><Cell text="365 days" /></td><td><Cell text="90 days" /></td><td><Cell text="Unlimited" /></td></tr>
-                <tr className="pr-row"><td>Minimum events kept</td><td><Cell text="3 events" /></td><td><Cell text="25 events" /></td><td><Cell text="10 events" /></td><td><Cell text="All events" /></td></tr>
-                <tr className="pr-row"><td>Per-contact history</td><td><Cell text="Last 3 shown" /></td><td><Cell text="Full · 365 days" /></td><td><Cell text="Full · 90 days" /></td><td><Cell text="Full · unlimited" /></td></tr>
-                <tr className="pr-row"><td>Merge duplicates</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-
-                {/* SYNC */}
-                <tr className="pr-cat"><td colSpan={5}>Sync</td></tr>
-                <tr className="pr-row"><td>CardDAV accounts</td><td><Cell text="1 account" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td></tr>
-                <tr className="pr-row"><td>Google Contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                {outlookLive && (
-                  <tr className="pr-row"><td>Outlook</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                )}
-                <tr className="pr-row"><td>iCloud (via CardDAV)</td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td></tr>
-                <tr className="pr-row"><td>Two-way sync</td><td><Cell text="CardDAV" /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-
-                {/* SHARING */}
-                <tr className="pr-cat"><td colSpan={5}>Sharing</td></tr>
-                <tr className="pr-row"><td>Public contact card</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Share individual contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Shared address book</td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Members</td><td><Cell /></td><td><Cell /></td><td><Cell text="Up to 6" /></td><td><Cell text="Unlimited" /></td></tr>
-                <tr className="pr-row"><td>Roles &amp; permissions</td><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Audit log</td><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
-
-                {/* DEVELOPER */}
-                <tr className="pr-cat"><td colSpan={5}>Developer</td></tr>
-                <tr className="pr-row"><td>REST API</td><td><Cell /></td><td><Cell yes /></td><td><Cell /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>API rate limit</td><td><Cell /></td><td><Cell text="5k / day" /></td><td><Cell /></td><td><Cell text="20k / day" /></td></tr>
-
-                {/* SUPPORT */}
-                <tr className="pr-cat"><td colSpan={5}>Support</td></tr>
-                <tr className="pr-row"><td>Help centre</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Email support</td><td><Cell /></td><td><Cell text="Standard" /></td><td><Cell text="Standard" /></td><td><Cell text="Priority" /></td></tr>
-                <tr className="pr-row"><td>Priority support</td><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
+                {/* P49A-14: every row comes from PLAN_MATRIX (plan-data.ts), whose
+                    limits are read from the enforced entitlements. */}
+                {PLAN_MATRIX.map((group) => (
+                  <Fragment key={group.cat}>
+                    <tr className="pr-cat"><td colSpan={5}>{group.cat}</td></tr>
+                    {group.rows
+                      .filter((row) => outlookLive || !row.requiresOutlook)
+                      .map((row) => (
+                        <tr key={row.id} className="pr-row">
+                          <td>{row.label}</td>
+                          {MATRIX_COLUMNS.map(({ plan }) => (
+                            <td key={plan}><Cell value={row.vals[plan]} /></td>
+                          ))}
+                        </tr>
+                      ))}
+                  </Fragment>
+                ))}
               </tbody>
             </table>
           </div>
