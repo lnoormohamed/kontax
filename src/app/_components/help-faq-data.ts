@@ -165,11 +165,11 @@ export const HELP_FAQ: HelpFaqSection[] = [
     items: [
       {
         q: "What file formats can I import?",
-        a: "Kontax imports vCard (.vcf) files — the universal contacts format — and CSV files. Both single-contact and multi-contact vCard files are supported. For CSV, any UTF-8 file with a header row works.",
+        a: "Kontax imports CSV files (any UTF-8 file with a header row) and Kontax archives (.zip) exported from another Kontax account. vCard (.vcf) files can be exported on Pro but not imported — to bring in contacts from iCloud or another CardDAV service, connect it on the Sync page instead.",
       },
       {
         q: "How do I import from Google Contacts?",
-        a: "Export your contacts as CSV or vCard from contacts.google.com (select all, then Export), then drop the file onto the Import page in Kontax. The Google column layout is detected automatically, so the field mapping is filled in for you.",
+        a: "Export your contacts as a Google CSV from contacts.google.com (select all, then Export), then drop the file onto the Import page in Kontax. The Google column layout is detected automatically, so the field mapping is filled in for you. Or connect your Google account on the Sync page to keep both in step.",
       },
       {
         q: "What CSV formats are supported?",

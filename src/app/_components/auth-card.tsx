@@ -398,7 +398,7 @@ export function AuthCard({
             <path d="M12 3l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.8 6.1 20.8l1.3-6.5L2.5 9.8 9.1 9z" />
           </svg>
           <span>
-            <strong className="font-semibold">14-day free Pro trial included</strong> — all Pro features, no card required to start.
+            <strong className="font-semibold">Pro starts with a 14-day free trial</strong> — you add a card at checkout and can cancel before it ends.
           </span>
         </div>
       ) : null}
