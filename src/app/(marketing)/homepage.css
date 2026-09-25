@@ -281,15 +281,15 @@
 .hp-faq__a a { font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
 
 /* ─── 10 · CTA band ───────────────────────────────────────────── */
-.hp-cta-band { background: var(--mkt-green); }
+/* The closing band sits directly on the site-wide dark-green footer, so it is
+   light — the same paper + hairline treatment as .mkt-cta-band on every other
+   marketing page. (The P49 prototype drew it green against a light footer; on
+   the real site green-on-green merged into one block.) */
+.hp-cta-band { background: var(--mkt-paper); border-top: 1px solid var(--mkt-hairline); }
 .hp-cta-band__inner { max-width: var(--hp-maxw); margin: 0 auto; padding: 88px 48px; text-align: center; }
-.hp-cta-band__title { margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -0.02em; color: #fff; line-height: 1.12; }
-.hp-cta-band__sub { margin: 16px auto 0; font-size: 16px; color: #c7d6cd; }
+.hp-cta-band__title { margin: 0; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -0.02em; color: var(--mkt-green); line-height: 1.12; text-wrap: balance; }
+.hp-cta-band__sub { margin: 16px auto 0; font-size: 16px; color: var(--mkt-body); }
 .hp-cta-band__btns { display: flex; gap: 12px; justify-content: center; margin-top: 30px; }
-.hp-cta-band .hp-btn--primary { background: #fff; color: var(--mkt-green); border-color: #fff; }
-.hp-cta-band .hp-btn--primary:hover { background: var(--hp-green-tile-text); border-color: var(--hp-green-tile-text); }
-.hp-cta-band .hp-btn--ghost { color: var(--hp-green-tile-text); border-color: rgba(223, 240, 231, 0.32); }
-.hp-cta-band .hp-btn--ghost:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 
 /* ─── Gentle entrance: resting state is fully visible ─────────── */
 @media (prefers-reduced-motion: no-preference) {
