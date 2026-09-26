@@ -6,6 +6,7 @@ import { FaqList } from "./_faq";
 import { fetchStripePrices, formatCurrencyAmount } from "./_prices";
 import type { StripePrices } from "./_pricing-toggle";
 import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
+import { CheckIcon, CtaBand, SectionHead } from "../_components/mkt-ui";
 import "./pricing.css";
 
 const DEFAULT_STRIPE_PRICES: StripePrices = {
@@ -46,16 +47,15 @@ export const metadata: Metadata = {
   },
 };
 
-const CHECK = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M5 12.5l4.2 4.2L19 7" />
-  </svg>
-);
-
 function Cell({ yes, text }: { yes?: boolean; text?: string }) {
-  if (yes) return <span className="pr-cell-yes" aria-label="Included">{CHECK}</span>;
+  if (yes) return <span className="pr-yes"><CheckIcon size={18} label="Included" /></span>;
   if (text) return <>{text}</>;
-  return <span className="pr-cell-no" aria-label="Not included">—</span>;
+  return (
+    <span className="pr-no">
+      <span aria-hidden="true">—</span>
+      <span className="mkt-sr-only">Not included</span>
+    </span>
+  );
 }
 
 // P38-10: statically rendered with hourly ISR for the Stripe price fetch;
@@ -77,27 +77,33 @@ export default async function PricingPage() {
           { name: "Pricing", path: "/pricing" },
         ])}
       />
-      {/* ── Hero ── */}
-      <section className="pr-hero">
-        <div className="pr-wrap">
-          <h1 className="pr-hero__title">Simple, honest pricing</h1>
-          <p className="pr-hero__sub">Start free. Upgrade when you&apos;re ready.</p>
-        </div>
-      </section>
-
-      {/* ── Billing toggle + Plan cards (client interactive) ── */}
-      <PricingToggle stripePrices={stripePrices} outlookLive={outlookLive} />
+      {/* ── Page head, billing toggle and plan cards (client interactive) ── */}
+      <PricingToggle
+        stripePrices={stripePrices}
+        outlookLive={outlookLive}
+        head={{
+          label: "Pricing",
+          title: "Simple, honest pricing",
+          lede: "Start free. Upgrade when you’re ready.",
+        }}
+      />
 
       {/* ── Feature matrix ── */}
-      <section className="pr-matrix-sec">
-        <div className="pr-wrap">
-          <h2 className="pr-matrix-head">Compare all features</h2>
-          <p className="pr-matrix-lede">Every plan, side by side. No asterisks, no surprises.</p>
-          <div className="pr-matrix-wrapper">
-            <table className="pr-matrix">
+      <section className="pr-sec" id="compare">
+        <div className="mkt-container">
+          <SectionHead
+            label="Compare plans"
+            title="Compare all features"
+            lede="Every plan, side by side. No asterisks, no surprises."
+          />
+          {/* Scrolls sideways inside its own frame on narrow screens; focusable
+              so keyboard users can scroll it too. */}
+          <div className="pr-mxw" role="region" aria-label="Plan comparison table" tabIndex={0}>
+            <table className="pr-mxt">
+              <caption className="mkt-sr-only">Plan comparison</caption>
               <thead>
                 <tr>
-                  <th scope="col"></th>
+                  <th scope="col">Plan</th>
                   <th scope="col">
                     <span className="pr-mh-name">Free</span>
                     <span className="pr-mh-price">{getMatrixPriceLabel("free", stripePrices)}</span>
@@ -118,46 +124,46 @@ export default async function PricingPage() {
               </thead>
               <tbody>
                 {/* CORE */}
-                <tr className="pr-cat"><td colSpan={5}>Core</td></tr>
-                <tr className="pr-row"><td>Contacts</td><td>500</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
-                <tr className="pr-row"><td>Advanced search</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Labels</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Import (CSV, vCard)</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Export (GDPR)</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Global activity feed</td><td><Cell /></td><td><Cell text="365 days" /></td><td><Cell text="90 days" /></td><td><Cell text="Unlimited" /></td></tr>
-                <tr className="pr-row"><td>Minimum events kept</td><td><Cell text="3 events" /></td><td><Cell text="25 events" /></td><td><Cell text="10 events" /></td><td><Cell text="All events" /></td></tr>
-                <tr className="pr-row"><td>Per-contact history</td><td><Cell text="Last 3 shown" /></td><td><Cell text="Full · 365 days" /></td><td><Cell text="Full · 90 days" /></td><td><Cell text="Full · unlimited" /></td></tr>
-                <tr className="pr-row"><td>Merge duplicates</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-cat"><th colSpan={5} scope="colgroup">Core</th></tr>
+                <tr className="pr-row"><th scope="row">Contacts</th><td>500</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+                <tr className="pr-row"><th scope="row">Advanced search</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Labels</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Import (CSV, vCard)</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Export (GDPR)</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Global activity feed</th><td><Cell /></td><td><Cell text="365 days" /></td><td><Cell text="90 days" /></td><td><Cell text="Unlimited" /></td></tr>
+                <tr className="pr-row"><th scope="row">Minimum events kept</th><td><Cell text="3 events" /></td><td><Cell text="25 events" /></td><td><Cell text="10 events" /></td><td><Cell text="All events" /></td></tr>
+                <tr className="pr-row"><th scope="row">Per-contact history</th><td><Cell text="Last 3 shown" /></td><td><Cell text="Full · 365 days" /></td><td><Cell text="Full · 90 days" /></td><td><Cell text="Full · unlimited" /></td></tr>
+                <tr className="pr-row"><th scope="row">Merge duplicates</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
 
                 {/* SYNC */}
-                <tr className="pr-cat"><td colSpan={5}>Sync</td></tr>
-                <tr className="pr-row"><td>CardDAV accounts</td><td><Cell text="1 account" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td></tr>
-                <tr className="pr-row"><td>Google Contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-cat"><th colSpan={5} scope="colgroup">Sync</th></tr>
+                <tr className="pr-row"><th scope="row">CardDAV accounts</th><td><Cell text="1 account" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td><td><Cell text="Up to 5" /></td></tr>
+                <tr className="pr-row"><th scope="row">Google Contacts</th><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 {outlookLive && (
-                  <tr className="pr-row"><td>Outlook</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                  <tr className="pr-row"><th scope="row">Outlook</th><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 )}
-                <tr className="pr-row"><td>iCloud (via CardDAV)</td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td></tr>
-                <tr className="pr-row"><td>Two-way sync</td><td><Cell text="CardDAV" /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">iCloud (via CardDAV)</th><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td><td><Cell text="CardDAV" /></td></tr>
+                <tr className="pr-row"><th scope="row">Two-way sync</th><td><Cell text="CardDAV" /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
 
                 {/* SHARING */}
-                <tr className="pr-cat"><td colSpan={5}>Sharing</td></tr>
-                <tr className="pr-row"><td>Public contact card</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Share individual contacts</td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Shared address book</td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Members</td><td><Cell /></td><td><Cell /></td><td><Cell text="Up to 6" /></td><td><Cell text="Unlimited" /></td></tr>
-                <tr className="pr-row"><td>Roles &amp; permissions</td><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Audit log</td><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
+                <tr className="pr-cat"><th colSpan={5} scope="colgroup">Sharing</th></tr>
+                <tr className="pr-row"><th scope="row">Public contact card</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Share individual contacts</th><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Shared address book</th><td><Cell /></td><td><Cell /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Members</th><td><Cell /></td><td><Cell /></td><td><Cell text="Up to 6" /></td><td><Cell text="Unlimited" /></td></tr>
+                <tr className="pr-row"><th scope="row">Roles &amp; permissions</th><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Audit log</th><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
 
                 {/* DEVELOPER */}
-                <tr className="pr-cat"><td colSpan={5}>Developer</td></tr>
-                <tr className="pr-row"><td>REST API</td><td><Cell /></td><td><Cell yes /></td><td><Cell /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>API rate limit</td><td><Cell /></td><td><Cell text="5k / day" /></td><td><Cell /></td><td><Cell text="20k / day" /></td></tr>
+                <tr className="pr-cat"><th colSpan={5} scope="colgroup">Developer</th></tr>
+                <tr className="pr-row"><th scope="row">REST API</th><td><Cell /></td><td><Cell yes /></td><td><Cell /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">API rate limit</th><td><Cell /></td><td><Cell text="5k / day" /></td><td><Cell /></td><td><Cell text="20k / day" /></td></tr>
 
                 {/* SUPPORT */}
-                <tr className="pr-cat"><td colSpan={5}>Support</td></tr>
-                <tr className="pr-row"><td>Help centre</td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><td>Email support</td><td><Cell /></td><td><Cell text="Standard" /></td><td><Cell text="Standard" /></td><td><Cell text="Priority" /></td></tr>
-                <tr className="pr-row"><td>Priority support</td><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
+                <tr className="pr-cat"><th colSpan={5} scope="colgroup">Support</th></tr>
+                <tr className="pr-row"><th scope="row">Help centre</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
+                <tr className="pr-row"><th scope="row">Email support</th><td><Cell /></td><td><Cell text="Standard" /></td><td><Cell text="Standard" /></td><td><Cell text="Priority" /></td></tr>
+                <tr className="pr-row"><th scope="row">Priority support</th><td><Cell /></td><td><Cell /></td><td><Cell /></td><td><Cell yes /></td></tr>
               </tbody>
             </table>
           </div>
@@ -165,32 +171,18 @@ export default async function PricingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="pr-faq-sec">
-        <div className="pr-wrap">
-          <div className="pr-faq-inner">
-            <h2 className="pr-faq-head">Frequently asked questions</h2>
-            <FaqList />
-            <p className="pr-faq-foot">
-              Still have questions? <Link href="/contact">Get in touch</Link>.
-            </p>
-          </div>
+      <section className="pr-sec pr-sec--last" id="faq">
+        <div className="mkt-container">
+          <SectionHead label="Billing questions" title="Frequently asked questions" />
+          <FaqList />
+          <p className="pr-faq-foot">
+            Still have questions? <Link href="/contact">Get in touch</Link>.
+          </p>
         </div>
       </section>
 
       {/* ── CTA band ── */}
-      <section className="mkt-cta-band">
-        <div className="mkt-cta-band__inner">
-          <h2 className="mkt-cta-band__title">Ready to get started?</h2>
-          <p className="mkt-cta-band__sub">Free plan, no credit card required.</p>
-          <Link className="mkt-cta-band__btn" href="/register">
-            Get started free
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h13" />
-              <path d="M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </div>
-      </section>
+      <CtaBand title="Ready to get started?" sub="Free plan, no credit card required." secondary={null} />
     </>
   );
 }

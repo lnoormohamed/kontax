@@ -1,6 +1,7 @@
-"use client";
+import { PlusIcon } from "../_components/mkt-ui";
 
-import { useState } from "react";
+// P50-04 · Billing FAQ on native <details>/<summary> (.mkt-faq), no client JS.
+// Copy unchanged from P49; the first answer starts open.
 
 const FAQS = [
   {
@@ -39,30 +40,17 @@ const FAQS = [
 ];
 
 export function FaqList() {
-  const [openIdx, setOpenIdx] = useState<number | null>(0);
-
   return (
-    <div className="pr-faq-list">
-      {FAQS.map((faq, i) => {
-        const isOpen = openIdx === i;
-        return (
-          <div key={i} className="pr-faq-item" data-open={isOpen ? "true" : "false"}>
-            <button
-              className="pr-faq-q"
-              aria-expanded={isOpen}
-              onClick={() => setOpenIdx(isOpen ? null : i)}
-            >
-              {faq.q}
-              <span className="pr-faq-sign" aria-hidden="true">{isOpen ? "−" : "+"}</span>
-            </button>
-            <div className="pr-faq-a">
-              <div className="pr-faq-a__inner">
-                <p className="pr-faq-a__text">{faq.a}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
+    <div className="mkt-faq">
+      {FAQS.map((faq) => (
+        <details key={faq.q} open={faq.defaultOpen}>
+          <summary>
+            {faq.q}
+            <PlusIcon size={20} />
+          </summary>
+          <div className="mkt-faq__a">{faq.a}</div>
+        </details>
+      ))}
     </div>
   );
 }

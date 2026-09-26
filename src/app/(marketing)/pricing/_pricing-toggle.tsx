@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 
 import { createCheckoutSession } from "~/app/actions/billing";
 import { useBillingPortal } from "~/app/_components/use-billing-portal";
+import { CheckIcon, PageHead } from "../_components/mkt-ui";
 
 export type StripePrices = {
   currency: string;
@@ -27,12 +28,6 @@ function savingsPct(monthly: number, annual: number): number {
   return Math.round((1 - annual / (monthly * 12)) * 100);
 }
 
-const CHECK = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M5 12.5l4.2 4.2L19 7" />
-  </svg>
-);
-
 interface PlanFeat { text: React.ReactNode }
 interface Plan {
   id: string;
@@ -51,7 +46,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     name: "Free",
     tag: "For personal use",
     sublabel: null,
-    cta: { label: "Get started free", href: "/register", variant: "filled" },
+    cta: { label: "Get started free", href: "/register", variant: "outline" },
     features: [
       { text: <>Up to <strong>500 contacts</strong></> },
       { text: "Labels & advanced search" },
@@ -64,8 +59,9 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     id: "pro",
     name: "Pro",
     tag: "For power users",
+    recommended: true,
     sublabel: { monthly: "billed monthly", annual: "billed annually" },
-    cta: { label: "Choose Pro", href: "/register?plan=pro", variant: "outline" },
+    cta: { label: "Choose Pro", href: "/register?plan=pro", variant: "filled" },
     features: [
       { text: <><strong>Unlimited</strong> contacts</> },
       { text: "Up to 5 CardDAV accounts" },
@@ -78,9 +74,8 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     id: "family",
     name: "Family",
     tag: "For households",
-    recommended: true,
     sublabel: { monthly: "billed monthly", annual: "billed annually" },
-    cta: { label: "Choose Family", href: "/register?plan=family", variant: "filled" },
+    cta: { label: "Choose Family", href: "/register?plan=family", variant: "outline" },
     features: [
       { text: <><strong>Unlimited</strong> contacts, up to 5 sync accounts</> },
       { text: "Family shared address book" },
@@ -143,12 +138,19 @@ function buildPlans(stripePrices: StripePrices | null, outlookLive: boolean): Pl
   }));
 }
 
+// P50-04: the tag on the highlighted card. A description, not a ranking
+// ("Most popular" was a claim we can't back up).
+const HIGHLIGHT_TAG = "Most flexible";
+
 export function PricingToggle({
   stripePrices,
   outlookLive = false,
+  head,
 }: {
   stripePrices?: StripePrices | null;
   outlookLive?: boolean;
+  /** Page head copy; the billing toggle sits under it (Direction A `.tog`). */
+  head: { label: string; title: string; lede: string };
 }) {
   // P38-10: the page renders statically; highlight the visitor's current
   // plan after hydration instead of forcing the whole page dynamic.
@@ -223,34 +225,22 @@ export function PricingToggle({
   return (
     <>
       {portal.modal}
-      {/* Billing toggle */}
-      <section className="pr-billing">
-        <div className="pr-toggle" role="tablist" aria-label="Billing period">
-          <button
-            className="pr-toggle__btn"
-            role="tab"
-            aria-selected={!annual}
-            onClick={() => setAnnual(false)}
-          >
+      {/* Page head + billing toggle */}
+      <PageHead center label={head.label} title={head.title} lede={head.lede}>
+        <div className="pr-tog" role="group" aria-label="Billing period">
+          <button type="button" aria-pressed={!annual} onClick={() => setAnnual(false)}>
             Monthly
           </button>
-          <button
-            className="pr-toggle__btn"
-            role="tab"
-            aria-selected={annual}
-            onClick={() => setAnnual(true)}
-          >
+          <button type="button" aria-pressed={annual} onClick={() => setAnnual(true)}>
             Annually
-            {toggleSavingsLabel ? (
-              <span className="pr-toggle__badge">{toggleSavingsLabel}</span>
-            ) : null}
+            {toggleSavingsLabel ? <span className="pr-tog__save">{toggleSavingsLabel}</span> : null}
           </button>
         </div>
-      </section>
+      </PageHead>
 
       {/* Plan cards */}
-      <section className="pr-plans">
-        <div className="pr-wrap">
+      <section className="mkt-band pr-plans" aria-label="Plans">
+        <div className="mkt-container">
           <div className="pr-grid">
             {PLANS.map((plan) => {
               const isFree = plan.price === "free";
@@ -263,68 +253,89 @@ export function PricingToggle({
               const sublabel = plan.sublabel
                 ? (annual ? plan.sublabel.annual : plan.sublabel.monthly)
                 : null;
+              const btnCls = `mkt-btn mkt-btn--${plan.cta.variant === "filled" ? "pri" : "sec"} mkt-btn--block pr-plan__cta`;
 
               return (
                 <article
                   key={plan.id}
-                  className={`pr-plan${plan.recommended ? " pr-plan--rec" : ""}`}
-                  aria-label={`${plan.name} plan${plan.recommended ? ", most popular" : ""}`}
+                  className={`mkt-plan pr-plan${plan.recommended ? " mkt-plan--hl" : ""}`}
+                  aria-labelledby={`plan-${plan.id}`}
                 >
-                  {plan.recommended && (
-                    <span className="pr-plan__badge">Most popular</span>
-                  )}
-                  <h3 className="pr-plan__name">{plan.name}</h3>
-                  <p className="pr-plan__tag">{plan.tag}</p>
+                  <div className="mkt-plan__top">
+                    <h2 className="mkt-plan__n" id={`plan-${plan.id}`}>
+                      {plan.name}
+                    </h2>
+                    {plan.recommended ? <span className="mkt-tag">{HIGHLIGHT_TAG}</span> : null}
+                  </div>
+                  <p className="mkt-plan__for">{plan.tag}</p>
 
-                  <div className="pr-plan__price">
-                    {isFree ? (
-                      <span className="pr-plan__free">Free</span>
-                    ) : (
-                      <>
-                        <span className="pr-plan__currency">{currencySymbol}</span>
-                        <span className="pr-plan__amount">{fmt(amount!)}</span>
-                        <span className="pr-plan__per">{isTeams ? (annual ? "/seat/yr" : "/seat/mo") : (annual ? "/yr" : "/mo")}</span>
-                        {showSave && <span className="pr-plan__save">Save {planSavingsPct}%</span>}
-                      </>
-                    )}
+                  <div className="pr-price">
+                    <p className="mkt-plan__pr">
+                      {isFree ? (
+                        <b>{currencySymbol}0</b>
+                      ) : (
+                        <>
+                          <b>
+                            {currencySymbol}
+                            {fmt(amount!)}
+                          </b>
+                          <span>{isTeams ? (annual ? "/seat/yr" : "/seat/mo") : (annual ? "/yr" : "/mo")}</span>
+                          {showSave && <span className="pr-save">Save {planSavingsPct}%</span>}
+                        </>
+                      )}
+                    </p>
+                    <p className="pr-price__bill">{sublabel ?? "No credit card required"}</p>
                   </div>
 
-                  <p className="pr-plan__sublabel">{sublabel ?? " "}</p>
+                  <ul>
+                    {plan.features.map((f, i) => (
+                      <li key={i}>
+                        <CheckIcon />
+                        <span>{f.text}</span>
+                      </li>
+                    ))}
+                  </ul>
 
                   {/* Seat picker + total — Teams only, not shown if already on Teams */}
                   {isTeams && !isCurrent && (
-                    <>
-                    <div className="pr-seat-picker">
-                      <button
-                        aria-label="Remove seat"
-                        className="pr-seat-picker__btn"
-                        disabled={teamSeats <= 3}
-                        onClick={() => setTeamSeats((s) => Math.max(3, s - 1))}
-                        type="button"
-                      >−</button>
-                      <span className="pr-seat-picker__count">{teamSeats} seats</span>
-                      <button
-                        aria-label="Add seat"
-                        className="pr-seat-picker__btn"
-                        onClick={() => setTeamSeats((s) => Math.min(500, s + 1))}
-                        type="button"
-                      >+</button>
+                    <div className="pr-seats">
+                      <div className="pr-seats__pick" role="group" aria-label="Seats">
+                        <button
+                          aria-label="Remove seat"
+                          className="pr-seats__btn"
+                          disabled={teamSeats <= 3}
+                          onClick={() => setTeamSeats((s) => Math.max(3, s - 1))}
+                          type="button"
+                        >
+                          −
+                        </button>
+                        <span className="pr-seats__count" aria-live="polite">
+                          {teamSeats} seats
+                        </span>
+                        <button
+                          aria-label="Add seat"
+                          className="pr-seats__btn"
+                          onClick={() => setTeamSeats((s) => Math.min(500, s + 1))}
+                          type="button"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p className="pr-seats__total">
+                        {currencySymbol}{fmt((amount ?? 0) * teamSeats)} / {annual ? "yr" : "mo"} total
+                      </p>
                     </div>
-                    <p className="pr-seat-total">
-                      {currencySymbol}{fmt((amount ?? 0) * teamSeats)} / {annual ? "yr" : "mo"} total
-                    </p>
-                    </>
                   )}
 
                   {isCurrent ? (
-                    <span className="pr-plan__cta pr-plan__cta--current">Current plan</span>
+                    <span className="mkt-btn mkt-btn--block pr-plan__cta pr-plan__cta--current">Current plan</span>
                   ) : isFree ? (
-                    <Link className={`pr-plan__cta pr-plan__cta--${plan.cta.variant}`} href={plan.cta.href}>
+                    <Link className={btnCls} href={plan.cta.href}>
                       {plan.cta.label}
                     </Link>
                   ) : (
                     <button
-                      className={`pr-plan__cta pr-plan__cta--${plan.cta.variant} disabled:opacity-60`}
+                      className={btnCls}
                       disabled={loading === plan.id}
                       onClick={() => handlePaidCta(plan.id)}
                       type="button"
@@ -332,24 +343,13 @@ export function PricingToggle({
                       {loading === plan.id ? "Loading…" : plan.cta.label}
                     </button>
                   )}
-
-                  <div className="pr-plan__divider" />
-
-                  <ul className="pr-plan__features">
-                    {plan.features.map((f, i) => (
-                      <li key={i} className="pr-plan__feat">
-                        {CHECK}
-                        {f.text}
-                      </li>
-                    ))}
-                  </ul>
                 </article>
               );
             })}
           </div>
           {ctaError ? (
-            <p className="mt-6 flex items-center justify-center gap-2 text-[13.5px] text-[#9a3a23]">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b5472f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <p className="pr-err" role="alert">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" />
               </svg>
               {ctaError}
