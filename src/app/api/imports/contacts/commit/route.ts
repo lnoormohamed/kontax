@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           message:
-            "This import has already been run. Check your contacts, or choose the file again to start a new import.",
+            "This import is already running or has finished. Check your contacts, or choose the file again to start a new import.",
         },
         { status: 409 },
       );
