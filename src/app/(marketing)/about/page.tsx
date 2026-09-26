@@ -26,9 +26,25 @@ export const metadata: Metadata = {
   },
 };
 
-// P50-05 · Direction A layout over the existing About copy — restyled, not
-// rewritten. The ticket's "why Kontax exists" section waits for owner-supplied
-// copy (no invented history, team or numbers), so it is deliberately absent.
+// P50-05 · Direction A layout over the existing About copy. "Why Kontax
+// exists" (§02) is a draft for owner approval: it states only facts the site
+// already makes and verifies elsewhere (subscription-funded, no ads or
+// tracking, CardDAV/vCard, export any time, no app to install) — no invented
+// history, team or numbers.
+const PRINCIPLES: { title: string; body: string }[] = [
+  {
+    title: "Your contacts aren’t the product",
+    body: "Kontax is paid for by subscriptions. No ads, no tracking, and your address book is never sold, rented or used to profile anyone in it.",
+  },
+  {
+    title: "Work with what you already use",
+    body: "On iPhone and Mac, Kontax appears inside the Contacts app you already have. There’s nothing new to install and nothing to learn.",
+  },
+  {
+    title: "Easy to leave, on purpose",
+    body: "Kontax speaks CardDAV and vCard, the standards your other apps use. Export everything whenever you like, in a documented format.",
+  },
+];
 const PROMISES: { title: string; href: string; link: string }[] = [
   { title: "Syncs to your devices", href: "/features", link: "See features" },
   { title: "Stays private", href: "/security", link: "How we protect it" },
@@ -64,10 +80,37 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mkt-band mkt-band--stone ab-band" aria-labelledby="ab-fix">
+      <section className="mkt-band mkt-band--stone ab-band" aria-labelledby="ab-why">
         <div className="mkt-container">
           <SectionHead
             n="02"
+            label="Why Kontax exists"
+            id="ab-why"
+            title="Your contacts shouldn’t depend on which phone you bought"
+            lede={
+              <>
+                Most people&rsquo;s contacts are split between a phone, a Google account and an
+                email provider, and each one only really looks after its own copy. Kontax exists to
+                be the one place they agree, without asking you to switch phones, install another
+                app or hand your address book to an advertiser.
+              </>
+            }
+          />
+          <ul className="ab-principles">
+            {PRINCIPLES.map((p) => (
+              <li key={p.title}>
+                <h3>{p.title}</h3>
+                <p>{p.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="mkt-band ab-band" aria-labelledby="ab-fix">
+        <div className="mkt-container">
+          <SectionHead
+            n="03"
             label="What Kontax does"
             id="ab-fix"
             title="Kontax fixes that."
@@ -95,7 +138,7 @@ export default function AboutPage() {
       <section className="mkt-band ab-band" aria-labelledby="ab-maker">
         <div className="mkt-container">
           <SectionHead
-            n="03"
+            n="04"
             label="Who makes it"
             id="ab-maker"
             title={

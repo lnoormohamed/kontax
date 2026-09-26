@@ -21,6 +21,19 @@
 .mkt-band--stone .ab-card { border-color: var(--mkt-stone-line); }
 .ab-card__more { align-self: flex-start; min-height: 44px; }
 
+/* §02 principles: three columns on a hairline, like the homepage facts */
+.ab-principles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 48px;
+  margin: 56px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ab-principles li { padding-top: 24px; border-top: 1px solid var(--mkt-head); }
+.ab-principles h3 { margin: 0; font: 600 17px/1.35 var(--mkt-sans); color: var(--mkt-head); text-wrap: pretty; }
+.ab-principles p { margin: 8px 0 0; font-size: 15px; line-height: 1.6; color: var(--mkt-body); text-wrap: pretty; }
+
 /* Vexon link inside the h2: underline so it reads as a link at display size */
 .ab-maker {
   color: var(--mkt-g800);
@@ -31,6 +44,7 @@
 .ab-maker:hover { color: var(--mkt-g600); }
 
 @media (max-width: 980px) {
+  .ab-principles { grid-template-columns: 1fr; gap: 28px; margin-top: 40px; }
   .ab-cards { grid-template-columns: 1fr; gap: 12px; margin-top: 40px; }
   .ab-card { min-height: 0; gap: 16px; }
 }

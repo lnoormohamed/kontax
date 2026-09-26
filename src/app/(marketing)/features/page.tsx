@@ -127,7 +127,7 @@ const MORE: { icon: keyof typeof GRID_ICONS; title: string; body: string }[] = [
   {
     icon: "list",
     title: "Smart lists",
-    body: "Save a combination of search, label and book filters, and recall it with one click. On Pro.",
+    body: "Save a combination of search, label and book filters, and recall it with one click.",
   },
   {
     icon: "device",
