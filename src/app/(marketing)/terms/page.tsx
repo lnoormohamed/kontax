@@ -45,8 +45,11 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="doc-wrap">
-      <h1 className="doc-title">Terms of Service</h1>
-      <p className="doc-meta">Last updated: {LAST_UPDATED_LABEL}</p>
+      <header className="doc-head">
+        <p className="mkt-lab">Legal</p>
+        <h1 className="doc-title">Terms of Service</h1>
+        <p className="doc-meta">Last updated: {LAST_UPDATED_LABEL}</p>
+      </header>
 
       <div className="doc-body">
 

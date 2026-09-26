@@ -1,111 +1,85 @@
 /* ════════════════════════════════════════════════════════════════
-   Shared prose document layout (Privacy, Terms, About)
-   Prefix: doc-  (tokens come from .mkt-wrap in marketing.css)
+   Shared prose document layout (Privacy, Terms)
+   Prefix: doc-  · P50-05: colours and type moved onto the Direction A
+   --mkt-* tokens and type scale; the single-column document layout is
+   unchanged. Scoped to .mkt-wrap so it can never leak into the older
+   `.kx .doc-*` rules in public-site.css during client-side navigation.
    ════════════════════════════════════════════════════════════════ */
 
-.doc-wrap {
+.mkt-wrap .doc-wrap {
   max-width: 768px;
   margin: 0 auto;
-  padding: 72px 24px 96px;
+  padding: var(--mkt-space-md) 24px var(--mkt-space-lg);
 }
 
-.doc-wrap--center { text-align: center; }
+.mkt-wrap .doc-head {
+  padding-bottom: 32px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--mkt-line);
+}
 
-.doc-title {
-  margin: 0;
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--mkt-green);
-  line-height: 1.1;
+.mkt-wrap .doc-title {
+  margin: 16px 0 0;
+  font: var(--mkt-h2);
+  letter-spacing: var(--mkt-h2-ls);
+  color: var(--mkt-head);
   text-wrap: balance;
 }
 
-.doc-meta {
-  margin: 10px 0 40px;
-  font-size: 14px;
+.mkt-wrap .doc-meta {
+  margin: 20px 0 0;
+  font: var(--mkt-label);
   color: var(--mkt-mute);
 }
 
-.doc-body {
-  font-size: 16px;
-  line-height: 1.8;
+.mkt-wrap .doc-body {
+  font-size: 16.5px;
+  line-height: 1.75;
   color: var(--mkt-body);
 }
 
-.doc-body h2 {
+.mkt-wrap .doc-body h2 {
   margin: 48px 0 12px;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--mkt-ink);
+  font: var(--mkt-h4);
   letter-spacing: -0.01em;
-  line-height: 1.25;
+  color: var(--mkt-head);
+  scroll-margin-top: calc(var(--mkt-nav-h) + 16px);
 }
 
-.doc-body p {
+.mkt-wrap .doc-body h2:first-child { margin-top: 0; }
+
+.mkt-wrap .doc-body p {
   margin: 0 0 16px;
   text-wrap: pretty;
 }
 
-.doc-body ul,
-.doc-body ol {
+.mkt-wrap .doc-body ul,
+.mkt-wrap .doc-body ol {
   margin: 0 0 16px;
   padding-left: 22px;
 }
 
-.doc-body li {
-  margin-bottom: 6px;
+.mkt-wrap .doc-body ul { list-style: disc; }
+.mkt-wrap .doc-body ol { list-style: decimal; }
+.mkt-wrap .doc-body li { margin-bottom: 6px; }
+.mkt-wrap .doc-body li::marker { color: var(--mkt-g400); }
+
+.mkt-wrap .doc-body a {
+  color: var(--mkt-g800);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--mkt-g200);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
 }
 
-.doc-body a {
-  color: var(--mkt-accent);
-  text-decoration: none;
-}
+.mkt-wrap .doc-body a:hover { text-decoration-color: currentColor; }
 
-.doc-body a:hover { text-decoration: underline; }
-
-.doc-body strong { font-weight: 600; color: var(--mkt-ink); }
-
-.doc-divider {
-  margin: 40px 0 0;
-  padding-top: 40px;
-  border-top: 1px solid var(--mkt-hairline);
-  font-size: 15px;
-  color: var(--mkt-mute);
-}
-
-.doc-divider a {
-  color: var(--mkt-ink);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.doc-divider a:hover { color: var(--mkt-green); }
-
-.doc-cta {
-  margin-top: 48px;
-}
-
-.doc-cta__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 48px;
-  padding: 0 32px;
-  background: var(--mkt-green);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: background 0.15s ease;
-}
-
-.doc-cta__btn:hover { background: var(--mkt-green-deep); }
+.mkt-wrap .doc-body strong { font-weight: 600; color: var(--mkt-ink); }
 
 @media (max-width: 767px) {
-  .doc-wrap { padding: 48px 20px 72px; }
-  .doc-title { font-size: 28px; }
-  .doc-body h2 { font-size: 18px; margin-top: 36px; }
-  .doc-cta__btn { width: 100%; }
+  .mkt-wrap .doc-wrap { padding: 56px var(--mkt-pad) var(--mkt-space-sm); }
+  .mkt-wrap .doc-head { padding-bottom: 24px; margin-bottom: 32px; }
+  .mkt-wrap .doc-body { font-size: 16px; }
+  .mkt-wrap .doc-body h2 { font-size: 20px; margin-top: 36px; }
 }

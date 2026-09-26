@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { ArrowIcon } from "../_components/mkt-ui";
+
 type Subject = "general" | "billing" | "technical" | "feature" | "security";
 
 const SUBJECTS: { value: Subject; label: string }[] = [
@@ -69,7 +71,8 @@ export function ContactForm() {
           Thanks for reaching out. We&apos;ll get back to you within 1 business day.
         </p>
         <button
-          className="ct-btn"
+          className="mkt-btn mkt-btn--sec ct-btn"
+          type="button"
           onClick={() => setStatus("idle")}
         >
           Send another message
@@ -125,6 +128,7 @@ export function ContactForm() {
           required
           value={subject}
           onChange={(e) => setSubject(e.target.value as Subject)}
+          aria-describedby={subject === "security" ? "ct-subject-note" : undefined}
         >
           <option value="" disabled>Choose one…</option>
           {SUBJECTS.map((s) => (
@@ -132,7 +136,7 @@ export function ContactForm() {
           ))}
         </select>
         {subject === "security" && (
-          <p className="ct-field__note">
+          <p className="ct-field__note" id="ct-subject-note">
             For security vulnerabilities, you may also email{" "}
             <a href="mailto:security@getkontax.com">security@getkontax.com</a>{" "}
             directly.
@@ -158,11 +162,18 @@ export function ContactForm() {
       )}
 
       <button
-        className="ct-btn"
+        className="mkt-btn mkt-btn--pri ct-btn"
         type="submit"
         disabled={status === "submitting"}
       >
-        {status === "submitting" ? "Sending…" : "Send message →"}
+        {status === "submitting" ? (
+          "Sending…"
+        ) : (
+          <>
+            Send message
+            <ArrowIcon />
+          </>
+        )}
       </button>
     </form>
   );

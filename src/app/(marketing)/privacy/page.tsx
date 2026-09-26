@@ -49,8 +49,11 @@ export default function PrivacyPage() {
 
   return (
     <div className="doc-wrap">
-      <h1 className="doc-title">Privacy Policy</h1>
-      <p className="doc-meta">Last updated: {LAST_UPDATED_LABEL}</p>
+      <header className="doc-head">
+        <p className="mkt-lab">Legal</p>
+        <h1 className="doc-title">Privacy Policy</h1>
+        <p className="doc-meta">Last updated: {LAST_UPDATED_LABEL}</p>
+      </header>
 
       <div className="doc-body">
 
@@ -218,7 +221,7 @@ export default function PrivacyPage() {
           </li>
         </ul>
 
-        <h2>7. Cookies</h2>
+        <h2 id="cookies">7. Cookies</h2>
         <p>
           We use one session cookie (<code>next-auth.session-token</code>) to
           keep you logged in. This is a strictly necessary cookie — no consent

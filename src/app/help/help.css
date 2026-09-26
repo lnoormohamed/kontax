@@ -1,0 +1,269 @@
+/* ════════════════════════════════════════════════════════════════
+   /help — P50-05 · Direction A chrome and type on the existing docs
+   layout (single 760px column: provider guides, then searchable FAQ).
+   Replaces the `.kx .help-*` rules this page used from public-site.css.
+   Those rules are left untouched (public-site.css still serves /share and
+   /u) but no longer apply here: the page no longer renders inside `.kx`.
+   Everything is scoped to .mkt-wrap and uses the --mkt-* tokens.
+   Markup: help/page.tsx, _components/help-provider-guides.tsx,
+   _components/help-faq.tsx.
+   ════════════════════════════════════════════════════════════════ */
+
+.mkt-wrap .help-wrap {
+  max-width: 808px; /* 760px column + side padding */
+  margin: 0 auto;
+  padding: var(--mkt-space-md) 24px var(--mkt-space-lg);
+}
+
+/* ─── Page head ─────────────────────────────────────────────────── */
+.mkt-wrap .help-head {
+  padding-bottom: 32px;
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--mkt-line);
+}
+.mkt-wrap .help-h1 {
+  margin: 16px 0 0;
+  font: var(--mkt-h2);
+  letter-spacing: var(--mkt-h2-ls);
+  color: var(--mkt-head);
+  text-wrap: balance;
+}
+.mkt-wrap .help-lede {
+  margin: 16px 0 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+  text-wrap: pretty;
+}
+.mkt-wrap .help-wrap a.inline {
+  color: var(--mkt-g800);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--mkt-g200);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.mkt-wrap .help-wrap a.inline:hover { text-decoration-color: currentColor; }
+
+/* ─── Pills (provider rail + topic nav) ─────────────────────────── */
+.mkt-wrap .help-guides__rail,
+.mkt-wrap .help-topic-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mkt-wrap .help-guides__rail { margin-bottom: 20px; }
+.mkt-wrap .help-topic-nav { margin-bottom: 20px; }
+.mkt-wrap .help-guide-pill,
+.mkt-wrap .help-topic-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--mkt-line-strong);
+  border-radius: 999px;
+  background: var(--mkt-card);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mkt-body);
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.mkt-wrap .help-guide-pill:hover,
+.mkt-wrap .help-topic-pill:hover {
+  border-color: var(--mkt-g800);
+  color: var(--mkt-g800);
+}
+
+/* ─── Provider guides ───────────────────────────────────────────── */
+.mkt-wrap .help-guides { margin-bottom: 64px; }
+.mkt-wrap .help-guides__head { margin-bottom: 24px; }
+.mkt-wrap .help-guides .eyebrow {
+  margin: 0;
+  font: var(--mkt-label);
+  color: var(--mkt-g600);
+}
+.mkt-wrap .help-guides__title {
+  margin: 12px 0 0;
+  font: var(--mkt-h3);
+  letter-spacing: var(--mkt-h2-ls);
+  color: var(--mkt-head);
+  text-wrap: balance;
+}
+.mkt-wrap .help-guides__lede {
+  margin: 12px 0 0;
+  max-width: 680px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+}
+.mkt-wrap .help-guides__grid { display: grid; gap: 16px; }
+.mkt-wrap .help-guide-card {
+  padding: 28px;
+  border: 1px solid var(--mkt-line-strong);
+  border-radius: 14px;
+  background: var(--mkt-card);
+  scroll-margin-top: calc(var(--mkt-nav-h) + 16px);
+}
+.mkt-wrap .help-guide-card__title {
+  margin: 0;
+  font: var(--mkt-h4);
+  color: var(--mkt-head);
+}
+.mkt-wrap .help-guide-card__summary {
+  margin: 8px 0 0;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+}
+.mkt-wrap .help-guide-card__body {
+  display: grid;
+  gap: 20px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--mkt-line);
+}
+.mkt-wrap .help-guide-list h3 {
+  margin: 0 0 10px;
+  font: var(--mkt-label);
+  color: var(--mkt-g600);
+}
+.mkt-wrap .help-guide-list ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+.mkt-wrap .help-guide-list li {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+}
+.mkt-wrap .help-guide-list li::marker { color: var(--mkt-g400); }
+
+/* ─── Search ────────────────────────────────────────────────────── */
+.mkt-wrap .help-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0 0 40px;
+  padding: 0 4px 0 14px;
+  border: 1.5px solid var(--mkt-line-strong);
+  border-radius: var(--mkt-r-btn);
+  background: var(--mkt-card);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.mkt-wrap .help-search:hover { border-color: var(--mkt-g400); }
+.mkt-wrap .help-search:focus-within {
+  border-color: var(--mkt-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mkt-focus) 20%, transparent);
+}
+.mkt-wrap .help-search > svg { flex: 0 0 auto; stroke: var(--mkt-mute); }
+/* font-size must stay >= 16px: iOS Safari zooms on focus below that. */
+.mkt-wrap .help-search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: 400 16px/1.4 var(--mkt-sans);
+  color: var(--mkt-ink);
+}
+/* the field's border + ring is the focus indicator */
+.mkt-wrap .help-search input:focus-visible { outline: none; }
+.mkt-wrap .help-search input::placeholder { color: var(--mkt-mute); opacity: 1; }
+.mkt-wrap .help-search input::-webkit-search-cancel-button { display: none; }
+.mkt-wrap .help-search__clear {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--mkt-r-sm);
+  background: transparent;
+  color: var(--mkt-mute);
+  cursor: pointer;
+}
+.mkt-wrap .help-search__clear:hover { background: var(--mkt-line2); color: var(--mkt-ink); }
+
+/* ─── FAQ sections ──────────────────────────────────────────────── */
+.mkt-wrap .help-sections { display: grid; gap: 48px; }
+.mkt-wrap .help-section { scroll-margin-top: calc(var(--mkt-nav-h) + 16px); }
+.mkt-wrap .help-sectitle {
+  margin: 0 0 12px;
+  font: var(--mkt-h4);
+  color: var(--mkt-head);
+}
+.mkt-wrap .help-list { display: grid; }
+.mkt-wrap .help-faq-item { border-top: 1px solid var(--mkt-line); }
+.mkt-wrap .help-faq-item:last-child { border-bottom: 1px solid var(--mkt-line); }
+.mkt-wrap .help-faq-q {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 14px 2px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--mkt-head);
+}
+.mkt-wrap .help-faq-q::-webkit-details-marker { display: none; }
+.mkt-wrap .help-faq-q:hover { color: var(--mkt-g600); }
+.mkt-wrap .help-faq-chev {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--mkt-g600);
+  transition: transform 0.16s ease;
+}
+.mkt-wrap .help-faq-item[open] .help-faq-chev { transform: rotate(90deg); }
+.mkt-wrap .help-faq-a {
+  padding: 0 2px 20px 26px;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--mkt-body);
+  text-wrap: pretty;
+}
+.mkt-wrap .help-noresult { padding: 40px 0; text-align: center; }
+.mkt-wrap .help-noresult__title { margin: 0; font-size: 16px; font-weight: 600; color: var(--mkt-head); }
+.mkt-wrap .help-noresult__sub { margin: 6px 0 0; font-size: 15px; color: var(--mkt-body); }
+
+/* ─── Sign-off ──────────────────────────────────────────────────── */
+.mkt-wrap .help-foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 64px;
+  padding-top: 28px;
+  border-top: 1px solid var(--mkt-line);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--mkt-body);
+}
+.mkt-wrap .help-foot__k {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--mkt-g800);
+  color: #dff0e7; /* brand tile ink, as .mkt-brand__k */
+  font: 700 17px/1 var(--mkt-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-wrap .help-faq-chev { transition: none; }
+}
+@media (max-width: 767px) {
+  .mkt-wrap .help-wrap { padding: 56px var(--mkt-pad) var(--mkt-space-sm); }
+  .mkt-wrap .help-lede { font-size: 16.5px; }
+  .mkt-wrap .help-guide-card { padding: 22px 20px; }
+  .mkt-wrap .help-foot { align-items: flex-start; }
+}

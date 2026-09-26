@@ -6,9 +6,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { PublicFooter } from "~/app/_components/public-footer";
-import { PublicNav } from "~/app/_components/public-nav";
-import "~/app/_components/public-site.css";
+import { MarketingFooter } from "~/app/(marketing)/_components/marketing-footer";
+import { MarketingNav } from "~/app/(marketing)/_components/marketing-nav";
+import "~/app/(marketing)/_components/marketing.css";
+import "./developers.css";
 
 // Mirrors getkontax.com:formatVersion (see open-format/ — the canonical repo).
 const FORMAT_VERSION = "1.0";
@@ -25,40 +26,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "/developers" },
 };
 
+// P50-05 · these docs helpers were inline-styled with pre-P50 colours; they
+// now carry classes styled on the --mkt-* tokens in developers.css.
 function Code({ children }: { children: string }) {
-  return (
-    <code
-      style={{
-        background: "#f4f4f5",
-        borderRadius: 5,
-        padding: "1px 6px",
-        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-        fontSize: "0.9em",
-        color: "#1d2823",
-      }}
-    >
-      {children}
-    </code>
-  );
+  return <code className="dev-code">{children}</code>;
 }
 
 function CodeBlock({ children, lang = "bash" }: { children: string; lang?: string }) {
   void lang;
   return (
-    <pre
-      style={{
-        background: "#1d2823",
-        color: "#d4f0e0",
-        borderRadius: 10,
-        padding: "16px 20px",
-        overflowX: "auto",
-        fontSize: 13,
-        lineHeight: 1.65,
-        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-        margin: "12px 0 20px",
-        whiteSpace: "pre",
-      }}
-    >
+    <pre className="dev-pre">
       <code>{children}</code>
     </pre>
   );
@@ -74,77 +51,29 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} style={{ marginBottom: 56 }}>
-      <h2
-        style={{
-          fontSize: 22,
-          fontWeight: 700,
-          color: "#1d2823",
-          letterSpacing: "-0.01em",
-          marginBottom: 16,
-          paddingTop: 8,
-          borderTop: "1px solid #e4e4e7",
-        }}
-      >
-        {title}
-      </h2>
+    <section id={id} className="dev-section">
+      <h2 className="dev-h2">{title}</h2>
       {children}
     </section>
   );
 }
 
 function H3({ children }: { children: React.ReactNode }) {
-  return (
-    <h3
-      style={{
-        fontSize: 16,
-        fontWeight: 700,
-        color: "#1d2823",
-        marginBottom: 8,
-        marginTop: 28,
-      }}
-    >
-      {children}
-    </h3>
-  );
+  return <h3 className="dev-h3">{children}</h3>;
 }
 
 function P({ children }: { children: React.ReactNode }) {
-  return (
-    <p style={{ fontSize: 14.5, lineHeight: 1.7, color: "#5c655e", marginBottom: 12 }}>
-      {children}
-    </p>
-  );
+  return <p className="dev-p">{children}</p>;
 }
 
 function Table({ headers, rows }: { headers: string[]; rows: (string | React.ReactNode)[][] }) {
   return (
-    <div style={{ overflowX: "auto", marginBottom: 20 }}>
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          fontSize: 13.5,
-          color: "#3a4540",
-        }}
-      >
+    <div className="dev-table-scroll">
+      <table className="dev-table">
         <thead>
-          <tr style={{ background: "#f4f4f5" }}>
+          <tr>
             {headers.map((h) => (
-              <th
-                key={h}
-                style={{
-                  textAlign: "left",
-                  padding: "8px 12px",
-                  fontWeight: 700,
-                  fontSize: 12,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "#8b938c",
-                  borderBottom: "1px solid #e4e4e7",
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <th key={h} scope="col">
                 {h}
               </th>
             ))}
@@ -152,14 +81,9 @@ function Table({ headers, rows }: { headers: string[]; rows: (string | React.Rea
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} style={{ borderBottom: "1px solid #f0f3ef" }}>
+            <tr key={i}>
               {row.map((cell, j) => (
-                <td
-                  key={j}
-                  style={{ padding: "9px 12px", verticalAlign: "top", lineHeight: 1.5 }}
-                >
-                  {cell}
-                </td>
+                <td key={j}>{cell}</td>
               ))}
             </tr>
           ))}
@@ -169,30 +93,18 @@ function Table({ headers, rows }: { headers: string[]; rows: (string | React.Rea
   );
 }
 
+// Verb colours are fixed per method in developers.css (not brand fills).
 function MethodBadge({ method }: { method: string }) {
-  const colors: Record<string, string> = {
-    GET: "#1d6fa4",
-    POST: "#1a7a40",
-    PUT: "#7a5c1a",
-    DELETE: "#9a3a23",
-  };
+  return <span className={`dev-method dev-method--${method.toLowerCase()}`}>{method}</span>;
+}
+
+// An endpoint's "METHOD /path" line.
+function Endpoint({ method, path }: { method: string; path: string }) {
   return (
-    <span
-      style={{
-        display: "inline-block",
-        background: colors[method] ?? "#5c655e",
-        color: "#fff",
-        borderRadius: 5,
-        padding: "2px 8px",
-        fontSize: 12,
-        fontWeight: 700,
-        letterSpacing: "0.04em",
-        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-        marginRight: 10,
-      }}
-    >
-      {method}
-    </span>
+    <div className="dev-endpoint__line">
+      <MethodBadge method={method} />
+      <code className="dev-endpoint__path">{path}</code>
+    </div>
   );
 }
 
@@ -218,120 +130,52 @@ const TOC_ITEMS = [
   { href: "#format-validate", label: "  Schemas & validator" },
 ];
 
+// P50-05 · Direction A chrome: the page stays outside the (marketing) route
+// group (URL, metadata and the root title template are unchanged) but renders
+// the same `.mkt-wrap` + MarketingNav/MarketingFooter shell as that group's
+// layout. The two-column docs layout (sticky contents + article) is kept.
 export default function DevelopersPage() {
-
   return (
-    <div className="kx">
-      <PublicNav />
+    <div className="mkt-wrap">
+      <MarketingNav />
 
-      <div
-        style={{
-          maxWidth: 1100,
-          margin: "0 auto",
-          padding: "48px 24px 80px",
-          display: "grid",
-          gridTemplateColumns: "200px 1fr",
-          gap: 48,
-          alignItems: "start",
-        }}
-      >
+      <div className="dev-layout">
         {/* Sticky TOC sidebar */}
-        <nav
-          style={{
-            position: "sticky",
-            top: 80,
-            fontSize: 13,
-            lineHeight: 1.7,
-          }}
-          className="dev-toc"
-        >
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "#8b938c",
-              marginBottom: 10,
-            }}
-          >
-            On this page
-          </p>
-          {TOC_ITEMS.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              style={{
-                display: "block",
-                color: item.label.startsWith("  ") ? "#8b938c" : "#5c655e",
-                padding: "2px 0",
-                paddingLeft: item.label.startsWith("  ") ? 12 : 0,
-                fontSize: item.label.startsWith("  ") ? 12.5 : 13,
-                fontFamily: item.label.startsWith("  ")
-                  ? "ui-monospace, SFMono-Regular, Menlo, monospace"
-                  : "inherit",
-                textDecoration: "none",
-                transition: "color 0.1s",
-              }}
-            >
-              {item.label.trim()}
-            </a>
-          ))}
+        <nav className="dev-toc" aria-label="On this page">
+          <p className="dev-toc__title">On this page</p>
+          {TOC_ITEMS.map((item) => {
+            const sub = item.label.startsWith("  ");
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className={sub ? "dev-toc__link dev-toc__link--sub" : "dev-toc__link"}
+              >
+                {item.label.trim()}
+              </a>
+            );
+          })}
         </nav>
 
         {/* Main content */}
-        <main style={{ minWidth: 0 }}>
+        <main className="dev-main">
           {/* Page header */}
-          <div style={{ marginBottom: 48 }}>
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.14em",
-                color: "#8b938c",
-                marginBottom: 8,
-              }}
-            >
-              Developer documentation
-            </p>
-            <h1
-              style={{
-                fontSize: 34,
-                fontWeight: 800,
-                letterSpacing: "-0.02em",
-                color: "#1d2823",
-                marginBottom: 12,
-              }}
-            >
-              Kontax API v1
-            </h1>
-            <p style={{ fontSize: 15.5, lineHeight: 1.7, color: "#5c655e", maxWidth: 600 }}>
+          <header className="dev-head">
+            <p className="mkt-lab">Developer documentation</p>
+            <h1 className="dev-h1">Kontax API v1</h1>
+            <p className="dev-lede">
               Read and write your contacts programmatically. All API requests are authenticated
               with a Bearer token created in{" "}
-              <Link href="/settings/developer" style={{ color: "#4158f4" }}>
+              <Link href="/settings/developer">
                 Settings → Developer
               </Link>
               .
             </p>
-            <div
-              style={{
-                marginTop: 16,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                background: "#f4f4f5",
-                borderRadius: 8,
-                padding: "8px 14px",
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                fontSize: 13.5,
-                color: "#1d2823",
-              }}
-            >
-              <span style={{ color: "#8b938c" }}>Base URL</span>
+            <div className="dev-baseurl">
+              <span className="dev-baseurl__k">Base URL</span>
               https://api.getkontax.com/v1
             </div>
-          </div>
+          </header>
 
           {/* Introduction */}
           <Section id="introduction" title="Introduction">
@@ -350,7 +194,7 @@ export default function DevelopersPage() {
           <Section id="authentication" title="Authentication">
             <P>
               Generate an API token in{" "}
-              <Link href="/settings/developer" style={{ color: "#4158f4" }}>
+              <Link href="/settings/developer">
                 Settings → Developer
               </Link>{" "}
               and include it as a Bearer token on every request:
@@ -374,20 +218,8 @@ export default function DevelopersPage() {
           </Section>
 
           {/* GET /contacts */}
-          <section id="get-contacts" style={{ marginBottom: 48 }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-              <MethodBadge method="GET" />
-              <code
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                  color: "#1d2823",
-                }}
-              >
-                /contacts
-              </code>
-            </div>
+          <section id="get-contacts" className="dev-endpoint">
+            <Endpoint method="GET" path="/contacts" />
             <P>List contacts. Returns up to 100 per page, ordered by full name.</P>
             <H3>Query parameters</H3>
             <Table
@@ -428,20 +260,8 @@ export default function DevelopersPage() {
           </section>
 
           {/* POST /contacts */}
-          <section id="post-contacts" style={{ marginBottom: 48 }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-              <MethodBadge method="POST" />
-              <code
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                  color: "#1d2823",
-                }}
-              >
-                /contacts
-              </code>
-            </div>
+          <section id="post-contacts" className="dev-endpoint">
+            <Endpoint method="POST" path="/contacts" />
             <P>
               Create a contact. Requires a <strong>read-write</strong> token. At least one of{" "}
               <Code>firstName</Code>, <Code>lastName</Code>, <Code>fullName</Code>, or{" "}
@@ -487,20 +307,8 @@ export default function DevelopersPage() {
           </section>
 
           {/* GET /contacts/:id */}
-          <section id="get-contact" style={{ marginBottom: 48 }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-              <MethodBadge method="GET" />
-              <code
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                  color: "#1d2823",
-                }}
-              >
-                /contacts/:id
-              </code>
-            </div>
+          <section id="get-contact" className="dev-endpoint">
+            <Endpoint method="GET" path="/contacts/:id" />
             <P>Fetch a single contact by ID.</P>
             <CodeBlock lang="bash">{`curl -H "Authorization: Bearer ktx_live_..." \\
   "https://api.getkontax.com/v1/contacts/clx7a..."`}</CodeBlock>
@@ -511,20 +319,8 @@ export default function DevelopersPage() {
           </section>
 
           {/* PUT /contacts/:id */}
-          <section id="put-contact" style={{ marginBottom: 48 }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-              <MethodBadge method="PUT" />
-              <code
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                  color: "#1d2823",
-                }}
-              >
-                /contacts/:id
-              </code>
-            </div>
+          <section id="put-contact" className="dev-endpoint">
+            <Endpoint method="PUT" path="/contacts/:id" />
             <P>
               Update a contact. Requires a <strong>read-write</strong> token. Only fields included
               in the request body are updated — omitted fields are left unchanged (PATCH semantics
@@ -543,20 +339,8 @@ export default function DevelopersPage() {
           </section>
 
           {/* DELETE /contacts/:id */}
-          <section id="delete-contact" style={{ marginBottom: 48 }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-              <MethodBadge method="DELETE" />
-              <code
-                style={{
-                  fontSize: 16,
-                  fontWeight: 600,
-                  fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                  color: "#1d2823",
-                }}
-              >
-                /contacts/:id
-              </code>
-            </div>
+          <section id="delete-contact" className="dev-endpoint">
+            <Endpoint method="DELETE" path="/contacts/:id" />
             <P>
               Archive a contact (soft delete). The contact is hidden from the contacts list but
               remains in the database. Add <Code>?permanent=true</Code> to hard-delete immediately
@@ -728,16 +512,16 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
               Kontax exports contacts in an <strong>open, documented format</strong> so your data is
               never locked in. One JSON document describes one contact; an archive is packaging
               around many of them plus their photos. The format is{" "}
-              <a href={FORMAT_REPO_URL} style={{ color: "#4158f4" }} target="_blank" rel="noreferrer">
+              <a href={FORMAT_REPO_URL} target="_blank" rel="noreferrer">
                 developed in the open
               </a>{" "}
               — this section is the reference; the canonical spec, JSON Schemas, and a reference
               validator live in that repository (also mirrored under{" "}
-              <a href="/format/spec.md" style={{ color: "#4158f4" }}>/format</a> on this site).
+              <a href="/format/spec.md">/format</a> on this site).
             </P>
             <P>
               The base standard is{" "}
-              <a href="https://www.rfc-editor.org/rfc/rfc9553" style={{ color: "#4158f4" }} target="_blank" rel="noreferrer">
+              <a href="https://www.rfc-editor.org/rfc/rfc9553" target="_blank" rel="noreferrer">
                 JSContact (RFC 9553)
               </a>
               : an exported contact is a JSContact <Code>Card</Code>. Everything Kontax-specific lives
@@ -758,7 +542,7 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
           </Section>
 
           {/* Document */}
-          <section id="format-document" style={{ marginBottom: 48 }}>
+          <section id="format-document" className="dev-endpoint">
             <H3>Document structure</H3>
             <P>
               A bare document is a single JSContact Card with two Kontax envelope properties. Native
@@ -811,18 +595,18 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
             <P>
               The complete property reference — every field, its class (must / optional / never), and
               its vendor shape — is in{" "}
-              <a href="/format/spec.md" style={{ color: "#4158f4" }}>the full spec</a> (§3). The
+              <a href="/format/spec.md">the full spec</a> (§3). The
               machine-checkable form is the{" "}
-              <a href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+              <a href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
                 contact JSON Schema
               </a>
               . A ready-to-read example is{" "}
-              <a href="/format/daniel-cho.json" style={{ color: "#4158f4" }}>daniel-cho.json</a>.
+              <a href="/format/daniel-cho.json">daniel-cho.json</a>.
             </P>
           </section>
 
           {/* Archive */}
-          <section id="format-archive" style={{ marginBottom: 48 }}>
+          <section id="format-archive" className="dev-endpoint">
             <H3>Archive layout</H3>
             <P>
               An archive is a <Code>.zip</Code> containing a manifest, one JSON document per contact,
@@ -859,9 +643,9 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
               Every <Code>contacts/*.json</Code> declares the same <Code>formatVersion</Code> as the
               manifest — a mixed-version archive is invalid. Full container rules (streaming, limits,
               recognition) are in{" "}
-              <a href="/format/spec.md" style={{ color: "#4158f4" }}>spec §7</a>; the manifest schema
+              <a href="/format/spec.md">spec §7</a>; the manifest schema
               is{" "}
-              <a href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+              <a href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
                 kontax-archive.v{FORMAT_VERSION.split(".")[0]}.schema.json
               </a>
               .
@@ -869,7 +653,7 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
           </section>
 
           {/* Versioning */}
-          <section id="format-versioning" style={{ marginBottom: 48 }}>
+          <section id="format-versioning" className="dev-endpoint">
             <H3>Versioning policy</H3>
             <P>Two independent version fields — do not conflate them:</P>
             <Table
@@ -894,7 +678,7 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
           </section>
 
           {/* vCard mapping */}
-          <section id="format-vcard" style={{ marginBottom: 48 }}>
+          <section id="format-vcard" className="dev-endpoint">
             <H3>vCard mapping</H3>
             <P>
               Every property maps to a <strong>native vCard property where one exists, or an{" "}
@@ -902,7 +686,7 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
               <Code>vcards/contacts.vcf</Code> is that projection, for tools that can&apos;t read
               JSContact — lossy by construction (a generic reader drops the <Code>X-</Code> props);
               the lossless source is always <Code>contacts/</Code>. Key rows (full table in{" "}
-              <a href="/format/spec.md" style={{ color: "#4158f4" }}>spec §6</a>):
+              <a href="/format/spec.md">spec §6</a>):
             </P>
             <Table
               headers={["Document property", "vCard line"]}
@@ -923,7 +707,7 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
           </section>
 
           {/* Schemas & validator */}
-          <section id="format-validate" style={{ marginBottom: 48 }}>
+          <section id="format-validate" className="dev-endpoint">
             <H3>Schemas &amp; validator</H3>
             <P>
               A developer can implement a reader from the files below alone — no Kontax account
@@ -935,31 +719,31 @@ print(f"Fetched {len(all_contacts)} contacts")`}</CodeBlock>
               headers={["File", "What it is"]}
               rows={[
                 [
-                  <a key="s1" href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+                  <a key="s1" href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
                     kontax-contact.v{FORMAT_VERSION.split(".")[0]}.schema.json
                   </a>,
                   "JSON Schema for one contact document",
                 ],
                 [
-                  <a key="s2" href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+                  <a key="s2" href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
                     kontax-archive.v{FORMAT_VERSION.split(".")[0]}.schema.json
                   </a>,
                   "JSON Schema for the archive manifest",
                 ],
                 [
-                  <a key="e1" href="/format/daniel-cho.json" style={{ color: "#4158f4" }}>daniel-cho.json</a>,
+                  <a key="e1" href="/format/daniel-cho.json">daniel-cho.json</a>,
                   "Example bare document (inline photo, custom field, labels)",
                 ],
                 [
-                  <a key="e2" href="/format/example-archive.zip" style={{ color: "#4158f4" }}>example-archive.zip</a>,
+                  <a key="e2" href="/format/example-archive.zip">example-archive.zip</a>,
                   "Example archive — two contacts sharing one photo",
                 ],
                 [
-                  <a key="v1" href="/format/validate.mjs" style={{ color: "#4158f4" }}>validate.mjs</a>,
+                  <a key="v1" href="/format/validate.mjs">validate.mjs</a>,
                   "Zero-dependency reference validator",
                 ],
                 [
-                  <a key="sp" href="/format/spec.md" style={{ color: "#4158f4" }}>spec.md</a>,
+                  <a key="sp" href="/format/spec.md">spec.md</a>,
                   "The full human-readable specification",
                 ],
               ]}
@@ -969,7 +753,7 @@ node validate.mjs contacts.zip
 node validate.mjs contact.json`}</CodeBlock>
             <P>
               Source, issues, and the canonical spec live at{" "}
-              <a href={FORMAT_REPO_URL} style={{ color: "#4158f4" }} target="_blank" rel="noreferrer">
+              <a href={FORMAT_REPO_URL} target="_blank" rel="noreferrer">
                 {FORMAT_REPO_URL.replace("https://", "")}
               </a>
               . The page and the repository always state the same{" "}
@@ -978,20 +762,14 @@ node validate.mjs contact.json`}</CodeBlock>
           </section>
 
           {/* Footer note */}
-          <div
-            style={{
-              borderTop: "1px solid #e4e4e7",
-              paddingTop: 24,
-              marginTop: 8,
-            }}
-          >
-            <p style={{ fontSize: 13, color: "#8b938c", lineHeight: 1.6 }}>
+          <div className="dev-foot">
+            <p>
               API questions or issues?{" "}
-              <a href="mailto:support@getkontax.com" style={{ color: "#4158f4" }}>
+              <a href="mailto:support@getkontax.com">
                 support@getkontax.com
               </a>
               {" · "}
-              <Link href="/settings/developer" style={{ color: "#4158f4" }}>
+              <Link href="/settings/developer">
                 Manage your tokens →
               </Link>
             </p>
@@ -999,16 +777,7 @@ node validate.mjs contact.json`}</CodeBlock>
         </main>
       </div>
 
-      <PublicFooter />
-
-      <style>{`
-        @media (max-width: 700px) {
-          .dev-toc { display: none; }
-          div[style*="grid-template-columns"] {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      <MarketingFooter />
     </div>
   );
 }

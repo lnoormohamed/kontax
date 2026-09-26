@@ -1,0 +1,249 @@
+/* ════════════════════════════════════════════════════════════════
+   /developers — P50-05 · Direction A chrome and type on the existing
+   docs layout: sticky "On this page" contents + one article column.
+   Replaces the page's inline styles (pre-P50 greys and blue links).
+   Scoped to .mkt-wrap; colours and type come from the --mkt-* tokens.
+   Prefix: dev-
+   ════════════════════════════════════════════════════════════════ */
+
+.mkt-wrap .dev-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+  max-width: var(--mkt-maxw);
+  margin: 0 auto;
+  padding: var(--mkt-space-md) var(--mkt-pad) var(--mkt-space-lg);
+}
+
+/* ─── Contents sidebar ─────────────────────────────────────────── */
+.mkt-wrap .dev-toc {
+  position: sticky;
+  top: calc(var(--mkt-nav-h) + 32px);
+  max-height: calc(100vh - var(--mkt-nav-h) - 64px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 4px 4px 0; /* room for focus rings */
+}
+.mkt-wrap .dev-toc__title {
+  margin: 0 0 12px;
+  font: var(--mkt-label);
+  color: var(--mkt-g600);
+}
+.mkt-wrap .dev-toc__link {
+  display: block;
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid var(--mkt-line);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--mkt-body);
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.mkt-wrap .dev-toc__link:hover {
+  color: var(--mkt-head);
+  border-left-color: var(--mkt-g800);
+}
+.mkt-wrap .dev-toc__link--sub {
+  padding-left: 24px;
+  font: 500 12.5px/1.5 var(--mkt-mono);
+  color: var(--mkt-mute);
+}
+
+/* ─── Article ──────────────────────────────────────────────────── */
+.mkt-wrap .dev-main { min-width: 0; max-width: 860px; }
+
+.mkt-wrap .dev-head {
+  padding-bottom: 40px;
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--mkt-line);
+}
+.mkt-wrap .dev-h1 {
+  margin: 16px 0 0;
+  font: var(--mkt-h2);
+  letter-spacing: var(--mkt-h2-ls);
+  color: var(--mkt-head);
+}
+.mkt-wrap .dev-lede {
+  max-width: 640px;
+  margin: 16px 0 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+}
+.mkt-wrap .dev-baseurl {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 24px;
+  padding: 10px 14px;
+  border: 1px solid var(--mkt-line-strong);
+  border-radius: var(--mkt-r-sm);
+  background: var(--mkt-card);
+  font: 500 14px/1.4 var(--mkt-mono);
+  color: var(--mkt-ink);
+  overflow-wrap: break-word;
+}
+.mkt-wrap .dev-baseurl__k { color: var(--mkt-g600); }
+
+.mkt-wrap .dev-section,
+.mkt-wrap .dev-endpoint { scroll-margin-top: calc(var(--mkt-nav-h) + 24px); }
+.mkt-wrap .dev-section { margin-bottom: 56px; }
+.mkt-wrap .dev-endpoint { margin-bottom: 48px; }
+
+.mkt-wrap .dev-h2 {
+  margin: 0 0 16px;
+  padding-top: 32px;
+  border-top: 1px solid var(--mkt-line);
+  font: var(--mkt-h3);
+  letter-spacing: var(--mkt-h2-ls);
+  color: var(--mkt-head);
+}
+.mkt-wrap .dev-section:first-of-type .dev-h2 { border-top: 0; padding-top: 0; }
+.mkt-wrap .dev-h3 {
+  margin: 28px 0 10px;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--mkt-head);
+}
+.mkt-wrap .dev-p {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--mkt-body);
+  text-wrap: pretty;
+}
+.mkt-wrap .dev-main strong { font-weight: 600; color: var(--mkt-ink); }
+
+.mkt-wrap .dev-main a {
+  color: var(--mkt-g800);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--mkt-g200);
+  text-underline-offset: 3px;
+  overflow-wrap: break-word;
+  transition: text-decoration-color 0.15s ease;
+}
+.mkt-wrap .dev-main a:hover { text-decoration-color: currentColor; }
+
+/* ─── Code ─────────────────────────────────────────────────────── */
+.mkt-wrap .dev-code {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--mkt-line2);
+  font-family: var(--mkt-mono);
+  font-size: 0.88em;
+  color: var(--mkt-ink);
+  overflow-wrap: break-word;
+}
+.mkt-wrap .dev-pre {
+  margin: 12px 0 24px;
+  padding: 18px 20px;
+  border-radius: var(--mkt-r-btn);
+  background: var(--mkt-g900);
+  color: var(--mkt-g100);
+  font: 400 13.5px/1.65 var(--mkt-mono);
+  white-space: pre;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mkt-wrap .dev-pre code { font: inherit; }
+.mkt-wrap .dev-pre:focus-visible { outline-offset: 3px; }
+
+/* ─── Endpoint line ────────────────────────────────────────────── */
+.mkt-wrap .dev-endpoint__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.mkt-wrap .dev-endpoint__path {
+  font: 600 17px/1.3 var(--mkt-mono);
+  color: var(--mkt-head);
+}
+/* HTTP verb badges: fixed semantic colours per method (all ≥ 5:1 with white). */
+.mkt-wrap .dev-method {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--mkt-body);
+  color: #fff;
+  font: 600 12px/1.3 var(--mkt-mono);
+  letter-spacing: 0.04em;
+}
+.mkt-wrap .dev-method--get { background: #1d6fa4; }
+.mkt-wrap .dev-method--post { background: var(--mkt-g600); }
+.mkt-wrap .dev-method--put { background: #7a5c1a; }
+.mkt-wrap .dev-method--delete { background: var(--mkt-err); }
+
+/* ─── Tables ───────────────────────────────────────────────────── */
+.mkt-wrap .dev-table-scroll {
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--mkt-line-strong);
+  border-radius: var(--mkt-r-sm);
+  background: var(--mkt-card);
+}
+.mkt-wrap .dev-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  color: var(--mkt-ink);
+}
+.mkt-wrap .dev-table th {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--mkt-line-strong);
+  background: var(--mkt-stone);
+  font: var(--mkt-label);
+  color: var(--mkt-g600);
+  text-align: left;
+  white-space: nowrap;
+}
+.mkt-wrap .dev-table td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--mkt-line);
+  vertical-align: top;
+  line-height: 1.5;
+  color: var(--mkt-body);
+}
+.mkt-wrap .dev-table tbody tr:first-child td { border-top: 0; }
+
+/* ─── Sign-off ─────────────────────────────────────────────────── */
+.mkt-wrap .dev-foot {
+  margin-top: 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--mkt-line);
+}
+.mkt-wrap .dev-foot p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+}
+
+/* Touch screens get full 44px targets in the (otherwise dense) contents. */
+@media (pointer: coarse) {
+  .mkt-wrap .dev-toc__link { display: flex; align-items: center; min-height: 44px; padding-top: 0; padding-bottom: 0; }
+}
+@media (max-width: 980px) {
+  .mkt-wrap .dev-layout { grid-template-columns: 180px minmax(0, 1fr); gap: 40px; }
+}
+@media (max-width: 767px) {
+  .mkt-wrap .dev-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-top: 56px;
+    padding-bottom: var(--mkt-space-sm);
+  }
+  .mkt-wrap .dev-toc { display: none; }
+  /* wide reference tables scroll inside their frame rather than crushing
+     the description column */
+  .mkt-wrap .dev-table { min-width: 580px; font-size: 14px; }
+  .mkt-wrap .dev-lede { font-size: 16.5px; }
+  .mkt-wrap .dev-pre { margin-left: calc(var(--mkt-pad) * -1); margin-right: calc(var(--mkt-pad) * -1); border-radius: 0; padding: 16px var(--mkt-pad); }
+}

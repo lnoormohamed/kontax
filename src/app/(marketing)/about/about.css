@@ -1,0 +1,36 @@
+/* ════════════════════════════════════════════════════════════════
+   About — P50-05 (Direction A). Prefix: ab-
+   Tokens and shared components come from marketing.css (.mkt-wrap).
+   ════════════════════════════════════════════════════════════════ */
+
+.ab-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 56px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ab-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 168px;
+}
+.mkt-band--stone .ab-card { border-color: var(--mkt-stone-line); }
+.ab-card__more { align-self: flex-start; min-height: 44px; }
+
+/* Vexon link inside the h2: underline so it reads as a link at display size */
+.ab-maker {
+  color: var(--mkt-g800);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+}
+.ab-maker:hover { color: var(--mkt-g600); }
+
+@media (max-width: 980px) {
+  .ab-cards { grid-template-columns: 1fr; gap: 12px; margin-top: 40px; }
+  .ab-card { min-height: 0; gap: 16px; }
+}

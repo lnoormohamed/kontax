@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { Metadata } from "next";
+import { ArrowIcon, CtaBand, PageHead } from "../_components/mkt-ui";
 import { ContactForm } from "./_contact-form";
 import "./contact.css";
 
@@ -21,21 +23,44 @@ export const metadata: Metadata = {
   },
 };
 
+// P50-05 · Direction A layout. The form, /api/contact and its rate limit are
+// unchanged — only the presentation moved onto the --mkt-* system.
 export default function ContactPage() {
   return (
-    <div className="ct-wrap">
-      <h1 className="ct-hero__title">Get in touch</h1>
-      <p className="ct-hero__sub">
-        We read every message and aim to respond within 1 business day.
-      </p>
+    <>
+      <PageHead
+        label="Contact"
+        title="Get in touch"
+        lede="We read every message and aim to respond within 1 business day."
+      />
 
-      <ContactForm />
+      <section className="mkt-band ct-band" aria-label="Contact form">
+        <div className="mkt-container ct-grid">
+          <div className="mkt-card ct-formcard">
+            <ContactForm />
+          </div>
 
-      <p className="ct-note">
-        For security vulnerabilities, email{" "}
-        <a href="mailto:security@getkontax.com">security@getkontax.com</a>{" "}
-        directly.
-      </p>
-    </div>
+          <aside className="ct-aside" aria-label="Other ways to get help">
+            <div className="ct-aside__item">
+              <h2 className="mkt-h4">Security reports</h2>
+              <p>
+                For security vulnerabilities, email{" "}
+                <a href="mailto:security@getkontax.com">security@getkontax.com</a> directly.
+              </p>
+            </div>
+            <div className="ct-aside__item">
+              <h2 className="mkt-h4">Help &amp; FAQ</h2>
+              <p>Answers to the questions new and long-time Kontax users ask most.</p>
+              <Link className="mkt-more ct-aside__more" href="/help">
+                Browse Help &amp; FAQ
+                <ArrowIcon size={15} />
+              </Link>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <CtaBand />
+    </>
   );
 }
