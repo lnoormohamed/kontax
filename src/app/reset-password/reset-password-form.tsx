@@ -5,6 +5,19 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { resetPassword } from "~/app/actions/auth";
+import {
+  AuthBrand,
+  authBtnPrimary,
+  authCard,
+  authFieldError,
+  authFocus,
+  authInput,
+  authLabel,
+  authLede,
+  authNoteErr,
+  authQuietLink,
+  authTitle,
+} from "~/app/_components/auth-ui";
 
 function EyeIcon({ visible }: { visible: boolean }) {
   return visible ? (
@@ -51,18 +64,19 @@ export function ResetPasswordForm({ token }: { token: string }) {
   };
 
   return (
-    <div className="w-full max-w-[400px] rounded-[2rem] border border-[#d8ddd6] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
-      <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Set a new password</h1>
-      <p className="mt-2 text-[14px] leading-[1.55] text-[#5c655e]">Choose a strong password. You&apos;ll be signed in automatically.</p>
+    <div className={authCard}>
+      <AuthBrand />
+      <h1 className={authTitle}>Set a new password</h1>
+      <p className={authLede}>Choose a strong password. You&apos;ll be signed in automatically.</p>
 
-      <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
+      <form className="mt-7 grid gap-4" onSubmit={handleSubmit}>
         <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">New password</span>
-          <div className="relative mt-[6px]">
+          <span className={`block ${authLabel}`}>New password</span>
+          <div className="relative">
             <input
               autoComplete="new-password"
               autoFocus
-              className="w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 pr-11 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+              className={`${authInput()} pr-[50px]`}
               minLength={8}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 8 characters"
@@ -70,37 +84,37 @@ export function ResetPasswordForm({ token }: { token: string }) {
               type={showPw ? "text" : "password"}
               value={password}
             />
-            <button aria-label="Toggle visibility" className="absolute right-[10px] top-1/2 grid h-[30px] w-[30px] -translate-y-1/2 place-items-center rounded-lg text-[#8b938c] hover:text-[#5c655e]" onClick={() => setShowPw((s) => !s)} tabIndex={-1} type="button">
+            <button aria-label="Toggle visibility" className={`absolute right-[5px] top-1/2 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-[8px] text-[#646c65] transition hover:bg-[#f4f1ea] hover:text-[#1d2823] ${authFocus}`} onClick={() => setShowPw((s) => !s)} tabIndex={-1} type="button">
               <EyeIcon visible={showPw} />
             </button>
           </div>
         </label>
         <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Confirm new password</span>
+          <span className={`block ${authLabel}`}>Confirm new password</span>
           <input
             autoComplete="new-password"
-            className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:ring-[3px] focus:ring-[#edf0fe] ${mismatch ? "border-[#c98a76] focus:border-[#c98a76]" : "border-[#d8ddd6] focus:border-[#4158f4]"}`}
+            className={authInput(mismatch)}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Re-enter new password"
             required
             type="password"
             value={confirm}
           />
-          {mismatch && <p className="mt-[6px] text-[12.5px] text-[#9a3a23]">Passwords don&apos;t match.</p>}
+          {mismatch && <p className={authFieldError}>Passwords don&apos;t match.</p>}
         </label>
         {error && (
-          <p className="rounded-[12px] border border-[#ecd0c7] bg-[#f7e9e4] px-[14px] py-[11px] text-[13.5px] text-[#8f3320]">{error}</p>
+          <p className={authNoteErr}>{error}</p>
         )}
         <button
-          className="w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+          className={`mt-2 ${authBtnPrimary}`}
           disabled={!canSubmit}
           type="submit"
         >
           {isPending ? "Resetting…" : "Reset password"}
         </button>
       </form>
-      <div className="mt-4 text-center">
-        <Link className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#4158f4]" href="/login">← Back to login</Link>
+      <div className="mt-6 text-center">
+        <Link className={`text-[14px] ${authQuietLink}`} href="/login">← Back to login</Link>
       </div>
     </div>
   );

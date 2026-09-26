@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
+import { AuthShell } from "~/app/_components/auth-ui";
 import { safeInternalPath } from "~/lib/safe-internal-path";
 import { auth } from "~/server/auth";
 import { CardRegisterContext } from "./card-register-context";
@@ -42,31 +43,9 @@ export default async function RegisterPage({
   }
 
   return (
-    <main className="relative flex min-h-svh flex-col items-center justify-center gap-[18px] px-5 py-10">
-      {/* Background */}
-      <div
-        aria-hidden
-        className="fixed inset-0 -z-10"
-        style={{
-          backgroundColor: "#eef1ec",
-          backgroundImage: [
-            "radial-gradient(ellipse 70% 55% at 50% 36%, rgba(23,53,46,0.10) 0%, rgba(23,53,46,0) 70%)",
-            "radial-gradient(ellipse 90% 70% at 50% 110%, rgba(23,53,46,0.07) 0%, rgba(23,53,46,0) 60%)",
-          ].join(", "),
-        }}
-      >
-        {/* faint grain */}
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E\")",
-          }}
-        />
-      </div>
+    <AuthShell>
       {prefillParam && <CardRegisterContext prefillParam={prefillParam} />}
       <AuthCard mode="register" next={next} plan={plan} />
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
-    </main>
+    </AuthShell>
   );
 }

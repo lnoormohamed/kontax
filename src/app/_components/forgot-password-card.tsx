@@ -4,6 +4,17 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 
 import { requestPasswordReset } from "~/app/actions/auth";
+import {
+  AuthBrand,
+  authBtnPrimary,
+  authCard,
+  authInput,
+  authLabel,
+  authLede,
+  authLink,
+  authNoteOk,
+  authTitle,
+} from "~/app/_components/auth-ui";
 
 function MailIcon() {
   return (
@@ -44,39 +55,22 @@ export function ForgotPasswordCard() {
   };
 
   return (
-    <div className="w-full max-w-[440px] rounded-[24px] border border-[#d8ddd6]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
-      <Link
-        aria-label="Kontax home"
-        className="flex items-center justify-center gap-[10px]"
-        href="/"
-      >
-        <span
-          aria-hidden
-          className="grid h-[34px] w-[34px] place-items-center rounded-[10px] text-[19px] font-bold leading-none text-[#dff0e7]"
-          style={{ background: "#17352e" }}
-        >
-          K
-        </span>
-        <span className="text-[25px] font-semibold tracking-[-0.018em] text-[#17352e]">
-          Kontax
-        </span>
-      </Link>
-
-      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d8ddd6]" />
+    <div className={authCard}>
+      <AuthBrand />
 
       {!submitted ? (
         <>
-          <h1 className="text-center text-[22px] font-semibold leading-tight tracking-[-0.015em] text-[#1d2823]">
+          <h1 className={authTitle}>
             Reset your password
           </h1>
-          <p className="mt-[7px] text-center text-[14px] leading-[1.55] text-[#5c655e]">
+          <p className={authLede}>
             Enter the email you use for Kontax and we&apos;ll send you a secure
             reset link.
           </p>
 
           <form
             aria-busy={isPending}
-            className="mt-[26px]"
+            className="mt-7"
             noValidate
             onSubmit={(e) => void handleSubmit(e)}
           >
@@ -85,13 +79,13 @@ export function ForgotPasswordCard() {
               disabled={isPending}
             >
               <label className="flex flex-col">
-                <span className="mb-[7px] text-[13px] font-medium text-[#3f4842]">
+                <span className={authLabel}>
                   Email address
                 </span>
                 <input
                   autoComplete="email"
                   autoFocus
-                  className="h-11 w-full rounded-[12px] border border-[#d8ddd6] bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
+                  className={authInput()}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
@@ -102,48 +96,48 @@ export function ForgotPasswordCard() {
 
               <button
                 aria-busy={isPending}
-                className="mt-2 flex h-12 w-full items-center justify-center rounded-[12px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] active:translate-y-px active:bg-[#2a3abf] disabled:cursor-not-allowed disabled:opacity-50"
+                className={`mt-2 ${authBtnPrimary}`}
                 disabled={!canSubmit || isPending}
                 type="submit"
               >
-                {isPending ? "Sending..." : "Send reset link"}
+                {isPending ? "Sending…" : "Send reset link"}
               </button>
             </fieldset>
           </form>
 
-          <p className="mt-4 text-center text-[13px] leading-[1.5] text-[#8b938c]">
+          <p className="mt-4 text-center text-[13px] leading-[1.5] text-[#646c65]">
             We&apos;ll only send the link if the address matches an existing
             account.
           </p>
         </>
       ) : (
         <>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#e7efe9] text-[#17352e]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#e8f0eb] text-[#17352e]">
             <MailIcon />
           </div>
-          <h1 className="mt-4 text-center text-[22px] font-semibold leading-tight tracking-[-0.015em] text-[#1d2823]">
+          <h1 className={`mt-4 ${authTitle}`}>
             Check your inbox
           </h1>
-          <p className="mt-[7px] text-center text-[14px] leading-[1.6] text-[#5c655e]">
+          <p className={authLede}>
             If an account exists for{" "}
-            <strong className="font-semibold text-[#1d2823]">
+            <strong className="break-words font-semibold text-[#1d2823]">
               {submittedEmail}
             </strong>
             , we&apos;ve sent a password reset link. It expires in 15 minutes.
           </p>
-          <div className="mt-5 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-[13.5px] leading-[1.5] text-[#17352e]">
+          <div className={`mt-5 ${authNoteOk}`}>
             For security, this screen always looks the same whether or not the
             email address is registered.
           </div>
         </>
       )}
 
-      <div className="mt-[22px] text-center text-[14px] text-[#5c655e]">
+      <div className="mt-6 text-center text-[14.5px] text-[#4e5851]">
         {submitted ? (
           <>
             Didn&apos;t get it?{" "}
             <button
-              className="font-medium text-[#4158f4] hover:underline"
+              className={authLink}
               onClick={() => setSubmitted(false)}
               type="button"
             >
@@ -153,7 +147,7 @@ export function ForgotPasswordCard() {
         ) : (
           <>
             Remembered it?{" "}
-            <Link className="font-medium text-[#4158f4] hover:underline" href="/login">
+            <Link className={authLink} href="/login">
               Back to login
             </Link>
           </>

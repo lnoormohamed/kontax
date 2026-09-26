@@ -4,6 +4,22 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+import {
+  AuthBrand,
+  authBtnPrimary,
+  authCard,
+  authFieldError,
+  authFocus,
+  authInput,
+  authLabel,
+  authLede,
+  authLink,
+  authNoteErr,
+  authNoteOk,
+  authNoteWarn,
+  authQuietLink,
+  authTitle,
+} from "~/app/_components/auth-ui";
 import { safeInternalPath } from "~/lib/safe-internal-path";
 
 // ── Password strength ──────────────────────────────────────────────────────
@@ -20,10 +36,10 @@ function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
 }
 
 const STRENGTH_COLORS: Record<number, string> = {
-  0: "#d8ddd6",
-  1: "#b5472f",
-  2: "#bf8526",
-  3: "#2f8f63",
+  0: "#d4d9d0",
+  1: "#b3261e",
+  2: "#9a6a12",
+  3: "#2f6b52",
 };
 
 function StrengthMeter({ password }: { password: string }) {
@@ -37,7 +53,7 @@ function StrengthMeter({ password }: { password: string }) {
             key={seg}
             className="h-1 flex-1 rounded-sm transition-colors duration-200"
             style={{
-              background: seg <= level ? STRENGTH_COLORS[level] : "#e7eae4",
+              background: seg <= level ? STRENGTH_COLORS[level] : "#e5e8e1",
             }}
           />
         ))}
@@ -94,7 +110,7 @@ function WarnIcon() {
   return (
     <svg
       aria-hidden
-      className="mt-px shrink-0 text-[#b5472f]"
+      className="mt-px shrink-0 text-[#b3261e]"
       fill="none"
       height={16}
       stroke="currentColor"
@@ -149,20 +165,16 @@ function Field({
 }) {
   return (
     <div className="flex flex-col">
-      <label className="mb-[7px] text-[13px] font-medium text-[#3f4842]" htmlFor={id}>
+      <label className={authLabel} htmlFor={id}>
         {label}
-        {hint ? <span className="font-normal text-[#8b938c]"> {hint}</span> : null}
+        {hint ? <span className="font-normal text-[#646c65]"> {hint}</span> : null}
       </label>
       <div className={`relative ${trailing ? "has-trailing" : ""}`}>
         <input
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={error ? "true" : undefined}
           autoComplete={autoComplete}
-          className={`h-11 w-full rounded-[12px] border bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] ${
-            error
-              ? "border-[#b5472f] focus:border-[#b5472f] focus:shadow-[0_0_0_3px_rgba(181,71,47,0.22)]"
-              : "border-[#d8ddd6] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
-          } ${trailing ? "pr-[46px]" : ""} disabled:opacity-60`}
+          className={`${authInput(Boolean(error))} ${trailing ? "pr-[50px]" : ""}`}
           disabled={disabled}
           id={id}
           onChange={(e) => onChange(e.target.value)}
@@ -173,7 +185,7 @@ function Field({
         {trailing}
       </div>
       {error ? (
-        <p className="mt-[7px] text-[12.5px] leading-[1.45] text-[#8f3320]" id={`${id}-error`} role="alert">
+        <p className={authFieldError} id={`${id}-error`} role="alert">
           {error}
         </p>
       ) : null}
@@ -330,7 +342,7 @@ export function AuthCard({
   const eyeBtn = (
     <button
       aria-label={showPw ? "Hide password" : "Show password"}
-      className="absolute right-[4px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-[9px] text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
+      className={`absolute right-[5px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-[8px] text-[#646c65] transition hover:bg-[#f4f1ea] hover:text-[#1d2823] ${authFocus}`}
       onClick={() => setShowPw((v) => !v)}
       tabIndex={submitting ? -1 : 0}
       type="button"
@@ -340,61 +352,47 @@ export function AuthCard({
   );
 
   return (
-    <div className="w-full max-w-[440px] rounded-[24px] border border-[#d8ddd6]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
+    <div className={authCard}>
       {/* Brand mark — links back to the marketing homepage */}
-      <Link className="flex items-center justify-center gap-[10px]" href="/" aria-label="Kontax home">
-        <span
-          aria-hidden
-          className="grid h-[34px] w-[34px] place-items-center rounded-[10px] text-[19px] font-bold leading-none text-[#dff0e7]"
-          style={{ background: "#17352e" }}
-        >
-          K
-        </span>
-        <span className="text-[25px] font-semibold tracking-[-0.018em] text-[#17352e]">
-          Kontax
-        </span>
-      </Link>
-
-      {/* Rule */}
-      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d8ddd6]" />
+      <AuthBrand />
 
       {/* Heading */}
-      <h1 className="text-center text-[22px] font-semibold leading-tight tracking-[-0.015em] text-[#1d2823]">
+      <h1 className={authTitle}>
         {isLogin ? "Log in to Kontax" : "Create your account"}
       </h1>
-      <p className="mt-[7px] text-center text-[14px] text-[#5c655e]">
-        {isLogin ? "Pick up right where you left off." : "Your contacts, organized and yours."}
+      <p className={authLede}>
+        {isLogin ? "Pick up right where you left off." : "Your contacts, organised and yours."}
       </p>
 
       {/* Message banners (password-reset, email-changed) */}
       {message === "password-reset" && (
-        <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
+        <div className={`mt-5 text-center ${authNoteOk}`}>
           Your password has been reset. Please sign in with your new password.
         </div>
       )}
       {message === "email-changed" && (
-        <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
+        <div className={`mt-5 text-center ${authNoteOk}`}>
           Your email has been updated. Please sign in with your new address.
         </div>
       )}
       {/* Session-expired: had a valid session, token is now expired/invalidated */}
       {!message && expired && isLogin && (
-        <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-[13.5px] text-[#7c5511]">
+        <div className={`mt-5 ${authNoteWarn}`}>
           <p className="font-semibold">Your session ended</p>
           <p className="mt-0.5 leading-[1.45]">Sign back in and you&rsquo;ll return right where you left off.</p>
         </div>
       )}
       {/* Auth-required: accessing a protected route without a session */}
       {!message && !expired && next && isLogin && (
-        <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-center text-[13.5px] text-[#7c5511]">
+        <div className={`mt-5 text-center ${authNoteWarn}`}>
           Sign in to access this page.
         </div>
       )}
 
       {/* Trial callout — register with ?plan=pro */}
       {!isLogin && plan === "pro" ? (
-        <div className="mt-4 flex items-start gap-2.5 rounded-[1.2rem] border border-[#c5cdf9] bg-[#edf0fe] px-4 py-3 text-[13.5px] leading-[1.45] text-[#3142c4]">
-          <svg aria-hidden className="mt-px h-[17px] w-[17px] shrink-0" fill="none" stroke="#4158f4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
+        <div className={`mt-5 flex items-start gap-2.5 ${authNoteOk}`}>
+          <svg aria-hidden className="mt-[2px] h-[17px] w-[17px] shrink-0" fill="none" stroke="#2f6b52" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
             <path d="M12 3l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.8 6.1 20.8l1.3-6.5L2.5 9.8 9.1 9z" />
           </svg>
           <span>
@@ -406,7 +404,7 @@ export function AuthCard({
       {/* Form */}
       <form
         aria-busy={submitting}
-        className="mt-[26px]"
+        className="mt-7"
         noValidate
         onSubmit={(e) => void handleSubmit(e)}
       >
@@ -432,7 +430,7 @@ export function AuthCard({
                 <span>
                   An account with this email already exists.{" "}
                   <Link
-                    className="font-semibold text-[#4158f4] hover:underline"
+                    className={authLink}
                     href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
                   >
                     Log in instead →
@@ -468,7 +466,7 @@ export function AuthCard({
           {isLogin ? (
             <div className="-mt-1 flex justify-end">
               <a
-                className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#4158f4]"
+                className={`text-[14px] ${authQuietLink}`}
                 href="/forgot-password"
               >
                 Forgot password?
@@ -479,7 +477,7 @@ export function AuthCard({
           {/* CTA */}
           <button
             aria-busy={submitting}
-            className="mt-2 flex h-12 w-full items-center justify-center rounded-[12px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] active:translate-y-px active:bg-[#2a3abf] disabled:cursor-not-allowed disabled:opacity-50"
+            className={`mt-2 ${authBtnPrimary}`}
             disabled={!canSubmit || submitting}
             type="submit"
           >
@@ -488,13 +486,13 @@ export function AuthCard({
 
           {/* Terms — register only */}
           {!isLogin ? (
-            <p className="-mt-1 text-center text-[12px] text-[#8b938c]">
+            <p className="-mt-1 text-center text-[13px] leading-[1.5] text-[#646c65]">
               By creating an account, you agree to our{" "}
-              <a className="text-[#5c655e] font-medium hover:text-[#4158f4] hover:underline" href="/terms">
+              <a className={`font-medium text-[#4e5851] underline decoration-[#d4d9d0] underline-offset-[3px] hover:text-[#17352e] hover:decoration-[#17352e] rounded-[3px] ${authFocus}`} href="/terms">
                 Terms
               </a>{" "}
               and{" "}
-              <a className="text-[#5c655e] font-medium hover:text-[#4158f4] hover:underline" href="/privacy">
+              <a className={`font-medium text-[#4e5851] underline decoration-[#d4d9d0] underline-offset-[3px] hover:text-[#17352e] hover:decoration-[#17352e] rounded-[3px] ${authFocus}`} href="/privacy">
                 Privacy Policy
               </a>
               .
@@ -506,7 +504,7 @@ export function AuthCard({
         {formError ? (
           <div
             ref={errorBoxRef}
-            className="mt-4 flex items-start gap-[9px] rounded-[11px] border border-[#ecd0c7] bg-[#f7e9e4] px-[14px] py-[11px] text-[13.5px] leading-[1.4] text-[#8f3320]"
+            className={`mt-4 flex items-start gap-[9px] ${authNoteErr} ${authFocus}`}
             role="alert"
             tabIndex={-1}
           >
@@ -517,10 +515,10 @@ export function AuthCard({
       </form>
 
       {/* Mode switch */}
-      <p className="mt-[22px] text-center text-[14px] text-[#5c655e]">
+      <p className="mt-6 text-center text-[14.5px] text-[#4e5851]">
         {isLogin ? "Don't have an account? " : "Already have an account? "}
         <Link
-          className="font-medium text-[#4158f4] hover:underline disabled:opacity-50"
+          className={authLink}
           href={switchHref}
         >
           {isLogin ? "Create one →" : "Log in →"}

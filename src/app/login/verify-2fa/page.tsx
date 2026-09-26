@@ -1,11 +1,22 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState, useTransition } from "react";
 
 import { redeemTotpRecoveryCode, submitTotpChallenge } from "~/app/actions/totp";
 import { signOutAction } from "~/app/actions/auth";
+import {
+  AuthBrand,
+  authBtnPrimary,
+  authCard,
+  authFieldError,
+  authInput,
+  AuthShell,
+  authLede,
+  authNoteErr,
+  authQuietLink,
+  authTitle,
+} from "~/app/_components/auth-ui";
 import { safeInternalPath } from "~/lib/safe-internal-path";
 
 export const dynamic = "force-dynamic";
@@ -28,10 +39,12 @@ function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
   };
 
   return (
-    <div className={`flex gap-[9px] ${error ? "st-shake" : ""}`}>
+    <div className={`flex justify-center gap-[7px] sm:gap-[9px] ${error ? "st-shake" : ""}`}>
       {digits.map((d, i) => (
         <input
-          className="st-otp-box"
+          // P50-06: auth-only Direction A styling (the shared `.st-otp-box`
+          // is also used in settings, so it is not restyled globally).
+          className={`h-[52px] w-[42px] rounded-[10px] border-[1.5px] bg-white text-center font-[family-name:var(--font-geist-mono)] text-[22px] font-medium text-[#1d2823] outline-none transition-[border-color,box-shadow] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.2)] disabled:bg-[#f4f1ea] disabled:text-[#646c65] sm:h-[56px] sm:w-[48px] ${error ? "border-[#b3261e]" : "border-[#d4d9d0]"}`}
           disabled={disabled}
           inputMode="numeric"
           key={i}
@@ -44,7 +57,6 @@ function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
           }}
           onPaste={(e) => { e.preventDefault(); const p = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 6); if (p) { onChange(p); if (p.length === 6 && onComplete) onComplete(p); else refs.current[Math.min(p.length, 5)]?.focus(); } }}
           ref={(el) => { refs.current[i] = el; }}
-          style={error ? { borderColor: "#c0492f", color: "#9a3a23" } : {}}
           value={d}
         />
       ))}
@@ -124,32 +136,26 @@ function VerifyTwoFaInner() {
   };
 
   return (
-    <main className="relative flex min-h-svh flex-col items-center justify-center gap-[18px] px-5 py-10">
-      <div aria-hidden className="fixed inset-0 -z-10" style={{ backgroundColor: "#eef1ec", backgroundImage: "radial-gradient(ellipse 70% 55% at 50% 36%, rgba(23,53,46,0.10) 0%, rgba(23,53,46,0) 70%)" }} />
-
-      <Link className="flex items-center gap-2.5" href="/">
-        <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-[#17352e] text-[19px] font-bold text-[#dff0e7]">K</span>
-        <span className="text-[20px] font-semibold tracking-[-0.018em] text-[#17352e]">Kontax</span>
-      </Link>
-
-      <div className="w-full max-w-[400px] rounded-[2rem] border border-[#d8ddd6] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
+    <AuthShell>
+      <div className={authCard}>
+        <AuthBrand />
         {!useRecovery ? (
           <>
-            <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Two-factor authentication</h1>
-            <p className="mt-2 text-[14px] leading-[1.55] text-[#5c655e]">
+            <h1 className={authTitle}>Two-factor authentication</h1>
+            <p className={authLede}>
               Enter the 6-digit code from your authenticator app.
             </p>
-            <div className="mt-6">
+            <div className="mt-7">
               {rateLimited ? (
-                <div className="rounded-[12px] border border-[#ecd0c7] bg-[#f7e9e4] px-[14px] py-[11px] text-[13.5px] text-[#8f3320]">
+                <div className={authNoteErr} role="alert">
                   Too many attempts. Please try again in 15 minutes.
                 </div>
               ) : (
                 <>
                   <OtpInput autoFocus disabled={isPending} error={!!err} onChange={setCode} onComplete={handleTotpSubmit} value={code} />
-                  {err && <p className="mt-[10px] text-[13px] text-[#9a3a23]">{err}</p>}
+                  {err && <p className={`mt-3 text-center ${authFieldError}`} role="alert">{err}</p>}
                   <button
-                    className="mt-5 w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+                    className={`mt-6 ${authBtnPrimary}`}
                     disabled={code.length !== 6 || isPending}
                     onClick={() => handleTotpSubmit()}
                     type="button"
@@ -159,28 +165,29 @@ function VerifyTwoFaInner() {
                 </>
               )}
             </div>
-            <div className="mt-4 border-t border-[#e9ece7] pt-4">
-              <button className="text-[13px] font-medium text-[#5c655e] hover:text-[#1d2823]" onClick={() => { setUseRecovery(true); setErr(""); setCode(""); }} type="button">
+            <div className="mt-6 border-t border-[#e5e8e1] pt-4 text-center">
+              <button className={`text-[14px] ${authQuietLink}`} onClick={() => { setUseRecovery(true); setErr(""); setCode(""); }} type="button">
                 Use a recovery code instead
               </button>
             </div>
           </>
         ) : (
           <>
-            <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Recovery code</h1>
-            <p className="mt-2 text-[14px] leading-[1.55] text-[#5c655e]">Enter one of your recovery codes.</p>
-            <div className="mt-5">
+            <h1 className={authTitle}>Recovery code</h1>
+            <p className={authLede}>Enter one of your recovery codes.</p>
+            <div className="mt-7">
               <input
+                aria-label="Recovery code"
                 autoFocus
-                className="w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[16px] uppercase tracking-[0.08em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+                className={`${authInput(Boolean(err))} font-[family-name:var(--font-geist-mono)] font-medium uppercase tracking-[0.08em]`}
                 onChange={(e) => setRecoveryCode(e.target.value)}
                 placeholder="XXXXXXXXXX"
                 type="text"
                 value={recoveryCode}
               />
-              {err && <p className="mt-2 text-[13px] text-[#9a3a23]">{err}</p>}
+              {err && <p className={authFieldError} role="alert">{err}</p>}
               <button
-                className="mt-4 w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+                className={`mt-5 ${authBtnPrimary}`}
                 disabled={!recoveryCode.trim() || isPending}
                 onClick={handleRecoverySubmit}
                 type="button"
@@ -188,8 +195,8 @@ function VerifyTwoFaInner() {
                 {isPending ? "Verifying…" : "Verify recovery code"}
               </button>
             </div>
-            <div className="mt-4 border-t border-[#e9ece7] pt-4">
-              <button className="text-[13px] font-medium text-[#5c655e] hover:text-[#1d2823]" onClick={() => { setUseRecovery(false); setErr(""); setRecoveryCode(""); }} type="button">
+            <div className="mt-6 border-t border-[#e5e8e1] pt-4 text-center">
+              <button className={`text-[14px] ${authQuietLink}`} onClick={() => { setUseRecovery(false); setErr(""); setRecoveryCode(""); }} type="button">
                 ← Use authenticator app instead
               </button>
             </div>
@@ -197,12 +204,10 @@ function VerifyTwoFaInner() {
         )}
         <div className="mt-4 text-center">
           <form action={signOutAction}>
-            <button className="text-[12px] text-[#8b938c] hover:text-[#5c655e]" type="submit">← Back to login</button>
+            <button className={`text-[13px] ${authQuietLink}`} type="submit">← Back to login</button>
           </form>
         </div>
       </div>
-
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
-    </main>
+    </AuthShell>
   );
 }
