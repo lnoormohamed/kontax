@@ -10,9 +10,15 @@ import { useEffect } from "react";
 export function LegacyAnchorRedirect({ map }: { map: Readonly<Record<string, string>> }) {
   useEffect(() => {
     const redirect = () => {
-      const anchor = decodeURIComponent(window.location.hash.replace(/^#/, ""));
-      const target = anchor ? map[anchor] : undefined;
-      if (target) window.location.replace(target);
+      let anchor: string;
+      try {
+        anchor = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      } catch {
+        return; // malformed escape in the hash — nothing to map
+      }
+      // Own keys only: "#constructor" / "#__proto__" must not resolve.
+      const target = anchor && Object.hasOwn(map, anchor) ? map[anchor] : undefined;
+      if (typeof target === "string") window.location.replace(target);
     };
     redirect();
     window.addEventListener("hashchange", redirect);

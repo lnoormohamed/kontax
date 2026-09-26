@@ -433,7 +433,7 @@ export default function FeaturesPage() {
                   <div>
                     <span className="fp-code__prompt">$ </span>curl{" "}
                     <span className="fp-code__flag">-H</span>{" "}
-                    <span className="fp-code__str">&quot;Authorization: Bearer kt_live_xxx&quot;</span> \
+                    <span className="fp-code__str">&quot;Authorization: Bearer ktx_live_xxx&quot;</span> \
                   </div>
                   <div className="fp-code__indent">
                     <span className="fp-code__url">https://api.getkontax.com/v1/contacts</span>

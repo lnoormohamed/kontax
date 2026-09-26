@@ -1,5 +1,7 @@
 import "server-only";
 
+import { GUIDE_PAGES, SECTION_INDEXES } from "~/app/(marketing)/guides/_content/pages";
+import { HELP_CATEGORIES, HELP_ROOT, allArticles, articleHref, categoryHref } from "~/app/(marketing)/help/_content";
 import { getRedis } from "~/server/rate-limit";
 
 // P50A-08 — Cookieless, privacy-respecting page-view counting.
@@ -19,22 +21,42 @@ import { getRedis } from "~/server/rate-limit";
 const PV_KEY_PREFIX = "pv:";
 const PV_TTL_SECONDS = 400 * 24 * 60 * 60; // ~13 months of daily history
 
-// Content pages this is allowed to count, plus the one conversion path
-// (guides/help/compare/for/features → /register). Kept local to this module
-// rather than imported from src/server/public-paths.ts: that file gates
-// session/auth routing and is owned by another in-flight change, whereas this
-// list only decides what a beacon is allowed to increment.
-const PV_TRACKED_PREFIXES = ["/guides/", "/compare/", "/help/", "/for/", "/features/"] as const;
-const PV_TRACKED_EXACT = ["/register", "/features"] as const;
+// Only real, published content pages can be counted (Fable review M1): the
+// allow-list is built from the same registries the sitemap uses, so a beacon
+// can never create a counter for an invented path — which keeps the number of
+// hash fields bounded (~100) in the Redis that also backs the login limiters.
+const STATIC_TRACKED_PATHS = [
+  "/register", // the one conversion path
+  "/features",
+  "/features/duplicates",
+  "/features/history",
+  "/for/families",
+  "/for/teams",
+] as const;
+
+let trackedPaths: ReadonlySet<string> | null = null;
+function getTrackedPaths(): ReadonlySet<string> {
+  trackedPaths ??= new Set<string>([
+    ...STATIC_TRACKED_PATHS,
+    HELP_ROOT,
+    ...HELP_CATEGORIES.map((c) => categoryHref(c.id)),
+    ...allArticles().map((a) => articleHref(a)),
+    ...Object.values(SECTION_INDEXES).map((s) => s.path),
+    ...GUIDE_PAGES.map((g) => g.path),
+  ]);
+  return trackedPaths;
+}
+
+// Belt and braces: even with an exact allow-list, never let one day's hash grow
+// past this many distinct paths.
+const MAX_FIELDS_PER_DAY = 1000;
 
 const MAX_PATH_LENGTH = 200;
 
-/** True when `path` is one this deployment counts page views for. */
+/** True when `path` is a published content page this deployment counts. */
 export function isTrackablePath(path: string): boolean {
   if (typeof path !== "string" || path.length === 0 || path.length > MAX_PATH_LENGTH) return false;
-  if (!path.startsWith("/") || path.startsWith("//")) return false;
-  if ((PV_TRACKED_EXACT as readonly string[]).includes(path)) return true;
-  return PV_TRACKED_PREFIXES.some((prefix) => path.startsWith(prefix));
+  return getTrackedPaths().has(path);
 }
 
 function utcDateStamp(date: Date): string {
@@ -56,6 +78,8 @@ export async function recordPageView(path: string): Promise<void> {
 
   try {
     const key = dayKey(new Date());
+    const known = await redis.hexists(key, path);
+    if (!known && (await redis.hlen(key)) >= MAX_FIELDS_PER_DAY) return;
     await redis.multi().hincrby(key, path, 1).expire(key, PV_TTL_SECONDS).exec();
   } catch {
     // Fail silently — see module note above.
@@ -63,9 +87,9 @@ export async function recordPageView(path: string): Promise<void> {
 }
 
 function categoryFor(path: string): string | null {
-  if (path.startsWith("/guides/")) return "Guides";
-  if (path.startsWith("/compare/")) return "Compare";
-  if (path.startsWith("/help/")) return "Help";
+  if (path === "/guides" || path.startsWith("/guides/")) return "Guides";
+  if (path === "/compare" || path.startsWith("/compare/")) return "Compare";
+  if (path === "/help" || path.startsWith("/help/")) return "Help";
   if (path.startsWith("/for/")) return "For";
   if (path === "/features" || path.startsWith("/features/")) return "Features";
   return null;
