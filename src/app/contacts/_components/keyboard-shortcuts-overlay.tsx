@@ -49,7 +49,7 @@ function KeyChip({ k }: { k: string }) {
         borderRadius: 5,
         background: "#f2f4f0",
         border: "1px solid #d8ddd6",
-        fontFamily: '"Geist Mono", ui-monospace, monospace',
+        fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
         fontSize: 12,
         fontWeight: 500,
         color: "#1d2823",

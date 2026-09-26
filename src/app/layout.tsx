@@ -2,6 +2,7 @@ import "~/styles/globals.css";
 
 import { type Metadata, type Viewport } from "next";
 
+import { geistMono, geistSans } from "~/app/_fonts/fonts";
 import { ImpersonationBanner } from "~/app/_components/impersonation-banner";
 import { MotionPreference } from "~/app/_components/motion-preference";
 import { PwaRegister } from "~/app/_components/pwa-register";
@@ -57,7 +58,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         <WebVitalsReporter />
         <MotionPreference />

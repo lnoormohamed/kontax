@@ -3,7 +3,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap");
 
 .adm {
-  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-geist-sans), "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   color: #1d2823;
@@ -536,7 +536,7 @@
 /* ───────────────── flags ───────────────── */
 .ad-flag-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ad-flag-title { font-size: 13.5px; font-weight: 600; color: #1d2823; }
-.ad-flag-key { font-size: 11.5px; color: #8b938c; font-family: "Geist Mono", ui-monospace, monospace; }
+.ad-flag-key { font-size: 11.5px; color: #8b938c; font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace; }
 .ad-flag-mode { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
 .ad-mode-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
 .ad-toggle { position: relative; width: 38px; height: 22px; border: none; border-radius: 999px; cursor: pointer; padding: 0; transition: background 0.16s; }
@@ -588,14 +588,14 @@
 .ad-audit-row { border-top: 1px solid #f0f1ee; }
 .ad-audit-row.is-open { background: #fafbf9; }
 .ad-audit-row .ad-tr { border-top: none; }
-.ad-mono-sm { font-family: "Geist Mono", ui-monospace, monospace; font-size: 12px; }
+.ad-mono-sm { font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace; font-size: 12px; }
 .ad-system-tag { font-size: 11.5px; font-weight: 600; color: #8b938c; background: #f4f4f5; padding: 2px 8px; border-radius: 6px; }
-.ad-action-badge { font-family: "Geist Mono", ui-monospace, monospace; font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.ad-action-badge { font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace; font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
 .ad-audit-summary { display: flex; align-items: center; gap: 7px; color: #8b938c; font-size: 12.5px; }
 .ad-audit-summary .ad-cell { color: #8b938c; }
 .ad-audit-detail { padding: 0 18px 16px 18px; }
 .ad-json-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8b938c; margin-bottom: 6px; }
-.ad-json { margin: 0; padding: 14px 16px; background: #1d2823; color: #e7ecdf; border-radius: 10px; font-family: "Geist Mono", ui-monospace, monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; }
+.ad-json { margin: 0; padding: 14px 16px; background: #1d2823; color: #e7ecdf; border-radius: 10px; font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace; font-size: 12.5px; line-height: 1.6; overflow-x: auto; }
 .ad-pagination { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding: 0 2px; }
 .ad-page-info { font-size: 12.5px; color: #8b938c; }
 .ad-page-info strong { color: #1d2823; font-weight: 600; }

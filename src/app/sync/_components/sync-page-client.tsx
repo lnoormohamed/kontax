@@ -859,7 +859,7 @@ function HistoryTable({
               <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
                 <span
                   style={{
-                    fontFamily: '"Geist Mono", ui-monospace, monospace',
+                    fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
                     fontSize: 11,
                     fontWeight: 700,
                     color: fg,
@@ -1003,7 +1003,7 @@ function HistoryTable({
                       <span style={{ color: T.mute, fontSize: 11.5, fontWeight: 600 }}>Pulled into Kontax</span>
                       <span
                         style={{
-                          fontFamily: '"Geist Mono", ui-monospace, monospace',
+                          fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
                           color: T.ink2,
                         }}
                       >
@@ -1020,7 +1020,7 @@ function HistoryTable({
                       </span>
                       <span
                         style={{
-                          fontFamily: '"Geist Mono", ui-monospace, monospace',
+                          fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
                           color: T.ink2,
                         }}
                       >
@@ -1031,7 +1031,7 @@ function HistoryTable({
                 ) : j.status === "skipped" || j.status === "halted" ? (
                   <span
                     style={{
-                      fontFamily: '"Geist Mono", ui-monospace, monospace',
+                      fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
                       color: T.ink2,
                       fontSize: 12,
                     }}
@@ -1595,7 +1595,7 @@ function DeletionPausePanel({
           </span>
           <span
             style={{
-              fontFamily: '"Geist Mono", ui-monospace, monospace',
+              fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
               fontSize: 12,
               fontWeight: 700,
               color: reconciled ? T.sgreenText : T.amber,
@@ -1671,7 +1671,7 @@ function DeletionPausePanel({
                 </span>
                 <span
                   style={{
-                    fontFamily: '"Geist Mono", ui-monospace, monospace',
+                    fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
                     fontSize: 12.5,
                     color: T.red,
                     fontWeight: 600,
@@ -2451,7 +2451,7 @@ function AccountHeader({
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
                     maxWidth: 420,
-                    fontFamily: '"Geist Mono", ui-monospace, monospace',
+                    fontFamily: 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace',
                   }}
                 >
                   {account.baseUrl}
@@ -2884,7 +2884,7 @@ function FormField({
           fontSize: 14,
           color: T.ink,
           outline: "none",
-          fontFamily: mono ? '"Geist Mono", ui-monospace, monospace' : "inherit",
+          fontFamily: mono ? 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace' : "inherit",
           boxSizing: "border-box",
         }}
       />
