@@ -146,6 +146,7 @@ export const SHARING: HelpCategoryContent = {
         "Visitors can save your details as a contact; Kontax users can add you straight to their address book.",
         "The card page shows view counts (total, last 7 days and last 30 days). Your own visits and known bots aren't counted, and individual visitors aren't shown.",
         "You can change your username once every 30 days.",
+        "Your card is never shown in Google or other search engines — only people you give the link or QR code to can find it.",
       ],
       ifItDoesntWork: [
         "Want it offline? Choose **Hide my card** and the link stops working until you show it again.",
