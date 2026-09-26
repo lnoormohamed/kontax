@@ -107,8 +107,62 @@ export function FeatureShowcase() {
           </MktWindow>
         </FeatureRow>
 
+        {/* P50 · Family phonebook. Facts: birthday and phone numbers sync both
+            ways over CardDAV (help FAQ "what syncs"), shared books sync to every
+            member's phone, edit/view roles per member, up to six on Family.
+            Birthday REMINDERS only cover a member's own contacts today, so the
+            copy doesn't promise reminders for the shared book. */}
         <FeatureRow
           flip
+          kicker="Family"
+          title="One family phonebook, always up to date"
+          body="Keep everyone's mobile numbers and birthdays in one shared Family book. When someone gets a new number, it's changed once and every phone in the family has it, right inside the Contacts app."
+          points={["Numbers and birthdays on everyone's iPhone or Mac", "Edit or view-only roles for each member"]}
+        >
+          <MktWindow bar="Books · Family">
+            <div className="hp-book-h">
+              <span className="hp-glyph">F</span>
+              <div>
+                <div className="hp-vname">Family</div>
+                <div className="hp-vsub">24 contacts · shared with 4</div>
+              </div>
+              <span className="hp-stack">
+                <span className="hp-av hp-av--sm hp-av-d">LM</span>
+                <span className="hp-av hp-av--sm hp-av-a">JM</span>
+                <span className="hp-av hp-av--sm hp-av-b">SM</span>
+                <span className="hp-av hp-av--sm hp-av-c">RM</span>
+              </span>
+            </div>
+            <div className="hp-vrow hp-vrow--hl">
+              <span className="hp-av hp-av-b">Mu</span>
+              <div className="hp-vrow__main">
+                <div className="hp-vname">Mum</div>
+                <div className="hp-vsub">Mobile +44 7700 900456 · Birthday 14 Mar</div>
+              </div>
+              <span className="hp-role hp-role--edit">New number</span>
+            </div>
+            <div className="hp-vrow">
+              <span className="hp-av hp-av-a">JM</span>
+              <div className="hp-vrow__main">
+                <div className="hp-vname">James M.</div>
+                <div className="hp-vsub">Mobile +44 7700 900781 · Birthday 2 Jun</div>
+              </div>
+            </div>
+            <div className="hp-vrow">
+              <span className="hp-av hp-av-c">GR</span>
+              <div className="hp-vrow__main">
+                <div className="hp-vname">Grandad</div>
+                <div className="hp-vsub">Home 020 7946 0321 · Birthday 21 Oct</div>
+              </div>
+            </div>
+            <span className="hp-sync-chip">
+              <i />
+              Mum&apos;s number updated · synced to 4 phones
+            </span>
+          </MktWindow>
+        </FeatureRow>
+
+        <FeatureRow
           kicker="Clean-up"
           title="Duplicates, found and fixed"
           body="Kontax spots the same person saved twice across your accounts, shows you both records side by side, and lets you pick what to keep. Every merge can be undone."
@@ -142,52 +196,6 @@ export function FeatureShowcase() {
           </MktWindow>
         </FeatureRow>
 
-        <FeatureRow
-          kicker="Sharing"
-          title="Share a book with family or your team"
-          body="Keep the plumber, the school and the grandparents in one shared book. Everyone sees the same numbers, and you decide who can edit."
-          points={["Edit or view-only roles for each member", "Shared books sync to everyone's phones"]}
-        >
-          <MktWindow bar="Books · Family">
-            <div className="hp-book-h">
-              <span className="hp-glyph">F</span>
-              <div>
-                <div className="hp-vname">Family</div>
-                <div className="hp-vsub">86 contacts · shared with 4</div>
-              </div>
-              <span className="hp-stack">
-                <span className="hp-av hp-av--sm hp-av-d">LM</span>
-                <span className="hp-av hp-av--sm hp-av-a">JM</span>
-                <span className="hp-av hp-av--sm hp-av-b">SM</span>
-                <span className="hp-av hp-av--sm hp-av-c">RM</span>
-              </span>
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-av hp-av-d">LM</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">Lina M. (you)</div>
-                <div className="hp-vsub">Owner</div>
-              </div>
-              <span className="hp-role hp-role--edit">Can edit</span>
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-av hp-av-a">JM</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">James M.</div>
-                <div className="hp-vsub">Joined 12 Aug</div>
-              </div>
-              <span className="hp-role hp-role--edit">Can edit</span>
-            </div>
-            <div className="hp-vrow">
-              <span className="hp-av hp-av-c">RM</span>
-              <div className="hp-vrow__main">
-                <div className="hp-vname">Rosa M.</div>
-                <div className="hp-vsub">Joined 3 Sep</div>
-              </div>
-              <span className="hp-role">Can view</span>
-            </div>
-          </MktWindow>
-        </FeatureRow>
 
         <div className="hp-sgrid">
           {GRID.map((item) => (
