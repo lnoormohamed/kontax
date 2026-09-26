@@ -57,7 +57,7 @@ function marketingGroupFiles(rootDir) {
 
 // Public content pages that live outside the (marketing) route group (so
 // they get the ROOT title template, not the marketing group's identity one).
-const EXTRA_PUBLIC_PAGES = ["src/app/help/page.tsx", "src/app/developers/page.tsx"];
+const EXTRA_PUBLIC_PAGES = ["src/app/developers/page.tsx", "src/app/developers/export-format/page.tsx"];
 
 /** @param {string} rootDir @returns {PageFile[]} */
 export function findMarketingPageFiles(rootDir) {

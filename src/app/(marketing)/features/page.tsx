@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
+import { PageViewBeacon } from "~/app/_components/page-view-beacon";
 import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import {
   ArrowIcon,
@@ -113,26 +114,19 @@ const GRID_ICONS = {
 // centre FAQ) for things the rows above don't cover. No new claims.
 const MORE: { icon: keyof typeof GRID_ICONS; title: string; body: string }[] = [
   {
-    icon: "merge",
-    title: "Duplicates, found and fixed",
-    body: "Spots the same person saved twice across your accounts and lets you pick what to keep.",
+    icon: "file",
+    title: "Open export format",
+    body: "A documented format that keeps labels, notes, custom fields and photos.",
   },
-  { icon: "clock", title: "Change history", body: "See what changed on each contact, when, and from where." },
-  { icon: "file", title: "Open export format", body: "A documented format that keeps labels, notes and history." },
   {
     icon: "tidy",
     title: "Tidy by default",
-    body: "Phone numbers formatted for their country, names sorted properly in any script.",
+    body: "Phone numbers formatted for their country, names in many scripts sorted sensibly.",
   },
   {
     icon: "list",
     title: "Smart lists",
     body: "Save a combination of search, label and book filters, and recall it with one click.",
-  },
-  {
-    icon: "device",
-    title: "No app to install",
-    body: "On iPhone and Mac, Kontax appears in the Contacts app you already use.",
   },
 ];
 
@@ -152,10 +146,14 @@ export default function FeaturesPage() {
         ])}
       />
 
+      {/* P50A-08: cookieless page-view beacon — see page-view-beacon.tsx */}
+      <PageViewBeacon path="/features" />
+
+      {/* P50A-04: the H1 names what the page covers (sync, clean-up, sharing). */}
       <PageHead
         label="Every feature, up close"
-        title="Everything your address book has been missing"
-        lede="From search to sync to sharing — Kontax keeps your contacts organised, backed up, and always up to date."
+        title="Contact sync, clean-up and sharing, in one private address book"
+        lede="From search to sync to sharing — Kontax keeps your contacts organised, synced and always up to date."
       />
 
       <section className="fp-rows" aria-label="Features">
@@ -357,10 +355,9 @@ export default function FeaturesPage() {
           >
             <p className="fp-frow__body">
               Invite the people you trust into a shared address book and
-              everyone sees the same up-to-date contacts. Assign roles — owner,
-              editor, or viewer — so you control who can change what. Updates
-              appear live, so when one person fixes a number, it&apos;s fixed
-              for everyone.
+              everyone sees the same up-to-date contacts. You decide who can
+              edit and who can only view, and when one person fixes a number,
+              the change reaches everyone&apos;s devices on the next sync.
             </p>
           </FeatureRow>
 
@@ -470,13 +467,125 @@ export default function FeaturesPage() {
             }
           >
             <p className="fp-frow__body">
-              Every contact, label, and address book is available through a
-              clean REST API. Authenticate with a scoped key, then read or write
-              contacts straight from your own tools, scripts, and integrations.
-              Rate limits are generous and every response is plain JSON.
+              Your contacts are available through a clean REST API.
+              Authenticate with a scoped key, then read or write contacts
+              straight from your own tools, scripts, and integrations. Every
+              response is plain JSON.
             </p>
             <Link className="mkt-more fp-frow__link" href="/developers">
               Read the API docs
+              <ArrowIcon />
+            </Link>
+          </FeatureRow>
+
+          {/* ── 07 Merge with 30-day undo (P50A-04; contact-merge.ts) ── */}
+          <FeatureRow
+            n="07"
+            label="Duplicates"
+            title="Merge duplicates, with 30 days to change your mind"
+            id="duplicates"
+            media={
+              <MktWindow bar="Merged contacts">
+                {(
+                  [
+                    { initials: "JW", av: "fp-av-e", name: "James Whitfield", sub: "kept · merged Jamie W.", days: 27 },
+                    { initials: "RP", av: "fp-av-a", name: "Rosa Pérez", sub: "kept · merged R. Perez", days: 12 },
+                  ] as const
+                ).map(({ initials, av, name, sub, days }) => (
+                  <div key={name} className="fp-vrow">
+                    <span className={`fp-av ${av}`}>{initials}</span>
+                    <div className="fp-vrow__main">
+                      <div className="fp-vname">{name}</div>
+                      <div className="fp-vsub">{sub}</div>
+                    </div>
+                    <span className="fp-role fp-role--editor">Undo · {days}d left</span>
+                  </div>
+                ))}
+              </MktWindow>
+            }
+          >
+            <p className="fp-frow__body">
+              Kontax spots likely duplicates and merges them once you approve — combining phone
+              numbers, emails and notes onto one contact. Every merge stays fully reversible for
+              30 days, so an accidental merge is never permanent.
+            </p>
+            <Link className="mkt-more fp-frow__link" href="/features/duplicates">
+              See how merging works
+              <ArrowIcon />
+            </Link>
+          </FeatureRow>
+
+          {/* ── 08 Change history ── */}
+          <FeatureRow
+            flip
+            n="08"
+            label="History"
+            title="Every change, remembered"
+            id="history"
+            media={
+              <MktWindow bar="Contact · History">
+                {(
+                  [
+                    { label: "Phone number updated", meta: "2 days ago" },
+                    { label: "Label added: VIP", meta: "1 week ago" },
+                    { label: "Merged with duplicate", meta: "3 weeks ago" },
+                    { label: "Contact created", meta: "4 months ago" },
+                  ] as const
+                ).map(({ label, meta }) => (
+                  <div key={label} className="fp-vrow">
+                    <span className="fp-hi__dot" />
+                    <div className="fp-vrow__main">
+                      <div className="fp-vname">{label}</div>
+                      <div className="fp-vsub">{meta}</div>
+                    </div>
+                  </div>
+                ))}
+              </MktWindow>
+            }
+          >
+            <p className="fp-frow__body">
+              Every contact keeps its own history — who changed a phone number, added a label, or
+              merged in a duplicate, and when. If something looks wrong, you can see exactly what
+              happened instead of guessing.
+            </p>
+            <Link className="mkt-more fp-frow__link" href="/features/history">
+              See your change history
+              <ArrowIcon />
+            </Link>
+          </FeatureRow>
+
+          {/* ── 09 Appears in iPhone and Mac Contacts ── */}
+          <FeatureRow
+            n="09"
+            label="No app to install"
+            title="Appears in iPhone and Mac Contacts"
+            media={
+              <MktWindow bar="Accounts">
+                {(
+                  [
+                    { glyph: "iP", name: "iPhone Contacts" },
+                    { glyph: "M", name: "Mac Contacts" },
+                  ] as const
+                ).map(({ glyph, name }) => (
+                  <div key={name} className="fp-vrow">
+                    <span className="fp-glyph">{glyph}</span>
+                    <div className="fp-vrow__main">
+                      <div className="fp-vname">{name}</div>
+                      <div className="fp-vsub">Built-in app · over CardDAV</div>
+                    </div>
+                    <Synced when="Synced" />
+                  </div>
+                ))}
+              </MktWindow>
+            }
+          >
+            <p className="fp-frow__body">
+              No separate app to open. Add your Kontax address book to the Contacts app you
+              already use on iPhone and Mac over CardDAV, and every edit flows both ways — no
+              extra step to remember.
+            </p>
+            <Link className="mkt-more fp-frow__link" href="/help/sync/connect-iphone-or-mac">
+              Connect your iPhone or Mac
               <ArrowIcon />
             </Link>
           </FeatureRow>
@@ -487,7 +596,7 @@ export default function FeaturesPage() {
       <section className="mkt-band" aria-labelledby="fp-more-title">
         <div className="mkt-container">
           <SectionHead
-            n="07"
+            n="10"
             label="And the rest"
             title="The details that keep it tidy"
             id="fp-more-title"

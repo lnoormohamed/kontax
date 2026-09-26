@@ -261,3 +261,6 @@
   .fp-sitem svg { grid-row: auto; }
   .fp-sitem p { font-size: 13.5px; }
 }
+
+/* ─── Change-history rows (07–09 added in the merged build) ─── */
+.fp-hi__dot { width: 8px; height: 8px; margin: 0 12px 0 4px; border-radius: 50%; background: var(--mkt-g600); flex: 0 0 auto; }

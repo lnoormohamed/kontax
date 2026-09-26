@@ -4,17 +4,17 @@
 // "Export format" section) — see that page for the REST API reference and a
 // short teaser back to this one.
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { PublicFooter } from "~/app/_components/public-footer";
-import { PublicNav } from "~/app/_components/public-nav";
-import "~/app/_components/public-site.css";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
 import { FORMAT_VERSION } from "~/server/export-format/constants";
 import { SITE_URL } from "~/lib/site-url";
 
-import { Code, CodeBlock, DocPageShell, FORMAT_REPO_URL, H3, P, Section, Table } from "../_doc-ui";
+import { Code, CodeBlock, DocHead, DocPageShell, FORMAT_REPO_URL, H3, P, Section, Table } from "../_doc-ui";
 
-const TITLE = "Export format reference — Kontax";
+// Outside the (marketing) group, so the root "%s · Kontax" template applies:
+// the rendered title is "Export format reference · Kontax".
+const TITLE = "Export format reference";
 const DESCRIPTION =
   "The open Kontax Contact Export Format: document and archive structure, versioning, the vCard mapping, and the schemas and reference validator.";
 
@@ -46,7 +46,7 @@ const TOC_ITEMS = [
 
 export default function ExportFormatPage() {
   return (
-    <div className="kx">
+    <>
       <JsonLd
         data={[
           breadcrumbSchema([
@@ -57,59 +57,33 @@ export default function ExportFormatPage() {
           webPageSchema(),
         ]}
       />
-      <PublicNav />
-
       <DocPageShell tocItems={TOC_ITEMS}>
-        {/* Page header */}
-        <div style={{ marginBottom: 48 }}>
-          <p
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.14em",
-              color: "#8b938c",
-              marginBottom: 8,
-            }}
-          >
-            Developer documentation
-          </p>
-          <h1
-            style={{
-              fontSize: 34,
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              color: "#1d2823",
-              marginBottom: 12,
-            }}
-          >
-            Export format reference
-          </h1>
-          <p style={{ fontSize: 15.5, lineHeight: 1.7, color: "#5c655e", maxWidth: 640 }}>
-            The complete reference for the Kontax Contact Export Format — the open format behind
-            every export from Settings. Part of the{" "}
-            <a href="/developers" style={{ color: "#4158f4" }}>
-              developer documentation
-            </a>
-            .
-          </p>
-        </div>
+        <DocHead
+          title="Export format reference"
+          lede={
+            <>
+              The complete reference for the Kontax Contact Export Format — the open format behind
+              every export from Settings. Part of the{" "}
+              <Link href="/developers">developer documentation</Link>.
+            </>
+          }
+        />
 
         <Section id="export-format" title={`Export format (v${FORMAT_VERSION})`}>
           <P>
             Kontax exports contacts in an <strong>open, documented format</strong> so your data is
             never locked in. One JSON document describes one contact; an archive is packaging
             around many of them plus their photos. The format is{" "}
-            <a href={FORMAT_REPO_URL} style={{ color: "#4158f4" }} target="_blank" rel="noreferrer">
+            <a href={FORMAT_REPO_URL} target="_blank" rel="noreferrer">
               developed in the open
             </a>{" "}
             — this page is the reference; the canonical spec, JSON Schemas, and a reference
             validator live in that repository (also mirrored under{" "}
-            <a href="/format/spec.md" style={{ color: "#4158f4" }}>/format</a> on this site).
+            <a href="/format/spec.md">/format</a> on this site).
           </P>
           <P>
             The base standard is{" "}
-            <a href="https://www.rfc-editor.org/rfc/rfc9553" style={{ color: "#4158f4" }} target="_blank" rel="noreferrer">
+            <a href="https://www.rfc-editor.org/rfc/rfc9553" target="_blank" rel="noreferrer">
               JSContact (RFC 9553)
             </a>
             : an exported contact is a JSContact <Code>Card</Code>. Everything Kontax-specific lives
@@ -130,7 +104,7 @@ export default function ExportFormatPage() {
         </Section>
 
         {/* Document */}
-        <section id="format-document" style={{ marginBottom: 48 }}>
+        <section id="format-document" className="dev-endpoint">
           <H3>Document structure</H3>
           <P>
             A bare document is a single JSContact Card with two Kontax envelope properties. Native
@@ -183,18 +157,18 @@ export default function ExportFormatPage() {
           <P>
             The complete property reference — every field, its class (must / optional / never), and
             its vendor shape — is in{" "}
-            <a href="/format/spec.md" style={{ color: "#4158f4" }}>the full spec</a> (§3). The
+            <a href="/format/spec.md">the full spec</a> (§3). The
             machine-checkable form is the{" "}
-            <a href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+            <a href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
               contact JSON Schema
             </a>
             . A ready-to-read example is{" "}
-            <a href="/format/daniel-cho.json" style={{ color: "#4158f4" }}>daniel-cho.json</a>.
+            <a href="/format/daniel-cho.json">daniel-cho.json</a>.
           </P>
         </section>
 
         {/* Archive */}
-        <section id="format-archive" style={{ marginBottom: 48 }}>
+        <section id="format-archive" className="dev-endpoint">
           <H3>Archive layout</H3>
           <P>
             An archive is a <Code>.zip</Code> containing a manifest, one JSON document per contact,
@@ -231,9 +205,9 @@ export default function ExportFormatPage() {
             Every <Code>contacts/*.json</Code> declares the same <Code>formatVersion</Code> as the
             manifest — a mixed-version archive is invalid. Full container rules (streaming, limits,
             recognition) are in{" "}
-            <a href="/format/spec.md" style={{ color: "#4158f4" }}>spec §7</a>; the manifest schema
+            <a href="/format/spec.md">spec §7</a>; the manifest schema
             is{" "}
-            <a href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+            <a href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
               kontax-archive.v{FORMAT_VERSION.split(".")[0]}.schema.json
             </a>
             .
@@ -241,7 +215,7 @@ export default function ExportFormatPage() {
         </section>
 
         {/* Versioning */}
-        <section id="format-versioning" style={{ marginBottom: 48 }}>
+        <section id="format-versioning" className="dev-endpoint">
           <H3>Versioning policy</H3>
           <P>Two independent version fields — do not conflate them:</P>
           <Table
@@ -266,7 +240,7 @@ export default function ExportFormatPage() {
         </section>
 
         {/* vCard mapping */}
-        <section id="format-vcard" style={{ marginBottom: 48 }}>
+        <section id="format-vcard" className="dev-endpoint">
           <H3>vCard mapping</H3>
           <P>
             Every property maps to a <strong>native vCard property where one exists, or an{" "}
@@ -274,7 +248,7 @@ export default function ExportFormatPage() {
             <Code>vcards/contacts.vcf</Code> is that projection, for tools that can&apos;t read
             JSContact — lossy by construction (a generic reader drops the <Code>X-</Code> props);
             the lossless source is always <Code>contacts/</Code>. Key rows (full table in{" "}
-            <a href="/format/spec.md" style={{ color: "#4158f4" }}>spec §6</a>):
+            <a href="/format/spec.md">spec §6</a>):
           </P>
           <Table
             headers={["Document property", "vCard line"]}
@@ -295,7 +269,7 @@ export default function ExportFormatPage() {
         </section>
 
         {/* Schemas & validator */}
-        <section id="format-validate" style={{ marginBottom: 48 }}>
+        <section id="format-validate" className="dev-endpoint">
           <H3>Schemas &amp; validator</H3>
           <P>
             A developer can implement a reader from the files below alone — no Kontax account
@@ -307,31 +281,31 @@ export default function ExportFormatPage() {
             headers={["File", "What it is"]}
             rows={[
               [
-                <a key="s1" href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+                <a key="s1" href={`/format/kontax-contact.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
                   kontax-contact.v{FORMAT_VERSION.split(".")[0]}.schema.json
                 </a>,
                 "JSON Schema for one contact document",
               ],
               [
-                <a key="s2" href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`} style={{ color: "#4158f4" }}>
+                <a key="s2" href={`/format/kontax-archive.v${FORMAT_VERSION.split(".")[0]}.schema.json`}>
                   kontax-archive.v{FORMAT_VERSION.split(".")[0]}.schema.json
                 </a>,
                 "JSON Schema for the archive manifest",
               ],
               [
-                <a key="e1" href="/format/daniel-cho.json" style={{ color: "#4158f4" }}>daniel-cho.json</a>,
+                <a key="e1" href="/format/daniel-cho.json">daniel-cho.json</a>,
                 "Example bare document (inline photo, custom field, labels)",
               ],
               [
-                <a key="e2" href="/format/example-archive.zip" style={{ color: "#4158f4" }}>example-archive.zip</a>,
+                <a key="e2" href="/format/example-archive.zip">example-archive.zip</a>,
                 "Example archive — two contacts sharing one photo",
               ],
               [
-                <a key="v1" href="/format/validate.mjs" style={{ color: "#4158f4" }}>validate.mjs</a>,
+                <a key="v1" href="/format/validate.mjs">validate.mjs</a>,
                 "Zero-dependency reference validator",
               ],
               [
-                <a key="sp" href="/format/spec.md" style={{ color: "#4158f4" }}>spec.md</a>,
+                <a key="sp" href="/format/spec.md">spec.md</a>,
                 "The full human-readable specification",
               ],
             ]}
@@ -341,7 +315,7 @@ node validate.mjs contacts.zip
 node validate.mjs contact.json`}</CodeBlock>
           <P>
             Source, issues, and the canonical spec live at{" "}
-            <a href={FORMAT_REPO_URL} style={{ color: "#4158f4" }} target="_blank" rel="noreferrer">
+            <a href={FORMAT_REPO_URL} target="_blank" rel="noreferrer">
               {FORMAT_REPO_URL.replace("https://", "")}
             </a>
             . The page and the repository always state the same{" "}
@@ -350,27 +324,16 @@ node validate.mjs contact.json`}</CodeBlock>
         </section>
 
         {/* Footer note */}
-        <div
-          style={{
-            borderTop: "1px solid #e4e4e7",
-            paddingTop: 24,
-            marginTop: 8,
-          }}
-        >
-          <p style={{ fontSize: 13, color: "#8b938c", lineHeight: 1.6 }}>
+        <div className="dev-foot">
+          <p>
             API questions or issues?{" "}
-            <a href="mailto:support@getkontax.com" style={{ color: "#4158f4" }}>
-              support@getkontax.com
-            </a>
+            <a href="mailto:support@getkontax.com">support@getkontax.com</a>
             {" · "}
-            <a href="/developers" style={{ color: "#4158f4" }}>
-              Back to developer docs →
-            </a>
+            <Link href="/developers">Back to developer docs →</Link>
           </p>
         </div>
       </DocPageShell>
 
-      <PublicFooter />
-    </div>
+    </>
   );
 }
