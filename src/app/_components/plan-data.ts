@@ -130,7 +130,7 @@ export const PLAN_MATRIX: FeatureGroup[] = [
       {
         id: "imports",
         label: "Imports per month",
-        vals: perPlan((e) => (e.monthlyImportLimit === null ? "Unlimited" : "Monthly allowance")),
+        vals: perPlan((e) => (e.monthlyImportLimit === null ? "Unlimited" : `${e.monthlyImportLimit} a month`)),
       },
       { id: "kontaxexport", label: "Export (CSV, Kontax archive)", vals: every(true) },
       { id: "export", label: "vCard export (whole library)", vals: perPlan((e) => e.premiumExportEnabled) },

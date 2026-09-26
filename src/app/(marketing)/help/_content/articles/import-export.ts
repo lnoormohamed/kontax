@@ -44,7 +44,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
         "Rows in the same file that share an email or phone must be fixed before the import can go ahead.",
         "CSV files can be up to 10 MB and 50,000 rows.",
         "Every import appears in **Import history**. Choose **Undo** there to archive everything that import added.",
-        "Free has a monthly import allowance; Pro, Family and Teams have none. Syncing a connected account doesn't count as importing.",
+        `Free includes ${FACTS.freeMonthlyImports} imports a month (each CSV file or Kontax archive you import counts as one, however many contacts it holds); Pro, Family and Teams are unlimited. Syncing a connected account doesn't count as importing.`,
       ],
       ifItDoesntWork: [
         "“Import blocked” lists what to fix — usually duplicate rows inside the file.",
@@ -278,7 +278,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
     },
     {
       q: "Is there a limit on imports?",
-      a: "Free has a monthly import allowance, shown on the Import & export page. Pro, Family and Teams can import as often as they like. Syncing a connected account isn't counted as an import.",
+      a: `Free includes ${FACTS.freeMonthlyImports} imports a month — each CSV file or Kontax archive counts as one, however many contacts it holds (up to the ${FACTS.freeContactLimit}-contact limit). The Import & export page shows how many you've used. Pro, Family and Teams can import as often as they like. Syncing a connected account isn't counted as an import.`,
       more: "getting-started/understand-free-plan-limits",
     },
     {

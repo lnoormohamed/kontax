@@ -19,6 +19,8 @@ export const FACTS = {
   // ── Plans (src/server/dav/plan-entitlements.mjs) ──
   freeContactLimit: fmt(need(PLAN_DEFAULTS.FREE.contactsLimit, "Free contact limit")),
   freeSyncAccounts: PLAN_DEFAULTS.FREE.syncAccountsLimit,
+  /** Import runs a month on Free (P49A-19: runs, not contacts). */
+  freeMonthlyImports: need(PLAN_DEFAULTS.FREE.monthlyImportLimit, "Free monthly imports"),
   proSyncAccounts: PLAN_DEFAULTS.PRO.syncAccountsLimit,
   freeDevicePasswords: PLAN_DEFAULTS.FREE.appPasswordsLimit,
   proDevicePasswords: PLAN_DEFAULTS.PRO.appPasswordsLimit,

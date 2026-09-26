@@ -166,7 +166,7 @@ const sections: GuideSection[] = [
           <>
             <strong>To copy once:</strong> on contacts.google.com, select your contacts, choose More actions →
             Export → Google CSV, and import the file into Kontax, which recognises Google’s CSV layout (Free
-            has a monthly import allowance; see <Link href="/pricing">pricing</Link>). See{" "}
+            includes three imports a month; see <Link href="/pricing">pricing</Link>). See{" "}
             <Link href="/help/import-export/import-from-google-icloud">import from Google or iCloud</Link>.
           </>,
           <>
