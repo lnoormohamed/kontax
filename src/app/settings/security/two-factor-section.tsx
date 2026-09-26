@@ -5,6 +5,8 @@ import { useEffect, useState, useTransition } from "react";
 
 import { disableTotpAuth, getTotpStatus, regenerateRecoveryCodes } from "~/app/actions/totp";
 
+import { RecoveryCodesDialog } from "./recovery-codes";
+
 const TwoFactorModal = dynamic(
   () => import("./two-factor-modal").then((mod) => mod.TwoFactorModal),
   { ssr: false },
@@ -25,6 +27,8 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
   const [pw, setPw] = useState("");
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
+  const [newCodes, setNewCodes] = useState<string[] | null>(null);
+  const [regenErr, setRegenErr] = useState("");
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -50,13 +54,28 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
     });
   };
 
+  // P49A-19: this used to drop `result.recoveryCodes` on the floor — the server
+  // had already replaced the stored set, so the old codes stopped working and
+  // the new ones were never shown. Now the new codes go straight into a dialog
+  // the user can only leave by confirming they've saved them.
   const doRegenerate = () => {
+    setRegenErr("");
     startTransition(async () => {
-      const result = await regenerateRecoveryCodes();
-      if ("success" in result) {
-        setRemainingCodes(8);
-        flash("A new set of recovery codes was generated");
-        setViewCodes(false);
+      try {
+        const result = await regenerateRecoveryCodes();
+        if ("success" in result) {
+          setNewCodes(result.recoveryCodes);
+          setRemainingCodes(result.recoveryCodes.length);
+          setViewCodes(false);
+        } else {
+          setRegenErr(result.error === "REGENERATE_FAILED"
+            ? "Couldn't create new codes. Your existing recovery codes still work."
+            : "Something went wrong. Your existing recovery codes haven't changed.");
+        }
+      } catch {
+        // No response, so we can't tell whether a new set was stored. Say so,
+        // rather than promise the old codes still work.
+        setRegenErr("Something went wrong and we couldn't confirm whether new codes were created. Regenerate again to get a set you can save.");
       }
     });
   };
@@ -133,6 +152,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
                 >
                   {isPending ? <><Spinner size={12} light={false} /> Regenerating…</> : "Regenerate recovery codes"}
                 </button>
+                {regenErr && <p className="mt-2 text-[12.5px] text-[#9a3a23]" role="alert">{regenErr}</p>}
               </div>
             )}
           </div>
@@ -184,6 +204,13 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
             </div>
           )}
         </>
+      )}
+
+      {newCodes && (
+        <RecoveryCodesDialog
+          codes={newCodes}
+          onSaved={() => { setNewCodes(null); flash("New recovery codes saved"); }}
+        />
       )}
 
       {enrol && (
