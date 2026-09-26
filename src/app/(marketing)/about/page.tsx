@@ -1,18 +1,21 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { JsonLd, organizationSchema } from "~/app/_components/json-ld";
+import { JsonLd, breadcrumbSchema, organizationSchema } from "~/app/_components/json-ld";
+import { webPageSchema } from "../_components/page-schema";
 import { ArrowIcon, CtaBand, PageHead, SectionHead } from "../_components/mkt-ui";
 import "./about.css";
 
+const TITLE = "About — Kontax";
+const DESCRIPTION =
+  "Kontax was built because address books haven't kept up with how we live. Made by Vexon, based in the UK.";
+
 export const metadata: Metadata = {
-  title: "About — Kontax",
-  description:
-    "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/about" },
   openGraph: {
     title: "About Kontax",
-    description:
-      "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
+    description: DESCRIPTION,
     url: "/about",
     siteName: "Kontax",
     type: "website",
@@ -20,12 +23,19 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "About — Kontax",
-    description:
-      "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
+    title: TITLE,
+    description: DESCRIPTION,
   },
 };
 
+// Owner approved 2026-09-26 (family-phonebook "Why Kontax exists" story).
+//
+// Fact-check (feat/p50-merged, 2026-09-26): the company is "Vexon" as the
+// terms and privacy policy name it (not "Vexon Group"); the terms are governed
+// by the laws of England and Wales. No team size, founding date, user numbers
+// or funding are stated because none are documented. Family = one shared book
+// for up to 6 members (memberSlotsLimit), edit/view per member.
+//
 // P50-05 · Direction A layout over the existing About copy. "Why Kontax
 // exists" (§02) tells the family-phonebook story the owner asked for. Claims
 // are limited to verified behaviour: a shared Family book for up to six
@@ -50,13 +60,22 @@ const PRINCIPLES: { title: string; body: string }[] = [
 const PROMISES: { title: string; href: string; link: string }[] = [
   { title: "Syncs to your devices", href: "/features", link: "See features" },
   { title: "Stays private", href: "/security", link: "How we protect it" },
-  { title: "Always yours to export", href: "/developers#export-format", link: "The export format" },
+  { title: "Always yours to export", href: "/developers/export-format", link: "The export format" },
 ];
 
 export default function AboutPage() {
   return (
     <>
-      <JsonLd data={organizationSchema()} />
+      <JsonLd
+        data={[
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+          webPageSchema({ name: TITLE, description: DESCRIPTION, path: "/about" }),
+        ]}
+      />
 
       <PageHead
         label="About"
@@ -75,7 +94,7 @@ export default function AboutPage() {
               <>
                 But the tools to manage them are either locked inside a platform&rsquo;s ecosystem
                 or frozen in 2005. You can&rsquo;t easily search across sources, organise with
-                labels, share a family address book, or let someone add you with a single tap.
+                labels, share a family address book, or hand someone your details with one link.
               </>
             }
           />
@@ -154,7 +173,7 @@ export default function AboutPage() {
                 .
               </>
             }
-            lede="A small team building tools that respect your data and your time."
+            lede="Based in the UK: our terms are governed by the laws of England and Wales, and the privacy policy explains how we handle your data under UK data protection law."
           />
         </div>
       </section>
