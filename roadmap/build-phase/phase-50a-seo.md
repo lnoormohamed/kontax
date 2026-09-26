@@ -15,8 +15,9 @@ for a new UK product with no social proof yet.
 - **2026-09-25 — Currency: GBP.** Stripe prices move to GBP (the product is UK-focused). The site
   already formats whatever currency Stripe returns, so no code change is needed for display; the
   owner changes the Stripe prices, then P50A-03's Offer schema reads the same GBP values.
-- **Open:** public contact cards in search — opt-in only (recommended) or never?
-- **Open:** OK to rebuild the changelog from the real release history (June 2026 onwards)?
+- **2026-09-26 — Public contact cards: never indexed** (they can hold addresses/phone numbers):
+  noindex meta + `X-Robots-Tag` on every `/u/*` page in all environments; not in the sitemap.
+- **2026-09-25 — Changelog rebuilt from the real release history** (approved; done in P50A-01).
 
 ## Tickets
 
