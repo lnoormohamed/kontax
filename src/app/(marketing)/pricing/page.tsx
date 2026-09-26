@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   },
 };
 
-function Cell({ yes, text }: { yes?: boolean; text?: string }) {
+function Cell({ yes, text }: { yes?: boolean; text?: React.ReactNode }) {
   if (yes) return <span className="pr-yes"><CheckIcon size={18} label="Included" /></span>;
   if (text) return <>{text}</>;
   return (
@@ -57,6 +57,15 @@ function Cell({ yes, text }: { yes?: boolean; text?: string }) {
     </span>
   );
 }
+
+// Per-token API limits by token scope (rate-limit.ts apiRead / apiWrite).
+const API_LIMIT = (
+  <>
+    1,000/hr read-only
+    <br />
+    200/hr read-write
+  </>
+);
 
 // P38-10: statically rendered with hourly ISR for the Stripe price fetch;
 // the visitor's current plan resolves client-side inside PricingToggle.
@@ -131,7 +140,8 @@ export default async function PricingPage() {
                 <tr className="pr-row"><th scope="row">Import (CSV, vCard)</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><th scope="row">Export (GDPR)</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
                 <tr className="pr-row"><th scope="row">Global activity feed</th><td><Cell /></td><td><Cell text="365 days" /></td><td><Cell text="90 days" /></td><td><Cell text="Unlimited" /></td></tr>
-                <tr className="pr-row"><th scope="row">Minimum events kept</th><td><Cell text="3 events" /></td><td><Cell text="25 events" /></td><td><Cell text="10 events" /></td><td><Cell text="All events" /></td></tr>
+                {/* Values from historyFloorPerContact in src/server/dav/plan-entitlements.mjs (A-33). */}
+                <tr className="pr-row"><th scope="row">Minimum events kept</th><td><Cell text="10 events" /></td><td><Cell text="20 events" /></td><td><Cell text="20 events" /></td><td><Cell text="20 events" /></td></tr>
                 <tr className="pr-row"><th scope="row">Per-contact history</th><td><Cell text="Last 3 shown" /></td><td><Cell text="Full · 365 days" /></td><td><Cell text="Full · 90 days" /></td><td><Cell text="Full · unlimited" /></td></tr>
                 <tr className="pr-row"><th scope="row">Merge duplicates</th><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td><td><Cell yes /></td></tr>
 
@@ -157,7 +167,8 @@ export default async function PricingPage() {
                 {/* DEVELOPER */}
                 <tr className="pr-cat"><th colSpan={5} scope="colgroup">Developer</th></tr>
                 <tr className="pr-row"><th scope="row">REST API</th><td><Cell /></td><td><Cell yes /></td><td><Cell /></td><td><Cell yes /></td></tr>
-                <tr className="pr-row"><th scope="row">API rate limit</th><td><Cell /></td><td><Cell text="5k / day" /></td><td><Cell /></td><td><Cell text="20k / day" /></td></tr>
+                {/* Per token, sliding hour: apiRead / apiWrite in src/server/rate-limit.ts, as on /developers (A-32). */}
+                <tr className="pr-row"><th scope="row">API rate limit (per token)</th><td><Cell /></td><td><Cell text={API_LIMIT} /></td><td><Cell /></td><td><Cell text={API_LIMIT} /></td></tr>
 
                 {/* SUPPORT */}
                 <tr className="pr-cat"><th colSpan={5} scope="colgroup">Support</th></tr>

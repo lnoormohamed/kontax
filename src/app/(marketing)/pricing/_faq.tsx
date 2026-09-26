@@ -19,7 +19,7 @@ const FAQS = [
   },
   {
     q: "Is my data safe?",
-    a: "Your address book is encrypted in transit and at rest, hosted in the EU. We never sell or share your data, and there are no ads or trackers anywhere in Kontax. Built on the open CardDAV standard, so you're never locked in.",
+    a: "Every connection to Kontax is encrypted in transit, and the secrets that could unlock your accounts (your two-factor secret and your sync credentials) are encrypted at rest. We never sell or share your data, and there are no ads or trackers anywhere in Kontax. Built on the open CardDAV standard, so you're never locked in.",
   },
   {
     q: "Do you offer refunds?",
@@ -31,7 +31,7 @@ const FAQS = [
   },
   {
     q: "Is there a family discount?",
-    a: "The Family plan is the discount — one flat price covers up to six members, each with their own login, rather than six separate Pro subscriptions. Switch to annual billing to save a further 20%.",
+    a: "The Family plan is the discount — one flat price covers up to six members, each with their own login, rather than six separate Pro subscriptions. Switch to annual billing to save more.",
   },
   {
     q: "Can I use the API on the Free plan?",
