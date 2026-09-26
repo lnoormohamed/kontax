@@ -27,24 +27,26 @@ export const metadata: Metadata = {
 };
 
 // P50-05 · Direction A layout over the existing About copy. "Why Kontax
-// exists" (§02) is a draft for owner approval: it states only facts the site
-// already makes and verifies elsewhere (subscription-funded, no ads or
-// tracking, CardDAV/vCard, export any time, no app to install) — no invented
-// history, team or numbers.
+// exists" (§02) tells the family-phonebook story the owner asked for. Claims
+// are limited to verified behaviour: a shared Family book for up to six
+// people, edit/view roles, phone numbers and birthdays synced both ways over
+// CardDAV into the Contacts app. It does NOT promise birthday reminders for
+// shared books (reminders only cover a member's own contacts today).
 const PRINCIPLES: { title: string; body: string }[] = [
   {
-    title: "Your contacts aren’t the product",
-    body: "Kontax is paid for by subscriptions. No ads, no tracking, and your address book is never sold, rented or used to profile anyone in it.",
+    title: "Change it once, right everywhere",
+    body: "When someone gets a new number, one person updates it and every phone in the family has it, inside the Contacts app they already use.",
   },
   {
-    title: "Work with what you already use",
-    body: "On iPhone and Mac, Kontax appears inside the Contacts app you already have. There’s nothing new to install and nothing to learn.",
+    title: "Birthdays next to the numbers",
+    body: "Each person’s birthday is kept with their contact details, so it’s on everyone’s phone too, not just in one person’s memory.",
   },
   {
-    title: "Easy to leave, on purpose",
-    body: "Kontax speaks CardDAV and vCard, the standards your other apps use. Export everything whenever you like, in a documented format.",
+    title: "Everyone can help, you decide who edits",
+    body: "Up to six people share one Family book. Give each member edit or view-only access.",
   },
 ];
+
 const PROMISES: { title: string; href: string; link: string }[] = [
   { title: "Syncs to your devices", href: "/features", link: "See features" },
   { title: "Stays private", href: "/security", link: "How we protect it" },
@@ -86,13 +88,14 @@ export default function AboutPage() {
             n="02"
             label="Why Kontax exists"
             id="ab-why"
-            title="Your contacts shouldn’t depend on which phone you bought"
+            title="Every family has one person who keeps everyone’s numbers"
             lede={
               <>
-                Most people&rsquo;s contacts are split between a phone, a Google account and an
-                email provider, and each one only really looks after its own copy. Kontax exists to
-                be the one place they agree, without asking you to switch phones, install another
-                app or hand your address book to an advertiser.
+                They know Grandad&rsquo;s landline, which cousin changed networks and whose
+                birthday is next week, and when they&rsquo;re not around, nobody else does. Kontax
+                exists so that list lives in one shared family phonebook instead: everyone&rsquo;s
+                numbers and birthdays, kept up to date by whoever hears first, on every phone in
+                the family.
               </>
             }
           />
