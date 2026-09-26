@@ -28,6 +28,27 @@ function generateRecoveryCode(): string {
   return crypto.randomBytes(8).toString("hex").toUpperCase().slice(0, 10);
 }
 
+const RECOVERY_CODE_COUNT = 8;
+
+/** The stored form of a recovery code. Redemption normalises input the same way. */
+function hashRecoveryCode(code: string): string {
+  return crypto.createHash("sha256").update(code.toUpperCase().trim()).digest("hex");
+}
+
+/**
+ * P49A-19: one set of recovery codes and the hashes that get stored for it,
+ * built together so the codes a caller returns to the user are, by
+ * construction, exactly the codes whose hashes are written. Duplicates (40
+ * bits each, so vanishingly unlikely) are redrawn so the set is always the
+ * full count of distinct codes.
+ */
+function newRecoveryCodeSet(): { codes: string[]; hashes: string[] } {
+  const codes = new Set<string>();
+  while (codes.size < RECOVERY_CODE_COUNT) codes.add(generateRecoveryCode());
+  const list = [...codes];
+  return { codes: list, hashes: list.map(hashRecoveryCode) };
+}
+
 // ── Enrolment ─────────────────────────────────────────────────────────────────
 
 export async function startTotpEnrolment(): Promise<
@@ -93,25 +114,28 @@ export async function confirmTotpEnrolment(input: {
     return { error: "INVALID_TOTP_CODE" };
   }
 
-  // Generate 8 single-use recovery codes
-  const recoveryCodes = Array.from({ length: 8 }, generateRecoveryCode);
-  const codeHashes = recoveryCodes.map((c) =>
-    crypto.createHash("sha256").update(c).digest("hex"),
-  );
+  const { codes: recoveryCodes, hashes: codeHashes } = newRecoveryCodeSet();
 
   const encryptedSecret = encryptTotp(payload.secret);
   const userId = session.user.id;
 
-  await db.$transaction([
-    db.user.update({
-      where: { id: userId },
+  // P49A-19: enable only if 2FA is still off. A pending token stays valid for
+  // ten minutes, so a double submit, a second tab, or a replayed request could
+  // otherwise confirm again after 2FA is on and silently replace the secret and
+  // the recovery codes the user has just been shown and saved.
+  const enabled = await db.$transaction(async (tx) => {
+    const claimed = await tx.user.updateMany({
+      where: { id: userId, totpEnabled: false },
       data: { totpEnabled: true, totpSecret: encryptedSecret, totpVerifiedAt: new Date(), lastTotpCounter: null },
-    }),
-    db.totpRecoveryCode.deleteMany({ where: { userId } }),
-    db.totpRecoveryCode.createMany({
+    });
+    if (claimed.count === 0) return false;
+    await tx.totpRecoveryCode.deleteMany({ where: { userId } });
+    await tx.totpRecoveryCode.createMany({
       data: codeHashes.map((codeHash) => ({ userId, codeHash })),
-    }),
-  ]);
+    });
+    return true;
+  });
+  if (!enabled) return { error: "TOTP_ALREADY_ENABLED" };
 
   await db.activityEvent.create({
     data: { userId, eventType: "ACCOUNT_UPDATED", actor: "USER", payload: { field: "totpEnabled" } },
@@ -131,23 +155,37 @@ export async function regenerateRecoveryCodes(): Promise<
     throw err;
   }
 
+  const userId = session.user.id;
   const user = await db.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: userId },
     select: { totpEnabled: true },
   });
   if (!user?.totpEnabled) return { error: "TOTP_NOT_ENABLED" };
 
-  const recoveryCodes = Array.from({ length: 8 }, generateRecoveryCode);
-  const codeHashes = recoveryCodes.map((c) =>
-    crypto.createHash("sha256").update(c).digest("hex"),
-  );
+  // P49A-19: the codes returned below are the ones whose hashes are stored —
+  // both come from the same `newRecoveryCodeSet()` call. The old set is deleted
+  // in the same transaction that stores the new one, so a failure anywhere
+  // rolls back and the old codes keep working. The settings UI must show the
+  // returned codes (it used to throw them away — the P49A-19 bug).
+  //
+  // Gated on a write session only, as before. P49A-13 adds step-up (password
+  // plus a current TOTP code) to this action.
+  const { codes: recoveryCodes, hashes: codeHashes } = newRecoveryCodeSet();
 
-  await db.$transaction([
-    db.totpRecoveryCode.deleteMany({ where: { userId: session.user.id } }),
-    db.totpRecoveryCode.createMany({
-      data: codeHashes.map((codeHash) => ({ userId: session.user.id, codeHash })),
-    }),
-  ]);
+  try {
+    await db.$transaction(async (tx) => {
+      await tx.totpRecoveryCode.deleteMany({ where: { userId } });
+      const created = await tx.totpRecoveryCode.createMany({
+        data: codeHashes.map((codeHash) => ({ userId, codeHash })),
+      });
+      if (created.count !== codeHashes.length) {
+        throw new Error(`stored ${created.count} of ${codeHashes.length} recovery codes`);
+      }
+    });
+  } catch (err) {
+    console.error("[regenerateRecoveryCodes] failed; existing codes left unchanged", { userId }, err);
+    return { error: "REGENERATE_FAILED" };
+  }
 
   return { success: true, recoveryCodes };
 }
@@ -210,17 +248,26 @@ export async function redeemTotpRecoveryCode(
   const rl = await checkRateLimit(rateLimiters.totpRecovery, `user:${session.user.id}`);
   if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
-  const codeHash = crypto.createHash("sha256").update(code.toUpperCase().trim()).digest("hex");
+  const codeHash = hashRecoveryCode(code);
 
   const recoveryCode = await db.totpRecoveryCode.findFirst({
     where: { userId: session.user.id, codeHash, usedAt: null },
+    select: { id: true },
   });
   if (!recoveryCode) return { error: "INVALID_RECOVERY_CODE" };
 
-  const [, remaining] = await Promise.all([
-    db.totpRecoveryCode.update({ where: { id: recoveryCode.id }, data: { usedAt: new Date() } }),
-    db.totpRecoveryCode.count({ where: { userId: session.user.id, usedAt: null } }).then((n) => n - 1),
-  ]);
+  // P49A-19: single use, atomically. The claim only succeeds while `usedAt` is
+  // still null, so two concurrent redemptions of the same code cannot both pass
+  // (the old `update({ where: { id } })` let both through).
+  const claimed = await db.totpRecoveryCode.updateMany({
+    where: { id: recoveryCode.id, usedAt: null },
+    data: { usedAt: new Date() },
+  });
+  if (claimed.count === 0) return { error: "INVALID_RECOVERY_CODE" };
+
+  const remaining = await db.totpRecoveryCode.count({
+    where: { userId: session.user.id, usedAt: null },
+  });
 
   // Mark UserSession as TOTP-verified
   if (session.jti) {

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 
 import { confirmTotpEnrolment, startTotpEnrolment } from "~/app/actions/totp";
 
+import { RecoveryCodesPanel } from "./recovery-codes";
+
 // ── 6-digit OTP input ─────────────────────────────────────────────────────────
 function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
   value: string; onChange: (v: string) => void; onComplete?: (v: string) => void;
@@ -67,7 +69,6 @@ export function TwoFactorModal({
   const [code, setCode] = useState("");
   const [err, setErr] = useState("");
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-  const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // Start enrolment on mount
@@ -93,23 +94,11 @@ export function TwoFactorModal({
       } else {
         setErr(result.error === "INVALID_TOTP_CODE" ? "Incorrect code. Try again."
           : result.error === "PENDING_TOKEN_EXPIRED" ? "Enrolment timed out. Please start again."
+          : result.error === "TOTP_ALREADY_ENABLED" ? "Two-factor authentication is already on. Close this and reload the page."
           : "Something went wrong.");
         setCode("");
       }
     });
-  };
-
-  const copyAll = () => {
-    try { void navigator.clipboard.writeText(recoveryCodes.join("\n")); } catch {}
-    setCopied(true); setTimeout(() => setCopied(false), 2000);
-  };
-
-  const download = () => {
-    try {
-      const blob = new Blob([recoveryCodes.join("\n") + "\n"], { type: "text/plain" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-      a.download = "kontax-recovery-codes.txt"; a.click(); URL.revokeObjectURL(a.href);
-    } catch {}
   };
 
   const secretSpaced = secret.replace(/(.{4})/g, "$1 ").trim();
@@ -190,22 +179,7 @@ export function TwoFactorModal({
               </span>
               <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]">Two-factor is enabled</h3>
             </div>
-            <div className="mt-4 flex items-start gap-2.5 rounded-[14px] border border-[#e6d3a3] bg-[#f6edd9] px-[15px] py-[13px]">
-              <svg fill="none" height="17" stroke="#7c5511" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.9" style={{ flexShrink: 0, marginTop: 1 }} viewBox="0 0 24 24" width="17"><path d="M10.3 3.9 1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" /></svg>
-              <span className="text-[13.5px] leading-[1.5] text-[#7c5511]">
-                Save your recovery codes somewhere safe. If you lose your authenticator app, these are the <strong className="font-semibold">only</strong> way to recover your account.
-              </span>
-            </div>
-            <div className="mt-[14px] grid grid-cols-2 gap-2 rounded-[14px] border border-[#e9ece7] bg-[#f8faf8] p-[14px]">
-              {recoveryCodes.map((c) => (
-                <span className="rounded-lg border border-[#e9ece7] bg-white py-[7px] text-center font-mono text-[15px] tracking-[0.06em] text-[#1d2823]" key={c}>{c}</span>
-              ))}
-            </div>
-            <div className="mt-[14px] flex flex-wrap gap-2.5">
-              <button className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-[9px] text-[13px] font-semibold text-[#1d2823] hover:bg-[#f2f4f0]" onClick={copyAll} type="button">{copied ? "Copied ✓" : "Copy all codes"}</button>
-              <button className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-[9px] text-[13px] font-semibold text-[#1d2823] hover:bg-[#f2f4f0]" onClick={download} type="button">Download as .txt</button>
-            </div>
-            <button className="mt-[18px] w-full rounded-[1.2rem] bg-[#17352e] py-3 text-[14px] font-semibold text-white hover:bg-[#20443b]" onClick={() => onEnabled(recoveryCodes)} type="button">I&apos;ve saved my codes →</button>
+            <RecoveryCodesPanel codes={recoveryCodes} onSaved={() => onEnabled(recoveryCodes)} />
           </>
         )}
       </div>

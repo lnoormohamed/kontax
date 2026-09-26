@@ -2,7 +2,7 @@
 // drive real server code (e.g. the Stripe webhook processor) without Postgres.
 //
 // Supports the subset those code paths use: findUnique/findUniqueOrThrow/
-// findFirst/findMany/count/create/update/updateMany/upsert/delete/deleteMany,
+// findFirst/findMany/count/create/createMany/update/updateMany/upsert/delete/deleteMany,
 // scalar `where` filters (equals, in, notIn, not, startsWith, lt/lte/gt/gte,
 // AND/OR/NOT), `orderBy` with Postgres null ordering, top-level scalar
 // `select`, compound-unique selectors (`{ userId_slug: { userId, slug } }`),
@@ -216,6 +216,12 @@ export function createFakePrisma(opts: FakePrismaOptions = {}) {
       findMany: async (a: Args = {}) => (log("findMany", a), find(a).map((r) => project(r, a.select))),
       count: async (a: Args = {}) => (log("count", a), find(a).length),
       create: async (a: Args) => (log("create", a), project(insert(model, a.data ?? {}), a.select)),
+      createMany: async (a: { data: Row | Row[] }) => {
+        log("createMany", a);
+        const list = Array.isArray(a.data) ? a.data : [a.data];
+        for (const data of list) insert(model, data);
+        return { count: list.length };
+      },
       update: async (a: Args) => {
         log("update", a);
         const row = find(a)[0];
