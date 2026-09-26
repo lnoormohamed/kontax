@@ -90,6 +90,14 @@
   --mkt-space-md: 88px;
   --mkt-space-sm: 72px;
   --mkt-nav-h: 68px;
+  /* Aliases used by the help centre, guides, comparisons and use-case pages
+     (written against the parallel P50 build's token names). */
+  --mkt-h3-ls: var(--mkt-h2-ls);
+  --mkt-lede-size: 18px;
+  --mkt-r-lg: 16px;
+  --mkt-section: var(--mkt-space-lg);
+  --mkt-foot-bg: var(--mkt-g800);
+  --mkt-foot-head: #ffffff;
 
   min-height: 100vh;
   font-family: var(--mkt-sans);
@@ -102,10 +110,15 @@
   color: var(--mkt-ink);
   color-scheme: light;
 }
+@media (max-width: 980px) {
+  .mkt-wrap { --mkt-section: var(--mkt-space-md); }
+}
 @media (max-width: 767px) {
   .mkt-wrap {
     --mkt-pad: 20px;
     --mkt-nav-h: 60px;
+    --mkt-section: var(--mkt-space-sm);
+    --mkt-lede-size: 16.5px;
   }
 }
 
@@ -641,4 +654,91 @@ a.mkt-card:hover { border-color: var(--mkt-g800); color: var(--mkt-ink); }
   .mkt-cta-band { padding: var(--mkt-space-sm) 0; }
   .mkt-cta-band__btns { flex-direction: column; }
   .mkt-cta-band__btns .mkt-btn { width: 100%; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Content-page components (help centre, guides, comparisons, use-case
+   and feature-detail pages, glossary). Merged in from the parallel P50
+   build; they reuse the tokens above and only add what the staging
+   build's component set didn't have.
+   ════════════════════════════════════════════════════════════════ */
+.mkt-body { margin: 0; font-size: 16px; line-height: 1.6; color: var(--mkt-body); }
+.mkt-body-lg { margin: 0; font-size: 17px; line-height: 1.6; color: var(--mkt-body); text-wrap: pretty; }
+.mkt-label { margin: 0; font: var(--mkt-label); color: var(--mkt-g600); }
+
+.mkt-tag--soon { background: var(--mkt-stone); color: var(--mkt-body); }
+.mkt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: var(--mkt-g100);
+  color: var(--mkt-g800);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mkt-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--mkt-g600); }
+
+/* <Wire> wraps the stretching .mkt-wire svg in a sized box */
+.mkt-wire-box { position: relative; min-height: 200px; height: 100%; }
+.mkt-wire-box > .mkt-wire { position: absolute; inset: 0; }
+
+/* Card anatomy: kicker, title, body, foot pinned to the bottom */
+.mkt-card:has(> .mkt-card__foot) { display: flex; flex-direction: column; }
+.mkt-card__kicker { font: 600 12px/1 var(--mkt-sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mkt-mute); }
+.mkt-card__title { margin: 12px 0 0; font: var(--mkt-h4); color: var(--mkt-head); }
+.mkt-card__body { margin: 10px 0 0; font-size: 15px; line-height: 1.55; color: var(--mkt-body); }
+.mkt-card__foot { margin-top: auto; padding-top: 20px; }
+
+/* Comparison marks (<NoMark>, partial support) and the note under a table */
+.mkt-cmp__no { color: var(--mkt-mute); }
+.mkt-cmp__part { font-size: 12.5px; font-weight: 500; color: var(--mkt-body); }
+.mkt-note { margin: 16px 0 0; font-size: 13px; line-height: 1.55; color: var(--mkt-body); text-align: center; text-wrap: pretty; }
+
+/* Data table (plan matrices, comparison pages) */
+.mkt-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--mkt-line-strong);
+  border-radius: var(--mkt-r-lg);
+  background: var(--mkt-card);
+}
+.mkt-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.mkt-table--wide { min-width: 720px; }
+.mkt-table th,
+.mkt-table td { padding: 14px 18px; text-align: left; border-top: 1px solid var(--mkt-line); }
+.mkt-table thead th { border-top: 0; padding-top: 20px; padding-bottom: 16px; font-size: 15px; font-weight: 600; color: var(--mkt-head); }
+.mkt-table tbody th { font-weight: 500; color: var(--mkt-ink); }
+.mkt-table td { color: var(--mkt-body); }
+.mkt-table__group th {
+  padding: 12px 18px;
+  background: var(--mkt-stone);
+  font: 600 12px/1 var(--mkt-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mkt-mute);
+}
+.mkt-table .is-hl { background: var(--mkt-g100); }
+.mkt-table svg { color: var(--mkt-g800); }
+
+/* Plan grid and <PlanCard> price figure */
+.mkt-plans { display: grid; gap: 20px; }
+.mkt-plans--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 860px; margin-left: auto; margin-right: auto; }
+.mkt-plans--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mkt-plan__amount { font: 700 32px/1 var(--mkt-sans); letter-spacing: -0.02em; color: var(--mkt-head); }
+@media (max-width: 980px) {
+  .mkt-plans--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .mkt-plans--2,
+  .mkt-plans--4 { grid-template-columns: 1fr; }
+}
+
+/* FAQ answers written as paragraphs */
+.mkt-faq__a p { margin: 0; }
+.mkt-faq__a p + p { margin-top: 10px; }
+@media (max-width: 767px) {
+  .mkt-cmp__part { font-size: 11px; }
 }

@@ -58,6 +58,13 @@ export const PUBLIC_PREFIXES = [
   "/format/", // P45-07: public export-format artifacts (schemas, examples,
   // validator, spec) linked from /developers — no login required
   "/u/", // P30-01: public contact cards — no login required
+  // P50A: SEO content sections. Trailing slashes keep them from matching app
+  // routes; the use-case pages live under /for/ because /family and /teams are
+  // the signed-in family and team workspaces.
+  "/guides/", // P50A-06: how-to guides
+  "/compare/", // P50A-06: honest comparisons
+  "/api/metrics/pv", // P50A-08: cookieless page-view beacon (path allow-list + rate limit)
+  "/for/", // P50A-07: use-case pages (/for/families, /for/teams)
 ];
 
 // P49A-15: public paths that must be matched EXACTLY (or as "<path>/…"), never
@@ -71,6 +78,9 @@ export const EXACT_PUBLIC_PATHS = [
   "/about", // marketing
   "/contact", // marketing — contact form page
   "/api/contact", // contact form submission endpoint (rate-limited, see route)
+  "/glossary", // P50A-07: glossary of terms
+  "/guides", // P50A-06: guides index (articles are under the /guides/ prefix)
+  "/compare", // P50A-06: comparisons index (pages are under the /compare/ prefix)
 ];
 
 export const isAlwaysAllowed = (pathname: string): boolean =>

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 
+import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
 import { useBillingPortal } from "~/app/_components/use-billing-portal";
 
 export type CancelPlanDetails = {
@@ -143,7 +144,11 @@ export function CancelPlanModal({
                 <InfoIcon />
                 <p className="m-0 text-[12.5px] leading-[1.5] text-[#2c39a0]">
                   Your {details.totalContacts} contacts are safe. You just can&rsquo;t add new ones above the{" "}
-                  {details.contactLimit} limit. Upgrade anytime to restore access.
+                  {details.contactLimit} limit. Upgrade anytime to restore access.{" "}
+                  {/* P50A-05: new tab, so the modal stays open. */}
+                  <a className="font-semibold underline" href={HELP_LINKS.downgradeConsequences} rel="noopener" target="_blank">
+                    Learn more
+                  </a>
                 </p>
               </div>
 

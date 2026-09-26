@@ -175,6 +175,11 @@ export const rateLimiters = {
   // P49A-09: duplicate rescans score the whole address book — 3 per user per
   // hour (was unlimited).
   mergeSuggestionRefresh: makeLimiter(3, 60 * 60, "rl:merge-refresh"),
+
+  // P50A-08: cookieless page-view beacon (/api/metrics/pv) — 60 pings per IP
+  // per minute. A visitor loading several tracked content pages in a minute
+  // is normal; a scripted flood inflating the counters is not.
+  pageViewBeacon: makeLimiter(60, 60, "rl:pv-beacon"),
 } as const;
 
 export interface RateLimitResult {

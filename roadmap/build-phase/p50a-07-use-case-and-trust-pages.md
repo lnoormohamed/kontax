@@ -4,8 +4,8 @@
 
 | URL | Purpose | Notes |
 |---|---|---|
-| `/family` | "Shared family address book on iPhone" — Apple has no native answer | Problem; how a shared book works; private books per member; up to 6 people; setup; the 7-day notice if a plan ends |
-| `/teams` | "Contacts that stay with the business" | Shared books + roles; audit log; up to 25 members; iPhone without an app; API |
+| `/for/families` | "Shared family address book on iPhone" — Apple has no native answer | Problem; how a shared book works; private books per member; up to 6 people; setup; the 7-day notice if a plan ends |
+| `/for/teams` | "Contacts that stay with the business" | Shared books + roles; audit log; up to 25 members; iPhone without an app; API |
 | `/features/duplicates`, `/features/history` | Single-feature landing pages | What it does; how; plan limits |
 | `/glossary` | CardDAV, vCard, JSContact, sync token, app password, … | 80–150 words per term; linked sitewide |
 | `/about` rewrite | Brand + trust (E-E-A-T) | Covered in P50A-04; owner-approved copy |

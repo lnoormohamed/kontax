@@ -4,23 +4,20 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-import {
-  AuthBrand,
-  authBtnPrimary,
-  authCard,
-  authFieldError,
-  authFocus,
-  authInput,
-  authLabel,
-  authLede,
-  authLink,
-  authNoteErr,
-  authNoteOk,
-  authNoteWarn,
-  authQuietLink,
-  authTitle,
-} from "~/app/_components/auth-ui";
 import { safeInternalPath } from "~/lib/safe-internal-path";
+
+// P50-06: this file styles with inline Tailwind arbitrary values rather than
+// importing `src/app/(marketing)/_components/marketing.css` — that stylesheet
+// is scoped under `.mkt-wrap` and pulls in marketing-only layout rules, so it
+// doesn't compose cleanly with a signed-out auth card. The colours/radii below
+// are copied from the Direction A tokens documented at the top of that file
+// (and `roadmap/design-briefs/p50-db01-handoff/{dir-a,p50-base}.css`):
+//   #17352e / #0f2620  → --mkt-g800 / --mkt-g900 (primary buttons + links)
+//   #e8f0eb / #cfe1d6  → --mkt-g100 / --mkt-g200 (tinted callouts)
+//   #d4d9d0            → --mkt-line-strong (card + input borders)
+//   #4158f4            → --mkt-focus — kept for focus rings only, never fills
+//   10px / 14px         → --mkt-r-btn / --mkt-r-card
+// Geist itself is already loaded app-wide via next/font in the root layout.
 
 // ── Password strength ──────────────────────────────────────────────────────
 function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
@@ -37,9 +34,9 @@ function scorePassword(pw: string): { level: 0 | 1 | 2 | 3; label: string } {
 
 const STRENGTH_COLORS: Record<number, string> = {
   0: "#d4d9d0",
-  1: "#b3261e",
-  2: "#9a6a12",
-  3: "#2f6b52",
+  1: "#b5472f",
+  2: "#bf8526",
+  3: "#2f8f63",
 };
 
 function StrengthMeter({ password }: { password: string }) {
@@ -53,7 +50,7 @@ function StrengthMeter({ password }: { password: string }) {
             key={seg}
             className="h-1 flex-1 rounded-sm transition-colors duration-200"
             style={{
-              background: seg <= level ? STRENGTH_COLORS[level] : "#e5e8e1",
+              background: seg <= level ? STRENGTH_COLORS[level] : "#e7eae4",
             }}
           />
         ))}
@@ -110,7 +107,7 @@ function WarnIcon() {
   return (
     <svg
       aria-hidden
-      className="mt-px shrink-0 text-[#b3261e]"
+      className="mt-px shrink-0 text-[#b5472f]"
       fill="none"
       height={16}
       stroke="currentColor"
@@ -165,16 +162,20 @@ function Field({
 }) {
   return (
     <div className="flex flex-col">
-      <label className={authLabel} htmlFor={id}>
+      <label className="mb-[7px] text-[13px] font-medium text-[#3f4842]" htmlFor={id}>
         {label}
-        {hint ? <span className="font-normal text-[#646c65]"> {hint}</span> : null}
+        {hint ? <span className="font-normal text-[#8b938c]"> {hint}</span> : null}
       </label>
       <div className={`relative ${trailing ? "has-trailing" : ""}`}>
         <input
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={error ? "true" : undefined}
           autoComplete={autoComplete}
-          className={`${authInput(Boolean(error))} ${trailing ? "pr-[50px]" : ""}`}
+          className={`h-11 w-full rounded-[10px] border bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] ${
+            error
+              ? "border-[#b5472f] focus:border-[#b5472f] focus:shadow-[0_0_0_3px_rgba(181,71,47,0.22)]"
+              : "border-[#d4d9d0] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
+          } ${trailing ? "pr-[46px]" : ""} disabled:opacity-60`}
           disabled={disabled}
           id={id}
           onChange={(e) => onChange(e.target.value)}
@@ -185,7 +186,7 @@ function Field({
         {trailing}
       </div>
       {error ? (
-        <p className={authFieldError} id={`${id}-error`} role="alert">
+        <p className="mt-[7px] text-[12.5px] leading-[1.45] text-[#8f3320]" id={`${id}-error`} role="alert">
           {error}
         </p>
       ) : null}
@@ -342,7 +343,7 @@ export function AuthCard({
   const eyeBtn = (
     <button
       aria-label={showPw ? "Hide password" : "Show password"}
-      className={`absolute right-[5px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-[8px] text-[#646c65] transition hover:bg-[#f4f1ea] hover:text-[#1d2823] ${authFocus}`}
+      className="absolute right-[4px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-[9px] text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
       onClick={() => setShowPw((v) => !v)}
       tabIndex={submitting ? -1 : 0}
       type="button"
@@ -352,47 +353,63 @@ export function AuthCard({
   );
 
   return (
-    <div className={authCard}>
+    <div className="w-full max-w-[440px] rounded-[14px] border border-[#d4d9d0]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
       {/* Brand mark — links back to the marketing homepage */}
-      <AuthBrand />
+      <Link className="flex items-center justify-center gap-[10px]" href="/" aria-label="Kontax home">
+        <span
+          aria-hidden
+          className="grid h-[34px] w-[34px] place-items-center rounded-[10px] text-[19px] font-bold leading-none text-[#dff0e7]"
+          style={{ background: "#17352e" }}
+        >
+          K
+        </span>
+        <span className="text-[25px] font-semibold tracking-[-0.018em] text-[#17352e]">
+          Kontax
+        </span>
+      </Link>
+
+      {/* Rule */}
+      <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d4d9d0]" />
 
       {/* Heading */}
-      <h1 className={authTitle}>
+      <h1 className="text-center text-[22px] font-semibold leading-tight tracking-[-0.015em] text-[#1d2823]">
         {isLogin ? "Log in to Kontax" : "Create your account"}
       </h1>
-      <p className={authLede}>
+      <p className="mt-[7px] text-center text-[14px] text-[#5c655e]">
         {isLogin ? "Pick up right where you left off." : "Your contacts, organised and yours."}
       </p>
 
       {/* Message banners (password-reset, email-changed) */}
       {message === "password-reset" && (
-        <div className={`mt-5 text-center ${authNoteOk}`}>
+        <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
           Your password has been reset. Please sign in with your new password.
         </div>
       )}
       {message === "email-changed" && (
-        <div className={`mt-5 text-center ${authNoteOk}`}>
+        <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
           Your email has been updated. Please sign in with your new address.
         </div>
       )}
       {/* Session-expired: had a valid session, token is now expired/invalidated */}
       {!message && expired && isLogin && (
-        <div className={`mt-5 ${authNoteWarn}`}>
+        <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-[13.5px] text-[#7c5511]">
           <p className="font-semibold">Your session ended</p>
           <p className="mt-0.5 leading-[1.45]">Sign back in and you&rsquo;ll return right where you left off.</p>
         </div>
       )}
       {/* Auth-required: accessing a protected route without a session */}
       {!message && !expired && next && isLogin && (
-        <div className={`mt-5 text-center ${authNoteWarn}`}>
+        <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-center text-[13.5px] text-[#7c5511]">
           Sign in to access this page.
         </div>
       )}
 
-      {/* Trial callout — register with ?plan=pro */}
+      {/* Trial callout — register with ?plan=pro. Direction A tokens
+          (marketing.css): bg --mkt-g100 #e8f0eb, border --mkt-g200 #cfe1d6,
+          text --mkt-g800 #17352e — was an indigo accent before P50-06. */}
       {!isLogin && plan === "pro" ? (
-        <div className={`mt-5 flex items-start gap-2.5 ${authNoteOk}`}>
-          <svg aria-hidden className="mt-[2px] h-[17px] w-[17px] shrink-0" fill="none" stroke="#2f6b52" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
+        <div className="mt-4 flex items-start gap-2.5 rounded-[1.2rem] border border-[#cfe1d6] bg-[#e8f0eb] px-4 py-3 text-[13.5px] leading-[1.45] text-[#17352e]">
+          <svg aria-hidden className="mt-px h-[17px] w-[17px] shrink-0" fill="none" stroke="#17352e" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
             <path d="M12 3l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.8 6.1 20.8l1.3-6.5L2.5 9.8 9.1 9z" />
           </svg>
           <span>
@@ -404,7 +421,7 @@ export function AuthCard({
       {/* Form */}
       <form
         aria-busy={submitting}
-        className="mt-7"
+        className="mt-[26px]"
         noValidate
         onSubmit={(e) => void handleSubmit(e)}
       >
@@ -430,7 +447,7 @@ export function AuthCard({
                 <span>
                   An account with this email already exists.{" "}
                   <Link
-                    className={authLink}
+                    className="font-semibold text-[#17352e] hover:underline"
                     href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
                   >
                     Log in instead →
@@ -466,7 +483,7 @@ export function AuthCard({
           {isLogin ? (
             <div className="-mt-1 flex justify-end">
               <a
-                className={`text-[14px] ${authQuietLink}`}
+                className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#17352e]"
                 href="/forgot-password"
               >
                 Forgot password?
@@ -477,7 +494,7 @@ export function AuthCard({
           {/* CTA */}
           <button
             aria-busy={submitting}
-            className={`mt-2 ${authBtnPrimary}`}
+            className="mt-2 flex h-12 w-full items-center justify-center rounded-[10px] bg-[#17352e] text-[14.5px] font-semibold text-white transition hover:bg-[#0f2620] active:translate-y-px active:bg-[#0c1f19] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!canSubmit || submitting}
             type="submit"
           >
@@ -486,13 +503,13 @@ export function AuthCard({
 
           {/* Terms — register only */}
           {!isLogin ? (
-            <p className="-mt-1 text-center text-[13px] leading-[1.5] text-[#646c65]">
+            <p className="-mt-1 text-center text-[12px] text-[#8b938c]">
               By creating an account, you agree to our{" "}
-              <a className={`font-medium text-[#4e5851] underline decoration-[#d4d9d0] underline-offset-[3px] hover:text-[#17352e] hover:decoration-[#17352e] rounded-[3px] ${authFocus}`} href="/terms">
+              <a className="text-[#5c655e] font-medium hover:text-[#17352e] hover:underline" href="/terms">
                 Terms
               </a>{" "}
               and{" "}
-              <a className={`font-medium text-[#4e5851] underline decoration-[#d4d9d0] underline-offset-[3px] hover:text-[#17352e] hover:decoration-[#17352e] rounded-[3px] ${authFocus}`} href="/privacy">
+              <a className="text-[#5c655e] font-medium hover:text-[#17352e] hover:underline" href="/privacy">
                 Privacy Policy
               </a>
               .
@@ -504,7 +521,7 @@ export function AuthCard({
         {formError ? (
           <div
             ref={errorBoxRef}
-            className={`mt-4 flex items-start gap-[9px] ${authNoteErr} ${authFocus}`}
+            className="mt-4 flex items-start gap-[9px] rounded-[11px] border border-[#ecd0c7] bg-[#f7e9e4] px-[14px] py-[11px] text-[13.5px] leading-[1.4] text-[#8f3320]"
             role="alert"
             tabIndex={-1}
           >
@@ -515,10 +532,10 @@ export function AuthCard({
       </form>
 
       {/* Mode switch */}
-      <p className="mt-6 text-center text-[14.5px] text-[#4e5851]">
+      <p className="mt-[22px] text-center text-[14px] text-[#5c655e]">
         {isLogin ? "Don't have an account? " : "Already have an account? "}
         <Link
-          className={authLink}
+          className="font-medium text-[#17352e] hover:underline disabled:opacity-50"
           href={switchHref}
         >
           {isLogin ? "Create one →" : "Log in →"}

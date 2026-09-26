@@ -11,6 +11,8 @@ const FOOTER_LINKS: { group: string; links: { label: string; href: string }[] }[
       { label: "Pricing", href: "/pricing" },
       { label: "Security", href: "/security" },
       { label: "Changelog", href: "/changelog" },
+      { label: "For families", href: "/for/families" },
+      { label: "For teams", href: "/for/teams" },
     ],
   },
   {
@@ -24,6 +26,9 @@ const FOOTER_LINKS: { group: string; links: { label: string; href: string }[] }[
     group: "Resources",
     links: [
       { label: "Help centre", href: "/help" },
+      { label: "Guides", href: "/guides" },
+      { label: "Compare", href: "/compare" },
+      { label: "Glossary", href: "/glossary" },
       { label: "Developers", href: "/developers" },
     ],
   },
@@ -32,6 +37,7 @@ const FOOTER_LINKS: { group: string; links: { label: string; href: string }[] }[
     links: [
       { label: "Privacy policy", href: "/privacy" },
       { label: "Terms of service", href: "/terms" },
+      // /privacy has an id="cookies" section (7. Cookies).
       { label: "Cookie policy", href: "/privacy#cookies" },
     ],
   },

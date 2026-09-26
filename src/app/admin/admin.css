@@ -533,6 +533,13 @@
 .ad-err-track { display: block; height: 6px; border-radius: 999px; background: #eceee9; overflow: hidden; }
 .ad-err-fill { display: block; height: 100%; border-radius: 999px; }
 
+/* ───────────────── page views (P50A-08) ───────────────── */
+.ad-pv-empty { font-size: 13px; color: #8b938c; }
+.ad-pv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid #eceee9; }
+.ad-pv-row:first-child { border-top: none; }
+.ad-pv-path { font-size: 13px; color: #1d2823; font-family: var(--font-geist-mono, monospace); }
+.ad-pv-count { font-size: 13px; font-weight: 700; color: #1d2823; flex: 0 0 auto; }
+
 /* ───────────────── flags ───────────────── */
 .ad-flag-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ad-flag-title { font-size: 13.5px; font-weight: 600; color: #1d2823; }
