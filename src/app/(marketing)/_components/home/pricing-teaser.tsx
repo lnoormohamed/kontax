@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { fetchStripePrices, formatCurrencyAmount } from "../../pricing/_prices";
 import type { StripePrices } from "../../pricing/_pricing-toggle";
+import { SectionHead } from "../mkt-ui";
 import { Icon } from "./icons";
 
 // P49-04 · §8 Pricing teaser — Free vs Pro only (decision D4).
@@ -14,6 +15,7 @@ import { Icon } from "./icons";
 //
 // The read is streamed behind <Suspense> so a cold Stripe call never holds up
 // the hero; the fallback is the same cards without the Pro price.
+// P50-03: Direction A plan cards (mkt-plan), Pro highlighted.
 
 const FREE_POINTS = [
   "Up to 500 contacts",
@@ -42,22 +44,26 @@ function PricingCards({ prices }: { prices: StripePrices | null }) {
   const currency = prices?.currency ?? "gbp";
   return (
     <div className="hp-ptz">
-      <div className="hp-ptz__card">
-        <div className="hp-ptz__top">
-          <span className="hp-ptz__name">Free</span>
-          <span className="hp-ptz__price">
-            <b>{formatCurrencyAmount(currency, 0)}</b>
-          </span>
+      <div className="mkt-plan">
+        <div className="mkt-plan__top">
+          <span className="mkt-plan__n">Free</span>
+        </div>
+        <p className="mkt-plan__for">For one person getting organised.</p>
+        <div className="mkt-plan__pr">
+          <b>{formatCurrencyAmount(currency, 0)}</b>
         </div>
         <Points items={FREE_POINTS} />
       </div>
-      <div className="hp-ptz__card hp-ptz__card--pro">
-        <div className="hp-ptz__top">
-          <span className="hp-ptz__name">Pro</span>
+      <div className="mkt-plan mkt-plan--hl">
+        <div className="mkt-plan__top">
+          <span className="mkt-plan__n">Pro</span>
+        </div>
+        <p className="mkt-plan__for">For you, across every account.</p>
+        <div className="mkt-plan__pr">
           {prices ? (
-            <span className="hp-ptz__price">
+            <>
               <b>{formatCurrencyAmount(prices.currency, prices.pro.monthly)}</b>/mo
-            </span>
+            </>
           ) : null}
         </div>
         <Points items={PRO_POINTS} />
@@ -73,17 +79,14 @@ async function LivePricingCards() {
 
 export function PricingTeaser() {
   return (
-    <section className="hp-band" id="pricing">
-      <div className="hp-container">
-        <div className="hp-section-head hp-section-head--center">
-          <p className="hp-section-kicker">Pricing</p>
-          <h2 className="hp-section-title">Free until you need more</h2>
-        </div>
+    <section className="mkt-band" id="pricing">
+      <div className="mkt-container">
+        <SectionHead n="06" layout="center" label="Pricing" title="Free until you need more" />
         <Suspense fallback={<PricingCards prices={null} />}>
           <LivePricingCards />
         </Suspense>
         <div className="hp-ptz-foot">
-          <Link className="hp-more-link" href="/pricing">
+          <Link className="mkt-more" href="/pricing">
             Compare plans
             <Icon name="arrow" size={16} />
           </Link>

@@ -1,11 +1,11 @@
 import Link from "next/link";
 
+import { MktWindow, SectionHead } from "../mkt-ui";
 import { Icon, type HomeIconName } from "./icons";
-import { MktWindow } from "./window";
 
 // P49-03 · §4 Feature showcase — replaces the six equal tiles. Three
 // alternating rows for the reasons people switch, then a chrome-less 3×2
-// grid (2 columns below 980px).
+// grid (2 columns below 980px). P50-03: Direction A 5/7 rows, h3 scale.
 
 function FeatureRow({
   kicker,
@@ -23,7 +23,7 @@ function FeatureRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`hp-frow${flip ? " hp-frow--flip" : ""} hp-rise`}>
+    <div className={`hp-frow${flip ? " hp-frow--flip" : ""}`}>
       <div className="hp-frow__text">
         <p className="hp-frow__kicker">{kicker}</p>
         <h3 className="hp-frow__title">{title}</h3>
@@ -62,12 +62,13 @@ const GRID: { icon: HomeIconName; title: string; body: string }[] = [
 
 export function FeatureShowcase() {
   return (
-    <section className="hp-band" id="features">
-      <div className="hp-container">
-        <div className="hp-section-head hp-section-head--center">
-          <p className="hp-section-kicker">Why people switch</p>
-          <h2 className="hp-section-title">The things your built-in address book never quite did</h2>
-        </div>
+    <section className="mkt-band" id="features">
+      <div className="mkt-container">
+        <SectionHead
+          n="02"
+          label="Why people switch"
+          title="The things your built-in address book never quite did"
+        />
 
         <FeatureRow
           kicker="Sync"
@@ -198,7 +199,7 @@ export function FeatureShowcase() {
           ))}
         </div>
         <div className="hp-sgrid-foot">
-          <Link className="hp-more-link" href="/features">
+          <Link className="mkt-more" href="/features">
             See all features
             <Icon name="arrow" size={16} />
           </Link>

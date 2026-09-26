@@ -1,21 +1,24 @@
+import { MktWindow, SectionHead } from "../mkt-ui";
 import { Icon } from "./icons";
-import { MktWindow } from "./window";
 
 // P49-02 · §3 How it works — the target of the hero's "See how it works".
 // Numbered because it is a real sequence. Stacks vertically below 980px.
+// P50-03: Direction A — stone band, index label, mono step numbers on a
+// hairline rule.
 
 export function HowItWorks() {
   return (
-    <section className="hp-band hp-band--surface" id="how">
-      <div className="hp-container">
-        <div className="hp-section-head hp-section-head--center">
-          <p className="hp-section-kicker">How it works</p>
-          <h2 className="hp-section-title">From three address books to one, in an afternoon</h2>
-        </div>
+    <section className="mkt-band mkt-band--stone" id="how">
+      <div className="mkt-container">
+        <SectionHead
+          n="01"
+          label="How it works"
+          title="From three address books to one, in an afternoon"
+        />
         <ol className="hp-steps">
-          <li className="hp-step hp-rise">
+          <li className="hp-step">
             <div className="hp-step__head">
-              <span className="hp-step__num" aria-hidden="true">1</span>
+              <p className="hp-step__n" aria-hidden="true">1</p>
               <h3 className="hp-step__title">Bring your contacts in</h3>
               <p className="hp-step__body">
                 Connect Google, iCloud or Fastmail, or import a CSV or vCard file.
@@ -42,9 +45,9 @@ export function HowItWorks() {
               </div>
             </MktWindow>
           </li>
-          <li className="hp-step hp-rise">
+          <li className="hp-step">
             <div className="hp-step__head">
-              <span className="hp-step__num" aria-hidden="true">2</span>
+              <p className="hp-step__n" aria-hidden="true">2</p>
               <h3 className="hp-step__title">Kontax tidies them up</h3>
               <p className="hp-step__body">
                 Duplicates found and merged, phone numbers formatted for their country, names
@@ -72,9 +75,9 @@ export function HowItWorks() {
               </div>
             </MktWindow>
           </li>
-          <li className="hp-step hp-rise">
+          <li className="hp-step">
             <div className="hp-step__head">
-              <span className="hp-step__num" aria-hidden="true">3</span>
+              <p className="hp-step__n" aria-hidden="true">3</p>
               <h3 className="hp-step__title">They stay in sync everywhere</h3>
               <p className="hp-step__body">
                 Add Kontax to the Contacts app on your iPhone or Mac with an app password.

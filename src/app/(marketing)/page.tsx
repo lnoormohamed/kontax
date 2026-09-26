@@ -13,12 +13,13 @@ import { isMicrosoftSyncEnabled } from "~/lib/microsoft-sync-flag";
 import { auth } from "~/server/auth";
 
 import { FeatureShowcase } from "./_components/home/feature-showcase";
-import { HeroSearchDemo } from "./_components/home/hero-search-demo";
 import { HomeFaq } from "./_components/home/home-faq";
 import { HowItWorks } from "./_components/home/how-it-works";
 import { HomeIconSprite, Icon } from "./_components/home/icons";
 import { PricingTeaser } from "./_components/home/pricing-teaser";
+import { Signature } from "./_components/home/signature";
 import { AudienceCards, CompareTable, SecurityFacts } from "./_components/home/why-kontax";
+import { ArrowIcon, CtaBand } from "./_components/mkt-ui";
 
 import "./homepage.css";
 
@@ -58,10 +59,11 @@ function worksWith(): string[] {
   ];
 }
 
-// P49 · Homepage refresh (design P49-DB01). Ten sections: show → differentiate
-// → reassure → ask. Everything is server-rendered except the hero search
-// typing effect (HeroSearchDemo). Signed-in visitors get the "Welcome back"
-// copy in the hero; the rest of the page is the same for everyone.
+// P50-03 · Homepage in Direction A (design P50-DB01, `?view=home`), on P49's
+// section order and verified copy. Hero: headline left, lede + CTAs right,
+// then the "three into one" signature panel. Everything is server-rendered;
+// the only homepage script is the signature's one-shot inline animation.
+// Signed-in visitors get the "Welcome back" hero and CTA.
 export default async function HomePage() {
   const session = await auth();
   const firstName = session?.user?.name?.split(/\s+/)[0] ?? null;
@@ -78,61 +80,74 @@ export default async function HomePage() {
       />
       <HomeIconSprite />
 
-      {/* ═══════════════════════════ 1 · HERO ═══════════════════════════ */}
+      {/* ═══════════════════════════ HERO + SIGNATURE ═══════════════════════════ */}
       <section className="hp-hero">
-        <div className="hp-hero__inner">
-          <div className="hp-hero__copy">
-            {session ? (
-              <>
-                <p className="hp-hero__eyebrow">Welcome back</p>
+        <div className="mkt-container hp-hero__g">
+          {session ? (
+            <>
+              <div>
+                <p className="hp-hero__e">Welcome back</p>
                 <h1 className="hp-hero__title">
                   {firstName ? `Welcome back, ${firstName}.` : "Pick up where you left off."}
                 </h1>
+              </div>
+              <div>
                 <p className="hp-hero__sub">Your contacts are waiting.</p>
                 <div className="hp-hero__ctas">
                   {/* P46: returning users land on the contact list, not Overview */}
-                  <Link className="hp-btn--green" href="/contacts">
+                  <Link className="mkt-btn mkt-btn--pri" href="/contacts">
                     Open Kontax
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
-                    </svg>
+                    <ArrowIcon />
                   </Link>
                 </div>
-              </>
-            ) : (
-              <>
-                <p className="hp-hero__eyebrow">Contact management, done right</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <p className="hp-hero__e">Contact management, done right</p>
                 <h1 className="hp-hero__title">
                   Your contacts. Organised, synced, and always with you.
                 </h1>
+              </div>
+              <div>
                 <p className="hp-hero__sub">
                   One address book for your phone, your laptop and the people you share with.
                   Kept tidy, kept private, kept yours.
                 </p>
                 <div className="hp-hero__ctas">
-                  <Link className="hp-btn--primary" href="/register">
+                  <Link className="mkt-btn mkt-btn--pri" href="/register">
                     Get started free
                   </Link>
-                  <a className="hp-btn--secondary" href="#how">
+                  <a className="mkt-btn mkt-btn--sec" href="#how">
                     See how it works
                     <Icon name="down" size={16} />
                   </a>
                 </div>
                 <p className="hp-hero__trust">
-                  <span>Free for up to 500 contacts</span>
-                  <span>No card needed</span>
-                  <span>Works on iPhone, Android and the web</span>
+                  <span>
+                    <Icon name="check" size={14} />
+                    Free for up to 500 contacts
+                  </span>
+                  <span>
+                    <Icon name="check" size={14} />
+                    No card needed
+                  </span>
+                  <span>
+                    <Icon name="check" size={14} />
+                    No app to install
+                  </span>
                 </p>
-              </>
-            )}
-          </div>
-          <HeroSearchDemo />
+              </div>
+            </>
+          )}
         </div>
+        <Signature />
       </section>
 
-      {/* ═══════════════════════════ 2 · WORKS WITH ═══════════════════════════ */}
+      {/* ═══════════════════════════ WORKS WITH ═══════════════════════════ */}
       <section className="hp-works" aria-label="Works with">
-        <p className="hp-works__inner">
+        <p className="mkt-container hp-works__in">
           <b>Works with</b>
           {worksWith().map((name) => (
             <span key={name}>{name}</span>
@@ -140,7 +155,7 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* ═══════════════════════════ 3–9 ═══════════════════════════ */}
+      {/* ═══════════════════════════ 01–07 ═══════════════════════════ */}
       <HowItWorks />
       <FeatureShowcase />
       <CompareTable />
@@ -149,38 +164,16 @@ export default async function HomePage() {
       <PricingTeaser />
       <HomeFaq />
 
-      {/* ═══════════════════════════ 10 · CTA ═══════════════════════════ */}
-      <section className="hp-cta-band">
-        <div className="hp-cta-band__inner">
-          {session ? (
-            <>
-              <h2 className="hp-cta-band__title">Your contacts are waiting.</h2>
-              <p className="hp-cta-band__sub">Pick up where you left off.</p>
-              <div className="hp-cta-band__btns">
-                <Link className="hp-btn--primary" href="/contacts">
-                  Open Kontax
-                </Link>
-                <Link className="hp-btn--ghost" href="/pricing">
-                  Compare plans
-                </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="hp-cta-band__title">Ready to get started?</h2>
-              <p className="hp-cta-band__sub">Free for up to 500 contacts. No card needed.</p>
-              <div className="hp-cta-band__btns">
-                <Link className="hp-btn--primary" href="/register">
-                  Get started free
-                </Link>
-                <Link className="hp-btn--ghost" href="/pricing">
-                  Compare plans
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
+      {/* ═══════════════════════════ CTA ═══════════════════════════ */}
+      {session ? (
+        <CtaBand
+          title="Your contacts are waiting."
+          sub="Pick up where you left off."
+          primary={{ label: "Open Kontax", href: "/contacts" }}
+        />
+      ) : (
+        <CtaBand title="Ready to get started?" />
+      )}
     </div>
   );
 }
