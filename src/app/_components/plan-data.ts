@@ -343,7 +343,10 @@ export const UPGRADE_GATES: UpgradeGate[] = [
     bannerLead: "You’ve used all 3 imports this month on the Free plan.",
     lockedTitle: "You’ve hit this month’s import limit",
     value: "Pro removes the monthly cap — import as often as you need.",
-    billing: "Free plan import limit reached. You can import up to 3 contacts per month on this plan.",
+    // P49A-19: 3 import runs a month (CSV / Kontax archive), not 3 contacts —
+    // mirrors importLimitMessage() in src/server/billing.ts.
+    billing:
+      "You've used your 3 imports this month on the Free plan. Upgrade for unlimited imports, or wait until the 1st of next month.",
   },
   {
     id: "sync",

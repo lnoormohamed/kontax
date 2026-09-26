@@ -345,12 +345,12 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
 
 // Usage grid for Free and active personal plans (matches §1a / §1b).
 function buildUsage(summary: Awaited<ReturnType<typeof getUserPlanSummary>>): BillingUsageRow[] {
-  const { entitlements, contactsUsed, importedThisMonth } = summary;
+  const { entitlements, contactsUsed, importsThisMonth } = summary;
   return [
     { label: "Contacts", used: contactsUsed, limit: entitlements.contactsLimit },
     {
       label: "Imports",
-      used: importedThisMonth,
+      used: importsThisMonth, // P49A-19: import runs, not contacts
       limit: entitlements.monthlyImportLimit,
       suffix: "this month",
       valueLabel: entitlements.monthlyImportLimit === null ? "Unlimited" : undefined,

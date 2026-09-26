@@ -325,6 +325,7 @@ export function ImportPreviewForm({
 }: {
   /** Free-plan import quota gate. */
   gate: "none" | "near" | "limit";
+  /** P49A-19: import runs (not contacts) used this month; cap 0 = unlimited. */
   quota: { used: number; cap: number; reset: string };
   /** Grace/Locked lifecycle — import disabled, show banner. */
   readOnly?: boolean;
@@ -602,7 +603,7 @@ export function ImportPreviewForm({
                 className="flex h-11 items-center justify-center rounded-[10px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8]"
                 href="/pricing"
               >
-                Upgrade to Pro to import more contacts
+                Upgrade to Pro for unlimited imports
               </Link>
               <div className="text-[13px] text-[#5c655e]">
                 Your import limit resets on <b className="text-[#1d2823]">{quota.reset}</b>.
@@ -675,6 +676,12 @@ export function ImportPreviewForm({
             ref={inputRef}
             type="file"
           />
+
+          {gate === "none" && quota.cap > 0 && !blocked ? (
+            <div className="text-[12.5px] text-[#8b938c] tabular-nums">
+              {quota.used} of {quota.cap} imports used this month.
+            </div>
+          ) : null}
 
           {!blocked && !kontaxInfo ? (
             <div>

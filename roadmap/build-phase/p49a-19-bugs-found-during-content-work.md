@@ -15,7 +15,23 @@ needs confirming in code before the fix.
 | 6 | Auto-pause after repeated sync failures defaults to 5, while copy says 3 | `src/server/sync-health.ts` | Copy/behaviour mismatch — pick one |
 | 7 | `DOWNGRADE_COPY` in `plan-data.ts` is never shown and is wrong in places; users see `cancel-plan-modal.tsx` | `src/app/_components/plan-data.ts`, `cancel-plan-modal.tsx` | Dead, misleading code — delete or wire up correctly |
 | 8 | iPhone edits through Kontax's CardDAV server are not marked as local edits, so they may not push to the source provider (e.g. Google) | `server.mjs` PUT `lastMutatedBy` | Already tracked as A-17 in P49A-12 — confirm there |
-| 9 | Free `monthlyImportLimit: 3` counts **contacts**, so any Free CSV import over 3 rows is refused | `src/server/billing.ts` `assertCanImportContacts` | Owner decision pending: likely "3 imports per month" |
+| 9 | Free `monthlyImportLimit: 3` counts **contacts**, so any Free CSV import over 3 rows is refused | `src/server/billing.ts` `assertCanImportContacts` | **Fixed** — owner decision 2026-09-26: 3 import runs a month (CSV + Kontax archive), not 3 contacts. See below. |
 
 Fixed already (not part of this ticket): the sign-up card's "no card required" trial copy and the
 help FAQ's vCard-import claim (08b6fac, release branch).
+
+## Item 9 — fixed (2026-09-26)
+
+`monthlyImportLimit` now counts import **runs** (`importsThisMonthWhere` in `src/server/billing.ts`):
+an ImportJob counts once it has created at least one contact (`importedCount > 0`), in the UTC month
+of its `committedAt` (legacy rows without one fall back to `createdAt`). So previews, failed runs and
+empty runs never count; a run cut short by the 500 contact cap counts as one; a rolled-back run still
+counts. An import is allowed while `importsThisMonth < monthlyImportLimit` (null = unlimited); the
+contact cap still applies separately and still creates only what fits (P49A-06).
+
+Every import path records `importedCount` + `committedAt` on its job inside the inserting
+transaction, after `lockUserForPlanCheck`, so concurrent imports at 2/3 let exactly one through
+(CSV commit route, Kontax archive import — first landing chunk — and the legacy in-app action).
+The CSV commit route claims a preview job atomically (only PENDING, or FAILED with nothing
+imported); a retry or double-submit of a job that already ran gets 409 instead of importing twice.
+Tests: `tests/node/monthly-import-limit.test.ts`.

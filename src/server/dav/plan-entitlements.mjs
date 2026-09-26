@@ -30,7 +30,9 @@
 /**
  * @typedef {object} PlanEntitlements
  * @property {number | null} contactsLimit  null = unlimited.
- * @property {number | null} monthlyImportLimit
+ * @property {number | null} monthlyImportLimit  Import RUNS (CSV / Kontax
+ *   archive files) per UTC calendar month, not contacts; null = unlimited.
+ *   Counting rules: src/server/billing.ts `importsThisMonthWhere` (P49A-19).
  * @property {number} syncAccountsLimit
  * @property {number} appPasswordsLimit
  * @property {boolean} advancedMergeEnabled

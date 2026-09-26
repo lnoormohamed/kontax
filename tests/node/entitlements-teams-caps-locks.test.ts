@@ -68,7 +68,7 @@ const stub = {
       return { id: `contact_${state.contactCreates.length}`, ...data };
     },
   },
-  importJob: { aggregate: async () => ({ _sum: { importedCount: 0 } }) },
+  importJob: { count: async () => 0 },
   syncAccount: { count: async () => 0 },
   appPassword: { count: async () => 0 },
   subscription: {

@@ -74,37 +74,56 @@ export async function POST(request: Request) {
   }
 
   const sourceFileName = parsedBody.data.sourceFileName?.trim() ?? "pasted-import.csv";
-  const existingJob = parsedBody.data.jobId
-    ? await db.importJob.findFirst({
-        where: {
-          id: parsedBody.data.jobId,
-          userId,
-        },
-      })
-    : null;
 
-  const job = existingJob
-    ? await db.importJob.update({
-        where: { id: existingJob.id },
-        data: {
-          status: "PROCESSING",
-          sourceProfile: parsedBody.data.profile,
-          sourceFileName,
-          sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
-          startedAt: new Date(),
+  // P49A-19: commit is idempotent per preview job. Claim the job atomically —
+  // only a PENDING preview, or a FAILED run that created nothing, can be
+  // (re)committed. A double-submit or a retry of a run that already landed
+  // contacts gets 409 instead of importing the file twice (duplicate contacts,
+  // and a second import counted against the monthly allowance).
+  let existingJob: Awaited<ReturnType<typeof db.importJob.findFirst>> = null;
+  if (parsedBody.data.jobId) {
+    const claimed = await db.importJob.updateMany({
+      where: {
+        id: parsedBody.data.jobId,
+        userId,
+        status: { in: ["PENDING", "FAILED"] },
+        importedCount: 0,
+      },
+      data: {
+        status: "PROCESSING",
+        sourceProfile: parsedBody.data.profile,
+        sourceFileName,
+        sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
+        startedAt: new Date(),
+      },
+    });
+    existingJob = await db.importJob.findFirst({
+      where: { id: parsedBody.data.jobId, userId },
+    });
+    if (existingJob && claimed.count === 0) {
+      return Response.json(
+        {
+          message:
+            "This import has already been run. Check your contacts, or choose the file again to start a new import.",
         },
-      })
-    : await db.importJob.create({
-        data: {
-          userId,
-          format: "CSV_GENERIC",
-          status: "PROCESSING",
-          sourceProfile: parsedBody.data.profile,
-          sourceFileName,
-          sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
-          startedAt: new Date(),
-        },
-      });
+        { status: 409 },
+      );
+    }
+  }
+
+  const job =
+    existingJob ??
+    (await db.importJob.create({
+      data: {
+        userId,
+        format: "CSV_GENERIC",
+        status: "PROCESSING",
+        sourceProfile: parsedBody.data.profile,
+        sourceFileName,
+        sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
+        startedAt: new Date(),
+      },
+    }));
 
   try {
     // P48-11 item 4: check the quota against a cheap row-count estimate
@@ -114,7 +133,8 @@ export async function POST(request: Request) {
     // only ever make the real count lower than this estimate).
     // P49A-06 (Fable review): over the contact cap is no longer a failure —
     // only what fits is created (below) — so this rejects only a read-only
-    // account, the monthly import limit, or an account with no room at all.
+    // account, no import run left this month (P49A-19), or an account with
+    // no room at all.
     try {
       await getImportCapacity(userId, approximateCsvRowCount(parsedBody.data.csvText) - 1);
     } catch (error) {
@@ -152,7 +172,7 @@ export async function POST(request: Request) {
     // transaction with the User row locked (a concurrent import / create for
     // the same account serialises here), and only the first contacts that fit
     // are created — the rest are reported as skipped, never failing the import.
-    const { created, capacity } = await db.$transaction(
+    const { created, capacity, committedAt } = await db.$transaction(
       async (tx) => {
         await lockUserForPlanCheck(tx, userId);
         let capacity: Awaited<ReturnType<typeof getImportCapacityTx>>;
@@ -163,6 +183,7 @@ export async function POST(request: Request) {
             error instanceof Error ? error.message : "Import limit reached.",
           );
         }
+        const committedAt = new Date();
         const created = await tx.contact.createMany({
           data: preview.contacts.slice(0, capacity.toCreate).map((contact) => ({
             userId,
@@ -192,7 +213,14 @@ export async function POST(request: Request) {
             lastMutatedByDetail: sourceFileName,
           })),
         });
-        return { created, capacity };
+        // P49A-19: record the run inside the locked transaction — this is
+        // what makes it count against the monthly import allowance, so a
+        // concurrent commit that takes the lock next sees it.
+        await tx.importJob.update({
+          where: { id: job.id },
+          data: { importedCount: created.count, committedAt },
+        });
+        return { created, capacity, committedAt };
       },
       // MAX_CSV_ROWS (50,000) can take longer than Prisma's 5s default to
       // insert; same generous timeout as the in-app CSV import.
@@ -242,7 +270,7 @@ export async function POST(request: Request) {
             .filter(Boolean)
             .join(" | ") || null,
         previewedAt: existingJob?.previewedAt ?? job.previewedAt ?? null,
-        committedAt: new Date(),
+        committedAt,
         completedAt: new Date(),
       },
     });

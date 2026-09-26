@@ -76,7 +76,7 @@ function makeClient(pending: Row[] | null, releasers: Array<() => void>) {
       },
     },
     importJob: {
-      aggregate: async () => ({ _sum: { importedCount: 0 } }),
+      count: async () => 0,
       findFirst: async () => null,
       create: async ({ data }: { data: Row }) => {
         const job = { id: `job_${state.importJobs.size + 1}`, previewedAt: null, ...data };

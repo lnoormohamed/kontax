@@ -9,7 +9,7 @@ import { ImportPreviewForm } from "~/app/_components/import-preview-form";
 import { PresetsPanel } from "./_components/presets-panel";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
-import { getUserPlanSummary } from "~/server/billing";
+import { formatImportResetDate, getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 
 type ImportExportPageProps = {
@@ -94,17 +94,16 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
   ]);
 
   const cap = planSummary.entitlements.monthlyImportLimit;
-  const used = planSummary.importedThisMonth;
+  // P49A-19: import runs this month (CSV / Kontax archive), not contacts.
+  const used = planSummary.importsThisMonth;
   const remaining = cap === null ? Infinity : cap - used;
   const gate: "none" | "near" | "limit" = cap === null ? "none" : remaining <= 0 ? "limit" : remaining === 1 ? "near" : "none";
   const readOnly =
     planSummary.lifecyclePolicy.label === "Grace" ||
     planSummary.lifecyclePolicy.label === "Locked";
 
-  const now = new Date();
-  const resetDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(
-    new Date(now.getFullYear(), now.getMonth() + 1, 1),
-  );
+  // Same UTC month boundary the allowance is counted on.
+  const resetDate = formatImportResetDate();
 
   // P46-15 / DB07: "presets" joins the segmented modes — saved field-mapping
   // presets folded in from the two old settings pages (301s point here).

@@ -129,10 +129,66 @@ const LIFECYCLE_ACCESS_POLICIES: Record<BillingLifecycleState, LifecycleAccessPo
 export const getLifecycleAccessPolicy = (state: BillingLifecycleState) =>
   LIFECYCLE_ACCESS_POLICIES[state];
 
-const getMonthStart = () => {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+const getMonthStart = (now = new Date()) =>
+  new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+
+/** Start of the next UTC calendar month — when the monthly import allowance resets. */
+export const getImportResetDate = (now = new Date()) =>
+  new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0, 0));
+
+/** "1 October" — the reset date in UK English, in UTC like the month boundary. */
+export const formatImportResetDate = (now = new Date()) =>
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }).format(
+    getImportResetDate(now),
+  );
+
+/**
+ * P49A-19 (owner decision 2026-09-26): `monthlyImportLimit` counts import RUNS
+ * — CSV / vCard commits and Kontax archive imports from the Import & export
+ * page — not contacts. A run counts once it has created at least one contact
+ * (`importedCount > 0`), whatever its final status:
+ *   - previews (PENDING jobs), failed runs and empty runs create nothing, so
+ *     they never count;
+ *   - a run cut short by the contact cap (P49A-06 partial import) counts as 1;
+ *   - a run later undone via rollback still counts (it was used);
+ *   - a retried job id is the same row, so it can only ever count once.
+ * The month is the UTC calendar month of `committedAt` (not `createdAt`, so a
+ * preview made last month and committed this month counts this month). Every
+ * import path sets `importedCount` + `committedAt` INSIDE the inserting
+ * transaction, under `lockUserForPlanCheck`, so a concurrent import for the
+ * same user sees it once it takes the lock. Rows without `committedAt` (the
+ * legacy in-app action before P49A-19) fall back to `createdAt`.
+ */
+export const importsThisMonthWhere = (
+  userId: string,
+  now = new Date(),
+): Prisma.ImportJobWhereInput => {
+  const monthStart = getMonthStart(now);
+  return {
+    userId,
+    importedCount: { gt: 0 },
+    OR: [
+      { committedAt: { gte: monthStart } },
+      { committedAt: null, createdAt: { gte: monthStart } },
+    ],
+  };
 };
+
+export const importLimitMessage = (planLabel: string, limit: number, now = new Date()) =>
+  `You've used your ${limit} import${limit === 1 ? "" : "s"} this month on the ${planLabel} plan. Upgrade for unlimited imports, or wait until ${formatImportResetDate(now)}.`;
+
+/** Thrown when the monthly import-run allowance is used up (P49A-19). */
+export class ImportLimitReachedError extends Error {
+  readonly code = "IMPORT_LIMIT_REACHED";
+  readonly planLabel: string;
+  readonly limit: number;
+  constructor(planLabel: string, limit: number) {
+    super(importLimitMessage(planLabel, limit));
+    this.name = "ImportLimitReachedError";
+    this.planLabel = planLabel;
+    this.limit = limit;
+  }
+}
 
 const toBillingContext = (
   effective: Awaited<ReturnType<typeof loadEffectivePlan>>,
@@ -200,19 +256,11 @@ const assertExportableAccount = (context: BillingContext) => {
 
 export const getUserPlanSummary = cache(async (userId: string) => {
   const context = await getUserBillingContext(userId);
-  const monthStart = getMonthStart();
 
-  const [contactsUsed, importedThisMonthAggregate, syncAccountsUsed, appPasswordsUsed] =
+  const [contactsUsed, importsThisMonth, syncAccountsUsed, appPasswordsUsed] =
     await Promise.all([
       db.contact.count({ where: { userId } }),
-      db.importJob.aggregate({
-        where: {
-          userId,
-          status: "COMPLETED",
-          createdAt: { gte: monthStart },
-        },
-        _sum: { importedCount: true },
-      }),
+      db.importJob.count({ where: importsThisMonthWhere(userId) }),
       countLiveSyncAccountSlots(userId),
       db.appPassword.count({ where: { userId } }),
     ]);
@@ -226,7 +274,8 @@ export const getUserPlanSummary = cache(async (userId: string) => {
       context.entitlements.contactsLimit === null
         ? null
         : Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
-    importedThisMonth: importedThisMonthAggregate._sum.importedCount ?? 0,
+    /** Import runs this UTC month (not contacts) — see `importsThisMonthWhere`. */
+    importsThisMonth,
     syncAccountsUsed,
     appPasswordsUsed,
   };
@@ -246,16 +295,26 @@ export const assertCanCreateContacts = async (userId: string, incomingCount = 1)
   return summary;
 };
 
+/**
+ * P49A-19: throws `ImportLimitReachedError` when the monthly import-run
+ * allowance is used up (null limit = unlimited). One more run is allowed while
+ * `importsThisMonth < monthlyImportLimit`, whatever its size — the contact cap
+ * is checked separately.
+ */
+const assertImportRunAvailable = (summary: {
+  planLabel: string;
+  entitlements: PlanEntitlements;
+  importsThisMonth: number;
+}) => {
+  const limit = summary.entitlements.monthlyImportLimit;
+  if (limit !== null && summary.importsThisMonth >= limit) {
+    throw new ImportLimitReachedError(summary.planLabel, limit);
+  }
+};
+
 export const assertCanImportContacts = async (userId: string, incomingCount: number) => {
   const summary = await assertCanCreateContacts(userId, incomingCount);
-
-  const limit = summary.entitlements.monthlyImportLimit;
-  if (limit !== null && summary.importedThisMonth + incomingCount > limit) {
-    throw new Error(
-      `${summary.planLabel} plan import limit reached. You can import up to ${limit} contacts per month on this plan.`,
-    );
-  }
-
+  assertImportRunAvailable(summary);
   return summary;
 };
 
@@ -379,15 +438,11 @@ const getUserBillingContextTx = async (tx: TxClient, userId: string): Promise<Bi
 
 const getUserPlanSummaryTx = async (tx: TxClient, userId: string) => {
   const context = await getUserBillingContextTx(tx, userId);
-  const monthStart = getMonthStart();
 
-  const [contactsUsed, importedThisMonthAggregate, syncAccountsUsed, appPasswordsUsed] =
+  const [contactsUsed, importsThisMonth, syncAccountsUsed, appPasswordsUsed] =
     await Promise.all([
       tx.contact.count({ where: { userId } }),
-      tx.importJob.aggregate({
-        where: { userId, status: "COMPLETED", createdAt: { gte: monthStart } },
-        _sum: { importedCount: true },
-      }),
+      tx.importJob.count({ where: importsThisMonthWhere(userId) }),
       tx.syncAccount.count({ where: liveSyncAccountWhere(userId) }),
       tx.appPassword.count({ where: { userId } }),
     ]);
@@ -400,7 +455,8 @@ const getUserPlanSummaryTx = async (tx: TxClient, userId: string) => {
       context.entitlements.contactsLimit === null
         ? null
         : Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
-    importedThisMonth: importedThisMonthAggregate._sum.importedCount ?? 0,
+    /** Import runs this UTC month (not contacts) — see `importsThisMonthWhere`. */
+    importsThisMonth,
     syncAccountsUsed,
     appPasswordsUsed,
   };
@@ -428,9 +484,12 @@ export const assertCanCreateContactsTx = async (
 /**
  * P49A-06 (Fable review): file imports (CSV/vCard commit, Kontax archive)
  * create only what fits under the contact cap and report the rest as skipped,
- * instead of failing the whole import. Checks the account can write and the
- * monthly import limit (for the contacts that will actually be created), and
- * throws `ContactLimitReachedError` only when not even one contact fits.
+ * instead of failing the whole import. Checks the account can write and has an
+ * import run left this month (P49A-19: `ImportLimitReachedError` otherwise),
+ * and throws `ContactLimitReachedError` only when not even one contact fits.
+ * The run itself is only counted once the caller records `importedCount` /
+ * `committedAt` on its ImportJob inside the same locked transaction — see
+ * `importsThisMonthWhere`.
  */
 export type ImportCapacity = {
   /** How many of the incoming contacts to create (the first N). */
@@ -446,6 +505,7 @@ const planImportCapacity = (
   incomingCount: number,
 ): ImportCapacity => {
   assertWritableAccount(summary);
+  assertImportRunAvailable(summary);
 
   const contactsLimit = summary.entitlements.contactsLimit;
   const remaining = summary.contactsRemaining;
@@ -453,13 +513,6 @@ const planImportCapacity = (
   const toCreate = remaining === null ? incoming : Math.min(incoming, remaining);
   if (contactsLimit !== null && incoming > 0 && toCreate === 0) {
     throw new ContactLimitReachedError(summary.planLabel, contactsLimit);
-  }
-
-  const importLimit = summary.entitlements.monthlyImportLimit;
-  if (importLimit !== null && summary.importedThisMonth + toCreate > importLimit) {
-    throw new Error(
-      `${summary.planLabel} plan import limit reached. You can import up to ${importLimit} contacts per month on this plan.`,
-    );
   }
 
   const capSkipped = incoming - toCreate;
@@ -484,6 +537,21 @@ export const getImportCapacity = async (userId: string, incomingCount: number) =
 export const getImportCapacityTx = async (tx: TxClient, userId: string, incomingCount: number) =>
   planImportCapacity(await getUserPlanSummaryTx(tx, userId), incomingCount);
 
+/**
+ * P49A-19: the import-run allowance alone (no contact-cap or sync aggregates),
+ * for imports that land in several transactions (Kontax archive chunks). Call
+ * after `lockUserForPlanCheck` in the transaction that lands the run's first
+ * contacts, and record `importedCount` / `committedAt` on the job in that same
+ * transaction. Throws `ImportLimitReachedError`.
+ */
+export const assertImportRunAvailableTx = async (tx: TxClient, userId: string) => {
+  const [context, importsThisMonth] = await Promise.all([
+    getUserBillingContextTx(tx, userId),
+    tx.importJob.count({ where: importsThisMonthWhere(userId) }),
+  ]);
+  assertImportRunAvailable({ ...context, importsThisMonth });
+};
+
 /** Transactional twin of `assertCanImportContacts` — call after `lockUserForPlanCheck`. */
 export const assertCanImportContactsTx = async (
   tx: TxClient,
@@ -491,14 +559,7 @@ export const assertCanImportContactsTx = async (
   incomingCount: number,
 ) => {
   const summary = await assertCanCreateContactsTx(tx, userId, incomingCount);
-
-  const limit = summary.entitlements.monthlyImportLimit;
-  if (limit !== null && summary.importedThisMonth + incomingCount > limit) {
-    throw new Error(
-      `${summary.planLabel} plan import limit reached. You can import up to ${limit} contacts per month on this plan.`,
-    );
-  }
-
+  assertImportRunAvailable(summary);
   return summary;
 };
 

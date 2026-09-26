@@ -517,7 +517,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           contactsUsed: planSummary.contactsUsed,
           contactsRemaining: planSummary.contactsRemaining,
           contactsLimit: planSummary.entitlements.contactsLimit,
-          importedThisMonth: planSummary.importedThisMonth,
+          importsThisMonth: planSummary.importsThisMonth,
           monthlyImportLimit: planSummary.entitlements.monthlyImportLimit,
           premiumExportEnabled: planSummary.entitlements.premiumExportEnabled,
           activityEnabled: isActivityLogEnabled(planSummary.entitlements),

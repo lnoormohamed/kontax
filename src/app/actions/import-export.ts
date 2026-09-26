@@ -68,14 +68,16 @@ export const importContactsCsv = async (formData: FormData) => {
 
     // P48-17: count-then-insert race — lock the user row so a concurrent
     // import (or contact create) for the same user serialises against this
-    // one, then re-check both the contact and monthly-import caps inside the
-    // same transaction as the insert.
+    // one, then re-check both the contact cap and the monthly import-run
+    // allowance inside the same transaction as the insert. P49A-19: the run
+    // is recorded on its job (importedCount + committedAt) in that same
+    // transaction, which is what counts it against the allowance.
     const created = await db.$transaction(
       async (tx) => {
         await lockUserForPlanCheck(tx, userId);
         await assertCanImportContactsTx(tx, userId, parsed.contacts.length);
 
-        return tx.contact.createMany({
+        const result = await tx.contact.createMany({
           data: parsed.contacts.map((contact) => ({
             userId,
             fullName: contact.fullName,
@@ -98,6 +100,11 @@ export const importContactsCsv = async (formData: FormData) => {
             notes: contact.notes,
           })),
         });
+        await tx.importJob.update({
+          where: { id: job.id },
+          data: { importedCount: result.count, committedAt: new Date() },
+        });
+        return result;
       },
       // MAX_CSV_ROWS (50,000) can take longer than Prisma's 5s default to
       // insert; match the generous timeout the sync commit transaction uses.
