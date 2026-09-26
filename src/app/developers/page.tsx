@@ -35,7 +35,9 @@ function Code({ children }: { children: string }) {
 function CodeBlock({ children, lang = "bash" }: { children: string; lang?: string }) {
   void lang;
   return (
-    <pre className="dev-pre">
+    // tabIndex: the block scrolls sideways on narrow screens, so keyboard
+    // users need to be able to focus it (axe scrollable-region-focusable).
+    <pre className="dev-pre" tabIndex={0}>
       <code>{children}</code>
     </pre>
   );
@@ -68,7 +70,7 @@ function P({ children }: { children: React.ReactNode }) {
 
 function Table({ headers, rows }: { headers: string[]; rows: (string | React.ReactNode)[][] }) {
   return (
-    <div className="dev-table-scroll">
+    <div className="dev-table-scroll" tabIndex={0} role="region" aria-label={`${headers.join(", ")} table`}>
       <table className="dev-table">
         <thead>
           <tr>
