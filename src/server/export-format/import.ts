@@ -8,9 +8,11 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
 import {
+  assertImportRunAvailableTx,
   contactLimitMessage,
   getContactCapacityFor,
   getImportCapacity,
+  ImportLimitReachedError,
   lockUserForPlanCheck,
 } from "~/server/billing";
 import { db } from "~/server/db";
@@ -202,8 +204,10 @@ export async function commitKontaxImport(
 
     // P49A-06 (Fable review): over the contact cap no longer fails the import
     // — only what fits is created (enforced per chunk below, inside the insert
-    // transaction) — so this rejects only a read-only account, the monthly
-    // import limit, or an account with no room at all.
+    // transaction) — so this rejects only a read-only account, no import run
+    // left this month (P49A-19), or an account with no room at all. Unlocked
+    // pre-check: the authoritative run check is in the first insert
+    // transaction below.
     try {
       await getImportCapacity(userId, contacts.length);
     } catch (error) {
@@ -281,6 +285,7 @@ export async function commitKontaxImport(
     // createMany can't carry per-contact photo URLs, so: upload photos for a
     // chunk, then create that chunk's contacts in one transaction.
     let importedCount = 0;
+    let committedAt: Date | null = null;
     let capSkippedCount = 0;
     let capLimit: { planLabel: string; limit: number } | null = null;
     const photoWarnings: string[] = [];
@@ -319,6 +324,21 @@ export async function commitKontaxImport(
 
       const created = await db.$transaction(async (tx) => {
         await lockUserForPlanCheck(tx, userId);
+        // P49A-19: the run is checked against the monthly import allowance —
+        // and recorded, below — in the first transaction that lands contacts,
+        // under the User-row lock, so two concurrent imports can't both take
+        // the last run. Later chunks belong to the same run.
+        const firstLanding = committedAt === null;
+        if (firstLanding) {
+          try {
+            await assertImportRunAvailableTx(tx, userId);
+          } catch (error) {
+            if (error instanceof ImportLimitReachedError) {
+              throw new KontaxImportError(error.message);
+            }
+            throw error;
+          }
+        }
         const capacity = await getContactCapacityFor(tx, userId);
         const fits =
           capacity.remaining === null ? group.length : Math.min(group.length, capacity.remaining);
@@ -373,13 +393,25 @@ export async function commitKontaxImport(
             select: { id: true },
           }));
         }
-        return rows;
+        if (rows.length > 0) {
+          const landedAt = committedAt ?? new Date();
+          await tx.importJob.update({
+            where: { id: job.id },
+            data: {
+              importedCount: { increment: rows.length },
+              ...(firstLanding ? { committedAt: landedAt } : {}),
+            },
+          });
+          return { rows, landedAt };
+        }
+        return { rows, landedAt: committedAt };
       }, { timeout: 60_000 });
-      created.forEach((row, index) => {
+      committedAt = created.landedAt;
+      created.rows.forEach((row, index) => {
         const source = group[index]!;
         landed.push({ id: row.id, source, primaryBookId: resolveBookId(source) });
       });
-      importedCount += created.length;
+      importedCount += created.rows.length;
     }
     const skippedCount = parseSkippedCount + capSkippedCount;
     const limitMessage =
@@ -424,7 +456,7 @@ export async function commitKontaxImport(
         errorSummary: limitMessage
           ? `${capSkippedCount} contact${capSkippedCount === 1 ? "" : "s"} not imported: ${limitMessage}`
           : undefined,
-        committedAt: new Date(),
+        committedAt: committedAt ?? new Date(),
         completedAt: new Date(),
       },
     });

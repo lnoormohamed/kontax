@@ -53,7 +53,8 @@ type PlanSummary = {
   contactsUsed: number;
   contactsRemaining: number | null;
   contactsLimit: number | null;
-  importedThisMonth: number;
+  /** P49A-19: import runs this month, not contacts. */
+  importsThisMonth: number;
   monthlyImportLimit: number | null;
   premiumExportEnabled: boolean;
   activityEnabled: boolean;

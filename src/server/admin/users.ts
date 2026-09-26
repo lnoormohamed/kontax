@@ -9,6 +9,7 @@ import {
   countLiveSyncAccountSlots,
   getLifecycleAccessPolicy,
   getUserBillingContext,
+  importsThisMonthWhere,
 } from "~/server/billing";
 import { listSupportCasesForSubject } from "~/server/admin/support-cases";
 import { getSyncAccountOperationalHealth, getSyncErrorSupportBucket } from "~/server/sync-health";
@@ -238,14 +239,13 @@ export async function loadUserDetail(userId: string) {
   });
   if (!user) return null;
 
-  const monthStart = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1));
 
   const [
     billing,
     contactsUsed,
     syncUsed,
     appPwdUsed,
-    importsAgg,
+    importsThisMonth,
     group,
     activityRaw,
     sessionsRaw,
@@ -260,10 +260,8 @@ export async function loadUserDetail(userId: string) {
       db.contact.count({ where: { userId } }),
       countLiveSyncAccountSlots(userId),
       db.appPassword.count({ where: { userId, revokedAt: null } }),
-      db.importJob.aggregate({
-        where: { userId, status: "COMPLETED", createdAt: { gte: monthStart } },
-        _sum: { importedCount: true },
-      }),
+      // P49A-19: import runs this month, not contacts.
+      db.importJob.count({ where: importsThisMonthWhere(userId) }),
       db.groupMember.findFirst({
         where: { userId, inviteStatus: "ACCEPTED" },
         select: {
@@ -453,9 +451,9 @@ export async function loadUserDetail(userId: string) {
       value:
         ent.monthlyImportLimit === null
           ? "Unlimited"
-          : String(importsAgg._sum.importedCount ?? 0),
+          : String(importsThisMonth),
       limit: ent.monthlyImportLimit === null ? "" : String(ent.monthlyImportLimit),
-      pct: ent.monthlyImportLimit === null ? null : Math.min(1, (importsAgg._sum.importedCount ?? 0) / ent.monthlyImportLimit),
+      pct: ent.monthlyImportLimit === null ? null : Math.min(1, importsThisMonth / ent.monthlyImportLimit),
     },
   ];
 
