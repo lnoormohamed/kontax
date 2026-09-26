@@ -239,6 +239,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
   font-size: 15px;
   font-weight: 600;
   color: var(--mkt-g800);

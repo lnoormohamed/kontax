@@ -1,360 +1,146 @@
 /* ════════════════════════════════════════════════════════════════
-   Changelog page — page-specific styles
-   Prefix: chg-  (tokens come from .mkt-wrap in marketing.css)
+   Changelog page — P50-05 Direction A
+   Prefix: chg-. Page head, container and CTA band come from
+   marketing.css; this file holds the meta line and the release list:
+   hairline-separated entries, Geist Mono dates in a narrow left column
+   (sticky on desktop), --mkt-* tokens only.
    ════════════════════════════════════════════════════════════════ */
 
-/* ─── Shared inner wrap ───────────────────────────────────────── */
-.chg-wrap {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* ─── Hero ────────────────────────────────────────────────────── */
-.chg-hero {
-  position: relative;
-  overflow: hidden;
-  background: var(--mkt-paper);
-  padding: 72px 0 40px;
-  border-bottom: 1px solid var(--mkt-hairline);
-}
-.chg-hero::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  left: -120px;
-  top: -160px;
-  width: 620px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, rgba(23, 53, 46, 0.06), rgba(23, 53, 46, 0) 70%);
-  pointer-events: none;
-}
-.chg-hero__inner {
-  position: relative;
-  z-index: 1;
-  max-width: 640px;
-}
-.chg-hero__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 28px;
-  padding: 0 14px;
-  margin: 0 0 20px;
-  border-radius: 999px;
-  white-space: nowrap;
-  background: var(--mkt-tile-bg);
-  color: var(--mkt-green);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.chg-hero__title {
-  margin: 0;
-  font-size: 44px;
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  color: var(--mkt-green);
-}
-.chg-hero__sub {
-  margin: 16px 0 0;
-  font-size: 17px;
-  line-height: 1.7;
-  color: var(--mkt-body);
-  text-wrap: pretty;
-}
-.chg-hero__meta {
-  margin: 22px 0 0;
+/* ─── Meta line under the page head ───────────────────────────── */
+.chg-meta {
   display: flex;
-  align-items: center;
-  gap: 16px;
   flex-wrap: wrap;
-  font-size: 13px;
+  align-items: center;
+  gap: 0 12px;
+  margin: 20px 0 0;
+  font: 500 13px/1.4 var(--mkt-mono);
   color: var(--mkt-mute);
-  white-space: nowrap;
 }
-.chg-hero__rss {
+.chg-meta__sep { color: var(--mkt-g400); }
+.chg-rss {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--mkt-accent);
-  text-decoration: none;
+  min-height: 44px;
+  font: 600 14.5px/1 var(--mkt-sans);
+  color: var(--mkt-g800);
+  text-decoration: underline;
+  text-decoration-color: var(--mkt-g200);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
-.chg-hero__rss:hover { opacity: 0.8; }
+.chg-rss:hover { color: var(--mkt-g600); text-decoration-color: currentColor; }
+.chg-rss svg { flex: 0 0 auto; color: var(--mkt-g600); }
 
-/* ─── Entry list ──────────────────────────────────────────────── */
-.chg-body { padding: 8px 0 56px; }
+/* ─── Release list ────────────────────────────────────────────── */
+.chg-list { padding: 8px 0 var(--mkt-space-md); }
 
 .chg-entry {
   display: grid;
-  /* minmax(0, 1fr), not 1fr: a bare 1fr track's automatic minimum size is its
-     content's min-content width, so nowrap children deeper in the tree (e.g.
-     the release-figure rows) can force this track — and the whole page — wider
-     than the viewport. minmax(0, …) removes that automatic minimum. */
-  grid-template-columns: 160px minmax(0, 1fr);
-  gap: 0;
-  padding: 52px 0;
-  border-bottom: 1px solid var(--mkt-hairline);
+  /* minmax(0, …): a bare 1fr track's automatic minimum is its content's
+     min-content width, which can force the page wider than the viewport. */
+  grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  gap: 0 48px;
+  padding: 56px 0;
+  scroll-margin-top: var(--mkt-nav-h);
 }
-.chg-entry:last-of-type { border-bottom: none; }
+.chg-entry + .chg-entry { border-top: 1px solid var(--mkt-line); }
 
-.chg-entry__date {
-  font-family: var(--mkt-mono);
-  font-size: 13.5px;
-  color: var(--mkt-mute);
-  text-align: right;
-  padding-right: 32px;
-  padding-top: 6px;
-}
-.chg-entry__date--mobile { display: none; }
-
-/* headline entries: text left, release figure right */
-.chg-entry__content--fig {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 48px;
-  align-items: start;
-}
-.chg-entry__aside .chg-fig { margin-top: 4px; }
-
-.chg-entry__head {
+.chg-entry__when {
+  position: sticky;
+  top: calc(var(--mkt-nav-h) + 28px);
+  align-self: start;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 7px;
 }
-.chg-vbadge {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  white-space: nowrap;
-  font-family: var(--mkt-mono);
-  background: var(--mkt-tile-bg);
-  color: var(--mkt-green);
-  font-size: 12.5px;
-  font-weight: 500;
-  border: 1px solid #dcebdd;
-  border-radius: 7px;
-  padding: 3px 9px;
-}
+.chg-entry__date { font: 500 13.5px/1 var(--mkt-mono); color: var(--mkt-head); }
+.chg-entry__ver { font: 500 12.5px/1 var(--mkt-mono); color: var(--mkt-g600); }
+
+.chg-entry__main { max-width: 720px; }
 .chg-entry__title {
-  font-size: 24px;
-  font-weight: 700;
+  margin: 0;
+  font: 650 26px/1.2 var(--mkt-sans);
   letter-spacing: -0.02em;
-  color: var(--mkt-green);
-  line-height: 1.2;
+  color: var(--mkt-head);
+  text-wrap: balance;
 }
 .chg-entry__summary {
   margin: 12px 0 0;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.6;
   color: var(--mkt-body);
   text-wrap: pretty;
 }
+.chg-entry__fig { margin-top: 28px; max-width: 520px; }
 
-/* ─── Release figure (mock screenshot on headline entries) ────── */
-.chg-fig {
-  margin-top: 22px;
-  max-width: 480px;
-  width: 100%;
-  border: 1px solid var(--mkt-hairline);
-  border-radius: 13px;
-  overflow: hidden;
-  background: var(--mkt-paper);
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.06);
-}
-.chg-fig__head {
+/* Category groups */
+.chg-cat { margin-top: 26px; }
+.chg-cat__label {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 13px 15px;
-  background: var(--mkt-tile-bg);
-}
-.chg-fig__bk {
-  width: 31px;
-  height: 31px;
-  border-radius: 8px;
-  background: var(--mkt-green);
-  display: grid;
-  place-items: center;
-  color: #fff;
-  flex: 0 0 auto;
-}
-.chg-fig__title {
-  display: block;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--mkt-green);
-}
-.chg-fig__sub {
-  display: block;
-  font-size: 11.5px;
-  color: var(--mkt-body);
-  margin-top: 1px;
-  white-space: nowrap;
-}
-.chg-fig__row {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 11px 15px;
-  border-top: 1px solid var(--mkt-hairline);
-}
-.chg-fig__row--first { border-top: none; }
-.chg-av {
-  width: 31px;
-  height: 31px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  flex: 0 0 auto;
-}
-.chg-nm {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--mkt-ink);
-  white-space: nowrap;
-}
-.chg-role {
-  margin-left: auto;
-  height: 21px;
-  padding: 0 10px;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.chg-role--owner { background: var(--mkt-green); color: #fff; }
-.chg-role--editor { background: var(--mkt-tile-bg); color: var(--mkt-green); }
-.chg-role--viewer { background: var(--mkt-surface); color: var(--mkt-body); border: 1px solid var(--mkt-card-border); }
-
-/* Sync row atoms */
-.chg-yicn {
-  width: 31px;
-  height: 31px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  flex: 0 0 auto;
-}
-.chg-ynm {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--mkt-ink);
-  white-space: nowrap;
-}
-.chg-ysub {
-  display: block;
-  font-size: 11px;
-  color: var(--mkt-mute);
-  margin-top: 1px;
-  white-space: nowrap;
-}
-.chg-ystatus {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #3f9d6b;
-  white-space: nowrap;
-}
-.chg-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #3f9d6b;
-  flex: 0 0 auto;
-}
-
-/* ─── Category groups ─────────────────────────────────────────── */
-.chg-cat-group { margin-top: 22px; }
-.chg-cbadge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
+  gap: 8px;
+  margin: 0;
+  font: 600 12px/1 var(--mkt-sans);
   letter-spacing: 0.1em;
-  border-radius: 6px;
-  padding: 4px 9px;
+  text-transform: uppercase;
+  color: var(--mkt-head);
 }
-.chg-cbadge--added    { background: #eef5ef; color: #17352e; }
-.chg-cbadge--improved { background: #edf2ff; color: #4158f4; }
-.chg-cbadge--fixed    { background: #fef3e2; color: #8a5f0a; }
-.chg-cbadge--security { background: #fde8e8; color: #b5472f; }
+.chg-cat__label::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mkt-line-strong);
+}
+.chg-cat--added::before { background: var(--mkt-g600); }
+.chg-cat--improved::before { background: var(--mkt-g400); }
+.chg-cat--fixed::before { background: var(--mkt-mute); }
+.chg-cat--security::before { background: var(--mkt-err); }
 
-.chg-cat-items {
-  list-style: disc;
-  margin: 11px 0 0;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+.chg-cat__items {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
 }
-.chg-cat-items li {
-  font-size: 15px;
-  line-height: 1.55;
+.chg-cat__items li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 15.5px;
+  line-height: 1.6;
   color: var(--mkt-body);
-  padding-left: 2px;
+  text-wrap: pretty;
 }
-.chg-cat-items li::marker { color: var(--mkt-card-border); }
+.chg-cat__items li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.8em;
+  width: 10px;
+  height: 1px;
+  background: var(--mkt-g400);
+}
 
 /* ─── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 939px) {
-  .chg-entry__content--fig { grid-template-columns: minmax(0, 1fr); gap: 26px; }
-  .chg-entry__aside .chg-fig { margin-top: 0; max-width: 480px; }
+@media (max-width: 980px) {
+  .chg-entry { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 44px 0; }
+  .chg-entry__when {
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding-top: 0;
+  }
+  .chg-entry__ver::before { content: "·"; margin-right: 12px; color: var(--mkt-g400); }
 }
 @media (max-width: 767px) {
-  .chg-hero { padding: 52px 0 32px; }
-  .chg-hero__title { font-size: 32px; }
-  /* minmax(0, 1fr): see the note on the base .chg-entry rule above — the
-     collapsed single-column layout hits the same auto-min-size overflow. */
-  .chg-entry { grid-template-columns: minmax(0, 1fr); padding: 42px 0; }
-  .chg-entry__content--fig { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-  .chg-entry__date { display: none; }
-  .chg-entry__date--mobile {
-    display: block;
-    font-family: var(--mkt-mono);
-    text-align: left;
-    padding: 0 0 12px;
-    font-size: 13px;
-    color: var(--mkt-mute);
-  }
-  .chg-entry__title { font-size: 21px; }
-  .chg-fig { max-width: none; }
-
-  /* The release-figure rows (chg-fig__row) pack a fixed-width icon plus
-     several no-wrap text spans (name, email/count, status). At 375px there
-     isn't room for all of it on one line; let the middle "identity" column
-     shrink and ellipsize instead of forcing the row — and with it .chg-fig,
-     .chg-entry__aside's grid track, and the page itself — wider than the
-     viewport. */
-  .chg-fig__row,
-  .chg-fig__head { min-width: 0; }
-  .chg-fig__row > span:not(.chg-av):not(.chg-yicn):not(.chg-role):not(.chg-ystatus):not(.chg-dot),
-  .chg-fig__head > span:not(.chg-fig__bk) {
-    min-width: 0;
-    overflow: hidden;
-  }
-  .chg-fig__sub,
-  .chg-nm,
-  .chg-ynm,
-  .chg-ysub {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  .chg-list { padding-bottom: var(--mkt-space-sm); }
+  .chg-entry { padding: 40px 0; }
+  .chg-entry__title { font-size: 22px; }
+  .chg-entry__summary { font-size: 16px; }
+  .chg-cat__items li { font-size: 15px; }
 }
