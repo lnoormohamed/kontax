@@ -21,7 +21,7 @@ export function HowItWorks() {
               <p className="hp-step__n" aria-hidden="true">1</p>
               <h3 className="hp-step__title">Bring your contacts in</h3>
               <p className="hp-step__body">
-                Connect Google, iCloud or Fastmail, or import a CSV or vCard file.
+                Connect Google, iCloud or Fastmail, or import a CSV file or a Kontax archive.
               </p>
             </div>
             <MktWindow>
@@ -40,7 +40,7 @@ export function HowItWorks() {
                   <span className="hp-glyph">
                     <Icon name="file" size={14} />
                   </span>
-                  CSV / vCard
+                  CSV / Kontax archive
                 </div>
               </div>
             </MktWindow>
@@ -50,8 +50,8 @@ export function HowItWorks() {
               <p className="hp-step__n" aria-hidden="true">2</p>
               <h3 className="hp-step__title">Kontax tidies them up</h3>
               <p className="hp-step__body">
-                Duplicates found and merged, phone numbers formatted for their country, names
-                sorted properly in any script.
+                Duplicates found and merged, phone numbers formatted for their country, names in
+                many scripts sorted sensibly.
               </p>
             </div>
             <MktWindow>

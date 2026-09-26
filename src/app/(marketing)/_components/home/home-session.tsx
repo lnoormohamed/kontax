@@ -52,7 +52,7 @@ export function HeroPrimaryCta() {
   );
 }
 
-const SIGNED_OUT_TITLE = "Start with the contacts you already have.";
+const SIGNED_OUT_TITLE = "Ready to get started?";
 const SIGNED_OUT_SUB = "Free for up to 500 contacts. No card needed.";
 
 export function ClosingCta() {

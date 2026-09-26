@@ -20,12 +20,13 @@ import { Icon } from "./icons";
 const FREE_POINTS = [
   "Up to 500 contacts",
   "1 sync source",
-  "One phone or Mac over CardDAV",
-  "Export any time",
+  "1 phone or Mac over CardDAV",
+  "CSV and Kontax archive export",
 ];
 
 // Pro's syncAccountsLimit is 5 (src/server/billing.ts).
-const PRO_POINTS = ["Unlimited contacts", "Up to 5 sync sources", "Developer API", "Everything in Free"];
+// Pro: syncAccountsLimit 5, carddavDevicesLimit 5; vCard export is Pro and up.
+const PRO_POINTS = ["Unlimited contacts", "Up to 5 sync sources", "5 devices", "Developer API", "vCard export"];
 
 function Points({ items }: { items: string[] }) {
   return (

@@ -32,10 +32,12 @@
 .hp-hero__e {
   display: flex;
   gap: 10px;
+  overflow: hidden; /* one line even when the signed-in "Welcome back, …" swaps in */
+  white-space: nowrap;
   font: var(--mkt-label);
   color: var(--mkt-g600);
 }
-.hp-hero__e::before { content: ""; width: 28px; height: 1px; align-self: center; background: var(--mkt-g400); }
+.hp-hero__e::before { content: ""; flex: 0 0 28px; height: 1px; align-self: center; background: var(--mkt-g400); }
 .hp-hero__title {
   margin-top: 22px;
   font: var(--mkt-h1);
@@ -55,6 +57,13 @@
 }
 .hp-hero__trust span { display: inline-flex; align-items: center; gap: 6px; }
 .hp-hero__trust svg { color: var(--mkt-g600); }
+
+/* P50A-02 · signed-in swaps (home-session.tsx): the signed-in label sits over
+   an invisible copy of the signed-out one in the same grid cell, so the
+   button or heading keeps its size and nothing below it moves. */
+.hp-swap { display: inline-grid; justify-items: center; }
+.hp-swap > * { grid-area: 1 / 1; }
+.hp-swap__ghost { visibility: hidden; }
 
 /* ─── Signature: three into one ───────────────────────────────── */
 .hp-sig {

@@ -56,7 +56,7 @@ const GRID: { icon: HomeIconName; title: string; body: string }[] = [
   { icon: "tag", title: "Labels", body: "Group contacts your way and filter in one tap." },
   { icon: "card", title: "Public card", body: "A shareable page with the details you choose to publish." },
   { icon: "clock", title: "Change history", body: "See what changed on each contact, when, and from where." },
-  { icon: "file", title: "Open export format", body: "A documented format that keeps labels, notes and history." },
+  { icon: "file", title: "Open export format", body: "A documented format that keeps labels, notes, custom fields and photos." },
   { icon: "code", title: "Developer API", body: "Read and write your contacts from your own tools." },
 ];
 
@@ -165,8 +165,8 @@ export function FeatureShowcase() {
         <FeatureRow
           kicker="Clean-up"
           title="Duplicates, found and fixed"
-          body="Kontax spots the same person saved twice across your accounts, shows you both records side by side, and lets you pick what to keep. Every merge can be undone."
-          points={["Phone numbers formatted for their country", "Names in any script sorted correctly"]}
+          body="Kontax spots the same person saved twice across your accounts, shows you both records side by side, and lets you pick what to keep. Every merge can be undone for 30 days."
+          points={["Phone numbers formatted for their country", "Names in many scripts sorted sensibly"]}
         >
           <MktWindow bar="Review merge">
             <div className="hp-mg">
@@ -190,7 +190,7 @@ export function FeatureShowcase() {
               </div>
             </div>
             <div className="hp-mg__foot">
-              <span className="hp-vsub">From Google and iCloud</span>
+              <span className="hp-vsub">From Google and iCloud · undo for 30 days</span>
               <span className="hp-vbtn hp-vbtn--solid">Merge</span>
             </div>
           </MktWindow>
