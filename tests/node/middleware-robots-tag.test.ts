@@ -71,3 +71,25 @@ test("middleware: production leaves responses without an X-Robots-Tag header", (
     restoreEnv();
   }
 });
+
+test("middleware: public contact cards are noindex in production too", () => {
+  process.env.KONTAX_DEPLOY_ENV = "production";
+  try {
+    const req = new NextRequest("https://getkontax.com/u/someone");
+    const res = middleware(req);
+    assert.equal(res.headers.get("X-Robots-Tag"), "noindex, nofollow, noarchive");
+  } finally {
+    restoreEnv();
+  }
+});
+
+test("middleware: production marketing pages still carry no X-Robots-Tag", () => {
+  process.env.KONTAX_DEPLOY_ENV = "production";
+  try {
+    const req = new NextRequest("https://getkontax.com/pricing");
+    const res = middleware(req);
+    assert.equal(res.headers.get("X-Robots-Tag"), null);
+  } finally {
+    restoreEnv();
+  }
+});

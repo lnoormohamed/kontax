@@ -122,7 +122,14 @@ export default function middleware(req: NextRequest) {
   if (isPublicPath(pathname)) {
     // Public user cards get the stricter nonce-based CSP (SEC-02).
     if (pathname.startsWith("/u/")) {
-      return applyRobotsTag(withStrictCardCsp(req));
+      // Owner decision 2026-09-26: public contact cards are never shown by
+      // search engines (they can hold addresses and phone numbers), in every
+      // environment. Header as well as the page's robots meta, so it also
+      // covers non-HTML responses. Don't block /u/ in robots.txt: crawlers
+      // must fetch the page to see this.
+      const res = applyRobotsTag(withStrictCardCsp(req));
+      res.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+      return res;
     }
     return applyRobotsTag(NextResponse.next());
   }

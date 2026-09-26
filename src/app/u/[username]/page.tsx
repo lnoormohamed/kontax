@@ -37,7 +37,9 @@ export async function generateMetadata({
   return {
     title: `${card.displayName}'s contact card — Kontax`,
     description: `Add ${card.displayName} to your contacts in one tap.`,
-    robots: hasVisibleFields(card) ? { index: true, follow: true } : { index: false, follow: true },
+    // Owner decision 2026-09-26: never indexed — cards can hold addresses and
+    // phone numbers. Sharing by link (and link previews) still works.
+    robots: { index: false, follow: false, nocache: true },
     openGraph: {
       title: `${card.displayName}'s contact card`,
       description: `Add ${card.displayName} to your contacts in one tap.`,
