@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 
 import { createCheckoutSession } from "~/app/actions/billing";
+import {
+  planCardFeatures,
+  TEAMS_SEAT_MAX,
+  TEAMS_SEAT_MIN,
+  type CardFeature,
+  type PlanKey,
+} from "~/app/_components/plan-data";
 import { useBillingPortal } from "~/app/_components/use-billing-portal";
 import { CheckIcon, PageHead } from "../_components/mkt-ui";
 
@@ -28,85 +35,59 @@ function savingsPct(monthly: number, annual: number): number {
   return Math.round((1 - annual / (monthly * 12)) * 100);
 }
 
-interface PlanFeat { text: React.ReactNode }
 interface Plan {
-  id: string;
+  id: "free" | "pro" | "family" | "teams";
+  key: PlanKey;
   name: string;
   tag: string;
   recommended?: boolean;
-  price: "free" | { monthly: number; annual: number };
+  /** null = paid plan whose price is unavailable (no Stripe catalogue). */
+  price: "free" | { monthly: number; annual: number } | null;
   sublabel: { monthly: string; annual: string } | null;
   cta: { label: string; href: string; variant: "filled" | "outline" };
-  features: PlanFeat[];
+  features: CardFeature[];
 }
 
-const BASE_PLANS: Omit<Plan, "price">[] = [
+// P49A-14 · feature bullets come from plan-data.ts (planCardFeatures), which
+// reads every limit from the enforced entitlements — nothing is typed here.
+const BASE_PLANS: Omit<Plan, "price" | "features">[] = [
   {
     id: "free",
+    key: "Free",
     name: "Free",
     tag: "For personal use",
     sublabel: null,
     cta: { label: "Get started free", href: "/register", variant: "outline" },
-    features: [
-      { text: <>Up to <strong>500 contacts</strong></> },
-      { text: "Labels & advanced search" },
-      { text: "1 CardDAV account" },
-      { text: "Public contact card" },
-      { text: "Full export (GDPR)" },
-    ],
   },
   {
     id: "pro",
+    key: "Pro",
     name: "Pro",
     tag: "For power users",
     recommended: true,
     sublabel: { monthly: "billed monthly", annual: "billed annually" },
     cta: { label: "Choose Pro", href: "/register?plan=pro", variant: "filled" },
-    features: [
-      { text: <><strong>Unlimited</strong> contacts</> },
-      { text: "Up to 5 CardDAV accounts" },
-      { text: "Google + Outlook sync" },
-      { text: "Contact sharing" },
-      { text: "Developer API access" },
-    ],
   },
   {
     id: "family",
+    key: "Family",
     name: "Family",
     tag: "For households",
     sublabel: { monthly: "billed monthly", annual: "billed annually" },
     cta: { label: "Choose Family", href: "/register?plan=family", variant: "outline" },
-    features: [
-      { text: <><strong>Unlimited</strong> contacts, up to 5 sync accounts</> },
-      { text: "Family shared address book" },
-      { text: <>Up to <strong>6 members</strong></> },
-      { text: "Shared labels & live edits" },
-      { text: "One bill for the whole family" },
-    ],
   },
   {
     id: "teams",
+    key: "Teams",
     name: "Teams",
     tag: "For organisations",
     sublabel: { monthly: "per seat · billed monthly", annual: "per seat · billed annually" },
     cta: { label: "Choose Teams", href: "/register?plan=teams", variant: "outline" },
-    features: [
-      { text: <>Everything in <strong>Pro</strong></> },
-      { text: "Team shared address book" },
-      { text: <>Minimum <strong>3 seats</strong></> },
-      { text: "Roles & permissions" },
-      { text: "Audit log" },
-    ],
   },
 ];
 
-const FALLBACK_PRICES: StripePrices = {
-  currency: "gbp",
-  pro: { monthly: 5, annual: 48 },
-  family: { monthly: 8, annual: 72 },
-  teams: { monthly: 12, annual: 120 },
-};
-
+// The annual saving is computed from the live catalogue; with no catalogue
+// there is no badge (never a hard-coded percentage).
 function getToggleSavingsLabel(prices: StripePrices): string | null {
   const savings = [prices.pro, prices.family, prices.teams]
     .map((plan) => savingsPct(plan.monthly, plan.annual))
@@ -120,21 +101,16 @@ function getToggleSavingsLabel(prices: StripePrices): string | null {
 }
 
 function buildPlans(stripePrices: StripePrices | null, outlookLive: boolean): Plan[] {
-  const p = stripePrices ?? FALLBACK_PRICES;
+  // P50A-01: Outlook only listed once Microsoft sync is configured — the flag
+  // is computed server-side in pricing/page.tsx and passed down, since this is
+  // a client component and can't read server env itself.
+  const features = planCardFeatures(outlookLive);
   return BASE_PLANS.map((base) => ({
     ...base,
-    price: base.id === "free" ? "free" : (p[base.id as keyof StripePrices] as { monthly: number; annual: number }),
-    // P50A-01: Outlook only listed once Microsoft sync is configured — the
-    // flag is computed server-side in pricing/page.tsx and passed down,
-    // since this is a client component and can't read server env itself.
-    features:
-      base.id === "pro"
-        ? base.features.map((f) =>
-            f.text === "Google + Outlook sync"
-              ? { text: outlookLive ? "Google + Outlook sync" : "Google Contacts sync" }
-              : f,
-          )
-        : base.features,
+    // P49A-14: no placeholder prices — a paid plan without a catalogue price
+    // renders no amount at all.
+    price: base.id === "free" ? "free" : (stripePrices?.[base.id] ?? null),
+    features: features[base.key],
   }));
 }
 
@@ -167,12 +143,13 @@ export function PricingToggle({
       cancelled = true;
     };
   }, []);
-  const prices = stripePrices ?? FALLBACK_PRICES;
+  const prices = stripePrices ?? null;
   const PLANS = buildPlans(prices, outlookLive);
-  const currencySymbol = sym(prices.currency);
-  const toggleSavingsLabel = getToggleSavingsLabel(prices);
+  // Free is formatted in the catalogue currency, falling back to GBP.
+  const currencySymbol = sym(prices?.currency ?? "gbp");
+  const toggleSavingsLabel = prices ? getToggleSavingsLabel(prices) : null;
   const [annual, setAnnual] = useState(false);
-  const [teamSeats, setTeamSeats] = useState(3);
+  const [teamSeats, setTeamSeats] = useState(TEAMS_SEAT_MIN);
   const [loading, setLoading] = useState<string | null>(null);
   const [ctaError, setCtaError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
@@ -246,7 +223,7 @@ export function PricingToggle({
               const isFree = plan.price === "free";
               const isTeams = plan.id === "teams";
               const isCurrent = currentPlan === plan.id.toUpperCase();
-              const priceObj = isFree ? null : (plan.price as { monthly: number; annual: number });
+              const priceObj = plan.price === "free" ? null : plan.price;
               const amount = priceObj ? (annual ? priceObj.annual : priceObj.monthly) : null;
               const planSavingsPct = priceObj ? savingsPct(priceObj.monthly, priceObj.annual) : 0;
               const showSave = !isFree && annual && planSavingsPct > 0;
@@ -273,25 +250,29 @@ export function PricingToggle({
                     <p className="mkt-plan__pr">
                       {isFree ? (
                         <b>{currencySymbol}0</b>
-                      ) : (
+                      ) : amount === null ? null : (
                         <>
                           <b>
                             {currencySymbol}
-                            {fmt(amount!)}
+                            {fmt(amount)}
                           </b>
                           <span>{isTeams ? (annual ? "/seat/yr" : "/seat/mo") : (annual ? "/yr" : "/mo")}</span>
                           {showSave && <span className="pr-save">Save {planSavingsPct}%</span>}
                         </>
                       )}
                     </p>
-                    <p className="pr-price__bill">{sublabel ?? "No credit card required"}</p>
+                    <p className="pr-price__bill">{sublabel ?? "No card needed"}</p>
                   </div>
 
                   <ul>
                     {plan.features.map((f, i) => (
                       <li key={i}>
                         <CheckIcon />
-                        <span>{f.text}</span>
+                        <span>
+                          {f.pre}
+                          {f.strong ? <strong>{f.strong}</strong> : null}
+                          {f.text}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -303,8 +284,8 @@ export function PricingToggle({
                         <button
                           aria-label="Remove seat"
                           className="pr-seats__btn"
-                          disabled={teamSeats <= 3}
-                          onClick={() => setTeamSeats((s) => Math.max(3, s - 1))}
+                          disabled={teamSeats <= TEAMS_SEAT_MIN}
+                          onClick={() => setTeamSeats((s) => Math.max(TEAMS_SEAT_MIN, s - 1))}
                           type="button"
                         >
                           −
@@ -315,15 +296,18 @@ export function PricingToggle({
                         <button
                           aria-label="Add seat"
                           className="pr-seats__btn"
-                          onClick={() => setTeamSeats((s) => Math.min(500, s + 1))}
+                          disabled={teamSeats >= TEAMS_SEAT_MAX}
+                          onClick={() => setTeamSeats((s) => Math.min(TEAMS_SEAT_MAX, s + 1))}
                           type="button"
                         >
                           +
                         </button>
                       </div>
-                      <p className="pr-seats__total">
-                        {currencySymbol}{fmt((amount ?? 0) * teamSeats)} / {annual ? "yr" : "mo"} total
-                      </p>
+                      {amount !== null ? (
+                        <p className="pr-seats__total">
+                          {currencySymbol}{fmt(amount * teamSeats)} / {annual ? "yr" : "mo"} total
+                        </p>
+                      ) : null}
                     </div>
                   )}
 

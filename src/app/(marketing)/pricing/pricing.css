@@ -231,3 +231,4 @@
   }
   .pr-mxt thead th:first-child { width: 132px; min-width: 132px; }
 }
+.pr-cell-note { font-size: 12.5px; color: var(--mkt-mute); }
