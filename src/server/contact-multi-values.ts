@@ -50,7 +50,7 @@ export type { MultiValueEntriesInput, MultiValueFamily };
 // Stored entries are Json: the known keys plus whatever metadata a writer
 // attached (phone `e164`, `validationStatus`, …), typed so they can be written
 // back through Prisma unchanged.
-type JsonExtras = { [key: string]: Prisma.InputJsonValue | null | undefined };
+type JsonExtras = Record<string, Prisma.InputJsonValue | null | undefined>;
 
 /** An email / phone / website entry as stored in its `*Entries` column. */
 export type MultiValueEntry = { label: string; value: string; isPrimary: boolean } & JsonExtras;
@@ -102,7 +102,7 @@ const asRecord = (value: ContactLike) => value as Record<string, unknown>;
  * left untouched; an empty one is cleared). Legacy columns are derived.
  */
 export const multiValueWriteData = (input: MultiValueEntriesInput): MultiValueWriteData =>
-  buildMultiValueWriteData(input, { jsonNull: Prisma.DbNull }) as MultiValueWriteData;
+  buildMultiValueWriteData(input, { jsonNull: Prisma.DbNull });
 
 /**
  * Prisma data carrying every family of a contact-shaped source (a stored row
@@ -131,7 +131,7 @@ export const restoreMultiValueWriteData = (snapshot: ContactLike): MultiValueWri
  * (a family the snapshot never recorded is not cleared).
  */
 export const snapshotMultiValueWriteData = (snapshot: ContactLike): MultiValueWriteData =>
-  snapshotWriteData(asRecord(snapshot), { jsonNull: Prisma.DbNull }) as MultiValueWriteData;
+  snapshotWriteData(asRecord(snapshot), { jsonNull: Prisma.DbNull });
 
 /** Typed entries of a stored contact (legacy fallback only for a not-yet-backfilled row). */
 export const readMultiValueEntries = (contact: ContactLike): MultiValueEntries =>
