@@ -125,8 +125,12 @@ async function getPlanPrice(
   };
 }
 
+// P49A-19 (Fable review): deadlines are shown in UK time (the product is
+// UK-focused; the container runs in UTC, so a 00:30 BST deadline would
+// otherwise read as the day before).
+export const BILLING_TIME_ZONE = "Europe/London";
 const formatDate = (date: Date) =>
-  date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: BILLING_TIME_ZONE });
 
 const daysUntil = (date: Date) =>
   Math.max(0, Math.ceil((date.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));

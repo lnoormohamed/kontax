@@ -19,12 +19,14 @@ const PLAN_RANK: Record<SubscriptionPlan, number> = {
   TEAMS: 3,
 };
 
+// P49A-19 (Fable review): UK date in UK time ("18 Jun 2026"), matching the
+// billing card (billing-surface.ts BILLING_TIME_ZONE) — not UTC.
 const fmtDate = (d: Date) =>
-  new Intl.DateTimeFormat("en-US", {
-    month: "short",
+  new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
+    month: "short",
     year: "numeric",
-    timeZone: "UTC",
+    timeZone: "Europe/London",
   }).format(d);
 
 async function emailFor(userId: string): Promise<string | null> {

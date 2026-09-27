@@ -179,7 +179,10 @@ test("payment still failing after the grace: on Free with a downgraded notice, n
   assert.equal(surface.plan, "FREE");
   assert.equal(surface.planLabel, "Free");
   assert.equal(surface.lapsedPlanLabel, "Pro");
-  assert.equal(surface.graceDeadline, graceEndsAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }));
+  assert.equal(
+    surface.graceDeadline,
+    graceEndsAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" }),
+  );
   assert.ok(surface.usage, "Free usage shown against the Free limits");
   assert.equal(surface.usage?.find((r) => r.label === "Contacts")?.limit, 500);
   assert.deepEqual(await getBillingBanner("user_1"), { variant: "ownerLapsed", daysRemaining: null });
@@ -196,4 +199,13 @@ test("comp Pro + own Pro unpaid past the grace: comp view with the own subscript
   assert.equal(surface.state, "comp", "the comp is what grants Pro now");
   assert.deepEqual(surface.personalSubscription, { planLabel: "Pro" }, "the portal to fix the card is still offered");
   assert.equal(await getBillingBanner("user_1"), null, "no 'update or move to Free' banner");
+});
+
+test("deadlines are shown in UK time, not the server's UTC", async () => {
+  // 23:30 UTC on 1 July = 00:30 BST on 2 July.
+  const graceEndsAt = new Date("2030-07-01T23:30:00Z");
+  state.subscriptions = [sub({ providerSubscriptionId: "sub_pro", plan: "PRO", status: "PAST_DUE", graceEndsAt })];
+  const surface = await getBillingSurface("user_1");
+  assert.equal(surface.state, "grace");
+  assert.equal(surface.graceDeadline, "2 July 2030");
 });

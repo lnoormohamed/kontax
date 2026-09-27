@@ -181,6 +181,6 @@ BillingEvent.PreviewProps = {
   type: "payment-failed",
   planName: "Kontax Pro",
   graceDays: 7,
-  graceDate: "Jun 18, 2026",
+  graceDate: "18 Jun 2026",
   updateUrl: "https://getkontax.com/settings/billing",
 } satisfies BillingEventProps;
