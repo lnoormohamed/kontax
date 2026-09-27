@@ -102,7 +102,6 @@ const inputStyle: React.CSSProperties = {
   fontSize: 14.5,
   fontWeight: 500,
   color: "#1d2823",
-  outline: "none",
 };
 
 function Btn({ variant = "ghost", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "ghost" | "blue" | "red" }) {
@@ -222,7 +221,7 @@ function Row({
             if (e.key === "Enter") onRenameSubmit((e.target as HTMLInputElement).value);
             if (e.key === "Escape") onRenameCancel();
           }}
-          className="h-[26px] min-w-0 flex-1 rounded-[7px] border-[1.5px] border-[#4158f4] px-2 text-[13px] font-semibold text-[#1d2823] outline-none"
+          className="kx-focus-visible h-[26px] min-w-0 flex-1 rounded-[7px] border-[1.5px] border-[#4158f4] px-2 text-[13px] font-semibold text-[#1d2823] outline-none"
           style={{ boxShadow: "0 0 0 3px rgba(65,88,244,0.12)" }}
         />
       ) : (
@@ -475,6 +474,7 @@ function SaveListModal({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. VCs in NYC"
+          className="outline-none kx-focus-visible"
           style={inputStyle}
         />
         <div style={{ marginTop: 18, fontSize: 13, color: "#5c655e" }}>Saves the current filter:</div>
@@ -511,7 +511,7 @@ function NameModal({
   return (
     <Modal title={title} onClose={onClose}>
       <div style={{ padding: "18px 22px 0" }}>
-        <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={placeholder} style={inputStyle} />
+        <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={placeholder} className="outline-none kx-focus-visible" style={inputStyle} />
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "22px" }}>
         <Btn onClick={onClose}>Cancel</Btn>
@@ -543,7 +543,7 @@ function BookManageModal({
     <Modal title="Manage book" onClose={onClose}>
       <div style={{ padding: "18px 24px 0" }}>
         <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "#1d2823", margin: "0 0 7px" }}>Name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
+        <input value={name} onChange={(e) => setName(e.target.value)} className="outline-none kx-focus-visible" style={inputStyle} />
         <div style={{ marginTop: 5, fontSize: 13, color: "#5c655e" }}>{book.count} contact{book.count === 1 ? "" : "s"}</div>
 
         <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: "#1d2823", margin: "18px 0 7px" }}>CardDAV slug</label>

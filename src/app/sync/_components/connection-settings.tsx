@@ -226,6 +226,7 @@ function OptSelect({
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
+        className="outline-none kx-focus-visible"
         style={{
           width: "100%",
           height: 44,
@@ -238,7 +239,6 @@ function OptSelect({
           cursor: disabled ? "default" : "pointer",
           appearance: "none",
           WebkitAppearance: "none",
-          outline: "none",
           opacity: disabled ? 0.6 : 1,
         }}
       >
@@ -1673,6 +1673,7 @@ export function ConnectionSettings({
                 value={draft.deletionGuard ? draft.maxDeletions : ""}
                 disabled={!draft.deletionGuard}
                 onChange={(e) => patch({ maxDeletions: e.target.value })}
+                className="outline-none kx-focus-visible"
                 style={{
                   width: 72,
                   height: 36,
@@ -1682,7 +1683,6 @@ export function ConnectionSettings({
                   fontSize: 14,
                   color: T.ink,
                   textAlign: "center",
-                  outline: "none",
                   background: draft.deletionGuard ? "#fff" : T.wash,
                   fontFamily: "inherit",
                 }}

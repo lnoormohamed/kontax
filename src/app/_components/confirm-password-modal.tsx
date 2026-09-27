@@ -127,6 +127,7 @@ export function ConfirmPasswordModal({
               ref={inputRef}
               type="password"
               autoComplete="current-password"
+              className="outline-none kx-focus-visible"
               value={password}
               onChange={(e) => { setPassword(e.target.value); if (error) setError(null); }}
               disabled={isPending}
@@ -139,7 +140,6 @@ export function ConfirmPasswordModal({
                 fontSize: 14,
                 color: "#1d2823",
                 background: "#fff",
-                outline: "none",
                 boxSizing: "border-box",
                 transition: "border-color 0.15s",
               }}

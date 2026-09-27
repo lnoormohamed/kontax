@@ -281,8 +281,9 @@ export function SearchDropdown({ labelRegistry = [] }: { labelRegistry?: LabelEn
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
+          className="outline-none kx-focus-visible"
           style={{
-            flex: 1, minWidth: 0, border: "none", outline: "none",
+            flex: 1, minWidth: 0, border: "none",
             background: "transparent", fontSize: 14,
             color: "#1d2823", fontFamily: "inherit",
           }}

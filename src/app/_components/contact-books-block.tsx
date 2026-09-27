@@ -94,7 +94,7 @@ export function ContactBooksBlock({
                 ) : null}
                 <button
                   type="button"
-                  className="max-w-[140px] truncate outline-none"
+                  className="kx-focus-visible max-w-[140px] truncate outline-none"
                   onClick={() => setChipMenu(open ? null : m.bookId)}
                   disabled={pending}
                   title="Book options"

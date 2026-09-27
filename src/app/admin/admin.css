@@ -96,7 +96,12 @@
   background: #fff;
   border: 1px solid #d8ddd6;
   border-radius: 10px;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
+/* P49A-20: .ad-header-search__input is borderless (outline: none below) —
+   the wrapper carries the focus indicator, same pattern as .ad-search-bar /
+   .ad-filter-search further down this file. */
+.ad-header-search:focus-within { border-color: #4158f4; box-shadow: 0 0 0 3px #edf0fe; }
 .ad-header-search__input {
   width: 100%;
   border: none;
@@ -577,6 +582,9 @@
 .ad-field-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .ad-rollout-val { font-size: 14px; font-weight: 700; color: #4158f4; }
 .ad-range { width: 100%; -webkit-appearance: none; appearance: none; height: 5px; border-radius: 999px; background: #dfe2dc; outline: none; }
+/* P49A-20: native range track has no border to recolour like the other
+   controls here, so give the control itself a direct focus-visible ring. */
+.ad-range:focus-visible { outline: 2px solid #4158f4; outline-offset: 3px; }
 .ad-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #4158f4; cursor: pointer; box-shadow: 0 1px 4px rgba(65,88,244,0.4); }
 .ad-range::-moz-range-thumb { width: 18px; height: 18px; border: none; border-radius: 50%; background: #4158f4; cursor: pointer; }
 .ad-field-hint { font-size: 12px; color: #646c65; margin-top: 9px; line-height: 1.45; }
@@ -584,8 +592,11 @@
 
 /* ───────────────── audit ───────────────── */
 .ad-filterbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-.ad-select-wrap { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px; background: #fff; border: 1px solid #d8ddd6; border-radius: 10px; }
+.ad-select-wrap { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px; background: #fff; border: 1px solid #d8ddd6; border-radius: 10px; transition: border-color 0.15s, box-shadow 0.15s; }
 .ad-select-wrap--block { display: flex; width: 100%; }
+/* P49A-20: .ad-select is borderless (outline: none below) — the wrapper
+   carries the focus indicator, same pattern as .ad-search-bar / .ad-filter-search. */
+.ad-select-wrap:focus-within { border-color: #4158f4; box-shadow: 0 0 0 3px #edf0fe; }
 .ad-select { appearance: none; -webkit-appearance: none; border: none; outline: none; background: transparent; font-size: 13px; font-weight: 500; color: #1d2823; cursor: pointer; padding-right: 18px; flex: 1; }
 .ad-select-wrap > svg:last-child { position: absolute; right: 10px; pointer-events: none; }
 .ad-filter-search { display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 12px; background: #fff; border: 1px solid #d8ddd6; border-radius: 10px; flex: 1; min-width: 220px; transition: border-color 0.15s, box-shadow 0.15s; }

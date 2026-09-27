@@ -182,7 +182,7 @@ function LabelRow({
         {renaming ? (
           <input
             ref={renameRef}
-            className="h-6 min-w-0 flex-1 rounded border border-[#4158f4] px-1.5 text-[12.5px] font-medium text-[#1d2823] outline-none ring-2 ring-[#edf0fe]"
+            className="kx-focus-visible h-6 min-w-0 flex-1 rounded border border-[#4158f4] px-1.5 text-[12.5px] font-medium text-[#1d2823] outline-none ring-2 ring-[#edf0fe]"
             defaultValue={label.name}
             autoFocus
             onBlur={handleRename}
@@ -354,7 +354,7 @@ export function LabelsSidebar({
           <span className="h-[14px] w-[14px] rounded-[4px] bg-[#6fa3a0]" />
           <input
             ref={createRef}
-            className="h-7 min-w-0 flex-1 rounded border border-[#4158f4] px-1.5 text-[12.5px] text-[#1d2823] outline-none ring-2 ring-[#edf0fe]"
+            className="kx-focus-visible h-7 min-w-0 flex-1 rounded border border-[#4158f4] px-1.5 text-[12.5px] text-[#1d2823] outline-none ring-2 ring-[#edf0fe]"
             placeholder="Label name…"
             value={createName}
             onChange={(e) => setCreateName(e.target.value)}

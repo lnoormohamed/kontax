@@ -2837,6 +2837,7 @@ function EditCredentialsForm({
                 name="password"
                 placeholder="App-specific password"
                 required
+                className="outline-none kx-focus-visible"
                 style={{
                   width: "100%",
                   height: 44,
@@ -2846,7 +2847,6 @@ function EditCredentialsForm({
                   padding: "0 58px 0 14px",
                   fontSize: 14,
                   color: T.ink,
-                  outline: "none",
                   fontFamily: "inherit",
                   boxSizing: "border-box",
                 }}
@@ -2924,6 +2924,7 @@ function FormField({
         placeholder={placeholder}
         defaultValue={defaultValue}
         required={required}
+        className="outline-none kx-focus-visible"
         style={{
           width: "100%",
           height: 44,
@@ -2933,7 +2934,6 @@ function FormField({
           padding: "0 14px",
           fontSize: 14,
           color: T.ink,
-          outline: "none",
           fontFamily: mono ? 'var(--font-geist-mono), "Geist Mono", ui-monospace, monospace' : "inherit",
           boxSizing: "border-box",
         }}
@@ -3381,7 +3381,8 @@ function AddAccountForm({
               value={labelValue}
               onChange={(e) => setLabelValue(e.target.value)}
               placeholder={sel.label}
-              style={{ width: "100%", height: 44, borderRadius: 12, border: `1px solid ${T.line}`, background: "#fff", padding: "0 14px", fontSize: 14, color: T.ink, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+              className="outline-none kx-focus-visible"
+              style={{ width: "100%", height: 44, borderRadius: 12, border: `1px solid ${T.line}`, background: "#fff", padding: "0 14px", fontSize: 14, color: T.ink, fontFamily: "inherit", boxSizing: "border-box" }}
             />
           </label>
           <label style={{ display: "block" }}>
@@ -3397,6 +3398,7 @@ function AddAccountForm({
               value={baseUrl}
               onChange={(e) => setBaseUrl(e.target.value)}
               placeholder="https://…"
+              className="outline-none kx-focus-visible"
               style={{
                 width: "100%",
                 height: 44,
@@ -3406,7 +3408,6 @@ function AddAccountForm({
                 padding: "0 14px",
                 fontSize: 14,
                 color: T.ink,
-                outline: "none",
                 fontFamily: "monospace",
                 boxSizing: "border-box",
               }}
@@ -3441,6 +3442,7 @@ function AddAccountForm({
                 name="password"
                 placeholder="App-specific password"
                 required
+                className="outline-none kx-focus-visible"
                 style={{
                   width: "100%",
                   height: 44,
@@ -3450,7 +3452,6 @@ function AddAccountForm({
                   padding: "0 58px 0 14px",
                   fontSize: 14,
                   color: T.ink,
-                  outline: "none",
                   fontFamily: "inherit",
                   boxSizing: "border-box",
                 }}
@@ -3646,6 +3647,7 @@ function ReauthModal({ onConfirmed, onCancel }: { onConfirmed: () => void; onCan
               if (e.key === "Enter") void submit();
             }}
             placeholder="Enter your password"
+            className="outline-none kx-focus-visible"
             style={{
               width: "100%",
               height: 44,
@@ -3655,7 +3657,6 @@ function ReauthModal({ onConfirmed, onCancel }: { onConfirmed: () => void; onCan
               padding: "0 14px",
               fontSize: 14,
               color: T.ink,
-              outline: "none",
             }}
           />
         </label>

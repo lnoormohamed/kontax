@@ -207,9 +207,10 @@ export function MobileSearchButton({ labelRegistry = [] }: { labelRegistry?: Lab
                   autoCorrect="off"
                   spellCheck={false}
                   type="search"
+                  className="outline-none kx-focus-visible"
                   style={{
                     flex: 1, minWidth: 0, border: "none",
-                    background: "transparent", outline: "none",
+                    background: "transparent",
                     fontSize: 16, color: "#1d2823",
                   }}
                 />

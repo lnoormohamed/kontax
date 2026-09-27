@@ -158,7 +158,8 @@ function MobileEditSheet({
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ height: 48, width: "100%", borderRadius: 12, border: "1.5px solid #d8ddd6", padding: "0 14px", fontSize: 16, color: "#1d2823", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+          className="outline-none kx-focus-visible"
+          style={{ height: 48, width: "100%", borderRadius: 12, border: "1.5px solid #d8ddd6", padding: "0 14px", fontSize: 16, color: "#1d2823", fontFamily: "inherit", boxSizing: "border-box" }}
         />
 
         <div style={{ fontSize: 12, fontWeight: 600, color: "#646c65", marginTop: 18, marginBottom: 9 }}>Color</div>
