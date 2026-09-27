@@ -165,8 +165,40 @@ If a user's contacts are badly out of sync (e.g. after a data migration):
 
 ---
 
+## Contact field model: emails, phones, addresses, websites (P49A-10)
+
+One canonical representation; build on it, never around it.
+
+- **Source of truth:** the typed `Contact.emailEntries`, `phoneEntries`, `addressEntries`,
+  `websiteEntries` Json columns (`[{ label, value | formatted, isPrimary, ...metadata }]`).
+- **Derived only:** `email`/`emailAddresses`, `phone`/`phoneNumbers`, `address`/`postalAddresses`,
+  `website`. Nothing writes them directly; they are dropped in P49A-18.
+- **Module:** `src/server/dav/contact-multi-values.mjs` (shared with `server.mjs`), Prisma-typed
+  wrapper `src/server/contact-multi-values.ts`.
+  - write: `multiValueWriteData({ emailEntries, ... })` — `undefined` family untouched, `[]`
+    clears; `copyMultiValueWriteData(row)`; `snapshotMultiValueWriteData(snapshot)` (only the
+    families the snapshot carries); `restoreMultiValueWriteData(snapshot)` (merge undo).
+  - read: `readMultiValueEntries(row)` (entries; legacy only while a family's entries are empty),
+    `readMultiValueFields(row)` (entries + re-derived legacy keys for portable/shadow shapes).
+- **Inbound sync (A-19):** an empty inbound list clears the local one only when the link's
+  capability profile marks the family `"full"` (`providerListIsAuthoritative`) and the record
+  carried it (`MappedContact.omittedFamilies`). Outlook addresses are `"partial"` (the Graph push
+  never sends them). A new provider/profile must set all four families deliberately.
+- **For P49A-03 (CardDAV push fidelity):** the pushed body is built from `contactToPortable` in
+  `sync-runner.ts`, which reads through `readMultiValueFields`; merging preserved remote
+  properties must keep EMAIL/TEL/ADR/URL as Kontax-owned (replaced from the entries).
+- **For P49A-12 (change propagation / merge):** every non-sync writer already goes through the
+  module, so a "dirty since last sync" marker can be set next to each `multiValueWriteData` /
+  `copyMultiValueWriteData` call; merge makes the chosen value the primary entry and derives the
+  rest (`canonicalMergedMultiValues` in `contact-merge.ts`).
+- **Data check:** the backfill migration's verification query (legacy array longer than the typed
+  entries) must return 0 — see `roadmap/build-phase/p49a-10-multi-value-field-model.md`.
+
+---
+
 ## References
 
+- Contact multi-value model: `src/server/dav/contact-multi-values.mjs`, `src/server/contact-multi-values.ts`
 - Sync runner: `src/server/sync-runner.ts`
 - Sync dedup: `src/server/sync-dedup.ts`
 - Sync credentials (token storage): `src/server/sync-credentials.ts`
