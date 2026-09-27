@@ -741,6 +741,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
             syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
             upgradeableAtCap={planSummary.plan === "FREE"}
             hasPassword={Boolean(owner?.password)}
+            // P49A-13: the Google / Outlook connect route sent us back for the
+            // sync re-auth; the client asks for the password, then resumes.
+            reauthProvider={
+              getParam("reauth") === "google" || getParam("reauth") === "microsoft"
+                ? (getParam("reauth") as "google" | "microsoft")
+                : null
+            }
           />
         </div>
       </div>

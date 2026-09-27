@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getAppUrl } from "~/lib/site-url";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
+import { requireSyncSettingsElevation, syncOAuthReauthPath } from "~/server/sync-elevation";
 import {
   GOOGLE_CONTACTS_SCOPES,
   createGoogleOAuthClient,
@@ -24,6 +25,15 @@ export async function GET(_req: NextRequest) {
       return NextResponse.redirect(new URL(dest, appUrl()));
     }
     throw err;
+  }
+
+  // P49A-13 (Fable review): connecting a provider account starts a two-way
+  // sync, so it needs the 15-minute sync elevation (password re-entry), not
+  // just the session. Without it, go back to /sync, which asks for the
+  // password and then comes straight back here.
+  const elevation = await requireSyncSettingsElevation();
+  if (!elevation.ok) {
+    return NextResponse.redirect(new URL(syncOAuthReauthPath("google"), appUrl()));
   }
 
   if (!isGoogleSyncConfigured()) {

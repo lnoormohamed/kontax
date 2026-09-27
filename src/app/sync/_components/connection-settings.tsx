@@ -1305,6 +1305,9 @@ export function ConnectionSettings({
       setToast("Sync started");
       onSaved();
       onClose();
+    } else if (result.error === ELEVATION_REQUIRED) {
+      // P49A-13: starting the first sync needs the sync re-auth; retry after it.
+      onNeedElevation(() => void finishSetup(useDefaults));
     } else {
       setToast(result.error ?? "Could not start syncing.");
     }

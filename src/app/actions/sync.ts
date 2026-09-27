@@ -2525,6 +2525,13 @@ export const completeSyncSetup = async (
     return { ok: false, error: "The sync window start and end hours must be different." };
   }
 
+  // P49A-13 (Fable review): finishing setup releases the held first sync —
+  // for a Google / Outlook connection, the first push of the address book —
+  // so it needs the same 15-minute elevation as the connect route and the
+  // settings. Normally still valid from the connect step.
+  const elevation = await requireSyncSettingsElevation();
+  if (!elevation.ok) return elevation;
+
   const account = await db.syncAccount.findFirst({
     where: currentSyncAccountWhere(userId, syncAccountId),
     select: {

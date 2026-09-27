@@ -112,7 +112,7 @@ export const SYNC: HelpCategoryContent = {
           text: "Under **CardDAV**, choose the **iCloud** preset. The server URL is filled in as `https://contacts.icloud.com`.",
         },
         {
-          text: "Enter a **Label**, your Apple Account email as the **Username** and the app-specific password as the **Password**, then choose **Connect**.",
+          text: "Enter a **Label**, your Apple Account email as the **Username**, the app-specific password as the **Password** and your Kontax password to confirm, then choose **Connect**.",
         },
         { text: START_SYNCING },
       ],
@@ -141,7 +141,10 @@ export const SYNC: HelpCategoryContent = {
       keywords: ["google", "gmail", "google contacts", "oauth", "android"],
       steps: [
         { text: OPEN_SYNC },
-        { text: "Under **Connect with OAuth**, choose **Google Contacts**." },
+        {
+          text: "Under **Connect with OAuth**, choose **Google Contacts**.",
+          details: ["Kontax asks for your Kontax password first, because the new connection will receive your contacts."],
+        },
         { text: "Sign in to the Google account you want to connect and allow Kontax to see and edit your contacts." },
         { text: START_SYNCING },
       ],
@@ -552,7 +555,7 @@ export const SYNC: HelpCategoryContent = {
     },
     {
       q: "How do I sync with Outlook / Microsoft 365?",
-      a: "Open Sync, choose **Add account**, then the **Outlook / Exchange** tile under **Connect with OAuth**. Sign in with your Microsoft account and approve access to your contacts, then choose **Start syncing**.",
+      a: "Open Sync, choose **Add account**, then the **Outlook / Exchange** tile under **Connect with OAuth**. Confirm your Kontax password, sign in with your Microsoft account and approve access to your contacts, then choose **Start syncing**.",
       requiresMicrosoftSync: true,
     },
   ],

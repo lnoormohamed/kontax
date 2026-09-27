@@ -3645,7 +3645,15 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 }
 
 // ── P23-06: re-authentication ("sudo") modal ──────────────────────────────────
-function ReauthModal({ onConfirmed, onCancel }: { onConfirmed: () => void; onCancel: () => void }) {
+function ReauthModal({
+  purpose = "settings",
+  onConfirmed,
+  onCancel,
+}: {
+  purpose?: "settings" | "connect";
+  onConfirmed: () => void;
+  onCancel: () => void;
+}) {
   const [pw, setPw] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -3674,7 +3682,9 @@ function ReauthModal({ onConfirmed, onCancel }: { onConfirmed: () => void; onCan
       <div className="sy-modal" onClick={(e) => e.stopPropagation()}>
         <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: T.ink }}>Confirm your password</h3>
         <p style={{ margin: "10px 0 20px", fontSize: 14, lineHeight: 1.55, color: T.ink2 }}>
-          Sync connection settings are sensitive. Enter your Kontax password to continue.
+          {purpose === "connect"
+            ? "Connecting an account sends your contacts to it. Enter your Kontax password to continue."
+            : "Sync connection settings are sensitive. Enter your Kontax password to continue."}
         </p>
         <label style={{ display: "block" }}>
           <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>Password</span>
@@ -3859,9 +3869,12 @@ export type SyncPageClientProps = {
   // P49A-13: saving CardDAV credentials takes the Kontax password (step-up);
   // false for OAuth-only accounts, which have none to give.
   hasPassword: boolean;
+  // P49A-13: set when /api/sync/{google,microsoft}/connect bounced back for
+  // the sync re-auth (no 15-minute elevation). Show the modal, then resume.
+  reauthProvider?: "google" | "microsoft" | null;
 };
 
-export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookModel, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap, hasPassword }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookModel, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap, hasPassword, reauthProvider = null }: SyncPageClientProps) {
   const allAccounts = [...accounts, ...pastAccounts];
   // P36-DB02: a freshly-connected account awaiting setup wins the initial selection
   // so its first-run setup panel opens immediately.
@@ -3905,6 +3918,18 @@ export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookM
   const [firstRun, setFirstRun] = useState(!initialAdd && !!pendingSetup);
   // P23-06: a pending save that needs re-auth; holds the retry to run once elevated.
   const [reauthRetry, setReauthRetry] = useState<(() => void) | null>(null);
+  const [reauthPurpose, setReauthPurpose] = useState<"settings" | "connect">("settings");
+
+  // P49A-13: resume a Google / Outlook connect once the password is confirmed.
+  // The route re-checks the elevation server-side; this is only the prompt.
+  useEffect(() => {
+    if (!reauthProvider) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("reauth");
+    window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+    setReauthPurpose("connect");
+    setReauthRetry(() => () => window.location.assign(`/api/sync/${reauthProvider}/connect`));
+  }, [reauthProvider]);
   // Disconnect confirmation modal target.
   const [disconnectTarget, setDisconnectTarget] = useState<{
     label: string;
@@ -4051,7 +4076,10 @@ export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookM
           }}
           onSaved={() => router.refresh()}
           setToast={setToast}
-          onNeedElevation={(retry) => setReauthRetry(() => retry)}
+          onNeedElevation={(retry) => {
+            setReauthPurpose("settings");
+            setReauthRetry(() => retry);
+          }}
           onDirtyChange={(dirty) => {
             settingsDirtyRef.current = dirty;
           }}
@@ -4752,6 +4780,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookM
       {/* P23-06: re-auth modal — confirm, then run the pending save */}
       {reauthRetry && (
         <ReauthModal
+          purpose={reauthPurpose}
           onConfirmed={() => {
             const retry = reauthRetry;
             setReauthRetry(null);

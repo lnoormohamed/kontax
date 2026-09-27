@@ -60,6 +60,22 @@ export const requireSyncSettingsElevation = async (): Promise<
   return elevated ? { ok: true } : { ok: false, error: SYNC_SETTINGS_ELEVATION_REQUIRED };
 };
 
+/**
+ * P49A-13 (Fable review): Google / Outlook connect (and reconnect) start an
+ * OAuth flow that ends with a two-way sync to whatever account the browser
+ * signs in to — so a hijacked cookie could connect the attacker's Google
+ * account and receive the whole address book. The connect routes require the
+ * same 15-minute elevation as sync settings. They are plain GET navigations
+ * (the OAuth redirect), so a missing elevation redirects back here: the /sync
+ * page reads `reauth=<provider>`, shows the re-auth modal and, once elevated,
+ * navigates to the connect route again. `add=1` opens the add-account view so
+ * the modal is visible on mobile too.
+ */
+export const SYNC_OAUTH_REAUTH_PROVIDERS = ["google", "microsoft"] as const;
+export type SyncOAuthReauthProvider = (typeof SYNC_OAUTH_REAUTH_PROVIDERS)[number];
+
+export const syncOAuthReauthPath = (provider: SyncOAuthReauthProvider) => `/sync?add=1&reauth=${provider}`;
+
 /** Resolve the elevation key for the current session, for the confirm action. */
 export const getCurrentElevationContext = async (): Promise<{
   userId: string;
