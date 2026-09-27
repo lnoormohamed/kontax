@@ -841,31 +841,48 @@ const MULTI_VALUE_SCALAR_FIELDS: Partial<
   website: "websiteEntries",
 };
 
+// A phone entry for a new value, with the P37 metadata (e164, national,
+// validationStatus, …) computed for THAT value — never carried over from the
+// number it replaces (P49A-10 Fable review: the legacy phoneNumbers array and
+// the search index are derived from e164).
+const phoneEntryFor = (value: string, label: string): Record<string, unknown> =>
+  buildNormalizedPhoneEntries({
+    primaryValue: value,
+    primaryLabel: label,
+    secondaryValues: [],
+    secondaryLabel: null,
+    defaultLabel: "mobile",
+    source: "user",
+  }).phoneEntries[0] ?? { label, value, isPrimary: true };
+
 // Replace the primary entry's value (clearing it removes that entry), or add
 // the value as a new primary entry when the family has none. Other entries
-// are kept as they are.
+// are kept as they are. A changed value keeps only the label: metadata and
+// structured address components described the old value.
 const replacePrimaryEntry = (
+  family: "emailEntries" | "phoneEntries" | "addressEntries" | "websiteEntries",
   entries: Array<Record<string, unknown> & { isPrimary: boolean }>,
   newValue: string | null,
-  valueKey: "value" | "formatted",
 ): Array<Record<string, unknown>> => {
+  const valueKey = family === "addressEntries" ? "formatted" : "value";
+  const entryFor = (value: string, label: string): Record<string, unknown> =>
+    family === "phoneEntries"
+      ? { ...phoneEntryFor(value, label), isPrimary: true }
+      : { label, [valueKey]: value, isPrimary: true };
   const primaryIndex = Math.max(
     0,
     entries.findIndex((entry) => entry.isPrimary),
   );
   const current = entries[primaryIndex];
   if (!current) {
-    return newValue ? [{ label: "", [valueKey]: newValue, isPrimary: true }] : [];
+    return newValue ? [entryFor(newValue, "")] : [];
   }
   if (!newValue) {
     return entries.filter((_, index) => index !== primaryIndex);
   }
-  // A new address replaces the structured components too — they described the
-  // old one.
+  const label = typeof current.label === "string" ? current.label : "";
   const replacement =
-    valueKey === "formatted"
-      ? { label: current.label, formatted: newValue, isPrimary: true }
-      : { ...current, value: newValue, isPrimary: true };
+    current[valueKey] === newValue ? { ...current, isPrimary: true } : entryFor(newValue, label);
   return entries.map((entry, index) => (index === primaryIndex ? replacement : entry));
 };
 
@@ -901,9 +918,9 @@ export const updateContactField = async (contactId: string, field: string, rawVa
       ...(multiValue
         ? multiValueWriteData({
             [multiValue]: replacePrimaryEntry(
+              multiValue,
               readMultiValueEntries(before)[multiValue],
               newValue,
-              multiValue === "addressEntries" ? "formatted" : "value",
             ),
           })
         : { [field]: field === "fullName" ? trimmed : newValue }),

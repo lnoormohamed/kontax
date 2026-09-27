@@ -16,6 +16,7 @@ import { Prisma } from "../../generated/prisma";
 import {
   buildMultiValueWriteData,
   deriveMultiValueFields,
+  familiesHeldBy,
   familiesPresentIn,
   normalizeAddressEntries,
   normalizeValueEntries,
@@ -153,10 +154,52 @@ test("reconcile (the backfill rule): legacy values missing from entries are appe
   assert.deepEqual(again, reconciled);
 });
 
-test("a snapshot only writes the families it carries", () => {
+test("a snapshot only writes the families it carries; an empty one only when clearable", () => {
   assert.deepEqual(familiesPresentIn({ fullName: "x", phoneEntries: [] }), ["phones"]);
-  const data = snapshotMultiValueWriteData({ fullName: "x", phoneEntries: [] }, { jsonNull: DB_NULL });
-  assert.deepEqual(data, { phoneEntries: DB_NULL, phone: null, phoneNumbers: DB_NULL });
+  const cleared = snapshotMultiValueWriteData(
+    { fullName: "x", phoneEntries: [] },
+    { jsonNull: DB_NULL, clearable: ["phones"] },
+  );
+  assert.deepEqual(cleared, { phoneEntries: DB_NULL, phone: null, phoneNumbers: DB_NULL });
+  // Not clearable (no evidence / "partial" family): an empty list is skipped…
+  assert.deepEqual(
+    snapshotMultiValueWriteData({ fullName: "x", phoneEntries: [] }, { jsonNull: DB_NULL, clearable: [] }),
+    {},
+  );
+  // …but a non-empty one always applies.
+  const applied = snapshotMultiValueWriteData(
+    { fullName: "x", phoneEntries: [{ label: "Mobile", value: "+1 555 0100", isPrimary: true }] },
+    { jsonNull: DB_NULL, clearable: [] },
+  );
+  assert.equal(applied.phone, "+1 555 0100");
+});
+
+test("null keys and raw provider arrays are not carried Kontax families", () => {
+  // A P39-03-stripped snapshot nulls a family: not carried, never cleared.
+  assert.deepEqual(
+    familiesPresentIn({ address: null, postalAddresses: null, addressEntries: null, email: "a@x.test" }),
+    ["emails"],
+  );
+  // Google's raw Person arrays are objects, not Kontax's legacy strings.
+  assert.deepEqual(
+    familiesPresentIn({
+      emailAddresses: [{ value: "a@x.test", type: "home" }],
+      phoneNumbers: [{ value: "+15550100" }],
+    }),
+    [],
+  );
+  assert.deepEqual(familiesPresentIn({ emailAddresses: ["a@x.test"], postalAddresses: [{ formatted: "1 Rd" }] }), [
+    "emails",
+    "addresses",
+  ]);
+});
+
+test("familiesHeldBy reads a shadow through the reader (typed or legacy keys)", () => {
+  assert.deepEqual(familiesHeldBy(null), []);
+  assert.deepEqual(
+    familiesHeldBy({ phoneEntries: [], emailAddresses: ["a@x.test"], website: "https://w.test" }),
+    ["emails", "websites"],
+  );
 });
 
 test("address normalisation keeps both vocabularies and builds a missing formatted", () => {
@@ -395,6 +438,43 @@ test("inline primary-email edit rewrites the primary entry instead of the scalar
   const cleared = state.contacts[0]!;
   assert.deepEqual(emailValues(cleared), ["ada@two.test", "ada@three.test"]);
   assert.equal(cleared.email, "ada@two.test", "the next entry becomes the primary");
+});
+
+test("inline primary-phone edit recomputes the phone metadata for the new number", async () => {
+  const row = await importCsv(THREE_EMAIL_CSV);
+  // Give the stored primary phone full P37 metadata, as the web form writes it.
+  Object.assign(row, {
+    phoneEntries: [
+      {
+        label: "mobile",
+        value: "+44 20 7946 0000",
+        isPrimary: true,
+        rawInput: "+44 20 7946 0000",
+        e164: "+442079460000",
+        national: "020 7946 0000",
+        displayInternational: "+44 20 7946 0000",
+        numberType: "FIXED_LINE",
+        validationStatus: "valid",
+      },
+      { label: "work", value: "+1 212 555 0100", isPrimary: false },
+    ],
+  });
+
+  await updateContactField(row.id as string, "phone", "+1 415 555 0132");
+  const updated = state.contacts[0]!;
+  const [primary, other] = updated.phoneEntries as Row[];
+  assert.equal(primary?.label, "mobile", "the label is kept");
+  assert.equal(primary?.isPrimary, true);
+  assert.equal(primary?.e164, "+14155550132", "e164 is the NEW number's");
+  assert.notEqual(primary?.national, "020 7946 0000");
+  assert.equal(primary?.rawInput, "+1 415 555 0132");
+  assert.equal(other?.value, "+1 212 555 0100", "other entries untouched");
+  assert.deepEqual(updated.phoneNumbers, ["+14155550132", "+1 212 555 0100"]);
+  assert.equal(updated.phone, primary?.value);
+  assert.ok(
+    !updated.phoneNumbers.includes("+442079460000"),
+    "the old number is gone from the derived array (and so from search)",
+  );
 });
 
 test("emptying a family in the full form clears it (entries and legacy)", async () => {
