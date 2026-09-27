@@ -15,6 +15,7 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { buildConflictRows } from "~/server/sync-conflict-merge";
 import { SYNC_ACCOUNT_HISTORICAL_STATUSES } from "~/lib/sync-account-status";
 import { summarizeProjection } from "~/lib/projection-preview";
 import {
@@ -106,52 +107,8 @@ const getSyncHelpHref = (account: {
 const isSuccessfulJob = (status: string) =>
   status === "SUCCEEDED" || status === "PARTIAL";
 
-// Extract a human-readable snapshot summary for conflict comparison rows.
-// The snapshots are stored as JSON blobs in the DB.
-const getSnapshotText = (snapshot: unknown, key: string): string => {
-  if (typeof snapshot !== "object" || snapshot === null) return "—";
-  const val = (snapshot as Record<string, unknown>)[key];
-  if (typeof val === "string" && val.trim()) return val.trim();
-  if (Array.isArray(val) && val.length > 0) {
-    return val
-      .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
-      .join(" | ") || "—";
-  }
-  return "—";
-};
-
-const buildConflictRows = (
-  local: unknown,
-  remote: unknown,
-): Array<{ label: string; local: string; remote: string; kind: "text" | "photo" }> => {
-  const fields: Array<[string, string]> = [
-    ["Full name", "fullName"],
-    ["Emails", "emailAddresses"],
-    ["Phones", "phoneNumbers"],
-    ["Company", "company"],
-    ["Job title", "jobTitle"],
-    ["Website", "website"],
-    ["Birthday", "birthday"],
-    ["Notes", "notes"],
-  ];
-  const textRows = fields
-    .map(([label, key]) => ({
-      label,
-      local: getSnapshotText(local, key),
-      remote: getSnapshotText(remote, key),
-      kind: "text" as const,
-    }))
-    .filter((r) => r.local !== "—" || r.remote !== "—");
-  // P44-05: photo row — the values are image URLs, rendered as side-by-side
-  // thumbnails by the review UI rather than as text.
-  const localPhoto = getSnapshotText(local, "avatarUrl");
-  const remotePhoto = getSnapshotText(remote, "avatarUrl");
-  const photoRows =
-    localPhoto !== "—" || remotePhoto !== "—"
-      ? [{ label: "Photo", local: localPhoto, remote: remotePhoto, kind: "photo" as const }]
-      : [];
-  return [...textRows, ...photoRows];
-};
+// Conflict comparison rows (P49A-19 item 2: keyed by field, so the manual
+// merge picks reach the server by field) — src/server/sync-conflict-merge.ts.
 
 // ── page ──────────────────────────────────────────────────────────────────────
 type PageProps = {

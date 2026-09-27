@@ -30,6 +30,13 @@ import { ConfirmDialog } from "~/app/_components/confirm-dialog";
 import { OfflineWriteNote } from "~/app/_components/connection-banner";
 import { useOffline } from "~/app/_components/connectivity";
 import { HelpTooltip } from "~/app/_components/help-tooltip";
+import {
+  CONFLICT_PICKS_FIELD,
+  type ConflictFieldKey,
+  type ConflictPicks,
+  type ConflictSide,
+  DEFAULT_CONFLICT_SIDE,
+} from "~/lib/sync-conflict-picks";
 import { SyncTimestamp } from "./sync-timestamp";
 
 import { ConnectionSettings } from "./connection-settings";
@@ -54,6 +61,8 @@ export type SyncJobRow = {
 };
 
 export type ConflictComparisonRow = {
+  // P49A-19 item 2: the stable field key the manual-merge pick is sent under.
+  key: ConflictFieldKey;
   label: string;
   local: string;
   remote: string;
@@ -536,7 +545,10 @@ function ConflictRow({
 }) {
   const [open, setOpen] = useState(false);
   const [manual, setManual] = useState(false);
-  const [picks, setPicks] = useState<Array<"local" | "remote">>(cf.comparisonRows.map(() => "local"));
+  // P49A-19 item 2: picks keyed by field (not row position) and sent with the
+  // MANUAL_MERGE resolution; an unpicked field is DEFAULT_CONFLICT_SIDE.
+  const [picks, setPicks] = useState<ConflictPicks>({});
+  const sideOf = (key: ConflictFieldKey): ConflictSide => picks[key] ?? DEFAULT_CONFLICT_SIDE;
   // P44-05: a photo-only conflict has just the one photo row. "Manual merge" is
   // meaningless for a single image (Keep local / Keep remote cover it) and the
   // resolve action maps a photo MANUAL_MERGE to keep-local, so hide it.
@@ -556,6 +568,15 @@ function ConflictRow({
       <input type="hidden" name="syncConflictId" value={cf.id} />
       <input type="hidden" name="resolutionStrategy" value={strategy} />
       <input type="hidden" name="redirectTo" value={redirectTo} />
+      {strategy === "MANUAL_MERGE" && (
+        <input
+          type="hidden"
+          name={CONFLICT_PICKS_FIELD}
+          value={JSON.stringify(
+            Object.fromEntries(cf.comparisonRows.map((row) => [row.key, sideOf(row.key)])),
+          )}
+        />
+      )}
       <ActionBtn variant={variant} type="submit">
         {children}
       </ActionBtn>
@@ -701,8 +722,8 @@ function ConflictRow({
                 Choose the value to keep for each field.
               </p>
               <div style={{ display: "grid", gap: 10, marginBottom: 14 }}>
-                {cf.comparisonRows.map((r, i) => (
-                  <div key={i} style={{ border: `1px solid ${T.line2}`, borderRadius: 12, padding: 14 }}>
+                {cf.comparisonRows.map((r) => (
+                  <div key={r.key} style={{ border: `1px solid ${T.line2}`, borderRadius: 12, padding: 14 }}>
                     <div
                       style={{
                         fontSize: 11,
@@ -722,14 +743,13 @@ function ConflictRow({
                           ["remote", "Remote", r.remote],
                         ] as const
                       ).map(([k, lbl, val]) => {
-                        const on = picks[i] === k;
+                        const on = sideOf(r.key) === k;
                         return (
                           <button
                             key={k}
                             type="button"
-                            onClick={() =>
-                              setPicks((p) => p.map((x, j) => (j === i ? k : x)))
-                            }
+                            aria-pressed={on}
+                            onClick={() => setPicks((p) => ({ ...p, [r.key]: k }))}
                             style={{
                               textAlign: "left",
                               padding: "10px 12px",

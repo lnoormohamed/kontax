@@ -20,16 +20,16 @@ import {
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
 import {
   copyMultiValueWriteData,
-  type MultiValueEntries,
   type MultiValueFields,
-  multiValueWriteData,
-  readMultiValueEntries,
   readMultiValueFields,
   snapshotMultiValueWriteData,
 } from "~/server/contact-multi-values";
 import { parseContactDateEntries } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import { buildPickedMergeWriteData } from "~/server/sync-conflict-merge";
+import { markSyncLinksDirty } from "~/server/sync-dirty";
 import { emitEvent } from "~/lib/activity";
+import { CONFLICT_PICKS_FIELD, parseConflictPicks } from "~/lib/sync-conflict-picks";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import {
@@ -219,7 +219,14 @@ const parseSyncConflictResolution = (formData: FormData) => {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid sync conflict update.");
   }
 
-  return parsed.data;
+  // P49A-19 item 2: a manual merge carries the per-field picks (validated:
+  // known field keys only, "local" | "remote"); other strategies ignore them.
+  const fieldPicks =
+    parsed.data.resolutionStrategy === "MANUAL_MERGE"
+      ? parseConflictPicks(formData.get(CONFLICT_PICKS_FIELD))
+      : null;
+
+  return { ...parsed.data, fieldPicks };
 };
 
 const createRetrySchedule = (attemptNumber: number) => {
@@ -446,124 +453,8 @@ const buildPortableFromRemoteSnapshot = (
   return { ...base.writeData, ...portableMultiValues(readMultiValueFields(base.snapshot)) };
 };
 
-const getSnapshotStringValue = (snapshot: unknown, key: string) => {
-  if (!isRecord(snapshot)) {
-    return null;
-  }
-
-  const value = snapshot[key];
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-};
-
-const getSnapshotObjectList = (snapshot: unknown, key: string) => {
-  if (!isRecord(snapshot)) {
-    return [];
-  }
-
-  const value = snapshot[key];
-  return Array.isArray(value) ? value.filter((item) => isRecord(item)) : [];
-};
-
-const mergeUniqueObjects = (localValues: Record<string, unknown>[], remoteValues: Record<string, unknown>[]) => {
-  const merged = [...localValues];
-  const seen = new Set(localValues.map((value) => JSON.stringify(value)));
-
-  for (const value of remoteValues) {
-    const key = JSON.stringify(value);
-    if (seen.has(key)) {
-      continue;
-    }
-
-    seen.add(key);
-    merged.push(value);
-  }
-
-  return merged;
-};
-
-const mergeNotesValue = (localValue: string | null, remoteValue: string | null) => {
-  const local = localValue?.trim();
-  const remote = remoteValue?.trim();
-
-  if (local && remote && local !== remote) {
-    return `${local}\n\nRemote note:\n${remote}`;
-  }
-
-  return local ?? remote ?? null;
-};
-
-// Local entries first (they keep primacy), then remote ones not already
-// present; label + value repeats collapse in the canonical normaliser.
-const mergeEntryLists = <T extends { isPrimary: boolean }>(local: T[], remote: T[]): T[] => [
-  ...local,
-  ...remote.map((entry) => ({ ...entry, isPrimary: local.length === 0 && entry.isPrimary })),
-];
-
-const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unknown) => {
-  const fullName =
-    getSnapshotStringValue(localSnapshot, "fullName") ??
-    getSnapshotStringValue(remoteSnapshot, "fullName");
-
-  if (!fullName) {
-    throw new Error("Manual merge needs at least one valid contact name.");
-  }
-
-  // P49A-10: merge the typed entries of both sides (read through the canonical
-  // reader, so a pre-P49A-10 snapshot's legacy values count too); the legacy
-  // columns are derived from the merged entries, never merged separately.
-  const local = readMultiValueEntries(isRecord(localSnapshot) ? localSnapshot : {});
-  const remote = readMultiValueEntries(isRecord(remoteSnapshot) ? remoteSnapshot : {});
-  const multiValues: MultiValueEntries = {
-    emailEntries: mergeEntryLists(local.emailEntries, remote.emailEntries),
-    phoneEntries: mergeEntryLists(local.phoneEntries, remote.phoneEntries),
-    addressEntries: mergeEntryLists(local.addressEntries, remote.addressEntries),
-    websiteEntries: mergeEntryLists(local.websiteEntries, remote.websiteEntries),
-  };
-  const significantDates = mergeUniqueObjects(
-    getSnapshotObjectList(localSnapshot, "significantDates"),
-    getSnapshotObjectList(remoteSnapshot, "significantDates"),
-  );
-
-  return {
-    fullName,
-    firstName:
-      getSnapshotStringValue(localSnapshot, "firstName") ??
-      getSnapshotStringValue(remoteSnapshot, "firstName"),
-    middleName:
-      getSnapshotStringValue(localSnapshot, "middleName") ??
-      getSnapshotStringValue(remoteSnapshot, "middleName"),
-    lastName:
-      getSnapshotStringValue(localSnapshot, "lastName") ??
-      getSnapshotStringValue(remoteSnapshot, "lastName"),
-    namePrefix:
-      getSnapshotStringValue(localSnapshot, "namePrefix") ??
-      getSnapshotStringValue(remoteSnapshot, "namePrefix"),
-    nameSuffix:
-      getSnapshotStringValue(localSnapshot, "nameSuffix") ??
-      getSnapshotStringValue(remoteSnapshot, "nameSuffix"),
-    nickname:
-      getSnapshotStringValue(localSnapshot, "nickname") ??
-      getSnapshotStringValue(remoteSnapshot, "nickname"),
-    multiValues,
-    company:
-      getSnapshotStringValue(localSnapshot, "company") ??
-      getSnapshotStringValue(remoteSnapshot, "company"),
-    department:
-      getSnapshotStringValue(localSnapshot, "department") ??
-      getSnapshotStringValue(remoteSnapshot, "department"),
-    jobTitle:
-      getSnapshotStringValue(localSnapshot, "jobTitle") ??
-      getSnapshotStringValue(remoteSnapshot, "jobTitle"),
-    birthday:
-      getSnapshotStringValue(localSnapshot, "birthday") ??
-      getSnapshotStringValue(remoteSnapshot, "birthday"),
-    significantDates: significantDates.length > 0 ? significantDates : undefined,
-    notes: mergeNotesValue(
-      getSnapshotStringValue(localSnapshot, "notes"),
-      getSnapshotStringValue(remoteSnapshot, "notes"),
-    ),
-  };
-};
+// P49A-19 item 2: the manual-merge write data (exactly the picked side per
+// field) is built by buildPickedMergeWriteData in src/server/sync-conflict-merge.ts.
 
 const recordFailedPreflight = async ({
   accountId,
@@ -1604,6 +1495,38 @@ export const retrySyncJob = async (formData: FormData) => {
   revalidateSyncViews();
 };
 
+// The local contact as conflict resolution reads (and, for a manual merge,
+// re-reads after writing) it.
+const conflictContactSelect = {
+  id: true,
+  syncUid: true,
+  syncVersion: true,
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  emailEntries: true,
+  phone: true,
+  phoneNumbers: true,
+  phoneEntries: true,
+  company: true,
+  department: true,
+  jobTitle: true,
+  website: true,
+  websiteEntries: true,
+  birthday: true,
+  significantDates: true,
+  address: true,
+  postalAddresses: true,
+  addressEntries: true,
+  notes: true,
+} satisfies Prisma.ContactSelect;
+
 export const resolveSyncConflict = async (formData: FormData) => {
   const userId = await requireUserId({ write: true });
   const input = parseSyncConflictResolution(formData);
@@ -1647,35 +1570,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
         },
       },
       contact: {
-        select: {
-          id: true,
-          syncUid: true,
-          syncVersion: true,
-          fullName: true,
-          firstName: true,
-          middleName: true,
-          lastName: true,
-          namePrefix: true,
-          nameSuffix: true,
-          nickname: true,
-          email: true,
-          emailAddresses: true,
-          emailEntries: true,
-          phone: true,
-          phoneNumbers: true,
-          phoneEntries: true,
-          company: true,
-          department: true,
-          jobTitle: true,
-          website: true,
-          websiteEntries: true,
-          birthday: true,
-          significantDates: true,
-          address: true,
-          postalAddresses: true,
-          addressEntries: true,
-          notes: true,
-        },
+        select: conflictContactSelect,
       },
     },
   });
@@ -1789,6 +1684,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           supportedFieldShadow: localShadow,
           remoteDeletedAt: null,
           tombstonedAt: null,
+          localDirtyAt: null, // P49A-12: settled by this resolution
           lastErrorCode: null,
           lastErrorMessage: null,
           lastSyncedAt: resolvedAt,
@@ -1832,6 +1728,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           ),
           remoteDeletedAt: null,
           tombstonedAt: null,
+          localDirtyAt: null, // P49A-12: settled by this resolution
           lastErrorCode: null,
           lastErrorMessage: null,
           lastSyncedAt: resolvedAt,
@@ -1908,6 +1805,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           ),
           remoteDeletedAt: null,
           tombstonedAt: null,
+          localDirtyAt: null, // P49A-12: settled by this resolution
           lastErrorCode: null,
           lastErrorMessage: null,
           lastSyncedAt: resolvedAt,
@@ -1957,34 +1855,37 @@ export const resolveSyncConflict = async (formData: FormData) => {
       );
     }
 
-    const mergedWriteData = buildManualMergeWriteData(
+    // P49A-19 item 2: exactly the side the user picked per field (an unpicked
+    // field — or a resolution from a page loaded before picks were sent —
+    // takes the side the UI preselected, "Kontax"). It used to union both
+    // sides with local winning whatever was picked.
+    const mergedWriteData = buildPickedMergeWriteData(
       conflict.localSnapshot,
       conflict.remoteSnapshot,
+      input.fieldPicks,
     );
-    const mergedMultiValues = portableMultiValues(readMultiValueFields(mergedWriteData.multiValues));
 
-    await db.contact.update({
-      where: { id: conflict.contactId },
-      data: {
-        fullName: mergedWriteData.fullName,
-        firstName: mergedWriteData.firstName,
-        middleName: mergedWriteData.middleName,
-        lastName: mergedWriteData.lastName,
-        namePrefix: mergedWriteData.namePrefix,
-        nameSuffix: mergedWriteData.nameSuffix,
-        nickname: mergedWriteData.nickname,
-        ...multiValueWriteData(mergedWriteData.multiValues),
-        company: mergedWriteData.company,
-        department: mergedWriteData.department,
-        jobTitle: mergedWriteData.jobTitle,
-        birthday: mergedWriteData.birthday,
-        significantDates: mergedWriteData.significantDates as Prisma.InputJsonValue | undefined,
-        notes: mergedWriteData.notes,
-        syncVersion: {
-          increment: 1,
+    // The merged record is the user's own edit: stored, then pushed from what
+    // was stored (so a field the snapshot never recorded is pushed as the
+    // contact holds it, not blanked). P49A-12: any other provider the contact
+    // is linked to receives it on its next sync.
+    const merged = await db.$transaction(async (tx) => {
+      const saved = await tx.contact.update({
+        where: { id: conflict.contactId! },
+        data: {
+          ...(mergedWriteData as Prisma.ContactUpdateInput),
+          lastMutatedBy: "MANUAL",
+          lastMutatedByDetail: null,
+          syncVersion: {
+            increment: 1,
+          },
         },
-      },
+        select: conflictContactSelect,
+      });
+      await markSyncLinksDirty(tx, saved.id, resolvedAt);
+      return saved;
     });
+    const mergedPortable = toPortableSyncContact(merged);
 
     const credentials = decryptSyncCredentialPayload(syncAccount.credentialReference);
     const pushed = await pushCardDavContact({
@@ -1993,50 +1894,23 @@ export const resolveSyncConflict = async (formData: FormData) => {
         username: credentials.username,
         password: credentials.password,
       },
-      remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
-      contact: {
-        fullName: mergedWriteData.fullName,
-        nickname: mergedWriteData.nickname ?? null,
-        ...mergedMultiValues,
-        company: mergedWriteData.company ?? null,
-        department: mergedWriteData.department ?? null,
-        jobTitle: mergedWriteData.jobTitle ?? null,
-        birthday: mergedWriteData.birthday ?? null,
-        significantDates: parseContactDateEntries(mergedWriteData.significantDates ?? []),
-        notes: mergedWriteData.notes ?? null,
-      },
+      remoteUid: conflict.syncContactLink?.remoteUid ?? merged.syncUid,
+      contact: mergedPortable,
     });
 
     if (conflict.syncContactLinkId) {
-      const mergedShadow = buildProviderSupportedContactShadow(
-        {
-          fullName: mergedWriteData.fullName,
-          firstName: mergedWriteData.firstName ?? null,
-          middleName: mergedWriteData.middleName ?? null,
-          lastName: mergedWriteData.lastName ?? null,
-          namePrefix: mergedWriteData.namePrefix ?? null,
-          nameSuffix: mergedWriteData.nameSuffix ?? null,
-          nickname: mergedWriteData.nickname ?? null,
-          ...mergedMultiValues,
-          company: mergedWriteData.company ?? null,
-          department: mergedWriteData.department ?? null,
-          jobTitle: mergedWriteData.jobTitle ?? null,
-          birthday: mergedWriteData.birthday ?? null,
-          significantDates: parseContactDateEntries(mergedWriteData.significantDates ?? []),
-          notes: mergedWriteData.notes ?? null,
-        },
-        capabilityProfile,
-      );
       await db.syncContactLink.update({
         where: { id: conflict.syncContactLinkId },
         data: {
           remoteHref: pushed.href,
-          remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
+          remoteUid: conflict.syncContactLink?.remoteUid ?? merged.syncUid,
           remoteETag: pushed.etag,
           capabilityProfileId: capabilityProfile.id,
-          supportedFieldShadow: mergedShadow,
+          supportedFieldShadow: buildProviderSupportedContactShadow(mergedPortable, capabilityProfile),
           remoteDeletedAt: null,
           tombstonedAt: null,
+          // Pushed to this provider just now.
+          localDirtyAt: null,
           lastErrorCode: null,
           lastErrorMessage: null,
           lastSyncedAt: resolvedAt,
