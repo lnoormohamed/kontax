@@ -133,7 +133,14 @@ function VerifyTwoFaInner() {
                 autoFocus
                 className="w-full rounded-[10px] border border-[#d4d9d0] bg-white px-4 py-3 font-mono text-[16px] uppercase tracking-[0.08em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
                 onChange={(e) => setRecoveryCode(e.target.value)}
-                placeholder="XXXXXXXXXX"
+                // P49A-13: new codes are XXXX-XXXX-XXXX-XXXX; older 10-character
+                // codes still work until regenerated.
+                aria-label="Recovery code"
+                autoCapitalize="characters"
+                autoComplete="off"
+                maxLength={64}
+                placeholder="XXXX-XXXX-XXXX-XXXX"
+                spellCheck={false}
                 type="text"
                 value={recoveryCode}
               />

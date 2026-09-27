@@ -220,7 +220,7 @@ export function SecurityPageClient({
       <PasswordChangeForm />
 
       <StSecLabel>Two-factor authentication</StSecLabel>
-      <TwoFactorSection flash={flash} />
+      <TwoFactorSection flash={flash} hasPassword={connectedAccounts.hasPassword} />
 
       <StSecLabel>Active sessions</StSecLabel>
       <SessionsSection flash={flash} />

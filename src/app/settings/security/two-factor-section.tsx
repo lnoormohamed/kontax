@@ -16,7 +16,14 @@ function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }
   return <span className="st-spin inline-block rounded-full" style={{ width: size, height: size, border: `2px solid ${light ? "rgba(255,255,255,.35)" : "rgba(23,53,46,.2)"}`, borderTopColor: light ? "#fff" : "#17352e" }} />;
 }
 
-export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
+export function TwoFactorSection({
+  flash,
+  hasPassword,
+}: {
+  flash: (msg: string) => void;
+  /** P49A-13: regenerate/enrol take the password (none for OAuth-only accounts). */
+  hasPassword: boolean;
+}) {
   const [enabled, setEnabled] = useState(false);
   const [verifiedAt, setVerifiedAt] = useState<Date | null>(null);
   const [remainingCodes, setRemainingCodes] = useState(0);
@@ -29,11 +36,15 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
   const [err, setErr] = useState("");
   const [newCodes, setNewCodes] = useState<string[] | null>(null);
   const [regenErr, setRegenErr] = useState("");
+  const [regenPw, setRegenPw] = useState("");
+  const [regenCode, setRegenCode] = useState("");
+  const [hasLegacyCodes, setHasLegacyCodes] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     getTotpStatus().then((s) => {
       setEnabled(s.enabled); setVerifiedAt(s.verifiedAt); setRemainingCodes(s.remainingCodes);
+      setHasLegacyCodes(s.hasLegacyCodes);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -58,19 +69,35 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
   // had already replaced the stored set, so the old codes stopped working and
   // the new ones were never shown. Now the new codes go straight into a dialog
   // the user can only leave by confirming they've saved them.
+  // P49A-13: regenerating takes the password and a current authenticator code,
+  // both verified by the action itself.
+  const canRegenerate = (!hasPassword || regenPw.length > 0) && regenCode.length === 6;
   const doRegenerate = () => {
+    if (!canRegenerate || isPending) return;
     setRegenErr("");
     startTransition(async () => {
       try {
-        const result = await regenerateRecoveryCodes();
+        const result = await regenerateRecoveryCodes({
+          currentPassword: hasPassword ? regenPw : undefined,
+          totpCode: regenCode,
+        });
         if ("success" in result) {
           setNewCodes(result.recoveryCodes);
           setRemainingCodes(result.recoveryCodes.length);
+          setHasLegacyCodes(false);
           setViewCodes(false);
+          setRegenPw("");
+          setRegenCode("");
         } else {
-          setRegenErr(result.error === "REGENERATE_FAILED"
-            ? "Couldn't create new codes. Your existing recovery codes still work."
-            : "Something went wrong. Your existing recovery codes haven't changed.");
+          setRegenCode("");
+          setRegenErr(
+            result.error === "WRONG_PASSWORD" ? "Incorrect password. Your existing recovery codes haven't changed."
+            : result.error === "INVALID_TOTP_CODE" ? "Incorrect authenticator code. Your existing recovery codes haven't changed."
+            : result.error === "TOTP_CODE_ALREADY_USED" ? "That code was just used. Wait for the next code in your authenticator app."
+            : result.error === "RATE_LIMIT_EXCEEDED" ? "Too many attempts. Please wait a while and try again."
+            : result.error === "REGENERATE_FAILED" ? "Couldn't create new codes. Your existing recovery codes still work."
+            : "Something went wrong. Your existing recovery codes haven't changed.",
+          );
         }
       } catch {
         // No response, so we can't tell whether a new set was stored. Say so,
@@ -130,6 +157,11 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
                   <strong className="font-semibold text-[#17352e]">{remainingCodes} remaining</strong>
                   {" · "}use these if you lose your device
                 </div>
+                {hasLegacyCodes && (
+                  <div className="mt-[6px] text-[12.5px] leading-[1.5] text-[#7c5511]">
+                    Your codes use an older, shorter format. They still work, but regenerating gives you stronger ones.
+                  </div>
+                )}
               </div>
               <button
                 className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
@@ -142,11 +174,39 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
             {viewCodes && (
               <div className="mt-[14px] border-t border-[#e9ece7] pt-[14px]">
                 <p className="m-0 text-[13px] leading-[1.5] text-[#5c655e]">
-                  For your security, existing codes are stored hashed and can&apos;t be shown again. Regenerating creates a fresh set and <strong className="font-semibold">invalidates the old ones</strong>.
+                  For your security, existing codes are stored hashed and can&apos;t be shown again. Regenerating creates a fresh set and <strong className="font-semibold">invalidates the old ones</strong>. To confirm it&apos;s you, enter {hasPassword ? "your password and " : ""}a code from your authenticator app.
                 </p>
+                <div className="mt-3 grid max-w-[420px] gap-3">
+                  {hasPassword && (
+                    <label className="block">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Password</span>
+                      <input
+                        autoComplete="current-password"
+                        className="mt-[6px] w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] md:text-[14px]"
+                        onChange={(e) => { setRegenPw(e.target.value); if (regenErr) setRegenErr(""); }}
+                        placeholder="Your password"
+                        type="password"
+                        value={regenPw}
+                      />
+                    </label>
+                  )}
+                  <label className="block">
+                    <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Authenticator code</span>
+                    <input
+                      autoComplete="one-time-code"
+                      className="mt-[6px] w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[16px] tracking-[0.1em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] md:text-[15px]"
+                      inputMode="numeric"
+                      maxLength={6}
+                      onChange={(e) => { setRegenCode(e.target.value.replace(/\D/g, "").slice(0, 6)); if (regenErr) setRegenErr(""); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") doRegenerate(); }}
+                      placeholder="000000"
+                      value={regenCode}
+                    />
+                  </label>
+                </div>
                 <button
                   className="mt-3 inline-flex items-center gap-2 rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0] disabled:opacity-50"
-                  disabled={isPending}
+                  disabled={isPending || !canRegenerate}
                   onClick={doRegenerate}
                   type="button"
                 >
@@ -215,6 +275,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
 
       {enrol && (
         <TwoFactorModal
+          hasPassword={hasPassword}
           onCancel={() => setEnrol(false)}
           onEnabled={(codes) => {
             setEnrol(false); setEnabled(true); setRemainingCodes(codes.length);

@@ -14,14 +14,19 @@ function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 export function TwoFactorModal({
+  hasPassword,
   onCancel,
   onEnabled,
 }: {
+  /** P49A-13: enrolment starts with a password step-up when the account has one. */
+  hasPassword: boolean;
   onCancel: () => void;
   onEnabled: (codes: string[]) => void;
 }) {
-  type Step = "loading" | "qr" | "verify" | "codes" | "error";
-  const [step, setStep] = useState<Step>("loading");
+  type Step = "password" | "loading" | "qr" | "verify" | "codes" | "error";
+  const [step, setStep] = useState<Step>(hasPassword ? "password" : "loading");
+  const [password, setPassword] = useState("");
+  const [pwErr, setPwErr] = useState("");
   const [qrDataUri, setQrDataUri] = useState("");
   const [secret, setSecret] = useState("");
   const [pendingToken, setPendingToken] = useState("");
@@ -31,15 +36,31 @@ export function TwoFactorModal({
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
 
-  // Start enrolment on mount
-  useEffect(() => {
-    startTotpEnrolment().then((result) => {
-      if ("error" in result) { setErr(result.error); setStep("error"); return; }
+  // P49A-13: `startTotpEnrolment` verifies the password itself (step-up). A
+  // wrong password keeps the user on the password step; anything else is final.
+  const begin = (currentPassword?: string) => {
+    setStep("loading");
+    startTotpEnrolment({ currentPassword }).then((result) => {
+      if ("error" in result) {
+        if (currentPassword !== undefined && (result.error === "WRONG_PASSWORD" || result.error === "RATE_LIMIT_EXCEEDED")) {
+          setPwErr(result.error === "WRONG_PASSWORD" ? "Incorrect password. Please try again." : "Too many attempts. Please wait a while and try again.");
+          setPassword("");
+          setStep("password");
+          return;
+        }
+        setErr(result.error); setStep("error"); return;
+      }
       setQrDataUri(result.qrCodeDataUri);
       setSecret(result.plaintextSecret);
       setPendingToken(result.pendingToken);
       setStep("qr");
     }).catch(() => { setErr("Failed to start enrolment."); setStep("error"); });
+  };
+
+  // Accounts without a password (OAuth-only) start straight away.
+  useEffect(() => {
+    if (!hasPassword) begin();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only
   }, []);
 
   const verify = (val?: string) => {
@@ -86,6 +107,32 @@ export function TwoFactorModal({
         role="dialog"
         tabIndex={-1}
       >
+
+        {step === "password" && (
+          <form onSubmit={(e) => { e.preventDefault(); if (password) begin(password); }}>
+            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]" id="totp-modal-title">Set up two-factor authentication</h3>
+            <p className="mt-[6px] text-[14px] leading-[1.55] text-[#5c655e]">
+              First, confirm it&apos;s you. Enter your Kontax password to continue.
+            </p>
+            <label className="mt-4 block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Password</span>
+              <input
+                autoComplete="current-password"
+                autoFocus
+                className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] md:text-[14px] ${pwErr ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
+                onChange={(e) => { setPassword(e.target.value); if (pwErr) setPwErr(""); }}
+                placeholder="Your password"
+                type="password"
+                value={password}
+              />
+            </label>
+            {pwErr && <p className="mt-[6px] text-[12.5px] text-[#9a3a23]" role="alert">{pwErr}</p>}
+            <div className="mt-[22px] flex justify-end gap-2.5">
+              <button className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#1d2823] hover:bg-[#f2f4f0]" onClick={onCancel} type="button">Cancel</button>
+              <button className="rounded-[1.2rem] bg-[#17352e] px-[18px] py-3 text-[14px] font-semibold text-white hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45" disabled={!password} type="submit">Continue →</button>
+            </div>
+          </form>
+        )}
 
         {step === "loading" && (
           <div className="flex flex-col items-center gap-4 py-8">

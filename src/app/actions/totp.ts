@@ -1,11 +1,11 @@
 "use server";
 
-import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import QRCode from "qrcode";
 
 import { authIncludingPendingTotp } from "~/server/auth";
 import { isSessionError, requireSession } from "~/server/auth/require-session";
+import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { db } from "~/server/db";
 import {
   createTotpSecret,
@@ -16,42 +16,35 @@ import {
   generateTotpUri,
   verifyTotpToken,
 } from "~/server/totp-crypto";
+import {
+  findMatchingRecoveryCode,
+  isLegacyRecoveryCodeHash,
+  newRecoveryCodeSet,
+} from "~/server/totp-recovery-codes";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 
-/**
- * P48-03: a 10-character recovery code, as the UI has always claimed.
- * `randomBytes(5).toString("base64url")` produced only 7 characters, so
- * `.slice(0, 10)` was a no-op and every code was ~10 bits short of the intended
- * strength. Hex over 8 bytes gives 16 characters to trim to a full 10 (40 bits).
- */
-function generateRecoveryCode(): string {
-  return crypto.randomBytes(8).toString("hex").toUpperCase().slice(0, 10);
-}
-
-const RECOVERY_CODE_COUNT = 8;
-
-/** The stored form of a recovery code. Redemption normalises input the same way. */
-function hashRecoveryCode(code: string): string {
-  return crypto.createHash("sha256").update(code.toUpperCase().trim()).digest("hex");
-}
+// P49A-13: recovery codes are 16 base32 characters, stored as salted scrypt;
+// see src/server/totp-recovery-codes.ts (older 10-hex codes still redeem).
 
 /**
- * P49A-19: one set of recovery codes and the hashes that get stored for it,
- * built together so the codes a caller returns to the user are, by
- * construction, exactly the codes whose hashes are written. Duplicates (40
- * bits each, so vanishingly unlikely) are redrawn so the set is always the
- * full count of distinct codes.
+ * P49A-13: what a pending-enrolment token carries. `userId` binds it to the
+ * account whose password was just verified — `startTotpEnrolment` only mints
+ * one after the step-up — so confirming needs no second password prompt, and a
+ * token minted before this change (no `userId`) is refused: the user restarts.
  */
-function newRecoveryCodeSet(): { codes: string[]; hashes: string[] } {
-  const codes = new Set<string>();
-  while (codes.size < RECOVERY_CODE_COUNT) codes.add(generateRecoveryCode());
-  const list = [...codes];
-  return { codes: list, hashes: list.map(hashRecoveryCode) };
-}
+type PendingEnrolment = { secret: string; expiresAt: number; userId?: string };
+
+type StepUpFailure = "STEP_UP_REQUIRED" | "WRONG_PASSWORD" | "RATE_LIMIT_EXCEEDED";
 
 // ── Enrolment ─────────────────────────────────────────────────────────────────
 
-export async function startTotpEnrolment(): Promise<
+/**
+ * P49A-13 (A-28): turning 2FA on replaces the account's second factor and mints
+ * recovery codes — from a hijacked session that would let an attacker lock the
+ * owner out — so it takes a server-verified password step-up. OAuth-only
+ * accounts have no password to prove (the `verifyStepUpPassword` convention).
+ */
+export async function startTotpEnrolment(input: { currentPassword?: string } = {}): Promise<
   { qrCodeDataUri: string; plaintextSecret: string; pendingToken: string } | { error: string }
 > {
   let session: Awaited<ReturnType<typeof requireSession>>;
@@ -64,21 +57,25 @@ export async function startTotpEnrolment(): Promise<
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { totpEnabled: true, emailVerified: true, email: true },
+    select: { totpEnabled: true, emailVerified: true, email: true, password: true },
   });
   if (!user) return { error: "UNAUTHORIZED" };
   if (user.totpEnabled) return { error: "TOTP_ALREADY_ENABLED" };
   if (!user.emailVerified) return { error: "EMAIL_NOT_VERIFIED" };
 
+  const stepUp = await verifyStepUpPassword(session.user.id, user.password, input.currentPassword);
+  if (stepUp !== "OK") return { error: stepUp satisfies StepUpFailure };
+
   const secret = createTotpSecret();
   const totpUri = generateTotpUri(secret, user.email);
   const qrCodeDataUri = await QRCode.toDataURL(totpUri, { width: 196, margin: 1 });
 
-  // Encrypt { secret, expiresAt } — client submits this as pendingToken
+  // Encrypt { secret, expiresAt, userId } — client submits this as pendingToken
   const pendingToken = encryptPayload({
     secret,
     expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes
-  });
+    userId: session.user.id,
+  } satisfies PendingEnrolment);
 
   return { qrCodeDataUri, plaintextSecret: secret, pendingToken };
 }
@@ -101,12 +98,14 @@ export async function confirmTotpEnrolment(input: {
   if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
   // Decrypt and validate the pending token
-  let payload: { secret: string; expiresAt: number };
+  let payload: PendingEnrolment;
   try {
-    payload = decryptPayload<{ secret: string; expiresAt: number }>(input.pendingToken);
+    payload = decryptPayload<PendingEnrolment>(input.pendingToken);
   } catch {
     return { error: "INVALID_PENDING_TOKEN" };
   }
+  // P49A-13: only a token minted — after the step-up — for this same account.
+  if (payload.userId !== session.user.id) return { error: "INVALID_PENDING_TOKEN" };
   if (Date.now() > payload.expiresAt) return { error: "PENDING_TOKEN_EXPIRED" };
 
   // Verify the submitted TOTP code
@@ -114,7 +113,7 @@ export async function confirmTotpEnrolment(input: {
     return { error: "INVALID_TOTP_CODE" };
   }
 
-  const { codes: recoveryCodes, hashes: codeHashes } = newRecoveryCodeSet();
+  const { codes: recoveryCodes, hashes: codeHashes } = await newRecoveryCodeSet();
 
   const encryptedSecret = encryptTotp(payload.secret);
   const userId = session.user.id;
@@ -144,9 +143,16 @@ export async function confirmTotpEnrolment(input: {
   return { success: true, recoveryCodes };
 }
 
-export async function regenerateRecoveryCodes(): Promise<
-  { success: true; recoveryCodes: string[] } | { error: string }
-> {
+/**
+ * P49A-13 (A-28): new recovery codes invalidate the old set and are a way back
+ * into the account, so regenerating takes the password (step-up) *and* a
+ * current authenticator code. The TOTP code is rate-limited like the login
+ * challenge and claims its 30-second step, so it can't be replayed.
+ */
+export async function regenerateRecoveryCodes(input: {
+  currentPassword?: string;
+  totpCode?: string;
+} = {}): Promise<{ success: true; recoveryCodes: string[] } | { error: string }> {
   let session: Awaited<ReturnType<typeof requireSession>>;
   try {
     session = await requireSession({ write: true });
@@ -156,21 +162,37 @@ export async function regenerateRecoveryCodes(): Promise<
   }
 
   const userId = session.user.id;
+
+  const rl = await checkRateLimit(rateLimiters.totpChallenge, `regen:${userId}`);
+  if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
+
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { totpEnabled: true },
+    select: { totpEnabled: true, totpSecret: true, password: true },
   });
-  if (!user?.totpEnabled) return { error: "TOTP_NOT_ENABLED" };
+  if (!user?.totpEnabled || !user.totpSecret) return { error: "TOTP_NOT_ENABLED" };
+
+  const stepUp = await verifyStepUpPassword(userId, user.password, input.currentPassword);
+  if (stepUp !== "OK") return { error: stepUp satisfies StepUpFailure };
+
+  const totpCode = typeof input.totpCode === "string" ? input.totpCode.trim() : "";
+  if (!totpCode) return { error: "TOTP_CODE_REQUIRED" };
+  if (!verifyTotpToken(decryptTotp(user.totpSecret), totpCode)) return { error: "INVALID_TOTP_CODE" };
+
+  // Replay guard, as in submitTotpChallenge.
+  const counter = Math.floor(Date.now() / 30_000);
+  const claimedStep = await db.user.updateMany({
+    where: { id: userId, OR: [{ lastTotpCounter: null }, { lastTotpCounter: { lt: counter } }] },
+    data: { lastTotpCounter: counter },
+  });
+  if (claimedStep.count === 0) return { error: "TOTP_CODE_ALREADY_USED" };
 
   // P49A-19: the codes returned below are the ones whose hashes are stored —
   // both come from the same `newRecoveryCodeSet()` call. The old set is deleted
   // in the same transaction that stores the new one, so a failure anywhere
   // rolls back and the old codes keep working. The settings UI must show the
   // returned codes (it used to throw them away — the P49A-19 bug).
-  //
-  // Gated on a write session only, as before. P49A-13 adds step-up (password
-  // plus a current TOTP code) to this action.
-  const { codes: recoveryCodes, hashes: codeHashes } = newRecoveryCodeSet();
+  const { codes: recoveryCodes, hashes: codeHashes } = await newRecoveryCodeSet();
 
   try {
     await db.$transaction(async (tx) => {
@@ -186,6 +208,10 @@ export async function regenerateRecoveryCodes(): Promise<
     console.error("[regenerateRecoveryCodes] failed; existing codes left unchanged", { userId }, err);
     return { error: "REGENERATE_FAILED" };
   }
+
+  await db.activityEvent.create({
+    data: { userId, eventType: "ACCOUNT_UPDATED", actor: "USER", payload: { field: "totpRecoveryCodesRegenerated" } },
+  });
 
   return { success: true, recoveryCodes };
 }
@@ -248,19 +274,20 @@ export async function redeemTotpRecoveryCode(
   const rl = await checkRateLimit(rateLimiters.totpRecovery, `user:${session.user.id}`);
   if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
-  const codeHash = hashRecoveryCode(code);
-
-  const recoveryCode = await db.totpRecoveryCode.findFirst({
-    where: { userId: session.user.id, codeHash, usedAt: null },
-    select: { id: true },
+  // P49A-13: codes are salted now, so the lookup can't be by hash — load the
+  // (at most eight) unused codes and compare in constant time.
+  const unused = await db.totpRecoveryCode.findMany({
+    where: { userId: session.user.id, usedAt: null },
+    select: { id: true, codeHash: true },
   });
-  if (!recoveryCode) return { error: "INVALID_RECOVERY_CODE" };
+  const matchId = await findMatchingRecoveryCode(typeof code === "string" ? code : "", unused);
+  if (!matchId) return { error: "INVALID_RECOVERY_CODE" };
 
   // P49A-19: single use, atomically. The claim only succeeds while `usedAt` is
   // still null, so two concurrent redemptions of the same code cannot both pass
   // (the old `update({ where: { id } })` let both through).
   const claimed = await db.totpRecoveryCode.updateMany({
-    where: { id: recoveryCode.id, usedAt: null },
+    where: { id: matchId, usedAt: null },
     data: { usedAt: new Date() },
   });
   if (claimed.count === 0) return { error: "INVALID_RECOVERY_CODE" };
@@ -337,23 +364,27 @@ export async function getTotpStatus(): Promise<{
   enabled: boolean;
   verifiedAt: Date | null;
   remainingCodes: number;
+  /** P49A-13: some unused codes are the older, weaker 10-character kind. */
+  hasLegacyCodes: boolean;
 }> {
   const session = await requireSession().catch(() => null);
-  if (!session?.user?.id) return { enabled: false, verifiedAt: null, remainingCodes: 0 };
+  if (!session?.user?.id) return { enabled: false, verifiedAt: null, remainingCodes: 0, hasLegacyCodes: false };
 
-  const [user, remaining] = await Promise.all([
+  const [user, unused] = await Promise.all([
     db.user.findUnique({
       where: { id: session.user.id },
       select: { totpEnabled: true, totpVerifiedAt: true },
     }),
-    db.totpRecoveryCode.count({
+    db.totpRecoveryCode.findMany({
       where: { userId: session.user.id, usedAt: null },
+      select: { codeHash: true },
     }),
   ]);
 
   return {
     enabled: user?.totpEnabled ?? false,
     verifiedAt: user?.totpVerifiedAt ?? null,
-    remainingCodes: remaining,
+    remainingCodes: unused.length,
+    hasLegacyCodes: unused.some((row) => isLegacyRecoveryCodeHash(row.codeHash)),
   };
 }
