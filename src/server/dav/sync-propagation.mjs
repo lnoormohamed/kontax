@@ -38,6 +38,17 @@ export const LOCAL_MUTATION_SOURCE_TYPES = /** @type {const} */ ([
 ]);
 
 /**
+ * Contacts eligible to be *created* on a provider that doesn't have them yet.
+ * Narrower than LOCAL_MUTATION_SOURCE_TYPES on purpose (Fable review of
+ * P49A-12, M2): a contact someone shared with the user (SHARED_*) must not
+ * leave Kontax into the user's own Google / Outlook / iCloud, and imports and
+ * API-created contacts aren't mass-created there either (the pre-P49A-12
+ * rule). Once the user edits such a contact it becomes MANUAL and is created.
+ * Device edits through Kontax's CardDAV server are MANUAL too.
+ */
+export const PROVIDER_CREATE_SOURCE_TYPES = /** @type {const} */ (["MANUAL"]);
+
+/**
  * `lastMutatedBy` for an edit a device made through Kontax's CardDAV server —
  * the user's own edit (it reads "Last updated by you"), so it is a local
  * mutation the providers must receive.

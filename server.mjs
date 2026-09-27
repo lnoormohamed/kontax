@@ -779,14 +779,21 @@ const bookScopeWhere = (userId, book) => {
   return { userId, bookId: book.id };
 };
 
-const computeAddressBookCTag = async (userId, book) => {
-  const mostRecent = await prisma.contact.findFirst({
-    where: bookScopeWhere(userId, book),
-    orderBy: { updatedAt: "desc" },
-    select: { updatedAt: true },
+// P49A-12 (Fable L1): a CTag is the newest updatedAt *and* the row count. A
+// purge of a permanently deleted contact removes the row that carried the
+// newest updatedAt, so max(updatedAt) alone could step back to a value a
+// device already saw and it would keep the deleted card; the count moves.
+const cTagFor = async (where) => {
+  const agg = await prisma.contact.aggregate({
+    where,
+    _max: { updatedAt: true },
+    _count: { _all: true },
   });
-  return mostRecent?.updatedAt.toISOString() ?? "empty";
+  const newest = agg._max.updatedAt;
+  return newest ? `${newest.toISOString()}:${agg._count._all}` : "empty";
 };
+
+const computeAddressBookCTag = async (userId, book) => cTagFor(bookScopeWhere(userId, book));
 
 const getPrincipalUserId = (pathname) => pathname.match(/^\/dav\/principals\/([^/]+)\/?$/)?.[1];
 const getAddressBookUserId = (pathname) => pathname.match(/^\/dav\/addressbooks\/([^/]+)\/?$/)?.[1];
@@ -915,14 +922,8 @@ const fetchFamilyContacts = (bookId) =>
     orderBy: { syncUid: "asc" },
   });
 
-const computeFamilyCTag = async (bookId) => {
-  const mostRecent = await prisma.contact.findFirst({
-    where: { groupContacts: { some: { groupAddressBookId: bookId } } },
-    orderBy: { updatedAt: "desc" },
-    select: { updatedAt: true },
-  });
-  return mostRecent?.updatedAt.toISOString() ?? "empty";
-};
+const computeFamilyCTag = async (bookId) =>
+  cTagFor({ groupContacts: { some: { groupAddressBookId: bookId } } });
 
 // Best-effort activity attribution for a family-book change made over CardDAV.
 const emitFamilyDavEvent = async (userId, contactId, eventType) => {
@@ -1022,14 +1023,8 @@ const fetchTeamBookContacts = (bookId) =>
     orderBy: { syncUid: "asc" },
   });
 
-const computeTeamBookCTag = async (bookId) => {
-  const mostRecent = await prisma.contact.findFirst({
-    where: { groupContacts: { some: { groupAddressBookId: bookId } } },
-    orderBy: { updatedAt: "desc" },
-    select: { updatedAt: true },
-  });
-  return mostRecent?.updatedAt.toISOString() ?? "empty";
-};
+const computeTeamBookCTag = async (bookId) =>
+  cTagFor({ groupContacts: { some: { groupAddressBookId: bookId } } });
 
 const emitTeamDavEvent = async (userId, contactId, eventType, label) => {
   try {

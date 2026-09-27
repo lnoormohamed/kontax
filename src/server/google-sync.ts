@@ -38,7 +38,7 @@ import {
 import {
   clearSyncLinkDirty,
   linkHasPendingLocalChange,
-  LOCAL_MUTATION_SOURCE_TYPES,
+  PROVIDER_CREATE_SOURCE_TYPES,
   pendingLocalChangeWhere,
 } from "~/server/sync-dirty";
 import { buildExportLabelFilterWhere } from "~/server/sync-settings";
@@ -973,7 +973,8 @@ export const pushLocalChangesToGoogle = async (
       userId: account.userId,
       archivedAt: null,
       syncTombstoneAt: null,
-      lastMutatedBy: { in: LOCAL_MUTATION_SOURCE_TYPES },
+      // P49A-12: creates stay narrower than pushes of existing links.
+      lastMutatedBy: { in: PROVIDER_CREATE_SOURCE_TYPES },
       syncLinks: { none: { syncAccountId: account.id } },
       ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
     },

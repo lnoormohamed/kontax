@@ -44,6 +44,9 @@ export const createFakeCardDavServer = (addressBookUrl: string) => {
   // Runs before a PUT is evaluated — lets a test make a "concurrent" remote
   // edit land between Kontax's REPORT and its PUT.
   let beforePut: ((href: string) => void) | null = null;
+  // Cards the next REPORTs leave out although they still exist — a partial
+  // listing, as iCloud occasionally returns.
+  const hiddenFromReport = new Set<string>();
 
   const hrefFor = (name: string) => new URL(name, bookUrl).toString();
 
@@ -68,7 +71,7 @@ export const createFakeCardDavServer = (addressBookUrl: string) => {
     requests.push({ method, url, headers, body });
 
     if (method === "REPORT" && url === bookUrl) {
-      const blocks = [...cards.entries()].map(
+      const blocks = [...cards.entries()].filter(([href]) => !hiddenFromReport.has(href)).map(
         ([href, card]) =>
           `<d:response><d:href>${escapeXml(new URL(href).pathname)}</d:href><d:propstat><d:prop>` +
           `<d:getetag>${escapeXml(card.etag)}</d:getetag>` +
@@ -136,7 +139,14 @@ export const createFakeCardDavServer = (addressBookUrl: string) => {
       beforePut = hook;
     },
     puts: () => requests.filter((request) => request.method === "PUT"),
+    deletes: () => requests.filter((request) => request.method === "DELETE"),
+    /** Leave these cards out of REPORT responses (null = list everything). */
+    hideFromReport(hrefs: string[] | null) {
+      hiddenFromReport.clear();
+      for (const href of hrefs ?? []) hiddenFromReport.add(href);
+    },
     reset() {
+      hiddenFromReport.clear();
       cards.clear();
       requests.length = 0;
       beforePut = null;

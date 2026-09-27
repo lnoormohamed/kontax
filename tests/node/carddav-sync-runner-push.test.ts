@@ -365,3 +365,37 @@ test("creates use If-None-Match: * and a local contact whose UID is already remo
   assert.equal(fake.linkByRemoteUid("shared-uid")!.remoteHref, server.hrefFor("shared.vcf"));
   assert.equal(server.cardCount(), 2, "no second card with the shared UID");
 });
+
+// Fable review of P49A-12 (M1): a card missing from one listing must not
+// retire the link of a contact that is only in the trash — otherwise a later
+// "Delete permanently" hard-deletes it while the card still exists on iCloud
+// and the next run re-imports it.
+test("a trashed contact whose card is missing from a partial listing keeps its link, and the delete still reaches iCloud", async () => {
+  const hrefA = server.seed("a.vcf", simpleCard("uid-a", "Ada"));
+  server.seed("b.vcf", simpleCard("uid-b", "Bob"));
+  await runSync();
+  const ada = [...fake.contacts.values()].find((c) => c.fullName === "Ada")!;
+  await fake.editContact(ada.id, { archivedAt: new Date() });
+
+  server.hideFromReport([hrefA]);
+  await runSync();
+  const linkA = [...fake.links.values()].find((l) => l.contactId === ada.id)!;
+  assert.equal(linkA.tombstonedAt ?? null, null, "not retired on a partial listing");
+  assert.ok(server.card(hrefA), "the card is still on iCloud");
+
+  server.hideFromReport(null);
+  await runSync();
+  assert.equal(server.card(hrefA), undefined, "the trash delete then reaches iCloud");
+});
+
+test("an empty listing never retires links, even for a permanently deleted contact", async () => {
+  const hrefA = server.seed("a.vcf", simpleCard("uid-a", "Ada"));
+  await runSync();
+  const ada = onlyContact();
+  await fake.editContact(ada.id, { archivedAt: new Date(), deletedAt: new Date() });
+
+  server.hideFromReport([hrefA]);
+  await runSync();
+  const linkA = [...fake.links.values()].find((l) => l.contactId === ada.id)!;
+  assert.equal(linkA.tombstonedAt ?? null, null, "an empty REPORT is not proof of deletion");
+});

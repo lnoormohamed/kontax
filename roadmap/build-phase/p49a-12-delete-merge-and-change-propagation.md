@@ -119,3 +119,30 @@ operators these need.
 - Google / Outlook conflict resolution (keep local / manual merge) still pushes through the
   CardDAV client and fails for OAuth accounts — pre-existing, see P49A-19 item 2 note.
 - Contact shares moved to the survivor by a merge are not moved back on undo (unchanged).
+
+### Fable review (2026-09-27)
+Nothing blocked staging; fixed before shipping:
+- **M1:** a card missing from one CardDAV listing no longer retires the link of a contact that is
+  only in the trash. Only a permanently deleted contact (`deletedAt`) is settled that way, and
+  an empty listing while live links exist settles nothing. Tests are in
+  `carddav-sync-runner-push.test.ts`.
+- **M2:** creates on a provider are narrower than pushes of existing links
+  (`PROVIDER_CREATE_SOURCE_TYPES` = MANUAL). Contacts shared with the user (SHARED_*) are never
+  created on their own Google / Outlook / iCloud. Imports and API-created contacts are not
+  mass-created either, as before P49A-12, until the user edits them. Updates to already-linked
+  contacts still go out from every non-sync writer (A-17). Whether imports should be created
+  remotely is an open product question.
+- **L1:** DAV CTags are `max(updatedAt):count`, so the purge of a deleted row can't step a
+  book's CTag back to a value a device has already seen.
+
+Known, low, not fixed:
+- **L2:** links on a DISCONNECTED account hold a purge.
+- **L3:** a restore racing an in-flight delete can orphan a tombstoned link.
+- **L4:** a device PUT without If-Match revives a permanently deleted row.
+- **L5:** manual merge writes the local *snapshot*, not the current contact.
+- **L6:** undo stamps MANUAL on both contacts.
+
+Also pre-existing:
+- Family/team dissolve hard-deletes.
+- KEEP_LOCAL / manual-merge pushes fail for Google/Outlook conflicts.
+- Shares moved by a merge are not moved back on undo.

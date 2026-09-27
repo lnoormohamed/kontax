@@ -8,6 +8,7 @@ import {
   isLocalMutationSource,
   LOCAL_MUTATION_SOURCE_TYPES as LOCAL_SOURCES,
   markSyncLinksDirty as markDirty,
+  PROVIDER_CREATE_SOURCE_TYPES as CREATE_SOURCES,
   reviveSyncLinks as reviveLinks,
   SYNC_SOURCE_TYPES as SYNC_SOURCES,
 } from "~/server/dav/sync-propagation.mjs";
@@ -16,6 +17,7 @@ export { DAV_DEVICE_MUTATION, isLocalMutationSource };
 
 export const SYNC_SOURCE_TYPES: SourceType[] = [...SYNC_SOURCES];
 export const LOCAL_MUTATION_SOURCE_TYPES: SourceType[] = [...LOCAL_SOURCES];
+export const PROVIDER_CREATE_SOURCE_TYPES: SourceType[] = [...CREATE_SOURCES];
 
 type LinkClient = Pick<Prisma.TransactionClient, "syncContactLink">;
 

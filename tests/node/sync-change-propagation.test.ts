@@ -441,3 +441,17 @@ test("undo is refused server-side after 30 days", async () => {
   );
   assert.ok(fake.contacts.get(absorbed.id)!.archivedAt instanceof Date, "nothing was undone");
 });
+
+// Fable review of P49A-12 (M2): creates stay narrower than pushes. A contact
+// someone shared with the user, or one that arrived by import, is not created
+// on the user's own Google; one they made (or edited) themselves is.
+test("only the user's own contacts are created on Google — not shared copies or imports", async () => {
+  await localContact({ fullName: "Shared Live", firstName: "Shared", lastMutatedBy: "SHARED_LIVE", sourceType: "SHARED_LIVE" });
+  await localContact({ fullName: "Shared Static", firstName: "Static", lastMutatedBy: "SHARED_STATIC", sourceType: "SHARED_STATIC" });
+  await localContact({ fullName: "From CSV", firstName: "Csv", lastMutatedBy: "IMPORT_CSV", sourceType: "IMPORT_CSV" });
+  await localContact({ fullName: "Mine", firstName: "Mine" });
+
+  const tally = await push();
+  assert.equal(tally.created, 1);
+  assert.deepEqual(api.creates.map((p) => p.names?.[0]?.givenName), ["Mine"]);
+});

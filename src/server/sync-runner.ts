@@ -77,7 +77,7 @@ import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { enqueueMergeSuggestionRefresh } from "~/server/merge-suggestion-refresh-queue";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
-import { LOCAL_MUTATION_SOURCE_TYPES } from "~/server/sync-dirty";
+import { PROVIDER_CREATE_SOURCE_TYPES } from "~/server/sync-dirty";
 import {
   createSyncLeaseKeeper,
   decideScheduledRun,
@@ -1374,6 +1374,9 @@ export const runQueuedSyncJobs = async ({
               syncVersion: true,
               updatedAt: true,
               archivedAt: true,
+              // P49A-12: only a contact the user deleted permanently may have
+              // its link settled when the remote card is gone.
+              deletedAt: true,
               avatarUrl: true,
               // P39-02: book grouping for the deletion-hold review card.
               book: { select: { name: true } },
@@ -1520,8 +1523,13 @@ export const runQueuedSyncJobs = async ({
       const recordRemoteMissing = (link: (typeof existingLinks)[number], remoteUid: string) => {
         if (link.contact.archivedAt) {
           // P49A-12 (A-16): deleted on both sides — settle the link so a
-          // permanently deleted contact can be purged.
-          if (!link.tombstonedAt) remoteGoneLinkIds.push(link.id);
+          // permanently deleted contact can be purged. Only for a contact the
+          // user deleted permanently: a card missing from one listing (an
+          // iCloud REPORT that came back partial) must not retire the link of
+          // a contact that is merely in the trash, or a later "Delete
+          // permanently" would hard-delete it while the remote card still
+          // exists and the next run re-imports it (Fable review, M1).
+          if (link.contact.deletedAt && !link.tombstonedAt) remoteGoneLinkIds.push(link.id);
           return;
         }
         conflictEntries.push({
@@ -1616,8 +1624,9 @@ export const runQueuedSyncJobs = async ({
                 ...contactScopeWhere,
                 archivedAt: null,
                 syncTombstoneAt: null,
-                // P49A-12 (A-17): any non-sync writer (was MANUAL only).
-                lastMutatedBy: { in: LOCAL_MUTATION_SOURCE_TYPES },
+                // P49A-12: creates stay narrower than pushes of existing links
+                // (shared copies and imports are not created remotely).
+                lastMutatedBy: { in: PROVIDER_CREATE_SOURCE_TYPES },
                 syncLinks: { none: { syncAccountId: job.syncAccountId } },
                 ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
               },
@@ -1772,8 +1781,13 @@ export const runQueuedSyncJobs = async ({
         lastSyncedAt: Date;
         capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
-      const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> =
-        remoteGoneLinkIds.map((linkId) => ({ linkId, lastSyncedAt: now }));
+      // An empty listing while live links exist is far more likely a server
+      // hiccup than every card deleted: settle nothing on its word.
+      const listingLooksEmpty =
+        remoteCards.length === 0 && existingLinks.some((link) => !link.tombstonedAt);
+      const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = listingLooksEmpty
+        ? []
+        : remoteGoneLinkIds.map((linkId) => ({ linkId, lastSyncedAt: now }));
 
       // P44-04: a full-card PUT with no PHOTO line would wipe the remote photo
       // (and cascade into deleting the local one on the next photo pass).
