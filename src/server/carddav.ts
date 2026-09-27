@@ -13,6 +13,7 @@ import {
   mergeRemoteVCardForPush,
   readVCardRevision,
 } from "~/server/carddav-vcard-merge";
+import { extractElements, firstElementContents } from "~/server/dav/parse.mjs";
 
 type CardDavCredentials = {
   username: string;
@@ -198,41 +199,38 @@ const resolveHref = (href: string | null, contextUrl: string) => {
   }
 };
 
-const getTagContent = (xml: string, localName: string) => {
-  const match = new RegExp(
-    `<(?:[\\w-]+:)?${localName}(?:\\s[^>]*)?>([\\s\\S]*?)</(?:[\\w-]+:)?${localName}>`,
-    "i",
-  ).exec(xml);
+// P49A-13 (A-29): these used to be lazy `[\s\S]*?` regexes over the whole
+// (untrusted, up to 10 MB) response — quadratic on repeated unclosed tags. They
+// now use the single-pass tokenizer from `dav/parse.mjs`; see the note there.
+const getTagContent = (xml: string, localName: string): string | null =>
+  firstElementContents(xml, [localName])[localName] ?? null;
 
-  return match?.[1]?.trim() ?? null;
-};
+const hrefIn = (block: string | null, contextUrl: string) =>
+  block ? resolveHref(getTagContent(block, "href"), contextUrl) : null;
 
-const getNestedHref = (xml: string, localName: string, contextUrl: string) => {
-  const block = getTagContent(xml, localName);
+const getResponseBlocks = (xml: string) => extractElements(xml, "response");
 
-  if (!block) {
-    return null;
-  }
-
-  return resolveHref(getTagContent(block, "href"), contextUrl);
-};
-
-const getResponseBlocks = (xml: string) =>
-  [...xml.matchAll(/<(?:[\w-]+:)?response\b[\s\S]*?<\/(?:[\w-]+:)?response>/gi)].map(
-    (match) => match[0],
-  );
+const RESPONSE_PROPS = [
+  "href",
+  "current-user-principal",
+  "addressbook-home-set",
+  "displayname",
+  "getctag",
+  "resourcetype",
+] as const;
 
 const summarizeResponse = (responseXml: string, contextUrl: string): CardDavResponseSummary => {
-  const href = getTagContent(responseXml, "href");
+  const props = firstElementContents(responseXml, RESPONSE_PROPS);
+  const href = props.href;
 
   return {
     href,
     resolvedHref: resolveHref(href, contextUrl),
-    currentUserPrincipal: getNestedHref(responseXml, "current-user-principal", contextUrl),
-    addressBookHomeSet: getNestedHref(responseXml, "addressbook-home-set", contextUrl),
-    displayName: getTagContent(responseXml, "displayname"),
-    ctag: getTagContent(responseXml, "getctag"),
-    resourceTypeXml: getTagContent(responseXml, "resourcetype"),
+    currentUserPrincipal: hrefIn(props["current-user-principal"], contextUrl),
+    addressBookHomeSet: hrefIn(props["addressbook-home-set"], contextUrl),
+    displayName: props.displayname,
+    ctag: props.getctag,
+    resourceTypeXml: props.resourcetype,
   };
 };
 
@@ -259,6 +257,18 @@ const propfind = async ({
   });
 };
 
+/**
+ * P49A-13 (A-29): response caps. Discovery PROPFINDs return a handful of
+ * properties per collection — 2 MB is far beyond any real server. The
+ * address-book REPORT still returns the whole book in one response (vCards,
+ * inline photos) until P49A-16 pages it with a batched multiget, so it keeps
+ * 10 MB for now; with the linear parser that is a bounded, linear cost.
+ */
+const DAV_RESPONSE_MAX_BYTES = {
+  PROPFIND: 2 * 1024 * 1024,
+  REPORT: 10 * 1024 * 1024,
+} as const;
+
 const davRequest = async ({
   url,
   credentials,
@@ -284,7 +294,7 @@ const davRequest = async ({
         "User-Agent": USER_AGENT,
       },
       body,
-      maxBytes: 10 * 1024 * 1024,
+      maxBytes: DAV_RESPONSE_MAX_BYTES[method],
       timeoutMs: 20_000,
     });
   } catch (error) {

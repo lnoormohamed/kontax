@@ -179,6 +179,100 @@ export const extractRequestedPropNames = (body) => {
   return names.length > 0 ? names : null;
 };
 
+// ── Multistatus *responses* (the CardDAV client side) ───────────────────────
+//
+// P49A-13 (A-29): `src/server/carddav.ts` used to split a server's multistatus
+// reply with `/<response\b[\s\S]*?<\/response>/gi` and read each property with
+// a lazy `<name…>([\s\S]*?)</name>` regex. On a body of repeated *unclosed*
+// `<d:response>` tags every match attempt scans to the end of the body — the
+// same quadratic shape P48-08 removed from the request side — and these bodies
+// come from arbitrary remote servers, up to 10 MB, on the shared event loop.
+// The helpers below reuse `forEachTag`: one forward pass, no backtracking, and
+// an element whose close tag never arrives simply produces nothing.
+
+/**
+ * Every complete element named `localName` (namespace prefix ignored,
+ * case-insensitive), as the exact source text from its `<` to the end of its
+ * close tag, in document order. Same-name nesting is depth-tracked; an element
+ * left unclosed at the end of the body is dropped.
+ *
+ * @param {string} xml
+ * @param {string} localName
+ * @returns {string[]}
+ */
+export const extractElements = (xml, localName) => {
+  if (typeof xml !== "string" || xml.length === 0) return [];
+  const wanted = localName.toLowerCase();
+  /** @type {string[]} */
+  const out = [];
+  let start = -1;
+  let depth = 0;
+
+  forEachTag(xml, (tag) => {
+    if (tag.localName.toLowerCase() !== wanted || tag.kind === "self") return true;
+    if (tag.kind === "open") {
+      if (depth === 0) start = tag.tagStart;
+      depth += 1;
+      return true;
+    }
+    if (depth === 0) return true; // stray close tag
+    depth -= 1;
+    if (depth === 0) out.push(xml.slice(start, tag.contentStart));
+    return true;
+  });
+
+  return out;
+};
+
+/**
+ * The trimmed inner text of the first complete element for each of `names`
+ * (namespace prefix ignored, case-insensitive), in one pass that stops as soon
+ * as every name is found. A name with no complete, non-self-closing element
+ * maps to `null`. Content is returned raw — entities and CDATA are the
+ * caller's to decode.
+ *
+ * @template {string} N
+ * @param {string} xml
+ * @param {readonly N[]} names
+ * @returns {Record<N, string | null>}
+ */
+export const firstElementContents = (xml, names) => {
+  /** @type {Record<string, string | null>} */
+  const result = {};
+  /** @type {Map<string, { depth: number, start: number }>} */
+  const open = new Map();
+  const pending = new Set();
+  for (const name of names) {
+    result[name] = null;
+    pending.add(name.toLowerCase());
+  }
+  /** @type {Map<string, string>} */
+  const original = new Map(names.map((name) => [name.toLowerCase(), name]));
+
+  if (typeof xml === "string" && xml.length > 0 && pending.size > 0) {
+    forEachTag(xml, (tag) => {
+      if (tag.kind === "self") return true;
+      const local = tag.localName.toLowerCase();
+      if (!pending.has(local)) return true;
+      const state = open.get(local);
+      if (tag.kind === "open") {
+        if (state) state.depth += 1;
+        else open.set(local, { depth: 1, start: tag.contentStart });
+        return true;
+      }
+      if (!state) return true; // stray close tag
+      state.depth -= 1;
+      if (state.depth > 0) return true;
+      result[/** @type {string} */ (original.get(local))] = xml.slice(state.start, tag.tagStart).trim();
+      open.delete(local);
+      pending.delete(local);
+      return pending.size > 0;
+    });
+  }
+
+  return /** @type {Record<N, string | null>} */ (result);
+};
+
 // Bounded alternation, no nesting: linear and backtracking-free.
 const XML_ENTITY = /&(?:#(\d{1,7})|#[xX]([0-9a-fA-F]{1,6})|(amp|lt|gt|quot|apos));/g;
 const NAMED_ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
