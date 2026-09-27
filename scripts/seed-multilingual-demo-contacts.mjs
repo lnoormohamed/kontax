@@ -1,6 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 
 import { PrismaClient } from "../generated/prisma/index.js";
+import { assertSeedTarget } from "./seed-guard.mjs";
 
 const db = new PrismaClient();
 
@@ -264,9 +265,8 @@ const createContactPayload = (userId, index) => {
 const main = async () => {
   const requestedCount = normalizeCount(getArg("count", DEFAULT_COUNT), DEFAULT_COUNT);
   const userEmail = getArg("user", undefined) ?? process.env.SEED_USER_EMAIL;
-  const user = userEmail
-    ? await db.user.findUnique({ where: { email: userEmail.toLowerCase() } })
-    : await db.user.findFirst({ orderBy: { createdAt: "asc" } });
+  // No "oldest user" fallback any more — see seed-guard.mjs.
+  const user = await assertSeedTarget(db, userEmail);
 
   if (!user) {
     console.error("No user found. Pass --user=email or set SEED_USER_EMAIL.");

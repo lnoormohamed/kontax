@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { PrismaClient } from "../generated/prisma/index.js";
+import { assertSeedTarget } from "./seed-guard.mjs";
 
 const db = new PrismaClient();
 
@@ -13,7 +14,7 @@ const getArg = (name, fallback = undefined) => {
 
 const hasFlag = (name) => process.argv.includes(`--${name}`);
 
-const TARGET_EMAIL = getArg("user", process.env.SEED_USER_EMAIL ?? "li@linoormohamed.com");
+const TARGET_EMAIL = getArg("user", process.env.SEED_USER_EMAIL);
 
 const buildPairKey = (leftContactId, rightContactId) => [leftContactId, rightContactId].sort().join(":");
 
@@ -511,16 +512,7 @@ const pairs = [
 ];
 
 const main = async () => {
-  const user = await db.user.findUnique({
-    where: { email: TARGET_EMAIL.toLowerCase() },
-    select: { id: true, email: true },
-  });
-
-  if (!user) {
-    console.error(`User not found: ${TARGET_EMAIL}`);
-    process.exitCode = 1;
-    return;
-  }
+  const user = await assertSeedTarget(db, TARGET_EMAIL);
 
   if (hasFlag("reset")) {
     const priorContacts = await db.contact.findMany({

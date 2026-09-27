@@ -1,6 +1,6 @@
 // seed-sync-showcase.mjs — multi-account sync showcase for staging
 //
-// Adds to li@linoormohamed.com:
+// Adds to the account given with --user=<email> (no default — see seed-guard.mjs):
 //   • A second Google account (work, NEEDS_REAUTH)
 //   • A Microsoft / Outlook account (healthy)
 //   • Realistic SyncJob history for all 5 accounts
@@ -12,9 +12,15 @@
 //   node scripts/seed-sync-showcase.mjs --reset   # wipe added accounts first
 
 import { PrismaClient } from '../generated/prisma/index.js';
+import { assertSeedTarget } from './seed-guard.mjs';
 
 const db = new PrismaClient();
-const TARGET_EMAIL = 'li@linoormohamed.com';
+const getArg = (name, fallback = undefined) => {
+  const prefix = `--${name}=`;
+  const hit = process.argv.find((a) => a.startsWith(prefix));
+  return hit ? hit.slice(prefix.length) : fallback;
+};
+const TARGET_EMAIL = getArg('user', process.env.SEED_USER_EMAIL);
 
 const hoursAgo  = (n) => new Date(Date.now() - n * 3_600_000);
 const minsAgo   = (n) => new Date(Date.now() - n * 60_000);
@@ -43,8 +49,7 @@ async function addJobs(syncAccountId, rows) {
 }
 
 // ── main ─────────────────────────────────────────────────────────────────────
-const user = await db.user.findUnique({ where: { email: TARGET_EMAIL } });
-if (!user) { console.error('User not found'); process.exitCode = 1; process.exit(); }
+const user = await assertSeedTarget(db, TARGET_EMAIL);
 
 // ── optional reset ────────────────────────────────────────────────────────────
 if (hasFlag('reset')) {
@@ -94,7 +99,7 @@ const msAccount = await db.syncAccount.upsert({
     provider: 'MICROSOFT',
     label: 'Outlook / Exchange',
     baseUrl: 'https://graph.microsoft.com/v1.0',
-    remoteAccountId: 'li@linoormohamed.com',
+    remoteAccountId: TARGET_EMAIL,
     status: 'ACTIVE',
     lastSyncedAt: minsAgo(25),
     lastSucceededAt: minsAgo(25),

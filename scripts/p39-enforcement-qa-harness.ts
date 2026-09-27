@@ -615,7 +615,7 @@ const modeWindow = async () => {
 // P39-05: retry sensitivity on a scratch CardDAV account pointing nowhere.
 const modeRetry = async () => {
   const owner = await db.user.findUniqueOrThrow({
-    where: { email: getArg("user", "li@linoormohamed.com") },
+    where: { email: getArg("user", process.env.SEED_USER_EMAIL) },
     select: { id: true },
   });
   const t0 = new Date();

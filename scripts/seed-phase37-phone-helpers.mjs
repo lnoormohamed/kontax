@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { PrismaClient } from "../generated/prisma/index.js";
+import { assertSeedTarget } from "./seed-guard.mjs";
 
 export const getArg = (name, fallback = undefined) => {
   const prefix = `--${name}=`;
@@ -126,14 +127,7 @@ export const runPhoneSeed = async ({
   const db = new PrismaClient();
 
   try {
-    const user = await db.user.findUnique({
-      where: { email: targetEmail.toLowerCase() },
-      select: { id: true, email: true },
-    });
-
-    if (!user) {
-      throw new Error(`User not found: ${targetEmail}`);
-    }
+    const user = await assertSeedTarget(db, targetEmail);
 
     if (hasFlag("reset")) {
       const priorContacts = await db.contact.findMany({

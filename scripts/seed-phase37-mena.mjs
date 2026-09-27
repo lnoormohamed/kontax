@@ -1,6 +1,6 @@
 import { getArg, makeLocalIntlPair, runPhoneSeed } from "./seed-phase37-phone-helpers.mjs";
 
-const targetEmail = getArg("user", process.env.SEED_USER_EMAIL ?? "li@linoormohamed.com");
+const targetEmail = getArg("user", process.env.SEED_USER_EMAIL);
 
 const pairs = [
   makeLocalIntlPair({

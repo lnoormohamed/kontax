@@ -1,4 +1,5 @@
 import { PrismaClient } from "../generated/prisma/index.js";
+import { assertSeedTarget } from "./seed-guard.mjs";
 
 const db = new PrismaClient();
 
@@ -10,7 +11,7 @@ const getArg = (name, fallback = undefined) => {
 
 const hasFlag = (name) => process.argv.includes(`--${name}`);
 
-const targetEmail = getArg("user", process.env.SEED_USER_EMAIL ?? "li@linoormohamed.com");
+const targetEmail = getArg("user", process.env.SEED_USER_EMAIL);
 const phaseFilter = (getArg("phase", "all") ?? "all").trim().toLowerCase();
 
 const PHASES = [
@@ -212,14 +213,7 @@ if (selectedPhases.length === 0) {
 }
 
 try {
-  const user = await db.user.findUnique({
-    where: { email: targetEmail.toLowerCase() },
-    select: { id: true, email: true },
-  });
-
-  if (!user) {
-    throw new Error(`User not found: ${targetEmail}`);
-  }
+  const user = await assertSeedTarget(db, targetEmail);
 
   const results = [];
 

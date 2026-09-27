@@ -1,4 +1,5 @@
 import { PrismaClient } from "../generated/prisma/index.js";
+import { assertSeedTarget } from "./seed-guard.mjs";
 
 const db = new PrismaClient();
 
@@ -372,9 +373,8 @@ const main = async () => {
   const userEmail = getArg("user", undefined) || process.env.SEED_USER_EMAIL;
   const contactCount = normalizeCount(getArg("count", "200"), 200);
 
-  const user = userEmail
-    ? await db.user.findUnique({ where: { email: userEmail.toLowerCase() } })
-    : await db.user.findFirst({ orderBy: { createdAt: "asc" } });
+  // No "oldest user" fallback any more — see seed-guard.mjs.
+  const user = await assertSeedTarget(db, userEmail);
 
   if (!user) {
     console.error(
