@@ -52,7 +52,9 @@ export async function POST(req: NextRequest) {
       await db.user.delete({ where: { id: user.id } });
       // Cascade deletes all child records via Prisma onDelete: Cascade
       deleted++;
-      console.log(`[Kontax] Hard-deleted account ${user.id} (${email})`);
+      // P49A-13: user id only — the address is personal data of an account
+      // that has just been erased, and must not outlive it in the logs.
+      console.log(`[Kontax] Hard-deleted account ${user.id}`);
 
       // Fire-and-forget — a failed send does not re-trigger deletion
       void sendAccountDeletionConfirmationEmail({ email, deletedAt });

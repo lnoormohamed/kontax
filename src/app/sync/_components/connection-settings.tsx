@@ -361,7 +361,8 @@ function BookAllowlist({
     else setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/sync/${account.id}/books${refresh ? "?refresh=1" : ""}`);
+      // P49A-13: a forced re-discovery is a POST (it was `GET ?refresh=1`).
+      const res = await fetch(`/api/sync/${account.id}/books`, refresh ? { method: "POST" } : undefined);
       const data = (await res.json()) as { books?: DiscoveredBook[]; error?: string };
       if (!res.ok) {
         setError(data.error ?? "Could not load address books.");

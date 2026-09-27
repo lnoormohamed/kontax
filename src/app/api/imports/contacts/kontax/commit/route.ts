@@ -2,6 +2,7 @@
 // the uploaded bytes (never trusts the client's recognition), parses, and
 // lands contacts via commitKontaxImport.
 
+import { beginArchiveImport } from "~/server/archive-import-guard";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { commitKontaxImport, KontaxImportError } from "~/server/export-format/import";
 import {
@@ -27,6 +28,17 @@ export async function POST(request: Request) {
     throw err;
   }
 
+  // P49A-13: size/rate/concurrency gate before the body is read.
+  const gate = await beginArchiveImport(userId, request, MAX_BYTES);
+  if (!gate.ok) return Response.json({ error: gate.message }, { status: gate.status });
+  try {
+    return await commit(request, userId);
+  } finally {
+    gate.release();
+  }
+}
+
+async function commit(request: Request, userId: string) {
   const formData = await request.formData().catch(() => null);
   const file = formData?.get("file");
   if (!file || !(file instanceof File)) {

@@ -4,16 +4,36 @@ import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { CardDavPreflightError, discoverCardDavAddressBooks } from "~/server/carddav";
 import { db } from "~/server/db";
+import { rejectCrossSite } from "~/server/same-origin";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 
 const BOOKS_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
+type RouteContext = { params: Promise<{ accountId: string }> };
+
 // P23-03: list the remote address books for a connection's allowlist picker.
-// Returns cached discovery within the TTL unless ?refresh=1 forces a re-run.
-export async function GET(
+// GET returns cached discovery within the TTL; POST forces a re-run.
+//
+// P49A-13: the forced refresh used to be `GET ?refresh=1` — a cookie-authed
+// GET that makes outbound requests with the stored credentials and rewrites
+// the cache, triggerable cross-site by any link or <img>. It is a POST now,
+// and both methods refuse requests the browser marks as cross-site.
+export async function GET(request: Request, context: RouteContext) {
+  return listBooks(request, context, false);
+}
+
+export async function POST(request: Request, context: RouteContext) {
+  return listBooks(request, context, true);
+}
+
+async function listBooks(
   request: Request,
-  { params }: { params: Promise<{ accountId: string }> },
+  { params }: RouteContext,
+  forceRefresh: boolean,
 ) {
+  const crossSite = rejectCrossSite(request);
+  if (crossSite) return crossSite;
+
   let userId: string;
   try {
     userId = await requireUserId({ write: true });
@@ -26,7 +46,6 @@ export async function GET(
   }
 
   const { accountId } = await params;
-  const forceRefresh = new URL(request.url).searchParams.get("refresh") === "1";
 
   const account = await db.syncAccount.findFirst({
     where: {

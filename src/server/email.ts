@@ -68,6 +68,9 @@ async function isEmailSuppressed(email: string): Promise<boolean> {
   return user?.emailStatus === "BOUNCED" || user?.emailStatus === "COMPLAINED";
 }
 
+/** P48-17 / P49A-13: enough of an address to debug delivery, not to identify. */
+const redactEmail = (address: string) => address.replace(/^(.).*(@.*)$/, "$1***$2");
+
 /**
  * The single transport all email callers converge on (P20-02). Sends via AWS
  * SES when SES_CONFIGURED, otherwise logs to the console. Never throws —
@@ -82,7 +85,8 @@ export const sendEmail = async ({
   bypassSuppression = false,
 }: SendEmailParams): Promise<SendEmailResult> => {
   if (!bypassSuppression && (await isEmailSuppressed(to))) {
-    console.warn(`[email] suppressed send to ${to}`);
+    // P49A-13: no recipient address in logs (subject says which mail it was).
+    console.warn(`[email] suppressed send: "${subject}"`);
     return { success: false, error: "EMAIL_SUPPRESSED" };
   }
 
@@ -98,8 +102,7 @@ export const sendEmail = async ({
       console.log(`[email:dev] TO: ${to} | SUBJECT: ${subject}`);
       console.log(`[email:dev] TEXT:\n${text}`);
     } else {
-      const redacted = to.replace(/^(.).*(@.*)$/, "$1***$2");
-      console.warn(`[Kontax] email not sent (SES unconfigured): "${subject}" to ${redacted}`);
+      console.warn(`[Kontax] email not sent (SES unconfigured): "${subject}" to ${redactEmail(to)}`);
     }
     return { success: true, messageId: "dev-console" };
   }
@@ -122,7 +125,7 @@ export const sendEmail = async ({
     );
     return { success: true, messageId: result.MessageId };
   } catch (error) {
-    console.error(`[email] failed to send "${subject}" to ${to}:`, error);
+    console.error(`[email] failed to send "${subject}" to ${redactEmail(to)}:`, error);
     return { success: false, error: String(error) };
   }
 };

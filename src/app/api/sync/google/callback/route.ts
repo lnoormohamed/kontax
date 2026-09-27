@@ -110,7 +110,8 @@ export async function GET(req: NextRequest) {
       const emails = me.data.emailAddresses ?? [];
       googleEmail =
         emails.find((em) => em.metadata?.primary)?.value ?? emails[0]?.value ?? "";
-      if (googleEmail) console.log("[google/callback] email resolved via People API fallback:", googleEmail);
+      // P49A-13: log that the fallback was used, not the address it found.
+      if (googleEmail) console.log("[google/callback] account email resolved via People API fallback");
     } catch (err) {
       console.error("[google/callback] People API fallback failed:", err);
     }

@@ -3,6 +3,7 @@
 // uses the extension to decide to call this endpoint at all, so a renamed
 // file still recognizes correctly.
 
+import { beginArchiveImport } from "~/server/archive-import-guard";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { recognizeKontaxFile } from "~/server/export-format/parse";
 
@@ -11,13 +12,25 @@ import { recognizeKontaxFile } from "~/server/export-format/parse";
 const MAX_BYTES = 64 * 1024 * 1024; // 64 MB
 
 export async function POST(request: Request) {
+  let userId: string;
   try {
-    await requireUserId();
+    userId = await requireUserId();
   } catch (err) {
     if (isSessionError(err)) return Response.json({ message: "Unauthorized" }, { status: 401 });
     throw err;
   }
 
+  // P49A-13: size/rate/concurrency gate before the body is read.
+  const gate = await beginArchiveImport(userId, request, MAX_BYTES);
+  if (!gate.ok) return Response.json({ message: gate.message }, { status: gate.status });
+  try {
+    return await preview(request);
+  } finally {
+    gate.release();
+  }
+}
+
+async function preview(request: Request) {
   const formData = await request.formData().catch(() => null);
   const file = formData?.get("file");
   if (!file || !(file instanceof File)) {

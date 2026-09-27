@@ -1,6 +1,7 @@
 import { assertCanUsePremiumExport } from "~/server/billing";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
+import { rejectCrossSite } from "~/server/same-origin";
 import { MULTI_VALUE_ENTRY_SELECT, withDerivedLegacyFields } from "~/server/contact-multi-values";
 import {
   contactsToVCard,
@@ -8,6 +9,11 @@ import {
 } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
+  // P49A-13: this GET writes an export job and streams the whole address book;
+  // refuse it when the browser says the request came from another site.
+  const crossSite = rejectCrossSite(request);
+  if (crossSite) return crossSite;
+
   let userId: string;
   try {
     userId = await requireUserId(); // P48-02: exports stay available during the deletion grace period

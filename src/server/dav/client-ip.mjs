@@ -28,6 +28,13 @@ export const clientIpFromNodeHeaders = (headers) => {
   const cf = first(headers["cf-connecting-ip"])?.trim();
   if (cf) return cf;
 
+  // P49A-13: X-Forwarded-For / X-Real-IP only outside production (or with
+  // KONTAX_TRUST_FORWARDED_FOR=1) — see src/lib/client-ip.ts. In production a
+  // request without CF-Connecting-IP falls through to the socket peer.
+  if (process.env.NODE_ENV === "production" && process.env.KONTAX_TRUST_FORWARDED_FOR !== "1") {
+    return null;
+  }
+
   const forwarded = first(headers["x-forwarded-for"])?.split(",")[0]?.trim();
   if (forwarded) return forwarded;
 

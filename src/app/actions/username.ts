@@ -2,6 +2,7 @@
 
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { RESERVED_USERNAMES, containsProfanity } from "~/server/username/reserved";
 
 // 3–30 chars, letters/numbers/hyphens/underscores, must start and end with letter or number.
@@ -10,11 +11,9 @@ function isValidFormat(username: string): boolean {
   return /^[a-z0-9][a-z0-9_-]*[a-z0-9]$/.test(username);
 }
 
-export async function checkUsernameAvailability(
-  username: string,
-): Promise<"available" | "taken" | "reserved" | "invalid"> {
-  const normalised = username.toLowerCase().trim();
-
+const lookupAvailability = async (
+  normalised: string,
+): Promise<"available" | "taken" | "reserved" | "invalid"> => {
   if (!isValidFormat(normalised)) return "invalid";
   if (RESERVED_USERNAMES.has(normalised) || containsProfanity(normalised)) return "reserved";
 
@@ -24,6 +23,32 @@ export async function checkUsernameAvailability(
   });
 
   return existing ? "taken" : "available";
+};
+
+/**
+ * P49A-13: this was callable by anyone — a server action needs no session
+ * unless it checks for one — so it was an unauthenticated, unlimited oracle
+ * for which usernames exist. It now needs a signed-in session and is
+ * rate-limited per user (the settings field debounces, so real typing stays
+ * well under the limit). Over the limit it answers "rate_limited" rather than
+ * guessing.
+ */
+export async function checkUsernameAvailability(
+  username: string,
+): Promise<"available" | "taken" | "reserved" | "invalid" | "rate_limited"> {
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch (err) {
+    if (isSessionError(err)) return "invalid";
+    throw err;
+  }
+  if (typeof username !== "string" || username.length > 64) return "invalid";
+
+  const rl = await checkRateLimit(rateLimiters.usernameCheck, `user:${userId}`);
+  if (!rl.allowed) return "rate_limited";
+
+  return lookupAvailability(username.toLowerCase().trim());
 }
 
 export async function claimUsername(username: string): Promise<
@@ -50,7 +75,9 @@ export async function claimUsername(username: string): Promise<
     if (daysSince < 30) return { error: "COOLDOWN" };
   }
 
-  const availability = await checkUsernameAvailability(normalised);
+  // The claim itself is not rate-limited by the probe bucket — it has its own
+  // 30-day cooldown — and the unique index on `username` is the final arbiter.
+  const availability = await lookupAvailability(normalised);
   if (availability === "taken") return { error: "TAKEN" };
   if (availability === "reserved") return { error: "RESERVED" };
   if (availability === "invalid") return { error: "INVALID" };

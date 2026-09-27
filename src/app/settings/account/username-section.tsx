@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 
 import { checkUsernameAvailability, claimUsername } from "~/app/actions/username";
 
-type Status = "idle" | "checking" | "available" | "taken" | "reserved" | "invalid";
+type Status = "idle" | "checking" | "available" | "taken" | "reserved" | "invalid" | "rate_limited";
 
 function Spinner() {
   return (
@@ -280,6 +280,11 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
           {status === "reserved" && (
             <span className="flex items-center gap-1.5 text-[13px] text-[#9a3a23]">
               <XIcon />This username is reserved.
+            </span>
+          )}
+          {status === "rate_limited" && (
+            <span className="flex items-center gap-1.5 text-[13px] text-[#9a3a23]">
+              <XIcon />Too many checks. Wait a few minutes and try again.
             </span>
           )}
           {status === "invalid" && value.length > 0 && (
