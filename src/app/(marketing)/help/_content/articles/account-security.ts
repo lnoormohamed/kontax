@@ -21,7 +21,7 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
       keywords: ["2fa", "totp", "authenticator", "mfa", "security"],
       steps: [
         { text: "Make sure your email address is verified — Kontax asks you to verify it before you can turn on two-factor authentication." },
-        { text: "Open **Settings → Security** and, under **Two-factor authentication**, choose **Set up authenticator app**." },
+        { text: "Open **Settings → Security** and, under **Two-factor authentication**, choose **Set up authenticator app**. Kontax asks for your password first." },
         {
           text: "Scan the QR code with an authenticator app such as 1Password, Authy or Google Authenticator, then choose **Continue**.",
           details: ["Can't scan? Choose **Can't scan? Enter this code manually** and type the code into your app instead."],
@@ -62,9 +62,9 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
       steps: [
         { text: "Sign in with your email and password as usual." },
         { text: "On the two-factor screen, choose **Use a recovery code instead**." },
-        { text: "Enter one of your 10-character recovery codes and choose **Verify recovery code**." },
+        { text: "Enter one of your recovery codes (they look like `ABCD-EFGH-JKLM-NPQR`; older codes are 10 characters) and choose **Verify recovery code**." },
         {
-          text: "Once you're in, get a fresh set of codes: in **Settings → Security**, choose **View or regenerate**, then **Regenerate recovery codes**. The old codes stop working.",
+          text: "Once you're in, get a fresh set of codes: in **Settings → Security**, choose **View or regenerate**, enter your password and another unused recovery code (or an authenticator code), then choose **Regenerate recovery codes**. The old codes stop working.",
           details: [
             "To move two-factor authentication to a new phone you have to turn it off first with **Disable 2FA**, which needs your password and a current authenticator code — so do it from the old app while you still have it.",
             "Then follow [Set up two-factor authentication](/help/account-security/set-up-two-factor-authentication) again on the new phone.",
@@ -77,7 +77,7 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
         "After 5 wrong attempts Kontax pauses sign-in attempts for 15 minutes.",
       ],
       ifItDoesntWork: [
-        "“Recovery code not found or already used” means that code has been used or was mistyped. Codes are letters A–F and digits only — try another one.",
+        "“Recovery code not found or already used” means that code has been used or was mistyped. Dashes, spaces and upper or lower case don't matter — try another one.",
         "If you see “Too many attempts”, wait 15 minutes and try again.",
         "If you have neither your authenticator app nor any recovery codes, email [support@getkontax.com](mailto:support@getkontax.com) from the address on your account. There is no self-service reset, so keep your codes safe.",
       ],
@@ -134,7 +134,7 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
       ],
       whatToExpect: [
         "Each link works once. Asking for a new link cancels any earlier unused one.",
-        "Resetting your password signs you out on every device. Two-factor authentication stays on.",
+        "Resetting your password signs you out on every device and revokes your API tokens. Two-factor authentication stays on.",
         "Device app passwords used by your iPhone, Mac or Android are separate and keep working.",
       ],
       ifItDoesntWork: [

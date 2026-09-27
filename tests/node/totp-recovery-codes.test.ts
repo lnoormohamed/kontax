@@ -227,6 +227,26 @@ test("regenerate refuses without a valid, unreplayed TOTP code", async () => {
   assert.deepEqual(await regenerate(), { error: "TOTP_CODE_ALREADY_USED" });
 });
 
+test("regenerate accepts an unused recovery code instead of a TOTP code (lost phone)", async () => {
+  seedEnabledUserWithLegacyCodes(OLD_CODES);
+  await redeemTotpRecoveryCode(OLD_CODES[0]!); // used to sign in
+
+  // A used code, or a wrong one, is not a second factor.
+  assert.deepEqual(await regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[0]! }), {
+    error: "INVALID_TOTP_CODE",
+  });
+  assert.deepEqual(await regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: "ZZZZ-ZZZZ-ZZZZ-ZZZZ" }), {
+    error: "INVALID_TOTP_CODE",
+  });
+  // Still needs the password too.
+  assert.deepEqual(await regenerateRecoveryCodes({ totpCode: OLD_CODES[1]! }), { error: "STEP_UP_REQUIRED" });
+
+  const result = await regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[1]! });
+  assert.ok("success" in result, JSON.stringify(result));
+  await assertStoredSetIs(result.recoveryCodes);
+  assert.deepEqual(await redeemTotpRecoveryCode(OLD_CODES[2]!), { error: "INVALID_RECOVERY_CODE" }, "old set gone");
+});
+
 test("a failed regenerate leaves the old codes working", async () => {
   seedEnabledUserWithLegacyCodes(OLD_CODES);
   const before = storedHashes();

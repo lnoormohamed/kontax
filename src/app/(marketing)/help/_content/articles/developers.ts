@@ -21,12 +21,13 @@ export const DEVELOPERS: HelpCategoryContent = {
       steps: [
         { text: "Open **Settings → Developer**." },
         { text: "Under **Create a new token**, give it a name you'll recognise (for example “My automation script”)." },
-        { text: "Choose **Read only** or **Read / Write**, then **Create token**." },
+        { text: "Choose **Read only** or **Read / Write**, then **Create token**, and confirm with your password." },
         { text: "Copy the token straight away — Kontax won't show it again — and store it somewhere safe." },
       ],
       whatToExpect: [
         "Send the token as a bearer token to `https://api.getkontax.com/v1`. The [developer page](/developers) documents every endpoint.",
         "Tokens don't expire. Choose **Revoke token** when you no longer need one; revoking takes effect immediately.",
+        "Changing or resetting your password revokes every API token, so a token nobody should have can't outlive it. Create new ones afterwards.",
         "The API is part of Pro and Teams. It isn't included in Free or Family.",
       ],
       ifItDoesntWork: [

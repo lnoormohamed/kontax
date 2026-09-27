@@ -71,7 +71,7 @@ export function TwoFactorSection({
   // the user can only leave by confirming they've saved them.
   // P49A-13: regenerating takes the password and a current authenticator code,
   // both verified by the action itself.
-  const canRegenerate = (!hasPassword || regenPw.length > 0) && regenCode.length === 6;
+  const canRegenerate = (!hasPassword || regenPw.length > 0) && regenCode.trim().length >= 6;
   const doRegenerate = () => {
     if (!canRegenerate || isPending) return;
     setRegenErr("");
@@ -92,7 +92,7 @@ export function TwoFactorSection({
           setRegenCode("");
           setRegenErr(
             result.error === "WRONG_PASSWORD" ? "Incorrect password. Your existing recovery codes haven't changed."
-            : result.error === "INVALID_TOTP_CODE" ? "Incorrect authenticator code. Your existing recovery codes haven't changed."
+            : result.error === "INVALID_TOTP_CODE" ? "That code isn't right. Your existing recovery codes haven't changed."
             : result.error === "TOTP_CODE_ALREADY_USED" ? "That code was just used. Wait for the next code in your authenticator app."
             : result.error === "RATE_LIMIT_EXCEEDED" ? "Too many attempts. Please wait a while and try again."
             : result.error === "REGENERATE_FAILED" ? "Couldn't create new codes. Your existing recovery codes still work."
@@ -174,7 +174,7 @@ export function TwoFactorSection({
             {viewCodes && (
               <div className="mt-[14px] border-t border-[#e9ece7] pt-[14px]">
                 <p className="m-0 text-[13px] leading-[1.5] text-[#5c655e]">
-                  For your security, existing codes are stored hashed and can&apos;t be shown again. Regenerating creates a fresh set and <strong className="font-semibold">invalidates the old ones</strong>. To confirm it&apos;s you, enter {hasPassword ? "your password and " : ""}a code from your authenticator app.
+                  For your security, existing codes are stored hashed and can&apos;t be shown again. Regenerating creates a fresh set and <strong className="font-semibold">invalidates the old ones</strong>. To confirm it&apos;s you, enter {hasPassword ? "your password and " : ""}a code from your authenticator app (or an unused recovery code).
                 </p>
                 <div className="mt-3 grid max-w-[420px] gap-3">
                   {hasPassword && (
@@ -191,17 +191,21 @@ export function TwoFactorSection({
                     </label>
                   )}
                   <label className="block">
-                    <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Authenticator code</span>
+                    <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Authenticator or recovery code</span>
                     <input
+                      autoCapitalize="characters"
                       autoComplete="one-time-code"
                       className="mt-[6px] w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[16px] tracking-[0.1em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] md:text-[15px]"
-                      inputMode="numeric"
-                      maxLength={6}
-                      onChange={(e) => { setRegenCode(e.target.value.replace(/\D/g, "").slice(0, 6)); if (regenErr) setRegenErr(""); }}
+                      maxLength={32}
+                      onChange={(e) => { setRegenCode(e.target.value.slice(0, 32)); if (regenErr) setRegenErr(""); }}
                       onKeyDown={(e) => { if (e.key === "Enter") doRegenerate(); }}
-                      placeholder="000000"
+                      placeholder="123456"
+                      spellCheck={false}
                       value={regenCode}
                     />
+                    <span className="mt-[6px] block text-[12px] leading-[1.45] text-[#646c65]">
+                      Lost your phone? Enter one of your unused recovery codes instead.
+                    </span>
                   </label>
                 </div>
                 <button

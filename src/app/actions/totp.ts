@@ -146,8 +146,10 @@ export async function confirmTotpEnrolment(input: {
 /**
  * P49A-13 (A-28): new recovery codes invalidate the old set and are a way back
  * into the account, so regenerating takes the password (step-up) *and* a
- * current authenticator code. The TOTP code is rate-limited like the login
- * challenge and claims its 30-second step, so it can't be replayed.
+ * second factor: a current authenticator code, or one of the user's unused
+ * recovery codes (for someone who lost their phone — see below). Guesses are
+ * rate-limited like the login challenge, and a TOTP code claims its 30-second
+ * step, so it can't be replayed.
  */
 export async function regenerateRecoveryCodes(input: {
   currentPassword?: string;
@@ -175,17 +177,31 @@ export async function regenerateRecoveryCodes(input: {
   const stepUp = await verifyStepUpPassword(userId, user.password, input.currentPassword);
   if (stepUp !== "OK") return { error: stepUp satisfies StepUpFailure };
 
-  const totpCode = typeof input.totpCode === "string" ? input.totpCode.trim() : "";
-  if (!totpCode) return { error: "TOTP_CODE_REQUIRED" };
-  if (!verifyTotpToken(decryptTotp(user.totpSecret), totpCode)) return { error: "INVALID_TOTP_CODE" };
+  const secondFactor = typeof input.totpCode === "string" ? input.totpCode.trim() : "";
+  if (!secondFactor) return { error: "TOTP_CODE_REQUIRED" };
 
-  // Replay guard, as in submitTotpChallenge.
-  const counter = Math.floor(Date.now() / 30_000);
-  const claimedStep = await db.user.updateMany({
-    where: { id: userId, OR: [{ lastTotpCounter: null }, { lastTotpCounter: { lt: counter } }] },
-    data: { lastTotpCounter: counter },
-  });
-  if (claimedStep.count === 0) return { error: "TOTP_CODE_ALREADY_USED" };
+  if (/^\d{6}$/.test(secondFactor)) {
+    if (!verifyTotpToken(decryptTotp(user.totpSecret), secondFactor)) return { error: "INVALID_TOTP_CODE" };
+
+    // Replay guard, as in submitTotpChallenge.
+    const counter = Math.floor(Date.now() / 30_000);
+    const claimedStep = await db.user.updateMany({
+      where: { id: userId, OR: [{ lastTotpCounter: null }, { lastTotpCounter: { lt: counter } }] },
+      data: { lastTotpCounter: counter },
+    });
+    if (claimedStep.count === 0) return { error: "TOTP_CODE_ALREADY_USED" };
+  } else {
+    // An unused recovery code also proves the second factor. Someone who lost
+    // their phone signs in with a recovery code and must then be able to get a
+    // fresh set — the help centre tells them to — without an authenticator
+    // code they no longer have. The code is used up with the rest of the set,
+    // which the transaction below replaces.
+    const unused = await db.totpRecoveryCode.findMany({
+      where: { userId, usedAt: null },
+      select: { id: true, codeHash: true },
+    });
+    if (!(await findMatchingRecoveryCode(secondFactor, unused))) return { error: "INVALID_TOTP_CODE" };
+  }
 
   // P49A-19: the codes returned below are the ones whose hashes are stored —
   // both come from the same `newRecoveryCodeSet()` call. The old set is deleted

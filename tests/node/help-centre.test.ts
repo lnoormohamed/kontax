@@ -210,9 +210,10 @@ test("mirrored product facts match their source", () => {
     assert.equal(Number(m[1]), expected, `${file}: source says ${m[1]}, help says ${expected}`);
   }
 
-  const totp = read("src/app/actions/totp.ts");
-  const codes = /Array\.from\(\{ length: (\d+) \}, generateRecoveryCode\)/.exec(totp) ?? /RECOVERY_CODE_COUNT = (\d+)/.exec(totp);
-  assert.ok(codes, "src/app/actions/totp.ts: recovery code count not found — update facts.ts and this test");
+  // P49A-13: recovery-code generation moved to src/server/totp-recovery-codes.ts.
+  const totp = read("src/server/totp-recovery-codes.ts");
+  const codes = /RECOVERY_CODE_COUNT = (\d+)/.exec(totp);
+  assert.ok(codes, "src/server/totp-recovery-codes.ts: recovery code count not found — update facts.ts and this test");
   assert.equal(Number(codes[1]), FACTS.recoveryCodes);
 
   const api = read("src/server/api-rate-limit.ts");

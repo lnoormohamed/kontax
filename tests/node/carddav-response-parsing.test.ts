@@ -176,14 +176,17 @@ test("10 MB of unclosed property tags reads in linear time", () => {
   assertFast("10 MB unclosed property read", ms);
 });
 
-test("cost grows linearly: 4x the input takes nowhere near 16x the time", () => {
+test("cost grows linearly: 8x the input takes nowhere near 64x the time", () => {
+  // Linear is ~8x; quadratic would be 64x. The 24x bound leaves room for GC
+  // and a busy machine without letting a quadratic parser through.
   const unit = "<d:response><cs:getctag>";
   const small = repeatTo(unit, TEN_MB / 8);
-  const large = repeatTo(unit, TEN_MB / 2);
+  const large = repeatTo(unit, TEN_MB);
   extractElements(small, "response");
+  extractElements(large, "response");
   const a = timed(() => extractElements(small, "response")).ms;
   const b = timed(() => extractElements(large, "response")).ms;
-  assert.ok(b < Math.max(a, 1) * 10, `small ${a.toFixed(1)} ms, large ${b.toFixed(1)} ms`);
+  assert.ok(b < Math.max(a, 1) * 24, `small ${a.toFixed(1)} ms, large ${b.toFixed(1)} ms`);
 });
 
 // ── end to end through carddav.ts ────────────────────────────────────────────
