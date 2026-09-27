@@ -5,7 +5,8 @@ import { z } from "zod";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { countLiveSyncAccountSlots } from "~/server/billing";
-import { isPlaceholderProviderId, REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
+import { findCheckoutBlockingSubscription } from "~/server/billing-checkout-guard";
+import { isPlaceholderProviderId } from "~/server/billing-placeholders";
 import { isEligibleForProTrial } from "~/server/billing-trial";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
@@ -20,8 +21,8 @@ const CheckoutInputSchema = z.object({
 });
 
 // Comp / admin-override rows (manual_*, admin-override-*) are not Stripe
-// subscriptions: they never block a checkout and never reach the Stripe API.
-const isLegacyManualSubscription = isPlaceholderProviderId;
+// subscriptions: they never block a checkout (findCheckoutBlockingSubscription)
+// and never reach the Stripe API.
 
 export async function createCheckoutSession(input: {
   plan: string;
@@ -41,42 +42,12 @@ export async function createCheckoutSession(input: {
   const { plan, interval, seats } = parsed.data;
   const quantity = plan === "TEAMS" ? Math.max(3, seats ?? 3) : 1;
 
-  // If the user already has an active paid subscription, send them to the portal.
-  // P34F-02: a Teams subscription is org-anchored — check the user's owned team
-  // group's subscription, not the user's personal one.
-  if (plan === "TEAMS") {
-    const teamGroup = await db.group.findFirst({
-      where: { ownerId: userId, type: "TEAM" },
-      select: { id: true },
-    });
-    if (teamGroup) {
-      const groupSub = await db.subscription.findFirst({
-        where: {
-          groupId: teamGroup.id,
-          status: { in: ["ACTIVE", "TRIALING"] },
-          plan: { not: "FREE" },
-        },
-        select: { id: true, providerSubscriptionId: true },
-      });
-      if (groupSub && !isLegacyManualSubscription(groupSub.providerSubscriptionId)) {
-        return { error: "USE_CUSTOMER_PORTAL" };
-      }
-    }
-  } else {
-    // Real Stripe subscriptions only: a comp / admin-override row found first
-    // must not hide a paid one (which would allow a second, duplicate checkout).
-    const activeSub = await db.subscription.findFirst({
-      where: {
-        userId,
-        status: { in: ["ACTIVE", "TRIALING"] },
-        plan: { not: "FREE" },
-        ...REAL_STRIPE_SUBSCRIPTION_WHERE,
-      },
-      select: { id: true, providerSubscriptionId: true },
-    });
-    if (activeSub && !isLegacyManualSubscription(activeSub.providerSubscriptionId)) {
-      return { error: "USE_CUSTOMER_PORTAL" };
-    }
+  // If the user already has a live paid subscription (active, trialing, or
+  // P49A-19: past due / unpaid), send them to the portal rather than start a
+  // second one. P34F-02: a Teams subscription is org-anchored — the owned
+  // team group's subscription is checked, not the user's personal one.
+  if (await findCheckoutBlockingSubscription(db, userId, plan)) {
+    return { error: "USE_CUSTOMER_PORTAL" };
   }
 
   // 14-day trial for first-time subscribers only (P49A-05: a canceled Pro

@@ -131,12 +131,16 @@ export function PricingToggle({
   // P38-10: the page renders statically; highlight the visitor's current
   // plan after hydration instead of forcing the whole page dynamic.
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  // P49A-19: a paid plan held back by an unpaid invoice — the paid CTAs open
+  // the billing portal to fix the card (a checkout would be a 2nd subscription).
+  const [lapsedPlan, setLapsedPlan] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     fetch("/api/billing/plan")
       .then((res) => (res.ok ? res.json() : null))
-      .then((data: { plan: string | null } | null) => {
+      .then((data: { plan: string | null; paymentLapse?: { plan: string } | null } | null) => {
         if (!cancelled && data?.plan) setCurrentPlan(data.plan);
+        if (!cancelled && data?.paymentLapse) setLapsedPlan(data.paymentLapse.plan);
       })
       .catch(() => undefined);
     return () => {
@@ -160,6 +164,17 @@ export function PricingToggle({
     setLoading(planId);
     setCtaError(null);
     startTransition(async () => {
+      if (lapsedPlan) {
+        const launch = await portal.launch();
+        if (launch !== "failed") {
+          setLoading(null);
+          return;
+        }
+        setCtaError("Something went wrong opening billing. Please try again or contact support.");
+        setLoading(null);
+        return;
+      }
+
       // Always ask the server what the right billing surface is.
       // Real Stripe subscribers are routed to the customer portal there;
       // legacy manual subscribers can be migrated through a fresh checkout.
@@ -324,7 +339,7 @@ export function PricingToggle({
                       onClick={() => handlePaidCta(plan.id)}
                       type="button"
                     >
-                      {loading === plan.id ? "Loading…" : plan.cta.label}
+                      {loading === plan.id ? "Loading…" : lapsedPlan ? "Update payment method" : plan.cta.label}
                     </button>
                   )}
                 </article>
