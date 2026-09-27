@@ -251,6 +251,27 @@ The P49A batch (P49A-01/-02/-04/-05/-08/-15) adds one migration,
 (drift). Roll back with `KONTAX_SCHEMA_MODE=skip` on the app, as in the P48-14 section; the column
 can stay (nothing in the old code reads it). Restore `validate` after rolling forward again.
 
+## P49A-19 deploy — 3-day payment grace enforced
+
+No migration (uses the existing `Subscription.graceEndsAt`), no new env var, no new crontab entry
+(the lapsed-payment resync runs inside the existing nightly `/api/cron/delete-accounts`).
+
+1. **Pre-deploy check — PAST_DUE rows without a grace deadline.** Since P49A-05 the webhook stamps
+   `graceEndsAt` in the same transaction as PAST_DUE, so only older rows can lack one, and such a
+   row keeps paid entitlements indefinitely (fail-open). Check on the prod DB (read-only):
+   ```sql
+   SELECT count(*) FROM "Subscription" WHERE status = 'PAST_DUE' AND "graceEndsAt" IS NULL;
+   ```
+   If it is not 0, give those rows a fresh 3-day grace (the deadline the customer is told about):
+   ```sql
+   UPDATE "Subscription" SET "graceEndsAt" = now() + interval '3 days'
+   WHERE status = 'PAST_DUE' AND "graceEndsAt" IS NULL;
+   ```
+   (Prod had 0 subscriptions at the time of writing, so this is expected to be a no-op.)
+2. **Stripe dunning** — see step 2 above: prefer *cancel* at the end of dunning.
+3. After deploy, the next nightly `delete-accounts` response includes
+   `paymentLapseResync: { scanned, synced, errors }`; `errors` should be empty.
+
 ## Normal state
 
 - Coolify shows the service as **Running** with a green indicator.
