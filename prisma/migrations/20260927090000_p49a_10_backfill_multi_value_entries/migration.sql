@@ -17,10 +17,13 @@
 --    JS twin: reconcileLegacyIntoEntries in
 --    src/server/dav/contact-multi-values.mjs.
 -- 2. Re-derive the legacy columns from the entries, exactly as every writer
---    now does (deriveMultiValueFields in the same module): the scalar is the
---    primary entry (first isPrimary, else the first entry); the flat arrays
+--    now does (deriveMultiValueFields in the same module): entries deduped on
+--    label + value; the scalar is the primary entry (first isPrimary: true — a
+--    missing flag counts as false — else the first entry); the flat arrays
 --    hold each distinct value in entry order (phones: e164 when present);
 --    postalAddresses is [{label, formatted}] per entry; empty → NULL.
+--    Every step is set-based (joins / GROUP BY aggregates, no correlated
+--    subqueries), so it is linear in contacts + entries.
 --
 -- Verification (must return 0 after this migration; see
 -- roadmap/build-phase/p49a-10-multi-value-field-model.md):
@@ -66,11 +69,15 @@ missing AS (
    WHERE NOT EXISTS (SELECT 1 FROM known k WHERE k."id" = l."id" AND k.key = lower(l.value))
    ORDER BY l."id", lower(l.value), l.ord
 ),
+known_ids AS (
+  SELECT DISTINCT "id" FROM known
+),
 ranked AS (
   SELECT m.*,
          row_number() OVER (PARTITION BY m."id" ORDER BY m.ord) AS rn,
-         EXISTS (SELECT 1 FROM known k WHERE k."id" = m."id") AS has_entries
+         (h."id" IS NOT NULL) AS has_entries
     FROM missing m
+    LEFT JOIN known_ids h ON h."id" = m."id"
 ),
 appended AS (
   SELECT r."id",
@@ -126,11 +133,15 @@ missing AS (
      AND NOT EXISTS (SELECT 1 FROM known k WHERE k."id" = l."id" AND k.key = l.key)
    ORDER BY l."id", l.key, l.ord
 ),
+known_ids AS (
+  SELECT DISTINCT "id" FROM known
+),
 ranked AS (
   SELECT m.*,
          row_number() OVER (PARTITION BY m."id" ORDER BY m.ord) AS rn,
-         EXISTS (SELECT 1 FROM known k WHERE k."id" = m."id") AS has_entries
+         (h."id" IS NOT NULL) AS has_entries
     FROM missing m
+    LEFT JOIN known_ids h ON h."id" = m."id"
 ),
 appended AS (
   SELECT r."id",
@@ -158,14 +169,18 @@ WITH known AS (
    WHERE jsonb_typeof(x.item) = 'object' AND jsonb_typeof(x.item -> 'value') = 'string'
      AND btrim(x.item ->> 'value') <> ''
 ),
+known_ids AS (
+  SELECT DISTINCT "id" FROM known
+),
 appended AS (
   SELECT c."id",
          jsonb_build_array(jsonb_build_object(
            'label', 'other',
            'value', btrim(c."website"),
-           'isPrimary', NOT EXISTS (SELECT 1 FROM known k WHERE k."id" = c."id")
+           'isPrimary', h."id" IS NULL
          )) AS items
     FROM "Contact" c
+    LEFT JOIN known_ids h ON h."id" = c."id"
    WHERE btrim(coalesce(c."website", '')) <> ''
      AND NOT EXISTS (SELECT 1 FROM known k WHERE k."id" = c."id" AND k.key = lower(btrim(c."website")))
 )
@@ -198,12 +213,12 @@ known AS (
   SELECT c."id", lower(btrim(coalesce(
            nullif(btrim(x.item ->> 'formatted'), ''),
            nullif(concat_ws(', ',
-             nullif(btrim(coalesce(x.item ->> 'streetLine1', x.item ->> 'street')), ''),
+             coalesce(nullif(btrim(x.item ->> 'streetLine1'), ''), nullif(btrim(x.item ->> 'street'), '')),
              nullif(btrim(x.item ->> 'streetLine2'), ''),
-             nullif(btrim(coalesce(x.item ->> 'cityOrTown', x.item ->> 'city')), ''),
-             nullif(btrim(coalesce(x.item ->> 'stateOrProvince', x.item ->> 'state', x.item ->> 'region')), ''),
-             nullif(btrim(coalesce(x.item ->> 'postcode', x.item ->> 'postalCode')), ''),
-             nullif(btrim(coalesce(x.item ->> 'countryOrRegion', x.item ->> 'country')), '')
+             coalesce(nullif(btrim(x.item ->> 'cityOrTown'), ''), nullif(btrim(x.item ->> 'city'), '')),
+             coalesce(nullif(btrim(x.item ->> 'stateOrProvince'), ''), nullif(btrim(x.item ->> 'state'), ''), nullif(btrim(x.item ->> 'region'), '')),
+             coalesce(nullif(btrim(x.item ->> 'postcode'), ''), nullif(btrim(x.item ->> 'postalCode'), '')),
+             coalesce(nullif(btrim(x.item ->> 'countryOrRegion'), ''), nullif(btrim(x.item ->> 'country'), ''))
            ), ''),
            nullif(btrim(x.item ->> 'poBox'), '')
          ))) AS key
@@ -219,11 +234,15 @@ missing AS (
    WHERE NOT EXISTS (SELECT 1 FROM known k WHERE k."id" = l."id" AND k.key = lower(l.formatted))
    ORDER BY l."id", lower(l.formatted), l.ord
 ),
+known_ids AS (
+  SELECT DISTINCT "id" FROM known WHERE key IS NOT NULL
+),
 ranked AS (
   SELECT m.*,
          row_number() OVER (PARTITION BY m."id" ORDER BY m.ord) AS rn,
-         EXISTS (SELECT 1 FROM known k WHERE k."id" = m."id" AND k.key IS NOT NULL) AS has_entries
+         (h."id" IS NOT NULL) AS has_entries
     FROM missing m
+    LEFT JOIN known_ids h ON h."id" = m."id"
 ),
 appended AS (
   SELECT r."id",
@@ -242,8 +261,18 @@ UPDATE "Contact" c
  WHERE c."id" = a."id";
 
 -- ── 2. re-derive the legacy columns from the entries ───────────────────────────
-WITH email_items AS (
-  SELECT c."id", btrim(x.item ->> 'value') AS value, (x.item -> 'isPrimary') = 'true'::jsonb AS is_primary, x.ord
+-- Set-based (GROUP BY aggregates joined back to "Contact", no correlated
+-- subqueries). Mirrors deriveMultiValueFields: entries are first deduped on
+-- label + value (normalizeValueEntries), the scalar is the first entry flagged
+-- isPrimary (a missing flag counts as false), else the first entry; the flat
+-- arrays hold each distinct value (case-insensitive) in entry order.
+
+WITH items AS (
+  SELECT c."id",
+         coalesce(CASE WHEN jsonb_typeof(x.item -> 'label') = 'string' THEN btrim(x.item ->> 'label') END, '') AS label,
+         btrim(x.item ->> 'value') AS value,
+         coalesce((x.item -> 'isPrimary') = 'true'::jsonb, false) AS is_primary,
+         x.ord
     FROM "Contact" c
    CROSS JOIN LATERAL jsonb_array_elements(
            CASE WHEN jsonb_typeof(c."emailEntries") = 'array' THEN c."emailEntries" ELSE '[]'::jsonb END
@@ -251,17 +280,31 @@ WITH email_items AS (
    WHERE jsonb_typeof(x.item) = 'object' AND jsonb_typeof(x.item -> 'value') = 'string'
      AND btrim(x.item ->> 'value') <> ''
 ),
-email_distinct AS (
+deduped AS (
+  SELECT DISTINCT ON ("id", lower(label), lower(value)) *
+    FROM items
+   ORDER BY "id", lower(label), lower(value), ord
+),
+flat AS (
   SELECT DISTINCT ON ("id", lower(value)) "id", value, ord
-    FROM email_items
+    FROM deduped
    ORDER BY "id", lower(value), ord
 ),
+primary_value AS (
+  SELECT "id", (array_agg(value ORDER BY is_primary DESC, ord))[1] AS email
+    FROM deduped
+   GROUP BY "id"
+),
+flat_values AS (
+  SELECT "id", jsonb_agg(to_jsonb(value) ORDER BY ord) AS addresses
+    FROM flat
+   GROUP BY "id"
+),
 derived AS (
-  SELECT c."id",
-         (SELECT i.value FROM email_items i WHERE i."id" = c."id"
-           ORDER BY i.is_primary DESC, i.ord LIMIT 1) AS email,
-         (SELECT jsonb_agg(to_jsonb(d.value) ORDER BY d.ord) FROM email_distinct d WHERE d."id" = c."id") AS addresses
+  SELECT c."id", p.email, f.addresses
     FROM "Contact" c
+    LEFT JOIN primary_value p ON p."id" = c."id"
+    LEFT JOIN flat_values f ON f."id" = c."id"
 )
 UPDATE "Contact" c
    SET "email" = d.email,
@@ -270,12 +313,14 @@ UPDATE "Contact" c
  WHERE c."id" = d."id"
    AND (c."email" IS DISTINCT FROM d.email OR c."emailAddresses" IS DISTINCT FROM d.addresses);
 
-WITH phone_items AS (
+WITH items AS (
   SELECT c."id",
+         coalesce(CASE WHEN jsonb_typeof(x.item -> 'label') = 'string' THEN btrim(x.item ->> 'label') END, '') AS label,
          btrim(x.item ->> 'value') AS value,
+         -- phoneNumbers holds the e164 form when the entry carries one
          coalesce(nullif(CASE WHEN jsonb_typeof(x.item -> 'e164') = 'string' THEN btrim(x.item ->> 'e164') END, ''),
                   btrim(x.item ->> 'value')) AS flat,
-         (x.item -> 'isPrimary') = 'true'::jsonb AS is_primary,
+         coalesce((x.item -> 'isPrimary') = 'true'::jsonb, false) AS is_primary,
          x.ord
     FROM "Contact" c
    CROSS JOIN LATERAL jsonb_array_elements(
@@ -284,17 +329,31 @@ WITH phone_items AS (
    WHERE jsonb_typeof(x.item) = 'object' AND jsonb_typeof(x.item -> 'value') = 'string'
      AND btrim(x.item ->> 'value') <> ''
 ),
-phone_distinct AS (
+deduped AS (
+  SELECT DISTINCT ON ("id", lower(label), lower(value)) *
+    FROM items
+   ORDER BY "id", lower(label), lower(value), ord
+),
+flat AS (
   SELECT DISTINCT ON ("id", lower(flat)) "id", flat, ord
-    FROM phone_items
+    FROM deduped
    ORDER BY "id", lower(flat), ord
 ),
+primary_value AS (
+  SELECT "id", (array_agg(value ORDER BY is_primary DESC, ord))[1] AS phone
+    FROM deduped
+   GROUP BY "id"
+),
+flat_values AS (
+  SELECT "id", jsonb_agg(to_jsonb(flat) ORDER BY ord) AS numbers
+    FROM flat
+   GROUP BY "id"
+),
 derived AS (
-  SELECT c."id",
-         (SELECT i.value FROM phone_items i WHERE i."id" = c."id"
-           ORDER BY i.is_primary DESC, i.ord LIMIT 1) AS phone,
-         (SELECT jsonb_agg(to_jsonb(d.flat) ORDER BY d.ord) FROM phone_distinct d WHERE d."id" = c."id") AS numbers
+  SELECT c."id", p.phone, f.numbers
     FROM "Contact" c
+    LEFT JOIN primary_value p ON p."id" = c."id"
+    LEFT JOIN flat_values f ON f."id" = c."id"
 )
 UPDATE "Contact" c
    SET "phone" = d.phone,
@@ -303,8 +362,12 @@ UPDATE "Contact" c
  WHERE c."id" = d."id"
    AND (c."phone" IS DISTINCT FROM d.phone OR c."phoneNumbers" IS DISTINCT FROM d.numbers);
 
-WITH website_items AS (
-  SELECT c."id", btrim(x.item ->> 'value') AS value, (x.item -> 'isPrimary') = 'true'::jsonb AS is_primary, x.ord
+WITH items AS (
+  SELECT c."id",
+         coalesce(CASE WHEN jsonb_typeof(x.item -> 'label') = 'string' THEN btrim(x.item ->> 'label') END, '') AS label,
+         btrim(x.item ->> 'value') AS value,
+         coalesce((x.item -> 'isPrimary') = 'true'::jsonb, false) AS is_primary,
+         x.ord
     FROM "Contact" c
    CROSS JOIN LATERAL jsonb_array_elements(
            CASE WHEN jsonb_typeof(c."websiteEntries") = 'array' THEN c."websiteEntries" ELSE '[]'::jsonb END
@@ -312,11 +375,20 @@ WITH website_items AS (
    WHERE jsonb_typeof(x.item) = 'object' AND jsonb_typeof(x.item -> 'value') = 'string'
      AND btrim(x.item ->> 'value') <> ''
 ),
+deduped AS (
+  SELECT DISTINCT ON ("id", lower(label), lower(value)) *
+    FROM items
+   ORDER BY "id", lower(label), lower(value), ord
+),
+primary_value AS (
+  SELECT "id", (array_agg(value ORDER BY is_primary DESC, ord))[1] AS website
+    FROM deduped
+   GROUP BY "id"
+),
 derived AS (
-  SELECT c."id",
-         (SELECT i.value FROM website_items i WHERE i."id" = c."id"
-           ORDER BY i.is_primary DESC, i.ord LIMIT 1) AS website
+  SELECT c."id", p.website
     FROM "Contact" c
+    LEFT JOIN primary_value p ON p."id" = c."id"
 )
 UPDATE "Contact" c
    SET "website" = d.website
@@ -324,23 +396,23 @@ UPDATE "Contact" c
  WHERE c."id" = d."id"
    AND c."website" IS DISTINCT FROM d.website;
 
-WITH address_items AS (
+WITH items AS (
   SELECT c."id",
          coalesce(CASE WHEN jsonb_typeof(x.item -> 'label') = 'string' THEN btrim(x.item ->> 'label') END, '') AS label,
          coalesce(
            nullif(btrim(x.item ->> 'formatted'), ''),
            nullif(concat_ws(', ',
-             nullif(btrim(coalesce(x.item ->> 'streetLine1', x.item ->> 'street')), ''),
+             coalesce(nullif(btrim(x.item ->> 'streetLine1'), ''), nullif(btrim(x.item ->> 'street'), '')),
              nullif(btrim(x.item ->> 'streetLine2'), ''),
-             nullif(btrim(coalesce(x.item ->> 'cityOrTown', x.item ->> 'city')), ''),
-             nullif(btrim(coalesce(x.item ->> 'stateOrProvince', x.item ->> 'state', x.item ->> 'region')), ''),
-             nullif(btrim(coalesce(x.item ->> 'postcode', x.item ->> 'postalCode')), ''),
-             nullif(btrim(coalesce(x.item ->> 'countryOrRegion', x.item ->> 'country')), '')
+             coalesce(nullif(btrim(x.item ->> 'cityOrTown'), ''), nullif(btrim(x.item ->> 'city'), '')),
+             coalesce(nullif(btrim(x.item ->> 'stateOrProvince'), ''), nullif(btrim(x.item ->> 'state'), ''), nullif(btrim(x.item ->> 'region'), '')),
+             coalesce(nullif(btrim(x.item ->> 'postcode'), ''), nullif(btrim(x.item ->> 'postalCode'), '')),
+             coalesce(nullif(btrim(x.item ->> 'countryOrRegion'), ''), nullif(btrim(x.item ->> 'country'), ''))
            ), ''),
            nullif(btrim(x.item ->> 'poBox'), '')
          ) AS formatted,
          coalesce(btrim(x.item ->> 'poBox'), '') AS po_box,
-         (x.item -> 'isPrimary') = 'true'::jsonb AS is_primary,
+         coalesce((x.item -> 'isPrimary') = 'true'::jsonb, false) AS is_primary,
          x.ord
     FROM "Contact" c
    CROSS JOIN LATERAL jsonb_array_elements(
@@ -348,20 +420,24 @@ WITH address_items AS (
          ) WITH ORDINALITY AS x(item, ord)
    WHERE jsonb_typeof(x.item) = 'object'
 ),
-address_distinct AS (
+deduped AS (
   -- label + formatted + PO box repeats collapse, as in normalizeAddressEntries
   SELECT DISTINCT ON ("id", lower(label), lower(formatted), lower(po_box)) *
-    FROM address_items
+    FROM items
    WHERE formatted IS NOT NULL
    ORDER BY "id", lower(label), lower(formatted), lower(po_box), ord
 ),
+aggregated AS (
+  SELECT "id",
+         (array_agg(formatted ORDER BY is_primary DESC, ord))[1] AS address,
+         jsonb_agg(jsonb_build_object('label', label, 'formatted', formatted) ORDER BY ord) AS postal
+    FROM deduped
+   GROUP BY "id"
+),
 derived AS (
-  SELECT c."id",
-         (SELECT i.formatted FROM address_distinct i WHERE i."id" = c."id"
-           ORDER BY i.is_primary DESC, i.ord LIMIT 1) AS address,
-         (SELECT jsonb_agg(jsonb_build_object('label', i.label, 'formatted', i.formatted) ORDER BY i.ord)
-            FROM address_distinct i WHERE i."id" = c."id") AS postal
+  SELECT c."id", a.address, a.postal
     FROM "Contact" c
+    LEFT JOIN aggregated a ON a."id" = c."id"
 )
 UPDATE "Contact" c
    SET "address" = d.address,
