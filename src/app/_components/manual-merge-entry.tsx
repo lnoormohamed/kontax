@@ -190,7 +190,7 @@ function PickerField({
                   // aria-label below; dropping the attribute is the honest
                   // fix until this becomes a real ARIA combobox.
                   autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-[#646c65]"
+                  className="kx-focus-visible min-w-0 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-[#646c65]"
                   onChange={(event) => {
                     if (selectedContact && event.target.value !== selectedContact.fullName) {
                       onSelect("");

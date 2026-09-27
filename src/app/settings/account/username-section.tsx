@@ -206,9 +206,15 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
         </p>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* prefix + input */}
+          {/* prefix + input. P49A-20: the input below is borderless with
+              `outline-none` and sits flush against this wrapper's
+              `overflow-hidden`, so a direct `:focus-visible` outline on the
+              input would get clipped — the wrapper carries the focus
+              indicator instead, keyed off `:focus-visible` (not
+              `:focus-within`) so a mouse click doesn't show it, matching
+              search-input.tsx's `has-[:focus-visible]` ring. */}
           <div
-            className={`flex h-11 flex-1 items-center overflow-hidden rounded-xl border bg-white transition ${ringClass}`}
+            className={`flex h-11 flex-1 items-center overflow-hidden rounded-xl border bg-white transition has-[:focus-visible]:border-[#4158f4] ${ringClass}`}
             style={{ minWidth: 240 }}
           >
             <span className="select-none whitespace-nowrap pl-3.5 pr-1 text-[13.5px] text-[#646c65]">

@@ -5,6 +5,31 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+/* ── P49A-20: focus-visible ring for borderless inline-edit inputs/buttons ──
+   Inline-edit controls (contact fields, merge pickers, bulk edit, import
+   preview, username claim, calendar feed token, onboarding invites, admin
+   sliders/selects…) drop the native outline with a bare `outline-none`
+   because they sit flush against text or a row with no border of their own
+   — the default outline looked wrong there, but nothing replaced it, so
+   keyboard users had no visible focus (P49A-20, split from P49A-17).
+   `:focus-visible` only (never `:focus`) so a mouse/pointer click stays
+   silent, mirroring the search input's `has-[:focus-visible]` ring and the
+   marketing site's `.mkt-wrap :focus-visible` rule (src/app/(marketing)/
+   _components/marketing.css). A 2px solid outline in the brand focus colour
+   (#4158f4 — ≥4.5:1 against every app surface used here, see the P49A-17
+   contrast pass) with a 1px offset meets WCAG 2.4.7 (focus-visible) and
+   2.4.11 (focus appearance: ≥2px thick, ≥3:1 contrast). Pure `outline`, so
+   it never reflows layout and is safe to add without changing the
+   unfocused, mouse-click, or `:focus`-only appearance of anything.
+   For a control embedded in an `overflow-hidden` wrapper (an outline would
+   get clipped there), use `has-[:focus-visible]:border-[#4158f4]` on the
+   wrapper instead — see phone-country-input.tsx and username-section.tsx. */
+.kx-focus-visible:focus-visible {
+  outline: 2px solid #4158f4;
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
 /* ── Settings / P18 animations ─────────────────────────────────────────────── */
 @keyframes stSpin  { to { transform: rotate(360deg); } }
 @keyframes stPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }

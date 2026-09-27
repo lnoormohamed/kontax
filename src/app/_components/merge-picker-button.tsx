@@ -247,7 +247,7 @@ function MergePickerOverlay({
                   </svg>
                   <input
                     ref={inputRef}
-                    className="flex-1 bg-transparent text-[14px] text-[#1d2823] placeholder:text-[#646c65] outline-none"
+                    className="kx-focus-visible flex-1 bg-transparent text-[14px] text-[#1d2823] placeholder:text-[#646c65] outline-none"
                     placeholder="Search contacts…"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}

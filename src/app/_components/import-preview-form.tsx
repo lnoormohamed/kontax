@@ -697,7 +697,7 @@ export function ImportPreviewForm({
               </button>
               {showPaste ? (
                 <textarea
-                  className="mt-2.5 min-h-[120px] w-full resize-y rounded-[10px] border border-[#d8ddd6] bg-white px-3.5 py-3 font-mono text-[13px] leading-[1.55] text-[#1d2823] outline-none"
+                  className="kx-focus-visible mt-2.5 min-h-[120px] w-full resize-y rounded-[10px] border border-[#d8ddd6] bg-white px-3.5 py-3 font-mono text-[13px] leading-[1.55] text-[#1d2823] outline-none"
                   onChange={(e) => onPaste(e.target.value)}
                   placeholder={"name,email,phone\nJane Cooper,jane@acme.co,+1 555 0100"}
                   value={paste}

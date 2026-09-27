@@ -258,7 +258,7 @@ function MultiRow({
         ) : editing ? (
           <input
             autoFocus
-            className="w-full border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
+            className="kx-focus-visible w-full border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
             onChange={(e) => setDraft(e.target.value)}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {

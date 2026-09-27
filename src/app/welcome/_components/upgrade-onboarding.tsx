@@ -123,7 +123,7 @@ export function UpgradeOnboarding({ plan }: { plan: UpgradePlan }) {
                       <path d="M4 6.5h16v11H4z" /><path d="M4.5 7l7.5 6 7.5-6" />
                     </svg>
                     <input
-                      className="min-w-0 flex-1 bg-transparent text-[14px] text-[#1d2823] outline-none placeholder:text-[#646c65]"
+                      className="kx-focus-visible min-w-0 flex-1 bg-transparent text-[14px] text-[#1d2823] outline-none placeholder:text-[#646c65]"
                       onChange={(ev) => setEmail(i, ev.target.value)}
                       placeholder="email@example.com"
                       type="email"

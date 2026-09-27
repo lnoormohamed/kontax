@@ -402,7 +402,7 @@ export function BulkEditToolbar({
                           if (e.key === "Enter") run(() => setCompanyBulk({ contactIds: selectedIds, company: companyText }), () => onOptimisticPatch?.(Object.fromEntries(selectedIds.map((id) => [id, { company: companyText.trim() || null }]))));
                         }}
                         placeholder="Company name…"
-                        className="h-9 w-full rounded-[9px] border-[1.5px] border-[#4158f4] px-2.5 text-[13px] text-[#1d2823] outline-none"
+                        className="kx-focus-visible h-9 w-full rounded-[9px] border-[1.5px] border-[#4158f4] px-2.5 text-[13px] text-[#1d2823] outline-none"
                         style={{ boxShadow: "0 0 0 3px rgba(65,88,244,0.12)" }}
                       />
                     </div>

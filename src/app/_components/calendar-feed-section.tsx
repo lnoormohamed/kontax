@@ -79,7 +79,7 @@ export function CalendarFeedSection({
           <>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <input
-                className="h-10 min-w-0 flex-1 rounded-lg border border-[#d8ddd6] bg-[#f6f7f4] px-3 text-[13px] text-[#1d2823] outline-none"
+                className="kx-focus-visible h-10 min-w-0 flex-1 rounded-lg border border-[#d8ddd6] bg-[#f6f7f4] px-3 text-[13px] text-[#1d2823] outline-none"
                 onFocus={(e) => e.target.select()}
                 readOnly
                 value={url}

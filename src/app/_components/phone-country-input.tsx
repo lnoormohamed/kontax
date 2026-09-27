@@ -198,7 +198,14 @@ export function PhoneCountryInput({
         }}
         ref={rootRef}
       >
-        <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-[0.7rem] border border-[#d8ddd6] bg-white focus-within:border-[#4158f4]">
+        {/* P49A-20: the number input below is borderless with `outline-none` —
+            it sits flush against this wrapper's `overflow-hidden`, so a
+            direct `:focus-visible` outline on the input would get clipped.
+            The wrapper carries the focus indicator instead, keyed off
+            `:focus-visible` (not `:focus-within`) so a mouse click on either
+            the selector or the input stays silent, matching the search
+            input's `has-[:focus-visible]` ring (search-input.tsx). */}
+        <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-[0.7rem] border border-[#d8ddd6] bg-white has-[:focus-visible]:border-[#4158f4]">
           <button
             aria-label={selectorAriaLabel}
             aria-expanded={open}
