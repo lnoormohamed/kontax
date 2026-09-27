@@ -2763,6 +2763,7 @@ function EditCredentialsForm({
           Edit credentials
         </h2>
         <button
+          aria-label="Close"
           type="button"
           onClick={onCancel}
           style={{

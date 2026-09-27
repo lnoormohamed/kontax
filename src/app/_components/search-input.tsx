@@ -70,12 +70,13 @@ export function SearchInput({
   return (
     <div className="flex min-w-0 flex-1 justify-center">
       <div
-        className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-[10px] border bg-white px-3 transition lg:max-w-[560px] ${
+        className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-[10px] border bg-white px-3 transition has-[:focus-visible]:border-[#4158f4] has-[:focus-visible]:shadow-[0_0_0_3px_#edf0fe] lg:max-w-[560px] ${
           value ? "border-[#4158f4] shadow-[0_0_0_3px_#edf0fe]" : "border-[#d8ddd6]"
         }`}
       >
         <WorkspaceIcon className={value ? "text-[#5c655e]" : "text-[#8b938c]"} name="search" size={18} />
         <input
+          aria-label="Search contacts"
           data-search-input
           className="h-10 w-full bg-transparent text-sm text-[#1d2823] outline-none placeholder:text-[#8b938c]"
           onChange={(event) => onChange(event.target.value)}

@@ -68,6 +68,7 @@ function RenameInput({
           value={value}
         />
         <button
+          aria-label="Save preset name"
           className="grid h-9 w-9 shrink-0 place-items-center rounded-[8px] transition disabled:opacity-40"
           disabled={!canSave}
           onClick={() => canSave && onSave(value.trim())}
@@ -77,6 +78,7 @@ function RenameInput({
           <WorkspaceIcon name="check" size={15} strokeWidth={2.4} className="text-white" />
         </button>
         <button
+          aria-label="Cancel rename"
           className="grid h-9 w-9 shrink-0 place-items-center rounded-[8px] border border-[#d8ddd6] bg-white transition hover:bg-[#f2f4f0]"
           onClick={onCancel}
           type="button"
