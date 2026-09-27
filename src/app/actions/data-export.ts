@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache";
 import { type ActionResult } from "~/lib/action-result";
 import { requireUserId } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
-import { createDataExportJob, getActiveDataExportJob } from "~/server/data-export/jobs";
+import {
+  createDataExportJob,
+  DATA_EXPORT_SETTINGS_PATH,
+  getActiveDataExportJob,
+} from "~/server/data-export/jobs";
 import { db } from "~/server/db";
 
 export async function getDataExportStatus() {
@@ -45,7 +49,7 @@ export async function requestDataExport(
   if (existing) return { ok: true, data: { jobId: existing.id } };
 
   const job = await createDataExportJob(userId, params.includeArchived ?? false);
-  revalidatePath("/settings/account");
+  revalidatePath(DATA_EXPORT_SETTINGS_PATH);
 
   return { ok: true, data: { jobId: job.id } };
 }

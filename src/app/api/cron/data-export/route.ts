@@ -4,6 +4,7 @@ import { assertCronSecret } from "~/server/cron-guard";
 import { generateDataExport } from "~/server/data-export/generate-export";
 import {
   claimOldestPendingJob,
+  DATA_EXPORT_SETTINGS_PATH,
   markJobFailed,
   markJobReady,
   reclaimStaleDataExportJobs,
@@ -85,8 +86,8 @@ export async function POST(req: NextRequest) {
     const sent = await sendEmail({
       to: userEmail,
       subject: "Your Kontax data export is ready",
-      html: `<p>Your Kontax data export has been prepared. <a href="${appUrl}/settings/account">Download it within 48 hours.</a></p>`,
-      text: `Your Kontax data export is ready. Download within 48 hours at: ${appUrl}/settings/account`,
+      html: `<p>Your Kontax data export has been prepared. <a href="${appUrl}${DATA_EXPORT_SETTINGS_PATH}">Download it within 48 hours.</a></p>`,
+      text: `Your Kontax data export is ready. Download within 48 hours at: ${appUrl}${DATA_EXPORT_SETTINGS_PATH}`,
     });
     emailed = sent.success;
   } catch (err) {

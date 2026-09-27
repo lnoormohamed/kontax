@@ -5,6 +5,10 @@ import { db } from "~/server/db";
 // (maxDuration); a job still PROCESSING long after that was orphaned by a
 // restart or crash. Left alone it counts as "active" forever and blocks every
 // new export request for that user.
+// Where a user requests and downloads their export (the "ready" email links
+// here). P49A-19 item 3: the email used to point at /settings/account.
+export const DATA_EXPORT_SETTINGS_PATH = "/settings/data/export";
+
 export const DATA_EXPORT_PROCESSING_TIMEOUT_MS = 30 * 60 * 1000;
 export const DATA_EXPORT_INTERRUPTED_MESSAGE =
   "Interrupted — the export stopped before it finished (server restart). Request a new export.";
