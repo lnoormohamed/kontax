@@ -149,17 +149,8 @@ function Checklist({
 }
 
 function Completion({ onDone }: { onDone: () => void }) {
-  const [count, setCount] = useState(5);
-
-  useEffect(() => {
-    if (count <= 0) {
-      onDone();
-      return;
-    }
-    const t = setTimeout(() => setCount((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [count, onDone]);
-
+  // P49A-17: this card used to auto-dismiss itself after 5s regardless of
+  // whether the user had seen or read it — now it stays until they dismiss it.
   return (
     <section className="mb-4 flex items-start gap-4 rounded-[14px] border border-[#d8ddd6] bg-white px-4 py-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] max-[760px]:flex-col sm:px-6 sm:py-5">
       <span aria-hidden className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#1f8a5b]">
@@ -186,12 +177,6 @@ function Completion({ onDone }: { onDone: () => void }) {
           </button>
         </div>
       </div>
-      <span
-        className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]"
-        title="Auto-dismisses if no action is taken"
-      >
-        Auto-dismisses in {count}s
-      </span>
     </section>
   );
 }
