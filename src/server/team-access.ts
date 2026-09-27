@@ -1,7 +1,7 @@
 import { cache } from "react";
 
 import { db } from "~/server/db";
-import { isTeamLocked } from "~/server/dav/plan-entitlements.mjs";
+import { isPaymentGraceOver, isTeamLocked } from "~/server/dav/plan-entitlements.mjs";
 
 export type TeamGraceState = "active" | "grace" | "locked";
 
@@ -133,6 +133,7 @@ export const getTeamBillingSummary = async (groupId: string) => {
         select: {
           plan: true,
           status: true,
+          graceEndsAt: true,
           memberSlotsLimit: true,
           currentPeriodEnd: true,
           cancelAtPeriodEnd: true,
@@ -153,6 +154,9 @@ export const getTeamBillingSummary = async (groupId: string) => {
     cancelAtPeriodEnd: sub?.cancelAtPeriodEnd ?? false,
     graceState: getTeamGraceState(group.teamsGraceEndsAt, group.teamsEnabled),
     graceEndsAt: group.teamsGraceEndsAt,
+    // P49A-19: the org's payment failed and the 3-day grace is over — members
+    // are on their own plans until it is paid (the team itself isn't locked).
+    paymentLapsedSince: sub && isPaymentGraceOver(sub) ? sub.graceEndsAt : null,
   };
 };
 

@@ -110,6 +110,9 @@ export default async function TeamSettingsPage() {
                     : memberBilling.renewsAt
                       ? ` · renews ${fmtDate(memberBilling.renewsAt)}`
                       : ""}
+                  {memberBilling.paymentLapsedSince
+                    ? ` · payment failed — Teams features off since ${fmtDate(memberBilling.paymentLapsedSince)} until it's paid`
+                    : ""}
                 </p>
               </div>
               {memberOf.canManageBilling && (
@@ -334,6 +337,9 @@ export default async function TeamSettingsPage() {
                   : billingSummary.renewsAt
                     ? ` · renews ${fmtDate(billingSummary.renewsAt)}`
                     : ""}
+                {billingSummary.paymentLapsedSince
+                  ? ` · payment failed — Teams features off since ${fmtDate(billingSummary.paymentLapsedSince)} until it's paid`
+                  : ""}
               </p>
             </div>
             <form action={openTeamBillingPortal}>

@@ -12,6 +12,7 @@ import {
   importsThisMonthWhere,
 } from "~/server/billing";
 import { listSupportCasesForSubject } from "~/server/admin/support-cases";
+import { ACTIVE_SUBSCRIPTION_STATUSES, resolveEffectivePlan } from "~/server/dav/plan-entitlements.mjs";
 import { getSyncAccountOperationalHealth, getSyncErrorSupportBucket } from "~/server/sync-health";
 import {
   getSyncProviderCapabilityProfileLabel,
@@ -48,6 +49,20 @@ export type AdminUserRow = {
 
 const fmtDate = (d: Date) =>
   new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(d);
+
+/**
+ * P49A-19 (Fable review): the plan an admin sees. When the user's own paid
+ * plan is unpaid past the 3-day payment grace, say so rather than showing
+ * the raw plan ("Pro — payment lapsed, on Free since Oct 3, 2026").
+ */
+export const adminPlanLabel = (
+  plan: string,
+  paymentLapse: { plan: string; graceEndedAt: Date } | null,
+): string => {
+  const label = PLAN_LABEL[plan] ?? "Free";
+  if (!paymentLapse) return label;
+  return `${PLAN_LABEL[paymentLapse.plan] ?? paymentLapse.plan} — payment lapsed, on ${label} since ${fmtDate(paymentLapse.graceEndedAt)}`;
+};
 
 const providerLabel = (provider: string) => {
   switch (provider) {
@@ -149,22 +164,25 @@ export async function searchUsers(input: {
       scheduledDeleteAt: true,
       createdAt: true,
       subscriptions: {
-        where: { status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] } },
-        orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
-        take: 1,
-        select: { plan: true },
+        where: { status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
+        select: { plan: true, memberSlotsLimit: true, status: true, graceEndsAt: true },
       },
     },
   });
 
-  return users.map((u) => ({
+  return users.map((u) => {
+    // P49A-19: the user's own plans, resolved like enforcement (max rank,
+    // payment grace applied). Team memberships aren't loaded for the list.
+    const own = resolveEffectivePlan({ userId: u.id, subscriptions: u.subscriptions, teamGroups: [] });
+    return {
     id: u.id,
     name: u.name?.trim() ?? u.email.split("@")[0] ?? "—",
     email: u.email,
-    plan: PLAN_LABEL[u.subscriptions[0]?.plan ?? "FREE"] ?? "Free",
+    plan: adminPlanLabel(own.plan, own.paymentLapse),
     status: statusOf(u.lifecycleState, u.scheduledDeleteAt),
     joined: fmtDate(u.createdAt),
-  }));
+    };
+  });
 }
 
 function relativeTime(d: Date): string {
@@ -462,7 +480,7 @@ export async function loadUserDetail(userId: string) {
     name: user.name?.trim() ?? user.email.split("@")[0] ?? "—",
     email: user.email,
     role: user.role,
-    plan: PLAN_LABEL[billing.plan] ?? "Free",
+    plan: adminPlanLabel(billing.plan, billing.paymentLapse),
     status: statusOf(user.lifecycleState, user.scheduledDeleteAt),
     overridden: !!user.planOverriddenAt,
     overriddenAt: user.planOverriddenAt,
@@ -488,7 +506,7 @@ export async function loadUserDetail(userId: string) {
       canWrite: lifecyclePolicy.canWrite,
       canAuthenticateExpected: lifecyclePolicy.canAuthenticateExpected,
       basePlan: sub ? (PLAN_LABEL[sub.plan] ?? "Free") : "Free",
-      effectivePlan: PLAN_LABEL[billing.plan] ?? "Free",
+      effectivePlan: adminPlanLabel(billing.plan, billing.paymentLapse),
       subscriptionStatus: sub?.status ?? "FREE",
       trialEndsAt: sub?.trialEndsAt ? fmtDate(sub.trialEndsAt) : null,
       periodEndsAt: sub?.currentPeriodEnd ? fmtDate(sub.currentPeriodEnd) : null,
