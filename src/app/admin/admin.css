@@ -338,7 +338,7 @@
 .ad-usage-limit { font-weight: 400; color: #646c65; }
 .ad-prog { display: block; height: 8px; border-radius: 999px; background: #eceee9; overflow: hidden; }
 .ad-prog-fill { display: block; height: 100%; border-radius: 999px; }
-.ad-prog-na { color: #aeb4ac; font-size: 13px; }
+.ad-prog-na { color: #646c65; font-size: 13px; }
 
 .ad-collapse-head { display: flex; align-items: center; justify-content: space-between; width: 100%; border: none; background: transparent; cursor: pointer; padding: 0; }
 .ad-collapse-meta { display: flex; align-items: center; gap: 10px; }
@@ -627,7 +627,7 @@
 .ad-req { color: #dc2626; }
 .ad-text-input { width: 100%; border: 1px solid #d8ddd6; border-radius: 11px; padding: 11px 13px; font-size: 13.5px; color: #1d2823; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
 .ad-text-input:focus { border-color: #4158f4; box-shadow: 0 0 0 3px #edf0fe; }
-.ad-text-input::placeholder { color: #aeb4ac; }
+.ad-text-input::placeholder { color: #646c65; }
 .ad-modal-error { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #fef2f2; border: 1px solid #fbcabf; border-radius: 10px; color: #b91c1c; font-size: 12.5px; margin-bottom: 16px; }
 .ad-modal-foot { display: flex; justify-content: flex-end; gap: 10px; }
 

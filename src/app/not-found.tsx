@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 // P49A-17 — branded 404. This is the Next.js root `not-found.tsx`: it renders
@@ -9,9 +10,14 @@ import Link from "next/link";
 // all still gets redirected to /login by middleware before ever reaching
 // here — that's the existing, intentional "unknown path requires a session"
 // default in src/server/public-paths.ts, and out of scope to change here.)
+export const metadata: Metadata = { title: "Page not found" };
+
+// A <div>, not <main>: Next renders this inside segment layouts that already
+// provide the page's <main> (marketing, admin), and two would be a duplicate
+// landmark.
 export default function NotFound() {
   return (
-    <main
+    <div
       className="flex min-h-svh flex-col items-center justify-center gap-[18px] px-5 py-10"
       style={{ backgroundColor: "#eef1ec" }}
     >
@@ -48,6 +54,6 @@ export default function NotFound() {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

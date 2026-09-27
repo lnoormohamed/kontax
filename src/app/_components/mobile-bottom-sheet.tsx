@@ -145,6 +145,7 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
       {/* Backdrop */}
       <div
         aria-hidden
+        data-dialog-backdrop
         onClick={onClose}
         style={{
           position: "fixed",

@@ -1,7 +1,7 @@
 # P49A-17 — UX & accessibility: confirmations, labels, 2FA inputs, dialogs, loading states
 
-**Phase:** 49A · **Priority:** P1 · **Status:** Ready — reassessed 2026-09-27 after Phase 50 shipped
-(production 0886b69) · **Effort:** M overall (mostly S items) · **Depends on:** —
+**Phase:** 49A · **Priority:** P1 · **Status:** Done 2026-09-27 (branch docs/p49-homepage-brief; not yet on staging/prod) — reassessed
+2026-09-27 after Phase 50 shipped (production 0886b69) · **Effort:** M overall (mostly S items) · **Depends on:** —
 **Audit IDs:** A-43…A-47 (UX-12…UX-18) + follow-ups · Split out: [P49A-20](p49a-20-focus-visible-sweep.md)
 
 ## Objective
@@ -59,3 +59,27 @@ Auth screens themselves (`auth-card.tsx`) are fine: 16 px inputs, real labels, f
 ## Out of scope
 The invisible focus on borderless inline-edit inputs (10 files) is a design-system sweep: see
 [P49A-20](p49a-20-focus-visible-sweep.md).
+
+## Resolution (2026-09-27)
+- Steps 1–7 implemented (Sonnet), commits 0220343..81a4f36: ConfirmDialog for live-share
+  revoke/unlink and session sign-out; labelled search and icon buttons; labelled create-contact
+  fields with 16 px mobile inputs; one shared `OtpInput`; `useDialogFocus` (focus in/restore,
+  background `inert`, Escape) in every modal and the bottom sheet; loading skeletons and a branded
+  404; onboarding card and delete-account modal fixes.
+- Contrast (added at the owner's request), 15153c7 + follow-up: the tertiary grey `#8b938c`
+  (2.5–3.2:1) is now `#646c65` (≥4.5:1 on every light surface), `#aeb4ac` text/placeholders
+  likewise, amber text `#7c5511`, white-on-amber badges `#9a6612`. axe colour-contrast: 0
+  violations on 15 public pages at 1280 and 390 px.
+- Fable review fixes: the bottom-sheet backdrop is exempt from `inert` (`data-dialog-backdrop`)
+  so tapping it dismisses again; Escape only closes the topmost dialog and never while focus is
+  in another dialog on top (delete-account + password step-up), and not while the delete runs;
+  whole-code OTP autofill into box 1 is handled like a paste, and typing the 6th digit now
+  auto-submits (`applyOtpInput`, unit-tested; verified in Chromium); contact detail / new / print
+  get their own loading fallbacks instead of the list skeleton; the 404 uses a `<div>` (no
+  duplicate `<main>`) and has its own title.
+- Accepted, advisory: with a `loading.tsx` above them, `notFound()` in `/contacts/[id]` and
+  `/merge-suggestions/[id]` now returns HTTP 200 with the 404 UI (Next adds `noindex`), and an
+  in-page `redirect()` becomes a client redirect. Middleware still 307s requests without a
+  session cookie, so auth is unaffected; these are signed-in pages, so SEO is too.
+- Not verified in a browser (need a signed-in session + DB): the signed-in dialogs, sheets and
+  skeletons — check on staging.

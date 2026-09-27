@@ -214,7 +214,7 @@ export function MobileSettingsNav({
         </form>
       </GroupCard>
 
-      <div style={{ textAlign: "center", fontSize: 12, color: "#aeb4ac", padding: "4px 0 16px" }}>
+      <div style={{ textAlign: "center", fontSize: 12, color: "#646c65", padding: "4px 0 16px" }}>
         Kontax · getkontax.com
       </div>
     </div>

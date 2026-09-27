@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   applyOtpBackspace,
+  applyOtpInput,
   applyOtpPaste,
   sanitizeDigits,
   setDigitAt,
@@ -79,4 +80,27 @@ test("applyOtpBackspace on the first box with nothing to clear is a no-op", () =
   const result = applyOtpBackspace("", 0, 6);
   assert.equal(result.value, "");
   assert.equal(result.focusIndex, 0);
+});
+
+test("applyOtpInput: one typed digit fills the slot and advances", () => {
+  assert.deepEqual(applyOtpInput("12", 2, "3"), { value: "123", focusIndex: 3, complete: false });
+});
+
+test("applyOtpInput: typing the last digit completes (auto-submit)", () => {
+  assert.deepEqual(applyOtpInput("12345", 5, "6"), { value: "123456", focusIndex: 5, complete: true });
+});
+
+test("applyOtpInput: whole-code autofill into the first box is handled like a paste", () => {
+  // iOS "From Messages" / WebOTP / password managers ignore maxLength=1.
+  assert.deepEqual(applyOtpInput("", 0, "482913"), { value: "482913", focusIndex: 5, complete: true });
+  assert.deepEqual(applyOtpInput("", 0, "482 913"), { value: "482913", focusIndex: 5, complete: true });
+});
+
+test("applyOtpInput: typing into a filled slot keeps the new digit, not the old one", () => {
+  assert.equal(applyOtpInput("123456", 2, "37").value, "127456");
+  assert.equal(applyOtpInput("123456", 2, "73").value, "127456");
+});
+
+test("applyOtpInput: non-digits are ignored", () => {
+  assert.deepEqual(applyOtpInput("12", 2, "a"), { value: "12", focusIndex: 2, complete: false });
 });

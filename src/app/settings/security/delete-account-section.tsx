@@ -135,7 +135,13 @@ function DeleteAccountDialog({
   onEmailChange: (value: string) => void;
 }) {
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const dialogRef = useDialogFocus<HTMLDivElement>({ open: true, onClose, initialFocusRef: emailInputRef });
+  const dialogRef = useDialogFocus<HTMLDivElement>({
+    open: true,
+    onClose,
+    // Not while the delete is in flight: closing then would hide its outcome.
+    closeOnEscape: !isPending,
+    initialFocusRef: emailInputRef,
+  });
   return (
     <div className="fixed inset-0 z-[90] grid place-items-center bg-[rgba(20,30,25,0.42)] p-4">
       <div

@@ -16,9 +16,16 @@ import { useEffect, useRef } from "react";
  *    leave it — a real focus trap without a manual Tab-key handler;
  *  - optionally closes on Escape (`closeOnEscape`, default true — pass
  *    `false` for dialogs that must be confirmed out of, e.g. recovery codes).
+ *    Only the topmost open dialog reacts, and not while focus is inside some
+ *    other dialog layered on top (e.g. a step-up password modal), so one
+ *    Escape never closes two dialogs.
  *
- * Attach the returned ref to the dialog's outermost element.
+ * Attach the returned ref to the dialog's outermost element. A backdrop that
+ * is a *sibling* of that element (bottom sheets) must carry
+ * `data-dialog-backdrop`, or it would be made inert and stop receiving taps.
  */
+const openDialogs: object[] = [];
+
 export function useDialogFocus<T extends HTMLElement>({
   open,
   onClose,
@@ -60,7 +67,8 @@ export function useDialogFocus<T extends HTMLElement>({
           if (
             child !== node &&
             child instanceof HTMLElement &&
-            !child.hasAttribute("inert")
+            !child.hasAttribute("inert") &&
+            !child.hasAttribute("data-dialog-backdrop")
           ) {
             child.setAttribute("inert", "");
             madeInert.push(child);
@@ -73,13 +81,22 @@ export function useDialogFocus<T extends HTMLElement>({
 
     (initialFocusRef?.current ?? container)?.focus();
 
+    const token = {};
+    openDialogs.push(token);
     const onKeyDown = (e: KeyboardEvent) => {
-      if (closeOnEscapeRef.current && e.key === "Escape") onCloseRef.current?.();
+      if (e.key !== "Escape" || !closeOnEscapeRef.current) return;
+      if (openDialogs[openDialogs.length - 1] !== token) return;
+      // Focus inside another element outside this dialog means a dialog that
+      // doesn't use this hook is on top; it handles its own Escape.
+      const target = e.target;
+      if (container && target instanceof Node && target !== document.body && !container.contains(target)) return;
+      onCloseRef.current?.();
     };
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      openDialogs.splice(openDialogs.indexOf(token), 1);
       for (const el of madeInert) el.removeAttribute("inert");
       trigger?.focus();
     };

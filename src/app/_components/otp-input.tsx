@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { applyOtpBackspace, applyOtpPaste, OTP_LENGTH, setDigitAt } from "~/lib/otp-input-logic";
+import { applyOtpBackspace, applyOtpInput, applyOtpPaste, OTP_LENGTH } from "~/lib/otp-input-logic";
 
 /**
  * P49A-17 — shared 6-digit OTP entry used by both 2FA screens
@@ -43,12 +43,6 @@ export function OtpInput({
     if (autoFocus) refs.current[0]?.focus();
   }, [autoFocus]);
 
-  const setAt = (i: number, ch: string) => {
-    const next = setDigitAt(value, i, ch, length);
-    onChange(next);
-    if (ch && i < length - 1) refs.current[i + 1]?.focus();
-    if (next.length === length && !next.includes("") && onComplete) onComplete(next);
-  };
 
   return (
     <div
@@ -66,8 +60,11 @@ export function OtpInput({
           key={i}
           maxLength={1}
           onChange={(e) => {
-            const v = e.target.value.replace(/\D/g, "");
-            if (v) setAt(i, v[v.length - 1]!);
+            const result = applyOtpInput(value, i, e.target.value, length);
+            if (result.value === value) return;
+            onChange(result.value);
+            if (result.complete && onComplete) onComplete(result.value);
+            else refs.current[result.focusIndex]?.focus();
           }}
           onKeyDown={(e) => {
             if (e.key === "Backspace") {

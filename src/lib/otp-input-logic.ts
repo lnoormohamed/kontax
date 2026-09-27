@@ -64,3 +64,28 @@ export function applyOtpBackspace(
   }
   return { value: setDigitAt(value, index, "", length), focusIndex: index };
 }
+
+/**
+ * A change event on slot `index` whose raw value is `raw`. One new digit is
+ * typed entry; several digits into an empty slot (or more than one extra into
+ * a filled one) are an autofill — iOS "From Messages", WebOTP, a password
+ * manager or dictation putting the whole code into the first box, often
+ * ignoring `maxLength` — and are handled exactly like a paste.
+ */
+export function applyOtpInput(
+  current: string,
+  index: number,
+  raw: string,
+  length: number = OTP_LENGTH,
+): { value: string; focusIndex: number; complete: boolean } {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return { value: current, focusIndex: index, complete: false };
+  const existing = current[index] ?? "";
+  if (digits.length > (existing ? 2 : 1)) return applyOtpPaste(current, digits, length);
+  // One typed digit, possibly next to the digit already in the slot: keep
+  // the one that is new.
+  const ch = existing && digits.length === 2 ? (digits.startsWith(existing) ? digits[1]! : digits[0]!) : digits[digits.length - 1]!;
+  const value = setDigitAt(current, index, ch, length);
+  const complete = value.length === length;
+  return { value, focusIndex: complete ? index : Math.min(index + 1, length - 1), complete };
+}
