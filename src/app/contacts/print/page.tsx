@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import { parseContactStringArray } from "~/server/contact-portability";
+import { MULTI_VALUE_ENTRY_SELECT, readMultiValueFields } from "~/server/contact-multi-values";
 
 // P36-DB04: print-friendly view for a bulk selection. Opened in a new tab from
 // the contacts bulk toolbar (?ids=a,b,c); auto-triggers the browser print dialog.
@@ -42,6 +42,8 @@ export default async function ContactsPrintPage({
           emailAddresses: true,
           phoneNumbers: true,
           address: true,
+          postalAddresses: true,
+          ...MULTI_VALUE_ENTRY_SELECT,
         },
       })
     : [];
@@ -72,10 +74,11 @@ export default async function ContactsPrintPage({
           <p>No contacts to print.</p>
         ) : (
           contacts.map((c) => {
-            const emails = [c.email, ...parseContactStringArray(c.emailAddresses)].filter(Boolean);
-            const phones = [c.phone, ...parseContactStringArray(c.phoneNumbers)].filter(Boolean);
-            const uniqEmails = [...new Set(emails as string[])];
-            const uniqPhones = [...new Set(phones as string[])];
+            // P49A-10: every value comes from the typed entries.
+            const multiValues = readMultiValueFields(c);
+            const uniqEmails = [...new Set(multiValues.emailEntries.map((entry) => entry.value))];
+            const uniqPhones = [...new Set(multiValues.phoneEntries.map((entry) => entry.value))];
+            const address = multiValues.address;
             const org = [c.jobTitle, c.company].filter(Boolean).join(" · ");
             return (
               <div key={c.id} className="c">
@@ -83,7 +86,7 @@ export default async function ContactsPrintPage({
                 {org ? <div className="sub">{org}</div> : null}
                 {uniqEmails.length ? <div className="row"><b>Email</b>{uniqEmails.join(", ")}</div> : null}
                 {uniqPhones.length ? <div className="row"><b>Phone</b>{uniqPhones.join(", ")}</div> : null}
-                {c.address ? <div className="row"><b>Address</b>{c.address}</div> : null}
+                {address ? <div className="row"><b>Address</b>{address}</div> : null}
               </div>
             );
           })

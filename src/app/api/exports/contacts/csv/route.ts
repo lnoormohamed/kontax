@@ -2,11 +2,10 @@ import { z } from "zod";
 
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
+import { MULTI_VALUE_ENTRY_SELECT, withDerivedLegacyFields } from "~/server/contact-multi-values";
 import {
   contactsToCsv,
   contactsToCsvFiltered,
-  parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
@@ -87,17 +86,12 @@ export async function GET(request: Request) {
         address: true,
         postalAddresses: true,
         notes: true,
+        ...MULTI_VALUE_ENTRY_SELECT,
       },
     });
 
-    const body = contactsToCsv(
-      contacts.map((contact) => ({
-        ...contact,
-        emailAddresses: parseContactStringArray(contact.emailAddresses),
-        phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-        postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-      })),
-    );
+    // P49A-10: the flat values are derived from the typed entries.
+    const body = contactsToCsv(contacts.map((contact) => withDerivedLegacyFields(contact)));
 
     await db.exportJob.update({
       where: { id: job.id },
@@ -203,15 +197,13 @@ export async function POST(request: Request) {
         company: true, phoneticCompany: true,
         jobTitle: true, website: true, birthday: true,
         address: true, postalAddresses: true, notes: true, customFields: true,
+        ...MULTI_VALUE_ENTRY_SELECT,
       },
     });
 
     const body = contactsToCsvFiltered(
       contacts.map((c) => ({
-        ...c,
-        emailAddresses: parseContactStringArray(c.emailAddresses),
-        phoneNumbers: parseContactStringArray(c.phoneNumbers),
-        postalAddresses: parseContactPostalAddresses(c.postalAddresses),
+        ...withDerivedLegacyFields(c),
         customFields:
           c.customFields && typeof c.customFields === "object" && !Array.isArray(c.customFields)
             ? (c.customFields as Record<string, string>)

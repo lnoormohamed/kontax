@@ -1,10 +1,9 @@
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
+import { MULTI_VALUE_ENTRY_SELECT, withDerivedLegacyFields } from "~/server/contact-multi-values";
 import {
   contactsToVCard,
   parseContactDateEntries,
-  parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 
 // Direct .vcf download of a single owned contact (all plans). Distinct from the
@@ -46,6 +45,7 @@ export async function GET(
       address: true,
       postalAddresses: true,
       notes: true,
+      ...MULTI_VALUE_ENTRY_SELECT,
     },
   });
 
@@ -55,11 +55,9 @@ export async function GET(
 
   const body = contactsToVCard([
     {
-      ...contact,
-      emailAddresses: parseContactStringArray(contact.emailAddresses),
-      phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+      // P49A-10: the flat values are derived from the typed entries.
+      ...withDerivedLegacyFields(contact),
       significantDates: parseContactDateEntries(contact.significantDates),
-      postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
     },
   ]);
 

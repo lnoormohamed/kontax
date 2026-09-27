@@ -1,11 +1,10 @@
 import { assertCanUsePremiumExport } from "~/server/billing";
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
+import { MULTI_VALUE_ENTRY_SELECT, withDerivedLegacyFields } from "~/server/contact-multi-values";
 import {
   contactsToVCard,
   parseContactDateEntries,
-  parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
@@ -100,16 +99,15 @@ export async function GET(request: Request) {
         address: true,
         postalAddresses: true,
         notes: true,
+        ...MULTI_VALUE_ENTRY_SELECT,
       },
     });
 
+    // P49A-10: the flat values are derived from the typed entries.
     const body = contactsToVCard(
       contacts.map((contact) => ({
-        ...contact,
-        emailAddresses: parseContactStringArray(contact.emailAddresses),
-        phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+        ...withDerivedLegacyFields(contact),
         significantDates: parseContactDateEntries(contact.significantDates),
-        postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
       })),
     );
 

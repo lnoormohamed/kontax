@@ -156,6 +156,47 @@ export const readMultiValueFields = (contact: ContactLike): MultiValueFields => 
   };
 };
 
+/**
+ * Only the legacy keys (email / emailAddresses, phone / phoneNumbers, address /
+ * postalAddresses, website), derived from the entries — for exports whose
+ * output format is built from the flat values.
+ */
+export const readDerivedLegacyFields = (contact: ContactLike) => {
+  const fields = readMultiValueFields(contact);
+  return {
+    email: fields.email,
+    emailAddresses: fields.emailAddresses,
+    phone: fields.phone,
+    phoneNumbers: fields.phoneNumbers,
+    address: fields.address,
+    postalAddresses: fields.postalAddresses,
+    website: fields.website,
+  };
+};
+
+/** The typed entry columns — add to a `select` that feeds the readers. */
+export const MULTI_VALUE_ENTRY_SELECT = {
+  emailEntries: true,
+  phoneEntries: true,
+  addressEntries: true,
+  websiteEntries: true,
+} as const;
+
+type EntryColumn = keyof typeof MULTI_VALUE_ENTRY_SELECT;
+
+/**
+ * A selected row with its entry columns swapped for the legacy keys derived
+ * from them — for exports whose format is built from the flat values, so the
+ * output stays exactly as before while the data comes from the entries.
+ */
+export const withDerivedLegacyFields = <T extends object>(
+  contact: T,
+): Omit<T, EntryColumn> & ReturnType<typeof readDerivedLegacyFields> => {
+  const rest: Record<string, unknown> = { ...(contact as Record<string, unknown>) };
+  for (const column of Object.keys(MULTI_VALUE_ENTRY_SELECT)) delete rest[column];
+  return { ...(rest as Omit<T, EntryColumn>), ...readDerivedLegacyFields(contact) };
+};
+
 /** Whether a snapshot carries a family at all (typed or legacy key present). */
 export const snapshotCarriesFamily = (snapshot: ContactLike, family: MultiValueFamily) =>
   familiesPresentIn(asRecord(snapshot)).includes(family);

@@ -4,6 +4,7 @@
 // when Phase 40's shared-book read helper lands, it slots in here.
 
 import { db } from "~/server/db";
+import { readMultiValueEntries } from "~/server/contact-multi-values";
 import { buildPrivateOverlay } from "~/lib/contact-private-fields";
 import { contactToCard, type CardPhoto, type KontaxCard } from "./card";
 import { mediaRefPath, type ArchiveEntry, type ArchiveMediaFile } from "./archive";
@@ -33,6 +34,11 @@ export const EXPORT_CONTACT_SELECT = {
   phoneEntries: true,
   websiteEntries: true,
   addressEntries: true,
+  // P49A-10: legacy columns, read only as the fallback for a row the backfill
+  // has not reached (see readMultiValueEntries).
+  emailAddresses: true,
+  phoneNumbers: true,
+  postalAddresses: true,
   significantDates: true,
   relatedPeople: true,
   customFields: true,
@@ -97,6 +103,10 @@ export async function loadExportableContacts(userId: string, filter: ExportConta
   // export can't contain them. Today this is a verified no-op (no private rows
   // exist until Phase 40's write path lands); it establishes the correct read
   // seam now so the exporter never grows its own ad-hoc privacy filter.
+  // P49A-10: the typed entries are canonical — read through the one reader so
+  // a not-yet-backfilled (CSV) row still exports every value.
+  for (const contact of contacts) Object.assign(contact, readMultiValueEntries(contact));
+
   await mergeOwnPrivateFields(userId, contacts);
 
   const bookNames = new Map(books.map((b) => [b.id, b.name]));

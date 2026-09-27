@@ -3,11 +3,10 @@ import { PassThrough } from "stream";
 
 import type { Contact, Subscription, User } from "../../../generated/prisma";
 import { db } from "~/server/db";
+import { MULTI_VALUE_ENTRY_SELECT, withDerivedLegacyFields } from "~/server/contact-multi-values";
 import {
   contactsToCsv,
   contactsToVCard,
-  parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 
 const CONTACT_SELECT = {
@@ -29,17 +28,14 @@ const CONTACT_SELECT = {
   address: true,
   postalAddresses: true,
   notes: true,
+  ...MULTI_VALUE_ENTRY_SELECT,
 } as const;
 
 type ContactRow = Pick<Contact, keyof typeof CONTACT_SELECT>;
 
+// P49A-10: the flat values are derived from the typed entries.
 function mapContact(c: ContactRow) {
-  return {
-    ...c,
-    emailAddresses: parseContactStringArray(c.emailAddresses),
-    phoneNumbers: parseContactStringArray(c.phoneNumbers),
-    postalAddresses: parseContactPostalAddresses(c.postalAddresses),
-  };
+  return withDerivedLegacyFields(c);
 }
 
 function billingSummary(

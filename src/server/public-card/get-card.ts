@@ -1,3 +1,4 @@
+import { readPhoneEntries } from "~/server/contact-multi-values";
 import { db } from "~/server/db";
 import { SITE_URL } from "~/lib/site-url";
 import {
@@ -32,6 +33,7 @@ export async function getPublicCard(username: string): Promise<PublicCardData | 
       fullName: true,
       jobTitle: true,
       company: true,
+      phone: true,
       phoneNumbers: true,
       websiteEntries: true,
       phoneEntries: true,
@@ -44,16 +46,8 @@ export async function getPublicCard(username: string): Promise<PublicCardData | 
   // Extract structured phone numbers (stored as Json)
   const phones: string[] = [];
   if (fields.showPhone && ownContact) {
-    const raw = (ownContact.phoneEntries ?? ownContact.phoneNumbers) as Array<{
-      value?: string;
-      number?: string;
-    }> | null;
-    if (Array.isArray(raw)) {
-      for (const p of raw) {
-        const v = p.value ?? p.number;
-        if (v) phones.push(v);
-      }
-    }
+    // P49A-10: the typed entries through the canonical reader.
+    for (const entry of readPhoneEntries(ownContact)) phones.push(entry.value);
   }
 
   // Extract websites

@@ -1,8 +1,7 @@
+import { MULTI_VALUE_ENTRY_SELECT, readDerivedLegacyFields } from "~/server/contact-multi-values";
 import {
   contactsToVCard,
   parseContactDateEntries,
-  parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 import { findShareByToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
@@ -37,6 +36,7 @@ const VCARD_SHARE_SELECT = {
       address: true,
       postalAddresses: true,
       notes: true,
+      ...MULTI_VALUE_ENTRY_SELECT,
     },
   },
 } satisfies Prisma.ContactShareSelect;
@@ -88,6 +88,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
   });
 
   const c = share.contact;
+  // P49A-10: the flat values are derived from the typed entries.
+  const multiValues = readDerivedLegacyFields(c);
   const vcard = contactsToVCard([
     {
       fullName: c.fullName,
@@ -96,18 +98,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
       phoneticFirstName: c.phoneticFirstName,
       phoneticLastName: c.phoneticLastName,
       nickname: c.nickname,
-      email: c.email,
-      emailAddresses: parseContactStringArray(c.emailAddresses),
-      phone: c.phone,
-      phoneNumbers: parseContactStringArray(c.phoneNumbers),
+      email: multiValues.email,
+      emailAddresses: multiValues.emailAddresses,
+      phone: multiValues.phone,
+      phoneNumbers: multiValues.phoneNumbers,
       company: c.company,
       phoneticCompany: c.phoneticCompany,
       jobTitle: c.jobTitle,
-      website: c.website,
+      website: multiValues.website,
       birthday: c.birthday,
       significantDates: parseContactDateEntries(c.significantDates),
-      address: c.address,
-      postalAddresses: parseContactPostalAddresses(c.postalAddresses),
+      address: multiValues.address,
+      postalAddresses: multiValues.postalAddresses,
       notes: c.notes,
     },
   ]);
