@@ -2915,6 +2915,7 @@ function KontaxPasswordField() {
         autoComplete="current-password"
         placeholder="Confirm it’s you"
         required
+        className="outline-none kx-focus-visible"
         style={{
           width: "100%",
           height: 44,
@@ -2924,7 +2925,6 @@ function KontaxPasswordField() {
           padding: "0 14px",
           fontSize: 14,
           color: T.ink,
-          outline: "none",
           fontFamily: "inherit",
           boxSizing: "border-box",
         }}
