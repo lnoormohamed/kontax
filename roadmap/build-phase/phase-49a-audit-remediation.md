@@ -1,11 +1,14 @@
 # Phase 49A — Full-audit remediation
 
 ## Phase status
-In progress. On production (main f7ead25, 2026-09-27): P49A-01, -02, -03, -04, -05, -06, -07, -08,
--09, -10, -11, -12, -14 (with Phase 50), -15, -17, and P49A-19 items 1, 2, 3, 7, 8 and 9.
-Migrations 20260927090000 (P49A-10 backfill) and 20260927120000 (P49A-12 columns) applied to
-staging and production out of band before the deploy. Open: P49A-13, -16, -18, -20 and P49A-19
-items 4–6 (owner decisions), plus the low follow-ups recorded in the P49A-03 / -10 / -12 tickets.
+In progress. On production (main 7e3617d, 2026-09-27): P49A-01 to -15 except -13's follow-ups
+(i.e. -01, -02, -03, -04, -05, -06, -07, -08, -09, -10, -11, -12, -13, -14, -15), -17, -20, and
+P49A-19 items 1–9 (owner decisions 2026-09-27: 3-day payment grace enforced; vCard in every
+plan's data export; sync auto-pause after 3 failures on Free, 5 on paid). Open: P49A-16, -18,
+the sync follow-ups recorded in the P49A-03 / -10 / -12 tickets (DEVICE_WINS never pushes,
+KEEP_LOCAL/manual merge for Google/Outlook, family/team dissolve hard-deletes, 412 create loop,
+L2–L6), P49A-13 follow-ups (lockdown doesn't revoke tokens/app passwords; dead code) and the
+owner's ingress decision (origin reachable without Cloudflare → CF-Connecting-IP spoofable).
 
 Tickets written 2026-09-25 from the full audit
 ([kontax-full-audit-2026-09-25.md](../runbooks/kontax-full-audit-2026-09-25.md)).
