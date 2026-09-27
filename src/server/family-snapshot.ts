@@ -1,5 +1,6 @@
 import type { Prisma } from "../../generated/prisma";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
+import { copyMultiValueWriteData, readMultiValueFields } from "~/server/contact-multi-values";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
 
 type Tx = Prisma.TransactionClient;
@@ -21,8 +22,10 @@ const COPY_SELECT = {
   nameSuffix: true,
   nickname: true,
   email: true,
+  emailAddresses: true, // P49A-10: legacy fallback for a not-yet-backfilled row
   emailEntries: true,
   phone: true,
+  phoneNumbers: true,
   phoneEntries: true,
   company: true,
   phoneticCompany: true,
@@ -32,6 +35,7 @@ const COPY_SELECT = {
   websiteEntries: true,
   birthday: true,
   address: true,
+  postalAddresses: true,
   addressEntries: true,
   significantDates: true,
   relatedPeople: true,
@@ -118,7 +122,12 @@ export async function snapshotFamilyBookForUser(
   });
 
   for (const raw of shared) {
-    const contact = projectContactForSharing(raw.contact, policy, "family");
+    // P49A-10: project the canonical entries, then derive the legacy columns.
+    const contact = projectContactForSharing(
+      { ...raw.contact, ...readMultiValueFields(raw.contact) },
+      policy,
+      "family",
+    );
     const copy = await tx.contact.create({
       data: {
         userId: args.targetUserId,
@@ -132,19 +141,13 @@ export async function snapshotFamilyBookForUser(
         namePrefix: contact.namePrefix,
         nameSuffix: contact.nameSuffix,
         nickname: contact.nickname,
-        email: contact.email,
-        emailEntries: jsonOrUndef(contact.emailEntries),
-        phone: contact.phone,
-        phoneEntries: jsonOrUndef(contact.phoneEntries),
+        // P49A-10: typed entries (policy-filtered) with legacy columns derived.
+        ...copyMultiValueWriteData(contact),
         company: contact.company,
         phoneticCompany: contact.phoneticCompany,
         jobTitle: contact.jobTitle,
         department: contact.department,
-        website: contact.website,
-        websiteEntries: jsonOrUndef(contact.websiteEntries),
         birthday: contact.birthday,
-        address: contact.address,
-        addressEntries: jsonOrUndef(contact.addressEntries),
         significantDates: jsonOrUndef(contact.significantDates),
         relatedPeople: jsonOrUndef(contact.relatedPeople),
         customFields: jsonOrUndef(contact.customFields),

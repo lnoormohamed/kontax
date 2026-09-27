@@ -20,6 +20,7 @@ import {
   type MultiValueEntriesInput,
   type MultiValueFamily,
   readMultiValueEntries as readEntries,
+  reconcileLegacyIntoEntries as reconcileEntries,
   snapshotMultiValueWriteData as snapshotWriteData,
 } from "~/server/dav/contact-multi-values.mjs";
 
@@ -110,6 +111,20 @@ export const multiValueWriteData = (input: MultiValueEntriesInput): MultiValueWr
  */
 export const copyMultiValueWriteData = (source: ContactLike): MultiValueWriteData =>
   multiValueWriteData(readEntries(asRecord(source)));
+
+/**
+ * Entries with every legacy value missing from them appended ("other") — the
+ * rule the P49A-10 backfill migration applies in SQL.
+ */
+export const reconcileLegacyIntoEntries = (contact: ContactLike): MultiValueEntries =>
+  reconcileEntries(asRecord(contact)) as MultiValueEntries;
+
+/**
+ * Prisma data restoring a snapshot taken before P49A-10 (merge undo): its
+ * entries reconciled with its legacy values, so neither side's data is lost.
+ */
+export const restoreMultiValueWriteData = (snapshot: ContactLike): MultiValueWriteData =>
+  multiValueWriteData(reconcileEntries(asRecord(snapshot)));
 
 /**
  * Prisma data for the families a remote / conflict snapshot actually carries

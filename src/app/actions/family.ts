@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
+import { copyMultiValueWriteData, readMultiValueFields } from "~/server/contact-multi-values";
 import { requireUserId } from "~/server/auth/require-session";
 import {
   assertCanCreateContactsTx,
@@ -288,8 +289,10 @@ const COPY_SELECT = {
   nameSuffix: true,
   nickname: true,
   email: true,
+  emailAddresses: true, // P49A-10: legacy fallback for a not-yet-backfilled row
   emailEntries: true,
   phone: true,
+  phoneNumbers: true,
   phoneEntries: true,
   company: true,
   phoneticCompany: true,
@@ -299,6 +302,7 @@ const COPY_SELECT = {
   websiteEntries: true,
   birthday: true,
   address: true,
+  postalAddresses: true,
   addressEntries: true,
   significantDates: true,
   relatedPeople: true,
@@ -360,7 +364,13 @@ export const addContactToFamilyBook = async (formData: FormData) => {
     groupMember?.sharingPolicy ?? null,
     book?.minimumSharingPolicy ?? null,
   );
-  const source = projectContactForSharing(rawSource, policy, "family");
+  // P49A-10: project the canonical entries (read through the one reader, so a
+  // legacy-only row's values are split by the policy like any other).
+  const source = projectContactForSharing(
+    { ...rawSource, ...readMultiValueFields(rawSource) },
+    policy,
+    "family",
+  );
 
   // Already in the book? Dedupe against the unprojected email — this is only a
   // comparison, never stored, so it isn't a policy leak.
@@ -395,19 +405,13 @@ export const addContactToFamilyBook = async (formData: FormData) => {
         namePrefix: source.namePrefix,
         nameSuffix: source.nameSuffix,
         nickname: source.nickname,
-        email: source.email,
-        emailEntries: jsonOrUndef(source.emailEntries),
-        phone: source.phone,
-        phoneEntries: jsonOrUndef(source.phoneEntries),
+        // P49A-10: typed entries (policy-filtered) with legacy columns derived.
+        ...copyMultiValueWriteData(source),
         company: source.company,
         phoneticCompany: source.phoneticCompany,
         jobTitle: source.jobTitle,
         department: source.department,
-        website: source.website,
-        websiteEntries: jsonOrUndef(source.websiteEntries),
         birthday: source.birthday,
-        address: source.address,
-        addressEntries: jsonOrUndef(source.addressEntries),
         significantDates: jsonOrUndef(source.significantDates),
         relatedPeople: jsonOrUndef(source.relatedPeople),
         customFields: jsonOrUndef(source.customFields),

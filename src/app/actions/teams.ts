@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
+import { copyMultiValueWriteData, readMultiValueFields } from "~/server/contact-multi-values";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
 import { requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateContactsTx, getUserBillingContext, lockUserForPlanCheck } from "~/server/billing";
@@ -663,8 +664,10 @@ const TEAM_COPY_SELECT = {
   nameSuffix: true,
   nickname: true,
   email: true,
+  emailAddresses: true, // P49A-10: legacy fallback for a not-yet-backfilled row
   emailEntries: true,
   phone: true,
+  phoneNumbers: true,
   phoneEntries: true,
   company: true,
   phoneticCompany: true,
@@ -674,6 +677,7 @@ const TEAM_COPY_SELECT = {
   websiteEntries: true,
   birthday: true,
   address: true,
+  postalAddresses: true,
   addressEntries: true,
   significantDates: true,
   relatedPeople: true,
@@ -722,7 +726,12 @@ export const addContactToTeamBook = async (formData: FormData) => {
     groupMember?.sharingPolicy ?? null,
     book.minimumSharingPolicy,
   );
-  const source = projectContactForSharing(rawSource, policy, "team");
+  // P49A-10: project the canonical entries (see addContactToFamilyBook).
+  const source = projectContactForSharing(
+    { ...rawSource, ...readMultiValueFields(rawSource) },
+    policy,
+    "team",
+  );
   const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
 
   await db.$transaction(async (tx) => {
@@ -745,19 +754,13 @@ export const addContactToTeamBook = async (formData: FormData) => {
         namePrefix: source.namePrefix,
         nameSuffix: source.nameSuffix,
         nickname: source.nickname,
-        email: source.email,
-        emailEntries: jsonOrUndef(source.emailEntries),
-        phone: source.phone,
-        phoneEntries: jsonOrUndef(source.phoneEntries),
+        // P49A-10: typed entries (policy-filtered) with legacy columns derived.
+        ...copyMultiValueWriteData(source),
         company: source.company,
         phoneticCompany: source.phoneticCompany,
         jobTitle: source.jobTitle,
         department: source.department,
-        website: source.website,
-        websiteEntries: jsonOrUndef(source.websiteEntries),
         birthday: source.birthday,
-        address: source.address,
-        addressEntries: jsonOrUndef(source.addressEntries),
         significantDates: jsonOrUndef(source.significantDates),
         relatedPeople: jsonOrUndef(source.relatedPeople),
         customFields: jsonOrUndef(source.customFields),

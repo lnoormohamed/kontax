@@ -1,5 +1,6 @@
 import { Prisma } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
+import { copyMultiValueWriteData } from "~/server/contact-multi-values";
 import { db } from "~/server/db";
 
 // Fields pushed to a live recipient's copy on propagation. Excludes `notes`
@@ -138,21 +139,12 @@ export const propagateLiveShares = async (ownerUserId: string, contactId: string
             namePrefix: src.namePrefix,
             nameSuffix: src.nameSuffix,
             nickname: src.nickname,
-            email: src.email,
-            emailAddresses: jsonOrNull(src.emailAddresses),
-            emailEntries: jsonOrNull(src.emailEntries),
-            phone: src.phone,
-            phoneNumbers: jsonOrNull(src.phoneNumbers),
-            phoneEntries: jsonOrNull(src.phoneEntries),
+            // P49A-10: the owner's entries, legacy columns derived.
+            ...copyMultiValueWriteData(src),
             company: src.company,
             phoneticCompany: src.phoneticCompany,
             jobTitle: src.jobTitle,
-            website: src.website,
-            websiteEntries: jsonOrNull(src.websiteEntries),
             birthday: src.birthday,
-            address: src.address,
-            postalAddresses: jsonOrNull(src.postalAddresses),
-            addressEntries: jsonOrNull(src.addressEntries),
             avatarUrl: src.avatarUrl,
             labels: jsonOrNull(src.labels),
             significantDates: jsonOrNull(src.significantDates),

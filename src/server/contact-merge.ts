@@ -19,8 +19,17 @@ import {
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
+import {
+  type MultiValueAddressEntry,
+  type MultiValueEntry,
+  multiValueWriteData,
+  readMultiValueEntries,
+  readMultiValueFields,
+  restoreMultiValueWriteData,
+} from "~/server/contact-multi-values";
 import { db } from "~/server/db";
 import {
+  arePhoneValuesEquivalent,
   choosePreferredPhoneChoice,
   mergePhoneEntries,
   mergePhoneValues,
@@ -1592,37 +1601,102 @@ export const buildContactMergeSuggestionsAsync = async (
   return step.value;
 };
 
+// Make `chosen` the primary entry (adding it when no entry carries it); the
+// other entries keep their order. A null choice leaves primacy as merged.
+const promoteChosenEntry = <T extends { isPrimary: boolean }>(
+  entries: T[],
+  chosen: string | null,
+  valueOf: (entry: T) => string,
+  same: (left: string, right: string) => boolean,
+  create: (value: string) => T,
+): T[] => {
+  if (!chosen) return entries;
+  const index = entries.findIndex((entry) => same(valueOf(entry), chosen));
+  if (index < 0) {
+    return [create(chosen), ...entries.map((entry) => ({ ...entry, isPrimary: false }))];
+  }
+  return entries.map((entry, i) => ({ ...entry, isPrimary: i === index }));
+};
+
+const sameText = (left: string, right: string) =>
+  left.trim().toLowerCase() === right.trim().toLowerCase();
+
+const canonicalMergedMultiValues = (merged: {
+  email: string | null;
+  emailEntries: MultiValueEntry[] | null;
+  phone: string | null;
+  phoneEntries: MultiValueEntry[] | null;
+  website: string | null;
+  websiteEntries: MultiValueEntry[] | null;
+  address: string | null;
+  addressEntries: MultiValueAddressEntry[] | null;
+}) => {
+  const valueEntry = (value: string): MultiValueEntry => ({ label: "", value, isPrimary: true });
+  const derived = readMultiValueFields({
+    emailEntries: promoteChosenEntry(
+      merged.emailEntries ?? [],
+      merged.email,
+      (entry) => entry.value,
+      sameText,
+      valueEntry,
+    ),
+    phoneEntries: promoteChosenEntry(
+      merged.phoneEntries ?? [],
+      merged.phone,
+      (entry) => entry.value,
+      arePhoneValuesEquivalent,
+      valueEntry,
+    ),
+    websiteEntries: promoteChosenEntry(
+      merged.websiteEntries ?? [],
+      merged.website,
+      (entry) => entry.value,
+      sameText,
+      valueEntry,
+    ),
+    addressEntries: promoteChosenEntry(
+      merged.addressEntries ?? [],
+      merged.address,
+      (entry) => entry.formatted,
+      sameText,
+      (formatted): MultiValueAddressEntry => ({ label: "", formatted, isPrimary: true }),
+    ),
+  });
+  return {
+    email: derived.email,
+    emailAddresses: derived.emailAddresses,
+    emailEntries: derived.emailEntries,
+    phone: derived.phone,
+    phoneNumbers: derived.phoneNumbers,
+    phoneEntries: derived.phoneEntries,
+    website: derived.website,
+    websiteEntries: derived.websiteEntries,
+    address: derived.address,
+    postalAddresses: derived.postalAddresses,
+    addressEntries: derived.addressEntries,
+  };
+};
+
 export const buildMergedContactPreview = (
   primaryContact: MergeableContact,
   secondaryContact: MergeableContact,
   fieldChoices: MergeFieldChoices = {},
 ): MergePreview => {
+  // P49A-10: typed entries through the canonical reader (legacy values only
+  // for a row the backfill has not reached), so a CSV contact's extra emails
+  // are merged instead of dropped.
+  const primaryMultiValues = readMultiValueEntries(primaryContact);
+  const secondaryMultiValues = readMultiValueEntries(secondaryContact);
   const normalizedPrimary = {
     ...primaryContact,
     sourceKind: primaryContact.sourceKind ?? getSourceKind(primaryContact),
     emailAddresses: parseContactStringArray(primaryContact.emailAddresses),
-    emailEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
-      primaryContact.emailEntries,
-    ),
+    emailEntries: primaryMultiValues.emailEntries,
     phoneNumbers: parseContactStringArray(primaryContact.phoneNumbers),
-    phoneEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
-      primaryContact.phoneEntries,
-    ),
+    phoneEntries: primaryMultiValues.phoneEntries,
     postalAddresses: parseContactPostalAddresses(primaryContact.postalAddresses),
-    addressEntries: parseObjectArray<{
-      label: string;
-      formatted: string;
-      isPrimary?: boolean;
-      countryOrRegion?: string;
-      streetLine1?: string;
-      streetLine2?: string;
-      cityOrTown?: string;
-      postcode?: string;
-      poBox?: string;
-    }>(primaryContact.addressEntries),
-    websiteEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
-      primaryContact.websiteEntries,
-    ),
+    addressEntries: primaryMultiValues.addressEntries,
+    websiteEntries: primaryMultiValues.websiteEntries,
     labels: parseContactStringArray(primaryContact.labels),
     significantDates: parseObjectArray<{ label: string; date: string; isPrimary?: boolean }>(
       primaryContact.significantDates,
@@ -1636,28 +1710,12 @@ export const buildMergedContactPreview = (
     ...secondaryContact,
     sourceKind: secondaryContact.sourceKind ?? getSourceKind(secondaryContact),
     emailAddresses: parseContactStringArray(secondaryContact.emailAddresses),
-    emailEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
-      secondaryContact.emailEntries,
-    ),
+    emailEntries: secondaryMultiValues.emailEntries,
     phoneNumbers: parseContactStringArray(secondaryContact.phoneNumbers),
-    phoneEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
-      secondaryContact.phoneEntries,
-    ),
+    phoneEntries: secondaryMultiValues.phoneEntries,
     postalAddresses: parseContactPostalAddresses(secondaryContact.postalAddresses),
-    addressEntries: parseObjectArray<{
-      label: string;
-      formatted: string;
-      isPrimary?: boolean;
-      countryOrRegion?: string;
-      streetLine1?: string;
-      streetLine2?: string;
-      cityOrTown?: string;
-      postcode?: string;
-      poBox?: string;
-    }>(secondaryContact.addressEntries),
-    websiteEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
-      secondaryContact.websiteEntries,
-    ),
+    addressEntries: secondaryMultiValues.addressEntries,
+    websiteEntries: secondaryMultiValues.websiteEntries,
     labels: parseContactStringArray(secondaryContact.labels),
     significantDates: parseObjectArray<{ label: string; date: string; isPrimary?: boolean }>(
       secondaryContact.significantDates,
@@ -1920,6 +1978,11 @@ export const buildMergedContactPreview = (
             choice: resolvedChoices.notes,
           }),
   };
+
+  // P49A-10: the merged entries are canonical — the chosen email / phone /
+  // address / website becomes the primary entry and every legacy column is
+  // derived from the entries (they used to be merged separately).
+  Object.assign(mergedContact, canonicalMergedMultiValues(mergedContact));
 
   const mergeNotes = [
     normalizedPrimary.sourceKind !== normalizedSecondary.sourceKind
@@ -2618,21 +2681,17 @@ export const mergeContactsForUser = async ({
         lastName: preview.mergedContact.lastName,
         namePrefix: preview.mergedContact.namePrefix,
         nameSuffix: preview.mergedContact.nameSuffix,
-        email: preview.mergedContact.email,
-        emailAddresses: toNullableJsonField(preview.mergedContact.emailAddresses),
-        emailEntries: toNullableJsonField(preview.mergedContact.emailEntries),
-        phone: preview.mergedContact.phone,
-        phoneNumbers: toNullableJsonField(preview.mergedContact.phoneNumbers),
-        phoneEntries: toNullableJsonField(preview.mergedContact.phoneEntries),
+        // P49A-10: merged entries, legacy columns derived by the canonical module.
+        ...multiValueWriteData({
+          emailEntries: preview.mergedContact.emailEntries ?? [],
+          phoneEntries: preview.mergedContact.phoneEntries ?? [],
+          websiteEntries: preview.mergedContact.websiteEntries ?? [],
+          addressEntries: preview.mergedContact.addressEntries ?? [],
+        }),
         company: preview.mergedContact.company,
         nickname: preview.mergedContact.nickname,
         jobTitle: preview.mergedContact.jobTitle,
-        website: preview.mergedContact.website,
-        websiteEntries: toNullableJsonField(preview.mergedContact.websiteEntries),
         birthday: preview.mergedContact.birthday,
-        address: preview.mergedContact.address,
-        postalAddresses: toNullableJsonField(preview.mergedContact.postalAddresses),
-        addressEntries: toNullableJsonField(preview.mergedContact.addressEntries),
         avatarUrl: preview.mergedContact.avatarUrl,
         isFavorite: preview.mergedContact.isFavorite,
         labels: toNullableJsonField(preview.mergedContact.labels),
@@ -2920,20 +2979,12 @@ export const undoMergedContactsForUser = async ({
         namePrefix: details.primaryBefore.namePrefix,
         nameSuffix: details.primaryBefore.nameSuffix,
         nickname: details.primaryBefore.nickname,
-        email: details.primaryBefore.email,
-        emailAddresses: toNullableJsonField(details.primaryBefore.emailAddresses),
-        emailEntries: toNullableJsonField(details.primaryBefore.emailEntries),
-        phone: details.primaryBefore.phone,
-        phoneNumbers: toNullableJsonField(details.primaryBefore.phoneNumbers),
-        phoneEntries: toNullableJsonField(details.primaryBefore.phoneEntries),
+        // P49A-10: the snapshot's entries reconciled with its legacy values
+        // (a pre-P49A-10 snapshot can hold values in either), legacy derived.
+        ...restoreMultiValueWriteData(details.primaryBefore),
         company: details.primaryBefore.company,
         jobTitle: details.primaryBefore.jobTitle,
-        website: details.primaryBefore.website,
-        websiteEntries: toNullableJsonField(details.primaryBefore.websiteEntries),
         birthday: details.primaryBefore.birthday,
-        address: details.primaryBefore.address,
-        postalAddresses: toNullableJsonField(details.primaryBefore.postalAddresses),
-        addressEntries: toNullableJsonField(details.primaryBefore.addressEntries),
         avatarUrl: details.primaryBefore.avatarUrl,
         isFavorite: details.primaryBefore.isFavorite,
         labels: toNullableJsonField(details.primaryBefore.labels),
@@ -2966,20 +3017,12 @@ export const undoMergedContactsForUser = async ({
         namePrefix: details.secondaryBefore.namePrefix,
         nameSuffix: details.secondaryBefore.nameSuffix,
         nickname: details.secondaryBefore.nickname,
-        email: details.secondaryBefore.email,
-        emailAddresses: toNullableJsonField(details.secondaryBefore.emailAddresses),
-        emailEntries: toNullableJsonField(details.secondaryBefore.emailEntries),
-        phone: details.secondaryBefore.phone,
-        phoneNumbers: toNullableJsonField(details.secondaryBefore.phoneNumbers),
-        phoneEntries: toNullableJsonField(details.secondaryBefore.phoneEntries),
+        // P49A-10: the snapshot's entries reconciled with its legacy values
+        // (a pre-P49A-10 snapshot can hold values in either), legacy derived.
+        ...restoreMultiValueWriteData(details.secondaryBefore),
         company: details.secondaryBefore.company,
         jobTitle: details.secondaryBefore.jobTitle,
-        website: details.secondaryBefore.website,
-        websiteEntries: toNullableJsonField(details.secondaryBefore.websiteEntries),
         birthday: details.secondaryBefore.birthday,
-        address: details.secondaryBefore.address,
-        postalAddresses: toNullableJsonField(details.secondaryBefore.postalAddresses),
-        addressEntries: toNullableJsonField(details.secondaryBefore.addressEntries),
         avatarUrl: details.secondaryBefore.avatarUrl,
         isFavorite: details.secondaryBefore.isFavorite,
         labels: toNullableJsonField(details.secondaryBefore.labels),

@@ -312,6 +312,80 @@ export const readMultiValueEntries = (contact, options = {}) => ({
   websiteEntries: readWebsiteEntries(contact, options),
 });
 
+// --- reconcile (backfill) -----------------------------------------------------------
+
+/** @param {string} value */
+const phoneKey = (value) => value.replace(/[^0-9+]/g, "");
+
+/**
+ * Append every legacy value that is missing from the typed entries as an
+ * entry labelled "other" (a postal address keeps its own label) — the same
+ * rule as the P49A-10 backfill migration, which is the SQL twin of this
+ * function. Matching is case-insensitive; phones also match an entry's `e164`
+ * and ignore formatting (only digits and `+` are compared). An appended entry
+ * is primary only when the family had no entries at all.
+ *
+ * Used for data written before P49A-10 where the two representations can
+ * disagree (merge "before" snapshots restored by undo); live rows are
+ * backfilled by the migration and read with `readMultiValueEntries`.
+ *
+ * @param {Record<string, unknown>} contact
+ * @returns {MultiValueEntries}
+ */
+export const reconcileLegacyIntoEntries = (contact) => {
+  /**
+   * @param {MultiValueEntry[]} entries
+   * @param {string[]} legacyValues
+   * @param {(value: string) => string} keyOf
+   * @param {(entry: MultiValueEntry) => string[]} entryKeys
+   * @returns {MultiValueEntry[]}
+   */
+  const appendMissing = (entries, legacyValues, keyOf, entryKeys) => {
+    const known = new Set(entries.flatMap(entryKeys).map(keyOf).filter(Boolean));
+    const out = [...entries];
+    for (const value of legacyValues) {
+      const key = keyOf(value);
+      if (!key || known.has(key)) continue;
+      known.add(key);
+      out.push({ label: LEGACY_ENTRY_LABEL, value, isPrimary: out.length === 0 });
+    }
+    return out;
+  };
+  /** @param {unknown} scalar @param {unknown} legacy */
+  const legacyStrings = (scalar, legacy) =>
+    [trimmedString(scalar), ...(Array.isArray(legacy) ? legacy.map(trimmedString) : [])].filter(Boolean);
+
+  const emailEntries = appendMissing(
+    normalizeValueEntries(contact.emailEntries),
+    legacyStrings(contact.email, contact.emailAddresses),
+    foldKey,
+    (entry) => [entry.value],
+  );
+  const phoneEntries = appendMissing(
+    normalizeValueEntries(contact.phoneEntries),
+    legacyStrings(contact.phone, contact.phoneNumbers),
+    phoneKey,
+    (entry) => [entry.value, trimmedString(entry.e164)],
+  );
+  const websiteEntries = appendMissing(
+    normalizeValueEntries(contact.websiteEntries),
+    legacyStrings(contact.website, null),
+    foldKey,
+    (entry) => [entry.value],
+  );
+
+  const addressEntries = normalizeAddressEntries(contact.addressEntries);
+  const knownAddresses = new Set(addressEntries.map((entry) => foldKey(entry.formatted)));
+  for (const candidate of addressEntriesFromLegacy(contact.address, contact.postalAddresses)) {
+    const key = foldKey(candidate.formatted);
+    if (knownAddresses.has(key)) continue;
+    knownAddresses.add(key);
+    addressEntries.push({ ...candidate, isPrimary: addressEntries.length === 0 });
+  }
+
+  return { emailEntries, phoneEntries, addressEntries, websiteEntries };
+};
+
 // --- entries → legacy ------------------------------------------------------------
 
 /**

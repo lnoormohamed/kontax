@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
 import { projectContactForSharing, resolveEffectiveSharingPolicy } from "~/lib/sharing-policy";
+import { copyMultiValueWriteData, readMultiValueFields } from "~/server/contact-multi-values";
 import { requireUserId } from "~/server/auth/require-session";
 import {
   assertCanCreateContactsTx,
@@ -351,7 +352,11 @@ export const createStaticShare = async (formData: FormData) => {
       : (owner?.email ?? "A Kontax user");
 
   // P48-07: notes never travel into a share snapshot.
-  const projected = projectContactForSharing(contact, PERSONAL_SHARE_POLICY, "static-share");
+  const projected = projectContactForSharing(
+    { ...contact, ...readMultiValueFields(contact) },
+    PERSONAL_SHARE_POLICY,
+    "static-share",
+  );
 
   const share = await db.contactShare.create({
     data: {
@@ -469,21 +474,13 @@ export const acceptStaticShare = async (formData: FormData) => {
         namePrefix: fields.namePrefix ?? null,
         nameSuffix: fields.nameSuffix ?? null,
         nickname: fields.nickname ?? null,
-        email: fields.email ?? null,
-        emailAddresses: (fields.emailAddresses ?? undefined) as never,
-        emailEntries: (fields.emailEntries ?? undefined) as never,
-        phone: fields.phone ?? null,
-        phoneNumbers: (fields.phoneNumbers ?? undefined) as never,
-        phoneEntries: (fields.phoneEntries ?? undefined) as never,
+        // P49A-10: the snapshot's entries (legacy values for a snapshot taken
+        // before the backfill) with every legacy column derived.
+        ...copyMultiValueWriteData(fields),
         company: fields.company ?? null,
         phoneticCompany: fields.phoneticCompany ?? null,
         jobTitle: fields.jobTitle ?? null,
-        website: fields.website ?? null,
-        websiteEntries: (fields.websiteEntries ?? undefined) as never,
         birthday: fields.birthday ?? null,
-        address: fields.address ?? null,
-        postalAddresses: (fields.postalAddresses ?? undefined) as never,
-        addressEntries: (fields.addressEntries ?? undefined) as never,
         labels: (fields.labels ?? undefined) as never,
         significantDates: (fields.significantDates ?? undefined) as never,
         relatedPeople: (fields.relatedPeople ?? undefined) as never,
@@ -594,7 +591,11 @@ export const createLiveShare = async (formData: FormData) => {
 
   // P48-07: notes never travel into the initial live-share snapshot — matches
   // LIVE_FIELD_SELECT (contact-shares.ts), which every subsequent propagation uses.
-  const projected = projectContactForSharing(snapshotFields, PERSONAL_SHARE_POLICY, "live-share");
+  const projected = projectContactForSharing(
+    { ...snapshotFields, ...readMultiValueFields(snapshotFields) },
+    PERSONAL_SHARE_POLICY,
+    "live-share",
+  );
 
   const share = await db.contactShare.create({
     data: {
@@ -683,21 +684,13 @@ export const acceptLiveShare = async (formData: FormData) => {
         namePrefix: fields.namePrefix ?? null,
         nameSuffix: fields.nameSuffix ?? null,
         nickname: fields.nickname ?? null,
-        email: fields.email ?? null,
-        emailAddresses: (fields.emailAddresses ?? undefined) as never,
-        emailEntries: (fields.emailEntries ?? undefined) as never,
-        phone: fields.phone ?? null,
-        phoneNumbers: (fields.phoneNumbers ?? undefined) as never,
-        phoneEntries: (fields.phoneEntries ?? undefined) as never,
+        // P49A-10: the snapshot's entries (legacy values for a snapshot taken
+        // before the backfill) with every legacy column derived.
+        ...copyMultiValueWriteData(fields),
         company: fields.company ?? null,
         phoneticCompany: fields.phoneticCompany ?? null,
         jobTitle: fields.jobTitle ?? null,
-        website: fields.website ?? null,
-        websiteEntries: (fields.websiteEntries ?? undefined) as never,
         birthday: fields.birthday ?? null,
-        address: fields.address ?? null,
-        postalAddresses: (fields.postalAddresses ?? undefined) as never,
-        addressEntries: (fields.addressEntries ?? undefined) as never,
         labels: (fields.labels ?? undefined) as never,
         significantDates: (fields.significantDates ?? undefined) as never,
         relatedPeople: (fields.relatedPeople ?? undefined) as never,
