@@ -1,34 +1,57 @@
-#!/bin/sh
-# Nightly logical backup of the kontax database (run as the postgres OS user).
-# Replaces a crontab entry that was malformed (two jobs on one line with a
-# literal "\n" and doubled backslashes before %), so it had never run as
-# intended. Writes a dated gzip dump over the local socket, logs, and prunes
-# dumps older than 30 days. To enable at-rest encryption see
-# roadmap/runbooks/db-restore.md "Backup encryption (P48-17)": set AGE_RECIPIENT
-# to the age public key and the dump is piped through `age` before touching disk.
-set -u
-cd / || exit 1
+#!/bin/bash
+# Nightly logical backup of the kontax database (run as the postgres OS user,
+# from its crontab on the DB container, LXC 129). P49A-11:
+#  - any failure in the pipeline fails the run (pipefail), so a pg_dump that
+#    dies half-way can never leave a truncated file logged as OK;
+#  - the dump is PostgreSQL's custom format (compressed, restorable with
+#    pg_restore) and is verified with `pg_restore -l` before it replaces
+#    anything;
+#  - if AGE_RECIPIENT is set but `age` isn't installed, the run fails loudly
+#    instead of silently writing plaintext;
+#  - writes $DIR/last-success (UTC timestamp) for monitoring and the off-host
+#    copy (scripts/ops/kontax-db-offsite.sh on the Proxmox host).
+# Restore: roadmap/runbooks/db-restore.md.
+set -euo pipefail
+cd /
+
 DIR=/var/lib/postgresql/backups/kontax
 LOG=$DIR/backup.log
-PGDUMP=/usr/lib/postgresql/18/bin/pg_dump
+BIN=/usr/lib/postgresql/18/bin
 AGE_RECIPIENT="${AGE_RECIPIENT:-}"
-DAY=$(date +%Y%m%d)
+RETENTION_DAYS=30
+STAMP=$(date -u +%Y%m%d)
+START=$(date +%s)
+
 mkdir -p "$DIR"
-if [ -n "$AGE_RECIPIENT" ] && command -v age >/dev/null 2>&1; then
-  OUT=$DIR/kontax_$DAY.sql.gz.age
-  if $PGDUMP -d kontax | gzip | age -r "$AGE_RECIPIENT" > "$OUT.tmp" 2>>"$LOG"; then
-    mv "$OUT.tmp" "$OUT"
-  else
-    rm -f "$OUT.tmp"; echo "$(date -u +%FT%TZ) FAILED (encrypted)" >> "$LOG"; exit 1
-  fi
-else
-  OUT=$DIR/kontax_$DAY.sql.gz
-  if $PGDUMP -d kontax | gzip > "$OUT.tmp" 2>>"$LOG" && gzip -t "$OUT.tmp"; then
-    mv "$OUT.tmp" "$OUT"
-  else
-    rm -f "$OUT.tmp"; echo "$(date -u +%FT%TZ) FAILED" >> "$LOG"; exit 1
-  fi
+log() { echo "$(date -u +%FT%TZ) $*" >> "$LOG"; }
+
+OUT=$DIR/kontax_$STAMP.dump
+TMP=$OUT.tmp
+trap 'rm -f "$TMP" "$TMP.age"; log "FAILED (exit $?)"' ERR
+
+if [ -n "$AGE_RECIPIENT" ] && ! command -v age >/dev/null 2>&1; then
+  log "FAILED: AGE_RECIPIENT is set but age is not installed — refusing to write an unencrypted dump"
+  exit 1
 fi
-echo "$(date -u +%FT%TZ) OK $(basename "$OUT") $(stat -c %s "$OUT") bytes" >> "$LOG"
-find "$DIR" -name 'kontax_*.sql.gz' -mtime +30 -delete
-find "$DIR" -name 'kontax_*.sql.gz.age' -mtime +30 -delete
+
+"$BIN/pg_dump" --format=custom --compress=9 --file="$TMP" kontax 2>>"$LOG"
+# A dump whose table of contents can't be read is not a backup.
+"$BIN/pg_restore" --list "$TMP" > /dev/null 2>>"$LOG"
+
+if [ -n "$AGE_RECIPIENT" ]; then
+  age -r "$AGE_RECIPIENT" -o "$TMP.age" "$TMP" 2>>"$LOG"
+  rm -f "$TMP"
+  mv "$TMP.age" "$OUT.age"
+  FINAL=$OUT.age
+else
+  mv "$TMP" "$OUT"
+  FINAL=$OUT
+fi
+trap - ERR
+
+log "OK $(basename "$FINAL") $(stat -c %s "$FINAL") bytes in $(( $(date +%s) - START ))s"
+date -u +%FT%TZ > "$DIR/last-success"
+
+# Retention: new custom-format dumps and the older .sql.gz generation.
+find "$DIR" -maxdepth 1 \( -name 'kontax_*.dump' -o -name 'kontax_*.dump.age' \
+  -o -name 'kontax_*.sql.gz' -o -name 'kontax_*.sql.gz.age' \) -mtime +"$RETENTION_DAYS" -delete

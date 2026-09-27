@@ -78,36 +78,42 @@ Provisioned remotely via `COPY TO PROGRAM` as the postgres superuser. No SSH req
 
 First backup run manually on 2026-06-17: `/var/lib/postgresql/backups/kontax/kontax_20260617.sql.gz` — 12 KB, 3,613 SQL lines. ✅
 
-### Current nightly backup — script-based (since 2026-09-15)
+### Current nightly backup — script-based (P49A-11, since 2026-09-27)
 
-The original crontab was malformed (both jobs on one line with a literal
-`\n`, doubled backslashes before `%`) and pointed at the old
-`192.168.1.193` address, so it never ran after 2026-06-17. It was replaced on
-2026-09-15 by a script that lives in this repo:
+Three scripts, all in this repo under `scripts/ops/`:
 
-- **Script**: [`scripts/ops/kontax-pg-backup.sh`](../../scripts/ops/kontax-pg-backup.sh),
-  installed on LXC 129 as `/usr/local/bin/kontax-pg-backup.sh` (root-owned,
-  mode 755). It dumps over the local socket (no password needed), writes
-  `kontax_YYYYMMDD.sql.gz` via a temp file, verifies it with `gzip -t`, logs one
-  line per run to `backup.log`, and deletes dumps older than 30 days.
-- **Crontab** (`postgres` OS user, LXC 129):
-  ```
-  0 2 * * * /usr/local/bin/kontax-pg-backup.sh
-  ```
-- **Check it ran**: `tail -3 /var/lib/postgresql/backups/kontax/backup.log`
-  on LXC 129 — expect an `OK kontax_YYYYMMDD.sql.gz <bytes> bytes` line per
-  night.
-- **Update the installed copy** after changing the script in the repo:
+| Script | Runs on | When | What |
+|---|---|---|---|
+| [`kontax-pg-backup.sh`](../../scripts/ops/kontax-pg-backup.sh) | LXC 129, `postgres` crontab | `0 2 * * *` | `pg_dump --format=custom` → `kontax_YYYYMMDD.dump` via a temp file, verified with `pg_restore --list` before it replaces anything; `set -euo pipefail` so a half-finished dump fails the run; writes `last-success`; keeps 30 days |
+| [`kontax-db-offsite.sh`](../../scripts/ops/kontax-db-offsite.sh) | Proxmox host 10.0.50.10, root crontab | `0 3 * * *` | Copies the newest dump to the NAS: `/mnt/pve/pve-backup-nfs/kontax-db/` (mode 600, size-checked); keeps 14 days; logs `FAILED` if the newest dump is older than 26 h |
+| [`kontax-db-restore-test.sh`](../../scripts/ops/kontax-db-restore-test.sh) | LXC 129, `postgres` crontab | `0 4 1 * *` | Restores the newest dump into `kontax_restore_test`, compares row counts of key tables with live, drops it |
+
+- **Check it ran**:
+  - LXC 129: `tail -5 /var/lib/postgresql/backups/kontax/backup.log` — expect `OK kontax_YYYYMMDD.dump <bytes> bytes in <n>s`
+    nightly and a monthly `restore-test OK …` line; `cat …/kontax/last-success`.
+  - Host: `tail -3 /var/log/kontax-db-offsite.log` — expect `OK copied kontax_YYYYMMDD.dump …`.
+- **Update the installed copies** after changing a script in the repo:
   ```bash
   ssh -i ~/.ssh/claude-proxmox-uk root@10.0.50.10 'cat > /tmp/kontax-pg-backup.sh' < scripts/ops/kontax-pg-backup.sh
   ssh -i ~/.ssh/claude-proxmox-uk root@10.0.50.10 'pct push 129 /tmp/kontax-pg-backup.sh /usr/local/bin/kontax-pg-backup.sh --perms 0755 && rm /tmp/kontax-pg-backup.sh'
+  # same pattern for kontax-db-restore-test.sh; the offsite script is installed directly on the host:
+  ssh -i ~/.ssh/claude-proxmox-uk root@10.0.50.10 'cat > /usr/local/bin/kontax-db-offsite.sh && chmod 755 /usr/local/bin/kontax-db-offsite.sh' < scripts/ops/kontax-db-offsite.sh
   ```
-- The previous crontab is kept at `/root/postgres.cron.bak-*` on LXC 129.
+- Installed 2026-09-27: first custom-format dump 326 KB in 1 s; restore test OK
+  (User 3/3, Contact 1/1, `_prisma_migrations` 6/6); first off-host copy OK. The previous script
+  is kept as `/usr/local/bin/kontax-pg-backup.sh.bak-20260927` on LXC 129; previous crontabs as
+  `/tmp/pgcron.bak` (LXC 129) and `/root/crontab.bak-20260927` (host).
+- Older `kontax_YYYYMMDD.sql.gz` files (plain SQL, pre-2026-09-27) are pruned by the same 30-day rule.
 
 Separately, Proxmox snapshots the whole LXC 129 to the NAS monthly (job
 `c02d393d`, 1st of the month 02:30, storage `pve-backup-nfs`).
 
-### Backup encryption (P48-17)
+### Backup encryption (P48-17) — NOT enabled
+
+> **Status (2026-09-27): deferred by owner decision (2026-09-25).** `age` is not installed on
+> LXC 129 and `AGE_RECIPIENT` is not set, so dumps on disk and on the NAS are **unencrypted**. If
+> `AGE_RECIPIENT` is set without `age` installed, the backup now fails instead of writing
+> plaintext. When enabled, the script encrypts the verified `.dump` to `.dump.age`.
 
 The crontab above writes a plain `gzip`'d dump to disk — anyone with
 filesystem or off-host-copy access to `/var/lib/postgresql/backups/kontax/`
@@ -173,15 +179,10 @@ age -d -i /path/to/kontax-backup-key.txt \
 
 ### Verify a backup file
 
-Backups since P48-17 are `age`-encrypted (`.sql.gz.age`) — decrypt first
-(see above), then verify the plain `.sql.gz` exactly as before:
-
 ```bash
-# From the server as postgres, after `age -d ...` (above):
-gunzip -c kontax_YYYYMMDD.sql.gz | head -3
-# Expected: -- PostgreSQL database dump
-gunzip -c kontax_YYYYMMDD.sql.gz | wc -l
-# Schema-only (no data): ~3613 lines; with data: much larger
+# On LXC 129 as postgres (encrypted dumps: `age -d -i key.txt -o x.dump x.dump.age` first):
+/usr/lib/postgresql/18/bin/pg_restore --list /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.dump | head
+# Lists the archive's table of contents; a truncated or corrupt file errors out.
 ```
 
 ## Restore from dump
@@ -189,36 +190,31 @@ gunzip -c kontax_YYYYMMDD.sql.gz | wc -l
 ### Full restore to a new database
 
 ```bash
-# 1. Create target database (postgres superuser required)
-psql -U postgres -c "CREATE DATABASE kontax_restored OWNER kontax;"
+# 1. Create the target database (as postgres)
+createdb -O kontax kontax_restored
 
-# 2. Decrypt, then restore
-age -d -i /path/to/kontax-backup-key.txt \
-  /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz.age \
-  | gunzip -c | psql -U kontax -d kontax_restored
+# 2. Restore (custom format; add `age -d` first if the dump is encrypted)
+/usr/lib/postgresql/18/bin/pg_restore --no-owner --role=kontax --exit-on-error \
+  -d kontax_restored /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.dump
+#    From the NAS copy: pct push 129 /mnt/pve/pve-backup-nfs/kontax-db/kontax_YYYYMMDD.dump /tmp/restore.dump
 
 # 3. Verify table and row counts
-psql -U kontax -d kontax_restored \
-  -c "SELECT relname, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC LIMIT 10;"
+psql -d kontax_restored -c "SELECT relname, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC LIMIT 10;"
 
 # 4. Swap (once verified): update DATABASE_URL in Coolify to point to kontax_restored,
-#    then drop the old kontax database.
+#    then drop the old kontax database. For validate-mode startup, the restored DB carries its
+#    own _prisma_migrations table, so no migration step is needed if the dump is from the same release.
 ```
 
-**RTO estimate (tested 2026-06-16):** Schema-only restore (45 tables, no data) completes in ~173 s. With production data, estimate ~5–15 min depending on contact count.
+Older plain-SQL backups (`kontax_YYYYMMDD.sql.gz`): `gunzip -c file.sql.gz | psql -d kontax_restored`.
 
-### Restore test procedure (run after each major schema change)
+**RTO:** a full restore of the current production dump takes seconds (326 KB, 2026-09-27); expect
+minutes as contact counts grow.
 
-```bash
-psql -U postgres -c "CREATE DATABASE kontax_restore_test OWNER kontax;"
-age -d -i /path/to/kontax-backup-key.txt \
-  /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz.age \
-  | gunzip -c | psql -U kontax -d kontax_restore_test --quiet
-psql -U kontax -d kontax_restore_test \
-  -c "SELECT count(*) FROM pg_tables WHERE schemaname='public';"
-# Expected: 45
-psql -U postgres -c "DROP DATABASE kontax_restore_test;"
-```
+### Restore test
+
+Automated monthly by `kontax-db-restore-test.sh` (see above). To run one by hand on LXC 129:
+`su postgres -c /usr/local/bin/kontax-db-restore-test.sh && tail -1 /var/lib/postgresql/backups/kontax/backup.log`.
 
 ## Checking user privileges
 
