@@ -187,9 +187,14 @@ One canonical representation; build on it, never around it.
   means no evidence and nothing is cleared. Outlook addresses are `"partial"` (the Graph push
   never sends them). A new provider/profile must set all four families deliberately. Snapshot
   applies pass the clearable set explicitly (`snapshotMultiValueWriteData(snapshot, clearable)`).
-- **For P49A-03 (CardDAV push fidelity):** the pushed body is built from `contactToPortable` in
-  `sync-runner.ts`, which reads through `readMultiValueFields`; merging preserved remote
-  properties must keep EMAIL/TEL/ADR/URL as Kontax-owned (replaced from the entries).
+- **CardDAV push fidelity (P49A-03, done):** the pushed body is built from `contactToPortable` in
+  `sync-runner.ts` (reads through `readMultiValueFields`) and merged with the raw remote card by
+  `src/server/carddav-vcard-merge.ts`: EMAIL/TEL/ADR/URL and the other modelled families are
+  Kontax-owned (replaced from the entries), every other remote property and group is kept
+  verbatim. Every PUT is conditional (`If-Match` on the ETag read, `If-None-Match: *` for a
+  create); a 412 re-reads the card and goes through the conflict policy. A new modelled vCard
+  property must be added to `CARDDAV_KONTAX_OWNED_PROPERTIES`, or the remote copy is kept next to
+  Kontax's.
 - **For P49A-12 (change propagation / merge):** every non-sync writer already goes through the
   module, so a "dirty since last sync" marker can be set next to each `multiValueWriteData` /
   `copyMultiValueWriteData` call; merge makes the chosen value the primary entry and derives the
