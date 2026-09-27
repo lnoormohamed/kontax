@@ -380,12 +380,11 @@ export function AuthCard({
       </p>
 
       {/* Message banners (password-reset, email-changed) */}
-      {(message === "password-reset" || message === "password-reset-tokens") && (
+      {/* P49A-13: what a reset revoked (API tokens, device app passwords) is
+          shown on the reset page itself, before it links here. */}
+      {message === "password-reset" && (
         <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
           Your password has been reset. Please sign in with your new password.
-          {/* P49A-13: a reset revokes every API token. */}
-          {message === "password-reset-tokens" &&
-            " Your API tokens were revoked too — create new ones in Settings → Developer."}
         </div>
       )}
       {message === "email-changed" && (

@@ -6,15 +6,17 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import {
+  invalidateDavCredentialCacheForUser,
   formatAppPasswordToken,
   generateAppPasswordToken,
   hashAppPassword,
   listUserAppPasswords,
   revokeUserAppPassword,
 } from "~/server/app-passwords";
-import { requireUserId } from "~/server/auth/require-session";
+import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { verifyStepUpPassword } from "~/server/auth/step-up";
 import { getUserBillingContext } from "~/server/billing";
+import { revokeAllAppPasswords } from "~/server/credential-revocation";
 import { db } from "~/server/db";
 
 const createAppPasswordSchema = z.object({
@@ -118,13 +120,42 @@ export const createAppPassword = async (_previousState: unknown, formData: FormD
 };
 
 class AppPasswordLimitError extends Error {
-  constructor(
-    public current: number,
-    public limit: number | null,
-  ) {
+  // Plain fields, not parameter properties: node's strip-types test runner
+  // can't load those, and the tests import this module.
+  readonly current: number;
+  readonly limit: number | null;
+  constructor(current: number, limit: number | null) {
     super("App password limit reached.");
+    this.current = current;
+    this.limit = limit;
   }
 }
+
+/**
+ * P49A-13 (Fable review): "Sign out all devices" — revoke every live CardDAV
+ * app password at once, offered after a password change (which, unlike a
+ * reset, keeps devices working). No step-up: it only takes access away, and
+ * the person who needs it most is the owner of a possibly hijacked account.
+ */
+export const signOutAllDevices = async (): Promise<{ ok: true; revoked: number } | { ok: false; error: string }> => {
+  let userId: string;
+  try {
+    userId = await requireUserId({ write: true });
+  } catch (err) {
+    if (isSessionError(err)) return { ok: false, error: "UNAUTHORIZED" };
+    throw err;
+  }
+  const revoked = await revokeAllAppPasswords(db, userId);
+  // Also on 0: a cached verification must not outlive a row revoked elsewhere.
+  await invalidateDavCredentialCacheForUser(userId);
+  if (revoked > 0) {
+    await db.activityEvent.create({
+      data: { userId, eventType: "ACCOUNT_UPDATED", actor: "USER", payload: { field: "appPasswordsRevokedAll", revoked } },
+    });
+  }
+  revalidatePath("/settings");
+  return { ok: true, revoked };
+};
 
 export const getAppPasswords = async () => {
   const userId = await requireUserId();

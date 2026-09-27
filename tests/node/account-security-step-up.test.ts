@@ -66,8 +66,18 @@ mock.module("next/headers", {
 mock.module("~/server/session-validation-cache", {
   namedExports: { invalidateSessionValidation: async () => undefined },
 });
+const davCacheInvalidations: string[] = [];
 mock.module("~/server/app-passwords", {
-  namedExports: { invalidateDavCredentialCacheForUser: async () => undefined },
+  namedExports: {
+    invalidateDavCredentialCacheForUser: async (userId: string) => {
+      davCacheInvalidations.push(userId);
+    },
+    formatAppPasswordToken: (t: string) => t,
+    generateAppPasswordToken: () => "token",
+    hashAppPassword: async () => "hash",
+    listUserAppPasswords: async () => [],
+    revokeUserAppPassword: async () => true,
+  },
 });
 mock.module("~/server/billing-emails", {
   namedExports: { sendAccountDeletionScheduledEmail: async () => undefined },
@@ -95,6 +105,7 @@ const { createApiToken } = await import("../../src/app/actions/api-tokens");
 const { changePassword } = await import("../../src/app/actions/account");
 const { resetPassword } = await import("../../src/app/actions/auth");
 const { verifyStepUpPassword } = await import("../../src/server/auth/step-up");
+const { signOutAllDevices } = await import("../../src/app/actions/app-passwords");
 
 let fake: ReturnType<typeof createFakePrisma>;
 let userSeq = 0;
@@ -193,6 +204,12 @@ const seedTokens = (userId: string, n: number) => {
   }
 };
 
+const seedDevices = (userId: string, n: number) => {
+  for (let i = 0; i < n; i++) fake.seed("appPassword", { userId, label: `device ${i}`, revokedAt: null });
+};
+const liveDevices = (userId: string) =>
+  fake.rows("appPassword").filter((r) => r.userId === userId && r.revokedAt == null);
+
 test("changePassword revokes every live API token and says how many", async () => {
   const userId = seedUser();
   seedTokens(userId, 3);
@@ -200,7 +217,7 @@ test("changePassword revokes every live API token and says how many", async () =
   seedTokens("someone_else", 1);
 
   const result = await changePassword({ currentPassword: PASSWORD, newPassword: "a brand new password" });
-  assert.deepEqual(result, { success: true, revokedApiTokens: 3 });
+  assert.deepEqual(result, { success: true, revokedApiTokens: 3, activeAppPasswords: 0 });
   assert.equal(liveTokens(userId).length, 0);
   assert.equal(liveTokens("someone_else").length, 1, "other users' tokens untouched");
   assert.equal(
@@ -233,8 +250,57 @@ test("resetPassword revokes every live API token", async () => {
   seedResetToken(userId);
 
   const result = await resetPassword({ plaintextToken: RESET_TOKEN, newPassword: "a brand new password" });
-  assert.deepEqual(result, { success: true, revokedApiTokens: 2 });
+  assert.deepEqual(result, { success: true, revokedApiTokens: 2, revokedAppPasswords: 0 });
   assert.equal(liveTokens(userId).length, 0);
+});
+
+// ── app passwords (Fable review) ─────────────────────────────────────────────
+
+test("resetPassword revokes every CardDAV app password and drops the DAV credential cache", async () => {
+  const userId = seedUser();
+  seedDevices(userId, 2);
+  seedDevices("someone_else", 1);
+  seedResetToken(userId);
+  davCacheInvalidations.length = 0;
+
+  const result = await resetPassword({ plaintextToken: RESET_TOKEN, newPassword: "a brand new password" });
+  assert.deepEqual(result, { success: true, revokedApiTokens: 0, revokedAppPasswords: 2 });
+  assert.equal(liveDevices(userId).length, 0);
+  assert.equal(liveDevices("someone_else").length, 1, "other users' devices untouched");
+  assert.deepEqual(davCacheInvalidations, [userId], "cached CardDAV verifications are dropped");
+});
+
+test("a failed reset (link already used) revokes no devices", async () => {
+  const userId = seedUser();
+  seedDevices(userId, 1);
+  seedResetToken(userId);
+  fake.rows("passwordResetToken")[0]!.usedAt = new Date();
+  assert.deepEqual(
+    await resetPassword({ plaintextToken: RESET_TOKEN, newPassword: "a brand new password" }),
+    { error: "TOKEN_INVALID" },
+  );
+  assert.equal(liveDevices(userId).length, 1);
+});
+
+test("changePassword keeps devices working but reports how many are signed in", async () => {
+  const userId = seedUser();
+  seedDevices(userId, 2);
+  const result = await changePassword({ currentPassword: PASSWORD, newPassword: "a brand new password" });
+  assert.deepEqual(result, { success: true, revokedApiTokens: 0, activeAppPasswords: 2 });
+  assert.equal(liveDevices(userId).length, 2);
+});
+
+test("signOutAllDevices revokes every app password and drops the DAV cache", async () => {
+  const userId = seedUser();
+  seedDevices(userId, 3);
+  seedDevices("someone_else", 1);
+  davCacheInvalidations.length = 0;
+
+  assert.deepEqual(await signOutAllDevices(), { ok: true, revoked: 3 });
+  assert.equal(liveDevices(userId).length, 0);
+  assert.equal(liveDevices("someone_else").length, 1);
+  assert.deepEqual(davCacheInvalidations, [userId]);
+  assert.deepEqual(await signOutAllDevices(), { ok: true, revoked: 0 }, "idempotent");
 });
 
 test("resetPassword: two concurrent submits of one link — exactly one wins", async () => {

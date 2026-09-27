@@ -79,7 +79,9 @@ export async function updateProfile(input: {
 export async function changePassword(input: {
   currentPassword: string;
   newPassword: string;
-}): Promise<{ success: true; revokedApiTokens: number } | { error: string }> {
+}): Promise<
+  { success: true; revokedApiTokens: number; activeAppPasswords: number } | { error: string }
+> {
   let session: Awaited<ReturnType<typeof requireSession>>;
   try {
     session = await requireSession({ write: true });
@@ -128,6 +130,12 @@ export async function changePassword(input: {
   // P38-09: the sessionVersion bump must beat the 45s validation cache
   await invalidateSessionValidation(userId);
 
+  // P49A-13 (Fable review): a voluntary change keeps CardDAV devices syncing
+  // (revoking them would silently break every phone), but an app password
+  // minted with a leaked password would survive too — so report how many are
+  // live and let the success notice offer "Sign out all devices".
+  const activeAppPasswords = await db.appPassword.count({ where: { userId, revokedAt: null } });
+
   await db.activityEvent.create({
     data: {
       userId,
@@ -137,7 +145,7 @@ export async function changePassword(input: {
     },
   });
 
-  return { success: true, revokedApiTokens };
+  return { success: true, revokedApiTokens, activeAppPasswords };
 }
 
 // ─── Email Change (P18-03) ───────────────────────────────────────────────────

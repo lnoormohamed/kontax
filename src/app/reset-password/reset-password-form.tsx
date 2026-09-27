@@ -33,6 +33,8 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  // P49A-13: what the reset revoked, shown before sign-in when non-zero.
+  const [revoked, setRevoked] = useState<{ apiTokens: number; appPasswords: number } | null>(null);
 
   const mismatch = confirm.length > 0 && confirm !== password;
   const canSubmit = password.length >= 8 && password === confirm && !isPending;
@@ -43,15 +45,47 @@ export function ResetPasswordForm({ token }: { token: string }) {
     startTransition(async () => {
       const result = await resetPassword({ plaintextToken: token, newPassword: password });
       if ("success" in result) {
-        // P49A-13: the login banner tells the user their API tokens went too.
-        router.push(
-          result.revokedApiTokens > 0 ? "/login?message=password-reset-tokens" : "/login?message=password-reset",
-        );
+        // P49A-13: a reset revokes API tokens and CardDAV app passwords. When
+        // it revoked anything, say what before sending the user to sign in.
+        if (result.revokedApiTokens > 0 || result.revokedAppPasswords > 0) {
+          setRevoked({ apiTokens: result.revokedApiTokens, appPasswords: result.revokedAppPasswords });
+        } else {
+          router.push("/login?message=password-reset");
+        }
       } else {
         setError(ERROR_MESSAGES[result.error] ?? "Something went wrong.");
       }
     });
   };
+
+  if (revoked) {
+    return (
+      <div className="w-full max-w-[400px] rounded-[14px] border border-[#d4d9d0] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]" role="status">
+        <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">Your password has been reset</h1>
+        <p className="mt-2 text-[14px] leading-[1.55] text-[#5c655e]">
+          To keep your account safe, everything that was signed in with the old password has been signed out:
+        </p>
+        <ul className="mt-3 grid gap-2 pl-5 text-[14px] leading-[1.5] text-[#1d2823]">
+          {revoked.appPasswords > 0 && (
+            <li>
+              {revoked.appPasswords === 1 ? "1 device" : `${revoked.appPasswords} devices`} syncing over CardDAV will need to sign in again — create a new app password in Settings → Data &amp; sync → Connect a device.
+            </li>
+          )}
+          {revoked.apiTokens > 0 && (
+            <li>
+              {revoked.apiTokens === 1 ? "1 API token was" : `${revoked.apiTokens} API tokens were`} revoked — create new ones in Settings → Developer.
+            </li>
+          )}
+        </ul>
+        <Link
+          className="mt-6 block w-full rounded-[10px] bg-[#17352e] py-3 text-center text-[14px] font-semibold text-white transition hover:bg-[#0f2620]"
+          href="/login?message=password-reset"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[400px] rounded-[14px] border border-[#d4d9d0] bg-white p-8 shadow-[0_2px_12px_rgba(20,30,25,0.08)]">

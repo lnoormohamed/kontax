@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
 
 import { changePassword } from "~/app/actions/account";
+import { signOutAllDevices } from "~/app/actions/app-passwords";
 
 function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }) {
   return (
@@ -82,7 +83,12 @@ export function PasswordChangeForm({ oauthOnly = false }: { oauthOnly?: boolean 
   const [conf, setConf] = useState("");
   const [errs, setErrs] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState("");
+  // P49A-13 (Fable review): CardDAV devices keep working after a password
+  // change; show how many and offer to sign them all out.
+  const [liveDevices, setLiveDevices] = useState(0);
+  const [devicesNote, setDevicesNote] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [isSigningOut, startSignOut] = useTransition();
 
   const reset = () => { setOpen(false); setCur(""); setNw(""); setConf(""); setErrs({}); };
   const filled = oauthOnly ? (nw && conf) : (cur && nw && conf);
@@ -111,8 +117,11 @@ export function PasswordChangeForm({ oauthOnly = false }: { oauthOnly?: boolean 
           ? "Password set. You can now sign in with your email and password."
           : "Password updated. All other sessions have been signed out.") + tokenNote;
         setNotice(msg);
+        setLiveDevices(result.activeAppPasswords);
+        setDevicesNote("");
         await update();
-        setTimeout(() => setNotice(""), revoked > 0 ? 15000 : 6000);
+        // The device prompt stays until acted on or dismissed; a plain notice fades.
+        if (result.activeAppPasswords === 0) setTimeout(() => setNotice(""), revoked > 0 ? 15000 : 6000);
       } else {
         setErrs({ cur: ERROR_MESSAGES[result.error] ?? "Something went wrong." });
       }
@@ -135,8 +144,45 @@ export function PasswordChangeForm({ oauthOnly = false }: { oauthOnly?: boolean 
             </p>
           )}
           {notice && (
-            <div className="mt-3 rounded-[12px] border border-[#bcdac9] bg-[#e7efe9] px-[14px] py-[11px] text-[13.5px] leading-[1.45] text-[#17352e]">
+            <div className="mt-3 rounded-[12px] border border-[#bcdac9] bg-[#e7efe9] px-[14px] py-[11px] text-[13.5px] leading-[1.45] text-[#17352e]" role="status">
               {notice}
+              {liveDevices > 0 && (
+                <div className="mt-2 border-t border-[#bcdac9] pt-2">
+                  <p className="m-0">
+                    {liveDevices === 1 ? "1 device is" : `${liveDevices} devices are`} still signed in over CardDAV with an app password. If you changed your password because someone else may have had it, sign them out — each device will need a new app password.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      className="rounded-[1rem] bg-[#b5472f] px-3 py-[7px] text-[13px] font-semibold text-white transition hover:bg-[#9a3a23] disabled:opacity-50"
+                      disabled={isSigningOut}
+                      onClick={() =>
+                        startSignOut(async () => {
+                          const res = await signOutAllDevices();
+                          if (res.ok) {
+                            setLiveDevices(0);
+                            setDevicesNote(
+                              res.revoked === 1 ? "1 device signed out." : `${res.revoked} devices signed out.`,
+                            );
+                          } else {
+                            setDevicesNote("Couldn't sign the devices out. Try again, or revoke them in Settings → Data & sync → Connect a device.");
+                          }
+                        })
+                      }
+                      type="button"
+                    >
+                      {isSigningOut ? "Signing out…" : "Sign out all devices"}
+                    </button>
+                    <button
+                      className="rounded-[1rem] border border-[#bcdac9] bg-white px-3 py-[7px] text-[13px] font-semibold text-[#17352e] transition hover:bg-[#f2f4f0]"
+                      onClick={() => { setLiveDevices(0); setNotice(""); }}
+                      type="button"
+                    >
+                      Keep them
+                    </button>
+                  </div>
+                </div>
+              )}
+              {devicesNote && <p className="m-0 mt-2 font-semibold">{devicesNote}</p>}
             </div>
           )}
           <button

@@ -135,7 +135,7 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
       whatToExpect: [
         "Each link works once. Asking for a new link cancels any earlier unused one.",
         "Resetting your password signs you out on every device and revokes your API tokens. Two-factor authentication stays on.",
-        "Device app passwords used by your iPhone, Mac or Android are separate and keep working.",
+        "It also revokes the app passwords your iPhone, Mac or Android use to sync — each one needs a new app password from **Settings → Data & sync → Connect a device**.",
       ],
       ifItDoesntWork: [
         "No email? Check spam, and make sure you used the address on your account. Requests are rate-limited, so wait a few minutes before asking again.",
@@ -160,7 +160,12 @@ export const ACCOUNT_SECURITY: HelpCategoryContent = {
       steps: [
         { text: "Read the alert. If the activity was you, you don't need to do anything." },
         { text: "If it wasn't, open **Settings → Security → Active sessions** and choose **Sign out of all other devices**." },
-        { text: "Change your password with **Change password** in **Settings → Security** (or sign out and use **Forgot password?**)." },
+        {
+          text: "Change your password with **Change password** in **Settings → Security** (or sign out and use **Forgot password?**).",
+          details: [
+            "Changing your password keeps synced devices working; if any are signed in, Kontax offers **Sign out all devices** — choose it if someone else may have had your password. A reset signs them out automatically.",
+          ],
+        },
         { text: "Turn on [two-factor authentication](/help/account-security/set-up-two-factor-authentication) if it isn't already on." },
       ],
       sections: [
