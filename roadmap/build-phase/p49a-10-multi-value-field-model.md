@@ -79,7 +79,7 @@ Outlook / CardDAV push sources and supported-field shadows, merge preview, CSV /
 The scalar `email`/`phone` columns stay readable for list views, search and indexes — they are
 always derived now.
 
-### A-19 — inbound deletions
+### A-19 — inbound deletions (see also "Fable review fixes" below: clearing also needs shadow evidence)
 - Capability profiles gain `fields.emails|phones|addresses|websites: "full" | "partial"`
   (`sync-provider-capabilities.ts`, `providerListIsAuthoritative`). `"full"` = Kontax pushes the
   family and the provider returns it on every read, so an empty inbound list is a deletion and
@@ -102,7 +102,8 @@ always derived now.
   address keeps its own label; phones match on `e164` and digits/`+` only; primary only when the
   family had no entries) and bumps `syncVersion` + `updatedAt` so devices re-download; step 2
   re-derives the legacy columns from the entries. A second run updates 0 rows.
-- Checked on a throwaway local Postgres 17 cluster (never a real DB): all migrations applied, 8
+- Checked on a throwaway local Postgres 17 cluster (never a real DB; re-checked after the Fable
+  review fixes with 12 rows, see below): all migrations applied, 8
   fixture rows (CSV legacy-only, legacy extra, e164 phone, stale legacy, web-editor address,
   already-clean, JSON-null entries, scalar-only edit) matched the JS twin
   `reconcileLegacyIntoEntries` + `deriveMultiValueFields` field for field; re-run → `UPDATE 0` ×8.
@@ -123,6 +124,48 @@ SELECT count(*) FROM "Contact"
 legacy derived; mobile-sheet save and inline editor keep all three; DAV GET returns three;
 inline primary-email edit; emptied family clears) and `tests/node/sync-multi-value-deletions.test.ts`
 (phone removed on Google clears; Outlook family not returned / not round-tripped is left alone).
+
+### Fable review fixes (2026-09-27)
+1. **HIGH — an empty remote list could delete values Kontax never pushed.** Non-MANUAL local edits
+   (Kontax CardDAV PUT, REST API) are anchored without a push (A-17), so the next unrelated remote
+   edit cleared them — on the device too. An empty inbound list is now a deletion only when the
+   family is authoritative in the capability profile **and** the link's stored
+   `supportedFieldShadow` shows the provider held values for it at the last sync
+   (`clearableInboundFamilies`, `sync-contact-mapping.ts`); no shadow = no evidence = nothing
+   cleared. Threaded through `mappedContactToWriteData(m, profile, previousShadow)`,
+   `applyRemoteToContact(..., previousShadow)` (engine update paths and the Google / Outlook
+   SERVER_WINS stale-etag paths — Outlook push links now select the shadow) and the CardDAV
+   runner's remote apply (`buildContactWriteDataFromRemoteSnapshot(..., previousShadow)`).
+   Remaining limitation: if the provider held a family and then emptied it, a value added locally
+   and not yet pushed in between is cleared with it (a non-empty remote list replaced it before
+   P49A-10 anyway); A-17 in P49A-12 closes that by pushing non-MANUAL edits.
+2. **MEDIUM — inline primary-phone edit kept the old number's metadata.** `replacePrimaryEntry`
+   (`actions/contacts.ts`) now keeps only the label when the value changes: phones are rebuilt
+   with `buildNormalizedPhoneEntries` (fresh `e164`, `national`, `validationStatus`, …), other
+   families drop stale metadata / structured address components.
+3. **LOW — migration primacy order.** Step 2 orders by `coalesce(isPrimary = true, false) DESC`
+   (a missing flag no longer sorts first) and dedupes entries on label + value first, exactly as
+   `normalizeValueEntries` + `primaryEntryOf`; address component fallbacks treat `""` like the JS
+   `||` (e.g. empty `streetLine1` → `street`).
+4. **LOW — migration cost.** Every correlated subquery was replaced by joins / GROUP BY
+   aggregates (`(array_agg(value ORDER BY is_primary DESC, ord))[1]`, `jsonb_agg(... ORDER BY
+   ord)`), so step 1 and step 2 are linear in contacts + entries. Edited in place (never applied).
+   Re-run on a fresh throwaway Postgres 17 cluster with 12 fixture rows (the 8 before plus mixed
+   primacy flags, empty `streetLine1`, duplicate label+value with the later copy flagged, website
+   primary out of date): run 1 matched the JS twin field for field ("ALL MATCH"), run 2 → `UPDATE 0`
+   ×8, verification query → 0, no SubPlan in the step-2 plan. Cluster deleted afterwards.
+5. **LOW — snapshot applies.** `snapshotMultiValueWriteData(snapshot, clearable)` now requires
+   the families an empty list may clear: the CardDAV runner passes the shadow-evidence set; the
+   explicit keep-remote resolution (`actions/sync.ts` `buildContactWriteDataFromRemoteSnapshot`
+   only) passes the profile's authoritative families, so Outlook addresses ("partial") are never
+   cleared. `familiesPresentIn` counts only an entries array, a string scalar or a legacy array in
+   Kontax's shape — null keys (P39-03 exclusions) and Google's raw `emailAddresses` /
+   `phoneNumbers` object arrays are not carried families.
+
+Tests added: unpushed non-MANUAL phone survives an unrelated Google edit (full run, no conflict);
+empty list without shadow evidence / with a legacy-only shadow; inline phone edit recomputes
+`e164` and the derived `phoneNumbers`; snapshot clearable / carried-family rules; `familiesHeldBy`.
+A mutation check (dropping the shadow condition) makes the two A-19 tests fail.
 
 ### Not done / deferred
 - Dropping the legacy columns: P49A-18.

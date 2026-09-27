@@ -181,9 +181,12 @@ One canonical representation; build on it, never around it.
   - read: `readMultiValueEntries(row)` (entries; legacy only while a family's entries are empty),
     `readMultiValueFields(row)` (entries + re-derived legacy keys for portable/shadow shapes).
 - **Inbound sync (A-19):** an empty inbound list clears the local one only when the link's
-  capability profile marks the family `"full"` (`providerListIsAuthoritative`) and the record
-  carried it (`MappedContact.omittedFamilies`). Outlook addresses are `"partial"` (the Graph push
-  never sends them). A new provider/profile must set all four families deliberately.
+  capability profile marks the family `"full"` (`providerListIsAuthoritative`), the record
+  carried it (`MappedContact.omittedFamilies`) **and** the link's stored `supportedFieldShadow`
+  shows the provider held values for it at the last sync (`clearableInboundFamilies`) — no shadow
+  means no evidence and nothing is cleared. Outlook addresses are `"partial"` (the Graph push
+  never sends them). A new provider/profile must set all four families deliberately. Snapshot
+  applies pass the clearable set explicitly (`snapshotMultiValueWriteData(snapshot, clearable)`).
 - **For P49A-03 (CardDAV push fidelity):** the pushed body is built from `contactToPortable` in
   `sync-runner.ts`, which reads through `readMultiValueFields`; merging preserved remote
   properties must keep EMAIL/TEL/ADR/URL as Kontax-owned (replaced from the entries).
