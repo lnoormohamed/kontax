@@ -117,16 +117,23 @@ export function UndoMergeButton({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [undoing, setUndoing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   const handleUndo = () => {
     setUndoing(true);
+    setError(null);
     startTransition(async () => {
       const fd = new FormData();
       fd.set("decisionId", decisionId);
-      await undoMergeContacts(fd);
-      setOpen(false);
+      const result = await undoMergeContacts(fd);
       setUndoing(false);
+      // P49A-12: refused server-side (older than 30 days, contact deleted…).
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setOpen(false);
       router.push("/contacts?tab=duplicates&mergeUndone=1");
     });
   };
@@ -157,8 +164,14 @@ export function UndoMergeButton({
                 </>
               ) : (
                 "This restores the absorbed contact as a separate record, reverts the surviving contact to its pre-merge state, and re-opens the duplicate suggestion."
-              )}
+              )}{" "}
+              Fields you edited after the merge keep your edits.
             </p>
+            {error && (
+              <p className="-mt-2 mb-[18px] text-[13px] leading-[1.5] text-[#a03d2a]" role="alert">
+                {error}
+              </p>
+            )}
             <div className="flex justify-end gap-2.5">
               <button
                 className="px-2 py-2.5 text-[13.5px] font-semibold text-[#5c655e] disabled:opacity-50"

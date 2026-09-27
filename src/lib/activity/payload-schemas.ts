@@ -44,6 +44,8 @@ const contactMerged = z.object({
 const contactMergeUndone = z.object({
   restoredContactId: z.string(),
   originalMergeEventId: z.string().optional(),
+  // P49A-12 (A-20): survivor fields edited after the merge, kept as edited.
+  keptFields: z.array(z.string()).optional(),
 });
 
 const contactImported = z.object({

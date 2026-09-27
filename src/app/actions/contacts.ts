@@ -12,6 +12,7 @@ import { setPrimaryMembership } from "~/server/contact-book-membership";
 import {
   bulkAcceptHighConfidenceForUser,
   mergeContactsForUser,
+  MergeUndoError,
   undoMergedContactsForUser,
 } from "~/server/contact-merge";
 import { cleanupDeletedContactPhotos, deleteContactsPermanently } from "~/server/contact-deletion";
@@ -1478,10 +1479,19 @@ export const undoMergeContacts = async (formData: FormData) => {
   const userId = await requireUserId({ write: true });
   const decisionId = parseMergeDecisionId(formData);
 
-  const survivingContactId = await undoMergedContactsForUser({
-    userId,
-    decisionId,
-  });
-
-  revalidateContactViews(survivingContactId);
+  // P49A-12 (A-20): the 30-day window and "the merged-away contact still
+  // exists" are checked server-side; a refusal comes back as a message.
+  try {
+    const result = await undoMergedContactsForUser({
+      userId,
+      decisionId,
+    });
+    revalidateContactViews(result.survivingContactId);
+    return { ok: true as const, keptFields: result.keptFields };
+  } catch (error) {
+    if (error instanceof MergeUndoError) {
+      return { ok: false as const, error: error.message };
+    }
+    throw error;
+  }
 };

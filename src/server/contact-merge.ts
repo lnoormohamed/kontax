@@ -25,9 +25,10 @@ import {
   multiValueWriteData,
   readMultiValueEntries,
   readMultiValueFields,
-  restoreMultiValueWriteData,
+  reconcileLegacyIntoEntries,
 } from "~/server/contact-multi-values";
 import { db } from "~/server/db";
+import { markSyncLinksDirty, reviveContactSyncLinks } from "~/server/sync-dirty";
 import {
   arePhoneValuesEquivalent,
   choosePreferredPhoneChoice,
@@ -53,6 +54,12 @@ export type MergeCandidateContact = {
   phoneEntries?: unknown;
   company: string | null;
   jobTitle?: string | null;
+  // P49A-12 (A-20): carried through a merge (they used to be dropped).
+  department?: string | null;
+  phoneticFirstName?: string | null;
+  phoneticLastName?: string | null;
+  phoneticCompany?: string | null;
+  isEmergency?: boolean;
   website?: string | null;
   websiteEntries?: unknown;
   birthday?: string | null;
@@ -259,6 +266,12 @@ export type MergePreview = {
     company: string | null;
     nickname: string | null;
     jobTitle: string | null;
+    // P49A-12 (A-20)
+    department: string | null;
+    phoneticFirstName: string | null;
+    phoneticLastName: string | null;
+    phoneticCompany: string | null;
+    isEmergency: boolean;
     website: string | null;
     websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     birthday: string | null;
@@ -330,7 +343,7 @@ type MergeDecisionSnapshot = {
     archivedAt: string | null;
     syncTombstoneAt: string | null;
     mergedIntoContactId: string | null;
-  };
+  } & MergeExtraFields;
   secondaryBefore: {
     id: string;
     fullName: string;
@@ -374,7 +387,7 @@ type MergeDecisionSnapshot = {
     archivedAt: string | null;
     syncTombstoneAt: string | null;
     mergedIntoContactId: string | null;
-  };
+  } & MergeExtraFields;
   mergedAfter: {
     fullName: string;
     firstName: string | null;
@@ -414,8 +427,42 @@ type MergeDecisionSnapshot = {
     relatedPeople: Array<{ relationship: string; name: string }> | null;
     customFields: Array<{ label: string; value: string }> | null;
     notes: string | null;
-  };
+  } & MergeExtraFields;
   fieldChoices: MergeFieldChoices;
+  // P49A-12: what the merge changed outside the two contact rows, so undo can
+  // reverse exactly that. Absent on decisions recorded before P49A-12.
+  propagation?: MergePropagation;
+};
+
+// P49A-12 (A-20): fields a merge carries that pre-P49A-12 snapshots did not
+// record (optional: an older snapshot leaves them untouched on undo).
+type MergeExtraFields = {
+  department?: string | null;
+  phoneticFirstName?: string | null;
+  phoneticLastName?: string | null;
+  phoneticCompany?: string | null;
+  isEmergency?: boolean;
+};
+
+const mergeExtraFieldsOf = (contact: MergeExtraFields): Required<MergeExtraFields> => ({
+  department: contact.department ?? null,
+  phoneticFirstName: contact.phoneticFirstName ?? null,
+  phoneticLastName: contact.phoneticLastName ?? null,
+  phoneticCompany: contact.phoneticCompany ?? null,
+  isEmergency: contact.isEmergency ?? false,
+});
+
+type MergePropagation = {
+  /** Personal books the survivor joined because the absorbed contact was in them. */
+  addedBookIds: string[];
+  /** Family / team books the survivor joined for the same reason. */
+  addedGroupBookIds: string[];
+  /**
+   * The absorbed contact's live sync links moved onto the survivor (accounts
+   * where the survivor had none), so the provider's record is updated in place
+   * instead of deleted and re-created.
+   */
+  relinkedLinkIds: string[];
 };
 
 const normalizeValue = (value: string | null | undefined) =>
@@ -1902,6 +1949,39 @@ export const buildMergedContactPreview = (
           secondaryContact: normalizedSecondary,
         }),
       }) ?? null,
+    // P49A-12 (A-20): department follows the usual precedence; the phonetic
+    // names follow the side whose name was chosen, the phonetic company the
+    // side whose company was chosen (each falls back to the other side).
+    department:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.department,
+        secondaryValue: normalizedSecondary.department,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.department,
+          secondaryValue: normalizedSecondary.department,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
+    phoneticFirstName:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.phoneticFirstName,
+        secondaryValue: normalizedSecondary.phoneticFirstName,
+        choice: resolvedChoices.fullName,
+      }) ?? null,
+    phoneticLastName:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.phoneticLastName,
+        secondaryValue: normalizedSecondary.phoneticLastName,
+        choice: resolvedChoices.fullName,
+      }) ?? null,
+    phoneticCompany:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.phoneticCompany,
+        secondaryValue: normalizedSecondary.phoneticCompany,
+        choice: resolvedChoices.company,
+      }) ?? null,
+    isEmergency: [normalizedPrimary.isEmergency, normalizedSecondary.isEmergency].some(Boolean),
     website:
       pickFieldValue({
         primaryValue: normalizedPrimary.website,
@@ -2589,6 +2669,15 @@ export const mergeContactsForUser = async ({
         mergedIntoContactId: true,
         importJobId: true,
         updatedAt: true,
+        // P49A-12 (A-20): every field and membership is carried.
+        department: true,
+        phoneticFirstName: true,
+        phoneticLastName: true,
+        phoneticCompany: true,
+        isEmergency: true,
+        bookMemberships: { select: { addressBookId: true } },
+        groupContacts: { select: { groupAddressBookId: true } },
+        syncLinks: { where: { tombstonedAt: null }, select: { id: true, syncAccountId: true } },
       },
     });
 
@@ -2691,6 +2780,11 @@ export const mergeContactsForUser = async ({
         company: preview.mergedContact.company,
         nickname: preview.mergedContact.nickname,
         jobTitle: preview.mergedContact.jobTitle,
+        department: preview.mergedContact.department,
+        phoneticFirstName: preview.mergedContact.phoneticFirstName,
+        phoneticLastName: preview.mergedContact.phoneticLastName,
+        phoneticCompany: preview.mergedContact.phoneticCompany,
+        isEmergency: preview.mergedContact.isEmergency,
         birthday: preview.mergedContact.birthday,
         avatarUrl: preview.mergedContact.avatarUrl,
         isFavorite: preview.mergedContact.isFavorite,
@@ -2706,6 +2800,71 @@ export const mergeContactsForUser = async ({
         },
       },
     });
+
+    // P49A-12 (A-20): the survivor joins every book the absorbed contact was
+    // in (personal books as extra memberships, family / team books as shared
+    // copies), so merging never drops it out of a book or a device collection.
+    const survivorBookIds = new Set(primaryContact.bookMemberships.map((m) => m.addressBookId));
+    const addedBookIds = [
+      ...new Set(secondaryContact.bookMemberships.map((m) => m.addressBookId)),
+    ].filter((bookId) => !survivorBookIds.has(bookId));
+    if (addedBookIds.length > 0) {
+      await tx.contactBookMembership.createMany({
+        data: addedBookIds.map((addressBookId) => ({
+          contactId: primaryContact.id,
+          addressBookId,
+          isPrimary: false,
+        })),
+        skipDuplicates: true,
+      });
+    }
+    const survivorGroupBookIds = new Set(
+      primaryContact.groupContacts.map((g) => g.groupAddressBookId),
+    );
+    const addedGroupBookIds = [
+      ...new Set(secondaryContact.groupContacts.map((g) => g.groupAddressBookId)),
+    ].filter((bookId) => !survivorGroupBookIds.has(bookId));
+    if (addedGroupBookIds.length > 0) {
+      await tx.groupContact.createMany({
+        data: addedGroupBookIds.map((groupAddressBookId) => ({
+          groupAddressBookId,
+          contactId: primaryContact.id,
+          addedByUserId: userId,
+        })),
+        skipDuplicates: true,
+      });
+    }
+
+    // P49A-12 (A-17/A-20): sync links. Where only the absorbed contact is on a
+    // provider, its link moves to the survivor — the provider's record is
+    // updated in place with the merged data. Where both are, the absorbed
+    // contact keeps its link and, being archived below, is deleted there on
+    // the next push. The survivor's links are all marked dirty so the merged
+    // record is pushed everywhere.
+    const survivorAccountIds = new Set(primaryContact.syncLinks.map((l) => l.syncAccountId));
+    const relinkedLinkIds = secondaryContact.syncLinks
+      .filter((link) => !survivorAccountIds.has(link.syncAccountId))
+      .map((link) => link.id);
+    if (relinkedLinkIds.length > 0) {
+      // A tombstoned survivor link for the same account would collide with the
+      // unique (account, contact) pair; its remote copy is gone anyway.
+      await tx.syncContactLink.deleteMany({
+        where: {
+          contactId: primaryContact.id,
+          tombstonedAt: { not: null },
+          syncAccountId: {
+            in: secondaryContact.syncLinks
+              .filter((link) => relinkedLinkIds.includes(link.id))
+              .map((link) => link.syncAccountId),
+          },
+        },
+      });
+      await tx.syncContactLink.updateMany({
+        where: { id: { in: relinkedLinkIds } },
+        data: { contactId: primaryContact.id },
+      });
+    }
+    await markSyncLinksDirty(tx, primaryContact.id, reviewedAt);
 
     await tx.contact.update({
       where: {
@@ -2828,6 +2987,7 @@ export const mergeContactsForUser = async ({
               archivedAt: primaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: primaryContact.syncTombstoneAt?.toISOString() ?? null,
               mergedIntoContactId: primaryContact.mergedIntoContactId ?? null,
+              ...mergeExtraFieldsOf(primaryContact),
             },
             secondaryBefore: {
               id: secondaryContact.id,
@@ -2888,9 +3048,11 @@ export const mergeContactsForUser = async ({
               archivedAt: secondaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: secondaryContact.syncTombstoneAt?.toISOString() ?? null,
               mergedIntoContactId: secondaryContact.mergedIntoContactId ?? null,
+              ...mergeExtraFieldsOf(secondaryContact),
             },
             mergedAfter: preview.mergedContact,
             fieldChoices: fieldChoices ?? preview.defaultChoices,
+            propagation: { addedBookIds, addedGroupBookIds, relinkedLinkIds },
           } satisfies MergeDecisionSnapshot,
         },
         select: {
@@ -2929,13 +3091,200 @@ export const mergeContactsForUser = async ({
   return mergeResult;
 };
 
+// P49A-12 (A-20): undo a merge without overwriting what happened since.
+//
+// * The 30-day window is enforced here, not only in the UI.
+// * The survivor gets its pre-merge value back only for fields still exactly
+//   as the merge wrote them; a field edited since the merge keeps the edit and
+//   is reported in `keptFields` (the name parts count as one field, so a
+//   renamed contact never ends up with half its old name).
+// * The absorbed contact's own fields were never changed by the merge, so only
+//   its archive / merge state is reversed (edits made to it since are kept).
+// * Book memberships and sync links the merge moved are moved back; both
+//   contacts' links are revived / marked dirty so every provider gets the
+//   restored records (the absorbed contact's remote copies were deleted when
+//   it was archived — they are re-created).
+export class MergeUndoError extends Error {}
+
+const MERGE_UNDO_WINDOW_MS = MERGE_UNDO_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
+const undoSurvivorSelect = {
+  id: true,
+  deletedAt: true,
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  emailEntries: true,
+  phone: true,
+  phoneNumbers: true,
+  phoneEntries: true,
+  website: true,
+  websiteEntries: true,
+  address: true,
+  postalAddresses: true,
+  addressEntries: true,
+  company: true,
+  jobTitle: true,
+  department: true,
+  phoneticFirstName: true,
+  phoneticLastName: true,
+  phoneticCompany: true,
+  birthday: true,
+  avatarUrl: true,
+  isFavorite: true,
+  isEmergency: true,
+  labels: true,
+  significantDates: true,
+  relatedPeople: true,
+  customFields: true,
+  notes: true,
+} satisfies Prisma.ContactSelect;
+
+// JSON with object keys sorted — a Json column read back from Postgres (jsonb)
+// does not keep the key order the snapshot was written with.
+const stableJson = (value: unknown): string => {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (value && typeof value === "object" && !(value instanceof Date)) {
+    const record = value as Record<string, unknown>;
+    return `{${Object.keys(record)
+      .filter((key) => record[key] !== undefined)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableJson(record[key])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value ?? null);
+};
+
+// null, undefined, "" and [] all mean "no value".
+const comparableValue = (value: unknown): string => {
+  if (value == null) return "null";
+  if (typeof value === "string") return value.length === 0 ? "null" : JSON.stringify(value);
+  if (Array.isArray(value) && value.length === 0) return "null";
+  return stableJson(value);
+};
+
+const MULTI_VALUE_UNDO_FAMILIES = [
+  ["emails", "emailEntries", "value"],
+  ["phones", "phoneEntries", "value"],
+  ["websites", "websiteEntries", "value"],
+  ["addresses", "addressEntries", "formatted"],
+] as const;
+
+const entriesKey = (entries: Array<Record<string, unknown>>, valueKey: string) =>
+  JSON.stringify(
+    entries.map((entry) => [entry.label ?? "", entry[valueKey] ?? "", entry.isPrimary === true]),
+  );
+
+const NAME_UNDO_FIELDS = [
+  "fullName",
+  "firstName",
+  "middleName",
+  "lastName",
+  "namePrefix",
+  "nameSuffix",
+] as const;
+
+const SCALAR_UNDO_FIELDS = [
+  "nickname",
+  "company",
+  "jobTitle",
+  "department",
+  "phoneticFirstName",
+  "phoneticLastName",
+  "phoneticCompany",
+  "birthday",
+  "avatarUrl",
+  "isFavorite",
+  "isEmergency",
+  "notes",
+] as const;
+
+const JSON_UNDO_FIELDS = ["labels", "significantDates", "relatedPeople", "customFields"] as const;
+
+/**
+ * The survivor's undo write: each field (or field group) still as the merge
+ * wrote it goes back to its pre-merge value; the rest are kept and listed.
+ * Fields an older snapshot never recorded are left alone.
+ */
+export const buildSurvivorUndoData = (
+  survivor: Record<string, unknown>,
+  details: Pick<MergeDecisionSnapshot, "primaryBefore" | "mergedAfter">,
+): { data: Prisma.ContactUpdateInput; keptFields: string[] } => {
+  const before = details.primaryBefore as Record<string, unknown>;
+  const merged = details.mergedAfter as Record<string, unknown>;
+  const data: Record<string, unknown> = {};
+  const keptFields: string[] = [];
+  const unchanged = (field: string) =>
+    comparableValue(survivor[field]) === comparableValue(merged[field]);
+  const recorded = (field: string) => field in before && field in merged;
+
+  // Name parts: one group — all restored, or all kept.
+  const nameFields = NAME_UNDO_FIELDS.filter(recorded);
+  if (nameFields.length > 0) {
+    if (nameFields.every(unchanged)) {
+      for (const field of nameFields) data[field] = before[field] ?? null;
+      if (typeof data.fullName !== "string" || data.fullName.length === 0) {
+        data.fullName = survivor.fullName;
+      }
+    } else {
+      keptFields.push("name");
+    }
+  }
+
+  for (const field of SCALAR_UNDO_FIELDS) {
+    if (!recorded(field)) continue;
+    if (unchanged(field)) {
+      data[field] =
+        field === "isFavorite" || field === "isEmergency" ? before[field] === true : (before[field] ?? null);
+    } else {
+      keptFields.push(field);
+    }
+  }
+
+  for (const field of JSON_UNDO_FIELDS) {
+    if (!recorded(field)) continue;
+    if (unchanged(field)) {
+      const value = before[field];
+      data[field] =
+        Array.isArray(value) && value.length > 0 ? (value as Prisma.InputJsonValue) : Prisma.DbNull;
+    } else {
+      keptFields.push(field);
+    }
+  }
+
+  // Multi-value families through the canonical model (P49A-10): compared on
+  // label / value / primacy, restored from the snapshot's entries reconciled
+  // with its legacy values (a pre-P49A-10 snapshot can hold values in either).
+  const current = readMultiValueEntries(survivor);
+  const mergedEntries = readMultiValueEntries(merged);
+  const beforeEntries = reconcileLegacyIntoEntries(before);
+  const restore: Partial<Record<(typeof MULTI_VALUE_UNDO_FAMILIES)[number][1], unknown>> = {};
+  for (const [label, column, valueKey] of MULTI_VALUE_UNDO_FAMILIES) {
+    const same =
+      entriesKey(current[column], valueKey) === entriesKey(mergedEntries[column], valueKey);
+    if (same) restore[column] = beforeEntries[column];
+    else keptFields.push(label);
+  }
+  Object.assign(data, multiValueWriteData(restore));
+
+  return { data, keptFields };
+};
+
 export const undoMergedContactsForUser = async ({
   userId,
   decisionId,
+  now = new Date(),
 }: {
   userId: string;
   decisionId: string;
-}) => {
+  now?: Date;
+}): Promise<{ survivingContactId: string; restoredContactId: string; keptFields: string[] }> => {
   return db.$transaction(async (tx) => {
     const decision = await tx.mergeDecision.findFirst({
       where: {
@@ -2946,102 +3295,131 @@ export const undoMergedContactsForUser = async ({
       select: {
         id: true,
         suggestionId: true,
+        decidedAt: true,
         reversedAt: true,
         details: true,
       },
     });
 
     if (!decision) {
-      throw new Error("Merge decision not found.");
+      throw new MergeUndoError("Merge decision not found.");
     }
 
     if (decision.reversedAt) {
-      throw new Error("This merge has already been undone.");
+      throw new MergeUndoError("This merge has already been undone.");
+    }
+
+    // P49A-12 (A-20): the window the UI shows is also the rule.
+    if (now.getTime() - decision.decidedAt.getTime() > MERGE_UNDO_WINDOW_MS) {
+      throw new MergeUndoError(
+        `This merge is more than ${MERGE_UNDO_WINDOW_DAYS} days old and can no longer be undone.`,
+      );
     }
 
     const details = decision.details as MergeDecisionSnapshot | null;
 
     if (!details) {
-      throw new Error("No merge snapshot is available for this decision.");
+      throw new MergeUndoError("No merge snapshot is available for this decision.");
     }
 
-    const reversedAt = new Date();
+    const survivor = await tx.contact.findFirst({
+      where: { id: details.primaryBefore.id, userId },
+      select: undoSurvivorSelect,
+    });
+    const absorbed = await tx.contact.findFirst({
+      where: { id: details.secondaryBefore.id, userId },
+      select: { id: true, deletedAt: true, mergedIntoContactId: true },
+    });
+    if (!survivor || survivor.deletedAt) {
+      throw new MergeUndoError("The merged contact was deleted, so this merge can't be undone.");
+    }
+    if (!absorbed || absorbed.deletedAt) {
+      throw new MergeUndoError(
+        "The merged-away contact was deleted permanently, so this merge can't be undone.",
+      );
+    }
+
+    const reversedAt = now;
+    const { data: survivorData, keptFields } = buildSurvivorUndoData(survivor, details);
 
     await tx.contact.update({
-      where: {
-        id: details.primaryBefore.id,
-      },
+      where: { id: survivor.id },
       data: {
-        fullName: details.primaryBefore.fullName,
-        firstName: details.primaryBefore.firstName,
-        middleName: details.primaryBefore.middleName,
-        lastName: details.primaryBefore.lastName,
-        namePrefix: details.primaryBefore.namePrefix,
-        nameSuffix: details.primaryBefore.nameSuffix,
-        nickname: details.primaryBefore.nickname,
-        // P49A-10: the snapshot's entries reconciled with its legacy values
-        // (a pre-P49A-10 snapshot can hold values in either), legacy derived.
-        ...restoreMultiValueWriteData(details.primaryBefore),
-        company: details.primaryBefore.company,
-        jobTitle: details.primaryBefore.jobTitle,
-        birthday: details.primaryBefore.birthday,
-        avatarUrl: details.primaryBefore.avatarUrl,
-        isFavorite: details.primaryBefore.isFavorite,
-        labels: toNullableJsonField(details.primaryBefore.labels),
-        significantDates: toNullableJsonField(details.primaryBefore.significantDates),
-        relatedPeople: toNullableJsonField(details.primaryBefore.relatedPeople),
-        customFields: toNullableJsonField(details.primaryBefore.customFields),
-        notes: details.primaryBefore.notes,
-        archivedAt: details.primaryBefore.archivedAt
-          ? new Date(details.primaryBefore.archivedAt)
-          : null,
-        syncTombstoneAt: details.primaryBefore.syncTombstoneAt
-          ? new Date(details.primaryBefore.syncTombstoneAt)
-          : null,
-        mergedIntoContactId: details.primaryBefore.mergedIntoContactId,
-        syncVersion: {
-          increment: 1,
-        },
+        ...survivorData,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
+        syncVersion: { increment: 1 },
       },
     });
 
+    // The absorbed contact comes back as it was before the merge (its fields
+    // were never touched by it). One the user already restored from the trash
+    // only loses its merge lineage.
     await tx.contact.update({
-      where: {
-        id: details.secondaryBefore.id,
-      },
+      where: { id: absorbed.id },
       data: {
-        fullName: details.secondaryBefore.fullName,
-        firstName: details.secondaryBefore.firstName,
-        middleName: details.secondaryBefore.middleName,
-        lastName: details.secondaryBefore.lastName,
-        namePrefix: details.secondaryBefore.namePrefix,
-        nameSuffix: details.secondaryBefore.nameSuffix,
-        nickname: details.secondaryBefore.nickname,
-        // P49A-10: the snapshot's entries reconciled with its legacy values
-        // (a pre-P49A-10 snapshot can hold values in either), legacy derived.
-        ...restoreMultiValueWriteData(details.secondaryBefore),
-        company: details.secondaryBefore.company,
-        jobTitle: details.secondaryBefore.jobTitle,
-        birthday: details.secondaryBefore.birthday,
-        avatarUrl: details.secondaryBefore.avatarUrl,
-        isFavorite: details.secondaryBefore.isFavorite,
-        labels: toNullableJsonField(details.secondaryBefore.labels),
-        significantDates: toNullableJsonField(details.secondaryBefore.significantDates),
-        relatedPeople: toNullableJsonField(details.secondaryBefore.relatedPeople),
-        customFields: toNullableJsonField(details.secondaryBefore.customFields),
-        notes: details.secondaryBefore.notes,
-        archivedAt: details.secondaryBefore.archivedAt
-          ? new Date(details.secondaryBefore.archivedAt)
-          : null,
-        syncTombstoneAt: details.secondaryBefore.syncTombstoneAt
-          ? new Date(details.secondaryBefore.syncTombstoneAt)
-          : null,
+        ...(absorbed.mergedIntoContactId === survivor.id
+          ? {
+              archivedAt: details.secondaryBefore.archivedAt
+                ? new Date(details.secondaryBefore.archivedAt)
+                : null,
+              syncTombstoneAt: details.secondaryBefore.syncTombstoneAt
+                ? new Date(details.secondaryBefore.syncTombstoneAt)
+                : null,
+            }
+          : {}),
         mergedIntoContactId: details.secondaryBefore.mergedIntoContactId,
-        syncVersion: {
-          increment: 1,
-        },
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
+        syncVersion: { increment: 1 },
       },
     });
+
+    const propagation = details.propagation;
+    if (propagation) {
+      if (propagation.addedBookIds.length > 0) {
+        await tx.contactBookMembership.deleteMany({
+          where: {
+            contactId: survivor.id,
+            addressBookId: { in: propagation.addedBookIds },
+            isPrimary: false,
+          },
+        });
+      }
+      if (propagation.addedGroupBookIds.length > 0) {
+        await tx.groupContact.deleteMany({
+          where: { contactId: survivor.id, groupAddressBookId: { in: propagation.addedGroupBookIds } },
+        });
+      }
+      // Links the merge moved onto the survivor go back to the absorbed
+      // contact (unless it has been linked to that account again since).
+      if (propagation.relinkedLinkIds.length > 0) {
+        const moved = await tx.syncContactLink.findMany({
+          where: { id: { in: propagation.relinkedLinkIds }, contactId: survivor.id },
+          select: { id: true, syncAccountId: true },
+        });
+        const absorbedAccounts = new Set(
+          (
+            await tx.syncContactLink.findMany({
+              where: { contactId: absorbed.id },
+              select: { syncAccountId: true },
+            })
+          ).map((link) => link.syncAccountId),
+        );
+        const movable = moved.filter((link) => !absorbedAccounts.has(link.syncAccountId));
+        if (movable.length > 0) {
+          await tx.syncContactLink.updateMany({
+            where: { id: { in: movable.map((link) => link.id) } },
+            data: { contactId: absorbed.id },
+          });
+        }
+      }
+    }
+
+    // Both records reach every provider again: the absorbed contact's deleted
+    // remote copies are re-created, the survivor's restored fields pushed.
+    await reviveContactSyncLinks(tx, absorbed.id, reversedAt);
+    await markSyncLinksDirty(tx, survivor.id, reversedAt);
 
     await tx.mergeSuggestion.update({
       where: {
@@ -3072,26 +3450,30 @@ export const undoMergedContactsForUser = async ({
         decidedAt: reversedAt,
         details: {
           reversedDecisionId: decision.id,
+          ...(keptFields.length > 0 ? { keptFields } : {}),
         },
       },
     });
 
     await emitEvent(tx, {
       userId,
-      contactId: details.primaryBefore.id,
+      contactId: survivor.id,
       eventType: "CONTACT_MERGE_UNDONE",
       actor: "USER",
-      payload: { restoredContactId: details.secondaryBefore.id },
+      payload: {
+        restoredContactId: absorbed.id,
+        ...(keptFields.length > 0 ? { keptFields } : {}),
+      },
     });
     await emitEvent(tx, {
       userId,
-      contactId: details.secondaryBefore.id,
+      contactId: absorbed.id,
       eventType: "CONTACT_RESTORED",
       actor: "USER",
       payload: {},
     });
 
-    return details.primaryBefore.id;
+    return { survivingContactId: survivor.id, restoredContactId: absorbed.id, keptFields };
   });
 };
 
