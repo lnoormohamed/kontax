@@ -86,7 +86,7 @@ mock.module("~/server/sync-credentials", {
 const { isSafeWebUrl, hasDangerousUrlScheme, safeExternalHref } = await import("../../src/lib/safe-url");
 const { isSameOriginRequest } = await import("../../src/server/same-origin");
 const { getClientIp } = await import("../../src/lib/client-ip");
-const { clientIpFromNodeHeaders } = await import("../../src/server/dav/client-ip.mjs");
+const { clientIpFromNodeHeaders, getRequestIp } = await import("../../src/server/dav/client-ip.mjs");
 const { checkUsernameAvailability } = await import("../../src/app/actions/username");
 const { recordCardView } = await import("../../src/server/public-card/analytics");
 const { buildPersonSchema } = await import("../../src/server/public-card/get-card");
@@ -224,18 +224,42 @@ const withEnv = async (vars: Record<string, string | undefined>, fn: () => void 
 
 test("production trusts CF-Connecting-IP only; X-Forwarded-For is ignored (both twins)", async () => {
   const spoofed = { "x-forwarded-for": "203.0.113.66", "x-real-ip": "203.0.113.67" };
-  await withEnv({ NODE_ENV: "production", KONTAX_TRUST_FORWARDED_FOR: undefined }, () => {
-    assert.equal(getClientIp(new Headers(spoofed)), null);
-    assert.equal(clientIpFromNodeHeaders(spoofed), null);
-    assert.equal(getClientIp(new Headers({ ...spoofed, "cf-connecting-ip": "198.51.100.1" })), "198.51.100.1");
-  });
-  await withEnv({ NODE_ENV: "production", KONTAX_TRUST_FORWARDED_FOR: "1" }, () => {
-    assert.equal(getClientIp(new Headers(spoofed)), "203.0.113.66", "explicit opt-in for non-Cloudflare hosts");
-    assert.equal(clientIpFromNodeHeaders(spoofed), "203.0.113.66");
-  });
-  await withEnv({ NODE_ENV: "test", KONTAX_TRUST_FORWARDED_FOR: undefined }, () => {
-    assert.equal(getClientIp(new Headers(spoofed)), "203.0.113.66", "dev keeps the fallback");
-  });
+  const warn = mock.method(console, "warn", () => undefined);
+  try {
+    await withEnv({ NODE_ENV: "production", KONTAX_DEPLOY_ENV: undefined, KONTAX_TRUST_FORWARDED_FOR: undefined }, () => {
+      assert.equal(getClientIp(new Headers(spoofed)), null);
+      assert.equal(clientIpFromNodeHeaders(spoofed), null);
+      assert.equal(getClientIp(new Headers({ ...spoofed, "cf-connecting-ip": "198.51.100.1" })), "198.51.100.1");
+      // The node:http twin no longer falls back to the socket peer (always the
+      // proxy in production): same shared "unknown" key as the Next side.
+      assert.equal(getRequestIp({ headers: spoofed, socket: { remoteAddress: "10.0.0.9" } }), "unknown");
+    });
+    // A missing CF-Connecting-IP in production is reported, throttled.
+    assert.ok(warn.mock.callCount() >= 1 && warn.mock.callCount() <= 2, `warned ${warn.mock.callCount()}x`);
+    assert.match(String(warn.mock.calls[0]!.arguments[0]), /CF-Connecting-IP/);
+
+    // The repo-wide rule: KONTAX_DEPLOY_ENV decides when set.
+    await withEnv({ NODE_ENV: "production", KONTAX_DEPLOY_ENV: "production" }, () => {
+      assert.equal(getClientIp(new Headers(spoofed)), null);
+    });
+    await withEnv({ NODE_ENV: "production", KONTAX_DEPLOY_ENV: "staging", KONTAX_TRUST_FORWARDED_FOR: undefined }, () => {
+      assert.equal(getClientIp(new Headers(spoofed)), "203.0.113.66", "staging is not production");
+      assert.equal(clientIpFromNodeHeaders(spoofed), "203.0.113.66");
+    });
+    await withEnv({ NODE_ENV: "development", KONTAX_DEPLOY_ENV: "production", KONTAX_TRUST_FORWARDED_FOR: undefined }, () => {
+      assert.equal(getClientIp(new Headers(spoofed)), null, "a prod-marked maintenance run is production");
+    });
+    await withEnv({ NODE_ENV: "production", KONTAX_DEPLOY_ENV: undefined, KONTAX_TRUST_FORWARDED_FOR: "1" }, () => {
+      assert.equal(getClientIp(new Headers(spoofed)), "203.0.113.66", "explicit opt-in for non-Cloudflare hosts");
+      assert.equal(clientIpFromNodeHeaders(spoofed), "203.0.113.66");
+    });
+    await withEnv({ NODE_ENV: "test", KONTAX_DEPLOY_ENV: undefined, KONTAX_TRUST_FORWARDED_FOR: undefined }, () => {
+      assert.equal(getClientIp(new Headers(spoofed)), "203.0.113.66", "dev keeps the fallback");
+      assert.equal(getRequestIp({ headers: {}, socket: { remoteAddress: "10.0.0.9" } }), "10.0.0.9");
+    });
+  } finally {
+    warn.mock.restore();
+  }
 });
 
 // ── username probe ───────────────────────────────────────────────────────────
@@ -284,19 +308,29 @@ const apiRequest = (token: string, ip: string) =>
 
 const ok = async () => new (await import("next/server")).NextResponse("ok");
 
-test("invalid-token spraying is cut off per IP before the token lookup", async () => {
+test("invalid-token spraying is cut off per IP before the token lookup (150 / 15 min)", async () => {
   validToken = "ktx_live_valid";
   validateCalls = 0;
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 150; i++) {
     const res = await withApiAuth(apiRequest(`ktx_live_guess${i}`, "203.0.113.5"), ok);
     assert.equal(res.status, 401);
   }
-  assert.equal(validateCalls, 30);
+  assert.equal(validateCalls, 150);
 
-  const blocked = await withApiAuth(apiRequest("ktx_live_guess31", "203.0.113.5"), ok);
+  const warn = mock.method(console, "warn", () => undefined);
+  let blocked: Response;
+  try {
+    blocked = await withApiAuth(apiRequest("ktx_live_guess151", "203.0.113.5"), ok);
+    await withApiAuth(apiRequest("ktx_live_guess152", "203.0.113.5"), ok);
+    assert.equal(warn.mock.callCount(), 1, "logged once, throttled");
+    assert.match(String(warn.mock.calls[0]!.arguments[0]), /invalid-token limit/);
+    assert.ok(!String(warn.mock.calls[0]!.arguments[0]).includes("203.0.113.5"), "no IP in the log");
+  } finally {
+    warn.mock.restore();
+  }
   assert.equal(blocked.status, 429);
   assert.ok(blocked.headers.get("retry-after"));
-  assert.equal(validateCalls, 30, "no lookup once the IP is blocked");
+  assert.equal(validateCalls, 150, "no lookup once the IP is blocked");
 
   // A different IP, and valid tokens, are unaffected.
   assert.equal((await withApiAuth(apiRequest("ktx_live_guess", "203.0.113.6"), ok)).status, 401);

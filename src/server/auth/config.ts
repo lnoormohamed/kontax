@@ -107,10 +107,15 @@ export const authConfig = {
         // P34D-01: brute-force protection.
         // Peek (no consume) so successful logins don't drain the bucket.
         // IP bucket checked first — cheap gate before any DB work.
-        if (ip) {
-          const ipPeek = await peekRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
-          if (!ipPeek.allowed) return null;
-        }
+        // P49A-13 (Fable review): with no resolvable client IP (a production
+        // request without CF-Connecting-IP — logged by getClientIp) the IP
+        // gate used to be skipped. It now uses one shared bucket with a higher
+        // cap, so that path is never weaker than having an IP; the per-email
+        // bucket below still applies either way.
+        const ipLimiter = ip ? rateLimiters.loginByIp : rateLimiters.loginByUnknownIp;
+        const ipKey = ip ? `ip:${ip}` : "ip:unknown";
+        const ipPeek = await peekRateLimit(ipLimiter, ipKey);
+        if (!ipPeek.allowed) return null;
 
         const user = await db.user.findUnique({
           where: { email: parsedCredentials.data.email },
@@ -134,7 +139,7 @@ export const authConfig = {
         if (!passwordMatches) {
           // Consume a point only on failure so successful logins don't lock users out.
           await checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
-          if (ip) await checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
+          await checkRateLimit(ipLimiter, ipKey);
           // P22-04 Rule 3: track repeated failed logins against this account.
           await recordFailedLogin(user.id, ip);
           return null;

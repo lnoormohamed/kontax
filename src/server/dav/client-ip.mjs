@@ -20,6 +20,29 @@
  */
 const first = (value) => (Array.isArray(value) ? value[0] : value);
 
+// P49A-13 (Fable review): same "production" rule as src/lib/client-ip.ts —
+// KONTAX_DEPLOY_ENV decides when set, NODE_ENV only when it is unset.
+const isProductionDeploy = () => {
+  const deployEnv = (process.env.KONTAX_DEPLOY_ENV ?? "").trim().toLowerCase();
+  return deployEnv ? deployEnv === "production" : process.env.NODE_ENV === "production";
+};
+
+/** Mirrors `trustsForwardedFor` in src/lib/client-ip.ts. */
+export const trustsForwardedFor = () =>
+  !isProductionDeploy() || process.env.KONTAX_TRUST_FORWARDED_FOR === "1";
+
+const MISSING_CF_WARN_INTERVAL_MS = 60_000;
+let lastMissingCfWarnAt = 0;
+
+const warnMissingCfHeader = () => {
+  const now = Date.now();
+  if (now - lastMissingCfWarnAt < MISSING_CF_WARN_INTERVAL_MS) return;
+  lastMissingCfWarnAt = now;
+  console.warn(
+    "[Kontax] production CardDAV request without CF-Connecting-IP — per-IP rate limits are using a shared bucket. Check that traffic reaches the app through Cloudflare (or set KONTAX_TRUST_FORWARDED_FOR=1 behind a trusted proxy).",
+  );
+};
+
 /**
  * @param {NodeJS.Dict<string | string[]>} headers  `req.headers` (lower-cased keys).
  * @returns {string | null}
@@ -29,9 +52,9 @@ export const clientIpFromNodeHeaders = (headers) => {
   if (cf) return cf;
 
   // P49A-13: X-Forwarded-For / X-Real-IP only outside production (or with
-  // KONTAX_TRUST_FORWARDED_FOR=1) — see src/lib/client-ip.ts. In production a
-  // request without CF-Connecting-IP falls through to the socket peer.
-  if (process.env.NODE_ENV === "production" && process.env.KONTAX_TRUST_FORWARDED_FOR !== "1") {
+  // KONTAX_TRUST_FORWARDED_FOR=1) — see src/lib/client-ip.ts.
+  if (!trustsForwardedFor()) {
+    warnMissingCfHeader();
     return null;
   }
 
@@ -42,11 +65,19 @@ export const clientIpFromNodeHeaders = (headers) => {
 };
 
 /**
- * Resolved client IP for an inbound request, falling back to the socket peer
- * for traffic that never traversed a proxy (local/dev).
+ * Resolved client IP for an inbound request. Outside production (or with the
+ * forwarded-for opt-in) it falls back to the socket peer, for traffic that
+ * never traversed a proxy (local/dev). In production the socket peer is always
+ * the reverse proxy, so — like the Next side — a request without
+ * CF-Connecting-IP gets the shared "unknown" key (P49A-13, Fable review: the
+ * two twins used to disagree on this).
  *
  * @param {{ headers: NodeJS.Dict<string | string[]>, socket?: { remoteAddress?: string } }} req
  * @returns {string}
  */
-export const getRequestIp = (req) =>
-  clientIpFromNodeHeaders(req.headers) ?? req.socket?.remoteAddress ?? "unknown";
+export const getRequestIp = (req) => {
+  const ip = clientIpFromNodeHeaders(req.headers);
+  if (ip) return ip;
+  if (!trustsForwardedFor()) return "unknown";
+  return req.socket?.remoteAddress ?? "unknown";
+};

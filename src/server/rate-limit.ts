@@ -151,6 +151,10 @@ export const rateLimiters = {
   loginByEmail: makeLimiter(5, 15 * 60, "rl:login-email"),
   // P34D-01: login brute-force — 20 attempts per IP per 15 minutes (shared across accounts)
   loginByIp: makeLimiter(20, 15 * 60, "rl:login-ip"),
+  // P49A-13 (Fable review): logins with no resolvable client IP (production
+  // request without CF-Connecting-IP) share this one bucket — a higher cap
+  // than per-IP since everyone affected lands in it, but never "no limit".
+  loginByUnknownIp: makeLimiter(200, 15 * 60, "rl:login-ip-unknown"),
 
   // P48-09: CardDAV auth. The (IP, email) pair is the bucket that actually
   // blocks — a burst from one shared Cloudflare edge IP must not lock sync for
@@ -181,11 +185,14 @@ export const rateLimiters = {
   // is normal; a scripted flood inflating the counters is not.
   pageViewBeacon: makeLimiter(60, 60, "rl:pv-beacon"),
 
-  // P49A-13: REST API — invalid bearer tokens per IP, 30 per 15 minutes.
+  // P49A-13: REST API — invalid bearer tokens per IP, 150 per 15 minutes.
   // Peeked before the token lookup and consumed only on a failed lookup, so a
   // busy, correctly-configured client never touches it but token spraying is
-  // cut off before it reaches the database.
-  apiAuthFailByIp: makeLimiter(30, 15 * 60, "rl:api-auth-fail-ip"),
+  // cut off before it reaches the database. Fable review: raised from 30 —
+  // behind NAT / CGNAT / shared CI runners one misconfigured client could
+  // otherwise lock out every valid token on the same address. Still ~10/min,
+  // far below anything that could enumerate a 256-bit token.
+  apiAuthFailByIp: makeLimiter(150, 15 * 60, "rl:api-auth-fail-ip"),
 
   // P49A-13: username availability probe (settings) — 60 per user per hour.
   // It is session-only now; this stops it being scripted as a directory.

@@ -20,6 +20,23 @@ const tooManyAuthFailures = (resetAt: Date) =>
     },
   );
 
+// P49A-13 (Fable review): say when the invalid-token gate refuses someone —
+// at most once a minute, and without the IP (it's a volume signal; a blocked
+// shared address shows up as repeated lines).
+const AUTH_FAIL_LOG_INTERVAL_MS = 60_000;
+let lastAuthFailLogAt = 0;
+let refusedSinceLastLog = 0;
+const logAuthFailGateTripped = () => {
+  refusedSinceLastLog += 1;
+  const now = Date.now();
+  if (now - lastAuthFailLogAt < AUTH_FAIL_LOG_INTERVAL_MS) return;
+  console.warn(
+    `[api] invalid-token limit refused ${refusedSinceLastLog} request(s) since the last report (per-IP, 150 bad tokens / 15 min)`,
+  );
+  lastAuthFailLogAt = now;
+  refusedSinceLastLog = 0;
+};
+
 export async function withApiAuth(
   req: NextRequest,
   handler: (userId: string, scope: ApiTokenScope) => Promise<NextResponse>,
@@ -37,7 +54,10 @@ export async function withApiAuth(
   // this one up; only failed lookups count, so valid traffic is unaffected.
   const ipKey = `ip:${getClientIp(req.headers) ?? "unknown"}`;
   const ipGate = await peekRateLimit(rateLimiters.apiAuthFailByIp, ipKey);
-  if (!ipGate.allowed) return tooManyAuthFailures(ipGate.resetAt);
+  if (!ipGate.allowed) {
+    logAuthFailGateTripped();
+    return tooManyAuthFailures(ipGate.resetAt);
+  }
 
   const token = authHeader.slice(7);
   const identity = await validateApiToken(token);
