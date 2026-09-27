@@ -1,7 +1,11 @@
 # Phase 49A — Full-audit remediation
 
 ## Phase status
-Planned — tickets written 2026-09-25 from the full audit
+In progress. On production (main c50fe28, 2026-09-27): P49A-01, -02, -04, -05, -06, -07, -08,
+-09, -11, -14 (with Phase 50), -15, -17, and P49A-19 items 1, 7 and 9. Open: P49A-03, -10, -12,
+-13, -16, -18, -20 and P49A-19 items 2–6 (8 is tracked in -12).
+
+Tickets written 2026-09-25 from the full audit
 ([kontax-full-audit-2026-09-25.md](../runbooks/kontax-full-audit-2026-09-25.md)).
 
 ## Phase objective
@@ -46,7 +50,7 @@ Every ticket below was checked against production before it was written:
 | [P49A-14](p49a-14-pricing-truth-from-plan-data.md) | Pricing matrix rendered from plan data; correct false claims | P1 | A-31–A-34 | — |
 | [P49A-15](p49a-15-public-site-fixes.md) | Public site: /about & /contact public, dead links, mobile, titles | P1 | A-35–A-37 | — |
 | [P49A-16](p49a-16-runtime-ops-and-sync-performance.md) | Runtime & ops: Dockerfile, timeouts, health split, DAV/sync perf, export blobs | P1 | A-29, A-30, A-38–A-42 | P49A-04 |
-| [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, dialogs, loading states — **reassessed 2026-09-27, ready** | P1 | A-43–A-47 + follow-ups | — |
+| [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, dialogs, loading states, contrast — **done, on prod** | P1 | A-43–A-47 + follow-ups | — |
 | [P49A-18](p49a-18-hardening-and-debt-backlog.md) | Hardening & debt backlog | P2 | P2 list | — |
 | [P49A-19](p49a-19-bugs-found-during-content-work.md) | Bugs found while writing help/guides (2FA recovery codes, manual merge, …) | P0/P1 | — | — |
 | [P49A-20](p49a-20-focus-visible-sweep.md) | Focus-visible sweep for borderless inline-edit inputs (split from 17) | P2 | — | — |

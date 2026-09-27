@@ -1,6 +1,6 @@
 # P49A-17 — UX & accessibility: confirmations, labels, 2FA inputs, dialogs, loading states
 
-**Phase:** 49A · **Priority:** P1 · **Status:** Done 2026-09-27 (branch docs/p49-homepage-brief; not yet on staging/prod) — reassessed
+**Phase:** 49A · **Priority:** P1 · **Status:** Done — live on production 2026-09-27 (main c50fe28) — reassessed
 2026-09-27 after Phase 50 shipped (production 0886b69) · **Effort:** M overall (mostly S items) · **Depends on:** —
 **Audit IDs:** A-43…A-47 (UX-12…UX-18) + follow-ups · Split out: [P49A-20](p49a-20-focus-visible-sweep.md)
 
