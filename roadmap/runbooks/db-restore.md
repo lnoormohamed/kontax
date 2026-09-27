@@ -105,6 +105,26 @@ Three scripts, all in this repo under `scripts/ops/`:
   `/tmp/pgcron.bak` (LXC 129) and `/root/crontab.bak-20260927` (host).
 - Older `kontax_YYYYMMDD.sql.gz` files (plain SQL, pre-2026-09-27) are pruned by the same 30-day rule.
 
+### Failure alerts (Uptime Kuma push monitor)
+
+All three scripts report to one Uptime Kuma **Push** monitor, "Kontax DB backup"
+(Kuma: LXC 131 on 10.0.50.10, http://10.0.50.73:3001):
+
+- `kontax-pg-backup.sh` pushes `up` after a verified dump and `down` (with the reason) on any failure.
+- `kontax-db-offsite.sh` and `kontax-db-restore-test.sh` push only `down`, so a later success can
+  never hide a failed nightly backup; the next good backup flips the monitor back to up.
+- The monitor's heartbeat interval is 26 h, so a job that never runs (cron gone, container down)
+  also goes down.
+- The push URL is in `/etc/kontax-backup.env` (`KUMA_PUSH_URL=http://10.0.50.73:3001/api/push/<token>`),
+  on LXC 129 (`root:postgres`, mode 640) and on the Proxmox host (`root`, mode 600). It is read with
+  `sed`, never sourced. The file is missing → the scripts skip alerting; Kuma unreachable → a
+  `WARN: alert push failed` log line. Neither ever changes the backup's own result.
+- Kuma only pages if the monitor has a **notification channel** (Settings → Notifications). As of
+  2026-09-27 Kuma had none, so no monitor alerted anyone.
+- Test an alert without breaking anything:
+  `curl -G --data-urlencode status=down --data-urlencode "msg=test alert" "$KUMA_PUSH_URL"`,
+  then run `kontax-pg-backup.sh` (as postgres) to put it back up.
+
 Separately, Proxmox snapshots the whole LXC 129 to the NAS monthly (job
 `c02d393d`, 1st of the month 02:30, storage `pve-backup-nfs`).
 

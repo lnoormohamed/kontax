@@ -39,5 +39,10 @@ A backup that is logged OK is complete and restorable, and a host loss costs at 
   into a throwaway DB, compares key row counts, drops it.
 - Installed and run once by hand on production: backup OK (326 KB, 1 s), restore test OK, off-host
   copy OK. Runbook `db-restore.md` updated (new format, restore commands, encryption status).
-- Not done: encryption (deferred by owner) and alerting — failures are logged, not paged. A
-  Coolify/uptime check on `last-success` age would close that gap.
+- Not done: encryption (deferred by owner).
+- Alerting (added 2026-09-27): all three scripts push to an Uptime Kuma push monitor (backup: up
+  on success, down on failure; off-host copy and restore test: down only). The 26 h heartbeat
+  catches a job that never runs. The ERR traps now report the real exit code (they logged
+  `exit 0` before). Tested locally against a stub push server, then installed on production.
+  Live once the monitor exists, `/etc/kontax-backup.env` holds its push URL, and Kuma has a
+  notification channel. Details: `db-restore.md` → Failure alerts.

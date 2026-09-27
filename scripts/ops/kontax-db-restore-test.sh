@@ -3,7 +3,8 @@
 # OS user on the DB container (LXC 129). Restores the newest custom-format dump
 # into a throwaway database, compares row counts of key tables with the live
 # database, then drops the throwaway database. A backup that has never been
-# restored is only a hope. Logs to the backup log; exits 1 on any mismatch.
+# restored is only a hope. Logs to the backup log; exits 1 on any mismatch and
+# pushes "down" to the Uptime Kuma backup monitor (/etc/kontax-backup.env).
 set -euo pipefail
 cd /
 
@@ -15,12 +16,18 @@ TABLES=("User" "Contact" "SyncAccount" "Subscription" "Group" "_prisma_migration
 
 log() { echo "$(date -u +%FT%TZ) restore-test $*" >> "$LOG"; }
 cleanup() { "$BIN/dropdb" --if-exists "$TEST_DB" 2>>"$LOG" || true; }
-trap 'log "FAILED (exit $?)"; cleanup' ERR
+KUMA_PUSH_URL=$(sed -n 's/^KUMA_PUSH_URL=//p' /etc/kontax-backup.env 2>/dev/null || true)
+notify() {
+  [ -n "$KUMA_PUSH_URL" ] || return 0
+  curl -fsS -m 10 -G -o /dev/null --data-urlencode "status=$1" --data-urlencode "msg=$2" \
+    --data-urlencode "ping=" "$KUMA_PUSH_URL" 2>>"$LOG" || log "WARN: alert push failed"
+}
+fail() { log "FAILED: $1"; notify down "kontax restore test FAILED: $1"; cleanup; exit 1; }
+trap 'rc=$?; log "FAILED (exit $rc)"; notify down "kontax restore test FAILED (exit $rc), see $LOG"; cleanup' ERR
 
 LATEST=$(ls -1t "$DIR"/kontax_*.dump 2>/dev/null | head -1 || true)
 if [ -z "$LATEST" ]; then
-  log "FAILED: no plain kontax_*.dump to test (encrypted dumps need decrypting first)"
-  exit 1
+  fail "no plain kontax_*.dump to test (encrypted dumps need decrypting first)"
 fi
 
 cleanup
@@ -36,9 +43,7 @@ for t in "${TABLES[@]}"; do
   restored=$("$BIN/psql" -XtAq -d "$TEST_DB" -c "SELECT count(*) FROM \"$t\"")
   REPORT+=" $t=$restored/$live"
   if [ "$live" -gt 0 ] && [ "$restored" -eq 0 ]; then
-    log "FAILED: $t restored empty (live has $live)$REPORT"
-    cleanup
-    exit 1
+    fail "$t restored empty (live has $live)$REPORT"
   fi
 done
 trap - ERR
