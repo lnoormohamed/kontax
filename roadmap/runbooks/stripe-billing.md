@@ -57,7 +57,19 @@ Billing is driven entirely by Stripe webhooks hitting `POST /api/stripe/webhook`
   ("cancel" or "mark unpaid") is safe for entitlements.
 - Check a user: `SELECT status, "graceEndsAt" FROM "Subscription" WHERE "userId" = …` — PAST_DUE
   with `graceEndsAt` in the past = on Free until paid. Settings → Plan & billing shows
-  "Payment failed — your account moved to the Free plan on <date>".
+  "Payment failed — your account moved to the Free plan on <date>"; the admin user view shows
+  "Pro — payment lapsed, on Free since <date>".
+- **Self-heal for a lost recovery webhook:** the nightly `POST /api/cron/delete-accounts` (existing
+  crontab entry, no new schedule) also re-reads from Stripe every real subscription that is
+  PAST_DUE past `graceEndsAt` (`resyncLapsedPaymentSubscriptions` → `syncStripeSubscriptionById`;
+  100 per night, least recently updated first, 250 ms apart). The JSON response has
+  `paymentLapseResync: { scanned, synced, errors }`; errors are per subscription and don't stop the
+  batch. The billing-portal return (`?portal=returned`) also resyncs at once. To heal one customer
+  immediately: resend the latest `invoice.payment_succeeded` / `customer.subscription.updated` from
+  the Stripe dashboard.
+- **While unpaid:** a new checkout is refused (`USE_CUSTOMER_PORTAL` → billing portal) so the
+  customer can't start a second subscription; live shares they receive are paused
+  (`RECIPIENT_PAYMENT_LAPSED`), not converted, and resume after payment.
 
 ---
 

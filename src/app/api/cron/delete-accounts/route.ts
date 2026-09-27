@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { invalidateDavCredentialCacheForUser } from "~/server/app-passwords";
+import { resyncLapsedPaymentSubscriptions } from "~/server/billing-lapse-resync";
 import { cancelBillingForDeletedUser } from "~/server/billing-lifecycle";
 import { assertCronSecret } from "~/server/cron-guard";
 import { db } from "~/server/db";
@@ -9,6 +10,7 @@ import {
   type AfterCommit,
   runAfterCommit,
   sweepDueFamilyDissolutions,
+  syncStripeSubscriptionById,
 } from "~/server/stripe-handlers";
 
 export const dynamic = "force-dynamic";
@@ -80,5 +82,19 @@ export async function POST(req: NextRequest) {
   }
   await runAfterCommit(familyEffects);
 
-  return NextResponse.json({ deleted, errors, scanned: due.length, family });
+  // P49A-19: re-read from Stripe every subscription unpaid past its payment
+  // grace, so a lost recovery webhook can't leave a paying customer on Free
+  // (bounded + paced; failures reported, never thrown).
+  let paymentLapseResync: { scanned: number; synced: number; errors: string[] };
+  try {
+    paymentLapseResync = await resyncLapsedPaymentSubscriptions({
+      db,
+      syncSubscription: syncStripeSubscriptionById,
+    });
+  } catch (err) {
+    console.error("[Kontax] Lapsed-payment resync failed:", err);
+    paymentLapseResync = { scanned: 0, synced: 0, errors: [err instanceof Error ? err.message : String(err)] };
+  }
+
+  return NextResponse.json({ deleted, errors, scanned: due.length, family, paymentLapseResync });
 }

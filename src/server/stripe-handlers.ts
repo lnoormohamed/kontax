@@ -1171,6 +1171,31 @@ export async function handleTrialWillEnd(
 }
 
 /**
+ * P49A-19 (Fable review): re-read ONE subscription from Stripe and apply it —
+ * personal or org-anchored (Teams) alike — then run the Family follow-up for
+ * a personal customer. Used by the nightly lapsed-payment resync
+ * (billing-lapse-resync.ts) so a lost recovery webhook can't leave a paying
+ * customer on Free. Throws on a Stripe / DB failure; the caller logs it.
+ */
+export async function syncStripeSubscriptionById(providerSubscriptionId: string): Promise<void> {
+  if (isLegacyManualSubscription(providerSubscriptionId)) return;
+  const current = await getStripeClient().subscriptions.retrieve(providerSubscriptionId, {
+    expand: ["latest_invoice"],
+  });
+  const effects: AfterCommit = [];
+  await db.$transaction((tx) => applySubscriptionState(current, tx, effects));
+  const customerId = customerIdOf(current.customer);
+  if (customerId) {
+    try {
+      await reconcileFamilyLapseForCustomer(db, customerId, effects);
+    } catch (err) {
+      console.error(`[stripe] family reconcile after resync of ${providerSubscriptionId} failed:`, err);
+    }
+  }
+  await runAfterCommit(effects);
+}
+
+/**
  * Pull the latest Stripe subscription state for a user into Kontax outside the
  * webhook path. This is used sparingly on high-signal return points like
  * Checkout success and Billing Portal return so Settings reflects plan changes

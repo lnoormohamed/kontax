@@ -4,7 +4,7 @@
 // Supports the subset those code paths use: findUnique/findUniqueOrThrow/
 // findFirst/findMany/count/create/createMany/update/updateMany/upsert/delete/deleteMany,
 // scalar `where` filters (equals, in, notIn, not, startsWith, lt/lte/gt/gte,
-// AND/OR/NOT), `orderBy` with Postgres null ordering, top-level scalar
+// AND/OR/NOT), `orderBy` with Postgres null ordering, `take` on findMany, top-level scalar
 // `select`, compound-unique selectors (`{ userId_slug: { userId, slug } }`),
 // and `$transaction(fn)` with rollback on throw. Relation filters and nested
 // selects are NOT supported — a relation filter throws so a test can't
@@ -208,6 +208,7 @@ export function createFakePrisma(opts: FakePrismaOptions = {}) {
       data?: Row;
       select?: Record<string, unknown>;
       orderBy?: OrderBy;
+      take?: number;
       create?: Row;
       update?: Row;
     };
@@ -221,7 +222,9 @@ export function createFakePrisma(opts: FakePrismaOptions = {}) {
         return project(row, a.select);
       },
       findFirst: async (a: Args = {}) => (log("findFirst", a), project(find(a)[0], a.select)),
-      findMany: async (a: Args = {}) => (log("findMany", a), find(a).map((r) => project(r, a.select))),
+      findMany: async (a: Args = {}) => (
+        log("findMany", a), find(a).slice(0, a.take ?? undefined).map((r) => project(r, a.select))
+      ),
       count: async (a: Args = {}) => (log("count", a), find(a).length),
       create: async (a: Args) => (log("create", a), project(insert(model, a.data ?? {}), a.select)),
       createMany: async (a: { data: Row | Row[] }) => {

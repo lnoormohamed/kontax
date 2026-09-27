@@ -67,6 +67,10 @@ Or generate directly via the DB + generate-export script if impersonation is not
 
 For each, it calls `db.user.delete({ where: { id } })`. Prisma cascades the delete to all child records: contacts, sync accounts, subscriptions, shares, activity events, sessions, notifications, etc. A confirmation email is sent to the address on file.
 
+The same nightly job also dissolves Family groups whose 7-day notice has run out (P49A-05) and
+re-reads from Stripe subscriptions unpaid past their 3-day payment grace (P49A-19 — see
+`stripe-billing.md`). No extra crontab entry is needed for either.
+
 ---
 
 ## Handling an inbound GDPR erasure request
