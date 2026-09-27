@@ -195,12 +195,44 @@ One canonical representation; build on it, never around it.
   create); a 412 re-reads the card and goes through the conflict policy. A new modelled vCard
   property must be added to `CARDDAV_KONTAX_OWNED_PROPERTIES`, or the remote copy is kept next to
   Kontax's.
-- **For P49A-12 (change propagation / merge):** every non-sync writer already goes through the
-  module, so a "dirty since last sync" marker can be set next to each `multiValueWriteData` /
-  `copyMultiValueWriteData` call; merge makes the chosen value the primary entry and derives the
-  rest (`canonicalMergedMultiValues` in `contact-merge.ts`).
+- **P49A-12 (change propagation / merge):** done — see "Local changes, deletes and merges
+  reaching providers" below. Merge makes the chosen value the primary entry and derives the rest
+  (`canonicalMergedMultiValues` in `contact-merge.ts`); undo restores a family only if it is still
+  exactly as the merge wrote it.
 - **Data check:** the backfill migration's verification query (legacy array longer than the typed
   entries) must return 0 — see `roadmap/build-phase/p49a-10-multi-value-field-model.md`.
+
+---
+
+## Local changes, deletes and merges reaching providers (P49A-12)
+
+- **Dirty marker:** `SyncContactLink.localDirtyAt` — set by every non-sync writer next to its
+  contact write (`markSyncLinksDirty` in `src/server/sync-dirty.ts` / `src/server/dav/sync-propagation.mjs`):
+  web edits, REST API, the Kontax CardDAV server (device PUT; also stamps
+  `lastMutatedBy = MANUAL`, detail "CardDAV device"), merge, undo, restore, live-share updates.
+  Google / Outlook push a link when it is dirty **or** its contact was last written by a
+  non-sync source (`lastMutatedBy` not SYNC_*) after the link last synced; the push clears it
+  (only a marker set before the push read the contact). A MANUAL-policy conflict leaves it set.
+  The CardDAV client ignores it (it diffs every link's supported-field shadow each run).
+  Creates: any contact last written by a non-sync source (API, CSV, card import, shares — it
+  used to be MANUAL only) is created on a two-way / export provider.
+  - A link that "never pushes": check `localDirtyAt`, `lastSyncedAt`, the contact's
+    `lastMutatedBy` / `updatedAt`, open conflicts on the link, and `lastErrorCode`.
+- **Permanent delete:** a contact still linked to a provider (or not yet in the trash) is not
+  hard-deleted: it is archived + sync-tombstoned + `Contact.deletedAt` (hidden everywhere,
+  including the trash, exports and the plan's contact count). The next push deletes the remote
+  copies; `purgeDeletedContacts` (sync cron, `src/server/contact-deletion.ts`) hard-deletes it
+  once no live link remains (links on RETIRED connections don't count) and 7 days have passed.
+  An import-only connection never pushes a delete, so such a row stays hidden until the provider
+  deletes the contact too. Query stuck rows:
+  `SELECT id, "deletedAt" FROM "Contact" WHERE "deletedAt" < now() - interval '7 days';`
+  and their `SyncContactLink` rows with `"tombstonedAt" IS NULL`.
+- **Restore / merge undo:** tombstoned links are removed (the provider copy is gone) so the next
+  push re-creates the contact there; live links are marked dirty.
+- **Merge:** where only the absorbed contact is on a provider, its link moves to the survivor
+  (provider record updated in place); where both are, the absorbed copy is deleted there. The
+  decision snapshot's `propagation` records moved links and added books so undo reverses them.
+  Undo is refused after 30 days (server-side) and keeps survivor fields edited since the merge.
 
 ---
 
