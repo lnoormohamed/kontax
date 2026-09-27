@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { HELP_LINKS } from "~/app/(marketing)/help/_content/links";
+import { useDialogFocus } from "~/app/_components/use-dialog-focus";
 
 /**
  * P49A-19: the one place recovery codes are shown — used by the enrolment
@@ -84,13 +85,23 @@ export function RecoveryCodesPanel({
  * confirm they have saved the new ones.
  */
 export function RecoveryCodesDialog({ codes, onSaved }: { codes: string[]; onSaved: () => void }) {
+  // Mounts/unmounts with the caller's "show regenerate dialog" state, so
+  // `open: true` for this component's lifetime is enough — mount focuses in
+  // and inerts the background, unmount (onSaved closing it) restores focus.
+  // No `onClose`/`closeOnEscape`: this dialog is confirm-to-close only (the
+  // old codes have already stopped working), but it must still be reachable
+  // and operable by keyboard, which the inert background guarantees.
+  const dialogRef = useDialogFocus<HTMLDivElement>({ open: true, closeOnEscape: false });
+
   return (
     <div className="fixed inset-0 z-[90] grid items-end bg-[rgba(20,30,25,0.42)] p-0 md:place-items-center md:p-4">
       <div
+        ref={dialogRef}
         aria-labelledby="recovery-codes-dialog-title"
         aria-modal="true"
         className="st-modal-in max-h-[calc(100dvh-18px)] w-full overflow-y-auto rounded-t-[1.6rem] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,0.25)] md:max-w-[460px] md:rounded-[1.6rem] md:p-6"
         role="dialog"
+        tabIndex={-1}
       >
         <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]" id="recovery-codes-dialog-title">Your new recovery codes</h3>
         <p className="mt-[6px] text-[14px] leading-[1.55] text-[#5c655e]">

@@ -1,52 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { confirmTotpEnrolment, startTotpEnrolment } from "~/app/actions/totp";
+import { OtpInput } from "~/app/_components/otp-input";
+import { useDialogFocus } from "~/app/_components/use-dialog-focus";
 
 import { RecoveryCodesPanel } from "./recovery-codes";
-
-// ── 6-digit OTP input ─────────────────────────────────────────────────────────
-function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
-  value: string; onChange: (v: string) => void; onComplete?: (v: string) => void;
-  error?: boolean; disabled?: boolean; autoFocus?: boolean;
-}) {
-  const refs = useRef<(HTMLInputElement | null)[]>([]);
-  const digits = Array.from({ length: 6 }, (_, i) => value[i] ?? "");
-
-  useEffect(() => { if (autoFocus) refs.current[0]?.focus(); }, [autoFocus]);
-
-  const setAt = (i: number, ch: string) => {
-    const next = (value.slice(0, i) + ch + value.slice(i + 1)).slice(0, 6);
-    onChange(next);
-    if (ch && i < 5) refs.current[i + 1]?.focus();
-    if (next.length === 6 && !next.includes("") && onComplete) onComplete(next);
-  };
-
-  return (
-    <div className={`flex gap-[9px] ${error ? "st-shake" : ""}`}>
-      {digits.map((d, i) => (
-        <input
-          className="st-otp-box text-[16px]"
-          disabled={disabled}
-          inputMode="numeric"
-          key={i}
-          maxLength={1}
-          onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); if (v) setAt(i, v[v.length - 1]!); }}
-          onKeyDown={(e) => {
-            if (e.key === "Backspace") { if (!digits[i] && i > 0) { refs.current[i - 1]?.focus(); setAt(i - 1, ""); } else setAt(i, ""); }
-            if (e.key === "ArrowLeft" && i > 0) refs.current[i - 1]?.focus();
-            if (e.key === "ArrowRight" && i < 5) refs.current[i + 1]?.focus();
-          }}
-          onPaste={(e) => { e.preventDefault(); const p = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 6); if (p) { onChange(p); if (p.length === 6 && onComplete) onComplete(p); else refs.current[Math.min(p.length, 5)]?.focus(); } }}
-          ref={(el) => { refs.current[i] = el; }}
-          style={error ? { borderColor: "#c0492f", color: "#9a3a23" } : {}}
-          value={d}
-        />
-      ))}
-    </div>
-  );
-}
 
 function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }) {
   return <span className="st-spin inline-block rounded-full" style={{ width: size, height: size, border: `2px solid ${light ? "rgba(255,255,255,.35)" : "rgba(23,53,46,.2)"}`, borderTopColor: light ? "#fff" : "#17352e" }} />;
@@ -103,20 +63,40 @@ export function TwoFactorModal({
 
   const secretSpaced = secret.replace(/(.{4})/g, "$1 ").trim();
 
+  // The modal mounts/unmounts with the parent's "show 2FA setup" state, so
+  // `open` is constant for this component's whole lifetime — the hook's
+  // mount effect does the initial focus + inert, and its cleanup (on
+  // unmount, i.e. onCancel/onEnabled removing this component) restores
+  // focus. Escape is disabled once the recovery codes are showing, matching
+  // the backdrop-click guard below (codes must be confirmed, not dismissed).
+  const dialogRef = useDialogFocus<HTMLDivElement>({
+    open: true,
+    onClose: onCancel,
+    closeOnEscape: step !== "codes",
+  });
+
   return (
     <div className="fixed inset-0 z-[90] grid items-end bg-[rgba(20,30,25,0.42)] p-0 md:place-items-center md:p-4" onClick={step === "codes" ? undefined : onCancel}>
-      <div className="st-modal-in max-h-[calc(100dvh-18px)] w-full overflow-y-auto rounded-t-[1.6rem] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,0.25)] md:max-w-[460px] md:rounded-[1.6rem] md:p-6" onClick={(e) => e.stopPropagation()} role="dialog">
+      <div
+        ref={dialogRef}
+        aria-labelledby="totp-modal-title"
+        aria-modal="true"
+        className="st-modal-in max-h-[calc(100dvh-18px)] w-full overflow-y-auto rounded-t-[1.6rem] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,0.25)] md:max-w-[460px] md:rounded-[1.6rem] md:p-6"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        tabIndex={-1}
+      >
 
         {step === "loading" && (
           <div className="flex flex-col items-center gap-4 py-8">
             <Spinner size={28} light={false} />
-            <p className="text-[14px] text-[#5c655e]">Setting up…</p>
+            <p className="text-[14px] text-[#5c655e]" id="totp-modal-title">Setting up…</p>
           </div>
         )}
 
         {step === "error" && (
           <>
-            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]">Couldn&apos;t start enrolment</h3>
+            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]" id="totp-modal-title">Couldn&apos;t start enrolment</h3>
             <p className="mt-3 text-[14px] text-[#5c655e]">
               {err === "EMAIL_NOT_VERIFIED" ? "Please verify your email address before enabling 2FA."
                 : err === "TOTP_ALREADY_ENABLED" ? "Two-factor authentication is already enabled."
@@ -128,7 +108,7 @@ export function TwoFactorModal({
 
         {step === "qr" && (
           <>
-            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]">Set up two-factor authentication</h3>
+            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]" id="totp-modal-title">Set up two-factor authentication</h3>
             <p className="mt-[6px] text-[13px] font-semibold tracking-[0.02em] text-[#17352e]">Step 1 of 2</p>
             <p className="mt-[6px] text-[14px] leading-[1.55] text-[#5c655e]">
               Scan this QR code with your authenticator app (1Password, Authy, Google Authenticator…).
@@ -155,7 +135,7 @@ export function TwoFactorModal({
 
         {step === "verify" && (
           <>
-            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]">Set up two-factor authentication</h3>
+            <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]" id="totp-modal-title">Set up two-factor authentication</h3>
             <p className="mt-[6px] text-[13px] font-semibold text-[#17352e]">Step 2 of 2</p>
             <p className="mt-[6px] mb-4 text-[14px] leading-[1.55] text-[#5c655e]">
               Enter the 6-digit code from your authenticator app to confirm.
@@ -177,7 +157,7 @@ export function TwoFactorModal({
               <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[#e7efe9] text-[#17352e]">
                 <svg fill="none" height="17" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" viewBox="0 0 24 24" width="17"><polyline points="20 6 9 17 4 12" /></svg>
               </span>
-              <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]">Two-factor is enabled</h3>
+              <h3 className="m-0 text-[19px] font-semibold text-[#1d2823]" id="totp-modal-title">Two-factor is enabled</h3>
             </div>
             <RecoveryCodesPanel codes={recoveryCodes} onSaved={() => onEnabled(recoveryCodes)} />
           </>

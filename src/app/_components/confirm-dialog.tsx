@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useDialogFocus } from "~/app/_components/use-dialog-focus";
+
 /**
  * P24B-05 — Confirm / destructive-action dialog (spec §D4).
  *
@@ -42,18 +44,23 @@ export function ConfirmDialog({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !busy) onClose();
-    };
-    document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    confirmRef.current?.focus();
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, busy, onClose]);
+  }, [open]);
+
+  // Focus the confirm button on open, restore the trigger's focus on close,
+  // inert the rest of the page while open, and close on Escape (unless busy).
+  // Gated on `mounted` too (not just `open`): the dialog only actually enters
+  // the DOM once mounted flips true (see the portal comment below), so the
+  // hook must wait for that same tick or it inspects a still-empty container.
+  const dialogRef = useDialogFocus<HTMLDivElement>({
+    open: open && mounted,
+    onClose: () => { if (!busy) onClose(); },
+    initialFocusRef: confirmRef,
+  });
 
   if (!mounted || !open) return null;
 
@@ -61,9 +68,11 @@ export function ConfirmDialog({
 
   return createPortal(
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={title}
+      tabIndex={-1}
       style={{
         position: "fixed",
         inset: 0,

@@ -2,55 +2,14 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useRef, useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 
 import { redeemTotpRecoveryCode, submitTotpChallenge } from "~/app/actions/totp";
 import { signOutAction } from "~/app/actions/auth";
+import { OtpInput } from "~/app/_components/otp-input";
 import { safeInternalPath } from "~/lib/safe-internal-path";
 
 export const dynamic = "force-dynamic";
-
-// ── 6-digit OTP input ─────────────────────────────────────────────────────────
-function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
-  value: string; onChange: (v: string) => void; onComplete?: (v: string) => void;
-  error?: boolean; disabled?: boolean; autoFocus?: boolean;
-}) {
-  const refs = useRef<(HTMLInputElement | null)[]>([]);
-  const digits = Array.from({ length: 6 }, (_, i) => value[i] ?? "");
-
-  useEffect(() => { if (autoFocus) refs.current[0]?.focus(); }, [autoFocus]);
-
-  const setAt = (i: number, ch: string) => {
-    const next = (value.slice(0, i) + ch + value.slice(i + 1)).slice(0, 6);
-    onChange(next);
-    if (ch && i < 5) refs.current[i + 1]?.focus();
-    if (next.length === 6 && !next.includes("") && onComplete) onComplete(next);
-  };
-
-  return (
-    <div className={`flex gap-[9px] ${error ? "st-shake" : ""}`}>
-      {digits.map((d, i) => (
-        <input
-          className="st-otp-box"
-          disabled={disabled}
-          inputMode="numeric"
-          key={i}
-          maxLength={1}
-          onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); if (v) setAt(i, v[v.length - 1]!); }}
-          onKeyDown={(e) => {
-            if (e.key === "Backspace") { if (!digits[i] && i > 0) { refs.current[i - 1]?.focus(); setAt(i - 1, ""); } else setAt(i, ""); }
-            if (e.key === "ArrowLeft" && i > 0) refs.current[i - 1]?.focus();
-            if (e.key === "ArrowRight" && i < 5) refs.current[i + 1]?.focus();
-          }}
-          onPaste={(e) => { e.preventDefault(); const p = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 6); if (p) { onChange(p); if (p.length === 6 && onComplete) onComplete(p); else refs.current[Math.min(p.length, 5)]?.focus(); } }}
-          ref={(el) => { refs.current[i] = el; }}
-          style={error ? { borderColor: "#c0492f", color: "#9a3a23" } : {}}
-          value={d}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function VerifyTwoFaPage() {
   // useSearchParams needs a Suspense boundary for static prerender.
