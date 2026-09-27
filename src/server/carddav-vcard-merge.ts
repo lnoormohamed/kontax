@@ -67,6 +67,12 @@ export const CARDDAV_KONTAX_OWNED_PROPERTIES: readonly string[] = [
   "TITLE",
   "BDAY",
   "NOTE",
+  // Phonetic names: written only by Kontax (contact-portability.ts), so a
+  // name cleared in Kontax must also disappear from the remote card.
+  "X-KONTAX-PINYIN-NAME",
+  "X-KONTAX-PINYIN-FIRST-NAME",
+  "X-KONTAX-PINYIN-LAST-NAME",
+  "X-KONTAX-PINYIN-COMPANY",
 ];
 
 /**
@@ -220,6 +226,12 @@ export const mergeRemoteVCardForPush = ({
       effectiveOwned.add(line.name);
     }
     if (line.group) kontaxGroups.add(line.group);
+  }
+
+  // SORT-STRING is standard vCard and other clients may write it, so it is
+  // Kontax's only when the remote copy came from a Kontax phonetic-name push.
+  if (/^X-KONTAX-PINYIN-NAME[;:]/im.test(normaliseLineBreaks(remoteVCard).replace(/\n[ \t]/g, ""))) {
+    effectiveOwned.add("SORT-STRING");
   }
 
   const preserved = selectPreservedRemoteLines(remoteVCard, effectiveOwned, kontaxGroups);

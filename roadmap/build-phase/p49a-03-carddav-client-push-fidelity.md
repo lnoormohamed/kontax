@@ -134,3 +134,17 @@ None — no schema change.
   profile, so they PUT to `<uid>.vcf` (a second card when the real href differs) with the default
   profile. They now read the card first and send If-Match / If-None-Match, but the href should
   come from the link (P49A-12 owns that file).
+
+### Fable review (2026-09-27)
+- Fixed: the Kontax phonetic properties (`X-KONTAX-PINYIN-*`) are Kontax-owned, and `SORT-STRING`
+  is owned when the remote card carries Kontax's pinyin name, so a phonetic name cleared in Kontax
+  also leaves the remote card; a `SORT-STRING` from another client is kept.
+- Follow-ups (low, not blocking):
+  - A create that gets 412 because a *different* card sits at `<uid>.vcf` is re-deferred every
+    run. It should GET the href and create under a fresh href.
+  - Weak ETags still mean unconditional PUTs.
+  - Apple's `itemN.X-ABADR` country hint is dropped with the owned ADR group; this is cosmetic,
+    iOS re-derives it.
+  - Found earlier, pre-existing: `DEVICE_WINS` conflicts never push.
+  - Found earlier, pre-existing: KEEP_LOCAL / manual-merge pushes in `actions/sync.ts` assume the
+    `<uid>.vcf` href.

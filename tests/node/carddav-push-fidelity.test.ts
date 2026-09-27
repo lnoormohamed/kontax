@@ -415,3 +415,27 @@ describe("pushCardDavContact against a CardDAV server", () => {
     assert.equal(await carddav.fetchCardDavContact({ href: server.hrefFor("missing.vcf"), credentials }), null);
   });
 });
+
+describe("phonetic names (Fable review of P49A-03)", () => {
+  const body = vcard("BEGIN:VCARD", "VERSION:3.0", "FN:Li Wei", "N:Li;Wei;;;", "UID:p-1", "END:VCARD");
+  const owned = merge.cardDavOwnedProperties({ significantDates: false, photo: false });
+
+  test("a phonetic name cleared in Kontax is removed from the remote card", () => {
+    const remote = vcard(
+      "BEGIN:VCARD", "VERSION:3.0", "FN:Li Wei", "N:Li;Wei;;;",
+      "SORT-STRING:li wei", "X-KONTAX-PINYIN-NAME:li wei",
+      "X-KONTAX-PINYIN-FIRST-NAME:wei", "X-KONTAX-PINYIN-LAST-NAME:li",
+      "X-KONTAX-PINYIN-COMPANY:ke ji", "UID:p-1", "END:VCARD",
+    );
+    const merged = merge.mergeRemoteVCardForPush({ kontaxVCard: body, remoteVCard: remote, owned });
+    for (const name of ["SORT-STRING", "X-KONTAX-PINYIN-NAME", "X-KONTAX-PINYIN-FIRST-NAME", "X-KONTAX-PINYIN-LAST-NAME", "X-KONTAX-PINYIN-COMPANY"]) {
+      assert.equal(countProperty(merged, name), 0, `${name} dropped`);
+    }
+  });
+
+  test("a SORT-STRING written by another client is kept", () => {
+    const remote = vcard("BEGIN:VCARD", "VERSION:3.0", "FN:Li Wei", "SORT-STRING:Wei", "UID:p-1", "END:VCARD");
+    const merged = merge.mergeRemoteVCardForPush({ kontaxVCard: body, remoteVCard: remote, owned });
+    assert.ok(vcardLines(merged).includes("SORT-STRING:Wei"));
+  });
+});

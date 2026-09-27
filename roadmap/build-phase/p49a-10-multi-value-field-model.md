@@ -178,3 +178,10 @@ A mutation check (dropping the shadow condition) makes the two A-19 tests fail.
 - Not verifiable without a DB: the real Prisma write of `Prisma.DbNull` into the Json columns and
   the migration on staging data (run it there first, then the verification query).
 
+
+### Deploy note (Fable, 2026-09-27)
+The backfill sets `updatedAt` on every row that gains an entry, so those contacts look locally
+edited to their sync links: expect a one-off burst of pushes (and policy-resolved conflicts) on the
+first sync after applying it. Also known (low): the "provider held it" evidence is per family, not
+per value — a value added outside the web editor and not yet pushed can still go when the provider
+empties that whole family (closed by P49A-12's A-17 fix).
