@@ -1,9 +1,11 @@
 # Phase 49A — Full-audit remediation
 
 ## Phase status
-In progress. On production (main c50fe28, 2026-09-27): P49A-01, -02, -04, -05, -06, -07, -08,
--09, -11, -14 (with Phase 50), -15, -17, and P49A-19 items 1, 7 and 9. Open: P49A-03, -10, -12,
--13, -16, -18, -20 and P49A-19 items 2–6 (8 is tracked in -12).
+In progress. On production (main f7ead25, 2026-09-27): P49A-01, -02, -03, -04, -05, -06, -07, -08,
+-09, -10, -11, -12, -14 (with Phase 50), -15, -17, and P49A-19 items 1, 2, 3, 7, 8 and 9.
+Migrations 20260927090000 (P49A-10 backfill) and 20260927120000 (P49A-12 columns) applied to
+staging and production out of band before the deploy. Open: P49A-13, -16, -18, -20 and P49A-19
+items 4–6 (owner decisions), plus the low follow-ups recorded in the P49A-03 / -10 / -12 tickets.
 
 Tickets written 2026-09-25 from the full audit
 ([kontax-full-audit-2026-09-25.md](../runbooks/kontax-full-audit-2026-09-25.md)).
