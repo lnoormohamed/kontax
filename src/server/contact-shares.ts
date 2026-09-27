@@ -1,7 +1,11 @@
 import { Prisma } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
 import { copyMultiValueWriteData } from "~/server/contact-multi-values";
-import { ACTIVE_SUBSCRIPTION_STATUSES, subscriptionGrantsPlan } from "~/server/dav/plan-entitlements.mjs";
+import {
+  ACTIVE_SUBSCRIPTION_STATUSES,
+  isPaymentGraceOver,
+  subscriptionGrantsPlan,
+} from "~/server/dav/plan-entitlements.mjs";
 import { db } from "~/server/db";
 import { markSyncLinksDirty } from "~/server/sync-dirty";
 
@@ -45,15 +49,36 @@ const jsonOrNull = (value: Prisma.InputJsonValue | null): Prisma.InputJsonValue 
 
 const PAID_PLANS = new Set(["PRO", "FAMILY", "TEAMS"]);
 
-// P49A-19: a PAST_DUE subscription past its payment grace no longer counts.
-const recipientCanLiveSync = async (userId: string) => {
-  const subs = await db.subscription.findMany({
-    where: { userId, status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
-    select: { plan: true, status: true, graceEndsAt: true },
-  });
-  const now = new Date();
-  return subs.some((sub) => PAID_PLANS.has(sub.plan) && subscriptionGrantsPlan(sub, now));
+/** Share paused because the recipient's paid plan is unpaid past its grace (P49A-19). */
+export const RECIPIENT_PAYMENT_LAPSED_CODE = "RECIPIENT_PAYMENT_LAPSED";
+
+/**
+ * Can this recipient hold a live share right now?
+ *   · "live"   — a paid plan that grants (ACTIVE / TRIALING / PAST_DUE in grace);
+ *   · "paused" — P49A-19 (Fable review): the only paid plan is PAST_DUE beyond
+ *     the 3-day payment grace. Still a live Stripe subscription, so nothing
+ *     irreversible happens: the share is paused like RECIPIENT_LOCKED and the
+ *     next propagation after the payment goes through syncs it again. If
+ *     Stripe finally cancels, applyDowngrade converts it to a static copy;
+ *   · "free"   — no paid plan at all → converted to a static copy (downgrade).
+ */
+export const classifyLiveShareRecipient = (
+  subs: Array<{ plan: string; status: string; graceEndsAt: Date | null }>,
+  now = new Date(),
+): "live" | "paused" | "free" => {
+  const paid = subs.filter((sub) => PAID_PLANS.has(sub.plan));
+  if (paid.some((sub) => subscriptionGrantsPlan(sub, now))) return "live";
+  if (paid.some((sub) => isPaymentGraceOver(sub, now))) return "paused";
+  return "free";
 };
+
+const recipientLiveShareState = async (userId: string) =>
+  classifyLiveShareRecipient(
+    await db.subscription.findMany({
+      where: { userId, status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
+      select: { plan: true, status: true, graceEndsAt: true },
+    }),
+  );
 
 /**
  * Propagate an owner's contact change to every active LIVE_SYNC recipient copy
@@ -101,8 +126,18 @@ export const propagateLiveShares = async (ownerUserId: string, contactId: string
     const recipientContactId = share.recipientContactId!;
 
     try {
+      const recipientState = await recipientLiveShareState(recipientUserId);
+      // P49A-19: payment lapsed but the subscription is still alive — pause,
+      // never convert (paying must bring the live share back).
+      if (recipientState === "paused") {
+        await db.contactShare.update({
+          where: { id: share.id },
+          data: { lastErrorAt: new Date(), lastErrorCode: RECIPIENT_PAYMENT_LAPSED_CODE },
+        });
+        continue;
+      }
       // Downgrade handling: a now-Free recipient can't hold a live link → convert.
-      if (!(await recipientCanLiveSync(recipientUserId))) {
+      if (recipientState === "free") {
         await db.$transaction([
           db.contactShare.update({
             where: { id: share.id },

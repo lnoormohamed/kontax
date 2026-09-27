@@ -481,7 +481,8 @@ function RecipientList({
             <span className="min-w-0 flex-1">
               <span className="block truncate font-medium text-[#1d2823]">{share.recipientEmail}</span>
               {live && share.accepted && share.status === "ACTIVE" ? (
-                share.lastErrorCode === "RECIPIENT_LOCKED" ? (
+                share.lastErrorCode === "RECIPIENT_LOCKED" ||
+                share.lastErrorCode === "RECIPIENT_PAYMENT_LAPSED" ? (
                   <span className="block text-[12px] text-[#7c5511]">
                     Sync paused — recipient account issue
                   </span>
