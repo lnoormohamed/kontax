@@ -56,6 +56,7 @@ import {
   type SyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
 import { resolveSyncProviderIdentity } from "~/server/sync-provider-identity";
+import { authoritativeFamilies } from "~/server/sync-contact-mapping";
 import { validateOutboundUrl } from "~/server/safe-fetch";
 
 const syncDirectionSchema = z.enum(["TWO_WAY", "IMPORT_ONLY", "EXPORT_ONLY"]);
@@ -428,7 +429,12 @@ const buildContactWriteDataFromRemoteSnapshot = (
   profile: SyncProviderCapabilityProfile,
 ) => {
   const base = buildRemoteSnapshotBase(snapshot, profile);
-  return { ...base.writeData, ...snapshotMultiValueWriteData(base.snapshot) };
+  return {
+    ...base.writeData,
+    // The user chose the remote record: every family the provider is
+    // authoritative for may clear, a "partial" one (Outlook addresses) never.
+    ...snapshotMultiValueWriteData(base.snapshot, authoritativeFamilies(profile)),
+  };
 };
 
 // The same snapshot as a portable contact, for the supported-field shadow.

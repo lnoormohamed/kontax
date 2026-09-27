@@ -16,7 +16,6 @@ import { Prisma } from "../../generated/prisma";
 import {
   buildMultiValueWriteData,
   deriveMultiValueFields,
-  familiesPresentIn,
   type MultiValueEntriesInput,
   type MultiValueFamily,
   readMultiValueEntries as readEntries,
@@ -31,6 +30,7 @@ export {
   deriveLegacyEmails,
   deriveLegacyPhones,
   deriveLegacyWebsites,
+  familiesHeldBy,
   familiesPresentIn,
   LEGACY_ENTRY_LABEL,
   MULTI_VALUE_COLUMNS,
@@ -128,10 +128,15 @@ export const restoreMultiValueWriteData = (snapshot: ContactLike): MultiValueWri
 
 /**
  * Prisma data for the families a remote / conflict snapshot actually carries
- * (a family the snapshot never recorded is not cleared).
+ * (a family the snapshot never recorded is not cleared). A carried family with
+ * values always applies; an empty one clears only when it is in `clearable`
+ * (see `clearableInboundFamilies` in sync-contact-mapping.ts).
  */
-export const snapshotMultiValueWriteData = (snapshot: ContactLike): MultiValueWriteData =>
-  snapshotWriteData(asRecord(snapshot), { jsonNull: Prisma.DbNull });
+export const snapshotMultiValueWriteData = (
+  snapshot: ContactLike,
+  clearable: Iterable<MultiValueFamily>,
+): MultiValueWriteData =>
+  snapshotWriteData(asRecord(snapshot), { jsonNull: Prisma.DbNull, clearable });
 
 /** Typed entries of a stored contact (legacy fallback only for a not-yet-backfilled row). */
 export const readMultiValueEntries = (contact: ContactLike): MultiValueEntries =>
@@ -196,7 +201,3 @@ export const withDerivedLegacyFields = <T extends object>(
   for (const column of Object.keys(MULTI_VALUE_ENTRY_SELECT)) delete rest[column];
   return { ...(rest as Omit<T, EntryColumn>), ...readDerivedLegacyFields(contact) };
 };
-
-/** Whether a snapshot carries a family at all (typed or legacy key present). */
-export const snapshotCarriesFamily = (snapshot: ContactLike, family: MultiValueFamily) =>
-  familiesPresentIn(asRecord(snapshot)).includes(family);

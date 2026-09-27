@@ -531,9 +531,26 @@ export const copyMultiValueWriteData = (source, options = {}) =>
   buildMultiValueWriteData(readMultiValueEntries(source), options);
 
 /**
- * Keep only the families a snapshot actually carries (typed or legacy key
- * present). Used when applying a remote / conflict snapshot: a family the
- * snapshot never recorded must not be cleared.
+ * A legacy flat array only counts as "carried" when it is in Kontax's own
+ * shape (strings; postal `{ formatted }` records). A raw provider object —
+ * Google's `emailAddresses: [{ value, type }]` — is not a Kontax family.
+ *
+ * @param {MultiValueFamily} family
+ * @param {unknown} legacy
+ */
+const isKontaxLegacyArray = (family, legacy) =>
+  Array.isArray(legacy) &&
+  legacy.every((item) =>
+    family === "addresses"
+      ? typeof item === "string" || (isRecord(item) && typeof item.formatted === "string")
+      : typeof item === "string",
+  );
+
+/**
+ * The families a snapshot actually carries: a typed entries array, a string
+ * scalar, or a legacy array in Kontax's shape. Keys that are absent or null
+ * (a family the snapshot never recorded, or stripped by a P39-03 exclusion)
+ * do not count, so such a family is never cleared from a snapshot.
  *
  * @param {Record<string, unknown>} snapshot
  * @returns {MultiValueFamily[]}
@@ -542,29 +559,62 @@ export const familiesPresentIn = (snapshot) =>
   MULTI_VALUE_FAMILIES.filter((family) => {
     const columns = MULTI_VALUE_COLUMNS[family];
     return (
-      columns.entries in snapshot ||
-      columns.scalar in snapshot ||
-      (columns.legacy !== null && columns.legacy in snapshot)
+      Array.isArray(snapshot[columns.entries]) ||
+      typeof snapshot[columns.scalar] === "string" ||
+      (columns.legacy !== null && isKontaxLegacyArray(family, snapshot[columns.legacy]))
     );
   });
 
 /**
+ * The families a stored supported-field shadow (or any contact-shaped object)
+ * shows holding at least one value — read through the reader, so a shadow
+ * recorded before P49A-10 (legacy keys only) counts too. A null / missing
+ * shadow holds nothing.
+ *
+ * @param {unknown} shadow
+ * @returns {MultiValueFamily[]}
+ */
+export const familiesHeldBy = (shadow) => {
+  if (!isRecord(shadow)) return [];
+  const entries = readMultiValueEntries(shadow);
+  return MULTI_VALUE_FAMILIES.filter(
+    (family) => entries[MULTI_VALUE_COLUMNS[family].entries].length > 0,
+  );
+};
+
+/**
  * Write data for the families a snapshot carries, read through the reader
  * (typed entries, else the snapshot's legacy values — conflict snapshots
- * recorded before P49A-10 may only have those).
+ * recorded before P49A-10 may only have those). A carried family with values
+ * always applies; a carried but EMPTY family is only written (cleared) when it
+ * is in `clearable` — the caller decides from the capability profile and, for
+ * automatic applies, from evidence that the provider held the family before
+ * (P49A-10 Fable review: an empty remote list is otherwise no proof that the
+ * user deleted anything).
  *
  * @template [J=null]
  * @param {Record<string, unknown>} snapshot
- * @param {{ jsonNull?: J }} [options]
+ * @param {{ jsonNull?: J, clearable: Iterable<MultiValueFamily> }} options
  */
-export const snapshotMultiValueWriteData = (snapshot, options = {}) => {
+export const snapshotMultiValueWriteData = (snapshot, options) => {
   const present = new Set(familiesPresentIn(snapshot));
+  const clearable = new Set(options.clearable);
   const entries = readMultiValueEntries(snapshot);
+  /** @type {Record<MultiValueFamily, unknown[]>} */
+  const byFamily = {
+    emails: entries.emailEntries,
+    phones: entries.phoneEntries,
+    addresses: entries.addressEntries,
+    websites: entries.websiteEntries,
+  };
+  /** @param {MultiValueFamily} family */
+  const applies = (family) =>
+    present.has(family) && (byFamily[family].length > 0 || clearable.has(family));
   /** @type {MultiValueEntriesInput} */
   const input = {};
-  if (present.has("emails")) input.emailEntries = entries.emailEntries;
-  if (present.has("phones")) input.phoneEntries = entries.phoneEntries;
-  if (present.has("addresses")) input.addressEntries = entries.addressEntries;
-  if (present.has("websites")) input.websiteEntries = entries.websiteEntries;
-  return buildMultiValueWriteData(input, options);
+  if (applies("emails")) input.emailEntries = entries.emailEntries;
+  if (applies("phones")) input.phoneEntries = entries.phoneEntries;
+  if (applies("addresses")) input.addressEntries = entries.addressEntries;
+  if (applies("websites")) input.websiteEntries = entries.websiteEntries;
+  return buildMultiValueWriteData(input, "jsonNull" in options ? { jsonNull: options.jsonNull } : {});
 };
