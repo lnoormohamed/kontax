@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import PasswordReset from "~/emails/password-reset";
 import { getClientIp } from "~/lib/client-ip";
+import { revokeAllApiTokens } from "~/server/api-tokens";
 import { signOut } from "~/server/auth";
 import { db } from "~/server/db";
 import { sendEmail } from "~/server/email";
@@ -116,7 +117,7 @@ export async function requestPasswordReset(email: string): Promise<{ success: tr
 export async function resetPassword(input: {
   plaintextToken: string;
   newPassword: string;
-}): Promise<{ success: true } | { error: string }> {
+}): Promise<{ success: true; revokedApiTokens: number } | { error: string }> {
   if (input.newPassword.length < 8) return { error: "PASSWORD_TOO_SHORT" };
 
   const hash = crypto
@@ -134,16 +135,23 @@ export async function resetPassword(input: {
 
   const newHash = await bcrypt.hash(input.newPassword, 12);
 
-  await db.$transaction([
-    db.user.update({
+  // P49A-13: claim the token atomically (a concurrent double-submit used to
+  // pass the `usedAt` check above twice), and revoke API tokens with the
+  // password write — a reset is account recovery, and a token minted by
+  // whoever had the account must not survive it.
+  const revokedApiTokens = await db.$transaction(async (tx) => {
+    const claimed = await tx.passwordResetToken.updateMany({
+      where: { id: token.id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+    if (claimed.count === 0) return null;
+    await tx.user.update({
       where: { id: token.userId },
       data: { password: newHash, sessionVersion: { increment: 1 } },
-    }),
-    db.passwordResetToken.update({
-      where: { id: token.id },
-      data: { usedAt: new Date() },
-    }),
-  ]);
+    });
+    return revokeAllApiTokens(tx, token.userId);
+  });
+  if (revokedApiTokens === null) return { error: "TOKEN_INVALID" };
   // P48-03: the sessionVersion bump must beat the 45s validation cache, exactly
   // as every other bumping path already does. Without this an attacker's live
   // session survived the victim's password reset for up to a full TTL — the one
@@ -155,9 +163,9 @@ export async function resetPassword(input: {
       userId: token.userId,
       eventType: "ACCOUNT_UPDATED",
       actor: "SYSTEM",
-      payload: { field: "passwordResetCompleted" },
+      payload: { field: "passwordResetCompleted", revokedApiTokens },
     },
   });
 
-  return { success: true };
+  return { success: true, revokedApiTokens };
 }

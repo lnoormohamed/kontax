@@ -4,6 +4,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
+import { revokeAllApiTokens } from "~/server/api-tokens";
 import { sendAccountDeletionScheduledEmail } from "~/server/billing-emails";
 import { auth } from "~/server/auth";
 import { isSessionError, requireSession } from "~/server/auth/require-session";
@@ -78,7 +79,7 @@ export async function updateProfile(input: {
 export async function changePassword(input: {
   currentPassword: string;
   newPassword: string;
-}): Promise<{ success: true } | { error: string }> {
+}): Promise<{ success: true; revokedApiTokens: number } | { error: string }> {
   let session: Awaited<ReturnType<typeof requireSession>>;
   try {
     session = await requireSession({ write: true });
@@ -111,23 +112,32 @@ export async function changePassword(input: {
 
   const newHash = await bcrypt.hash(input.newPassword, 12);
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { password: newHash, sessionVersion: { increment: 1 } },
+  // P49A-13: a password change is what a user does when they think someone
+  // else got in, and an API token minted from a hijacked session would
+  // otherwise outlive it (tokens don't carry `sessionVersion`). Revoke them in
+  // the same transaction as the password write; the user is told how many and
+  // re-creates the ones they still need.
+  const userId = session.user.id;
+  const revokedApiTokens = await db.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: { password: newHash, sessionVersion: { increment: 1 } },
+    });
+    return revokeAllApiTokens(tx, userId);
   });
   // P38-09: the sessionVersion bump must beat the 45s validation cache
-  await invalidateSessionValidation(session.user.id);
+  await invalidateSessionValidation(userId);
 
   await db.activityEvent.create({
     data: {
-      userId: session.user.id,
+      userId,
       eventType: "ACCOUNT_UPDATED",
       actor: "USER",
-      payload: { field: "password" },
+      payload: { field: "password", revokedApiTokens },
     },
   });
 
-  return { success: true };
+  return { success: true, revokedApiTokens };
 }
 
 // ─── Email Change (P18-03) ───────────────────────────────────────────────────

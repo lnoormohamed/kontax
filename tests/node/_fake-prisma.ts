@@ -188,7 +188,15 @@ export function createFakePrisma(opts: FakePrismaOptions = {}) {
   };
 
   const applyData = (model: string, row: Row, data: Row) => {
-    const next = { ...row, ...structuredClone(data), updatedAt: new Date() };
+    const patch = structuredClone(data);
+    // P49A-13: atomic number operations (`{ increment: n }` / `{ decrement: n }`).
+    for (const [key, value] of Object.entries(patch)) {
+      if (typeof value !== "object" || value === null || value instanceof Date || Array.isArray(value)) continue;
+      const op = value as Record<string, unknown>;
+      if (typeof op.increment === "number") patch[key] = Number(row[key] ?? 0) + op.increment;
+      else if (typeof op.decrement === "number") patch[key] = Number(row[key] ?? 0) - op.decrement;
+    }
+    const next = { ...row, ...patch, updatedAt: new Date() };
     checkUnique(model, next, row);
     Object.assign(row, next);
   };

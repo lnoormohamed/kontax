@@ -100,12 +100,19 @@ export function PasswordChangeForm({ oauthOnly = false }: { oauthOnly?: boolean 
       const result = await changePassword({ currentPassword: cur, newPassword: nw });
       if ("success" in result) {
         reset();
-        const msg = oauthOnly
+        // P49A-13: a password change also revokes every API token — say so,
+        // so an integration that stops working isn't a mystery.
+        const revoked = result.revokedApiTokens;
+        const tokenNote =
+          revoked > 0
+            ? ` ${revoked === 1 ? "Your API token was" : `All ${revoked} of your API tokens were`} revoked — create new ones in Settings → Developer.`
+            : "";
+        const msg = (oauthOnly
           ? "Password set. You can now sign in with your email and password."
-          : "Password updated. All other sessions have been signed out.";
+          : "Password updated. All other sessions have been signed out.") + tokenNote;
         setNotice(msg);
         await update();
-        setTimeout(() => setNotice(""), 6000);
+        setTimeout(() => setNotice(""), revoked > 0 ? 15000 : 6000);
       } else {
         setErrs({ cur: ERROR_MESSAGES[result.error] ?? "Something went wrong." });
       }

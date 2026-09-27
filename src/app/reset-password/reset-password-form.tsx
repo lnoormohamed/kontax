@@ -43,7 +43,10 @@ export function ResetPasswordForm({ token }: { token: string }) {
     startTransition(async () => {
       const result = await resetPassword({ plaintextToken: token, newPassword: password });
       if ("success" in result) {
-        router.push("/login?message=password-reset");
+        // P49A-13: the login banner tells the user their API tokens went too.
+        router.push(
+          result.revokedApiTokens > 0 ? "/login?message=password-reset-tokens" : "/login?message=password-reset",
+        );
       } else {
         setError(ERROR_MESSAGES[result.error] ?? "Something went wrong.");
       }

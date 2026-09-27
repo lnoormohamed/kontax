@@ -1,11 +1,24 @@
-import { createHash } from "crypto";
 import { type NextRequest, NextResponse } from "next/server";
 
 import type { ApiTokenScope } from "~/server/api-tokens";
-import { validateApiToken } from "~/server/api-tokens";
+import { recordApiTokenUse, validateApiToken } from "~/server/api-tokens";
 import { checkApiRateLimit } from "~/server/api-rate-limit";
 import { getUserBillingContext } from "~/server/billing";
 import { corsHeaders } from "~/lib/api-cors";
+import { getClientIp } from "~/lib/client-ip";
+import { checkRateLimit, peekRateLimit, rateLimiters } from "~/server/rate-limit";
+
+const tooManyAuthFailures = (resetAt: Date) =>
+  NextResponse.json(
+    { error: "RATE_LIMITED", message: "Too many invalid API tokens from this address. Try again later." },
+    {
+      status: 429,
+      headers: {
+        ...corsHeaders,
+        "Retry-After": Math.max(1, Math.ceil((resetAt.getTime() - Date.now()) / 1000)).toString(),
+      },
+    },
+  );
 
 export async function withApiAuth(
   req: NextRequest,
@@ -19,10 +32,18 @@ export async function withApiAuth(
     );
   }
 
+  // P49A-13: invalid-token spraying used to be unlimited — every guess was a DB
+  // lookup. Refuse an IP that has sent too many bad tokens *before* looking
+  // this one up; only failed lookups count, so valid traffic is unaffected.
+  const ipKey = `ip:${getClientIp(req.headers) ?? "unknown"}`;
+  const ipGate = await peekRateLimit(rateLimiters.apiAuthFailByIp, ipKey);
+  if (!ipGate.allowed) return tooManyAuthFailures(ipGate.resetAt);
+
   const token = authHeader.slice(7);
   const identity = await validateApiToken(token);
 
   if (!identity) {
+    await checkRateLimit(rateLimiters.apiAuthFailByIp, ipKey);
     return NextResponse.json(
       { error: "INVALID_TOKEN", message: "The provided API token is invalid or revoked." },
       { status: 401, headers: corsHeaders },
@@ -39,9 +60,8 @@ export async function withApiAuth(
     );
   }
 
-  // Hash the bearer token — rate limit key is per-token, not per-user
-  const tokenHash = createHash("sha256").update(token).digest("hex");
-  const rateLimit = await checkApiRateLimit(tokenHash, identity.scope);
+  // Rate limit key is per-token (its hash), not per-user
+  const rateLimit = await checkApiRateLimit(identity.tokenHash, identity.scope);
 
   const rateLimitHeaders: Record<string, string> = {
     "X-RateLimit-Limit": rateLimit.limit.toString(),
@@ -62,6 +82,10 @@ export async function withApiAuth(
       },
     );
   }
+
+  // P49A-13: counted only once the request is past the rate limit (a 429 used
+  // to count as a use and bump lastUsedAt).
+  recordApiTokenUse(identity.tokenHash);
 
   const response = await handler(identity.userId, identity.scope);
 
