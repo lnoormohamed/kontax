@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useDialogFocus } from "~/app/_components/use-dialog-focus";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 interface MobileBottomSheetProps {
@@ -128,15 +129,9 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
     };
   }, [isOpen]);
 
-  // Trap focus inside sheet and close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, onClose]);
+  // Real Tab focus trap (via `inert` on everything outside the sheet),
+  // initial focus and focus restore on close, plus close on Escape.
+  const sheetRef = useDialogFocus<HTMLDivElement>({ open: isOpen, onClose });
 
   const keyboardUp = keyboardOffset > 0 && visibleHeight > 0;
   // Swipe-down dismiss (shared implementation) — disabled while the keyboard
@@ -163,9 +158,11 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
 
       {/* Sheet panel */}
       <div
+        ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        tabIndex={-1}
         style={{
           position: "fixed",
           left: 0,
