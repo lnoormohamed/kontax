@@ -119,8 +119,12 @@ All three scripts report to one Uptime Kuma **Push** monitor, "Kontax DB backup"
   on LXC 129 (`root:postgres`, mode 640) and on the Proxmox host (`root`, mode 600). It is read with
   `sed`, never sourced. The file is missing → the scripts skip alerting; Kuma unreachable → a
   `WARN: alert push failed` log line. Neither ever changes the backup's own result.
-- Kuma only pages if the monitor has a **notification channel** (Settings → Notifications). As of
-  2026-09-27 Kuma had none, so no monitor alerted anyone.
+- Alerts go to the Kuma notification channel **"Phone (ntfy)"** (set up 2026-09-27): an ntfy.sh topic
+  subscribed to in the ntfy phone app; down = priority 5, up = 4. It is the default channel and is
+  linked to all monitors. The topic name is in Kuma (Settings → Notifications), not in this repo:
+  anyone who knows it can read the alerts. Before 2026-09-27 Kuma had no channels at all.
+- The monitor (id 23) was created by cloning "Kontax Cron (LXC 152)" in `kuma.db`
+  (backup `kuma.db.bak-20260927`); it can be edited in the Kuma UI like any other.
 - Test an alert without breaking anything:
   `curl -G --data-urlencode status=down --data-urlencode "msg=test alert" "$KUMA_PUSH_URL"`,
   then run `kontax-pg-backup.sh` (as postgres) to put it back up.

@@ -44,5 +44,6 @@ A backup that is logged OK is complete and restorable, and a host loss costs at 
   on success, down on failure; off-host copy and restore test: down only). The 26 h heartbeat
   catches a job that never runs. The ERR traps now report the real exit code (they logged
   `exit 0` before). Tested locally against a stub push server, then installed on production.
-  Live once the monitor exists, `/etc/kontax-backup.env` holds its push URL, and Kuma has a
-  notification channel. Details: `db-restore.md` → Failure alerts.
+  Live: Kuma push monitor "Kontax DB backup" (26 h heartbeat) plus an ntfy phone-push channel
+  (Kuma had none before). Tested end to end: a down push from the host and an up push from the
+  backup both arrived on ntfy. Details: `db-restore.md` → Failure alerts.
