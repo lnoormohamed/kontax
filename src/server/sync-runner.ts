@@ -47,6 +47,7 @@ import {
   exceedsDeletionThreshold,
 } from "~/server/sync-deletion-guard";
 import type { ImportDeletionGuard } from "~/server/sync-import-engine";
+import { clearableInboundFamilies } from "~/server/sync-contact-mapping";
 import {
   notifySyncAutoPause,
   notifySyncDeletionPause,
@@ -363,6 +364,9 @@ const cardDavPushContactSelect = {
 const buildContactWriteDataFromRemoteSnapshot = (
   snapshot: unknown,
   profile: SyncProviderCapabilityProfile,
+  // P49A-10 (Fable review): the link's stored supportedFieldShadow — only a
+  // family the remote held at the last sync may be cleared by an empty card.
+  previousShadow: unknown,
 ) => {
   if (!isRecord(snapshot)) {
     throw new Error("Remote sync snapshot is missing or invalid.");
@@ -383,9 +387,10 @@ const buildContactWriteDataFromRemoteSnapshot = (
     nameSuffix: typeof snapshot.nameSuffix === "string" ? snapshot.nameSuffix : null,
     nickname: typeof snapshot.nickname === "string" ? snapshot.nickname : null,
     // P49A-10 (A-19): the remote card's typed entries with legacy columns
-    // derived; a family the card carries but left empty (a phone deleted on
-    // the provider) clears locally — it used to be skipped as "no change".
-    ...snapshotMultiValueWriteData(snapshot),
+    // derived. A family the card left empty clears locally only when the
+    // remote held it at the last sync (a deletion there); otherwise the local
+    // values may be edits Kontax has not pushed yet and are kept.
+    ...snapshotMultiValueWriteData(snapshot, clearableInboundFamilies(profile, previousShadow)),
     company: typeof snapshot.company === "string" ? snapshot.company : null,
     department: typeof snapshot.department === "string" ? snapshot.department : null,
     jobTitle: typeof snapshot.jobTitle === "string" ? snapshot.jobTitle : null,
@@ -1431,6 +1436,7 @@ export const runQueuedSyncJobs = async ({
         remoteETag: string | null;
         remoteSnapshot: unknown;
         capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
+        previousShadow: unknown;
       }> = [];
       let deferredLocalChangesCount = 0;
       const canWrite = job.syncDirection !== "IMPORT_ONLY";
@@ -1573,6 +1579,7 @@ export const runQueuedSyncJobs = async ({
                 contactToPortable(link.contact),
                 capabilityProfile,
               ),
+              previousShadow: link.supportedFieldShadow,
             });
             // P23-05: record an AUTO_RESOLVED audit row for the applied conflict.
             autoResolvedEntries.push({
@@ -1646,6 +1653,7 @@ export const runQueuedSyncJobs = async ({
               contactToPortable(link.contact),
               capabilityProfile,
             ),
+            previousShadow: link.supportedFieldShadow,
           });
           continue;
         }
@@ -2028,6 +2036,7 @@ export const runQueuedSyncJobs = async ({
                 buildContactWriteDataFromRemoteSnapshot(
                   remoteApply.remoteSnapshot,
                   capabilityProfile,
+                  remoteApply.previousShadow,
                 ),
                 excludedFields,
               ),

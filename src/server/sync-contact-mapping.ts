@@ -5,14 +5,16 @@
 // P49A-10: the mapped typed entries are canonical — the legacy email/phone/
 // address/website columns are derived from them (src/server/contact-multi-values.ts),
 // never from the mapper's flat arrays. P49A-10 (A-19): an empty inbound list
-// clears the local one when the provider's list is authoritative for that
-// family (capability profile) and the record actually carried it.
+// clears the local one only with evidence that it is a deletion — see
+// clearableInboundFamilies.
 import type { PortableContactInput } from "~/server/contact-portability";
 import {
   deriveLegacyAddresses,
   deriveLegacyEmails,
   deriveLegacyPhones,
   deriveLegacyWebsites,
+  familiesHeldBy,
+  MULTI_VALUE_FAMILIES,
   type MultiValueFamily,
   multiValueWriteData,
   normalizeAddressEntries,
@@ -70,17 +72,55 @@ export type MappedContact = {
   omittedFamilies?: MultiValueFamily[];
 };
 
-// Which multi-value families an inbound apply writes. An empty list is only a
-// deletion when the provider's list is authoritative for the family and this
-// record carried it; otherwise an empty list leaves the local values alone
-// (a non-empty one always applies).
+/**
+ * P49A-10 (A-19, Fable review): the families for which an EMPTY inbound list
+ * may clear the local one. Both must hold:
+ *  - the provider's list is authoritative for the family (capability profile —
+ *    Outlook addresses are "partial"), and
+ *  - the link's last-synced remote shadow shows the provider HELD values for
+ *    it, i.e. the empty list is a deletion on the provider. Without that
+ *    evidence (no shadow, or the provider never had the family) an empty list
+ *    says nothing: the local values may be ones Kontax has not pushed yet —
+ *    a phone added on an iPhone over Kontax's CardDAV server or through the
+ *    API is anchored without a push (push picks MANUAL edits only, A-17) —
+ *    and clearing them would delete data on the device too.
+ * `previousShadow` null/undefined = no evidence = nothing clearable.
+ */
+export const clearableInboundFamilies = (
+  profile: SyncProviderCapabilityProfile,
+  previousShadow: unknown,
+): Set<MultiValueFamily> => {
+  const held = new Set(familiesHeldBy(previousShadow));
+  return new Set(
+    MULTI_VALUE_FAMILIES.filter(
+      (family) => held.has(family) && providerListIsAuthoritative(profile, family),
+    ),
+  );
+};
+
+/**
+ * The families an explicit "keep the remote version" may clear: every family
+ * the provider's list is authoritative for (the user chose the remote record,
+ * so no shadow evidence is needed — but a "partial" family is still never
+ * cleared, since the provider does not hold Kontax's values for it).
+ */
+export const authoritativeFamilies = (
+  profile: SyncProviderCapabilityProfile,
+): Set<MultiValueFamily> =>
+  new Set(MULTI_VALUE_FAMILIES.filter((family) => providerListIsAuthoritative(profile, family)));
+
+// Which multi-value families an inbound apply writes: a non-empty list always
+// applies (replacing the local one, as before); an empty list only when it is
+// clearable (see clearableInboundFamilies); a family the record omitted never.
 const inboundFamilies = (
   m: MappedContact,
   profile: SyncProviderCapabilityProfile,
+  previousShadow: unknown,
 ): Record<MultiValueFamily, boolean> => {
   const omitted = new Set(m.omittedFamilies ?? []);
+  const clearable = clearableInboundFamilies(profile, previousShadow);
   const applies = (family: MultiValueFamily, entries: unknown[]) =>
-    !omitted.has(family) && (entries.length > 0 || providerListIsAuthoritative(profile, family));
+    !omitted.has(family) && (entries.length > 0 || clearable.has(family));
   return {
     emails: applies("emails", m.emailEntries),
     phones: applies("phones", m.phoneEntries),
@@ -92,13 +132,15 @@ const inboundFamilies = (
 // MappedContact → Prisma contact write data (mirrors the CardDAV create path).
 // Multi-value families go through the canonical module: typed entries plus the
 // legacy columns derived from them, an applied empty family cleared (A-19).
+// `previousShadow` is the link's stored supportedFieldShadow (null on create).
 // relatedPeople / customFields are omitted (undefined) when empty — Kontax
 // keeps local-only values there that no provider returns.
 export const mappedContactToWriteData = (
   m: MappedContact,
   profile: SyncProviderCapabilityProfile,
+  previousShadow: unknown,
 ) => {
-  const families = inboundFamilies(m, profile);
+  const families = inboundFamilies(m, profile, previousShadow);
   return {
     fullName: m.fullName,
     firstName: m.firstName,

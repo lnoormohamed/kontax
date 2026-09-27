@@ -418,6 +418,9 @@ export type MicrosoftPushLink = {
   contactId: string;
   remoteUid: string;
   remoteETag: string | null;
+  // P49A-10: last-synced supported-field shadow — the evidence a SERVER_WINS
+  // re-apply needs before an empty Outlook list may clear a local one.
+  supportedFieldShadow?: unknown;
 };
 
 export type MicrosoftPushResult =
@@ -499,7 +502,17 @@ export const pushMicrosoftContact = async (
   if (account.conflictPolicy === "SERVER_WINS") {
     const mapped = mapGraphContactToKontax(latest);
     if (mapped) {
-      await applyRemoteToContact(engineAccount, link.id, link.contactId, mapped, link.remoteUid, latestEtag, now);
+      await applyRemoteToContact(
+        engineAccount,
+        link.id,
+        link.contactId,
+        mapped,
+        link.remoteUid,
+        latestEtag,
+        now,
+        null,
+        link.supportedFieldShadow ?? null,
+      );
     }
     await recordAutoResolved(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag, "KEEP_REMOTE", now);
     return { ok: false, conflict: true, strategy: "KEEP_REMOTE" };
@@ -790,6 +803,7 @@ export const pushLocalChangesToMicrosoft = async (
       remoteUid: true,
       remoteETag: true,
       lastSyncedAt: true,
+      supportedFieldShadow: true,
       contact: { select: pushContactSelect },
     },
   });
@@ -805,6 +819,7 @@ export const pushLocalChangesToMicrosoft = async (
           contactId: link.contactId,
           remoteUid: link.remoteUid,
           remoteETag: link.remoteETag,
+          supportedFieldShadow: link.supportedFieldShadow,
         },
         buildMicrosoftPushContact(link.contact),
       );

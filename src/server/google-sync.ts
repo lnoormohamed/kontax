@@ -605,6 +605,9 @@ export const pushGoogleContact = async (
         link.remoteUid,
         latestEtag,
         now,
+        null,
+        // P49A-10: only lists Google held at the last sync may be cleared.
+        link.supportedFieldShadow ?? null,
       );
     }
     await recordAutoResolved(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag, "KEEP_REMOTE", now);

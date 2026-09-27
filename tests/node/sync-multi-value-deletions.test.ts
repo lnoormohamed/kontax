@@ -17,6 +17,7 @@ const { mappedContactToWriteData, mappedContactToPortableContact } = await impor
   "~/server/sync-contact-mapping"
 );
 const { mapGraphContactToKontax } = await import("~/server/microsoft-sync-mapping");
+const { mapGooglePersonToContact } = await import("~/server/google-sync-mapping");
 const { resolveSyncProviderCapabilityProfile } = await import("~/server/sync-provider-capabilities");
 
 type Person = people_v1.Schema$Person;
@@ -118,15 +119,22 @@ test("a provider that does not return a family never clears it", () => {
   const mapped = mapGraphContactToKontax(graph)!;
   assert.deepEqual(mapped.omittedFamilies, ["phones"]);
   const microsoft = resolveSyncProviderCapabilityProfile({ provider: "MICROSOFT" });
-  const data = mappedContactToWriteData(mapped, microsoft) as Record<string, unknown>;
+  // The last sync saw Outlook holding a value in every family.
+  const heldEverything = {
+    emailEntries: [{ label: "Work", value: "old@work.example", isPrimary: true }],
+    phoneEntries: [{ label: "Mobile", value: "+15550100", isPrimary: true }],
+    addressEntries: [{ label: "Home", formatted: "9 Old Rd", isPrimary: true }],
+    websiteEntries: [{ label: "Work", value: "https://old.example", isPrimary: true }],
+  };
+  const data = mappedContactToWriteData(mapped, microsoft, heldEverything) as Record<string, unknown>;
   for (const key of ["phone", "phoneNumbers", "phoneEntries"]) {
     assert.ok(!(key in data), `${key} is not written`);
   }
   // …and are nulled on the shadow side so they never read as a remote change.
   assert.equal(mappedContactToPortableContact(mapped).phoneEntries, null);
 
-  // Emails were present → applied. An emptied website (key present, null) is
-  // a real deletion and clears.
+  // Emails were present → applied. An emptied website (key present, null)
+  // that Outlook held at the last sync is a real deletion and clears.
   assert.deepEqual(
     (data.emailEntries as Array<{ value: string }>).map((e) => e.value),
     ["ada@work.example"],
@@ -141,8 +149,69 @@ test("a provider that does not return a family never clears it", () => {
   }
   // A non-empty Outlook address still applies, as before.
   const withAddress = mapGraphContactToKontax({ ...graph, homeAddress: { street: "1 Main St", city: "Leeds" } })!;
-  const addressData = mappedContactToWriteData(withAddress, microsoft) as Record<string, unknown>;
+  const addressData = mappedContactToWriteData(withAddress, microsoft, heldEverything) as Record<
+    string,
+    unknown
+  >;
   assert.equal(addressData.address, "1 Main St, Leeds");
+});
+
+test("an empty remote list never clears values the provider did not hold at the last sync", () => {
+  // Fable review scenario, unit level: the link's shadow shows Google held no
+  // phone, so an empty inbound phone list is not a deletion — whatever phone
+  // the contact has locally was added in Kontax and not pushed (yet).
+  const googleProfile = resolveSyncProviderCapabilityProfile({ provider: "GOOGLE" });
+  const { phoneNumbers: _none, ...person } = ada();
+  const mapped = mapGooglePersonToContact(person)!;
+  const noPhonesShadow = { emailEntries: [{ label: "Home", value: "ada@example.com", isPrimary: true }], phoneEntries: [] };
+  const kept = mappedContactToWriteData(mapped, googleProfile, noPhonesShadow) as Record<string, unknown>;
+  assert.ok(!("phoneEntries" in kept) && !("phone" in kept), "phones untouched");
+
+  // No shadow at all (a link never synced, or a create) = no evidence.
+  const noEvidence = mappedContactToWriteData(mapped, googleProfile, null) as Record<string, unknown>;
+  assert.ok(!("phoneEntries" in noEvidence));
+
+  // A pre-P49A-10 shadow (legacy keys only) still counts as evidence.
+  const legacyShadow = { phone: "+447700900001", phoneNumbers: ["+447700900001"] };
+  const cleared = mappedContactToWriteData(mapped, googleProfile, legacyShadow) as Record<string, unknown>;
+  assert.equal(cleared.phone, null);
+});
+
+test("a phone added locally without a push survives an unrelated remote edit", async () => {
+  // Google contact with no phone.
+  const { phoneNumbers: _none, ...noPhone } = ada();
+  await runSync([noPhone], "t0");
+  const contact = fake.contactByRemoteUid("people/c1")!;
+  assert.deepEqual(readMultiValueEntries(contact).phoneEntries, []);
+
+  // A phone arrives through a non-MANUAL writer (Kontax CardDAV PUT / REST
+  // API): it is never pushed to Google (A-17), so Google still has none.
+  await new Promise((resolve) => setTimeout(resolve, 3));
+  Object.assign(contact, {
+    phoneEntries: [{ label: "Mobile", value: "+447700900555", isPrimary: true }],
+    phone: "+447700900555",
+    phoneNumbers: ["+447700900555"],
+    lastMutatedBy: "API",
+    updatedAt: new Date(),
+  });
+
+  // Run 1: Google unchanged → the link is anchored without a push.
+  await runSync([noPhone], "t1");
+  // Run 2: an unrelated Google edit (company) → applied as a remote update.
+  const result = await runSync(
+    [{ ...noPhone, etag: "e2", organizations: [{ name: "Analytical Engines Ltd" }] }],
+    "t2",
+  );
+  assert.equal(result.updated, 1);
+  const after = fake.contactByRemoteUid("people/c1")!;
+  assert.equal(after.company, "Analytical Engines Ltd");
+  assert.deepEqual(
+    readMultiValueEntries(after).phoneEntries.map((e) => e.value),
+    ["+447700900555"],
+    "the unpushed phone is kept",
+  );
+  assert.equal(after.phone, "+447700900555");
+  assert.equal(fake.conflicts.length, 0);
 });
 
 test("Google's profile treats every multi-value family as authoritative", () => {

@@ -200,10 +200,17 @@ export const applyRemoteToContact = async (
   etag: string | null,
   now: Date,
   capabilityDiagnostics: ProviderCapabilityDiagnostics | null = null,
+  // P49A-10 (Fable review): the link's stored supportedFieldShadow — the
+  // evidence that an empty remote list is a deletion. Null = no evidence, so
+  // no list is cleared.
+  previousShadow: unknown = null,
 ) => {
   // P39-03: excluded fields never overwrite local values (keys removed, not
   // nulled) and stay out of the stored shadow.
-  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped, account.capabilityProfile), exclusionsOf(account));
+  const data = omitExcludedContactWriteData(
+    mappedContactToWriteData(mapped, account.capabilityProfile, previousShadow),
+    exclusionsOf(account),
+  );
   const supportedFieldShadow = buildProviderSupportedContactShadow(
     stripExcludedPortableFields(mappedContactToPortableContact(mapped), exclusionsOf(account)),
     account.capabilityProfile,
@@ -445,8 +452,12 @@ const createContact = async (
   now: Date,
   capped: boolean,
 ) => {
-  // P39-03: excluded fields are not imported on create either.
-  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped, account.capabilityProfile), exclusionsOf(account));
+  // P39-03: excluded fields are not imported on create either. No previous
+  // shadow: a new contact has nothing to clear.
+  const data = omitExcludedContactWriteData(
+    mappedContactToWriteData(mapped, account.capabilityProfile, null),
+    exclusionsOf(account),
+  );
   const supportedFieldShadow = buildProviderSupportedContactShadow(
     stripExcludedPortableFields(mappedContactToPortableContact(mapped), exclusionsOf(account)),
     account.capabilityProfile,
@@ -635,6 +646,7 @@ export const importRemoteContactBatch = async (
             linkedContactToPortable(link.contact),
             account.capabilityProfile,
           ),
+          link.supportedFieldShadow,
         );
         await recordAutoResolved(account, link, link.contact, item.remoteSnapshot, item.etag, "KEEP_REMOTE", now);
         summary.updated += 1;
@@ -662,6 +674,7 @@ export const importRemoteContactBatch = async (
           linkedContactToPortable(link.contact),
           account.capabilityProfile,
         ),
+        link.supportedFieldShadow,
       );
       summary.updated += 1;
       continue;
