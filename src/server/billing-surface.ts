@@ -2,6 +2,7 @@ import { type SubscriptionPlan, type SubscriptionStatus } from "../../generated/
 
 import { getUserBillingContext, getUserPlanSummary, PLAN_LABELS } from "~/server/billing";
 import { REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
+import { isPaymentGraceOver } from "~/server/dav/plan-entitlements.mjs";
 import { db } from "~/server/db";
 import { getStripeCatalog } from "~/server/stripe-catalog";
 
@@ -181,8 +182,14 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       canceledAt: true,
     },
   });
+  // P49A-19 (Fable review): a real row unpaid past its payment grace grants
+  // nothing, so it must not speak for a plan that is held by something else
+  // (e.g. a comp at the same rank) — prefer rows that still grant.
+  const grantingSubscriptions = realSubscriptions.filter((row) => !isPaymentGraceOver(row));
   const subscription =
-    realSubscriptions.find((row) => row.plan === plan) ?? realSubscriptions[0] ?? null;
+    grantingSubscriptions.find((row) => row.plan === plan) ?? grantingSubscriptions[0] ?? null;
+  // A real subscription the user still pays (or owes) for, for the grant views.
+  const ownSubscription = subscription ?? realSubscriptions[0] ?? null;
 
   // Fable review (P49A-06/07): a plan this user doesn't pay for — Teams via
   // membership of an org-billed team, or a plan granted by Kontax with no real
@@ -221,7 +228,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
         members: null,
         usage: buildUsage(summary),
         grant,
-        personalSubscription: subscription ? { planLabel: PLAN_LABELS[subscription.plan] } : null,
+        personalSubscription: ownSubscription ? { planLabel: PLAN_LABELS[ownSubscription.plan] } : null,
       };
     }
   }
@@ -256,8 +263,12 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
 
   const status = subscription?.status ?? null;
 
-  // Grace / payment failed — takes priority over everything else.
-  if (lifecycleState === "GRACE" || status === "PAST_DUE") {
+  // Grace / payment failed — takes priority over everything else. Never with
+  // a deadline already in the past (P49A-19: that row no longer grants).
+  if (
+    (lifecycleState === "GRACE" || status === "PAST_DUE") &&
+    !(subscription && isPaymentGraceOver(subscription))
+  ) {
     const deadline = subscription?.graceEndsAt ?? null;
     return {
       state: "grace",
@@ -459,6 +470,10 @@ export const getBillingBanner = async (userId: string): Promise<BillingBanner | 
     select: { status: true, trialEndsAt: true, graceEndsAt: true },
   });
   if (!subscription) return null;
+
+  // P49A-19: past its grace, a PAST_DUE row that isn't a paymentLapse (above)
+  // is outranked by a comp / other plan — no "update or move to Free" banner.
+  if (isPaymentGraceOver(subscription)) return null;
 
   // Owner in grace: split standard vs critical by hours remaining.
   if (context.lifecycleState === "GRACE" || subscription.status === "PAST_DUE") {

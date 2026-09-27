@@ -184,3 +184,16 @@ test("payment still failing after the grace: on Free with a downgraded notice, n
   assert.equal(surface.usage?.find((r) => r.label === "Contacts")?.limit, 500);
   assert.deepEqual(await getBillingBanner("user_1"), { variant: "ownerLapsed", daysRemaining: null });
 });
+
+test("comp Pro + own Pro unpaid past the grace: comp view with the own subscription's portal, never a past 'update by' date", async () => {
+  state.subscriptions = [
+    sub({ providerSubscriptionId: "manual_admin-override-user_1", plan: "PRO", currentPeriodEnd: null }),
+    sub({ providerSubscriptionId: "sub_pro", plan: "PRO", status: "PAST_DUE", graceEndsAt: new Date(Date.now() - DAY) }),
+  ];
+
+  const surface = await getBillingSurface("user_1");
+  assert.equal(surface.plan, "PRO");
+  assert.equal(surface.state, "comp", "the comp is what grants Pro now");
+  assert.deepEqual(surface.personalSubscription, { planLabel: "Pro" }, "the portal to fix the card is still offered");
+  assert.equal(await getBillingBanner("user_1"), null, "no 'update or move to Free' banner");
+});
