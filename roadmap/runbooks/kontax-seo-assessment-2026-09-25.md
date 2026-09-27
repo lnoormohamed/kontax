@@ -111,7 +111,8 @@ server-side counts, consistent with "no tracking").
 ## 5. Decisions for the owner
 1. **Currency: decided 2026-09-25 — GBP.** The owner is switching Stripe prices to GBP (UK-focused);
    the site displays whatever currency Stripe returns.
-2. **Public cards in search:** index only cards whose owner opts in (recommended), or none?
+2. **Public cards in search: decided 2026-09-26 — never.** Cards can hold addresses and phone
+   numbers, so every `/u/*` page is noindex (meta + `X-Robots-Tag`) and excluded from the sitemap.
 3. **Changelog history:** OK to rebuild it from the real release history (phases since June 2026)?
 
 
