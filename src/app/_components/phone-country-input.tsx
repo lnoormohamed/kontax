@@ -30,6 +30,10 @@ type PhoneCountryInputProps = {
   selectorClassName?: string;
   numberInputClassName?: string;
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
+  /** Forwarded to the number input, so a `<label htmlFor>` can target it. */
+  id?: string;
+  /** Forwarded to the number input when there's no visible label for it. */
+  "aria-label"?: string;
 };
 
 const COUNTRY_OPTIONS = [...PHONE_COUNTRY_RULES_LIST].sort((left, right) =>
@@ -54,6 +58,8 @@ export function PhoneCountryInput({
   selectorClassName,
   numberInputClassName,
   onKeyDown,
+  id,
+  "aria-label": ariaLabel,
 }: PhoneCountryInputProps) {
   const [{ iso2, value: draftValue }, setState] = useState(() =>
     parsePhoneCountryInputValue(value),
@@ -218,11 +224,13 @@ export function PhoneCountryInput({
             />
           </button>
           <input
+            aria-label={ariaLabel}
             autoFocus={autoFocus}
             className={
               numberInputClassName ??
               "h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-sm text-[#1d2823] outline-none placeholder:text-[#aeb4ac]"
             }
+            id={id}
             inputMode="tel"
             onChange={(event) => emit(event.target.value, false)}
             onClick={(event) => event.stopPropagation()}

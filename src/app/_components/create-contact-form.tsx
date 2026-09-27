@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { resolveAvatarSrc } from "~/lib/avatar-src";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import { createContact } from "~/app/actions/contacts";
 import { AvatarUploadButton } from "~/app/_components/avatar-upload-button";
@@ -26,10 +26,16 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+// P49A-17: text-[16px] (not text-sm/14px) below the sm breakpoint so tapping
+// into a field on an iPhone doesn't trigger Safari's auto-zoom; sm: restores
+// the original 14px on larger viewports.
 const FIELD =
-  "w-full rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2.5 text-sm text-[#1d2823] outline-none transition placeholder:text-[#aeb4ac] focus:border-[#4158f4]";
+  "w-full rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2.5 text-[16px] sm:text-sm text-[#1d2823] outline-none transition placeholder:text-[#aeb4ac] focus:border-[#4158f4]";
 const LABEL_SELECT =
-  "rounded-[0.7rem] border border-[#d8ddd6] bg-[#f6f7f4] px-2.5 py-2.5 text-xs font-semibold text-[#5c655e] outline-none focus:border-[#4158f4]";
+  "rounded-[0.7rem] border border-[#d8ddd6] bg-[#f6f7f4] px-2.5 py-2.5 text-[16px] sm:text-xs font-semibold text-[#5c655e] outline-none focus:border-[#4158f4]";
+// Compact small-caps field label, matching the "Related people" /
+// "Significant dates" section headers already used further down this form.
+const FIELD_LABEL = "mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]";
 
 const initials = (name: string) =>
   name
@@ -60,6 +66,29 @@ function Group({ icon, children }: { icon?: string; children: React.ReactNode })
   );
 }
 
+// P49A-17: a compact, visible small-caps label above a single field — this
+// form previously had none (placeholder text isn't an accessible name).
+function Field({
+  label,
+  htmlFor,
+  className,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={className}>
+      <label className={FIELD_LABEL} htmlFor={htmlFor}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 function MultiValue({
   rows,
   setRows,
@@ -67,6 +96,7 @@ function MultiValue({
   type,
   placeholder,
   addText,
+  fieldLabel,
 }: {
   rows: ValueRow[];
   setRows: (rows: ValueRow[]) => void;
@@ -74,53 +104,72 @@ function MultiValue({
   type: string;
   placeholder: string;
   addText: string;
+  /** Visible compact label above the group, e.g. "Email" or "Phone". */
+  fieldLabel: string;
 }) {
+  const groupId = useId();
   const update = (i: number, patch: Partial<ValueRow>) =>
     setRows(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   const isPhoneField = type === "tel";
   return (
     <div className="grid gap-2">
-      {rows.map((row, i) => (
-        <div className="flex items-center gap-2" key={i}>
-          <select
-            className={LABEL_SELECT}
-            onChange={(e) => update(i, { label: e.target.value })}
-            value={labels.includes(row.label) ? row.label : labels[0]}
-          >
-            {labels.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
-          {isPhoneField ? (
-            <PhoneCountryInput
-              onChange={(value) => update(i, { value })}
-              placeholder={placeholder}
-              value={row.value}
-              wrapperClassName="min-w-0 flex-1"
-            />
-          ) : (
-            <input
-              className={FIELD}
-              onChange={(e) => update(i, { value: e.target.value })}
-              placeholder={placeholder}
-              type={type}
-              value={row.value}
-            />
-          )}
-          {rows.length > 1 ? (
-            <button
-              aria-label="Remove"
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#b5472f]"
-              onClick={() => setRows(rows.filter((_, idx) => idx !== i))}
-              type="button"
+      <label className={FIELD_LABEL} htmlFor={`${groupId}-0`}>
+        {fieldLabel}
+      </label>
+      {rows.map((row, i) => {
+        const inputId = i === 0 ? `${groupId}-0` : undefined;
+        // Row 0 gets the visible label above; later rows (2nd email, 2nd
+        // phone, …) get an aria-label instead, so they're still named without
+        // repeating the visible label for every row.
+        const rowAriaLabel = i === 0 ? undefined : `${fieldLabel} ${i + 1}`;
+        return (
+          <div className="flex items-center gap-2" key={i}>
+            <select
+              aria-label={`${fieldLabel} type`}
+              className={LABEL_SELECT}
+              onChange={(e) => update(i, { label: e.target.value })}
+              value={labels.includes(row.label) ? row.label : labels[0]}
             >
-              ✕
-            </button>
-          ) : null}
-        </div>
-      ))}
+              {labels.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
+            {isPhoneField ? (
+              <PhoneCountryInput
+                aria-label={rowAriaLabel}
+                id={inputId}
+                numberInputClassName="h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-[16px] sm:text-sm text-[#1d2823] outline-none placeholder:text-[#aeb4ac]"
+                onChange={(value) => update(i, { value })}
+                placeholder={placeholder}
+                value={row.value}
+                wrapperClassName="min-w-0 flex-1"
+              />
+            ) : (
+              <input
+                aria-label={rowAriaLabel}
+                className={FIELD}
+                id={inputId}
+                onChange={(e) => update(i, { value: e.target.value })}
+                placeholder={placeholder}
+                type={type}
+                value={row.value}
+              />
+            )}
+            {rows.length > 1 ? (
+              <button
+                aria-label={`Remove ${fieldLabel.toLowerCase()} ${i + 1}`}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#b5472f]"
+                onClick={() => setRows(rows.filter((_, idx) => idx !== i))}
+                type="button"
+              >
+                ✕
+              </button>
+            ) : null}
+          </div>
+        );
+      })}
       <button
         className="justify-self-start text-[13px] font-semibold text-[#4158f4]"
         onClick={() => setRows([...rows, { label: labels[0]!, value: "" }])}
@@ -143,6 +192,9 @@ export function CreateContactForm({
   teamBooks?: { id: string; name: string }[];
   prefillParam?: string;
 }) {
+  const uid = useId();
+  const fieldId = (name: string) => `${uid}-${name}`;
+
   // Decode card prefill once on mount (safe: user sees the form before saving)
   const prefill = useMemo<CardPrefillData | null>(() => {
     if (!prefillParam) return null;
@@ -388,28 +440,38 @@ export function CreateContactForm({
               currentUrl={avatarUrl.trim() || null}
               onUploaded={setAvatarUrl}
             />
-            <input
-              className={`${FIELD} max-w-[320px] text-center`}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="…or paste a photo URL"
-              type="url"
-              value={avatarUrl}
-            />
+            <Field className="w-full max-w-[320px]" htmlFor={fieldId("avatarUrl")} label="Photo URL">
+              <input
+                className={`${FIELD} text-center`}
+                id={fieldId("avatarUrl")}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="…or paste a photo URL"
+                type="url"
+                value={avatarUrl}
+              />
+            </Field>
           </div>
 
           {/* identity */}
           <Group icon="people">
             {mode === "org" ? (
-              <input
-                className={FIELD}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Company name"
-                value={company}
-              />
+              <Field htmlFor={fieldId("companyName")} label="Company name">
+                <input
+                  className={FIELD}
+                  id={fieldId("companyName")}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Company name"
+                  value={company}
+                />
+              </Field>
             ) : (
               <>
-                <input className={FIELD} onChange={(e) => setFirst(e.target.value)} placeholder="First name" value={first} />
-                <input className={FIELD} onChange={(e) => setLast(e.target.value)} placeholder="Surname" value={last} />
+                <Field htmlFor={fieldId("first")} label="First name">
+                  <input className={FIELD} id={fieldId("first")} onChange={(e) => setFirst(e.target.value)} placeholder="First name" value={first} />
+                </Field>
+                <Field htmlFor={fieldId("last")} label="Surname">
+                  <input className={FIELD} id={fieldId("last")} onChange={(e) => setLast(e.target.value)} placeholder="Surname" value={last} />
+                </Field>
               </>
             )}
           </Group>
@@ -417,35 +479,47 @@ export function CreateContactForm({
           {/* work */}
           {mode === "org" ? null : (
             <Group icon="archive">
-              <input className={FIELD} onChange={(e) => setCompany(e.target.value)} placeholder="Company" value={company} />
-              <input className={FIELD} onChange={(e) => setJobTitle(e.target.value)} placeholder="Job title" value={jobTitle} />
+              <Field htmlFor={fieldId("company")} label="Company">
+                <input className={FIELD} id={fieldId("company")} onChange={(e) => setCompany(e.target.value)} placeholder="Company" value={company} />
+              </Field>
+              <Field htmlFor={fieldId("jobTitle")} label="Job title">
+                <input className={FIELD} id={fieldId("jobTitle")} onChange={(e) => setJobTitle(e.target.value)} placeholder="Job title" value={jobTitle} />
+              </Field>
             </Group>
           )}
 
           {/* email */}
           <Group icon="bell">
-            <MultiValue addText="Add email" labels={EMAIL_LABELS} placeholder="Email" rows={emails} setRows={setEmails} type="email" />
+            <MultiValue addText="Add email" fieldLabel="Email" labels={EMAIL_LABELS} placeholder="Email" rows={emails} setRows={setEmails} type="email" />
           </Group>
 
           {/* phone */}
           <Group icon="people">
-            <MultiValue addText="Add phone" labels={PHONE_LABELS} placeholder="Phone" rows={phones} setRows={setPhones} type="tel" />
+            <MultiValue addText="Add phone" fieldLabel="Phone" labels={PHONE_LABELS} placeholder="Phone" rows={phones} setRows={setPhones} type="tel" />
           </Group>
 
           {/* address */}
           {showAddress ? (
             <Group icon="archive">
-              <select className={`${LABEL_SELECT} justify-self-start`} onChange={(e) => setAddrLabel(e.target.value)} value={addrLabel}>
+              <select aria-label="Address type" className={`${LABEL_SELECT} justify-self-start`} onChange={(e) => setAddrLabel(e.target.value)} value={addrLabel}>
                 {ADDR_LABELS.map((l) => (
                   <option key={l} value={l}>{l}</option>
                 ))}
               </select>
-              <input className={FIELD} onChange={(e) => setStreet(e.target.value)} placeholder="Street address" value={street} />
+              <Field htmlFor={fieldId("street")} label="Street address">
+                <input className={FIELD} id={fieldId("street")} onChange={(e) => setStreet(e.target.value)} placeholder="Street address" value={street} />
+              </Field>
               <div className="grid grid-cols-2 gap-2">
-                <input className={FIELD} onChange={(e) => setCity(e.target.value)} placeholder="City" value={city} />
-                <input className={FIELD} onChange={(e) => setPostcode(e.target.value)} placeholder="Postcode" value={postcode} />
+                <Field htmlFor={fieldId("city")} label="City">
+                  <input className={FIELD} id={fieldId("city")} onChange={(e) => setCity(e.target.value)} placeholder="City" value={city} />
+                </Field>
+                <Field htmlFor={fieldId("postcode")} label="Postcode">
+                  <input className={FIELD} id={fieldId("postcode")} onChange={(e) => setPostcode(e.target.value)} placeholder="Postcode" value={postcode} />
+                </Field>
               </div>
-              <input className={FIELD} onChange={(e) => setCountry(e.target.value)} placeholder="Country" value={country} />
+              <Field htmlFor={fieldId("country")} label="Country">
+                <input className={FIELD} id={fieldId("country")} onChange={(e) => setCountry(e.target.value)} placeholder="Country" value={country} />
+              </Field>
             </Group>
           ) : (
             <Group icon="archive">
@@ -463,14 +537,20 @@ export function CreateContactForm({
           {showBirthday ? (
             <Group icon="star">
               <div className="grid grid-cols-3 gap-2">
-                <select className={FIELD} onChange={(e) => setBMonth(e.target.value)} value={bMonth}>
-                  <option value="">Month</option>
-                  {MONTHS.map((m, i) => (
-                    <option key={m} value={String(i + 1)}>{m}</option>
-                  ))}
-                </select>
-                <input className={FIELD} inputMode="numeric" onChange={(e) => setBDay(e.target.value)} placeholder="Day" value={bDay} />
-                <input className={FIELD} inputMode="numeric" onChange={(e) => setBYear(e.target.value)} placeholder="Year (optional)" value={bYear} />
+                <Field htmlFor={fieldId("bMonth")} label="Month">
+                  <select className={FIELD} id={fieldId("bMonth")} onChange={(e) => setBMonth(e.target.value)} value={bMonth}>
+                    <option value="">Month</option>
+                    {MONTHS.map((m, i) => (
+                      <option key={m} value={String(i + 1)}>{m}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field htmlFor={fieldId("bDay")} label="Day">
+                  <input className={FIELD} id={fieldId("bDay")} inputMode="numeric" onChange={(e) => setBDay(e.target.value)} placeholder="Day" value={bDay} />
+                </Field>
+                <Field htmlFor={fieldId("bYear")} label="Year">
+                  <input className={FIELD} id={fieldId("bYear")} inputMode="numeric" onChange={(e) => setBYear(e.target.value)} placeholder="Year (optional)" value={bYear} />
+                </Field>
               </div>
             </Group>
           ) : (
@@ -488,13 +568,16 @@ export function CreateContactForm({
           {/* notes */}
           {showNotes ? (
             <Group icon="more">
-              <textarea
-                autoFocus
-                className={`${FIELD} min-h-24 resize-y`}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add any notes about this contact…"
-                value={notes}
-              />
+              <Field htmlFor={fieldId("notes")} label="Notes">
+                <textarea
+                  autoFocus
+                  className={`${FIELD} min-h-24 resize-y`}
+                  id={fieldId("notes")}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add any notes about this contact…"
+                  value={notes}
+                />
+              </Field>
             </Group>
           ) : (
             <Group icon="more">
@@ -522,30 +605,56 @@ export function CreateContactForm({
               {/* extended identity */}
               <Group icon="people">
                 <div className="grid grid-cols-3 gap-2">
-                  <input className={FIELD} onChange={(e) => setPrefix(e.target.value)} placeholder="Prefix" value={prefix} />
-                  <input className={FIELD} onChange={(e) => setMiddle(e.target.value)} placeholder="Middle" value={middle} />
-                  <input className={FIELD} onChange={(e) => setSuffix(e.target.value)} placeholder="Suffix" value={suffix} />
+                  <Field htmlFor={fieldId("prefix")} label="Prefix">
+                    <input className={FIELD} id={fieldId("prefix")} onChange={(e) => setPrefix(e.target.value)} placeholder="Prefix" value={prefix} />
+                  </Field>
+                  <Field htmlFor={fieldId("middle")} label="Middle">
+                    <input className={FIELD} id={fieldId("middle")} onChange={(e) => setMiddle(e.target.value)} placeholder="Middle" value={middle} />
+                  </Field>
+                  <Field htmlFor={fieldId("suffix")} label="Suffix">
+                    <input className={FIELD} id={fieldId("suffix")} onChange={(e) => setSuffix(e.target.value)} placeholder="Suffix" value={suffix} />
+                  </Field>
                 </div>
-                <input className={FIELD} onChange={(e) => setNickname(e.target.value)} placeholder="Nickname" value={nickname} />
+                <Field htmlFor={fieldId("nickname")} label="Nickname">
+                  <input className={FIELD} id={fieldId("nickname")} onChange={(e) => setNickname(e.target.value)} placeholder="Nickname" value={nickname} />
+                </Field>
                 <div className="grid grid-cols-2 gap-2">
-                  <input className={FIELD} onChange={(e) => setPhoneticFirst(e.target.value)} placeholder="Phonetic first" value={phoneticFirst} />
-                  <input className={FIELD} onChange={(e) => setPhoneticLast(e.target.value)} placeholder="Phonetic last" value={phoneticLast} />
+                  <Field htmlFor={fieldId("phoneticFirst")} label="Phonetic first">
+                    <input className={FIELD} id={fieldId("phoneticFirst")} onChange={(e) => setPhoneticFirst(e.target.value)} placeholder="Phonetic first" value={phoneticFirst} />
+                  </Field>
+                  <Field htmlFor={fieldId("phoneticLast")} label="Phonetic last">
+                    <input className={FIELD} id={fieldId("phoneticLast")} onChange={(e) => setPhoneticLast(e.target.value)} placeholder="Phonetic last" value={phoneticLast} />
+                  </Field>
                 </div>
-                <input className={FIELD} onChange={(e) => setPhoneticCompany(e.target.value)} placeholder="Phonetic company" value={phoneticCompany} />
+                <Field htmlFor={fieldId("phoneticCompany")} label="Phonetic company">
+                  <input className={FIELD} id={fieldId("phoneticCompany")} onChange={(e) => setPhoneticCompany(e.target.value)} placeholder="Phonetic company" value={phoneticCompany} />
+                </Field>
               </Group>
 
               {/* websites */}
               <Group icon="upload">
-                <MultiValue addText="Add website" labels={WEB_LABELS} placeholder="Website" rows={websites} setRows={setWebsites} type="url" />
+                <MultiValue addText="Add website" fieldLabel="Website" labels={WEB_LABELS} placeholder="Website" rows={websites} setRows={setWebsites} type="url" />
               </Group>
 
               {/* related people */}
               <Group icon="people">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">Related people</p>
+                <p className={FIELD_LABEL}>Related people</p>
                 {related.map((r, i) => (
                   <div className="flex items-center gap-2" key={i}>
-                    <input className={`${LABEL_SELECT} w-28`} onChange={(e) => setRelated(related.map((x, idx) => (idx === i ? { ...x, relationship: e.target.value } : x)))} placeholder="Relation" value={r.relationship} />
-                    <input className={FIELD} onChange={(e) => setRelated(related.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)))} placeholder="Name" value={r.name} />
+                    <input
+                      aria-label={i === 0 ? "Relationship" : `Relationship ${i + 1}`}
+                      className={`${LABEL_SELECT} w-28`}
+                      onChange={(e) => setRelated(related.map((x, idx) => (idx === i ? { ...x, relationship: e.target.value } : x)))}
+                      placeholder="Relation"
+                      value={r.relationship}
+                    />
+                    <input
+                      aria-label={i === 0 ? "Related person name" : `Related person name ${i + 1}`}
+                      className={FIELD}
+                      onChange={(e) => setRelated(related.map((x, idx) => (idx === i ? { ...x, name: e.target.value } : x)))}
+                      placeholder="Name"
+                      value={r.name}
+                    />
                   </div>
                 ))}
                 <button className="justify-self-start text-[13px] font-semibold text-[#4158f4]" onClick={() => setRelated([...related, { relationship: "Other", name: "" }])} type="button">
@@ -555,17 +664,24 @@ export function CreateContactForm({
 
               {/* significant dates */}
               <Group icon="star">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">Significant dates</p>
+                <p className={FIELD_LABEL}>Significant dates</p>
                 {dates.map((d, i) => (
                   <div className="flex items-center gap-2" key={i}>
                     <input
+                      aria-label={i === 0 ? "Date label" : `Date label ${i + 1}`}
                       className={`${LABEL_SELECT} w-28`}
                       list="contact-date-labels"
                       onChange={(e) => setDates(dates.map((x, idx) => (idx === i ? { ...x, label: e.target.value } : x)))}
                       placeholder="Label"
                       value={d.label}
                     />
-                    <input className={FIELD} onChange={(e) => setDates(dates.map((x, idx) => (idx === i ? { ...x, date: e.target.value } : x)))} placeholder="YYYY-MM-DD" value={d.date} />
+                    <input
+                      aria-label={i === 0 ? "Date" : `Date ${i + 1}`}
+                      className={FIELD}
+                      onChange={(e) => setDates(dates.map((x, idx) => (idx === i ? { ...x, date: e.target.value } : x)))}
+                      placeholder="YYYY-MM-DD"
+                      value={d.date}
+                    />
                   </div>
                 ))}
                 <datalist id="contact-date-labels">
@@ -580,11 +696,23 @@ export function CreateContactForm({
 
               {/* custom fields */}
               <Group icon="more">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">Custom fields</p>
+                <p className={FIELD_LABEL}>Custom fields</p>
                 {customs.map((c, i) => (
                   <div className="flex items-center gap-2" key={i}>
-                    <input className={`${LABEL_SELECT} w-28`} onChange={(e) => setCustoms(customs.map((x, idx) => (idx === i ? { ...x, label: e.target.value } : x)))} placeholder="Label" value={c.label} />
-                    <input className={FIELD} onChange={(e) => setCustoms(customs.map((x, idx) => (idx === i ? { ...x, value: e.target.value } : x)))} placeholder="Value" value={c.value} />
+                    <input
+                      aria-label={i === 0 ? "Custom field label" : `Custom field label ${i + 1}`}
+                      className={`${LABEL_SELECT} w-28`}
+                      onChange={(e) => setCustoms(customs.map((x, idx) => (idx === i ? { ...x, label: e.target.value } : x)))}
+                      placeholder="Label"
+                      value={c.label}
+                    />
+                    <input
+                      aria-label={i === 0 ? "Custom field value" : `Custom field value ${i + 1}`}
+                      className={FIELD}
+                      onChange={(e) => setCustoms(customs.map((x, idx) => (idx === i ? { ...x, value: e.target.value } : x)))}
+                      placeholder="Value"
+                      value={c.value}
+                    />
                   </div>
                 ))}
                 <button className="justify-self-start text-[13px] font-semibold text-[#4158f4]" onClick={() => setCustoms([...customs, { label: "", value: "" }])} type="button">
