@@ -48,7 +48,7 @@ Every ticket below was checked against production before it was written:
 | [P49A-10](p49a-10-multi-value-field-model.md) | One source of truth for emails/phones/addresses | P0 | A-14, A-19 | — |
 | [P49A-11](p49a-11-backup-integrity.md) | Backups: pipefail, verified dumps, off-host copy | P0 | A-15 | — |
 | [P49A-12](p49a-12-delete-merge-and-change-propagation.md) | Hard delete, merge/undo and non-web edits propagate correctly | P1 | A-16, A-17, A-20 | P49A-10 |
-| [P49A-13](p49a-13-account-security-step-up.md) | Step-up for durable credentials; account-security hardening | P1 | A-28, SEC P2 set | — |
+| [P49A-13](p49a-13-account-security-step-up.md) | Step-up for durable credentials; account-security hardening — **done on branch `p49a-13`, not deployed** | P1 | A-28, SEC P2 set | — |
 | [P49A-14](p49a-14-pricing-truth-from-plan-data.md) | Pricing matrix rendered from plan data; correct false claims | P1 | A-31–A-34 | — |
 | [P49A-15](p49a-15-public-site-fixes.md) | Public site: /about & /contact public, dead links, mobile, titles | P1 | A-35–A-37 | — |
 | [P49A-16](p49a-16-runtime-ops-and-sync-performance.md) | Runtime & ops: Dockerfile, timeouts, health split, DAV/sync perf, export blobs | P1 | A-29, A-30, A-38–A-42 | P49A-04 |
