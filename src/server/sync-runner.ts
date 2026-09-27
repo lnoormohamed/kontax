@@ -2,13 +2,19 @@ import { Prisma } from "../../generated/prisma";
 import {
   type CardDavContactCard,
   type CardDavRawPhoto,
+  type CardDavRemoteCardState,
+  CARDDAV_PUSH_PRECONDITION_FAILED,
   CardDavPreflightError,
+  dedupeCardDavCardsByUid,
   deleteCardDavContact,
-  fetchCardDavAddressBookCards,
-  fetchCardDavAddressBookIndex,
+  fetchCardDavAddressBookCardsWithRaw,
+  fetchCardDavContact,
   fetchCardDavPhotoBytes,
   pushCardDavContact,
+  putCardDavVCard,
+  toIfMatchValue,
 } from "~/server/carddav";
+import { replaceVCardPhoto } from "~/server/carddav-vcard-merge";
 import {
   deriveMultiValueFields,
   multiValueWriteData,
@@ -1313,24 +1319,21 @@ export const runQueuedSyncJobs = async ({
         capabilityProfileOverride:
           job.syncAccount.settings?.capabilityProfileOverride ?? null,
       });
-      const remoteEntries = await fetchCardDavAddressBookIndex({
+      const cardDavCredentials = {
+        username: decryptedCredentials.username,
+        password: decryptedCredentials.password,
+      };
+      // P49A-03: one REPORT gives every card with its raw vCard; the href /
+      // ETag / UID index is derived from it below, so the ETag a push is
+      // conditioned on and the raw card it preserves come from the same read.
+      const fetchedCards = await fetchCardDavAddressBookCardsWithRaw({
         addressBookUrl: job.syncAccount.addressBookUrl,
-        credentials: {
-          username: decryptedCredentials.username,
-          password: decryptedCredentials.password,
-        },
-      });
-      const remoteCards = await fetchCardDavAddressBookCards({
-        addressBookUrl: job.syncAccount.addressBookUrl,
-        credentials: {
-          username: decryptedCredentials.username,
-          password: decryptedCredentials.password,
-        },
+        credentials: cardDavCredentials,
         // P44-03: decode PHOTO only when photo sync is on (avoids the b64 cost).
         includePhoto: PHOTO_SYNC_ENABLED,
       });
 
-      const remoteUids = remoteEntries.map((entry) => entry.uid);
+      const remoteUids = [...new Set(fetchedCards.map((fetched) => fetched.card.uid))];
       const existingContacts =
         remoteUids.length > 0
           ? await db.contact.findMany({
@@ -1390,6 +1393,10 @@ export const runQueuedSyncJobs = async ({
               website: true,
               websiteEntries: true,
               birthday: true,
+              // P49A-03 (A-03): pushed back to providers that round-trip
+              // anniversaries (iCloud X-ABDATE); without it every push of a
+              // linked contact sent "no dates" and wiped them remotely.
+              significantDates: true,
               address: true,
               postalAddresses: true,
               addressEntries: true,
@@ -1398,6 +1405,27 @@ export const runQueuedSyncJobs = async ({
           },
         },
       });
+      // P49A-03 (A-21): a book can hold several cards sharing one UID. Sync
+      // exactly one per UID (the linked one first) and leave the rest alone —
+      // two of them used to reach the contact/link creates and abort the whole
+      // commit on the unique constraint, every run.
+      const { kept: keptCards, dropped: duplicateUidCards } = dedupeCardDavCardsByUid(
+        fetchedCards,
+        new Map(existingLinks.map((link) => [link.remoteUid ?? link.contact.syncUid, link.remoteHref])),
+      );
+      if (duplicateUidCards.length > 0) {
+        console.warn(
+          `[sync] CardDAV account ${job.syncAccountId}: ${duplicateUidCards.length} remote card(s) share a UID with another card in the book; synced one card per UID and left the others untouched.`,
+        );
+      }
+      const remoteCards = keptCards.map((fetched) => fetched.card);
+      const remoteEntries = remoteCards.map(({ href, etag, uid }) => ({ href, etag, uid }));
+      // P49A-03: the latest known state of each remote card (raw vCard + ETag).
+      // Every PUT is built from it (unmodelled properties preserved) and
+      // conditioned on its ETag; a successful PUT replaces it with what was sent.
+      const remoteStateByUid = new Map<string, CardDavRemoteCardState>(
+        keptCards.map((fetched) => [fetched.card.uid, { vcard: fetched.vcard, etag: fetched.card.etag }]),
+      );
       const contactByUid = new Map(existingContacts.map((contact) => [contact.syncUid, contact]));
       const remoteEntryByUid = new Map(remoteEntries.map((entry) => [entry.uid, entry]));
       // Also index the remote index by href so we can fall back to href lookup when a
@@ -1444,7 +1472,13 @@ export const runQueuedSyncJobs = async ({
         linkId: string;
         remoteHref: string;
         remoteUid: string;
+        // P49A-03: the link, for re-routing the push through the conflict path
+        // when the remote card changed under it (412).
+        link: (typeof existingLinks)[number];
         contact: SyncPushContactRow;
+        // P49A-03: the remote card the push replaces (its raw vCard and ETag
+        // are in remoteStateByUid under this card's UID).
+        remoteCard: CardDavContactCard | null;
         // P39-03: the remote card's current values, grafted back into the
         // pushed vCard for excluded fields.
         remotePortable: PortableContactInput | null;
@@ -1476,6 +1510,89 @@ export const runQueuedSyncJobs = async ({
         remoteSnapshot: unknown;
         strategy: "KEEP_REMOTE" | "KEEP_LOCAL";
       }> = [];
+
+      // The remote card of a link is gone while the local contact is active.
+      const recordRemoteMissing = (link: (typeof existingLinks)[number], remoteUid: string) => {
+        if (link.contact.archivedAt) return;
+        conflictEntries.push({
+          type: "DELETE_CONFLICT",
+          linkId: link.id,
+          contactId: link.contact.id,
+          localSyncVersion: link.contact.syncVersion,
+          remoteETag: link.remoteETag ?? null,
+          localSnapshot: buildLocalConflictSnapshot(link.contact),
+          remoteSnapshot: {
+            deleted: true,
+            remoteUid,
+            remoteHref: link.remoteHref,
+          },
+          resolutionNotes:
+            "Remote contact appears missing while the local contact is still active.",
+        });
+      };
+
+      // P23-01: resolve a local↔remote mutation by the connection's policy.
+      // P49A-03: shared by the classification below and by a push whose
+      // If-Match lost the race (the re-read remote card differs from Kontax).
+      const routeBothSidesChanged = (
+        link: (typeof existingLinks)[number],
+        remoteCard: CardDavContactCard,
+      ) => {
+        if (settings.conflictPolicy === "SERVER_WINS") {
+          // Remote wins: apply the remote snapshot over the local contact.
+          remoteApplyCandidates.push({
+            linkId: link.id,
+            contactId: link.contact.id,
+            remoteETag: remoteCard.etag ?? null,
+            remoteSnapshot: remoteCard,
+            capabilityDiagnostics: buildProviderCapabilityDiagnostics(
+              contactToPortable(link.contact),
+              capabilityProfile,
+            ),
+            previousShadow: link.supportedFieldShadow,
+          });
+          // P23-05: record an AUTO_RESOLVED audit row for the applied conflict.
+          autoResolvedEntries.push({
+            linkId: link.id,
+            contactId: link.contact.id,
+            localSyncVersion: link.contact.syncVersion,
+            remoteETag: remoteCard.etag ?? null,
+            localSnapshot: buildLocalConflictSnapshot(link.contact),
+            remoteSnapshot: remoteCard,
+            strategy: "KEEP_REMOTE",
+          });
+          return;
+        }
+        if (settings.conflictPolicy === "DEVICE_WINS") {
+          // Kontax wins: keep the local edit and let a later push carry it; do
+          // not overwrite with the remote snapshot on this pull.
+          deferredLocalChangesCount += 1;
+          // P23-05: record an AUTO_RESOLVED audit row for the kept-local conflict.
+          autoResolvedEntries.push({
+            linkId: link.id,
+            contactId: link.contact.id,
+            localSyncVersion: link.contact.syncVersion,
+            remoteETag: remoteCard.etag ?? null,
+            localSnapshot: buildLocalConflictSnapshot(link.contact),
+            remoteSnapshot: remoteCard,
+            strategy: "KEEP_LOCAL",
+          });
+          return;
+        }
+        // MANUAL: surface a SyncConflict row for the review queue (P23-05).
+        conflictEntries.push({
+          type: "LOCAL_REMOTE_MUTATION",
+          linkId: link.id,
+          contactId: link.contact.id,
+          localSyncVersion: link.contact.syncVersion,
+          remoteETag: remoteCard.etag ?? null,
+          localSnapshot: buildLocalConflictSnapshot(link.contact),
+          remoteSnapshot: remoteCard,
+          resolutionNotes:
+            "Local and remote contact data both changed since the last healthy sync point.",
+        });
+      };
+
       // P39-04: the export label filter gates NEW outbound pushes only —
       // already-linked contacts keep syncing and are never deleted for
       // losing the label.
@@ -1529,24 +1646,7 @@ export const runQueuedSyncJobs = async ({
         const remoteSupportedChanged = remoteChanged && supportedFieldsDiffer;
 
         if (!remoteEntry) {
-          if (!link.contact.archivedAt) {
-            conflictEntries.push({
-              type: "DELETE_CONFLICT",
-              linkId: link.id,
-              contactId: link.contact.id,
-              localSyncVersion: link.contact.syncVersion,
-              remoteETag: link.remoteETag ?? null,
-              localSnapshot: buildLocalConflictSnapshot(link.contact),
-              remoteSnapshot: {
-                deleted: true,
-                remoteUid,
-                remoteHref: link.remoteHref,
-              },
-              resolutionNotes:
-                "Remote contact appears missing while the local contact is still active.",
-            });
-          }
-
+          recordRemoteMissing(link, remoteUid);
           continue;
         }
 
@@ -1567,60 +1667,7 @@ export const runQueuedSyncJobs = async ({
         }
 
         if (localSupportedChanged && remoteSupportedChanged && remoteCard) {
-          // P23-01: resolve a local↔remote mutation by the connection's policy.
-          if (settings.conflictPolicy === "SERVER_WINS") {
-            // Remote wins: apply the remote snapshot over the local contact.
-            remoteApplyCandidates.push({
-              linkId: link.id,
-              contactId: link.contact.id,
-              remoteETag: remoteEntry.etag ?? null,
-              remoteSnapshot: remoteCard,
-              capabilityDiagnostics: buildProviderCapabilityDiagnostics(
-                contactToPortable(link.contact),
-                capabilityProfile,
-              ),
-              previousShadow: link.supportedFieldShadow,
-            });
-            // P23-05: record an AUTO_RESOLVED audit row for the applied conflict.
-            autoResolvedEntries.push({
-              linkId: link.id,
-              contactId: link.contact.id,
-              localSyncVersion: link.contact.syncVersion,
-              remoteETag: remoteEntry.etag ?? null,
-              localSnapshot: buildLocalConflictSnapshot(link.contact),
-              remoteSnapshot: remoteCard,
-              strategy: "KEEP_REMOTE",
-            });
-            continue;
-          }
-          if (settings.conflictPolicy === "DEVICE_WINS") {
-            // Kontax wins: keep the local edit and let a later push carry it; do
-            // not overwrite with the remote snapshot on this pull.
-            deferredLocalChangesCount += 1;
-            // P23-05: record an AUTO_RESOLVED audit row for the kept-local conflict.
-            autoResolvedEntries.push({
-              linkId: link.id,
-              contactId: link.contact.id,
-              localSyncVersion: link.contact.syncVersion,
-              remoteETag: remoteEntry.etag ?? null,
-              localSnapshot: buildLocalConflictSnapshot(link.contact),
-              remoteSnapshot: remoteCard,
-              strategy: "KEEP_LOCAL",
-            });
-            continue;
-          }
-          // MANUAL: surface a SyncConflict row for the review queue (P23-05).
-          conflictEntries.push({
-            type: "LOCAL_REMOTE_MUTATION",
-            linkId: link.id,
-            contactId: link.contact.id,
-            localSyncVersion: link.contact.syncVersion,
-            remoteETag: remoteEntry.etag ?? null,
-            localSnapshot: buildLocalConflictSnapshot(link.contact),
-            remoteSnapshot: remoteCard,
-            resolutionNotes:
-              "Local and remote contact data both changed since the last healthy sync point.",
-          });
+          routeBothSidesChanged(link, remoteCard);
           continue;
         }
 
@@ -1630,7 +1677,9 @@ export const runQueuedSyncJobs = async ({
               linkId: link.id,
               remoteHref: link.remoteHref,
               remoteUid: remoteUid ?? link.remoteHref,
+              link,
               contact: link.contact,
+              remoteCard: remoteCard ?? null,
               remotePortable: remoteCard ? cardDavCardToPortable(remoteCard) : null,
               capabilityDiagnostics: buildProviderCapabilityDiagnostics(
                 contactToPortable(link.contact),
@@ -1715,33 +1764,76 @@ export const runQueuedSyncJobs = async ({
       const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = [];
 
       // P44-04: a full-card PUT with no PHOTO line would wipe the remote photo
-      // (and cascade into deleting the local one on the next photo pass). While
-      // photo sync is on, carry the remote card's current photo through every
-      // field-push; the dedicated photo pass (below) is what changes it.
-      const cardPhotoToBase64 = async (
+      // (and cascade into deleting the local one on the next photo pass).
+      // P49A-03: a field push now carries the remote PHOTO line through
+      // verbatim (like every property it does not own), whether or not photo
+      // sync is on — it used to wipe the photo with photo sync off. While photo
+      // sync is on, a URI-form photo (iCloud) is still re-embedded as bytes, as
+      // P44-04 verified; if they can't be fetched the URI line is kept instead.
+      // The dedicated photo pass (below) is what changes the photo.
+      const fieldPushPhoto = async (
         photo: CardDavRawPhoto | null | undefined,
-      ): Promise<string | null> => {
-        if (!PHOTO_SYNC_ENABLED || !photo) return null;
-        if (photo.kind === "inline") return photo.base64.replace(/\s+/g, "");
+      ): Promise<string | undefined> => {
+        if (!PHOTO_SYNC_ENABLED || photo?.kind !== "uri") return undefined;
         const bytes = await fetchCardDavPhotoBytes(
           photo.uri,
-          {
-            username: decryptedCredentials.username,
-            password: decryptedCredentials.password,
-          },
+          cardDavCredentials,
           job.syncAccount.addressBookUrl ?? undefined,
         );
-        return bytes ? bytes.toString("base64") : null;
+        return bytes ? bytes.toString("base64") : undefined;
+      };
+
+      // P49A-03: the push lost its If-Match race — the remote card changed (or
+      // vanished) after the REPORT. Nothing was written. Re-read it and route it
+      // the way the classification above would have: gone → delete conflict;
+      // now equal to Kontax → just refresh the link; otherwise the connection's
+      // conflict policy (a MANUAL account gets one review-queue conflict).
+      const rerouteAfterLostPushRace = async (
+        candidate: (typeof localPushCandidates)[number],
+        cardUid: string,
+      ) => {
+        const current = await fetchCardDavContact({
+          href: candidate.remoteHref,
+          credentials: cardDavCredentials,
+          uid: cardUid,
+          includePhoto: PHOTO_SYNC_ENABLED,
+        });
+        if (!current) {
+          remoteStateByUid.delete(cardUid);
+          remoteCardByUid.delete(cardUid);
+          recordRemoteMissing(candidate.link, candidate.remoteUid);
+          return;
+        }
+        remoteStateByUid.set(current.card.uid, { vcard: current.vcard, etag: current.card.etag });
+        remoteCardByUid.set(current.card.uid, current.card);
+        const localShadow = buildProviderSupportedContactShadow(
+          stripExcludedPortableFields(contactToPortable(candidate.contact), excludedFields),
+          capabilityProfile,
+        );
+        const remoteShadow = buildProviderSupportedContactShadow(
+          stripExcludedPortableFields(cardDavCardToPortable(current.card), excludedFields),
+          capabilityProfile,
+        );
+        if (providerSupportedShadowsEqual(localShadow, remoteShadow)) {
+          metadataRefreshCandidates.push({
+            linkId: candidate.linkId,
+            remoteHref: current.card.href,
+            remoteUid: current.card.uid,
+            remoteETag: current.card.etag ?? null,
+            supportedFieldShadow: remoteShadow,
+            lastSyncedAt: candidate.contact.updatedAt,
+          });
+          return;
+        }
+        routeBothSidesChanged(candidate.link, current.card);
       };
 
       for (const candidate of localPushCandidates) {
+        const cardUid = candidate.remoteCard?.uid ?? candidate.remoteUid;
         try {
           const result = await pushCardDavContact({
             addressBookUrl: job.syncAccount.addressBookUrl,
-            credentials: {
-              username: decryptedCredentials.username,
-              password: decryptedCredentials.password,
-            },
+            credentials: cardDavCredentials,
             remoteUid: candidate.remoteUid,
             // P39-03: the full-card PUT carries the remote's own values for
             // excluded fields — local edits to them never propagate.
@@ -1752,27 +1844,47 @@ export const runQueuedSyncJobs = async ({
             ),
             capabilityProfile,
             hrefOverride: candidate.remoteHref || undefined,
-            photoBase64: await cardPhotoToBase64(remoteCardByUid.get(candidate.remoteUid)?.photo),
+            photoBase64: await fieldPushPhoto(candidate.remoteCard?.photo),
+            // P49A-03: built from the card as read (unmodelled properties
+            // preserved) and sent with If-Match on its ETag.
+            remote: remoteStateByUid.get(cardUid),
           });
+          remoteStateByUid.set(cardUid, { vcard: result.vcard, etag: result.etag });
           pushedLinks.push({ linkId: candidate.linkId, newETag: result.etag, newHref: result.href });
         } catch (err) {
+          if (err instanceof CardDavPreflightError && err.code === CARDDAV_PUSH_PRECONDITION_FAILED) {
+            try {
+              await rerouteAfterLostPushRace(candidate, cardUid);
+            } catch (rereadError) {
+              console.error(
+                `[sync] CardDAV re-read after a lost push race failed for link ${candidate.linkId}:`,
+                rereadError,
+              );
+              deferredLocalChangesCount += 1;
+            }
+            continue;
+          }
           console.error(`[sync] CardDAV push failed for link ${candidate.linkId}:`, err);
           deferredLocalChangesCount += 1;
         }
       }
 
+      // P49A-03: a local contact whose UID is already on the remote is linked
+      // to that card by matchedEntries in this run — "creating" it would PUT a
+      // second card with the same UID (or replace the existing one).
+      const remoteUidSet = new Set(remoteUids);
       for (const contact of localCreateCandidates) {
+        if (remoteUidSet.has(contact.syncUid)) continue;
         try {
           const result = await pushCardDavContact({
             addressBookUrl: job.syncAccount.addressBookUrl,
-            credentials: {
-              username: decryptedCredentials.username,
-              password: decryptedCredentials.password,
-            },
+            credentials: cardDavCredentials,
             remoteUid: contact.syncUid,
             // P39-03: excluded fields never reach a freshly-created remote card.
             contact: stripExcludedPortableFields(contactToPortable(contact), excludedFields),
             capabilityProfile,
+            // P49A-03: a create — If-None-Match: * never replaces an existing card.
+            remote: null,
           });
           createdLinks.push({
             contactId: contact.id,
@@ -2273,6 +2385,8 @@ export const runQueuedSyncJobs = async ({
               if (pushedLinks.length > 0) parts.push(`pushed ${pushedLinks.length} local update${pushedLinks.length !== 1 ? "s" : ""}`);
               if (deletedLinkIds.length > 0) parts.push(`deleted ${deletedLinkIds.length} remote`);
               if (deferredLocalChangesCount > 0) parts.push(`deferred ${deferredLocalChangesCount} local change${deferredLocalChangesCount !== 1 ? "s" : ""}`);
+              // P49A-03 (A-21): duplicate-UID remote cards left untouched.
+              if (duplicateUidCards.length > 0) parts.push(`skipped ${duplicateUidCards.length} remote card${duplicateUidCards.length !== 1 ? "s" : ""} with a duplicate UID`);
               if (openedConflictCount > 0) parts.push(`opened ${openedConflictCount} conflict${openedConflictCount !== 1 ? "s" : ""}`);
               const stillOpen = conflictEntries.length - openedConflictCount;
               if (stillOpen > 0) parts.push(`${stillOpen} conflict${stillOpen !== 1 ? "s" : ""} still awaiting review`);
@@ -2348,8 +2462,14 @@ export const runQueuedSyncJobs = async ({
           };
           const abUrl: string = job.syncAccount.addressBookUrl;
           const photoLinks: PhotoPassLink[] = [];
+          // P49A-03: a link left with an open field conflict this run is not
+          // photo-synced until the conflict is resolved — a photo PUT would move
+          // the stored ETag past the remote edit awaiting review, and the next
+          // run would then push the local fields over it.
+          const fieldConflictLinkIds = new Set(conflictEntries.map((entry) => entry.linkId));
           for (const link of existingLinks) {
             if (!link.remoteUid) continue;
+            if (fieldConflictLinkIds.has(link.id)) continue;
             const uid: string = link.remoteUid;
             const card = remoteCardByUid.get(uid);
             if (!card) continue; // not present remotely → deletion path owns it
@@ -2373,24 +2493,30 @@ export const runQueuedSyncJobs = async ({
               loadRemoteBytes = async () => fetchCardDavPhotoBytes(photo.uri, creds, abUrl);
             }
 
+            // P49A-03: a photo push changes only the PHOTO — the latest known
+            // remote card (as read, or as this run's field push left it) with
+            // its PHOTO swapped, sent with If-Match. Kontax fields are not
+            // re-projected here, so a photo push can't undo a remote edit that
+            // was applied or deferred this run. A 412 throws; runPhotoPass
+            // records the failure for this link and the next run retries.
             const pushCardWithPhoto = async (photoBase64: string | null): Promise<string | null> => {
-              const res = await pushCardDavContact({
-                addressBookUrl: abUrl,
+              let state = remoteStateByUid.get(uid);
+              if (state?.etag == null) {
+                // No ETag to condition on (a PUT response may omit it): re-read.
+                const current = await fetchCardDavContact({ href: card.href, credentials: creds, uid });
+                if (!current) {
+                  throw new Error("The remote card is gone; its photo is reconciled on the next sync.");
+                }
+                state = { vcard: current.vcard, etag: current.card.etag };
+              }
+              const vcard = replaceVCardPhoto(state.vcard, photoBase64);
+              const res = await putCardDavVCard({
+                href: card.href,
                 credentials: creds,
-                remoteUid: uid,
-                contact: mergeExcludedFieldsFromRemote(
-                  contactToPortable(link.contact),
-                  cardDavCardToPortable(card),
-                  excludedFields,
-                ),
-                capabilityProfile,
-                // Not `link.remoteHref ?? undefined`: an empty string is a
-                // possible (if degenerate) stored value and must still be
-                // treated as "no override", same as null/undefined.
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                hrefOverride: link.remoteHref ? link.remoteHref : undefined,
-                photoBase64,
+                vcard,
+                ifMatch: toIfMatchValue(state.etag),
               });
+              remoteStateByUid.set(uid, { vcard, etag: res.etag });
               return res.etag;
             };
 
