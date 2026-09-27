@@ -11,7 +11,7 @@ needs confirming in code before the fix.
 | 2 | Sync conflict **"Manual merge" ignores the fields the user picks** | sync conflict resolution in `src/app/actions/sync.ts` + the conflict review UI | **Fixed** 2026-09-27 with P49A-12 (branch `p49a-12`) — the picks are sent with MANUAL_MERGE keyed by field (`fieldPicks`, `src/lib/sync-conflict-picks.ts`), validated (zod, unknown keys / values rejected) and the merged contact is built from exactly the chosen side per field, multi-value families through the P49A-10 entries (`buildPickedMergeWriteData`, `src/server/sync-conflict-merge.ts`); the union helper is gone. Unpicked field = "Kontax" (the UI's preselection); a resolution with no picks (page loaded before the deploy) therefore saves what the user was shown, not the old union. Rows now also cover nickname, addresses, department and dates. Tests: `tests/node/sync-conflict-manual-merge.test.ts`. Still open (pre-existing): keep local / manual merge push through the CardDAV client, so they fail for Google / Outlook conflicts |
 | 3 | Data-export ready email links to the wrong settings page | `src/app/api/cron/data-export/route.ts` | **Fixed** 2026-09-27 — links to `/settings/data/export` via `DATA_EXPORT_SETTINGS_PATH` (also used for revalidation); test `tests/node/data-export-email-link.test.ts` |
 | 4 | Failed-payment grace (3 days) is not enforced — display only | `billing-surface.ts`, `stripe-handlers.ts` (P49A-05 notes: by policy, Stripe decides the lapse) | **Fixed** 2026-09-27 — owner decision: enforce. Paid plan for 3 days from the first failure, then Free entitlements until paid (web + CardDAV), Stripe untouched, nothing deleted. See below. |
-| 5 | Free users can get a vCard file via the Kontax Archive ".vcf copy" option and the full data export, although vCard export is Pro | `src/server/export-format/*`, data export | Plan leak (low); decide whether the GDPR export should include vCard for everyone (arguably yes — data portability) and align the pricing copy |
+| 5 | Free users can get a vCard file via the Kontax Archive ".vcf copy" option and the full data export, although vCard export is Pro | `src/server/export-format/*`, data export | **Fixed** 2026-09-27 — owner decision: not a leak. The full data export keeps `contacts.vcf` on every plan (data portability); the archive's .vcf compatibility copy stays on every plan too. Pro = the standalone vCard 4.0 export on Import & export. Copy aligned — see below. |
 | 6 | Auto-pause after repeated sync failures defaults to 5, while copy says 3 | `src/server/sync-health.ts` | Copy/behaviour mismatch — pick one |
 | 7 | `DOWNGRADE_COPY` in `plan-data.ts` is never shown and is wrong in places; users see `cancel-plan-modal.tsx` | `src/app/_components/plan-data.ts`, `cancel-plan-modal.tsx` | Dead, misleading code — delete or wire up correctly |
 | 8 | iPhone edits through Kontax's CardDAV server are not marked as local edits, so they may not push to the source provider (e.g. Google) | `server.mjs` PUT `lastMutatedBy` | **Fixed** 2026-09-27 in P49A-12 (A-17) — confirmed: PUT never set `lastMutatedBy`. Every device PUT / DELETE now stamps `MANUAL` ("CardDAV device") and marks the contact's sync links dirty (`flagDeviceWriteForSync`) |
@@ -69,3 +69,21 @@ Tests: `tests/node/monthly-import-limit.test.ts`.
   would show a past date). Help: "If a payment fails" rewritten.
 - Tests: `tests/node/payment-grace.test.ts` (rule, web + DAV path, contact cap, comp, Teams),
   `stripe-webhook.test.ts` "failed-payment grace (P49A-19)", `billing-surface-grant.test.ts`.
+
+## Item 5 — fixed (2026-09-27, owner decision: vCard in the data export for everyone)
+
+- Behaviour unchanged, now intended and tested: Settings → Data & sync → Download your data
+  (`generateDataExport`) always writes `contacts.vcf` (+ CSV, activity, billing summary, account)
+  with no plan check; the Kontax Archive's **Add a compatibility copy (.vcf)** (vCard 3.0 at
+  `vcards/contacts.vcf`) stays available on every plan — it is a fallback inside a full-fidelity
+  archive, consistent with the portability decision. The Pro feature (`premiumExportEnabled`,
+  `assertCanUsePremiumExport` on `/api/exports/contacts/vcard`) is the standalone **vCard 4.0
+  export** of the whole library from the Import & export page.
+- Copy no longer implies Free can never get a vCard file: pricing matrix (row renamed "vCard 4.0
+  export (whole library)" + new "Full data download (includes a vCard file)" on every plan; Pro
+  card "vCard 4.0 export"; upgrade-gate text), home pricing teaser, /security, /compare/kontax-vs-
+  google-contacts, /compare/kontax-vs-icloud-contacts, help (getting-started plan table,
+  export-your-contacts, Kontax format, the "Is vCard export available on Free?" answer, Free vs
+  Pro, downgrade consequences) and the in-app PRO popover on the export card.
+- Test: `tests/node/data-export-vcard-all-plans.test.ts` (a Free user's export zip contains
+  `contacts.vcf`; no plan gate on the export path).

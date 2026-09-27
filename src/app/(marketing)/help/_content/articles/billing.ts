@@ -15,7 +15,7 @@ export const BILLING: HelpCategoryContent = {
       category: "billing",
       audience: "Anyone deciding whether to upgrade",
       plans: ["Free", "Pro"],
-      summary: `Free covers up to ${FACTS.freeContactLimit} contacts with ${FACTS.freeSyncAccounts} sync account and ${FACTS.freeDevicePasswords} device; Pro removes the contact limit and adds more connections, vCard export, the Activity feed, contact sharing and the API.`,
+      summary: `Free covers up to ${FACTS.freeContactLimit} contacts with ${FACTS.freeSyncAccounts} sync account and ${FACTS.freeDevicePasswords} device; Pro removes the contact limit and adds more connections, vCard 4.0 export, the Activity feed, contact sharing and the API.`,
       keywords: ["pro", "free", "upgrade", "compare plans", "what does pro add"],
       steps: [],
       sections: [
@@ -24,7 +24,7 @@ export const BILLING: HelpCategoryContent = {
           list: [
             "Unlimited contacts and no monthly import cap.",
             `Up to ${FACTS.proSyncAccounts} sync accounts and ${FACTS.proDevicePasswords} device app passwords.`,
-            "vCard 4.0 export alongside CSV and the Kontax Archive.",
+            "vCard 4.0 export alongside CSV and the Kontax Archive (every plan's full data download already includes a vCard file).",
             `The Activity feed, showing the last ${FACTS.proActivityDays} days.`,
             "Every change in each contact's history (Free shows the most recent few).",
             "Sharing contacts with other Kontax users, as static copies or live shares.",

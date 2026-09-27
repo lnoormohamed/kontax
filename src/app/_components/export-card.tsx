@@ -573,7 +573,9 @@ export function ExportCard({
               <span className="fixed inset-0 z-30" onClick={() => setPop(false)} />
               <div className="absolute inset-x-3 top-[calc(100%+6px)] z-40 rounded-xl border border-[#d8ddd6] bg-white p-3.5 shadow-[0_14px_34px_rgba(20,30,25,0.18)]">
                 <div className="text-[13px] leading-[1.5] text-[#1d2823]">
-                  vCard export is a <b className="font-semibold">Pro</b> feature.
+                  vCard 4.0 export is a <b className="font-semibold">Pro</b> feature. On Free, a vCard file is
+                  still yours: turn on the archive&apos;s .vcf compatibility copy, or download all your data
+                  from Settings → Data &amp; sync.
                 </div>
                 <Link className="mt-2.5 inline-flex h-8 items-center rounded-lg bg-[#4158f4] px-3 text-[13px] font-semibold text-white" href="/pricing">
                   Upgrade →

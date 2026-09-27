@@ -174,7 +174,7 @@ export const FAMILY_TEAMS: HelpCategoryContent = {
             "Device app passwords you already have keep working; you can't create new ones beyond the Free allowance.",
             "Live shares you've sent or received become static copies.",
             `The Activity feed locks and each contact's history shows its last ${FACTS.freeHistoryShown} changes.`,
-            "vCard 4.0 export and the developer API are no longer available. CSV and Kontax Archive export stay.",
+            "vCard 4.0 export and the developer API are no longer available. CSV and Kontax Archive export stay, and your full data download (with a vCard file) is available on every plan.",
           ],
         },
         {

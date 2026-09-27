@@ -26,7 +26,7 @@ const FREE_POINTS = [
 
 // Pro's syncAccountsLimit is 5 (src/server/billing.ts).
 // Pro: syncAccountsLimit 5, carddavDevicesLimit 5; vCard export is Pro and up.
-const PRO_POINTS = ["Unlimited contacts", "Up to 5 sync sources", "5 devices", "Developer API", "vCard export"];
+const PRO_POINTS = ["Unlimited contacts", "Up to 5 sync sources", "5 devices", "Developer API", "vCard 4.0 export"];
 
 function Points({ items }: { items: string[] }) {
   return (

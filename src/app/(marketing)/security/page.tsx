@@ -311,13 +311,14 @@ export default function SecurityPage() {
               <h3 className="sp-scard__h">Your data, your rights</h3>
               <p className="sp-scard__p">
                 Export everything — contacts, labels, and account data — as CSV or a full GDPR
-                archive, on any plan including Free; vCard export is available on Pro. Account
+                archive that includes a vCard file, on any plan including Free; vCard 4.0 export
+                from the Import &amp; export page is on Pro. Account
                 deletion runs on a clear schedule, export links expire on their own, and we never
                 sell your data or run ads against it.
               </p>
               <div className="sp-scard__chips">
                 <span className="sp-techchip"><span className="sp-techchip__dot" />CSV, all plans</span>
-                <span className="sp-techchip"><span className="sp-techchip__dot" />vCard on Pro</span>
+                <span className="sp-techchip"><span className="sp-techchip__dot" />vCard in every data export</span>
                 <span className="sp-techchip"><span className="sp-techchip__dot" />GDPR archive</span>
                 <span className="sp-techchip"><span className="sp-techchip__dot" />Scheduled deletion</span>
               </div>

@@ -133,7 +133,10 @@ export const PLAN_MATRIX: FeatureGroup[] = [
         vals: perPlan((e) => (e.monthlyImportLimit === null ? "Unlimited" : `${e.monthlyImportLimit} a month`)),
       },
       { id: "kontaxexport", label: "Export (CSV, Kontax archive)", vals: every(true) },
-      { id: "export", label: "vCard export (whole library)", vals: perPlan((e) => e.premiumExportEnabled) },
+      { id: "export", label: "vCard 4.0 export (whole library)", vals: perPlan((e) => e.premiumExportEnabled) },
+      // P49A-19 (owner decision 2026-09-27): data portability — the full data
+      // download (Settings → Data & sync) includes contacts.vcf on every plan.
+      { id: "dataexport", label: "Full data download (includes a vCard file)", vals: every(true) },
     ],
   },
   {
@@ -273,7 +276,7 @@ export function planCardFeatures(outlookLive: boolean): Record<PlanKey, CardFeat
       contacts(e.Pro.contactsLimit),
       { text: `${cap(syncSources(e.Pro.syncAccountsLimit))}, ${devices(e.Pro.appPasswordsLimit)}` },
       { text: "Share contacts as a copy or live" },
-      { text: "vCard export" },
+      { text: "vCard 4.0 export" },
       { text: "Developer API" },
     ],
     Family: [
@@ -367,7 +370,7 @@ export const UPGRADE_GATES: UpgradeGate[] = [
     form: "locked",
     title: "vCard export",
     lockedTitle: "vCard export is a Pro feature",
-    value: "Export the full vCard format alongside CSV, with no limits.",
+    value: "Export your whole library as a vCard 4.0 file, alongside CSV and the Kontax Archive.",
     billing: "vCard export is available on the Pro plan.",
   },
   {

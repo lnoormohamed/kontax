@@ -82,7 +82,7 @@ const sections: GuideSection[] = [
             label: "Export",
             cells: [
               "vCard, from iCloud.com, the iPhone Contacts app or a Mac.",
-              "CSV and the documented Kontax Archive on every plan; vCard on Pro and above.",
+              "CSV, the documented Kontax Archive and a full data download with a vCard file on every plan; vCard 4.0 export on Pro and above.",
             ],
           },
         ]}
@@ -188,7 +188,8 @@ const sections: GuideSection[] = [
     body: (
       <>
         <p>
-          Export everything first: CSV or the Kontax Archive on any plan, or vCard on Pro and above. Contacts
+          Export everything first: CSV, the Kontax Archive or your full data download (it includes a vCard
+          file) on any plan, or vCard 4.0 export on Pro and above. Contacts
           that Kontax synced to iCloud stay in iCloud. Remove the Kontax account from your iPhone’s Contacts
           accounts, then delete your Kontax account in Settings; deletion completes after a 30-day grace period
           you can cancel.

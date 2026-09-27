@@ -82,7 +82,7 @@ const sections: GuideSection[] = [
             label: "Export",
             cells: [
               "Google CSV and vCard.",
-              "CSV and the documented Kontax Archive on every plan; vCard on Pro and above.",
+              "CSV, the documented Kontax Archive and a full data download with a vCard file on every plan; vCard 4.0 export on Pro and above.",
             ],
           },
         ]}
@@ -183,7 +183,8 @@ const sections: GuideSection[] = [
     body: (
       <>
         <p>
-          Export first: CSV or the Kontax Archive on any plan, or vCard on Pro and above. Google Contacts
+          Export first: CSV, the Kontax Archive or your full data download (it includes a vCard file) on any
+          plan, or vCard 4.0 export on Pro and above. Google Contacts
           imports both CSV and vCard. Contacts that Kontax synced to Google stay in Google. Disconnect Google
           from the Sync page, then delete your Kontax account in Settings; deletion completes after a 30-day
           grace period you can cancel.

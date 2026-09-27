@@ -89,7 +89,7 @@ export const GETTING_STARTED: HelpCategoryContent = {
               ["Sync accounts (iCloud, Google, Fastmail…)", String(FACTS.freeSyncAccounts), String(FACTS.proSyncAccounts)],
               ["Devices (iPhone, Mac, Android)", String(FACTS.freeDevicePasswords), String(FACTS.proDevicePasswords)],
               ["File imports", `${FACTS.freeMonthlyImports} a month`, "Unlimited"],
-              ["Export", "CSV, Kontax Archive", "CSV, Kontax Archive, vCard 4.0"],
+              ["Export", "CSV, Kontax Archive; vCard file in your full data download", "CSV, Kontax Archive, vCard 4.0"],
               ["Duplicate merge with undo", `Included (${FACTS.mergeUndoDays}-day undo)`, "Included"],
               ["Per-contact history", `Last ${FACTS.freeHistoryShown} changes`, "All changes"],
               ["Activity feed across all contacts", "—", `Shows the last ${FACTS.proActivityDays} days`],

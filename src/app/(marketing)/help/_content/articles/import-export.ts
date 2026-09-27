@@ -137,7 +137,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
         "Exporting never changes or removes anything in Kontax.",
       ],
       ifItDoesntWork: [
-        "If the vCard 4.0 option is greyed out and marked **PRO**, you're on Free — choose CSV or the Kontax Archive instead.",
+        "If the vCard 4.0 option is greyed out and marked **PRO**, you're on Free — choose CSV or the Kontax Archive instead. For a vCard file on Free, turn on the archive's **Add a compatibility copy (.vcf)**, or [download all your data](/help/import-export/download-full-account-export), which includes a contacts.vcf file.",
         "For everything in your account — not just contacts — see [Download a full copy of your account data](/help/import-export/download-full-account-export).",
       ],
       related: ["import-export/kontax-export-format", "import-export/download-full-account-export", "import-export/csv-format-reference"],
@@ -178,7 +178,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
         "The download link for an archive export lasts 7 days.",
       ],
       ifItDoesntWork: [
-        "Need a file for a contacts app that doesn't read JSON? Use CSV, or vCard 4.0 on a paid plan — see [Export your contacts](/help/import-export/export-your-contacts).",
+        "Need a file for a contacts app that doesn't read JSON? Use CSV, turn on **Add a compatibility copy (.vcf)** for a vCard file inside the archive (any plan), or use vCard 4.0 export on a paid plan — see [Export your contacts](/help/import-export/export-your-contacts).",
       ],
       related: ["import-export/export-your-contacts", "import-export/download-full-account-export", "developers/generate-an-api-token"],
       lastReviewed: REVIEWED,
@@ -287,7 +287,7 @@ export const IMPORT_EXPORT: HelpCategoryContent = {
     },
     {
       q: "Is vCard export available on Free?",
-      a: "Exporting your whole library as vCard is part of Pro, Family and Teams. On Free you can export CSV or a Kontax Archive at any time and download a single contact as a .vcf file, and the full data export includes a contacts.vcf file.",
+      a: "Yes, as part of your data: everyone, on every plan, can download all their data — including a contacts.vcf file — from **Settings → Data & sync → Download your data**, and the Kontax Archive can include a .vcf compatibility copy. The separate vCard 4.0 export on the Import & export page is part of Pro, Family and Teams. On Free you can also export CSV at any time and download a single contact as a .vcf file.",
       more: "import-export/export-your-contacts",
     },
   ],
