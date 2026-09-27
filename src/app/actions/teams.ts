@@ -18,7 +18,7 @@ import {
   findMemberByInviteToken,
   inviteTokenColumns,
 } from "~/server/capability-tokens";
-import { INVITE_FOR_SOMEONE_ELSE, isInviteForUser } from "~/server/invite-recipient";
+import { assertInviteForUser } from "~/server/invite-recipient";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -271,12 +271,9 @@ export const acceptTeamInvite = async (formData: FormData) => {
   // P48-17: bind acceptance to the invited address — previously any signed-in
   // user who obtained the token (a forwarded email, a shared clipboard, a
   // guessed/leaked token) could accept someone else's team invite.
-  if (member.invitedEmail) {
-    const acceptingUser = await db.user.findUnique({ where: { id: userId }, select: { email: true } });
-    if (acceptingUser?.email.toLowerCase() !== member.invitedEmail.toLowerCase()) {
-      throw new Error("This invite was sent to a different email address. Sign in as that address to accept it.");
-    }
-  }
+  // P49A-13 (Fable review): through the shared helper, which also requires a
+  // verified email (and no longer lets an invite without an address through).
+  await assertInviteForUser(member, userId);
   await db.groupMember.update({
     where: { id: member.id },
     data: {
@@ -300,7 +297,7 @@ export const declineTeamInvite = async (formData: FormData) => {
   );
   if (member?.inviteStatus === "PENDING") {
     // P49A-13: bound to the invitee, like acceptance (P48-17).
-    if (!(await isInviteForUser(member, userId))) throw new Error(INVITE_FOR_SOMEONE_ELSE);
+    await assertInviteForUser(member, userId);
     await db.groupMember.update({
       where: { id: member.id },
       data: { inviteStatus: "DECLINED", ...clearedInviteTokenColumns(), inviteExpiresAt: null },

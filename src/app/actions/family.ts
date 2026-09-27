@@ -18,7 +18,7 @@ import {
   findMemberByInviteToken,
   inviteTokenColumns,
 } from "~/server/capability-tokens";
-import { INVITE_FOR_SOMEONE_ELSE, isInviteForUser } from "~/server/invite-recipient";
+import { assertInviteForUser } from "~/server/invite-recipient";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
@@ -219,7 +219,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
   if (joinBlocked) throw new Error(joinBlocked);
   // P49A-13: as P48-17 did for team invites — the token alone is not enough;
   // the invite must be addressed to the signed-in account.
-  if (!(await isInviteForUser(member, userId))) throw new Error(INVITE_FOR_SOMEONE_ELSE);
+  await assertInviteForUser(member, userId);
 
   await db.groupMember.update({
     where: { id: member.id },
@@ -246,7 +246,7 @@ export const declineFamilyInvite = async (formData: FormData) => {
   if (member?.inviteStatus === "PENDING") {
     // P49A-13: only the invitee can decline (a forwarded link used to let
     // anyone signed in cancel someone else's invite).
-    if (!(await isInviteForUser(member, userId))) throw new Error(INVITE_FOR_SOMEONE_ELSE);
+    await assertInviteForUser(member, userId);
     await db.groupMember.update({
       where: { id: member.id },
       data: { inviteStatus: "DECLINED", ...clearedInviteTokenColumns(), inviteExpiresAt: null },

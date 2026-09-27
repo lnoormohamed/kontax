@@ -48,7 +48,7 @@ export const FAMILY_TEAMS: HelpCategoryContent = {
       keywords: ["invite", "remove member", "leave family", "family member"],
       steps: [
         { text: "To invite: in **Settings → Sharing → Family**, enter an email under **Invite a family member** and choose **Send invite**." },
-        { text: "The person opens the email link and chooses **Accept & join** (signing in or creating an account first if needed)." },
+        { text: "The person opens the email link and chooses **Accept & join** (signing in or creating an account first if needed). They must use the invited email address, verified — a new account verifies it with the link Kontax emails." },
         { text: "To remove someone (owner only): choose **Remove** next to them and confirm." },
         { text: "To leave (members): choose **Leave family** and confirm." },
       ],

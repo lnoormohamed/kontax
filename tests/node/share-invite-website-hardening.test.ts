@@ -38,6 +38,13 @@ mock.module("~/server/billing", {
     getUserBillingContext: async () => ({ plan: "PRO", entitlements: {} }),
   },
 });
+mock.module("~/server/session-validation-cache", {
+  namedExports: { invalidateSessionValidation: async () => undefined },
+});
+mock.module("~/server/render-email", {
+  namedExports: { renderEmail: async () => ({ html: "", text: "" }) },
+});
+mock.module("~/emails/verify-email", { defaultExport: () => null });
 mock.module("~/server/email", {
   namedExports: { appUrl: () => "https://app.example.com", sendEmail: async () => ({ success: true }) },
 });
@@ -61,7 +68,8 @@ mock.module("next/navigation", {
 const { hashToken } = await import("../../src/server/capability-tokens");
 const shareRoute = await import("../../src/app/share/[token]/vcard/route");
 const { declineFamilyInvite, acceptFamilyInvite } = await import("../../src/app/actions/family");
-const { declineTeamInvite } = await import("../../src/app/actions/teams");
+const { acceptTeamInvite, declineTeamInvite } = await import("../../src/app/actions/teams");
+const { verifyEmailToken } = await import("../../src/server/email-verification");
 const { createContact, updateContactEntries } = await import("../../src/app/actions/contacts");
 
 let fake: ReturnType<typeof createFakePrisma>;
@@ -135,9 +143,13 @@ test("an unlimited share link keeps serving and counting", async () => {
 
 // ── invites bound to the invitee ─────────────────────────────────────────────
 
-const seedInvite = (type: "FAMILY" | "TEAM") => {
-  fake.seed("user", { id: "invitee", email: "invitee@example.invalid" });
-  fake.seed("user", { id: "bystander", email: "bystander@example.invalid" });
+const seedInvite = (type: "FAMILY" | "TEAM", inviteeVerified = true) => {
+  fake.seed("user", {
+    id: "invitee",
+    email: "invitee@example.invalid",
+    emailVerified: inviteeVerified ? new Date() : null,
+  });
+  fake.seed("user", { id: "bystander", email: "bystander@example.invalid", emailVerified: new Date() });
   return fake.seed("groupMember", {
     groupId: "group_1",
     userId: null,
@@ -187,6 +199,48 @@ test("accepting a family invite is bound to the invitee too", async () => {
   await acceptFamilyInvite(tokenForm());
   assert.equal(member.inviteStatus, "ACCEPTED");
   assert.equal(member.userId, "invitee");
+});
+
+for (const [label, accept, type] of [
+  ["family", acceptFamilyInvite, "FAMILY"],
+  ["team", acceptTeamInvite, "TEAM"],
+] as const) {
+  test(`accepting a ${label} invite needs a verified email — squatting the address isn't enough`, async () => {
+    const member = seedInvite(type, false);
+    sessionUserId = "invitee";
+    await assert.rejects(() => accept(tokenForm()), /Verify your email address first/);
+    assert.equal(member.inviteStatus, "PENDING");
+  });
+
+  test(`${label}: a new invitee who registers and verifies can then accept`, async () => {
+    const member = seedInvite(type, false);
+    member.invitedEmail = "invitee@example.invalid"; // invites are stored lower-cased
+    // The real verification flow: consuming the SIGNUP token verifies the
+    // address and binds pending invites for it to the account.
+    const plaintext = "verify-token-plaintext";
+    const { createHash } = await import("node:crypto");
+    fake.seed("emailVerificationToken", {
+      userId: "invitee",
+      type: "SIGNUP",
+      tokenHash: createHash("sha256").update(plaintext).digest("hex"),
+      expiresAt: new Date(Date.now() + 60_000),
+      usedAt: null,
+    });
+    assert.deepEqual(await verifyEmailToken(plaintext), { success: true, type: "SIGNUP" });
+    assert.equal(member.userId, "invitee", "verification bound the invite to the account");
+
+    sessionUserId = "invitee";
+    await accept(tokenForm());
+    assert.equal(member.inviteStatus, "ACCEPTED");
+  });
+}
+
+test("a team invite with no address and no account is nobody's (old inline check let it through)", async () => {
+  const member = seedInvite("TEAM");
+  member.invitedEmail = null;
+  sessionUserId = "bystander";
+  await assert.rejects(() => acceptTeamInvite(tokenForm()), /different email address/);
+  assert.equal(member.inviteStatus, "PENDING");
 });
 
 // ── website fields ───────────────────────────────────────────────────────────
