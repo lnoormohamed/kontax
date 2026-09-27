@@ -5,8 +5,14 @@ import {
   type SyncProviderCapabilityProfile,
   getCardDavVCardFlavor,
   projectPortableContactForProvider,
+  providerSupportsSignificantDates,
   resolveSyncProviderCapabilityProfile,
 } from "~/server/sync-provider-capabilities";
+import {
+  cardDavOwnedProperties,
+  mergeRemoteVCardForPush,
+  readVCardRevision,
+} from "~/server/carddav-vcard-merge";
 
 type CardDavCredentials = {
   username: string;
@@ -87,7 +93,31 @@ export type CardDavContactCard = CardDavAddressBookEntry & {
 export type CardDavPushResult = {
   href: string;
   etag: string | null;
+  /** P49A-03: the exact body that was PUT (the remote card is now this). */
+  vcard: string;
 };
+
+/**
+ * P49A-03: a card as fetched, with the raw vCard text beside the parsed card.
+ * The raw text is kept out of CardDavContactCard on purpose — that object is
+ * stored as a SyncConflict remoteSnapshot and must not carry the whole card.
+ */
+export type CardDavFetchedCard = {
+  card: CardDavContactCard;
+  vcard: string;
+};
+
+/**
+ * P49A-03: the remote card a push replaces — its raw vCard (whose unmodelled
+ * properties are preserved) and the ETag the PUT is conditioned on.
+ */
+export type CardDavRemoteCardState = {
+  vcard: string;
+  etag: string | null;
+};
+
+/** P49A-03: a conditional PUT lost the race — the remote card changed (or vanished). */
+export const CARDDAV_PUSH_PRECONDITION_FAILED = "CARDDAV_PUSH_PRECONDITION_FAILED";
 
 // P44-03: a contact card's PHOTO as it arrived from the provider. Inline b64 is
 // decoded lazily by the photo pipeline; URI form (iCloud) is fetched with the
@@ -440,8 +470,12 @@ const normalizeBirthdayValue = (value: string | null) => {
   return trimmed;
 };
 
+// P49A-03: the input is the decoded vCard text (see decodeAddressData) — the
+// XML entity decoding happens once, where the card is taken out of the
+// multistatus body, so the raw text kept for push preservation and the parsed
+// fields agree (and a GET body, which is not XML, is never entity-decoded).
 const parseVCardLines = (value: string) =>
-  unfoldVCard(decodeXmlEntities(value))
+  unfoldVCard(value)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0 && !line.toUpperCase().startsWith("BEGIN:") && !line.toUpperCase().startsWith("END:"))
@@ -507,7 +541,7 @@ const getLineCustomLabel = (
   );
 
 const getVCardUid = (value: string) => {
-  const unfolded = unfoldVCard(decodeXmlEntities(value));
+  const unfolded = unfoldVCard(value);
   const match = /^UID(?:;[^:]*)?:(.+)$/im.exec(unfolded);
 
   return match?.[1]?.trim() ?? null;
@@ -798,6 +832,21 @@ const parseCardDavContactCard = (
   };
 };
 
+/**
+ * P49A-03: the vCard text inside a multistatus `address-data` element. Servers
+ * send it entity-escaped or as a CDATA section; either way the result is the
+ * card exactly as stored remotely.
+ */
+const decodeAddressData = (content: string): string => {
+  const cdata = /^<!\[CDATA\[([\s\S]*)\]\]>$/.exec(content.trim());
+  return cdata ? cdata[1]! : decodeXmlEntities(content);
+};
+
+const getAddressData = (block: string) => {
+  const content = getTagContent(block, "address-data");
+  return content ? decodeAddressData(content) : null;
+};
+
 export const fetchCardDavAddressBookIndex = async ({
   addressBookUrl,
   credentials,
@@ -817,7 +866,7 @@ export const fetchCardDavAddressBookIndex = async ({
   return getResponseBlocks(xml)
     .map((block) => {
       const summary = summarizeResponse(block, normalizedAddressBookUrl);
-      const addressData = getTagContent(block, "address-data");
+      const addressData = getAddressData(block);
       const uid = addressData ? getVCardUid(addressData) : null;
 
       if (!summary.resolvedHref || !uid) {
@@ -833,7 +882,12 @@ export const fetchCardDavAddressBookIndex = async ({
     .filter((item): item is CardDavAddressBookEntry => item != null);
 };
 
-export const fetchCardDavAddressBookCards = async ({
+/**
+ * P49A-03: every card in the book with its raw vCard, from one REPORT. The
+ * sync runner derives its href/ETag/UID index from this list too, so the ETag a
+ * push is conditioned on and the raw card it preserves come from the same read.
+ */
+export const fetchCardDavAddressBookCardsWithRaw = async ({
   addressBookUrl,
   credentials,
   includePhoto = false,
@@ -841,7 +895,7 @@ export const fetchCardDavAddressBookCards = async ({
   addressBookUrl: string;
   credentials: CardDavCredentials;
   includePhoto?: boolean;
-}): Promise<CardDavContactCard[]> => {
+}): Promise<CardDavFetchedCard[]> => {
   const normalizedAddressBookUrl = normalizeUrl(addressBookUrl);
   const xml = await davRequest({
     url: normalizedAddressBookUrl,
@@ -854,24 +908,79 @@ export const fetchCardDavAddressBookCards = async ({
   return getResponseBlocks(xml)
     .map((block) => {
       const summary = summarizeResponse(block, normalizedAddressBookUrl);
-      const addressData = getTagContent(block, "address-data");
+      const addressData = getAddressData(block);
       const uid = addressData ? getVCardUid(addressData) : null;
 
       if (!summary.resolvedHref || !addressData || !uid) {
         return null;
       }
 
-      return parseCardDavContactCard(
-        {
-          href: summary.resolvedHref,
-          etag: getTagContent(block, "getetag"),
-          uid,
-        },
-        addressData,
-        { includePhoto },
-      );
+      return {
+        card: parseCardDavContactCard(
+          {
+            href: summary.resolvedHref,
+            etag: getTagContent(block, "getetag"),
+            uid,
+          },
+          addressData,
+          { includePhoto },
+        ),
+        vcard: addressData,
+      };
     })
-    .filter((item): item is CardDavContactCard => item != null);
+    .filter((item): item is CardDavFetchedCard => item != null);
+};
+
+export const fetchCardDavAddressBookCards = async (options: {
+  addressBookUrl: string;
+  credentials: CardDavCredentials;
+  includePhoto?: boolean;
+}): Promise<CardDavContactCard[]> =>
+  (await fetchCardDavAddressBookCardsWithRaw(options)).map((fetched) => fetched.card);
+
+/**
+ * P49A-03 (A-21): one remote book can hold several cards with the same UID
+ * (copies made by other clients, a botched import). Kontax keys contacts and
+ * links by UID, so it syncs exactly one of them and leaves the others alone
+ * (never deleted, never pushed to). The kept card is, in order: the one already
+ * linked for that UID (`linkedHrefByUid`), the newest by REV, then the first by
+ * href — deterministic, so the same card is chosen on every run.
+ */
+export const dedupeCardDavCardsByUid = <T extends CardDavFetchedCard>(
+  fetched: readonly T[],
+  linkedHrefByUid: ReadonlyMap<string, string | null | undefined> = new Map(),
+): { kept: T[]; dropped: T[] } => {
+  const byUid = new Map<string, T[]>();
+  for (const item of fetched) {
+    const group = byUid.get(item.card.uid);
+    if (group) group.push(item);
+    else byUid.set(item.card.uid, [item]);
+  }
+
+  const keptByUid = new Map<string, T>();
+  const dropped: T[] = [];
+  for (const [uid, group] of byUid) {
+    if (group.length === 1) {
+      keptByUid.set(uid, group[0]!);
+      continue;
+    }
+    const linkedHref = linkedHrefByUid.get(uid);
+    const ranked = [...group].sort((left, right) => {
+      const leftLinked = linkedHref != null && left.card.href === linkedHref ? 1 : 0;
+      const rightLinked = linkedHref != null && right.card.href === linkedHref ? 1 : 0;
+      if (leftLinked !== rightLinked) return rightLinked - leftLinked;
+      const leftRev = readVCardRevision(left.vcard) ?? -Infinity;
+      const rightRev = readVCardRevision(right.vcard) ?? -Infinity;
+      if (leftRev !== rightRev) return rightRev > leftRev ? 1 : -1;
+      return left.card.href < right.card.href ? -1 : left.card.href > right.card.href ? 1 : 0;
+    });
+    keptByUid.set(uid, ranked[0]!);
+    dropped.push(...ranked.slice(1));
+  }
+
+  // Keep the server's order for the kept cards.
+  const keptSet = new Set(keptByUid.values());
+  return { kept: fetched.filter((item) => keptSet.has(item)), dropped };
 };
 
 /**
@@ -942,7 +1051,8 @@ const buildCardDavContactBody = (
   // P44-04: a vCard PUT replaces the whole card, so the PHOTO line must be
   // present or the remote photo is wiped. The pipeline passes the canonical
   // JPEG to push, or the remote's existing bytes to preserve (photo excluded /
-  // no local change). Absent → no PHOTO line (create with no photo).
+  // no local change). Absent → no PHOTO line here; P49A-03: on an update the
+  // remote card's own PHOTO is then preserved by the merge in pushCardDavContact.
   const trailer = photoBase64
     ? `\r\nUID:${uid}\r\n${foldVCardLine(`PHOTO;ENCODING=b;TYPE=JPEG:${photoBase64}`)}\r\nEND:VCARD`
     : `\r\nUID:${uid}\r\nEND:VCARD`;
@@ -952,43 +1062,122 @@ const buildCardDavContactBody = (
   );
 };
 
-export const pushCardDavContact = async ({
-  addressBookUrl,
-  credentials,
-  remoteUid,
-  contact,
-  capabilityProfile,
-  hrefOverride,
-  photoBase64,
-}: {
-  addressBookUrl: string;
-  credentials: CardDavCredentials;
-  remoteUid: string;
-  contact: PortableContactInput;
-  capabilityProfile?: SyncProviderCapabilityProfile;
-  hrefOverride?: string;
-  /** P44-04: base64 JPEG to embed as PHOTO. Omit to leave no photo on the card. */
-  photoBase64?: string | null;
-}): Promise<CardDavPushResult> => {
-  const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
-  const href = hrefOverride ?? new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
-  // Always use the canonical remoteUid for the vCard body — this is the UID iCloud
-  // already knows for this contact. Using the href filename instead causes iCloud to
-  // update the contact's UID, which then breaks future REPORT lookups (the new UID won't
-  // match our contactByUid map, triggering spurious bootstrap attempts).
-  const uidForBody = remoteUid;
-  const body = buildCardDavContactBody(
-    contact,
-    uidForBody,
-    collectionUrl,
-    capabilityProfile,
-    photoBase64,
-  );
+/**
+ * P49A-03: the If-Match value for an ETag as Kontax stored it. Multistatus
+ * ETags can arrive entity-escaped (`&quot;abc&quot;`); some servers omit the
+ * quotes. A weak ETag (`W/"…"`) never matches under If-Match's strong
+ * comparison (RFC 9110 §13.1.1), so it yields null — no condition — rather than
+ * a guaranteed 412 on every push.
+ */
+export const toIfMatchValue = (etag: string | null | undefined): string | null => {
+  if (!etag) return null;
+  const decoded = decodeXmlEntities(etag).trim();
+  if (!decoded || /^W\//i.test(decoded)) return null;
+  return decoded.startsWith('"') ? decoded : `"${decoded}"`;
+};
 
+const readEtagHeader = (response: SafeFetchResponse): string | null => {
+  const etagHeader: unknown = response.headers.etag;
+  return typeof etagHeader === "string" ? etagHeader : null;
+};
+
+/**
+ * P49A-03: GET one card (the re-read after a 412, and the base of a push whose
+ * caller did not supply the remote card). Null when the card is gone.
+ */
+export const fetchCardDavContact = async ({
+  href,
+  credentials,
+  uid,
+  includePhoto = false,
+}: {
+  href: string;
+  credentials: CardDavCredentials;
+  /** The UID to record when the card itself carries none. */
+  uid?: string;
+  includePhoto?: boolean;
+}): Promise<CardDavFetchedCard | null> => {
+  let response: SafeFetchResponse;
+
+  try {
+    response = await safeFetch(href, {
+      method: "GET",
+      headers: {
+        Authorization: basicAuthHeader(credentials),
+        Accept: "text/vcard, text/x-vcard;q=0.9",
+        "User-Agent": USER_AGENT,
+      },
+      // The card must be read from exactly the href it is written back to.
+      followRedirects: false,
+      maxBytes: 10 * 1024 * 1024,
+      timeoutMs: 20_000,
+    });
+  } catch (error) {
+    throw toPreflightError(error, "");
+  }
+
+  if (response.status === 404 || response.status === 410) {
+    return null;
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw new CardDavPreflightError(
+      "CARDDAV_AUTH_FAILED",
+      "CardDAV credentials were rejected while reading a contact card.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new CardDavPreflightError(
+      "CARDDAV_HTTP_ERROR",
+      `CardDAV contact read failed with HTTP ${response.status}.`,
+    );
+  }
+
+  const vcard = new TextDecoder("utf-8").decode(response.body);
+  const cardUid = getVCardUid(vcard) ?? uid;
+  if (!cardUid) {
+    return null;
+  }
+
+  return {
+    card: parseCardDavContactCard(
+      { href, etag: readEtagHeader(response), uid: cardUid },
+      vcard,
+      { includePhoto },
+    ),
+    vcard,
+  };
+};
+
+/**
+ * P49A-03: PUT a vCard, conditioned on the remote state it was built from:
+ * `ifMatch` for an update (the card must still be the version Kontax read),
+ * `ifNoneMatch` for a create (never replace a card that already sits at the
+ * href). A 412 throws CARDDAV_PUSH_PRECONDITION_FAILED and nothing was written.
+ */
+export const putCardDavVCard = async ({
+  href,
+  credentials,
+  vcard,
+  ifMatch,
+  ifNoneMatch = false,
+}: {
+  href: string;
+  credentials: CardDavCredentials;
+  vcard: string;
+  ifMatch?: string | null;
+  ifNoneMatch?: boolean;
+}): Promise<{ href: string; etag: string | null }> => {
   let response: SafeFetchResponse;
   // Explicitly convert to UTF-8 Buffer so the underlying HTTP stack cannot
   // re-interpret the string in any other encoding (e.g. Latin-1 fallback).
-  const bodyBytes = Buffer.from(body, "utf-8");
+  const bodyBytes = Buffer.from(vcard, "utf-8");
+  const conditionHeaders: Record<string, string> = ifMatch
+    ? { "If-Match": ifMatch }
+    : ifNoneMatch
+      ? { "If-None-Match": "*" }
+      : {};
 
   try {
     response = await safeFetch(href, {
@@ -998,6 +1187,7 @@ export const pushCardDavContact = async ({
         "Content-Type": "text/vcard; charset=utf-8",
         "Content-Length": String(bodyBytes.byteLength),
         "User-Agent": USER_AGENT,
+        ...conditionHeaders,
       },
       body: bodyBytes,
       // A PUT must land where we aimed it; a redirect is treated as a failure.
@@ -1015,6 +1205,15 @@ export const pushCardDavContact = async ({
     );
   }
 
+  if (response.status === 412) {
+    throw new CardDavPreflightError(
+      CARDDAV_PUSH_PRECONDITION_FAILED,
+      ifMatch
+        ? "The contact changed on the CardDAV server while Kontax was saving it. Nothing was overwritten; sync again to review the newer version."
+        : "A contact card already exists at that address on the CardDAV server. Nothing was overwritten; sync again to link it.",
+    );
+  }
+
   if (!response.ok) {
     throw new CardDavPreflightError(
       "CARDDAV_PUSH_HTTP_ERROR",
@@ -1022,11 +1221,94 @@ export const pushCardDavContact = async ({
     );
   }
 
-  const etagHeader: unknown = response.headers.etag;
-  return {
+  return { href, etag: readEtagHeader(response) };
+};
+
+/**
+ * Push a Kontax contact to a remote CardDAV book.
+ *
+ * P49A-03 (A-03): the PUT replaces the whole card, so it is built from the
+ * remote card it replaces — Kontax-owned properties from `contact`, everything
+ * else from the remote verbatim (carddav-vcard-merge.ts) — and conditioned on
+ * that card's ETag. `remote`:
+ * - `{ vcard, etag }` — the card as the caller last read it (the sync runner's
+ *   REPORT); the PUT carries `If-Match: etag`.
+ * - `null` — a create; the PUT carries `If-None-Match: *`.
+ * - omitted — the card is read first (GET) and treated as above, so no caller
+ *   can blindly overwrite a card.
+ * A 412 throws CARDDAV_PUSH_PRECONDITION_FAILED; the caller re-reads the card
+ * and goes through its conflict path.
+ */
+export const pushCardDavContact = async ({
+  addressBookUrl,
+  credentials,
+  remoteUid,
+  contact,
+  capabilityProfile,
+  hrefOverride,
+  photoBase64,
+  remote,
+}: {
+  addressBookUrl: string;
+  credentials: CardDavCredentials;
+  remoteUid: string;
+  contact: PortableContactInput;
+  capabilityProfile?: SyncProviderCapabilityProfile;
+  hrefOverride?: string;
+  /**
+   * P44-04: base64 JPEG to embed as PHOTO; `null` removes the photo. Omitted:
+   * the remote card's own PHOTO is carried through unchanged (P49A-03).
+   */
+  photoBase64?: string | null;
+  remote?: CardDavRemoteCardState | null;
+}): Promise<CardDavPushResult> => {
+  const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
+  const href = hrefOverride ?? new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
+  // Always use the canonical remoteUid for the vCard body — this is the UID iCloud
+  // already knows for this contact. Using the href filename instead causes iCloud to
+  // update the contact's UID, which then breaks future REPORT lookups (the new UID won't
+  // match our contactByUid map, triggering spurious bootstrap attempts).
+  const uidForBody = remoteUid;
+  const profile =
+    capabilityProfile ??
+    resolveSyncProviderCapabilityProfile({
+      provider: "CARDDAV",
+      addressBookUrl: collectionUrl,
+    });
+
+  let base = remote;
+  if (base === undefined) {
+    const current = await fetchCardDavContact({ href, credentials, uid: remoteUid });
+    base = current ? { vcard: current.vcard, etag: current.card.etag } : null;
+  }
+
+  const kontaxBody = buildCardDavContactBody(
+    contact,
+    uidForBody,
+    collectionUrl,
+    profile,
+    photoBase64,
+  );
+  const body = base
+    ? mergeRemoteVCardForPush({
+        kontaxVCard: kontaxBody,
+        remoteVCard: base.vcard,
+        owned: cardDavOwnedProperties({
+          significantDates: providerSupportsSignificantDates(profile),
+          photo: photoBase64 !== undefined,
+        }),
+      })
+    : kontaxBody;
+
+  const result = await putCardDavVCard({
     href,
-    etag: typeof etagHeader === "string" ? etagHeader : null,
-  };
+    credentials,
+    vcard: body,
+    ifMatch: base ? toIfMatchValue(base.etag) : null,
+    ifNoneMatch: base === null,
+  });
+
+  return { ...result, vcard: body };
 };
 
 export const deleteCardDavContact = async ({
