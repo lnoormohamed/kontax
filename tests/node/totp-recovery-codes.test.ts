@@ -88,7 +88,14 @@ mock.module("~/server/totp-crypto", {
   },
 });
 
-const { confirmTotpEnrolment, redeemTotpRecoveryCode, regenerateRecoveryCodes, startTotpEnrolment, getTotpStatus } =
+const {
+  confirmTotpEnrolment,
+  disableTotpAuth,
+  redeemTotpRecoveryCode,
+  regenerateRecoveryCodes,
+  startTotpEnrolment,
+  getTotpStatus,
+} =
   await import("../../src/app/actions/totp");
 const { findMatchingRecoveryCode, newRecoveryCodeSet } = await import("../../src/server/totp-recovery-codes");
 
@@ -247,6 +254,73 @@ test("regenerate accepts an unused recovery code instead of a TOTP code (lost ph
   assert.deepEqual(await redeemTotpRecoveryCode(OLD_CODES[2]!), { error: "INVALID_RECOVERY_CODE" }, "old set gone");
 });
 
+test("one recovery code can't authorise two concurrent regenerations", async () => {
+  seedEnabledUserWithLegacyCodes(OLD_CODES);
+  const results = await Promise.all([
+    regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[0]! }),
+    regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[0]! }),
+  ]);
+  const ok = results.filter((r) => "success" in r);
+  assert.equal(ok.length, 1, JSON.stringify(results));
+  assert.ok(results.some((r) => "error" in r && r.error === "INVALID_TOTP_CODE"));
+  // The set on file is the one the winner was shown.
+  await assertStoredSetIs((ok[0] as { recoveryCodes: string[] }).recoveryCodes);
+});
+
+test("a recovery code used to regenerate can't also sign in at the same time", async () => {
+  seedEnabledUserWithLegacyCodes(OLD_CODES);
+  const [regen, signIn] = await Promise.all([
+    regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[1]! }),
+    redeemTotpRecoveryCode(OLD_CODES[1]!),
+  ]);
+  assert.equal(["success" in regen, "success" in signIn].filter(Boolean).length, 1, JSON.stringify([regen, signIn]));
+});
+
+test("two regenerations authorised by different codes: the later one stops, the shown set is kept", async () => {
+  seedEnabledUserWithLegacyCodes(OLD_CODES);
+  // Request B has claimed its code (OLD_CODES[2]) and is about to write when
+  // request A — authorised by OLD_CODES[0] — commits a new set first. Run A
+  // from B's pre-transaction hook to reproduce exactly that interleaving.
+  let first: Awaited<ReturnType<typeof regenerateRecoveryCodes>> | null = null;
+  let armed = true;
+  fake.hooks.beforeTransaction = async () => {
+    if (!armed) return;
+    armed = false;
+    first = await regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[0]! });
+  };
+  const second = await regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[2]! });
+  fake.hooks.beforeTransaction = undefined;
+
+  assert.ok(first && "success" in first, JSON.stringify(first));
+  assert.deepEqual(second, { error: "RECOVERY_CODES_CHANGED" });
+  await assertStoredSetIs((first as { recoveryCodes: string[] }).recoveryCodes);
+});
+
+test("a failed regenerate gives back the recovery code it claimed", async () => {
+  seedEnabledUserWithLegacyCodes(OLD_CODES);
+  const delegate = (fake.client as Record<string, Record<string, unknown>>).totpRecoveryCode!;
+  delegate.createMany = async () => {
+    throw new Error("simulated DB failure");
+  };
+  const silence = mock.method(console, "error", () => undefined);
+  try {
+    assert.deepEqual(await regenerateRecoveryCodes({ currentPassword: PASSWORD, totpCode: OLD_CODES[0]! }), {
+      error: "REGENERATE_FAILED",
+    });
+  } finally {
+    silence.mock.restore();
+  }
+  assert.deepEqual(await redeemTotpRecoveryCode(OLD_CODES[0]!), { success: true, remaining: 2 });
+});
+
+test("disabling 2FA checks the password through the step-up helper", async () => {
+  seedEnabledUserWithLegacyCodes(OLD_CODES);
+  assert.deepEqual(await disableTotpAuth({ password: "wrong", totpCode: VALID_TOTP }), { error: "INCORRECT_PASSWORD" });
+  assert.equal(fake.rows("user")[0]!.totpEnabled, true);
+  assert.deepEqual(await disableTotpAuth({ password: PASSWORD, totpCode: VALID_TOTP }), { success: true });
+  assert.equal(fake.rows("user")[0]!.totpEnabled, false);
+});
+
 test("a failed regenerate leaves the old codes working", async () => {
   seedEnabledUserWithLegacyCodes(OLD_CODES);
   const before = storedHashes();
@@ -349,10 +423,11 @@ test("enrolment start refuses without the password step-up", async () => {
   assert.equal((JSON.parse(ok.pendingToken) as { userId?: string }).userId, USER_ID, "token bound to the user");
 });
 
-test("an OAuth-only account (no password) enrols on its session alone", async () => {
+test("an account with no password hash is refused, not waved through (fail closed)", async () => {
+  // P49A-13 Fable review: the step-up helper used to treat "no hash" as OK.
   seedEnrollableUser("");
-  const ok = await startTotpEnrolment();
-  assert.ok("pendingToken" in ok, JSON.stringify(ok));
+  assert.deepEqual(await startTotpEnrolment(), { error: "PASSWORD_NOT_SET" });
+  assert.deepEqual(await startTotpEnrolment({ currentPassword: "anything" }), { error: "PASSWORD_NOT_SET" });
 });
 
 test("confirm refuses a pending token not minted for this account after step-up", async () => {

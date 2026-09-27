@@ -24,15 +24,16 @@ export type CreateApiTokenError =
   | "INVALID_INPUT"
   | "STEP_UP_REQUIRED"
   | "WRONG_PASSWORD"
-  | "RATE_LIMIT_EXCEEDED";
+  | "RATE_LIMIT_EXCEEDED"
+  | "PASSWORD_NOT_SET";
 
 /**
  * P49A-13 (A-28): an API token is durable access that outlives the browser
  * session that minted it, so creating one takes a server-verified step-up —
  * the same `verifyStepUpPassword` check as app passwords and data export. A
  * hijacked session can no longer mint itself a token that survives sign-out.
- * OAuth-only accounts have no password to prove; for them the active session
- * is the step-up signal (the helper's documented convention).
+ * An account with no password is refused (PASSWORD_NOT_SET) — the helper
+ * fails closed unless a caller opts in to passwordless step-up.
  *
  * Returns a result instead of throwing: Next.js redacts thrown server-action
  * messages in production, so the old `throw new Error("NAME_REQUIRED")` codes

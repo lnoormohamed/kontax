@@ -60,6 +60,7 @@ export function TwoFactorSection({
       } else {
         setErr(result.error === "INCORRECT_PASSWORD" ? "Incorrect password."
           : result.error === "INVALID_TOTP_CODE" ? "Incorrect authenticator code."
+          : result.error === "RATE_LIMIT_EXCEEDED" ? "Too many attempts. Please wait a while and try again."
           : "Something went wrong.");
       }
     });
@@ -96,6 +97,7 @@ export function TwoFactorSection({
             : result.error === "TOTP_CODE_ALREADY_USED" ? "That code was just used. Wait for the next code in your authenticator app."
             : result.error === "RATE_LIMIT_EXCEEDED" ? "Too many attempts. Please wait a while and try again."
             : result.error === "REGENERATE_FAILED" ? "Couldn't create new codes. Your existing recovery codes still work."
+            : result.error === "RECOVERY_CODES_CHANGED" ? "Your recovery codes were just replaced in another window. Reload this page to see how many you have."
             : "Something went wrong. Your existing recovery codes haven't changed.",
           );
         }

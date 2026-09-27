@@ -1,6 +1,5 @@
 "use server";
 
-import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -32,7 +31,6 @@ import { markSyncLinksDirty } from "~/server/sync-dirty";
 import { emitEvent } from "~/lib/activity";
 import { CONFLICT_PICKS_FIELD, parseConflictPicks } from "~/lib/sync-conflict-picks";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
-import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import {
   createSyncConnectionId,
   emitSyncConnectionLifecycleEvent,
@@ -517,8 +515,8 @@ const recordFailedPreflight = async ({
  * server-verified password step-up. Without it a hijacked session could point
  * an existing two-way sync at an attacker's server and silently receive the
  * whole address book. The form sends the Kontax password as `currentPassword`;
- * OAuth-only accounts have none, so the session is the signal (the
- * `verifyStepUpPassword` convention). Returns an error message, or null.
+ * an account with no password is refused (the helper fails closed). Returns
+ * an error message, or null.
  */
 const checkSyncCredentialStepUp = async (
   userId: string,
@@ -535,6 +533,7 @@ const checkSyncCredentialStepUp = async (
   if (stepUp === "OK") return null;
   if (stepUp === "STEP_UP_REQUIRED") return "Enter your Kontax password to confirm this change.";
   if (stepUp === "RATE_LIMIT_EXCEEDED") return "Too many password attempts. Try again in an hour.";
+  if (stepUp === "PASSWORD_NOT_SET") return "Set a Kontax password first (Settings → Security), then try again.";
   return "Your Kontax password was incorrect.";
 };
 
@@ -2072,11 +2071,6 @@ export const confirmSyncSettingsPassword = async (
     return { elevated: false, error: "You must be signed in." };
   }
 
-  const rl = await checkRateLimit(rateLimiters.syncSettingsElevation, `user:${context.userId}`);
-  if (!rl.allowed) {
-    return { elevated: false, error: "Too many attempts. Try again in a few minutes." };
-  }
-
   const user = await db.user.findUnique({
     where: { id: context.userId },
     select: { password: true },
@@ -2085,8 +2079,17 @@ export const confirmSyncSettingsPassword = async (
     return { elevated: false, error: "You must be signed in." };
   }
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) {
+  // P49A-13 (Fable review): through the shared step-up helper, so every
+  // password-checking action draws on the one `stepUpVerify` budget instead of
+  // this having its own (a second, independent password oracle).
+  const stepUp = await verifyStepUpPassword(context.userId, user.password, password);
+  if (stepUp === "RATE_LIMIT_EXCEEDED") {
+    return { elevated: false, error: "Too many attempts. Try again later." };
+  }
+  if (stepUp === "PASSWORD_NOT_SET") {
+    return { elevated: false, error: "Set a Kontax password first (Settings → Security)." };
+  }
+  if (stepUp !== "OK") {
     return { elevated: false };
   }
 

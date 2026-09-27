@@ -11,8 +11,8 @@ import { createFakePrisma } from "./_fake-prisma";
  * change / reset revokes API tokens.
  *
  *   - `createApiToken` refuses without the password (and with a wrong one), and
- *     mints a token with it. OAuth-only accounts (no password) go through on
- *     their session, the `verifyStepUpPassword` convention.
+ *     mints a token with it. An account with no password hash is refused —
+ *     the helper fails closed unless a caller opts in (Fable review).
  *   - `changePassword` and `resetPassword` revoke every live API token in the
  *     same transaction as the password write, and report how many.
  *   - `resetPassword` claims its token atomically (two concurrent submits of
@@ -159,11 +159,16 @@ test("createApiToken validates its input server-side", async () => {
   );
 });
 
-test("an OAuth-only account (no password hash) creates a token on its session", async () => {
+test("an account with no password hash is refused, not waved through on its session", async () => {
   const userId = seedUser("");
-  const result = await createApiToken({ name: "script", scope: "READ_ONLY" });
-  assert.ok(result.ok, JSON.stringify(result));
-  assert.equal(liveTokens(userId).length, 1);
+  assert.deepEqual(await createApiToken({ name: "script", scope: "READ_ONLY" }), {
+    ok: false,
+    error: "PASSWORD_NOT_SET",
+  });
+  assert.equal(liveTokens(userId).length, 0);
+  // Only an explicit opt-in lets the session stand in for a password.
+  assert.equal(await verifyStepUpPassword(userId, "", undefined), "PASSWORD_NOT_SET");
+  assert.equal(await verifyStepUpPassword(userId, null, "x", { passwordless: "allow-session" }), "OK");
 });
 
 // ── step-up bucket ───────────────────────────────────────────────────────────

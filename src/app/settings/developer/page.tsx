@@ -64,8 +64,8 @@ export default async function DeveloperSettingsPage() {
           </div>
         </div>
       ) : (
-        // P49A-13: token creation takes a password step-up (OAuth-only
-        // accounts have none to prove — the server lets them through).
+        // P49A-13: token creation takes a password step-up, verified by the
+        // action; `hasPassword` only decides whether to show the prompt.
         <ApiTokenManager hasPassword={Boolean(owner?.password)} tokens={tokens} />
       )}
     </>

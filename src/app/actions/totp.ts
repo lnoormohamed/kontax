@@ -1,11 +1,10 @@
 "use server";
 
-import bcrypt from "bcryptjs";
 import QRCode from "qrcode";
 
 import { authIncludingPendingTotp } from "~/server/auth";
 import { isSessionError, requireSession } from "~/server/auth/require-session";
-import { verifyStepUpPassword } from "~/server/auth/step-up";
+import { type StepUpResult, verifyStepUpPassword } from "~/server/auth/step-up";
 import { db } from "~/server/db";
 import {
   createTotpSecret,
@@ -34,15 +33,15 @@ import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
  */
 type PendingEnrolment = { secret: string; expiresAt: number; userId?: string };
 
-type StepUpFailure = "STEP_UP_REQUIRED" | "WRONG_PASSWORD" | "RATE_LIMIT_EXCEEDED";
+type StepUpFailure = Exclude<StepUpResult, "OK">;
 
 // ── Enrolment ─────────────────────────────────────────────────────────────────
 
 /**
  * P49A-13 (A-28): turning 2FA on replaces the account's second factor and mints
  * recovery codes — from a hijacked session that would let an attacker lock the
- * owner out — so it takes a server-verified password step-up. OAuth-only
- * accounts have no password to prove (the `verifyStepUpPassword` convention).
+ * owner out — so it takes a server-verified password step-up (refused for an
+ * account with no password: the helper fails closed).
  */
 export async function startTotpEnrolment(input: { currentPassword?: string } = {}): Promise<
   { qrCodeDataUri: string; plaintextSecret: string; pendingToken: string } | { error: string }
@@ -178,6 +177,7 @@ export async function regenerateRecoveryCodes(input: {
   if (stepUp !== "OK") return { error: stepUp satisfies StepUpFailure };
 
   const secondFactor = typeof input.totpCode === "string" ? input.totpCode.trim() : "";
+  let claimedRecoveryCodeId: string | null = null;
   if (!secondFactor) return { error: "TOTP_CODE_REQUIRED" };
 
   if (/^\d{6}$/.test(secondFactor)) {
@@ -194,13 +194,22 @@ export async function regenerateRecoveryCodes(input: {
     // An unused recovery code also proves the second factor. Someone who lost
     // their phone signs in with a recovery code and must then be able to get a
     // fresh set — the help centre tells them to — without an authenticator
-    // code they no longer have. The code is used up with the rest of the set,
-    // which the transaction below replaces.
+    // code they no longer have.
     const unused = await db.totpRecoveryCode.findMany({
       where: { userId, usedAt: null },
       select: { id: true, codeHash: true },
     });
-    if (!(await findMatchingRecoveryCode(secondFactor, unused))) return { error: "INVALID_TOTP_CODE" };
+    const matchId = await findMatchingRecoveryCode(secondFactor, unused);
+    if (!matchId) return { error: "INVALID_TOTP_CODE" };
+    // P49A-13 (Fable review): claim it atomically, exactly like a sign-in
+    // redemption, so the same code can't authorise two regenerations (or a
+    // regeneration and a sign-in) at once.
+    const claimed = await db.totpRecoveryCode.updateMany({
+      where: { id: matchId, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+    if (claimed.count === 0) return { error: "INVALID_TOTP_CODE" };
+    claimedRecoveryCodeId = matchId;
   }
 
   // P49A-19: the codes returned below are the ones whose hashes are stored —
@@ -212,6 +221,14 @@ export async function regenerateRecoveryCodes(input: {
 
   try {
     await db.$transaction(async (tx) => {
+      if (claimedRecoveryCodeId) {
+        // The claimed row must still exist: if a concurrent regeneration
+        // (authorised by a different code) already replaced the set, this one
+        // stops instead of silently replacing the codes that one just showed.
+        // In Postgres this delete waits on the other transaction's row lock.
+        const own = await tx.totpRecoveryCode.deleteMany({ where: { id: claimedRecoveryCodeId, userId } });
+        if (own.count !== 1) throw new RecoveryCodeSetReplacedError();
+      }
       await tx.totpRecoveryCode.deleteMany({ where: { userId } });
       const created = await tx.totpRecoveryCode.createMany({
         data: codeHashes.map((codeHash) => ({ userId, codeHash })),
@@ -221,7 +238,14 @@ export async function regenerateRecoveryCodes(input: {
       }
     });
   } catch (err) {
+    if (err instanceof RecoveryCodeSetReplacedError) return { error: "RECOVERY_CODES_CHANGED" };
     console.error("[regenerateRecoveryCodes] failed; existing codes left unchanged", { userId }, err);
+    // The set is unchanged, so give back the recovery code this request claimed.
+    if (claimedRecoveryCodeId) {
+      await db.totpRecoveryCode
+        .updateMany({ where: { id: claimedRecoveryCodeId, userId }, data: { usedAt: null } })
+        .catch(() => undefined);
+    }
     return { error: "REGENERATE_FAILED" };
   }
 
@@ -230,6 +254,12 @@ export async function regenerateRecoveryCodes(input: {
   });
 
   return { success: true, recoveryCodes };
+}
+
+class RecoveryCodeSetReplacedError extends Error {
+  constructor() {
+    super("recovery code set was replaced concurrently");
+  }
 }
 
 // ── Login challenge ────────────────────────────────────────────────────────────
@@ -348,8 +378,12 @@ export async function disableTotpAuth(input: {
   });
   if (!user?.totpEnabled || !user.totpSecret) return { error: "TOTP_NOT_ENABLED" };
 
-  const passwordOk = await bcrypt.compare(input.password, user.password);
-  if (!passwordOk) return { error: "INCORRECT_PASSWORD" };
+  // P49A-13 (Fable review): the password goes through the shared step-up
+  // helper (one `stepUpVerify` budget for every password check); the bucket
+  // above still meters the TOTP code.
+  const stepUp = await verifyStepUpPassword(session.user.id, user.password, input.password);
+  if (stepUp === "RATE_LIMIT_EXCEEDED") return { error: "RATE_LIMIT_EXCEEDED" };
+  if (stepUp !== "OK") return { error: "INCORRECT_PASSWORD" };
 
   const secret = decryptTotp(user.totpSecret);
   if (!verifyTotpToken(secret, input.totpCode)) return { error: "INVALID_TOTP_CODE" };

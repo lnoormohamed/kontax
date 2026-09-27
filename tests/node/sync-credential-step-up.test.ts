@@ -145,8 +145,10 @@ test("createSyncAccount refuses without the Kontax password before any discovery
   assert.equal(discoveries.length, 1, JSON.stringify(ok));
 });
 
-test("an OAuth-only account (no password) needs no Kontax password", async () => {
+test("an account with no password hash is refused (step-up fails closed)", async () => {
   seed("");
   const result = await attachSyncCredentials(PREV, form(credentialFields));
-  assert.equal(result.ok, true, JSON.stringify(result));
+  assert.equal(result.ok, false);
+  assert.match(result.error ?? "", /Set a Kontax password/);
+  assert.equal(fake.rows("syncAccount")[0]!.credentialReference, "old-enc");
 });

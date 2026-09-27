@@ -86,6 +86,7 @@ const CREATE_ERROR_MESSAGES: Record<CreateApiTokenError, string> = {
   STEP_UP_REQUIRED: "Please enter your password.",
   WRONG_PASSWORD: "Incorrect password. Please try again.",
   RATE_LIMIT_EXCEEDED: "Too many attempts. Please wait a while and try again.",
+  PASSWORD_NOT_SET: "Set a password for your account first (Settings → Security).",
 };
 
 function CreateTokenForm({
