@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 
+import { ConfirmDialog } from "~/app/_components/confirm-dialog";
 import type { SessionSummary } from "~/app/actions/sessions";
 import { listActiveSessions, revokeAllOtherSessions, revokeSession } from "~/app/actions/sessions";
 
@@ -36,8 +37,10 @@ function relativeTime(date: Date): string {
 function SessionRow({ s, onSignOut, flash }: { s: SessionSummary; onSignOut: (id: string) => void; flash: (msg: string) => void }) {
   const [busy, setBusy] = useState(false);
   const [out, setOut] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const go = async () => {
+    setConfirmOpen(false);
     setBusy(true);
     const result = await revokeSession(s.id);
     if ("success" in result) {
@@ -71,11 +74,21 @@ function SessionRow({ s, onSignOut, flash }: { s: SessionSummary; onSignOut: (id
           ? <Spinner size={16} light={false} />
           : <button
               className="shrink-0 rounded-[1.1rem] border border-[#dcae9f] bg-white px-[13px] py-[7px] text-[13px] font-semibold text-[#b5472f] transition hover:bg-[#f3e1da]"
-              onClick={() => void go()}
+              onClick={() => setConfirmOpen(true)}
               type="button"
             >
               Sign out
             </button>}
+      <ConfirmDialog
+        body={`This will sign out ${s.deviceHint ?? "this device"}. It will need to sign in again.`}
+        busy={busy}
+        confirmLabel="Sign out"
+        destructive
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => void go()}
+        open={confirmOpen}
+        title="Sign out of this device?"
+      />
     </div>
   );
 }
@@ -134,36 +147,23 @@ export function SessionsSection({ flash }: { flash: (msg: string) => void }) {
             ))}
           </div>
           <div className="mt-[6px] border-t border-[#e9ece7] pt-[14px]">
-            {!confirm ? (
-              <button
-                className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#b5472f]"
-                onClick={() => setConfirm(true)}
-                type="button"
-              >
-                Sign out of all other devices
-              </button>
-            ) : (
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-[13.5px] text-[#3a4540]">
-                  Sign out of {others} other session{others === 1 ? "" : "s"}?
-                </span>
-                <button
-                  className="inline-flex items-center gap-2 rounded-[1.2rem] bg-[#b5472f] px-[14px] py-2 text-[13px] font-semibold text-white transition hover:bg-[#9a3a23] disabled:opacity-50"
-                  disabled={isRevoking}
-                  onClick={revokeAll}
-                  type="button"
-                >
-                  {isRevoking ? <><Spinner size={12} /> Signing out…</> : "Confirm"}
-                </button>
-                <button
-                  className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                  onClick={() => setConfirm(false)}
-                  type="button"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+            <button
+              className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#b5472f]"
+              onClick={() => setConfirm(true)}
+              type="button"
+            >
+              Sign out of all other devices
+            </button>
+            <ConfirmDialog
+              body={`This will sign out ${others} other session${others === 1 ? "" : "s"}. They will need to sign in again.`}
+              busy={isRevoking}
+              confirmLabel="Sign out"
+              destructive
+              onClose={() => setConfirm(false)}
+              onConfirm={revokeAll}
+              open={confirm}
+              title={`Sign out of ${others} other session${others === 1 ? "" : "s"}?`}
+            />
           </div>
         </>
       )}

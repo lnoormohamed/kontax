@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
+import { ConfirmDialog } from "~/app/_components/confirm-dialog";
 import { CopyField } from "~/app/_components/copy-field";
 import { QrCodeModal } from "~/app/contacts/_components/qr-code-modal";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -402,6 +403,51 @@ function EmailForm({
   );
 }
 
+// P49A-17: revoking a share is irreversible (the recipient's copy freezes or
+// the link stops working) — route it through the same ConfirmDialog used for
+// every other destructive action, instead of an unconfirmed submit button.
+function RevokeShareButton({
+  shareId,
+  contactId,
+  label = "Revoke",
+  className,
+  confirmTitle,
+  confirmBody,
+}: {
+  shareId: string;
+  contactId: string;
+  label?: string;
+  className: string;
+  confirmTitle: string;
+  confirmBody?: string;
+}) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  return (
+    <>
+      <form action={revokeShare} ref={formRef}>
+        <input name="shareId" type="hidden" value={shareId} />
+        <input name="contactId" type="hidden" value={contactId} />
+      </form>
+      <button className={className} onClick={() => setConfirmOpen(true)} type="button">
+        {label}
+      </button>
+      <ConfirmDialog
+        confirmLabel="Revoke"
+        destructive
+        body={confirmBody}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          formRef.current?.requestSubmit();
+        }}
+        open={confirmOpen}
+        title={confirmTitle}
+      />
+    </>
+  );
+}
+
 // Sent-share rows with status pills.
 function RecipientList({
   shares,
@@ -451,13 +497,17 @@ function RecipientList({
             <span className="flex shrink-0 items-center gap-2.5">
               <StatusPill status={statusLabel} />
               {share.status === "ACTIVE" && (live || !share.accepted) ? (
-                <form action={revokeShare}>
-                  <input name="shareId" type="hidden" value={share.id} />
-                  <input name="contactId" type="hidden" value={contactId} />
-                  <button className="text-[13px] font-semibold text-[#b5472f] hover:underline" type="submit">
-                    Revoke
-                  </button>
-                </form>
+                <RevokeShareButton
+                  className="text-[13px] font-semibold text-[#b5472f] hover:underline"
+                  confirmBody={
+                    live
+                      ? `${share.recipientEmail ?? "This recipient"} will stop receiving updates, and keep a frozen copy of the contact as it is now.`
+                      : `${share.recipientEmail ?? "This recipient"} will no longer be able to accept this share.`
+                  }
+                  confirmTitle="Revoke this share?"
+                  contactId={contactId}
+                  shareId={share.id}
+                />
               ) : null}
             </span>
           </li>
@@ -476,6 +526,8 @@ function LiveFromPanel({ owner, contactId }: { owner: string; contactId: string 
     .slice(0, 2)
     .join("")
     .toUpperCase();
+  const unlinkFormRef = useRef<HTMLFormElement>(null);
+  const [confirmUnlink, setConfirmUnlink] = useState(false);
   return (
     <section
       className="rounded-[14px] border"
@@ -510,16 +562,28 @@ function LiveFromPanel({ owner, contactId }: { owner: string; contactId: string 
 
         {/* Unlink action */}
         <div className="mt-3.5">
-          <form action={unlinkLiveShare}>
+          <form action={unlinkLiveShare} ref={unlinkFormRef}>
             <input name="contactId" type="hidden" value={contactId} />
-            <button
-              className="inline-flex items-center gap-2 rounded-[9px] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-              type="submit"
-            >
-              <WorkspaceIcon name="link" size={15} strokeWidth={1.8} className="text-[#5c655e]" />
-              Unlink (keep a static copy)
-            </button>
           </form>
+          <button
+            className="inline-flex items-center gap-2 rounded-[9px] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+            onClick={() => setConfirmUnlink(true)}
+            type="button"
+          >
+            <WorkspaceIcon name="link" size={15} strokeWidth={1.8} className="text-[#5c655e]" />
+            Unlink (keep a static copy)
+          </button>
+          <ConfirmDialog
+            body={`This contact will stop staying in sync with ${owner}. You'll keep a static copy you can edit freely.`}
+            confirmLabel="Unlink"
+            onClose={() => setConfirmUnlink(false)}
+            onConfirm={() => {
+              setConfirmUnlink(false);
+              unlinkFormRef.current?.requestSubmit();
+            }}
+            open={confirmUnlink}
+            title="Unlink this live share?"
+          />
         </div>
       </div>
     </section>
@@ -657,13 +721,14 @@ export function ContactSharing({
                       </form>
                     </div>
                   )}
-                  <form action={revokeShare}>
-                    <input name="shareId" type="hidden" value={link.id} />
-                    <input name="contactId" type="hidden" value={contactId} />
-                    <button className="mt-1.5 text-[13px] font-semibold text-[#b5472f] hover:underline" type="submit">
-                      Revoke link
-                    </button>
-                  </form>
+                  <RevokeShareButton
+                    className="mt-1.5 text-[13px] font-semibold text-[#b5472f] hover:underline"
+                    confirmBody="Anyone with this link will no longer be able to use it to view or download this contact."
+                    confirmTitle="Revoke this share link?"
+                    contactId={contactId}
+                    label="Revoke link"
+                    shareId={link.id}
+                  />
                 </div>
               ))}
             </div>
