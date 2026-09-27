@@ -2,9 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { acceptTeamInvite, declineTeamInvite } from "~/app/actions/teams";
+import { InviteRecipientNotice } from "~/app/_components/invite-recipient-notice";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { findMemberByInviteToken } from "~/server/capability-tokens";
+import { checkInviteRecipient } from "~/server/invite-recipient";
 import { db } from "~/server/db";
 
 const getInitials = (value: string) =>
@@ -49,6 +51,15 @@ export default async function TeamJoinPage({
     (await db.groupMember.findFirst({
       where: { groupId: member.groupId, userId: session.user.id, inviteStatus: "ACCEPTED" },
     }));
+
+  // P49A-13: only the invited, verified address can accept — say so here
+  // rather than letting Accept fail on a redacted server-action error.
+  const recipient =
+    valid && member && !alreadyMember ? await checkInviteRecipient(member, session.user.id) : "ok";
+  const myEmail =
+    recipient === "ok"
+      ? ""
+      : ((await db.user.findUnique({ where: { id: session.user.id }, select: { email: true } }))?.email ?? "");
 
   const ownerName = member?.group.owner.name?.trim() ?? member?.group.owner.email ?? "A team admin";
   const ownerEmail = member?.group.owner.email ?? "";
@@ -113,6 +124,8 @@ export default async function TeamJoinPage({
               Go to Kontax
             </Link>
           </>
+        ) : recipient !== "ok" ? (
+          <InviteRecipientNotice check={recipient} email={myEmail} kind="team" />
         ) : (
           /* Valid invite */
           <>

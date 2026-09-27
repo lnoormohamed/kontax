@@ -530,7 +530,19 @@ const checkSyncCredentialStepUp = async (
     owner.password,
     typeof supplied === "string" ? supplied : undefined,
   );
-  if (stepUp === "OK") return null;
+  if (stepUp === "OK") {
+    // The same proof counts as the 15-minute sync re-auth, so finishing the
+    // first-sync setup straight after doesn't ask for the password again
+    // (Fable re-check of P49A-13, A).
+    // Best effort: a failure here only means one extra prompt later.
+    try {
+      const context = await getCurrentElevationContext();
+      if (context?.userId === userId) await issueSyncSettingsElevation(context.userId, context.jti);
+    } catch {
+      // No request scope / session context — skip the convenience.
+    }
+    return null;
+  }
   if (stepUp === "STEP_UP_REQUIRED") return "Enter your Kontax password to confirm this change.";
   if (stepUp === "RATE_LIMIT_EXCEEDED") return "Too many password attempts. Try again in an hour.";
   if (stepUp === "PASSWORD_NOT_SET") return "Set a Kontax password first (Settings → Security), then try again.";

@@ -2,11 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { acceptFamilyInvite, declineFamilyInvite } from "~/app/actions/family";
+import { InviteRecipientNotice } from "~/app/_components/invite-recipient-notice";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { findMemberByInviteToken } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { familyJoinBlockedReason } from "~/server/family-lifecycle";
+import { checkInviteRecipient } from "~/server/invite-recipient";
 
 function JoinCard({ children }: { children: React.ReactNode }) {
   return (
@@ -114,6 +116,18 @@ export default async function FamilyJoinPage({
         >
           Go to Kontax
         </Link>
+      </JoinCard>
+    );
+  }
+
+  // P49A-13: only the invited, verified address can accept — say so here
+  // rather than letting Accept fail on a redacted server-action error.
+  const recipient = await checkInviteRecipient(member, userId);
+  if (recipient !== "ok") {
+    const me = await db.user.findUnique({ where: { id: userId }, select: { email: true } });
+    return (
+      <JoinCard>
+        <InviteRecipientNotice check={recipient} email={me?.email ?? ""} kind="family" />
       </JoinCard>
     );
   }

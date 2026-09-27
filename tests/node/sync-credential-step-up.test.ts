@@ -61,6 +61,19 @@ mock.module("~/server/sync-credentials", {
     getSyncCredentialEncryptionStatus: () => ({ available: true }),
   },
 });
+// The step-up also grants the 15-minute sync re-auth, so the first-sync
+// setup right after doesn't ask for the password again (Fable re-check, A).
+const elevations: Array<{ userId: string; jti: string }> = [];
+const realElevation = await import("~/server/sync-elevation");
+mock.module("~/server/sync-elevation", {
+  namedExports: {
+    ...realElevation,
+    getCurrentElevationContext: async () => ({ userId: USER, jti: "jti_1" }),
+    issueSyncSettingsElevation: async (userId: string, jti: string) => {
+      elevations.push({ userId, jti });
+    },
+  },
+});
 mock.module("next/cache", {
   namedExports: { revalidatePath: () => undefined, revalidateTag: () => undefined },
 });
@@ -94,6 +107,7 @@ beforeEach(() => {
   fake = createFakePrisma();
   currentDb = fake.client;
   discoveries.length = 0;
+  elevations.length = 0;
 });
 
 const credentialFields = { syncAccountId: "acct_1", username: "attacker@example.invalid", password: "remote-app-pw" };
@@ -119,6 +133,13 @@ test("attachSyncCredentials with the Kontax password saves the new credentials",
   const result = await attachSyncCredentials(PREV, form({ ...credentialFields, currentPassword: PASSWORD }));
   assert.equal(result.ok, true, JSON.stringify(result));
   assert.equal(fake.rows("syncAccount")[0]!.credentialReference, "enc");
+  assert.deepEqual(elevations, [{ userId: USER, jti: "jti_1" }], "the step-up counts as the sync re-auth");
+});
+
+test("a wrong Kontax password grants no sync re-auth", async () => {
+  seed(bcrypt.hashSync(PASSWORD, 4));
+  await attachSyncCredentials(PREV, form({ ...credentialFields, currentPassword: "guess" }));
+  assert.deepEqual(elevations, []);
 });
 
 const createFields = {
