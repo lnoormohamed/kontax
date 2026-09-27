@@ -2,7 +2,7 @@ import "server-only";
 
 import bcrypt from "bcryptjs";
 
-import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
+import { checkRateLimit, rateLimiters, refundRateLimit } from "~/server/rate-limit";
 
 /**
  * P48-02 — server-side step-up verification.
@@ -40,9 +40,18 @@ export async function verifyStepUpPassword(
     return "STEP_UP_REQUIRED";
   }
 
-  const rl = await checkRateLimit(rateLimiters.stepUpVerify, `user:${userId}`);
+  const key = `user:${userId}`;
+  const rl = await checkRateLimit(rateLimiters.stepUpVerify, key);
   if (!rl.allowed) return "RATE_LIMIT_EXCEEDED";
 
   const matches = await bcrypt.compare(supplied, passwordHash);
-  return matches ? "OK" : "WRONG_PASSWORD";
+  if (!matches) return "WRONG_PASSWORD";
+
+  // P49A-13: more actions now take a step-up (API tokens, 2FA, sync
+  // credentials), and a CardDAV setup can take a few tries. Only wrong
+  // passwords should count toward the 5/hour bucket, so a correct one gives its
+  // point back. The point is still consumed *before* the compare, so a burst of
+  // concurrent guesses stays bounded by the bucket.
+  await refundRateLimit(rateLimiters.stepUpVerify, key);
+  return "OK";
 }

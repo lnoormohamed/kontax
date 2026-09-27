@@ -2759,9 +2759,11 @@ function AccountHeader({
 // ── Edit credentials form ─────────────────────────────────────────────────────
 function EditCredentialsForm({
   account,
+  hasPassword,
   onCancel,
 }: {
   account: SyncAccountData;
+  hasPassword: boolean;
   onCancel: () => void;
 }) {
   const [reveal, setReveal] = useState(false);
@@ -2871,6 +2873,7 @@ function EditCredentialsForm({
               </button>
             </div>
           </div>
+          {hasPassword && <KontaxPasswordField />}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 22 }}>
           <ActionBtn variant="primary" type="submit">
@@ -2893,6 +2896,43 @@ function EditCredentialsForm({
         </div>
       </form>
     </div>
+  );
+}
+
+// P49A-13: step-up for saving CardDAV credentials — the server
+// (`checkSyncCredentialStepUp` in actions/sync.ts) verifies this; the field
+// only collects it. Distinct autocomplete from the remote app password above
+// so a password manager fills the right one.
+function KontaxPasswordField() {
+  return (
+    <label style={{ display: "block" }}>
+      <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
+        Your Kontax password
+      </span>
+      <input
+        type="password"
+        name="currentPassword"
+        autoComplete="current-password"
+        placeholder="Confirm it’s you"
+        required
+        style={{
+          width: "100%",
+          height: 44,
+          borderRadius: 12,
+          border: `1px solid ${T.line}`,
+          background: "#fff",
+          padding: "0 14px",
+          fontSize: 14,
+          color: T.ink,
+          outline: "none",
+          fontFamily: "inherit",
+          boxSizing: "border-box",
+        }}
+      />
+      <span style={{ display: "block", marginTop: 6, fontSize: 12, color: T.mute, lineHeight: 1.45 }}>
+        Needed to change where your contacts sync to.
+      </span>
+    </label>
   );
 }
 
@@ -3017,11 +3057,13 @@ function AddAccountForm({
   accounts,
   syncAccountsLimit,
   upgradeableAtCap,
+  hasPassword,
 }: {
   onCancel: () => void;
   accounts: SyncAccountData[];
   syncAccountsLimit: number;
   upgradeableAtCap: boolean;
+  hasPassword: boolean;
 }) {
   const [sel, setSel] = useState<QuickPreset>(QUICK_PRESETS[0]!);
   const [baseUrl, setBaseUrl] = useState(QUICK_PRESETS[0]!.url);
@@ -3476,6 +3518,7 @@ function AddAccountForm({
               </button>
             </div>
           </div>
+          {hasPassword && <KontaxPasswordField />}
           <input type="hidden" name="syncDirection" value="TWO_WAY" />
           {choiceMatch && (
             <>
@@ -3813,9 +3856,12 @@ export type SyncPageClientProps = {
   // P35: entitlement cap for the add-account form
   syncAccountsLimit: number;
   upgradeableAtCap: boolean;
+  // P49A-13: saving CardDAV credentials takes the Kontax password (step-up);
+  // false for OAuth-only accounts, which have none to give.
+  hasPassword: boolean;
 };
 
-export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookModel, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookModel, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap, hasPassword }: SyncPageClientProps) {
   const allAccounts = [...accounts, ...pastAccounts];
   // P36-DB02: a freshly-connected account awaiting setup wins the initial selection
   // so its first-run setup panel opens immediately.
@@ -3968,6 +4014,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookM
           accounts={accounts}
           syncAccountsLimit={syncAccountsLimit}
           upgradeableAtCap={upgradeableAtCap}
+          hasPassword={hasPassword}
         />
       );
     if (accounts.length === 0 && pastAccounts.length === 0) return <EmptyState onAdd={openAdd} />;
@@ -3976,6 +4023,7 @@ export function SyncPageClient({ accounts, pastAccounts, labels, books, hasBookM
       return (
         <EditCredentialsForm
           account={selectedAccount}
+          hasPassword={hasPassword}
           onCancel={() => setEditing(false)}
         />
       );

@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 
-import { createApiToken, revokeApiToken } from "~/app/actions/api-tokens";
+import { type CreateApiTokenError, createApiToken, revokeApiToken } from "~/app/actions/api-tokens";
+import { ConfirmPasswordModal } from "~/app/_components/confirm-password-modal";
 import type { ApiTokenScope, ApiTokenSummary } from "~/server/api-tokens";
 
 function formatRelativeDate(value: Date | null): string {
@@ -75,97 +76,150 @@ function TokenReveal({ token }: { token: string }) {
   );
 }
 
-function CreateTokenForm({ onCreated }: { onCreated: (token: string) => void }) {
+const CREATE_ERROR_MESSAGES: Record<CreateApiTokenError, string> = {
+  UNAUTHORIZED: "Your session has expired. Sign in again.",
+  UPGRADE_REQUIRED: "API access requires a Pro plan or above.",
+  NAME_REQUIRED: "Please enter a name for this token.",
+  NAME_TOO_LONG: "Name must be 64 characters or fewer.",
+  NAME_TAKEN: "You already have a token with this name. Choose another name.",
+  INVALID_INPUT: "Could not create token. Please try again.",
+  STEP_UP_REQUIRED: "Please enter your password.",
+  WRONG_PASSWORD: "Incorrect password. Please try again.",
+  RATE_LIMIT_EXCEEDED: "Too many attempts. Please wait a while and try again.",
+};
+
+function CreateTokenForm({
+  hasPassword,
+  onCreated,
+}: {
+  hasPassword: boolean;
+  onCreated: (token: string) => void;
+}) {
   const [name, setName] = useState("");
   const [scope, setScope] = useState<ApiTokenScope>("READ_ONLY");
   const [error, setError] = useState<string | null>(null);
+  const [showStepUp, setShowStepUp] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // P49A-13: the password is verified by `createApiToken` itself; the modal
+  // only collects it. Errors that are about the password stay in the modal.
+  const create = async (password?: string): Promise<string | void> => {
+    try {
+      const result = await createApiToken({ name, scope, currentPassword: password });
+      if (!result.ok) {
+        const message = CREATE_ERROR_MESSAGES[result.error];
+        if (
+          password !== undefined &&
+          (result.error === "WRONG_PASSWORD" ||
+            result.error === "STEP_UP_REQUIRED" ||
+            result.error === "RATE_LIMIT_EXCEEDED")
+        ) {
+          return message;
+        }
+        setShowStepUp(false);
+        setError(message);
+        return;
+      }
+      setShowStepUp(false);
+      setName("");
+      setScope("READ_ONLY");
+      onCreated(result.token);
+    } catch {
+      setShowStepUp(false);
+      setError("Could not create token. Please try again.");
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (hasPassword) {
+      setShowStepUp(true);
+      return;
+    }
     startTransition(async () => {
-      try {
-        const result = await createApiToken({ name, scope });
-        setName("");
-        setScope("READ_ONLY");
-        onCreated(result.token);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Something went wrong.";
-        setError(
-          msg === "NAME_REQUIRED" ? "Please enter a name for this token." :
-          msg === "NAME_TOO_LONG" ? "Name must be 64 characters or fewer." :
-          msg === "UPGRADE_REQUIRED" ? "API access requires a Pro plan or above." :
-          "Could not create token. Please try again."
-        );
-      }
+      await create();
     });
   };
 
   return (
-    <form
-      className="grid gap-4 rounded-[1.5rem] border border-[#d8ddd6] bg-[#f8faf8] p-4 md:p-5"
-      onSubmit={handleSubmit}
-    >
-      <div>
-        <p className="text-[14.5px] font-semibold text-[#1d2823]">Create a new token</p>
-        <p className="mt-0.5 text-[13px] leading-[1.5] text-[#5c655e]">
-          Give it a name that describes where you&apos;ll use it.
-        </p>
-      </div>
-
-      <label className="grid gap-1.5 text-[13px] font-medium text-[#5c655e]">
-        Token name
-        <input
-          className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] text-[#1d2823] outline-none transition placeholder:text-[#646c65] focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
-          disabled={isPending}
-          maxLength={64}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. My automation script"
-          type="text"
-          value={name}
+    <>
+      {/* Outside the <form>: React bubbles the modal's own submit through the
+          portal, which would re-enter this form's onSubmit. */}
+      {showStepUp && (
+        <ConfirmPasswordModal
+          title="Confirm your identity"
+          description="An API token gives lasting access to your contacts. Enter your password to create it."
+          confirmLabel="Create token"
+          serverVerifies
+          onConfirmed={(password) => create(password)}
+          onClose={() => setShowStepUp(false)}
         />
-      </label>
-
-      <fieldset className="grid gap-2">
-        <legend className="text-[13px] font-medium text-[#5c655e]">Scope</legend>
-        <div className="flex flex-wrap gap-3">
-          {(["READ_ONLY", "READ_WRITE"] as const).map((s) => (
-            <label
-              className="flex cursor-pointer items-center gap-2 text-[13.5px] text-[#1d2823]"
-              key={s}
-            >
-              <input
-                checked={scope === s}
-                className="accent-[#17352e]"
-                name="scope"
-                onChange={() => setScope(s)}
-                type="radio"
-                value={s}
-              />
-              <span>
-                {s === "READ_ONLY" ? "Read only" : "Read / Write"}
-              </span>
-              <span className="text-[12px] text-[#646c65]">
-                {s === "READ_ONLY" ? "— list and read contacts" : "— create, update, delete contacts"}
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {error && (
-        <p className="text-[13px] text-[#9a3a23]">{error}</p>
       )}
-
-      <button
-        className="w-fit rounded-[1.2rem] bg-[#17352e] px-[18px] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
-        disabled={isPending || !name.trim()}
-        type="submit"
+      <form
+        className="grid gap-4 rounded-[1.5rem] border border-[#d8ddd6] bg-[#f8faf8] p-4 md:p-5"
+        onSubmit={handleSubmit}
       >
-        {isPending ? "Creating…" : "Create token"}
-      </button>
-    </form>
+        <div>
+          <p className="text-[14.5px] font-semibold text-[#1d2823]">Create a new token</p>
+          <p className="mt-0.5 text-[13px] leading-[1.5] text-[#5c655e]">
+            Give it a name that describes where you&apos;ll use it.
+          </p>
+        </div>
+
+        <label className="grid gap-1.5 text-[13px] font-medium text-[#5c655e]">
+          Token name
+          <input
+            className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] text-[#1d2823] outline-none transition placeholder:text-[#646c65] focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+            disabled={isPending}
+            maxLength={64}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. My automation script"
+            type="text"
+            value={name}
+          />
+        </label>
+
+        <fieldset className="grid gap-2">
+          <legend className="text-[13px] font-medium text-[#5c655e]">Scope</legend>
+          <div className="flex flex-wrap gap-3">
+            {(["READ_ONLY", "READ_WRITE"] as const).map((s) => (
+              <label
+                className="flex cursor-pointer items-center gap-2 text-[13.5px] text-[#1d2823]"
+                key={s}
+              >
+                <input
+                  checked={scope === s}
+                  className="accent-[#17352e]"
+                  name="scope"
+                  onChange={() => setScope(s)}
+                  type="radio"
+                  value={s}
+                />
+                <span>
+                  {s === "READ_ONLY" ? "Read only" : "Read / Write"}
+                </span>
+                <span className="text-[12px] text-[#646c65]">
+                  {s === "READ_ONLY" ? "— list and read contacts" : "— create, update, delete contacts"}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {error && (
+          <p className="text-[13px] text-[#9a3a23]">{error}</p>
+        )}
+
+        <button
+          className="w-fit rounded-[1.2rem] bg-[#17352e] px-[18px] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
+          disabled={isPending || !name.trim()}
+          type="submit"
+        >
+          {isPending ? "Creating…" : "Create token"}
+        </button>
+      </form>
+    </>
   );
 }
 
@@ -230,7 +284,13 @@ function RevokeModal({
   );
 }
 
-export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
+export function ApiTokenManager({
+  tokens,
+  hasPassword,
+}: {
+  tokens: ApiTokenSummary[];
+  hasPassword: boolean;
+}) {
   const [newToken, setNewToken] = useState<string | null>(null);
   const [confirmRevoke, setConfirmRevoke] = useState<ApiTokenSummary | null>(null);
 
@@ -239,7 +299,7 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
 
   return (
     <div className="grid gap-5">
-      <CreateTokenForm onCreated={(token) => setNewToken(token)} />
+      <CreateTokenForm hasPassword={hasPassword} onCreated={(token) => setNewToken(token)} />
 
       {newToken && (
         <div className="grid gap-3">

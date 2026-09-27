@@ -10,6 +10,7 @@ import {
   requireUserId,
   sessionErrorMessage,
 } from "~/server/auth/require-session";
+import { verifyStepUpPassword } from "~/server/auth/step-up";
 import {
   assertCanCreateContactsTx,
   assertCanCreateSyncAccount,
@@ -510,6 +511,33 @@ const recordFailedPreflight = async ({
   ]);
 };
 
+/**
+ * P49A-13 (A-28): adding a CardDAV connection or swapping its credentials
+ * decides where the user's contacts are exported to, so both take a
+ * server-verified password step-up. Without it a hijacked session could point
+ * an existing two-way sync at an attacker's server and silently receive the
+ * whole address book. The form sends the Kontax password as `currentPassword`;
+ * OAuth-only accounts have none, so the session is the signal (the
+ * `verifyStepUpPassword` convention). Returns an error message, or null.
+ */
+const checkSyncCredentialStepUp = async (
+  userId: string,
+  formData: FormData,
+): Promise<string | null> => {
+  const owner = await db.user.findUnique({ where: { id: userId }, select: { password: true } });
+  if (!owner) return "You must be signed in.";
+  const supplied = formData.get("currentPassword");
+  const stepUp = await verifyStepUpPassword(
+    userId,
+    owner.password,
+    typeof supplied === "string" ? supplied : undefined,
+  );
+  if (stepUp === "OK") return null;
+  if (stepUp === "STEP_UP_REQUIRED") return "Enter your Kontax password to confirm this change.";
+  if (stepUp === "RATE_LIMIT_EXCEEDED") return "Too many password attempts. Try again in an hour.";
+  return "Your Kontax password was incorrect.";
+};
+
 export const createSyncAccount = async (
   _prev: SyncFormState,
   formData: FormData,
@@ -530,6 +558,10 @@ export const createSyncAccount = async (
 
     await assertCanCreateSyncAccount(userId);
     await assertCanUseCardDavSync(userId);
+
+    // P49A-13: before any outbound discovery request is made.
+    const stepUpError = await checkSyncCredentialStepUp(userId, formData);
+    if (stepUpError) return { ok: false, error: stepUpError };
 
     const encryptionStatus = getSyncCredentialEncryptionStatus();
     if (!encryptionStatus.available) {
@@ -891,6 +923,9 @@ export const attachSyncCredentials = async (
     const input = parseAttachSyncCredentialInput(formData);
 
     await assertCanUseCardDavSync(userId);
+
+    const stepUpError = await checkSyncCredentialStepUp(userId, formData);
+    if (stepUpError) return { ok: false, error: stepUpError };
 
     const encryptionStatus = getSyncCredentialEncryptionStatus();
     if (!encryptionStatus.available) {

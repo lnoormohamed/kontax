@@ -180,6 +180,27 @@ export const rateLimiters = {
   // per minute. A visitor loading several tracked content pages in a minute
   // is normal; a scripted flood inflating the counters is not.
   pageViewBeacon: makeLimiter(60, 60, "rl:pv-beacon"),
+
+  // P49A-13: REST API — invalid bearer tokens per IP, 30 per 15 minutes.
+  // Peeked before the token lookup and consumed only on a failed lookup, so a
+  // busy, correctly-configured client never touches it but token spraying is
+  // cut off before it reaches the database.
+  apiAuthFailByIp: makeLimiter(30, 15 * 60, "rl:api-auth-fail-ip"),
+
+  // P49A-13: username availability probe (settings) — 60 per user per hour.
+  // It is session-only now; this stops it being scripted as a directory.
+  usernameCheck: makeLimiter(60, 60 * 60, "rl:username-check"),
+
+  // P49A-13: public card views. One counted view per (IP, card) per 30 minutes
+  // (refreshes and crawlers don't inflate the count), and at most 120 counted
+  // views per IP per hour across all cards, which bounds PublicCardView rows.
+  cardViewPerIpCard: makeLimiter(1, 30 * 60, "rl:card-view-ip-card"),
+  cardViewPerIp: makeLimiter(120, 60 * 60, "rl:card-view-ip"),
+
+  // P49A-13: Kontax archive import (up to 64 MB per upload) — 20 uploads per
+  // user per hour across preview + commit. Concurrency is capped separately
+  // (one in flight per user, per process) in the routes.
+  archiveImport: makeLimiter(20, 60 * 60, "rl:archive-import"),
 } as const;
 
 export interface RateLimitResult {
@@ -235,6 +256,20 @@ export async function checkRateLimit(
     // store outage cannot lock every user out, but make it loud.
     warnThrottled("consume", rejection);
     return { allowed: true, remaining: 0, resetAt: new Date(0) };
+  }
+}
+
+/**
+ * P49A-13: give back one point consumed by `checkRateLimit`. For buckets where
+ * only failures should count (step-up): consume *before* the check so a burst
+ * of concurrent guesses stays bounded by the bucket, then refund on success so
+ * a user who types the right password is never locked out. Never throws.
+ */
+export async function refundRateLimit(limiter: Limiter, identifier: string): Promise<void> {
+  try {
+    await limiter.reward(identifier, 1);
+  } catch (error) {
+    warnThrottled("reward", error);
   }
 }
 

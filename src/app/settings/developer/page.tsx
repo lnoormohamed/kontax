@@ -4,6 +4,7 @@ import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { SettingsPageHead } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 import { getUserBillingContext } from "~/server/billing";
 import { listUserApiTokens } from "~/server/api-tokens";
 import { ApiTokenManager } from "./_components/api-token-manager";
@@ -13,9 +14,10 @@ export default async function DeveloperSettingsPage() {
   if (!session?.user?.id) return redirectToLogin("/settings/developer");
   const userId = session.user.id;
 
-  const [context, tokens] = await Promise.all([
+  const [context, tokens, owner] = await Promise.all([
     getUserBillingContext(userId),
     listUserApiTokens(userId),
+    db.user.findUnique({ where: { id: userId }, select: { password: true } }),
   ]);
 
   const apiEnabled = context.entitlements.apiAccessEnabled;
@@ -62,7 +64,9 @@ export default async function DeveloperSettingsPage() {
           </div>
         </div>
       ) : (
-        <ApiTokenManager tokens={tokens} />
+        // P49A-13: token creation takes a password step-up (OAuth-only
+        // accounts have none to prove — the server lets them through).
+        <ApiTokenManager hasPassword={Boolean(owner?.password)} tokens={tokens} />
       )}
     </>
   );

@@ -160,7 +160,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, incomingShares, syncErrorCount, openMergeSuggestions, labels, projectionBooks, rawAccounts, rawPastAccounts] =
+  const [planSummary, incomingShares, syncErrorCount, openMergeSuggestions, labels, projectionBooks, rawAccounts, rawPastAccounts, owner] =
     await Promise.all([
       getUserPlanSummary(userId),
       db.contactShare.count({
@@ -320,6 +320,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
           },
         },
       }),
+      // P49A-13: the CardDAV credential forms ask for the Kontax password.
+      db.user.findUnique({ where: { id: userId }, select: { password: true } }),
     ]);
 
   // P41-DB01: resolve projection book ids → display data. `books` is the user's
@@ -738,6 +740,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
             flash={flashMsg}
             syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
             upgradeableAtCap={planSummary.plan === "FREE"}
+            hasPassword={Boolean(owner?.password)}
           />
         </div>
       </div>
