@@ -38,6 +38,8 @@ import {
   ContactLimitReachedError,
   isTeamLocked,
 } from "./src/server/dav/plan-entitlements.mjs";
+// P49A-12 (A-17): device edits are local mutations the sync providers receive.
+import { DAV_DEVICE_MUTATION, flagDeviceWriteForSync } from "./src/server/dav/sync-propagation.mjs";
 
 // P48-15: this process is the actual Node entrypoint (`npm start` /
 // `node server.mjs`) — log fatals instead of letting them vanish silently.
@@ -1476,6 +1478,7 @@ const handleFamilyResource = async (req, res, requestUrl) => {
             syncVersion: 1,
             sourceType: "SYNC_CARDDAV",
             sourceDetail: `${familyBook.groupName} (family book)`,
+            ...DAV_DEVICE_MUTATION,
             ...fields,
           },
         });
@@ -1494,15 +1497,19 @@ const handleFamilyResource = async (req, res, requestUrl) => {
         where: { id: existing.id },
         select: { id: true, syncVersion: true },
       });
-      return tx.contact.update({
+      const saved = await tx.contact.update({
         where: { id: current.id },
         data: {
           ...fields,
+          ...DAV_DEVICE_MUTATION,
           syncVersion: (current.syncVersion ?? 0) + 1,
           syncTombstoneAt: null,
           archivedAt: null,
+          deletedAt: null,
         },
       });
+      await flagDeviceWriteForSync(tx, existing);
+      return saved;
     });
     await emitFamilyDavEvent(userId, updated.id, "CONTACT_UPDATED");
     return send(res, 204, null, { ETag: etagForContact(updated) });
@@ -1527,6 +1534,7 @@ const handleFamilyResource = async (req, res, requestUrl) => {
   await prisma.contact.update({
     where: { id: existing.id },
     data: {
+      ...DAV_DEVICE_MUTATION,
       syncTombstoneAt: now,
       archivedAt: existing.archivedAt ?? now,
       syncVersion: existing.syncVersion + 1,
@@ -1694,6 +1702,7 @@ const handleTeamResource = async (req, res, requestUrl) => {
             syncVersion: 1,
             sourceType: "SYNC_CARDDAV",
             sourceDetail: label,
+            ...DAV_DEVICE_MUTATION,
             ...fields,
           },
         });
@@ -1707,14 +1716,20 @@ const handleTeamResource = async (req, res, requestUrl) => {
       return send(res, 201, null, { ETag: etagForContact(created) });
     }
 
-    const updated = await prisma.contact.update({
-      where: { id: existing.id },
-      data: {
-        ...fields,
-        syncVersion: (existing.syncVersion ?? 0) + 1,
-        syncTombstoneAt: null,
-        archivedAt: null,
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const saved = await tx.contact.update({
+        where: { id: existing.id },
+        data: {
+          ...fields,
+          ...DAV_DEVICE_MUTATION,
+          syncVersion: (existing.syncVersion ?? 0) + 1,
+          syncTombstoneAt: null,
+          archivedAt: null,
+          deletedAt: null,
+        },
+      });
+      await flagDeviceWriteForSync(tx, existing);
+      return saved;
     });
     await emitTeamDavEvent(userId, updated.id, "CONTACT_UPDATED", label);
     return send(res, 204, null, { ETag: etagForContact(updated) });
@@ -1739,6 +1754,7 @@ const handleTeamResource = async (req, res, requestUrl) => {
   await prisma.contact.update({
     where: { id: existing.id },
     data: {
+      ...DAV_DEVICE_MUTATION,
       syncTombstoneAt: now,
       archivedAt: existing.archivedAt ?? now,
       syncVersion: existing.syncVersion + 1,
@@ -1955,6 +1971,7 @@ const handleContactResource = async (req, res, requestUrl) => {
             syncUid: uid,
             syncVersion: 1,
             bookId: book.id, // P18-11
+            ...DAV_DEVICE_MUTATION,
             ...fields,
           },
         }),
@@ -1970,17 +1987,22 @@ const handleContactResource = async (req, res, requestUrl) => {
         select: { id: true, syncVersion: true, bookId: true },
       });
 
-      return tx.contact.update({
+      const saved = await tx.contact.update({
         where: { id: current.id },
         data: {
           ...fields,
+          // P49A-12 (A-17): the user's own edit, pushed to linked providers.
+          ...DAV_DEVICE_MUTATION,
           // P48-09: adopt a legacy book-less contact into this book.
           ...(current.bookId === null ? { bookId: book.id } : {}),
           syncVersion: (current.syncVersion ?? 0) + 1,
           syncTombstoneAt: null,
           archivedAt: null,
+          deletedAt: null,
         },
       });
+      await flagDeviceWriteForSync(tx, existing);
+      return saved;
     });
 
     return send(res, 204, null, { ETag: etagForContact(updated) });
@@ -2012,6 +2034,9 @@ const handleContactResource = async (req, res, requestUrl) => {
   await prisma.contact.update({
     where: { id: existing.id },
     data: {
+      // P49A-12: a device delete is the user's own — the providers' push
+      // deletes their copies (the contact is archived + sync-tombstoned).
+      ...DAV_DEVICE_MUTATION,
       syncTombstoneAt: now,
       archivedAt: existing.archivedAt ?? now,
       syncVersion: existing.syncVersion + 1,

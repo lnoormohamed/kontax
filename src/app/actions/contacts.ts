@@ -14,8 +14,10 @@ import {
   mergeContactsForUser,
   undoMergedContactsForUser,
 } from "~/server/contact-merge";
+import { cleanupDeletedContactPhotos, deleteContactsPermanently } from "~/server/contact-deletion";
 import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
+import { markSyncLinksDirty, reviveContactSyncLinks } from "~/server/sync-dirty";
 import { editableContactWhere, getUserFamilyMembership } from "~/server/family-access";
 import { detectBulkContactDelete } from "~/server/notifications";
 import {
@@ -478,19 +480,6 @@ const contactDisplayName = (c: {
   return composed.length > 0 ? composed : "Unnamed contact";
 };
 
-// P46-03: best-effort removal of the Kontax-hosted photo objects behind deleted
-// contacts. Guards against aliasing — a live-share recipient copy or another
-// contact can reference the same avatarUrl — by only deleting objects no
-// surviving Contact row still points at. External (pasted, not-yet-internalized)
-// URLs are never delete-attempted. Runs after the delete has committed.
-const cleanupDeletedContactPhotos = async (avatarUrls: (string | null | undefined)[]) => {
-  const hosted = [...new Set(avatarUrls.filter((u): u is string => Boolean(u) && isKontaxHosted(u)))];
-  for (const url of hosted) {
-    const stillReferenced = await db.contact.count({ where: { avatarUrl: url } });
-    if (stillReferenced === 0) void deleteContactPhoto(url);
-  }
-};
-
 // P22-10: set (or clear) the per-contact reminder lead-time override. Empty /
 // "default" clears it so the contact falls back to User.reminderLeadDays.
 export const setContactReminderOverride = async (formData: FormData) => {
@@ -729,6 +718,8 @@ export const updateContact = async (formData: FormData) => {
         },
       },
     });
+    // P49A-12: the next sync pushes this edit to every linked provider.
+    await markSyncLinksDirty(tx, before.id);
 
     const diffs = computeContactDiff(before, after);
     if (diffs.length > 0) {
@@ -942,6 +933,7 @@ export const updateContactField = async (contactId: string, field: string, rawVa
       where: { id: contactId },
       data,
     });
+    await markSyncLinksDirty(tx, contactId);
     const diffs = computeContactDiff(before, after);
     if (diffs.length > 0) {
       await emitEvent(tx, {
@@ -1066,6 +1058,7 @@ export const updateContactEntries = async (
       syncVersion: { increment: 1 },
     };
     const after = await tx.contact.update({ where: { id: contactId }, data });
+    await markSyncLinksDirty(tx, contactId);
     const diffs = computeContactDiff(before, after);
     if (diffs.length > 0) {
       await emitEvent(tx, {
@@ -1251,7 +1244,13 @@ export const restoreContact = async (formData: FormData) => {
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
-      where: { AND: [editableContactWhere(userId, contactId), { NOT: { archivedAt: null } }] },
+      where: {
+        AND: [
+          editableContactWhere(userId, contactId),
+          // P49A-12: a permanently deleted contact is not in the trash.
+          { NOT: { archivedAt: null }, deletedAt: null },
+        ],
+      },
       data: {
         archivedAt: null,
         syncTombstoneAt: null,
@@ -1261,6 +1260,8 @@ export const restoreContact = async (formData: FormData) => {
       },
     });
     if (result.count > 0) {
+      // P49A-12 (A-20): providers that deleted it get it back.
+      await reviveContactSyncLinks(tx, contactId);
       await emitEvent(tx, {
         userId,
         contactId,
@@ -1289,7 +1290,7 @@ export const restoreContactsBulk = async (formData: FormData) => {
 
   await db.$transaction(async (tx) => {
     const affected = await tx.contact.findMany({
-      where: { id: { in: contactIds }, userId, NOT: { archivedAt: null } },
+      where: { id: { in: contactIds }, userId, NOT: { archivedAt: null }, deletedAt: null },
       select: { id: true },
     });
     if (affected.length === 0) {
@@ -1305,6 +1306,11 @@ export const restoreContactsBulk = async (formData: FormData) => {
         syncVersion: { increment: 1 },
       },
     });
+    // P49A-12 (A-20): providers that deleted them get them back.
+    await reviveContactSyncLinks(
+      tx,
+      affected.map((c) => c.id),
+    );
     await tx.activityEvent.createMany({
       data: affected.map((c) => ({
         userId,
@@ -1368,43 +1374,18 @@ export const deleteContactsBulk = async (formData: FormData) => {
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  const deletedAvatarUrls: (string | null)[] = [];
-  const removedNames = await db.$transaction(async (tx) => {
-    const affected = await tx.contact.findMany({
-      where: { id: { in: contactIds }, userId },
-      select: {
-        id: true, fullName: true, firstName: true, lastName: true, email: true, phone: true,
-        avatarUrl: true,
-      },
-    });
-    if (affected.length === 0) {
-      return [] as string[];
-    }
-    deletedAvatarUrls.push(...affected.map((c) => c.avatarUrl));
-    await tx.contact.deleteMany({
-      where: { id: { in: affected.map((c) => c.id) }, userId },
-    });
-    await tx.activityEvent.createMany({
-      data: affected.map((c) => ({
-        userId,
-        contactId: null,
-        eventType: "CONTACT_DELETED" as const,
-        actor: "USER" as const,
-        payload: {
-          fullName: contactDisplayName(c),
-          ...(c.email ? { email: c.email } : {}),
-          ...(c.phone ? { phone: c.phone } : {}),
-        },
-      })),
-    });
-    return affected.map(contactDisplayName);
-  });
+  // P49A-12 (A-16): a contact still on a sync provider is hidden and purged
+  // once each provider has deleted it — never hard-deleted under its links.
+  const result = await db.$transaction((tx) =>
+    deleteContactsPermanently(tx, { userId, contactIds, actor: "USER", source: "MANUAL" }),
+  );
+  const removedNames = result.names;
 
   // P22-DB05: raise a "bulk contact delete" security alert past the threshold.
   await detectBulkContactDelete(userId, removedNames.length, removedNames);
 
   // P46-03: reclaim the deleted contacts' photo objects (aliasing-guarded).
-  await cleanupDeletedContactPhotos(deletedAvatarUrls);
+  await cleanupDeletedContactPhotos(result.avatarUrls);
 
   revalidateContactViews();
 
@@ -1418,39 +1399,18 @@ export const permanentlyDeleteContact = async (formData: FormData) => {
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  let deletedAvatarUrl: string | null = null;
-  await db.$transaction(async (tx) => {
-    const contact = await tx.contact.findFirst({
-      where: { id: contactId, userId },
-      select: {
-        fullName: true, firstName: true, lastName: true, email: true, phone: true,
-        avatarUrl: true,
-      },
-    });
-    deletedAvatarUrl = contact?.avatarUrl ?? null;
-    const result = await tx.contact.deleteMany({
-      where: { id: contactId, userId },
-    });
-    if (result.count > 0 && contact) {
-      await emitEvent(tx, {
-        userId,
-        contactId: null,
-        eventType: "CONTACT_DELETED",
-        actor: "USER",
-        payload: {
-          fullName:
-            contact.fullName?.trim() ||
-            `${contact.firstName ?? ""} ${contact.lastName ?? ""}`.trim() ||
-            "Unnamed contact",
-          email: contact.email ?? undefined,
-          phone: contact.phone ?? undefined,
-        },
-      });
-    }
-  });
+  // P49A-12 (A-16): see deleteContactsBulk.
+  const result = await db.$transaction((tx) =>
+    deleteContactsPermanently(tx, {
+      userId,
+      contactIds: [contactId],
+      actor: "USER",
+      source: "MANUAL",
+    }),
+  );
 
   // P46-03: reclaim the deleted contact's photo object (aliasing-guarded).
-  await cleanupDeletedContactPhotos([deletedAvatarUrl]);
+  await cleanupDeletedContactPhotos(result.avatarUrls);
 
   revalidateContactViews(contactId);
 

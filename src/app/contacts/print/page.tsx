@@ -30,7 +30,7 @@ export default async function ContactsPrintPage({
 
   const contacts = ids.length
     ? await db.contact.findMany({
-        where: { userId, id: { in: ids } },
+        where: { userId, id: { in: ids }, deletedAt: null },
         orderBy: [{ fullName: "asc" }],
         select: {
           id: true,

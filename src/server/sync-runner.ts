@@ -77,6 +77,7 @@ import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { enqueueMergeSuggestionRefresh } from "~/server/merge-suggestion-refresh-queue";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
+import { LOCAL_MUTATION_SOURCE_TYPES } from "~/server/sync-dirty";
 import {
   createSyncLeaseKeeper,
   decideScheduledRun,
@@ -1364,6 +1365,7 @@ export const runQueuedSyncJobs = async ({
           supportedFieldShadow: true,
           photoShadow: true,
           lastSyncedAt: true,
+          tombstonedAt: true,
           contactId: true,
           contact: {
             select: {
@@ -1493,6 +1495,8 @@ export const runQueuedSyncJobs = async ({
         bookName: string;
         bookDetail: string | null;
       }> = [];
+      // P49A-12: links of archived contacts whose remote card is already gone.
+      const remoteGoneLinkIds: string[] = [];
       const metadataRefreshCandidates: Array<{
         linkId: string;
         remoteHref: string;
@@ -1514,7 +1518,12 @@ export const runQueuedSyncJobs = async ({
 
       // The remote card of a link is gone while the local contact is active.
       const recordRemoteMissing = (link: (typeof existingLinks)[number], remoteUid: string) => {
-        if (link.contact.archivedAt) return;
+        if (link.contact.archivedAt) {
+          // P49A-12 (A-16): deleted on both sides — settle the link so a
+          // permanently deleted contact can be purged.
+          if (!link.tombstonedAt) remoteGoneLinkIds.push(link.id);
+          return;
+        }
         conflictEntries.push({
           type: "DELETE_CONFLICT",
           linkId: link.id,
@@ -1607,7 +1616,8 @@ export const runQueuedSyncJobs = async ({
                 ...contactScopeWhere,
                 archivedAt: null,
                 syncTombstoneAt: null,
-                lastMutatedBy: "MANUAL",
+                // P49A-12 (A-17): any non-sync writer (was MANUAL only).
+                lastMutatedBy: { in: LOCAL_MUTATION_SOURCE_TYPES },
                 syncLinks: { none: { syncAccountId: job.syncAccountId } },
                 ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
               },
@@ -1762,7 +1772,8 @@ export const runQueuedSyncJobs = async ({
         lastSyncedAt: Date;
         capabilityDiagnostics: ProviderCapabilityDiagnostics | null;
       }> = [];
-      const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> = [];
+      const deletedLinkIds: Array<{ linkId: string; lastSyncedAt: Date }> =
+        remoteGoneLinkIds.map((linkId) => ({ linkId, lastSyncedAt: now }));
 
       // P44-04: a full-card PUT with no PHOTO line would wipe the remote photo
       // (and cascade into deleting the local one on the next photo pass).

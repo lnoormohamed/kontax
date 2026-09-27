@@ -374,7 +374,8 @@ export const getContactCapacity = async (client, userId, options = {}) => {
     return { plan: effective.plan, planLabel: effective.planLabel, limit, used: 0, remaining: null };
   }
   /** @type {number} */
-  const used = await client.contact.count({ where: { userId } });
+  // P49A-12: a permanently deleted contact awaiting purge no longer counts.
+  const used = await client.contact.count({ where: { userId, deletedAt: null } });
   return {
     plan: effective.plan,
     planLabel: effective.planLabel,

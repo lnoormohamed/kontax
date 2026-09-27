@@ -36,6 +36,12 @@ import {
   exceedsDeletionThreshold,
 } from "~/server/sync-deletion-guard";
 import { stripExcludedPortableFields } from "~/server/sync-field-exclusions";
+import {
+  clearSyncLinkDirty,
+  linkHasPendingLocalChange,
+  LOCAL_MUTATION_SOURCE_TYPES,
+  pendingLocalChangeWhere,
+} from "~/server/sync-dirty";
 import { buildExportLabelFilterWhere } from "~/server/sync-settings";
 import {
   addImportBatch,
@@ -46,7 +52,6 @@ import {
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
-  isLocalChanged,
   openMutationConflict,
   recordAutoResolved,
   recordSyncLinkError,
@@ -788,14 +793,18 @@ export const pushLocalChangesToMicrosoft = async (
   let conflicts = 0;
   let failed = 0;
 
-  // 1) UPDATES — active, locally-edited contacts already linked. Only genuine
-  //    user edits (lastMutatedBy = MANUAL) to avoid the push/import feedback loop.
+  // 1) UPDATES — active, locally-edited contacts already linked. P49A-12
+  //    (A-17): a link marked dirty by a non-sync writer, or whose contact was
+  //    last written by one after the link last synced; never a contact whose
+  //    last write was a sync re-import (the push/import feedback loop).
+  const selectedAt = new Date();
   const activeLinks = await db.syncContactLink.findMany({
     where: {
       syncAccountId: account.id,
       tombstonedAt: null,
       remoteUid: { not: null },
-      contact: { archivedAt: null, syncTombstoneAt: null, lastMutatedBy: "MANUAL" },
+      contact: { archivedAt: null, syncTombstoneAt: null },
+      ...pendingLocalChangeWhere(),
     },
     select: {
       id: true,
@@ -804,12 +813,13 @@ export const pushLocalChangesToMicrosoft = async (
       remoteETag: true,
       lastSyncedAt: true,
       supportedFieldShadow: true,
-      contact: { select: pushContactSelect },
+      localDirtyAt: true,
+      contact: { select: { ...pushContactSelect, lastMutatedBy: true } },
     },
   });
   for (const link of activeLinks) {
     if (!link.remoteUid) continue;
-    if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
+    if (!linkHasPendingLocalChange(link, link.contact)) continue;
     let result: MicrosoftPushResult;
     try {
       result = await pushMicrosoftContact(
@@ -832,6 +842,10 @@ export const pushLocalChangesToMicrosoft = async (
       failed += 1;
       continue;
     }
+    // Settled unless a MANUAL-policy conflict is waiting for the user.
+    if (result.ok || result.strategy !== "MANUAL") {
+      await clearSyncLinkDirty(db, link.id, selectedAt);
+    }
     if (result.ok) {
       await emitEvent(db, {
         userId: account.userId,
@@ -851,9 +865,10 @@ export const pushLocalChangesToMicrosoft = async (
     }
   }
 
-  // 2) CREATES — user-created local contacts not yet on Outlook. P39-04: the
-  //    export label filter gates these new pushes only — linked contacts keep
-  //    syncing regardless of labels.
+  // 2) CREATES — local contacts not yet on Outlook, last written by a non-sync
+  //    source (P49A-12: web, API, CSV, card import, shares, the CardDAV server
+  //    — it used to be MANUAL only). P39-04: the export label filter gates
+  //    these new pushes only — linked contacts keep syncing regardless of labels.
   const exportLabelWhere = await buildExportLabelFilterWhere(
     account.userId,
     account.exportLabelFilter ?? [],
@@ -863,7 +878,7 @@ export const pushLocalChangesToMicrosoft = async (
       userId: account.userId,
       archivedAt: null,
       syncTombstoneAt: null,
-      lastMutatedBy: "MANUAL",
+      lastMutatedBy: { in: LOCAL_MUTATION_SOURCE_TYPES },
       syncLinks: { none: { syncAccountId: account.id } },
       ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
     },

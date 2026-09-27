@@ -24,7 +24,7 @@ export async function GET(
 
   const { id } = await params;
   const contact = await db.contact.findFirst({
-    where: { id, userId },
+    where: { id, userId, deletedAt: null },
     select: {
       fullName: true,
       firstName: true,

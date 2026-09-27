@@ -35,6 +35,12 @@ import {
   googleUpdateFieldsFor,
   stripExcludedPortableFields,
 } from "~/server/sync-field-exclusions";
+import {
+  clearSyncLinkDirty,
+  linkHasPendingLocalChange,
+  LOCAL_MUTATION_SOURCE_TYPES,
+  pendingLocalChangeWhere,
+} from "~/server/sync-dirty";
 import { buildExportLabelFilterWhere } from "~/server/sync-settings";
 import {
   addImportBatch,
@@ -45,7 +51,6 @@ import {
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
-  isLocalChanged,
   openMutationConflict,
   recordAutoResolved,
   recordSyncLinkError,
@@ -878,16 +883,20 @@ export const pushLocalChangesToGoogle = async (
   let failed = 0;
 
   // 1) UPDATES — active, locally-edited contacts already linked to Google.
-  //    Only genuine user edits (lastMutatedBy = MANUAL): a contact whose last
-  //    write was a sync re-import (SYNC_*) must NOT be pushed back, or we get a
-  //    feedback loop (push -> Google normalises -> re-import bumps updatedAt ->
-  //    looks "dirty" -> push again, forever).
+  //    P49A-12 (A-17): a link is pushed when a non-sync writer (web, API, CSV,
+  //    Kontax's CardDAV server, merge, restore) marked it dirty, or the
+  //    contact's last write came from one after the link last synced. A
+  //    contact whose last write was a sync re-import (SYNC_*) is NOT pushed
+  //    back, or we get a feedback loop (push -> Google normalises -> re-import
+  //    bumps updatedAt -> looks "dirty" -> push again, forever).
+  const selectedAt = new Date();
   const activeLinks = await db.syncContactLink.findMany({
     where: {
       syncAccountId: account.id,
       tombstonedAt: null,
       remoteUid: { not: null },
-      contact: { archivedAt: null, syncTombstoneAt: null, lastMutatedBy: "MANUAL" },
+      contact: { archivedAt: null, syncTombstoneAt: null },
+      ...pendingLocalChangeWhere(),
     },
     select: {
       id: true,
@@ -896,12 +905,13 @@ export const pushLocalChangesToGoogle = async (
       remoteETag: true,
       supportedFieldShadow: true,
       lastSyncedAt: true,
-      contact: { select: pushContactSelect },
+      localDirtyAt: true,
+      contact: { select: { ...pushContactSelect, lastMutatedBy: true } },
     },
   });
   for (const link of activeLinks) {
     if (!link.remoteUid) continue;
-    if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
+    if (!linkHasPendingLocalChange(link, link.contact)) continue;
     let result: GooglePushResult;
     try {
       result = await pushGoogleContact(
@@ -924,6 +934,11 @@ export const pushLocalChangesToGoogle = async (
       failed += 1;
       continue;
     }
+    // Settled unless a MANUAL-policy conflict is waiting for the user (the
+    // change stays pending; resolving the conflict decides what is pushed).
+    if (result.ok || result.strategy !== "MANUAL") {
+      await clearSyncLinkDirty(db, link.id, selectedAt);
+    }
     if (result.ok) {
       await emitEvent(db, {
         userId: account.userId,
@@ -943,10 +958,12 @@ export const pushLocalChangesToGoogle = async (
     }
   }
 
-  // 2) CREATES — user-created local contacts not yet on Google. Restricted to
-  //    MANUAL contacts so we don't propagate contacts imported from other
-  //    sources into Google. P39-04: the export label filter gates these new
-  //    pushes only — linked contacts keep syncing regardless of labels.
+  // 2) CREATES — local contacts not yet on Google. Restricted to contacts last
+  //    written by a non-sync source (P49A-12: web, API, CSV, card import,
+  //    shares, the CardDAV server — it used to be MANUAL only) so contacts
+  //    imported from another provider are not propagated into Google.
+  //    P39-04: the export label filter gates these new pushes only — linked
+  //    contacts keep syncing regardless of labels.
   const exportLabelWhere = await buildExportLabelFilterWhere(
     account.userId,
     account.exportLabelFilter ?? [],
@@ -956,7 +973,7 @@ export const pushLocalChangesToGoogle = async (
       userId: account.userId,
       archivedAt: null,
       syncTombstoneAt: null,
-      lastMutatedBy: "MANUAL",
+      lastMutatedBy: { in: LOCAL_MUTATION_SOURCE_TYPES },
       syncLinks: { none: { syncAccountId: account.id } },
       ...(exportLabelWhere ? { AND: [exportLabelWhere] } : {}),
     },

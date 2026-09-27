@@ -259,7 +259,8 @@ export const getUserPlanSummary = cache(async (userId: string) => {
 
   const [contactsUsed, importsThisMonth, syncAccountsUsed, appPasswordsUsed] =
     await Promise.all([
-      db.contact.count({ where: { userId } }),
+      // P49A-12: a permanently deleted contact awaiting purge no longer counts.
+      db.contact.count({ where: { userId, deletedAt: null } }),
       db.importJob.count({ where: importsThisMonthWhere(userId) }),
       countLiveSyncAccountSlots(userId),
       db.appPassword.count({ where: { userId } }),
@@ -441,7 +442,7 @@ const getUserPlanSummaryTx = async (tx: TxClient, userId: string) => {
 
   const [contactsUsed, importsThisMonth, syncAccountsUsed, appPasswordsUsed] =
     await Promise.all([
-      tx.contact.count({ where: { userId } }),
+      tx.contact.count({ where: { userId, deletedAt: null } }),
       tx.importJob.count({ where: importsThisMonthWhere(userId) }),
       tx.syncAccount.count({ where: liveSyncAccountWhere(userId) }),
       tx.appPassword.count({ where: { userId } }),

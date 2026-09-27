@@ -42,9 +42,10 @@ export async function GET(request: Request) {
   try {
     const contacts = await db.contact.findMany({
       where: selectedIds.length > 0
-        ? { userId, id: { in: selectedIds } }
+        ? { userId, id: { in: selectedIds }, deletedAt: null }
         : {
         userId,
+        deletedAt: null, // P49A-12: a deleted contact awaiting purge is gone
         ...(includeArchived ? {} : { archivedAt: null }),
         ...(query
           ? {
@@ -173,9 +174,10 @@ export async function POST(request: Request) {
   try {
     const contacts = await db.contact.findMany({
       where: selectedIds.length > 0
-        ? { userId, id: { in: selectedIds } }
+        ? { userId, id: { in: selectedIds }, deletedAt: null }
         : {
             userId,
+            deletedAt: null, // P49A-12
             ...(includeArchived ? {} : { archivedAt: null }),
             ...(query
               ? {

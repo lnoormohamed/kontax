@@ -71,7 +71,8 @@ function billingSummary(
 export async function generateDataExport(userId: string, includeArchived = false): Promise<Buffer> {
   const [contacts, activityEvents, subscription, user] = await Promise.all([
     db.contact.findMany({
-      where: { userId, ...(includeArchived ? {} : { archivedAt: null }) },
+      // P49A-12: a permanently deleted contact awaiting purge is not exported.
+      where: { userId, deletedAt: null, ...(includeArchived ? {} : { archivedAt: null }) },
       select: CONTACT_SELECT,
       orderBy: { fullName: "asc" },
     }),

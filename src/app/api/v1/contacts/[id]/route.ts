@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { movePrimaryMembership } from "~/server/contact-book-membership";
+import { deleteContactsPermanently } from "~/server/contact-deletion";
 import { db } from "~/server/db";
+import { markSyncLinksDirty } from "~/server/sync-dirty";
 import { emitEvent } from "~/lib/activity";
 import { corsHeaders } from "~/lib/api-cors";
 import { API_CONTACT_SELECT, formatContactForApi, mapUpdateInputToDb } from "../../_lib/contact-mapper";
@@ -21,7 +23,8 @@ export async function GET(req: NextRequest, { params }: Params) {
     const { id } = await params;
 
     const contact = await db.contact.findFirst({
-      where: { id, userId },
+      // P49A-12: a permanently deleted contact awaiting purge is gone.
+      where: { id, userId, deletedAt: null },
       select: API_CONTACT_SELECT,
     });
 
@@ -99,6 +102,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
         select: API_CONTACT_SELECT,
       });
       if (movedBookId) await movePrimaryMembership(tx, id, movedBookId);
+      // P49A-12 (A-17): an API edit reaches the linked sync providers.
+      await markSyncLinksDirty(tx, id);
       await emitEvent(tx, {
         userId,
         contactId: id,
@@ -124,7 +129,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     const permanent = new URL(req.url).searchParams.get("permanent") === "true";
 
     const contact = await db.contact.findFirst({
-      where: { id, userId },
+      where: { id, userId, deletedAt: null },
       select: { id: true, fullName: true, email: true, phone: true },
     });
 
@@ -136,29 +141,28 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     }
 
     if (permanent) {
-      await db.$transaction(async (tx) => {
-        await tx.contact.delete({ where: { id } });
-        await emitEvent(tx, {
-          userId,
-          contactId: null,
-          eventType: "CONTACT_DELETED",
-          actor: "API",
-          payload: {
-            fullName: contact.fullName,
-            email: contact.email ?? undefined,
-            phone: contact.phone ?? undefined,
-          },
-        });
-      });
+      // P49A-12 (A-16): a contact still on a sync provider is hidden and purged
+      // once each provider has deleted it — never hard-deleted under its links.
+      await db.$transaction((tx) =>
+        deleteContactsPermanently(tx, { userId, contactIds: [id], actor: "API", source: "API" }),
+      );
       return new NextResponse(null, { status: 204 });
     }
 
     // Soft delete — archive
     await db.$transaction(async (tx) => {
+      const now = new Date();
       await tx.contact.update({
         where: { id },
         // P49A-02 (A-18): bump the CardDAV ETag so devices see the change.
-        data: { archivedAt: new Date(), lastMutatedBy: "API", syncVersion: { increment: 1 } },
+        // P49A-12: sync-tombstoned like a web archive, so every provider
+        // deletes its copy on the next push.
+        data: {
+          archivedAt: now,
+          syncTombstoneAt: now,
+          lastMutatedBy: "API",
+          syncVersion: { increment: 1 },
+        },
       });
       await emitEvent(tx, {
         userId,

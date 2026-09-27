@@ -275,6 +275,8 @@ const stub: Record<string, unknown> = {
     updateMany: async () => ({ count: 0 }),
   },
   activityEvent: { createMany: async () => ({ count: 0 }) },
+  // P49A-12: edits mark the contact's sync links dirty (none in these tests).
+  syncContactLink: { updateMany: async () => ({ count: 0 }) },
   syncAccount: { count: async () => 0 },
   appPassword: { count: async () => 0 },
   $queryRaw: async () => [],

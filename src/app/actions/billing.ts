@@ -171,7 +171,7 @@ export async function getDowngradeSummary(): Promise<
     db.contactShare.count({
       where: { recipientUserId: userId, shareType: "LIVE_SYNC", status: "ACTIVE" },
     }),
-    db.contact.count({ where: { userId } }),
+    db.contact.count({ where: { userId, deletedAt: null } }),
     db.groupMember.findFirst({
       where: { userId, inviteStatus: "ACCEPTED", role: "OWNER" },
       select: { group: { select: { type: true, _count: { select: { members: true } } } } },

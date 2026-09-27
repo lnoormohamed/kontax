@@ -8,7 +8,8 @@ import { SRC } from "../_content/sources";
 
 // P50A-06 · Guide 1. Kontax behaviour checked against the code (2026-09-25):
 // Google and CardDAV pushes only send contacts last changed in Kontax
-// (lastMutatedBy MANUAL — src/server/google-sync.ts, src/server/sync-runner.ts),
+// (web, API, import or a device via Kontax's CardDAV — never a sync import;
+// P49A-12 src/server/sync-dirty.ts, google-sync.ts, sync-runner.ts),
 // so Kontax does not copy a whole Google list into iCloud; Free = 1 sync source,
 // Pro = 5 (src/server/dav/plan-entitlements.mjs).
 

@@ -34,6 +34,7 @@ import {
   omitExcludedContactWriteData,
   stripExcludedPortableFields,
 } from "~/server/sync-field-exclusions";
+import { linkHasPendingLocalChange } from "~/server/sync-dirty";
 import { MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
 import { recordOpenSyncConflict } from "~/server/sync-job-lifecycle";
 import {
@@ -151,6 +152,7 @@ export const linkedContactSelect = {
   capabilityProfileId: true,
   supportedFieldShadow: true,
   lastSyncedAt: true,
+  localDirtyAt: true,
   contact: {
     select: {
       ...contactConflictSelect,
@@ -235,6 +237,8 @@ export const applyRemoteToContact = async (
         supportedFieldShadow: supportedFieldShadow,
         remoteDeletedAt: null,
         tombstonedAt: null,
+        // P49A-12: the remote version won — nothing local left to push here.
+        localDirtyAt: null,
         lastErrorCode: null,
         lastErrorMessage: null,
         // P49A-01 (A-05): anchor to the contact's own updatedAt, which this
@@ -683,8 +687,10 @@ export const importRemoteContactBatch = async (
     // No remote change — anchor the link's sync marker to this pull. P49A-01
     // (A-07): except for a user edit still waiting to be pushed (its push
     // failed earlier in this run): anchoring it would silently drop it from
-    // the next run's push queue.
-    const pendingPush = localSupportedChanged && link.contact.lastMutatedBy === "MANUAL";
+    // the next run's push queue. P49A-12 (A-17): any non-sync edit counts
+    // (API, CSV, the CardDAV server…), not only MANUAL.
+    const pendingPush =
+      localSupportedChanged && linkHasPendingLocalChange(link, link.contact);
     await db.syncContactLink.update({
       where: { id: link.id },
       data: {

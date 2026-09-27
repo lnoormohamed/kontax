@@ -67,6 +67,7 @@ export async function loadExportableContacts(userId: string, filter: ExportConta
       where: {
         userId,
         mergedIntoContactId: null,
+        deletedAt: null, // P49A-12
         ...(filter.includeArchived ? {} : { archivedAt: null }),
         ...(filter.ids && filter.ids.length > 0 ? { id: { in: filter.ids } } : {}),
         // P40-06: filter by membership so a multi-book contact exports under any

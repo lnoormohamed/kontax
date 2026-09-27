@@ -2,6 +2,7 @@ import { Prisma } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
 import { copyMultiValueWriteData } from "~/server/contact-multi-values";
 import { db } from "~/server/db";
+import { markSyncLinksDirty } from "~/server/sync-dirty";
 
 // Fields pushed to a live recipient's copy on propagation. Excludes `notes`
 // (the recipient's private notes stay local) and `isFavorite` / source columns
@@ -157,6 +158,8 @@ export const propagateLiveShares = async (ownerUserId: string, contactId: string
             syncVersion: { increment: 1 },
           },
         });
+        // P49A-12 (A-17): the recipient's own sync providers receive the update.
+        await markSyncLinksDirty(tx, recipientContactId);
         await tx.contactShare.update({
           where: { id: share.id },
           data: { lastPushedAt: new Date(), lastErrorAt: null, lastErrorCode: null },

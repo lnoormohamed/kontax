@@ -534,6 +534,11 @@ model Contact {
   lastMutatedBy            SourceType              @default(MANUAL)
   lastMutatedByDetail      String?
   archivedAt               DateTime?
+  // P49A-12 (A-16): "Delete permanently" on a contact whose copies still exist
+  // on a sync provider. The row stays (archived + sync-tombstoned, hidden from
+  // every view including the trash) until each link has pushed its remote
+  // delete, then src/server/contact-deletion.ts purges it. null = not deleted.
+  deletedAt                DateTime?
   // P18-11: address book grouping (nullable for safe migration; backfilled to default book)
   bookId                   String?
   book                     AddressBook?            @relation(fields: [bookId], references: [id], onDelete: SetNull)
@@ -558,6 +563,8 @@ model Contact {
   @@index([importJobId])
   @@index([mergedIntoContactId])
   @@index([bookId, archivedAt, fullName])
+  // P49A-12: the purge sweep scans for deleted rows.
+  @@index([deletedAt])
   // P38-06: GIN index over the trigger-maintained search vector. Declared so
   // `prisma db push` (which runs on deploy) does not drop it as drift.
   @@index([searchVector], type: Gin)
@@ -1039,6 +1046,10 @@ model SyncContactLink {
   lastSyncedAt         DateTime?
   tombstonedAt         DateTime?
   remoteDeletedAt      DateTime?
+  // P49A-12 (A-17): "dirty since last sync" — stamped by every non-sync writer
+  // (web, API, CSV, CardDAV server, merge, restore) when it changes the contact;
+  // cleared by the provider push that carries the change. null = clean.
+  localDirtyAt         DateTime?
   lastErrorCode        String?
   lastErrorMessage     String?
   createdAt            DateTime       @default(now())

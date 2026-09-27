@@ -28,7 +28,7 @@ export default async function NewContactPage({
       getUserPlanSummary(userId),
       db.contact.count({ where: { userId, archivedAt: null } }),
       db.contact.count({ where: { userId, archivedAt: null, isFavorite: true } }),
-      db.contact.count({ where: { userId, NOT: { archivedAt: null } } }),
+      db.contact.count({ where: { userId, NOT: { archivedAt: null }, deletedAt: null } }),
       db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
     ]);
 

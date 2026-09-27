@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { mergeContactsForUser } from "~/server/contact-merge";
+import { markSyncLinksDirty } from "~/server/sync-dirty";
 
 // P28-04: bulk field edits applied to a selection of contacts. Archive / delete
 // / restore stay in ~/app/actions/contacts (they emit activity + security
@@ -27,9 +28,20 @@ export async function setCompanyBulk(input: {
   if (ids.length === 0) return;
   const company = input.company.trim().slice(0, 200);
 
-  await db.contact.updateMany({
-    where: { id: { in: ids }, userId },
-    data: { company: company || null, ...SYNC_TOUCH },
+  await db.$transaction(async (tx) => {
+    const owned = await tx.contact.findMany({
+      where: { id: { in: ids }, userId },
+      select: { id: true },
+    });
+    await tx.contact.updateMany({
+      where: { id: { in: owned.map((c) => c.id) } },
+      data: { company: company || null, ...SYNC_TOUCH },
+    });
+    // P49A-12 (A-17): the next sync pushes the new company to linked providers.
+    await markSyncLinksDirty(
+      tx,
+      owned.map((c) => c.id),
+    );
   });
   revalidatePath("/contacts");
 }

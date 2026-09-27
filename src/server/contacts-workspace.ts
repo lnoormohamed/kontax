@@ -377,6 +377,8 @@ const privateBranch = (args: BranchArgs): Prisma.Sql => {
     FROM "Contact" c
     WHERE c."userId" = ${scope.userId}
       AND c."archivedAt" IS ${archived ? Prisma.sql`NOT NULL` : Prisma.sql`NULL`}
+      -- P49A-12: a permanently deleted contact awaiting purge is not in the trash
+      AND c."deletedAt" IS NULL
       -- archived view matches the legacy query: no group exclusion there
       AND ${archived ? Prisma.sql`true` : Prisma.sql`NOT EXISTS (SELECT 1 FROM "GroupContact" gc WHERE gc."contactId" = c.id)`}
       AND ${bookFilter}
@@ -554,7 +556,7 @@ export async function getWorkspaceCounts(
       ) AS private_people,
       count(*) FILTER (WHERE c."archivedAt" IS NULL AND c."isFavorite") AS favorites,
       count(*) FILTER (WHERE c."archivedAt" IS NULL AND c."isEmergency") AS emergency,
-      count(*) FILTER (WHERE c."archivedAt" IS NOT NULL) AS archived,
+      count(*) FILTER (WHERE c."archivedAt" IS NOT NULL AND c."deletedAt" IS NULL) AS archived,
       ${sharedCount} AS shared_people,
       (
         SELECT count(*) FROM "ContactShare" cs

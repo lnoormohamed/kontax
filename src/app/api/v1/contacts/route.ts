@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
       where: {
         userId,
         ...(archived ? { NOT: { archivedAt: null } } : { archivedAt: null }),
+        // P49A-12: a permanently deleted contact awaiting purge is not listed.
+        deletedAt: null,
         // P40-06: filter by membership (a contact can live in several books).
         ...(bookId ? { bookMemberships: { some: { addressBookId: bookId } } } : {}),
         ...(q

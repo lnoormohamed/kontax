@@ -292,6 +292,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const contact = await db.contact.findFirst({
     where: {
       id,
+      // P49A-12: a permanently deleted contact awaiting purge is gone.
+      deletedAt: null,
       OR: [
         { userId: session.user.id },
         ...(accessibleBookIds.length > 0
@@ -356,7 +358,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       getUserPlanSummary(session.user.id),
       db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
       db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
-      db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
+      db.contact.count({
+        where: { userId: session.user.id, NOT: { archivedAt: null }, deletedAt: null },
+      }),
       db.mergeSuggestion.count({ where: { userId: session.user.id, status: "OPEN" } }),
       db.user.findUnique({ where: { id: session.user.id }, select: { reminderLeadDays: true } }),
       db.label.findMany({ where: { userId: session.user.id }, select: { name: true, color: true } }),
