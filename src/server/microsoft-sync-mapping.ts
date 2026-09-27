@@ -6,6 +6,7 @@
 // NOTE: the real Graph contact resource exposes phone numbers as
 // homePhones[] / businessPhones[] / mobilePhone (not the single typed `phones`
 // array in the brief's pseudocode), so we map those actual fields.
+import type { MultiValueFamily } from "~/server/contact-multi-values";
 import type {
   AddressEntry,
   MappedContact,
@@ -123,6 +124,22 @@ const buildFullName = (
 
 // ── Graph → Kontax ───────────────────────────────────────────────────────────
 
+// P49A-10 (A-19): Graph returns every $select-ed property, empty ones as `[]` /
+// `null`, so a family whose keys are all missing from the JSON was not part of
+// this payload — it is reported as omitted and left untouched locally, while a
+// present-but-empty one clears the local list.
+const GRAPH_FAMILY_KEYS: Record<MultiValueFamily, Array<keyof GraphContact>> = {
+  emails: ["emailAddresses"],
+  phones: ["mobilePhone", "businessPhones", "homePhones"],
+  addresses: ["homeAddress", "businessAddress", "otherAddress"],
+  websites: ["businessHomePage"],
+};
+
+const omittedGraphFamilies = (contact: GraphContact): MultiValueFamily[] =>
+  (Object.keys(GRAPH_FAMILY_KEYS) as MultiValueFamily[]).filter((family) =>
+    GRAPH_FAMILY_KEYS[family].every((key) => !(key in contact)),
+  );
+
 export const mapGraphContactToKontax = (
   contact: GraphContact,
 ): MappedContact | null => {
@@ -196,6 +213,7 @@ export const mapGraphContactToKontax = (
     notes: blankToNull(contact.personalNotes),
     relatedPeople: [],
     customFields,
+    omittedFamilies: omittedGraphFamilies(contact),
   };
 };
 

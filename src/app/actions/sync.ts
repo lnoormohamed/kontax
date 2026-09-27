@@ -19,10 +19,15 @@ import {
 } from "~/server/billing";
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
 import {
-  parseContactDateEntries,
-  parseContactPostalAddresses,
-  parseContactStringArray,
-} from "~/server/contact-portability";
+  copyMultiValueWriteData,
+  type MultiValueEntries,
+  type MultiValueFields,
+  multiValueWriteData,
+  readMultiValueEntries,
+  readMultiValueFields,
+  snapshotMultiValueWriteData,
+} from "~/server/contact-multi-values";
+import { parseContactDateEntries } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { SYNC_ACCOUNT_ACTIVE_STATUSES } from "~/lib/sync-account-status";
@@ -343,26 +348,27 @@ const toPortableSyncContact = (contact: {
   namePrefix: contact.namePrefix,
   nameSuffix: contact.nameSuffix,
   nickname: contact.nickname,
-  email: contact.email,
-  emailAddresses: parseContactStringArray(contact.emailAddresses),
-  emailEntries: parseValueEntries(contact.emailEntries),
-  phone: contact.phone,
-  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-  phoneEntries: parseValueEntries(contact.phoneEntries),
+  // P49A-10: entries through the canonical reader; legacy keys re-derived.
+  ...portableMultiValues(readMultiValueFields(contact)),
   company: contact.company,
   department: contact.department,
   jobTitle: contact.jobTitle,
-  website: contact.website,
-  websiteEntries: parseValueEntries(contact.websiteEntries),
   birthday: contact.birthday,
   significantDates: parseContactDateEntries(contact.significantDates),
-  address: contact.address,
-  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-  addressEntries: parseAddressEntries(contact.addressEntries),
   notes: contact.notes,
 });
 
-const buildContactWriteDataFromRemoteSnapshot = (
+// Multi-value fields in the portable shape the CardDAV push / shadow code
+// expects (address entries in the push vocabulary).
+const portableMultiValues = (fields: MultiValueFields) => ({
+  ...fields,
+  emailEntries: parseValueEntries(fields.emailEntries),
+  phoneEntries: parseValueEntries(fields.phoneEntries),
+  websiteEntries: parseValueEntries(fields.websiteEntries),
+  addressEntries: parseAddressEntries(fields.addressEntries),
+});
+
+const buildRemoteSnapshotBase = (
   snapshot: unknown,
   profile: SyncProviderCapabilityProfile,
 ) => {
@@ -375,13 +381,6 @@ const buildContactWriteDataFromRemoteSnapshot = (
   if (!fullName) {
     throw new Error("Remote sync snapshot does not contain a valid contact name.");
   }
-
-  const emailAddresses = Array.isArray(snapshot.emailAddresses)
-    ? snapshot.emailAddresses.filter((value): value is string => typeof value === "string")
-    : [];
-  const phoneNumbers = Array.isArray(snapshot.phoneNumbers)
-    ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
-    : [];
 
   // P44-05: only touch avatarUrl when the snapshot carries it (newer conflicts);
   // pre-P44-05 snapshots omit it → the local photo is left untouched.
@@ -399,34 +398,46 @@ const buildContactWriteDataFromRemoteSnapshot = (
     namePrefix: typeof snapshot.namePrefix === "string" ? snapshot.namePrefix : null,
     nameSuffix: typeof snapshot.nameSuffix === "string" ? snapshot.nameSuffix : null,
     nickname: typeof snapshot.nickname === "string" ? snapshot.nickname : null,
-    email: emailAddresses[0] ?? (typeof snapshot.email === "string" ? snapshot.email : null),
-    emailAddresses: emailAddresses.length > 0 ? emailAddresses : undefined,
-    emailEntries: Array.isArray(snapshot.emailEntries) ? snapshot.emailEntries : undefined,
-    phone: phoneNumbers[0] ?? (typeof snapshot.phone === "string" ? snapshot.phone : null),
-    phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
-    phoneEntries: Array.isArray(snapshot.phoneEntries) ? snapshot.phoneEntries : undefined,
     company: typeof snapshot.company === "string" ? snapshot.company : null,
     department: typeof snapshot.department === "string" ? snapshot.department : null,
     jobTitle: typeof snapshot.jobTitle === "string" ? snapshot.jobTitle : null,
-    website: typeof snapshot.website === "string" ? snapshot.website : null,
-    websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
     birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
-    address: typeof snapshot.address === "string" ? snapshot.address : null,
-    postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
-    addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
     notes: typeof snapshot.notes === "string" ? snapshot.notes : null,
   };
 
   if (providerSupportsSignificantDates(profile)) {
     return {
-      ...writeData,
-      significantDates: Array.isArray(snapshot.significantDates)
-        ? snapshot.significantDates
-        : undefined,
+      snapshot,
+      writeData: {
+        ...writeData,
+        significantDates: Array.isArray(snapshot.significantDates)
+          ? snapshot.significantDates
+          : undefined,
+      },
     };
   }
 
-  return writeData;
+  return { snapshot, writeData };
+};
+
+// "Keep remote" write data. P49A-10 (A-19): the snapshot's typed entries with
+// legacy columns derived; a family the snapshot carries but left empty (a
+// phone deleted remotely) clears locally instead of being skipped.
+const buildContactWriteDataFromRemoteSnapshot = (
+  snapshot: unknown,
+  profile: SyncProviderCapabilityProfile,
+) => {
+  const base = buildRemoteSnapshotBase(snapshot, profile);
+  return { ...base.writeData, ...snapshotMultiValueWriteData(base.snapshot) };
+};
+
+// The same snapshot as a portable contact, for the supported-field shadow.
+const buildPortableFromRemoteSnapshot = (
+  snapshot: unknown,
+  profile: SyncProviderCapabilityProfile,
+) => {
+  const base = buildRemoteSnapshotBase(snapshot, profile);
+  return { ...base.writeData, ...portableMultiValues(readMultiValueFields(base.snapshot)) };
 };
 
 const getSnapshotStringValue = (snapshot: unknown, key: string) => {
@@ -438,28 +449,6 @@ const getSnapshotStringValue = (snapshot: unknown, key: string) => {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 };
 
-const getSnapshotStringList = (snapshot: unknown, listKey: string, fallbackKey?: string) => {
-  if (!isRecord(snapshot)) {
-    return [];
-  }
-
-  const listValue = snapshot[listKey];
-  const list = Array.isArray(listValue)
-    ? listValue.filter((value): value is string => typeof value === "string" && value.trim().length > 0)
-    : [];
-
-  if (list.length > 0) {
-    return list;
-  }
-
-  if (!fallbackKey) {
-    return [];
-  }
-
-  const fallback = snapshot[fallbackKey];
-  return typeof fallback === "string" && fallback.trim().length > 0 ? [fallback.trim()] : [];
-};
-
 const getSnapshotObjectList = (snapshot: unknown, key: string) => {
   if (!isRecord(snapshot)) {
     return [];
@@ -467,30 +456,6 @@ const getSnapshotObjectList = (snapshot: unknown, key: string) => {
 
   const value = snapshot[key];
   return Array.isArray(value) ? value.filter((item) => isRecord(item)) : [];
-};
-
-const mergeUniqueStrings = (...lists: string[][]) => {
-  const seen = new Set<string>();
-  const values: string[] = [];
-
-  for (const list of lists) {
-    for (const item of list) {
-      const normalized = item.trim();
-      if (!normalized) {
-        continue;
-      }
-
-      const key = normalized.toLowerCase();
-      if (seen.has(key)) {
-        continue;
-      }
-
-      seen.add(key);
-      values.push(normalized);
-    }
-  }
-
-  return values;
 };
 
 const mergeUniqueObjects = (localValues: Record<string, unknown>[], remoteValues: Record<string, unknown>[]) => {
@@ -521,6 +486,13 @@ const mergeNotesValue = (localValue: string | null, remoteValue: string | null) 
   return local ?? remote ?? null;
 };
 
+// Local entries first (they keep primacy), then remote ones not already
+// present; label + value repeats collapse in the canonical normaliser.
+const mergeEntryLists = <T extends { isPrimary: boolean }>(local: T[], remote: T[]): T[] => [
+  ...local,
+  ...remote.map((entry) => ({ ...entry, isPrimary: local.length === 0 && entry.isPrimary })),
+];
+
 const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unknown) => {
   const fullName =
     getSnapshotStringValue(localSnapshot, "fullName") ??
@@ -530,35 +502,17 @@ const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unkno
     throw new Error("Manual merge needs at least one valid contact name.");
   }
 
-  const emailAddresses = mergeUniqueStrings(
-    getSnapshotStringList(localSnapshot, "emailAddresses", "email"),
-    getSnapshotStringList(remoteSnapshot, "emailAddresses", "email"),
-  );
-  const phoneNumbers = mergeUniqueStrings(
-    getSnapshotStringList(localSnapshot, "phoneNumbers", "phone"),
-    getSnapshotStringList(remoteSnapshot, "phoneNumbers", "phone"),
-  );
-  const postalAddresses = mergeUniqueObjects(
-    getSnapshotObjectList(localSnapshot, "postalAddresses"),
-    getSnapshotObjectList(remoteSnapshot, "postalAddresses"),
-  );
-
-  const emailEntries = mergeUniqueObjects(
-    getSnapshotObjectList(localSnapshot, "emailEntries"),
-    getSnapshotObjectList(remoteSnapshot, "emailEntries"),
-  );
-  const phoneEntries = mergeUniqueObjects(
-    getSnapshotObjectList(localSnapshot, "phoneEntries"),
-    getSnapshotObjectList(remoteSnapshot, "phoneEntries"),
-  );
-  const websiteEntries = mergeUniqueObjects(
-    getSnapshotObjectList(localSnapshot, "websiteEntries"),
-    getSnapshotObjectList(remoteSnapshot, "websiteEntries"),
-  );
-  const addressEntries = mergeUniqueObjects(
-    getSnapshotObjectList(localSnapshot, "addressEntries"),
-    getSnapshotObjectList(remoteSnapshot, "addressEntries"),
-  );
+  // P49A-10: merge the typed entries of both sides (read through the canonical
+  // reader, so a pre-P49A-10 snapshot's legacy values count too); the legacy
+  // columns are derived from the merged entries, never merged separately.
+  const local = readMultiValueEntries(isRecord(localSnapshot) ? localSnapshot : {});
+  const remote = readMultiValueEntries(isRecord(remoteSnapshot) ? remoteSnapshot : {});
+  const multiValues: MultiValueEntries = {
+    emailEntries: mergeEntryLists(local.emailEntries, remote.emailEntries),
+    phoneEntries: mergeEntryLists(local.phoneEntries, remote.phoneEntries),
+    addressEntries: mergeEntryLists(local.addressEntries, remote.addressEntries),
+    websiteEntries: mergeEntryLists(local.websiteEntries, remote.websiteEntries),
+  };
   const significantDates = mergeUniqueObjects(
     getSnapshotObjectList(localSnapshot, "significantDates"),
     getSnapshotObjectList(remoteSnapshot, "significantDates"),
@@ -584,12 +538,7 @@ const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unkno
     nickname:
       getSnapshotStringValue(localSnapshot, "nickname") ??
       getSnapshotStringValue(remoteSnapshot, "nickname"),
-    email: emailAddresses[0] ?? null,
-    emailAddresses: emailAddresses.length > 0 ? emailAddresses : undefined,
-    emailEntries: emailEntries.length > 0 ? emailEntries : undefined,
-    phone: phoneNumbers[0] ?? null,
-    phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
-    phoneEntries: phoneEntries.length > 0 ? phoneEntries : undefined,
+    multiValues,
     company:
       getSnapshotStringValue(localSnapshot, "company") ??
       getSnapshotStringValue(remoteSnapshot, "company"),
@@ -599,19 +548,10 @@ const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unkno
     jobTitle:
       getSnapshotStringValue(localSnapshot, "jobTitle") ??
       getSnapshotStringValue(remoteSnapshot, "jobTitle"),
-    website:
-      getSnapshotStringValue(localSnapshot, "website") ??
-      getSnapshotStringValue(remoteSnapshot, "website"),
-    websiteEntries: websiteEntries.length > 0 ? websiteEntries : undefined,
     birthday:
       getSnapshotStringValue(localSnapshot, "birthday") ??
       getSnapshotStringValue(remoteSnapshot, "birthday"),
     significantDates: significantDates.length > 0 ? significantDates : undefined,
-    address:
-      getSnapshotStringValue(localSnapshot, "address") ??
-      getSnapshotStringValue(remoteSnapshot, "address"),
-    postalAddresses: postalAddresses.length > 0 ? postalAddresses : undefined,
-    addressEntries: addressEntries.length > 0 ? addressEntries : undefined,
     notes: mergeNotesValue(
       getSnapshotStringValue(localSnapshot, "notes"),
       getSnapshotStringValue(remoteSnapshot, "notes"),
@@ -1878,7 +1818,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           remoteETag: conflict.remoteETag,
           capabilityProfileId: capabilityProfile.id,
           supportedFieldShadow: buildProviderSupportedContactShadow(
-            buildContactWriteDataFromRemoteSnapshot(
+            buildPortableFromRemoteSnapshot(
               conflict.remoteSnapshot,
               capabilityProfile,
             ),
@@ -1920,17 +1860,13 @@ export const resolveSyncConflict = async (formData: FormData) => {
           namePrefix: localContact.namePrefix,
           nameSuffix: localContact.nameSuffix,
           nickname: localContact.nickname,
-          email: localContact.email,
-          emailAddresses: parseContactStringArray(localContact.emailAddresses),
-          phone: localContact.phone,
-          phoneNumbers: parseContactStringArray(localContact.phoneNumbers),
+          // P49A-10: the copy carries the typed entries (it used to copy only
+          // the legacy columns, losing every label).
+          ...copyMultiValueWriteData(localContact),
           company: localContact.company,
           jobTitle: localContact.jobTitle,
-          website: localContact.website,
           birthday: localContact.birthday,
           significantDates: parseContactDateEntries(localContact.significantDates),
-          address: localContact.address,
-          postalAddresses: parseContactPostalAddresses(localContact.postalAddresses),
           notes: localContact.notes,
         },
       });
@@ -1958,7 +1894,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
           remoteETag: conflict.remoteETag,
           capabilityProfileId: capabilityProfile.id,
           supportedFieldShadow: buildProviderSupportedContactShadow(
-            buildContactWriteDataFromRemoteSnapshot(
+            buildPortableFromRemoteSnapshot(
               conflict.remoteSnapshot,
               capabilityProfile,
             ),
@@ -2019,6 +1955,7 @@ export const resolveSyncConflict = async (formData: FormData) => {
       conflict.localSnapshot,
       conflict.remoteSnapshot,
     );
+    const mergedMultiValues = portableMultiValues(readMultiValueFields(mergedWriteData.multiValues));
 
     await db.contact.update({
       where: { id: conflict.contactId },
@@ -2030,22 +1967,12 @@ export const resolveSyncConflict = async (formData: FormData) => {
         namePrefix: mergedWriteData.namePrefix,
         nameSuffix: mergedWriteData.nameSuffix,
         nickname: mergedWriteData.nickname,
-        email: mergedWriteData.email,
-        emailAddresses: mergedWriteData.emailAddresses,
-        emailEntries: mergedWriteData.emailEntries as Prisma.InputJsonValue | undefined,
-        phone: mergedWriteData.phone,
-        phoneNumbers: mergedWriteData.phoneNumbers,
-        phoneEntries: mergedWriteData.phoneEntries as Prisma.InputJsonValue | undefined,
+        ...multiValueWriteData(mergedWriteData.multiValues),
         company: mergedWriteData.company,
         department: mergedWriteData.department,
         jobTitle: mergedWriteData.jobTitle,
-        website: mergedWriteData.website,
-        websiteEntries: mergedWriteData.websiteEntries as Prisma.InputJsonValue | undefined,
         birthday: mergedWriteData.birthday,
         significantDates: mergedWriteData.significantDates as Prisma.InputJsonValue | undefined,
-        address: mergedWriteData.address,
-        postalAddresses: mergedWriteData.postalAddresses as Prisma.InputJsonValue | undefined,
-        addressEntries: mergedWriteData.addressEntries as Prisma.InputJsonValue | undefined,
         notes: mergedWriteData.notes,
         syncVersion: {
           increment: 1,
@@ -2064,18 +1991,12 @@ export const resolveSyncConflict = async (formData: FormData) => {
       contact: {
         fullName: mergedWriteData.fullName,
         nickname: mergedWriteData.nickname ?? null,
-        email: mergedWriteData.email ?? null,
-        emailAddresses: mergedWriteData.emailAddresses ?? [],
-        phone: mergedWriteData.phone ?? null,
-        phoneNumbers: mergedWriteData.phoneNumbers ?? [],
+        ...mergedMultiValues,
         company: mergedWriteData.company ?? null,
         department: mergedWriteData.department ?? null,
         jobTitle: mergedWriteData.jobTitle ?? null,
-        website: mergedWriteData.website ?? null,
         birthday: mergedWriteData.birthday ?? null,
         significantDates: parseContactDateEntries(mergedWriteData.significantDates ?? []),
-        address: mergedWriteData.address ?? null,
-        postalAddresses: parseContactPostalAddresses(mergedWriteData.postalAddresses ?? []),
         notes: mergedWriteData.notes ?? null,
       },
     });
@@ -2090,22 +2011,12 @@ export const resolveSyncConflict = async (formData: FormData) => {
           namePrefix: mergedWriteData.namePrefix ?? null,
           nameSuffix: mergedWriteData.nameSuffix ?? null,
           nickname: mergedWriteData.nickname ?? null,
-          email: mergedWriteData.email ?? null,
-          emailAddresses: mergedWriteData.emailAddresses ?? [],
-          emailEntries: parseValueEntries(mergedWriteData.emailEntries ?? []),
-          phone: mergedWriteData.phone ?? null,
-          phoneNumbers: mergedWriteData.phoneNumbers ?? [],
-          phoneEntries: parseValueEntries(mergedWriteData.phoneEntries ?? []),
+          ...mergedMultiValues,
           company: mergedWriteData.company ?? null,
           department: mergedWriteData.department ?? null,
           jobTitle: mergedWriteData.jobTitle ?? null,
-          website: mergedWriteData.website ?? null,
-          websiteEntries: parseValueEntries(mergedWriteData.websiteEntries ?? []),
           birthday: mergedWriteData.birthday ?? null,
           significantDates: parseContactDateEntries(mergedWriteData.significantDates ?? []),
-          address: mergedWriteData.address ?? null,
-          postalAddresses: parseContactPostalAddresses(mergedWriteData.postalAddresses ?? []),
-          addressEntries: parseAddressEntries(mergedWriteData.addressEntries ?? []),
           notes: mergedWriteData.notes ?? null,
         },
         capabilityProfile,
@@ -2557,7 +2468,7 @@ export const updateSyncAccountSettings = async (
                 remoteETag: conflict.remoteETag,
                 capabilityProfileId: capabilityProfile.id,
                 supportedFieldShadow: buildProviderSupportedContactShadow(
-                  buildContactWriteDataFromRemoteSnapshot(
+                  buildPortableFromRemoteSnapshot(
                     conflict.remoteSnapshot,
                     capabilityProfile,
                   ),

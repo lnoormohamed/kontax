@@ -17,7 +17,6 @@ import { runPhotoPass, type PhotoPassLink, type PhotoPassTally } from "~/server/
 import {
   parseContactDateEntries,
   parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 import {
   buildGoogleUpdatePersonFields,
@@ -25,7 +24,7 @@ import {
   mapContactToGooglePerson,
   mapGooglePersonToContact,
 } from "~/server/google-sync-mapping";
-import type { ValueEntry } from "~/server/sync-contact-mapping";
+import { readMultiValueFields } from "~/server/contact-multi-values";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
   buildDeletionHoldPayload,
@@ -48,7 +47,6 @@ import {
   isConflictQueueFull,
   isLocalChanged,
   openMutationConflict,
-  parseStoredAddressEntries,
   recordAutoResolved,
   recordSyncLinkError,
   type RemoteContactItem,
@@ -656,22 +654,6 @@ export const pushGoogleContact = async (
 // edits. Per-contact concurrency (etag) and conflict policy live in
 // pushGoogleContact; here we only select dirty contacts and tally results.
 
-const parseValueEntries = (value: unknown): ValueEntry[] =>
-  Array.isArray(value)
-    ? value
-        .filter(
-          (entry): entry is Record<string, unknown> =>
-            typeof entry === "object" &&
-            entry !== null &&
-            typeof (entry as { value?: unknown }).value === "string",
-        )
-        .map((entry) => ({
-          label: typeof entry.label === "string" ? entry.label : "",
-          value: entry.value as string,
-          isPrimary: entry.isPrimary === true,
-        }))
-    : [];
-
 const pushContactSelect = {
   id: true,
   syncUid: true,
@@ -716,21 +698,12 @@ export const buildGooglePushContact = (c: PushContactRow): GooglePushContact => 
   namePrefix: c.namePrefix,
   nameSuffix: c.nameSuffix,
   nickname: c.nickname,
-  email: c.email,
-  emailAddresses: parseContactStringArray(c.emailAddresses),
-  emailEntries: parseValueEntries(c.emailEntries),
-  phone: c.phone,
-  phoneNumbers: parseContactStringArray(c.phoneNumbers),
-  phoneEntries: parseValueEntries(c.phoneEntries),
+  // P49A-10: entries through the canonical reader; legacy keys re-derived.
+  ...readMultiValueFields(c),
   company: c.company,
   department: c.department,
   jobTitle: c.jobTitle,
-  website: c.website,
-  websiteEntries: parseValueEntries(c.websiteEntries),
   birthday: c.birthday,
-  address: c.address,
-  postalAddresses: parseContactPostalAddresses(c.postalAddresses),
-  addressEntries: parseStoredAddressEntries(c.addressEntries),
   notes: c.notes,
 });
 
@@ -744,20 +717,12 @@ const buildGoogleCapabilityDiagnostics = (contact: PushContactRow) =>
       namePrefix: contact.namePrefix,
       nameSuffix: contact.nameSuffix,
       nickname: contact.nickname,
-      email: contact.email,
-      emailAddresses: parseContactStringArray(contact.emailAddresses),
-      emailEntries: parseValueEntries(contact.emailEntries),
-      phone: contact.phone,
-      phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-      phoneEntries: parseValueEntries(contact.phoneEntries),
+      ...readMultiValueFields(contact),
       company: contact.company,
       department: contact.department,
       jobTitle: contact.jobTitle,
-      website: contact.website,
       birthday: contact.birthday,
       significantDates: parseContactDateEntries(contact.significantDates),
-      address: contact.address,
-      postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
       notes: contact.notes,
     },
     GOOGLE_CAPABILITY_PROFILE,

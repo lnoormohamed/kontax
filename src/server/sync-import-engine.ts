@@ -12,10 +12,7 @@ import {
   ContactLimitReachedError,
   getContactCapacityFor,
 } from "~/server/billing";
-import {
-  parseContactPostalAddresses,
-  parseContactStringArray,
-} from "~/server/contact-portability";
+import { readMultiValueFields } from "~/server/contact-multi-values";
 import { db } from "~/server/db";
 import {
   buildLocalConflictSnapshot,
@@ -79,77 +76,6 @@ const NO_EXCLUSIONS = new Set<string>();
 const exclusionsOf = (account: ImportEngineAccount): Set<string> =>
   account.excludedFields ?? NO_EXCLUSIONS;
 
-const parseValueEntries = (value: unknown) =>
-  Array.isArray(value)
-    ? value.flatMap((entry) => {
-        if (
-          typeof entry !== "object" ||
-          entry === null ||
-          typeof (entry as { value?: unknown }).value !== "string"
-        ) {
-          return [];
-        }
-
-        return [
-          {
-            label:
-              typeof (entry as { label?: unknown }).label === "string"
-                ? (entry as { label: string }).label
-                : "Other",
-            value: (entry as { value: string }).value,
-            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
-          },
-        ];
-      })
-    : [];
-
-// Stored Contact.addressEntries JSON → typed entries (also used by the Google
-// push path, which sends structured addresses).
-export const parseStoredAddressEntries = (value: unknown) =>
-  Array.isArray(value)
-    ? value.flatMap((entry) => {
-        if (
-          typeof entry !== "object" ||
-          entry === null ||
-          typeof (entry as { formatted?: unknown }).formatted !== "string"
-        ) {
-          return [];
-        }
-
-        return [
-          {
-            label:
-              typeof (entry as { label?: unknown }).label === "string"
-                ? (entry as { label: string }).label
-                : "Other",
-            formatted: (entry as { formatted: string }).formatted,
-            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
-            ...(typeof (entry as { countryOrRegion?: unknown }).countryOrRegion === "string"
-              ? { countryOrRegion: (entry as { countryOrRegion: string }).countryOrRegion }
-              : {}),
-            ...(typeof (entry as { streetLine1?: unknown }).streetLine1 === "string"
-              ? { streetLine1: (entry as { streetLine1: string }).streetLine1 }
-              : {}),
-            ...(typeof (entry as { streetLine2?: unknown }).streetLine2 === "string"
-              ? { streetLine2: (entry as { streetLine2: string }).streetLine2 }
-              : {}),
-            ...(typeof (entry as { cityOrTown?: unknown }).cityOrTown === "string"
-              ? { cityOrTown: (entry as { cityOrTown: string }).cityOrTown }
-              : {}),
-            ...(typeof (entry as { stateOrProvince?: unknown }).stateOrProvince === "string"
-              ? { stateOrProvince: (entry as { stateOrProvince: string }).stateOrProvince }
-              : {}),
-            ...(typeof (entry as { postcode?: unknown }).postcode === "string"
-              ? { postcode: (entry as { postcode: string }).postcode }
-              : {}),
-            ...(typeof (entry as { poBox?: unknown }).poBox === "string"
-              ? { poBox: (entry as { poBox: string }).poBox }
-              : {}),
-          },
-        ];
-      })
-    : [];
-
 const linkedContactToPortable = (
   contact: NonNullable<LinkedContact["contact"]>,
 ) => ({
@@ -160,21 +86,13 @@ const linkedContactToPortable = (
   namePrefix: contact.namePrefix,
   nameSuffix: contact.nameSuffix,
   nickname: contact.nickname,
-  email: contact.email,
-  emailAddresses: parseContactStringArray(contact.emailAddresses),
-  emailEntries: parseValueEntries(contact.emailEntries),
-  phone: contact.phone,
-  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-  phoneEntries: parseValueEntries(contact.phoneEntries),
+  // P49A-10: entries through the canonical reader; legacy keys re-derived, so
+  // the local shadow matches the remote one built by mappedContactToPortableContact.
+  ...readMultiValueFields(contact),
   company: contact.company,
   department: contact.department,
   jobTitle: contact.jobTitle,
-  website: contact.website,
-  websiteEntries: parseValueEntries(contact.websiteEntries),
   birthday: contact.birthday,
-  address: contact.address,
-  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-  addressEntries: parseStoredAddressEntries(contact.addressEntries),
   notes: contact.notes,
 });
 
@@ -285,7 +203,7 @@ export const applyRemoteToContact = async (
 ) => {
   // P39-03: excluded fields never overwrite local values (keys removed, not
   // nulled) and stay out of the stored shadow.
-  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped), exclusionsOf(account));
+  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped, account.capabilityProfile), exclusionsOf(account));
   const supportedFieldShadow = buildProviderSupportedContactShadow(
     stripExcludedPortableFields(mappedContactToPortableContact(mapped), exclusionsOf(account)),
     account.capabilityProfile,
@@ -528,7 +446,7 @@ const createContact = async (
   capped: boolean,
 ) => {
   // P39-03: excluded fields are not imported on create either.
-  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped), exclusionsOf(account));
+  const data = omitExcludedContactWriteData(mappedContactToWriteData(mapped, account.capabilityProfile), exclusionsOf(account));
   const supportedFieldShadow = buildProviderSupportedContactShadow(
     stripExcludedPortableFields(mappedContactToPortableContact(mapped), exclusionsOf(account)),
     account.capabilityProfile,

@@ -2,11 +2,8 @@
 // sync-runner.ts, Google in google-sync.ts) so the localSnapshot shape the
 // P23-05 resolution UI reads is identical across providers.
 import { Prisma } from "../../generated/prisma";
-import {
-  parseContactDateEntries,
-  parseContactPostalAddresses,
-  parseContactStringArray,
-} from "~/server/contact-portability";
+import { readMultiValueFields } from "~/server/contact-multi-values";
+import { parseContactDateEntries } from "~/server/contact-portability";
 
 // Contact fields needed to detect conflicts and build a local snapshot.
 export const contactConflictSelect = Prisma.validator<Prisma.ContactSelect>()({
@@ -24,15 +21,19 @@ export const contactConflictSelect = Prisma.validator<Prisma.ContactSelect>()({
   nickname: true,
   email: true,
   emailAddresses: true,
+  emailEntries: true,
   phone: true,
   phoneNumbers: true,
+  phoneEntries: true,
   company: true,
   jobTitle: true,
   website: true,
+  websiteEntries: true,
   birthday: true,
   significantDates: true,
   address: true,
   postalAddresses: true,
+  addressEntries: true,
   notes: true,
   avatarUrl: true, // P44-05: photo shown side-by-side in the conflict review
 });
@@ -50,19 +51,26 @@ export type ContactConflictSnapshotInput = {
   nickname: string | null;
   email: string | null;
   emailAddresses: unknown;
+  emailEntries?: unknown;
   phone: string | null;
   phoneNumbers: unknown;
+  phoneEntries?: unknown;
   company: string | null;
   jobTitle: string | null;
   website: string | null;
+  websiteEntries?: unknown;
   birthday: string | null;
   significantDates?: unknown;
   address: string | null;
   postalAddresses: unknown;
+  addressEntries?: unknown;
   notes: string | null;
   avatarUrl?: string | null;
 };
 
+// P49A-10: multi-value fields come from the canonical reader — the typed
+// entries plus the legacy keys (still read by the resolution UI) derived from
+// them — so "keep local" restores exactly what the contact held.
 export const buildLocalConflictSnapshot = (contact: ContactConflictSnapshotInput) => ({
   id: contact.id,
   syncUid: contact.syncUid,
@@ -74,17 +82,11 @@ export const buildLocalConflictSnapshot = (contact: ContactConflictSnapshotInput
   namePrefix: contact.namePrefix,
   nameSuffix: contact.nameSuffix,
   nickname: contact.nickname,
-  email: contact.email,
-  emailAddresses: parseContactStringArray(contact.emailAddresses),
-  phone: contact.phone,
-  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+  ...readMultiValueFields(contact),
   company: contact.company,
   jobTitle: contact.jobTitle,
-  website: contact.website,
   birthday: contact.birthday,
   significantDates: parseContactDateEntries(contact.significantDates),
-  address: contact.address,
-  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
   notes: contact.notes,
   avatarUrl: contact.avatarUrl ?? null,
 });

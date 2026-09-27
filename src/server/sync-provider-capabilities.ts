@@ -5,6 +5,7 @@ import type {
   PortableContactInput,
 } from "./contact-portability";
 import { normalizePhoneExactKey } from "~/lib/phone-normalization";
+import type { MultiValueFamily } from "~/server/dav/contact-multi-values.mjs";
 import { resolveCardDavProviderIdentity } from "./sync-provider-identity";
 
 export type SyncProviderCapabilityProfileId =
@@ -26,6 +27,17 @@ export const CARD_DAV_CAPABILITY_OVERRIDE_IDS = [
   "carddav-fastmail",
 ] as const satisfies readonly CardDavCapabilityProfileOverrideId[];
 
+// P49A-10 (A-19): how an inbound multi-value list (emails, phones, addresses,
+// websites) is applied to the local contact.
+//   "full"    — Kontax pushes this family and the provider returns it on every
+//               read, so the remote list is authoritative: an empty list means
+//               the values were deleted there, and it clears them here.
+//   "partial" — the provider does not round-trip Kontax's values (Outlook
+//               addresses: the Graph push never sends them), so an empty
+//               inbound list leaves the local one alone; a non-empty one still
+//               replaces it, as before.
+export type MultiValueFamilySupport = "full" | "partial";
+
 export type SyncProviderCapabilityProfile = {
   id: SyncProviderCapabilityProfileId;
   provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
@@ -33,8 +45,21 @@ export type SyncProviderCapabilityProfile = {
   fields: {
     birthday: "full";
     significantDates: "full" | "none";
+    emails: MultiValueFamilySupport;
+    phones: MultiValueFamilySupport;
+    addresses: MultiValueFamilySupport;
+    websites: MultiValueFamilySupport;
   };
 };
+
+// Every provider round-trips all four multi-value families, except Outlook
+// addresses (see MultiValueFamilySupport).
+const FULL_MULTI_VALUE_SUPPORT = {
+  emails: "full",
+  phones: "full",
+  addresses: "full",
+  websites: "full",
+} as const satisfies Record<MultiValueFamily, MultiValueFamilySupport>;
 
 export type ProviderCapabilityUnsupportedFieldFamily = "significantDates";
 
@@ -120,6 +145,7 @@ const GOOGLE_PROFILE: SyncProviderCapabilityProfile = {
   fields: {
     birthday: "full",
     significantDates: "none",
+    ...FULL_MULTI_VALUE_SUPPORT,
   },
 };
 
@@ -129,6 +155,10 @@ const MICROSOFT_PROFILE: SyncProviderCapabilityProfile = {
   fields: {
     birthday: "full",
     significantDates: "none",
+    ...FULL_MULTI_VALUE_SUPPORT,
+    // The Graph push (mapKontaxContactToGraph) never sends addresses, so an
+    // Outlook contact with none is not evidence the user deleted Kontax's.
+    addresses: "partial",
   },
 };
 
@@ -139,6 +169,7 @@ const GENERIC_CARDDAV_PROFILE: SyncProviderCapabilityProfile = {
   fields: {
     birthday: "full",
     significantDates: "none",
+    ...FULL_MULTI_VALUE_SUPPORT,
   },
 };
 
@@ -149,6 +180,7 @@ const ICLOUD_CARDDAV_PROFILE: SyncProviderCapabilityProfile = {
   fields: {
     birthday: "full",
     significantDates: "full",
+    ...FULL_MULTI_VALUE_SUPPORT,
   },
 };
 
@@ -159,6 +191,7 @@ const FASTMAIL_CARDDAV_PROFILE: SyncProviderCapabilityProfile = {
   fields: {
     birthday: "full",
     significantDates: "none",
+    ...FULL_MULTI_VALUE_SUPPORT,
   },
 };
 
@@ -274,6 +307,16 @@ export const isGenericSafeCardDavProfile = (
 export const providerSupportsSignificantDates = (
   profile: SyncProviderCapabilityProfile,
 ) => profile.fields.significantDates === "full";
+
+/**
+ * P49A-10 (A-19): whether an EMPTY inbound list for this family means "deleted
+ * on the provider" (clear the local list) rather than "the provider doesn't
+ * hold these" (leave it). Non-empty inbound lists always apply.
+ */
+export const providerListIsAuthoritative = (
+  profile: SyncProviderCapabilityProfile,
+  family: MultiValueFamily,
+) => profile.fields[family] === "full";
 
 export const getSyncProviderCapabilityProfileDisplayName = (
   profile: SyncProviderCapabilityProfile,

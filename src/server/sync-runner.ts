@@ -9,6 +9,12 @@ import {
   fetchCardDavPhotoBytes,
   pushCardDavContact,
 } from "~/server/carddav";
+import {
+  deriveMultiValueFields,
+  multiValueWriteData,
+  readMultiValueFields,
+  snapshotMultiValueWriteData,
+} from "~/server/contact-multi-values";
 import type { PortableContactInput } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { contactLimitMessage, getContactCapacityFor } from "~/server/billing";
@@ -144,9 +150,6 @@ type SyncPushContactRow = SyncContactRow & {
   updatedAt: Date;
 };
 
-const safeStringArray = (v: unknown): string[] =>
-  Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
-
 const safeValueEntries = (value: unknown) =>
   Array.isArray(value)
     ? value.flatMap((entry) => {
@@ -246,61 +249,76 @@ const safeAddressEntries = (value: unknown) =>
       })
     : [];
 
-const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
-  fullName: c.fullName,
-  firstName: c.firstName,
-  middleName: c.middleName,
-  lastName: c.lastName,
-  namePrefix: c.namePrefix,
-  nameSuffix: c.nameSuffix,
-  nickname: c.nickname,
-  email: c.email,
-  emailAddresses: safeStringArray(c.emailAddresses),
-  emailEntries: safeValueEntries(c.emailEntries),
-  phone: c.phone,
-  phoneNumbers: safeStringArray(c.phoneNumbers),
-  phoneEntries: safeValueEntries(c.phoneEntries),
-  company: c.company,
-  department: c.department,
-  jobTitle: c.jobTitle,
-  website: c.website,
-  websiteEntries: safeValueEntries(c.websiteEntries),
-  birthday: c.birthday,
-  significantDates: safeDateEntries(c.significantDates),
-  address: c.address,
-  postalAddresses: Array.isArray(c.postalAddresses)
-    ? (c.postalAddresses as PortableContactInput["postalAddresses"])
-    : null,
-  addressEntries: safeAddressEntries(c.addressEntries),
-  notes: c.notes,
-});
+// P49A-10: multi-value fields through the canonical reader (entries; legacy
+// keys re-derived from them). Address entries keep the push vocabulary
+// (safeAddressEntries maps the web editor's `state` to stateOrProvince).
+const contactToPortable = (c: SyncContactRow): PortableContactInput => {
+  const multiValues = readMultiValueFields(c);
+  return {
+    fullName: c.fullName,
+    firstName: c.firstName,
+    middleName: c.middleName,
+    lastName: c.lastName,
+    namePrefix: c.namePrefix,
+    nameSuffix: c.nameSuffix,
+    nickname: c.nickname,
+    email: multiValues.email,
+    emailAddresses: multiValues.emailAddresses,
+    emailEntries: safeValueEntries(multiValues.emailEntries),
+    phone: multiValues.phone,
+    phoneNumbers: multiValues.phoneNumbers,
+    phoneEntries: safeValueEntries(multiValues.phoneEntries),
+    company: c.company,
+    department: c.department,
+    jobTitle: c.jobTitle,
+    website: multiValues.website,
+    websiteEntries: safeValueEntries(multiValues.websiteEntries),
+    birthday: c.birthday,
+    significantDates: safeDateEntries(c.significantDates),
+    address: multiValues.address,
+    postalAddresses: multiValues.postalAddresses,
+    addressEntries: safeAddressEntries(multiValues.addressEntries),
+    notes: c.notes,
+  };
+};
 
-const cardDavCardToPortable = (card: CardDavContactCard): PortableContactInput => ({
-  fullName: card.fullName,
-  firstName: card.firstName,
-  middleName: card.middleName,
-  lastName: card.lastName,
-  namePrefix: card.namePrefix,
-  nameSuffix: card.nameSuffix,
-  nickname: card.nickname,
-  email: card.emailAddresses[0] ?? null,
-  emailAddresses: card.emailAddresses,
-  emailEntries: card.emailEntries,
-  phone: card.phoneNumbers[0] ?? null,
-  phoneNumbers: card.phoneNumbers,
-  phoneEntries: card.phoneEntries,
-  company: card.company,
-  department: card.department,
-  jobTitle: card.jobTitle,
-  website: card.website,
-  websiteEntries: card.websiteEntries,
-  birthday: card.birthday,
-  significantDates: card.significantDates,
-  address: card.address,
-  postalAddresses: card.postalAddresses,
-  addressEntries: card.addressEntries,
-  notes: card.notes,
-});
+// The remote card as a portable contact: entries normalised the way the write
+// normalises them and legacy keys derived from them (P49A-10), so the shadow
+// of an applied card equals the local shadow of the stored contact.
+const cardDavCardToPortable = (card: CardDavContactCard): PortableContactInput => {
+  const multiValues = deriveMultiValueFields({
+    emailEntries: card.emailEntries,
+    phoneEntries: card.phoneEntries,
+    addressEntries: card.addressEntries,
+    websiteEntries: card.websiteEntries,
+  });
+  return {
+    fullName: card.fullName,
+    firstName: card.firstName,
+    middleName: card.middleName,
+    lastName: card.lastName,
+    namePrefix: card.namePrefix,
+    nameSuffix: card.nameSuffix,
+    nickname: card.nickname,
+    email: multiValues.email ?? null,
+    emailAddresses: multiValues.emailAddresses ?? [],
+    emailEntries: multiValues.emailEntries ?? [],
+    phone: multiValues.phone ?? null,
+    phoneNumbers: multiValues.phoneNumbers ?? [],
+    phoneEntries: multiValues.phoneEntries ?? [],
+    company: card.company,
+    department: card.department,
+    jobTitle: card.jobTitle,
+    website: multiValues.website ?? null,
+    websiteEntries: multiValues.websiteEntries ?? [],
+    birthday: card.birthday,
+    significantDates: card.significantDates,
+    address: multiValues.address ?? null,
+    postalAddresses: multiValues.postalAddresses ?? [],
+    addressEntries: safeAddressEntries(multiValues.addressEntries),
+    notes: card.notes,
+  };
+};
 
 const capabilityDiagnosticsToEventPayload = (
   diagnostics: ProviderCapabilityDiagnostics | null,
@@ -356,13 +374,6 @@ const buildContactWriteDataFromRemoteSnapshot = (
     throw new Error("Remote sync snapshot does not contain a valid contact name.");
   }
 
-  const emailAddresses = Array.isArray(snapshot.emailAddresses)
-    ? snapshot.emailAddresses.filter((value): value is string => typeof value === "string")
-    : [];
-  const phoneNumbers = Array.isArray(snapshot.phoneNumbers)
-    ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
-    : [];
-
   const writeData = {
     fullName,
     firstName: typeof snapshot.firstName === "string" ? snapshot.firstName : null,
@@ -371,21 +382,14 @@ const buildContactWriteDataFromRemoteSnapshot = (
     namePrefix: typeof snapshot.namePrefix === "string" ? snapshot.namePrefix : null,
     nameSuffix: typeof snapshot.nameSuffix === "string" ? snapshot.nameSuffix : null,
     nickname: typeof snapshot.nickname === "string" ? snapshot.nickname : null,
-    email: emailAddresses[0] ?? (typeof snapshot.email === "string" ? snapshot.email : null),
-    emailAddresses: emailAddresses.length > 0 ? emailAddresses : undefined,
-    emailEntries: Array.isArray(snapshot.emailEntries) ? snapshot.emailEntries : undefined,
-    phone: phoneNumbers[0] ?? (typeof snapshot.phone === "string" ? snapshot.phone : null),
-    phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
-    phoneEntries: Array.isArray(snapshot.phoneEntries) ? snapshot.phoneEntries : undefined,
+    // P49A-10 (A-19): the remote card's typed entries with legacy columns
+    // derived; a family the card carries but left empty (a phone deleted on
+    // the provider) clears locally — it used to be skipped as "no change".
+    ...snapshotMultiValueWriteData(snapshot),
     company: typeof snapshot.company === "string" ? snapshot.company : null,
     department: typeof snapshot.department === "string" ? snapshot.department : null,
     jobTitle: typeof snapshot.jobTitle === "string" ? snapshot.jobTitle : null,
-    website: typeof snapshot.website === "string" ? snapshot.website : null,
-    websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
     birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
-    address: typeof snapshot.address === "string" ? snapshot.address : null,
-    postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
-    addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
     notes: typeof snapshot.notes === "string" ? snapshot.notes : null,
   };
 
@@ -1925,24 +1929,19 @@ export const runQueuedSyncJobs = async ({
               namePrefix: card.namePrefix,
               nameSuffix: card.nameSuffix,
               nickname: card.nickname,
-              email: card.emailAddresses[0] ?? null,
-              emailAddresses: card.emailAddresses.length > 0 ? card.emailAddresses : undefined,
-              emailEntries: card.emailEntries.length > 0 ? card.emailEntries : undefined,
-              phone: card.phoneNumbers[0] ?? null,
-              phoneNumbers: card.phoneNumbers.length > 0 ? card.phoneNumbers : undefined,
-              phoneEntries: card.phoneEntries.length > 0 ? card.phoneEntries : undefined,
+              // P49A-10: typed entries, legacy columns derived.
+              ...multiValueWriteData({
+                emailEntries: card.emailEntries,
+                phoneEntries: card.phoneEntries,
+                addressEntries: card.addressEntries,
+                websiteEntries: card.websiteEntries,
+              }),
               company: card.company,
               department: card.department,
               jobTitle: card.jobTitle,
-              website: card.website,
-              websiteEntries: card.websiteEntries.length > 0 ? card.websiteEntries : undefined,
               birthday: card.birthday,
               significantDates: providerSupportsSignificantDates(capabilityProfile) &&
                 card.significantDates.length > 0 ? card.significantDates : undefined,
-              address: card.address,
-              postalAddresses:
-                card.postalAddresses.length > 0 ? card.postalAddresses : undefined,
-              addressEntries: card.addressEntries.length > 0 ? card.addressEntries : undefined,
               notes: card.notes,
               sourceType: "SYNC_CARDDAV",
               sourceDetail: scopeLabel,

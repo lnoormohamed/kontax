@@ -17,10 +17,7 @@ import {
   buildMultiValueWriteData,
   deriveMultiValueFields,
   familiesPresentIn,
-  type MultiValueAddressEntry,
-  type MultiValueEntries,
   type MultiValueEntriesInput,
-  type MultiValueEntry,
   type MultiValueFamily,
   readMultiValueEntries as readEntries,
   snapshotMultiValueWriteData as snapshotWriteData,
@@ -28,6 +25,7 @@ import {
 
 export {
   addressEntriesFromLegacy,
+  deriveMultiValueFields,
   deriveLegacyAddresses,
   deriveLegacyEmails,
   deriveLegacyPhones,
@@ -46,12 +44,24 @@ export {
   valueEntriesFromLegacy,
 } from "~/server/dav/contact-multi-values.mjs";
 
-export type {
-  MultiValueAddressEntry,
-  MultiValueEntries,
-  MultiValueEntriesInput,
-  MultiValueEntry,
-  MultiValueFamily,
+export type { MultiValueEntriesInput, MultiValueFamily };
+
+// Stored entries are Json: the known keys plus whatever metadata a writer
+// attached (phone `e164`, `validationStatus`, …), typed so they can be written
+// back through Prisma unchanged.
+type JsonExtras = { [key: string]: Prisma.InputJsonValue | null | undefined };
+
+/** An email / phone / website entry as stored in its `*Entries` column. */
+export type MultiValueEntry = { label: string; value: string; isPrimary: boolean } & JsonExtras;
+
+/** A postal address entry as stored in `addressEntries`. */
+export type MultiValueAddressEntry = { label: string; formatted: string; isPrimary: boolean } & JsonExtras;
+
+export type MultiValueEntries = {
+  emailEntries: MultiValueEntry[];
+  phoneEntries: MultiValueEntry[];
+  addressEntries: MultiValueAddressEntry[];
+  websiteEntries: MultiValueEntry[];
 };
 
 type JsonWrite = Prisma.InputJsonValue | typeof Prisma.DbNull;
@@ -110,14 +120,14 @@ export const snapshotMultiValueWriteData = (snapshot: ContactLike): MultiValueWr
 
 /** Typed entries of a stored contact (legacy fallback only for a not-yet-backfilled row). */
 export const readMultiValueEntries = (contact: ContactLike): MultiValueEntries =>
-  readEntries(asRecord(contact));
+  readEntries(asRecord(contact)) as MultiValueEntries;
 
 /**
  * Entries plus legacy keys derived from them, for read paths that still hand a
  * `PortableContactInput`-style object downstream (exports, sync push, shadows).
  */
 export const readMultiValueFields = (contact: ContactLike): MultiValueFields => {
-  const entries = readEntries(asRecord(contact));
+  const entries = readMultiValueEntries(contact);
   const derived = deriveMultiValueFields(entries);
   return {
     ...entries,

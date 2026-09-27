@@ -21,7 +21,6 @@ import { db } from "~/server/db";
 import {
   parseContactDateEntries,
   parseContactPostalAddresses,
-  parseContactStringArray,
 } from "~/server/contact-portability";
 import {
   type GraphContact,
@@ -29,7 +28,7 @@ import {
   mapGraphContactToKontax,
   mapKontaxContactToGraph,
 } from "~/server/microsoft-sync-mapping";
-import type { ValueEntry } from "~/server/sync-contact-mapping";
+import { readMultiValueFields } from "~/server/contact-multi-values";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
   buildDeletionHoldPayload,
@@ -538,22 +537,6 @@ export const pushMicrosoftContact = async (
 // contacts, which would otherwise mask local edits). NOTE: this connector cannot
 // be run/verified until Microsoft OAuth is configured (Azure app registration).
 
-const parseValueEntries = (value: unknown): ValueEntry[] =>
-  Array.isArray(value)
-    ? value
-        .filter(
-          (entry): entry is Record<string, unknown> =>
-            typeof entry === "object" &&
-            entry !== null &&
-            typeof (entry as { value?: unknown }).value === "string",
-        )
-        .map((entry) => ({
-          label: typeof entry.label === "string" ? entry.label : "",
-          value: entry.value as string,
-          isPrimary: entry.isPrimary === true,
-        }))
-    : [];
-
 const pushContactSelect = {
   id: true,
   syncUid: true,
@@ -581,6 +564,7 @@ const pushContactSelect = {
   significantDates: true,
   address: true,
   postalAddresses: true,
+  addressEntries: true,
   notes: true,
 } satisfies Prisma.ContactSelect;
 
@@ -597,20 +581,12 @@ const buildMicrosoftPushContact = (c: PushContactRow): MicrosoftPushContact => (
   namePrefix: c.namePrefix,
   nameSuffix: c.nameSuffix,
   nickname: c.nickname,
-  email: c.email,
-  emailAddresses: parseContactStringArray(c.emailAddresses),
-  emailEntries: parseValueEntries(c.emailEntries),
-  phone: c.phone,
-  phoneNumbers: parseContactStringArray(c.phoneNumbers),
-  phoneEntries: parseValueEntries(c.phoneEntries),
-  websiteEntries: parseValueEntries(c.websiteEntries),
+  // P49A-10: entries through the canonical reader; legacy keys re-derived.
+  ...readMultiValueFields(c),
   company: c.company,
   department: c.department,
   jobTitle: c.jobTitle,
-  website: c.website,
   birthday: c.birthday,
-  address: c.address,
-  postalAddresses: c.postalAddresses,
   notes: c.notes,
 });
 
@@ -624,21 +600,12 @@ const buildMicrosoftCapabilityDiagnostics = (contact: PushContactRow) =>
       namePrefix: contact.namePrefix,
       nameSuffix: contact.nameSuffix,
       nickname: contact.nickname,
-      email: contact.email,
-      emailAddresses: parseContactStringArray(contact.emailAddresses),
-      emailEntries: parseValueEntries(contact.emailEntries),
-      phone: contact.phone,
-      phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-      phoneEntries: parseValueEntries(contact.phoneEntries),
+      ...readMultiValueFields(contact),
       company: contact.company,
       department: contact.department,
       jobTitle: contact.jobTitle,
-      website: contact.website,
-      websiteEntries: parseValueEntries(contact.websiteEntries),
       birthday: contact.birthday,
       significantDates: parseContactDateEntries(contact.significantDates),
-      address: contact.address,
-      postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
       notes: contact.notes,
     },
     MICROSOFT_CAPABILITY_PROFILE,
