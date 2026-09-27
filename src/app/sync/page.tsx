@@ -549,6 +549,10 @@ export default async function SyncPage({ searchParams }: PageProps) {
       excludedFields: acct.settings?.excludedFields ?? [],
       exportLabelFilter: acct.settings?.exportLabelFilter ?? [],
       maxAttemptsBeforePause: acct.settings?.maxAttemptsBeforePause ?? null,
+      autoPause: {
+        planDefault: planSummary.entitlements.syncAutoPauseAfterFailures,
+        maxSetting: planSummary.entitlements.syncAutoPauseMaxFailures,
+      },
       // P36-DB02: setup is pending until completeSyncSetup stamps setupCompletedAt.
       needsSetup: acct.setupCompletedAt == null,
       createdAt: acct.createdAt.toISOString(),

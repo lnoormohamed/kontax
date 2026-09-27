@@ -63,13 +63,32 @@ const CAPABILITY_OPTS: Array<{
   { value: "carddav-fastmail", label: "Verified Fastmail profile" },
 ];
 const PLAN_FREQ_LABEL = "every 60 minutes"; // platform default (DEFAULT_SYNC_FREQUENCY_MINUTES)
-const RETRY_OPTS: { value: string; label: string }[] = [
-  { value: "default", label: "Platform default (5 failures)" },
+// P49A-19: the default and ceiling come from the owner's plan (3 failures on
+// Free, 5 on paid plans; Free can't choose more than 3 or "never"). A saved
+// value above the ceiling stays selectable so the draft shows what is stored.
+const RETRY_CHOICES: { value: string; label: string }[] = [
   { value: "1", label: "1 failure" },
   { value: "3", label: "3 failures" },
   { value: "5", label: "5 failures" },
   { value: "10", label: "10 failures" },
   { value: "0", label: "Never auto-pause" },
+];
+const retryOptions = (
+  autoPause: SyncAccountData["autoPause"],
+  current: string,
+): { value: string; label: string; disabled?: boolean }[] => [
+  { value: "default", label: `Plan default (${autoPause.planDefault} failures)` },
+  ...RETRY_CHOICES.map((choice) => {
+    const n = Number(choice.value);
+    const aboveCeiling = autoPause.maxSetting !== null && (n === 0 || n > autoPause.maxSetting);
+    return aboveCeiling
+      ? {
+          ...choice,
+          label: `${choice.label} — paid plans (pauses at ${autoPause.maxSetting} on Free)`,
+          disabled: choice.value !== current,
+        }
+      : choice;
+  }),
 ];
 const FIELD_OPTS: { token: string; label: string }[] = [
   { token: "NOTE", label: "Notes" },
@@ -1760,8 +1779,17 @@ export function ConnectionSettings({
 
         {/* §11 Retry sensitivity */}
         <OptSection label="Retry sensitivity" style={{ marginBottom: 0 }}>
-          <OptSelect value={draft.retry} onChange={(v) => patch({ retry: v })} options={RETRY_OPTS} />
-          <OptHint>After this many consecutive failures, the account is auto-paused. You’ll need to resume it manually.</OptHint>
+          <OptSelect
+            value={draft.retry}
+            onChange={(v) => patch({ retry: v })}
+            options={retryOptions(account.autoPause, baseline.retry)}
+          />
+          <OptHint>
+            After this many consecutive failures, the account is auto-paused. You’ll need to resume it manually.
+            {account.autoPause.maxSetting !== null
+              ? ` On your plan a connection pauses after at most ${account.autoPause.maxSetting} failures in a row; 5, 10 and never are for paid plans.`
+              : ""}
+          </OptHint>
         </OptSection>
 
         {/* pinned actions — first-run starts the held sync; edit mode saves a diff */}

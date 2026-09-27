@@ -134,6 +134,19 @@ Since P49A-04 a link has at most one `OPEN` `SyncConflict`: a divergence re-dete
 SELECT "syncContactLinkId", COUNT(*) FROM "SyncConflict" WHERE status = 'OPEN' GROUP BY 1 HAVING COUNT(*) > 1;
 ```
 
+### Account auto-paused after repeated failures (`SYNC_AUTO_PAUSED`)
+
+Owner decision 2026-09-27 (P49A-19 item 6): a connection auto-pauses after **3 consecutive
+failures on Free and 5 on paid plans** (Pro / Family / Teams; an admin comp counts as its plan;
+a paid plan unpaid past the 3-day payment grace counts as Free). Source: `PLAN_DEFAULTS[plan]
+.syncAutoPauseAfterFailures` in `src/server/dav/plan-entitlements.mjs`, applied by
+`getSyncAutoPauseThreshold` (`sync-health.ts`) in `markJobFailed`. The connection's **Retry
+sensitivity** (`SyncAccountSettings.maxAttemptsBeforePause`: null = plan default, 0 = never) is
+honoured within the plan's ceiling: Free can go down to 1 but a stored 5 / 10 / never acts as 3
+(the stored value is kept and applies again after an upgrade). Authentication errors never
+auto-pause. The support recovery export's `autoPauseFailureStreak` is this account's real
+threshold. Fix the error, then the user (or support) resumes the connection.
+
 ### syncVersion drift / contacts duplicated
 
 **Symptom:** Contacts appear twice after a sync.

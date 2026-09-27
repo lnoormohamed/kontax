@@ -2,8 +2,8 @@ import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { db } from "~/server/db";
 import { getSyncLineageInvariantIssues } from "~/server/sync-lineage";
 import {
-  AUTO_PAUSE_FAILURE_STREAK,
   getConsecutiveFailureStreak,
+  getSyncAutoPauseThreshold,
   getSyncAccountOperationalHealth,
   getSyncErrorSupportBucket,
 } from "~/server/sync-health";
@@ -185,6 +185,17 @@ export async function GET(request: Request) {
       },
     },
   });
+  // P49A-19: the threshold this connection actually pauses at (plan + setting;
+  // 0 = never), not the display heuristic.
+  const autoPauseSettings = await db.syncAccountSettings.findUnique({
+    where: { syncAccountId: syncAccount.id },
+    select: { maxAttemptsBeforePause: true },
+  });
+  const autoPauseFailureStreak = await getSyncAutoPauseThreshold(
+    db,
+    syncAccount.id,
+    autoPauseSettings?.maxAttemptsBeforePause,
+  );
   const failureStreak = getConsecutiveFailureStreak(
     syncAccount.syncJobs.map((job) => ({
       status: job.status,
@@ -206,7 +217,7 @@ export async function GET(request: Request) {
       product: "Kontax",
       type: "sync-recovery-package",
       support: {
-        autoPauseFailureStreak: AUTO_PAUSE_FAILURE_STREAK,
+        autoPauseFailureStreak,
         failureStreak,
         operationalHealth,
         latestSupportBucket: getSyncErrorSupportBucket(syncAccount.lastErrorCode),

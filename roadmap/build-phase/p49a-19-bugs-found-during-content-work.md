@@ -12,7 +12,7 @@ needs confirming in code before the fix.
 | 3 | Data-export ready email links to the wrong settings page | `src/app/api/cron/data-export/route.ts` | **Fixed** 2026-09-27 — links to `/settings/data/export` via `DATA_EXPORT_SETTINGS_PATH` (also used for revalidation); test `tests/node/data-export-email-link.test.ts` |
 | 4 | Failed-payment grace (3 days) is not enforced — display only | `billing-surface.ts`, `stripe-handlers.ts` (P49A-05 notes: by policy, Stripe decides the lapse) | **Fixed** 2026-09-27 — owner decision: enforce. Paid plan for 3 days from the first failure, then Free entitlements until paid (web + CardDAV), Stripe untouched, nothing deleted. See below. |
 | 5 | Free users can get a vCard file via the Kontax Archive ".vcf copy" option and the full data export, although vCard export is Pro | `src/server/export-format/*`, data export | **Fixed** 2026-09-27 — owner decision: not a leak. The full data export keeps `contacts.vcf` on every plan (data portability); the archive's .vcf compatibility copy stays on every plan too. Pro = the standalone vCard 4.0 export on Import & export. Copy aligned — see below. |
-| 6 | Auto-pause after repeated sync failures defaults to 5, while copy says 3 | `src/server/sync-health.ts` | Copy/behaviour mismatch — pick one |
+| 6 | Auto-pause after repeated sync failures defaults to 5, while copy says 3 | `src/server/sync-health.ts` | **Fixed** 2026-09-27 — owner decision: 3 consecutive failures on Free, 5 on paid plans, from the plan matrix; runner, settings panel, help and the support export share it. See below. |
 | 7 | `DOWNGRADE_COPY` in `plan-data.ts` is never shown and is wrong in places; users see `cancel-plan-modal.tsx` | `src/app/_components/plan-data.ts`, `cancel-plan-modal.tsx` | Dead, misleading code — delete or wire up correctly |
 | 8 | iPhone edits through Kontax's CardDAV server are not marked as local edits, so they may not push to the source provider (e.g. Google) | `server.mjs` PUT `lastMutatedBy` | **Fixed** 2026-09-27 in P49A-12 (A-17) — confirmed: PUT never set `lastMutatedBy`. Every device PUT / DELETE now stamps `MANUAL` ("CardDAV device") and marks the contact's sync links dirty (`flagDeviceWriteForSync`) |
 | 9 | Free `monthlyImportLimit: 3` counts **contacts**, so any Free CSV import over 3 rows is refused | `src/server/billing.ts` `assertCanImportContacts` | **Fixed** — owner decision 2026-09-26: 3 import runs a month (CSV + Kontax archive), not 3 contacts. See below. |
@@ -87,3 +87,25 @@ Tests: `tests/node/monthly-import-limit.test.ts`.
   Pro, downgrade consequences) and the in-app PRO popover on the export card.
 - Test: `tests/node/data-export-vcard-all-plans.test.ts` (a Free user's export zip contains
   `contacts.vcf`; no plan gate on the export path).
+
+## Item 6 — fixed (2026-09-27, owner decision: auto-pause 3 on Free / 5 on paid)
+
+- **One source:** `PLAN_DEFAULTS[plan].syncAutoPauseAfterFailures` (Free 3, Pro / Family / Teams
+  5) and `syncAutoPauseMaxFailures` (Free 3, paid null) in `plan-entitlements.mjs`;
+  `resolveSyncAutoPauseThreshold(entitlements, setting)` combines them with the connection's
+  setting. `sync-health.ts` exports `FREE_/PAID_AUTO_PAUSE_FAILURES`,
+  `getSyncAutoPauseThreshold(client, syncAccountId, setting)` (owner's effective plan via
+  `loadEffectivePlan`, so admin comp = paid and the item 4 payment grace applies) and
+  `shouldAutoPauseAfterFailure`. `DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE = 5` is gone.
+- **Runner** (`sync-runner.ts` `markJobFailed`): threshold from the above; a failed plan lookup
+  logs and uses Free's 3 for that failure rather than leaving the job RUNNING.
+- **Per-connection setting (decision):** "Retry sensitivity" is respected within the plan's
+  ceiling — Free may pause sooner (1) but a stored 5 / 10 / never acts as 3 (value kept, applies
+  again after an upgrade); paid plans keep any choice (1, 3, 5, 10, never) as before.
+- **Copy:** settings panel "Plan default (N failures)", Free options above 3 disabled and marked
+  "paid plans", hint explains the ceiling; help (sync troubleshooting, paused states, settings
+  list) via `FACTS.autoPauseRule` = "3 on Free, 5 on paid plans". Notifications / email already
+  quote the real count. The support recovery export's `autoPauseFailureStreak` now reports the
+  account's real threshold (it was the 3-failure display heuristic, `AUTO_PAUSE_FAILURE_STREAK`,
+  which stays only for classifying legacy pauses).
+- Test: `tests/node/sync-auto-pause-per-plan.test.ts`.

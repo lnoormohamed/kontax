@@ -257,7 +257,7 @@ Mark this entire section `[skip]` when the release smoke test is only covering c
 | ASYNC-09 | Field exclusions | Notes, birthdays, addresses, custom fields toggles save. | | |
 | ASYNC-10 | Export filter | Label checkboxes save and empty state means all contacts. | | |
 | ASYNC-11 | Notifications | Failure notification toggle saves. | | |
-| ASYNC-12 | Retry sensitivity | Default, numeric choices, and never auto-pause save. | | |
+| ASYNC-12 | Retry sensitivity | Default shows the plan's number (3 Free / 5 paid); numeric choices and never save on paid; on Free 5 / 10 / never are disabled ("paid plans"). | | |
 | ASYNC-13 | Cancel dirty settings | Changes are discarded. | | |
 
 ## Import and Export

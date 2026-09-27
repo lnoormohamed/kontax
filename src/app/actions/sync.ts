@@ -2083,7 +2083,8 @@ const updateSyncAccountSettingsSchema = z.object({
   syncWindowTimezone: z.string().min(1).max(64).nullable().optional(),
   excludedFields: z.array(z.string().min(1)).max(32).optional(),
   exportLabelFilter: z.array(z.string().min(1)).max(64).optional(),
-  // 0 = never auto-pause; null = platform default (5).
+  // 0 = never auto-pause; null = plan default (P49A-19: 3 on Free, 5 on paid
+  // plans). Stored as chosen; the runner clamps it to the plan's ceiling.
   maxAttemptsBeforePause: z.number().int().min(0).max(100).nullable().optional(),
   // P41-DB01 projection config. destinationBookId lives on SyncAccount; the rest
   // on SyncAccountSettings. All book ids are validated to belong to the user.

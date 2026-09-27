@@ -40,11 +40,13 @@ import {
   CONFLICT_QUEUE_FULL_CODE,
   CONTACT_LIMIT_REACHED_CODE,
   settleOAuthSyncJob,
-  DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE,
   MANUAL_CONFLICT_QUEUE_LIMIT,
   SYNC_AUTO_PAUSED_CODE,
+  FREE_AUTO_PAUSE_FAILURES,
   getConsecutiveFailureStreak,
+  getSyncAutoPauseThreshold,
   getSyncErrorSupportBucket,
+  shouldAutoPauseAfterFailure,
 } from "~/server/sync-health";
 import {
   buildDeletionHoldPayload,
@@ -464,14 +466,23 @@ const markJobFailed = async ({
 }) => {
   const now = new Date();
   const baseFailureStatus = getFailureStatus(accountStatus, errorCode);
-  // P39-05: retry sensitivity — the per-connection maxAttemptsBeforePause
-  // replaces the hardcoded platform streak. 0 = never auto-pause.
+  // P39-05: retry sensitivity — the per-connection maxAttemptsBeforePause.
+  // P49A-19 item 6: its default and ceiling come from the owner's effective
+  // plan (3 failures on Free, 5 on paid plans). 0 = never auto-pause.
   const settingsRow = await db.syncAccountSettings.findUnique({
     where: { syncAccountId },
     select: { maxAttemptsBeforePause: true, notifyOnFailure: true },
   });
-  const pauseThreshold =
-    settingsRow?.maxAttemptsBeforePause ?? DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE;
+  const pauseThreshold = await getSyncAutoPauseThreshold(
+    db,
+    syncAccountId,
+    settingsRow?.maxAttemptsBeforePause,
+  ).catch((err: unknown) => {
+    // Never let the plan lookup keep a failed job RUNNING: fall back to the
+    // strictest (Free) threshold for this one failure.
+    console.error(`[sync] auto-pause threshold lookup failed for ${syncAccountId}:`, err);
+    return FREE_AUTO_PAUSE_FAILURES;
+  });
   const notifyOnFailure = settingsRow?.notifyOnFailure ?? true;
   const recentJobs = await db.syncJob.findMany({
     where: {
@@ -500,11 +511,12 @@ const markJobFailed = async ({
     })),
   ]);
   const supportBucket = getSyncErrorSupportBucket(errorCode);
-  const shouldAutoPause =
-    baseFailureStatus === "ERROR" &&
-    pauseThreshold > 0 &&
-    failureStreak >= pauseThreshold &&
-    supportBucket !== "authentication";
+  const shouldAutoPause = shouldAutoPauseAfterFailure({
+    threshold: pauseThreshold,
+    failureStreak,
+    baseFailureStatus,
+    errorCode,
+  });
   const finalStatus = shouldAutoPause ? "PAUSED" : baseFailureStatus;
   // P39-DB01 §3a: the tripping run's history row carries the attempt counter;
   // earlier attempts carry theirs from their own markJobFailed pass.

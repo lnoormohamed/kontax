@@ -52,6 +52,11 @@
  * @property {boolean} liveShareEnabled
  * @property {boolean} staticShareEnabled
  * @property {boolean} apiAccessEnabled
+ * @property {number} syncAutoPauseAfterFailures  P49A-19: consecutive sync failures before a
+ *   connection auto-pauses when it has no explicit "Retry sensitivity" setting.
+ * @property {number | null} syncAutoPauseMaxFailures  The most failures an explicit setting may
+ *   allow before pausing (null = any setting, including "never"). See
+ *   `resolveSyncAutoPauseThreshold`.
  */
 
 /**
@@ -142,6 +147,11 @@ const PRO_PERSONAL = {
   liveShareEnabled: true,
   staticShareEnabled: true,
   apiAccessEnabled: true,
+  // P49A-19 (owner decision 2026-09-27): paid plans auto-pause a failing sync
+  // connection after 5 failures in a row by default, and may choose any
+  // retry sensitivity (1, 3, 5, 10 or never).
+  syncAutoPauseAfterFailures: 5,
+  syncAutoPauseMaxFailures: null,
 };
 
 /** @type {Record<PlanName, PlanEntitlements>} */
@@ -169,6 +179,11 @@ export const PLAN_DEFAULTS = {
     liveShareEnabled: false,
     staticShareEnabled: false,
     apiAccessEnabled: false,
+    // P49A-19 (owner decision 2026-09-27): Free auto-pauses a failing sync
+    // connection after 3 failures in a row; a connection setting can make it
+    // pause sooner (1) but not later.
+    syncAutoPauseAfterFailures: 3,
+    syncAutoPauseMaxFailures: 3,
   },
   PRO: {
     ...PRO_PERSONAL,
@@ -421,6 +436,31 @@ export const loadEffectivePlan = async (client, userId, now = new Date()) => {
     lifecycleState: user.lifecycleState,
     ...resolveEffectivePlan({ userId, subscriptions: user.subscriptions ?? [], teamGroups, now }),
   };
+};
+
+// ── Sync auto-pause (P49A-19 item 6) ───────────────────────────────────────────
+
+/**
+ * Consecutive failures after which a sync connection auto-pauses, for the
+ * account owner's effective plan and the connection's "Retry sensitivity"
+ * setting (`SyncAccountSettings.maxAttemptsBeforePause`: null = plan default,
+ * 0 = never, n = after n). Owner decision 2026-09-27: 3 on Free, 5 on paid
+ * plans (admin comp counts as paid — it is the effective plan).
+ *
+ * An explicit setting is respected within the plan's ceiling: on Free it can
+ * make a connection pause sooner (1) but a saved 5, 10 or "never" (chosen on
+ * a paid plan, or before this rule) is clamped to 3 — the stored value is
+ * kept, so it applies again after an upgrade. Paid plans keep any setting.
+ *
+ * @param {Pick<PlanEntitlements, "syncAutoPauseAfterFailures" | "syncAutoPauseMaxFailures">} entitlements
+ * @param {number | null | undefined} setting
+ * @returns {number} failures in a row before pausing; 0 = never auto-pause.
+ */
+export const resolveSyncAutoPauseThreshold = (entitlements, setting) => {
+  const { syncAutoPauseAfterFailures: planDefault, syncAutoPauseMaxFailures: max } = entitlements;
+  if (setting == null || !Number.isInteger(setting) || setting < 0) return planDefault;
+  if (max === null) return setting;
+  return setting === 0 ? max : Math.min(setting, max);
 };
 
 // ── Contact cap (A-25) ─────────────────────────────────────────────────────────

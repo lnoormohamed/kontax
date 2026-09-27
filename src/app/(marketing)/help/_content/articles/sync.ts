@@ -331,7 +331,7 @@ export const SYNC: HelpCategoryContent = {
       ],
       whatToExpect: [
         "Failed syncs are retried automatically with growing gaps (5 minutes, then 15, 60 and so on).",
-        `After ${FACTS.autoPauseDefaultFailures} failures in a row (the default; change it in **Retry sensitivity**), Kontax pauses the connection so it doesn't keep hammering the server. Authentication errors don't auto-pause — they wait for new credentials.`,
+        `After a number of failures in a row — ${FACTS.autoPauseRule} by default; change it in **Retry sensitivity** — Kontax pauses the connection so it doesn't keep hammering the server. Authentication errors don't auto-pause — they wait for new credentials.`,
       ],
       ifItDoesntWork: [
         "Email [support@getkontax.com](mailto:support@getkontax.com) with the connection's provider and the error text from **Sync history**.",
@@ -466,7 +466,7 @@ export const SYNC: HelpCategoryContent = {
               ],
               [
                 "**Auto-paused** (Paused for safety)",
-                `The sync failed ${FACTS.autoPauseDefaultFailures} times in a row (the default).`,
+                `The sync failed several times in a row — by default ${FACTS.autoPauseRule}.`,
                 "Fix the error shown in **Sync history** — see [Fix sync that isn't working](/help/sync/fix-sync-not-working) — then **Resume**.",
               ],
               [
@@ -485,7 +485,7 @@ export const SYNC: HelpCategoryContent = {
         {
           heading: "Settings that control pausing",
           list: [
-            `**Retry sensitivity** — how many failures in a row before auto-pausing: the platform default (${FACTS.autoPauseDefaultFailures}), 1, 3, 5, 10 or never.`,
+            `**Retry sensitivity** — how many failures in a row before auto-pausing: the plan default (${FACTS.autoPauseRule}), 1, 3, 5, 10 or never. On Free a connection pauses after at most ${FACTS.autoPauseFreeFailures} failures in a row, so 5, 10 and never apply on paid plans only.`,
             "**Deletion safety** — pause if a sync would delete more than a number of contacts at once. It's off until you turn it on.",
           ],
         },

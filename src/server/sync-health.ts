@@ -1,10 +1,73 @@
 import type { SyncAccountLifecycleStatus } from "~/lib/sync-account-status";
+import {
+  loadEffectivePlan,
+  PLAN_DEFAULTS,
+  resolveSyncAutoPauseThreshold,
+} from "~/server/dav/plan-entitlements.mjs";
 
+// Display heuristic only: a PAUSED account with no auto-pause code (paused
+// before P39-05 stamped SYNC_AUTO_PAUSED) and a streak this long is shown as
+// "paused for safety". The real threshold is per plan — see below.
 export const AUTO_PAUSE_FAILURE_STREAK = 3;
-// P39-05: the platform default for maxAttemptsBeforePause (the P36 panel calls
-// it "Platform default (5 failures)"). A per-connection setting overrides it;
-// 0 = never auto-pause.
-export const DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE = 5;
+
+// P49A-19 item 6 (owner decision 2026-09-27): a connection auto-pauses after
+// 3 consecutive failures on Free and 5 on paid plans (Pro / Family / Teams;
+// an admin comp counts as its plan). The numbers live in the plan matrix
+// (PLAN_DEFAULTS[plan].syncAutoPauseAfterFailures) so the runner, the
+// settings panel and the help centre can't drift; an explicit per-connection
+// "Retry sensitivity" is honoured within the plan's ceiling
+// (`resolveSyncAutoPauseThreshold`). Replaces the flat
+// DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE = 5 (P39-05).
+export const FREE_AUTO_PAUSE_FAILURES = PLAN_DEFAULTS.FREE.syncAutoPauseAfterFailures;
+export const PAID_AUTO_PAUSE_FAILURES = PLAN_DEFAULTS.PRO.syncAutoPauseAfterFailures;
+
+type AutoPauseDb = {
+  syncAccount: {
+    findUnique: (args: {
+      where: { id: string };
+      select: { userId: true };
+    }) => Promise<{ userId: string } | null>;
+  };
+};
+
+/**
+ * The auto-pause threshold for one connection right now: its owner's
+ * effective plan (same resolution as every other entitlement, so the 3-day
+ * payment grace applies) combined with the connection's setting. 0 = never.
+ */
+export const getSyncAutoPauseThreshold = async (
+  client: AutoPauseDb,
+  syncAccountId: string,
+  setting: number | null | undefined,
+): Promise<number> => {
+  const account = await client.syncAccount.findUnique({
+    where: { id: syncAccountId },
+    select: { userId: true },
+  });
+  const effective = account ? await loadEffectivePlan(client, account.userId) : null;
+  return resolveSyncAutoPauseThreshold(effective?.entitlements ?? PLAN_DEFAULTS.FREE, setting);
+};
+
+/**
+ * Should this failure auto-pause the connection? Only a plain ERROR (not an
+ * auth failure, which waits for new credentials) whose streak reached a
+ * non-zero threshold.
+ */
+export const shouldAutoPauseAfterFailure = ({
+  threshold,
+  failureStreak,
+  baseFailureStatus,
+  errorCode,
+}: {
+  threshold: number;
+  failureStreak: number;
+  baseFailureStatus: string;
+  errorCode: string | null;
+}) =>
+  baseFailureStatus === "ERROR" &&
+  threshold > 0 &&
+  failureStreak >= threshold &&
+  getSyncErrorSupportBucket(errorCode) !== "authentication";
 // P39-05: lastErrorCode set on the account when retry sensitivity trips. The
 // underlying error stays on the tripping SyncJob row.
 export const SYNC_AUTO_PAUSED_CODE = "SYNC_AUTO_PAUSED";

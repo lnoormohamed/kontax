@@ -169,8 +169,12 @@ export type SyncAccountData = {
   syncWindowTimezone: string | null;
   excludedFields: string[];
   exportLabelFilter: string[];
-  // null = platform default (5); 0 = never auto-pause.
+  // null = plan default (autoPause.planDefault); 0 = never auto-pause.
   maxAttemptsBeforePause: number | null;
+  // P49A-19: the owner's plan rule for auto-pause — default failures in a row
+  // (3 Free, 5 paid) and the most an explicit setting may allow (null = any,
+  // incl. never). Mirrors resolveSyncAutoPauseThreshold (plan-entitlements.mjs).
+  autoPause: { planDefault: number; maxSetting: number | null };
   // P36-DB02: true when the connection was just created and the user hasn't
   // confirmed sync settings yet — the first sync is held and setup is shown.
   needsSetup: boolean;

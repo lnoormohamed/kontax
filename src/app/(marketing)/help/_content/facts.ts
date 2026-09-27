@@ -6,7 +6,11 @@
 
 import { TEAMS_SEAT_MIN } from "~/app/_components/plan-data";
 import { PAYMENT_GRACE_DAYS, PLAN_DEFAULTS } from "~/server/dav/plan-entitlements.mjs";
-import { DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE, MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
+import {
+  FREE_AUTO_PAUSE_FAILURES,
+  MANUAL_CONFLICT_QUEUE_LIMIT,
+  PAID_AUTO_PAUSE_FAILURES,
+} from "~/server/sync-health";
 
 const fmt = (n: number) => n.toLocaleString("en-GB");
 
@@ -37,7 +41,11 @@ export const FACTS = {
 
   // ── Sync (src/server/sync-health.ts) ──
   conflictQueueLimit: MANUAL_CONFLICT_QUEUE_LIMIT,
-  autoPauseDefaultFailures: DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE,
+  /** P49A-19: failures in a row before a connection auto-pauses (plan matrix). */
+  autoPauseFreeFailures: FREE_AUTO_PAUSE_FAILURES,
+  autoPausePaidFailures: PAID_AUTO_PAUSE_FAILURES,
+  /** "3 on Free, 5 on paid plans" */
+  autoPauseRule: `${FREE_AUTO_PAUSE_FAILURES} on Free, ${PAID_AUTO_PAUSE_FAILURES} on paid plans`,
 
   // ── Mirrored (pinned by tests/node/help-centre.test.ts) ──
   /** src/app/actions/account.ts — scheduledDeleteAt = now + 30 days */
