@@ -18,12 +18,21 @@
 // Columns outside the mapping (tags, significant dates, related people, custom
 // fields, favourites, …) are never written by a PUT.
 //
-// Both representations of multi-value fields are written from the same parse:
-// the typed `*Entries` columns (what the web app reads first) and the legacy
-// `email`/`emailAddresses`, `phone`/`phoneNumbers`, `website`,
-// `address`/`postalAddresses` columns.
+// P49A-10: multi-value fields follow the canonical model in
+// `contact-multi-values.mjs` — the typed `*Entries` columns are parsed from the
+// card and the legacy `email`/`emailAddresses`, `phone`/`phoneNumbers`,
+// `website`, `address`/`postalAddresses` columns are derived from them; the
+// serializer reads the entries (legacy only for a row not yet backfilled).
 
 import { Buffer } from "node:buffer";
+
+import {
+  deriveMultiValueFields,
+  readAddressEntries,
+  readEmailEntries,
+  readPhoneEntries,
+  readWebsiteEntries,
+} from "./contact-multi-values.mjs";
 
 /**
  * @typedef {object} VCardLine
@@ -578,13 +587,6 @@ const parseAddressEntries = (lines) => {
   }));
 };
 
-/**
- * @template {{ isPrimary: boolean }} T
- * @param {T[]} entries
- * @returns {T | undefined}
- */
-const primaryOf = (entries) => entries.find((entry) => entry.isPrimary) ?? entries[0];
-
 // --- birthdays --------------------------------------------------------------
 
 /**
@@ -639,20 +641,22 @@ export const serializeVCardBirthday = (birthday) => {
 const orNull = (value) => (value?.trim() ? value.trim() : null);
 
 /**
- * Legacy flat arrays: one value each, even when two labelled entries share it.
+ * The legacy columns, derived from the parsed entries by the canonical module
+ * (flat arrays hold one value each, even when two labelled entries share it).
  *
- * @param {DavValueEntry[]} entries
+ * @param {{ emailEntries: unknown, phoneEntries: unknown, websiteEntries: unknown, addressEntries: unknown }} entries
  */
-const distinctValues = (entries) => {
-  const seen = new Set();
-  return entries
-    .map((entry) => entry.value)
-    .filter((value) => {
-      const key = valueKey(value);
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+const legacyFieldsFor = (entries) => {
+  const derived = deriveMultiValueFields(entries);
+  return {
+    email: derived.email ?? null,
+    emailAddresses: derived.emailAddresses ?? [],
+    phone: derived.phone ?? null,
+    phoneNumbers: derived.phoneNumbers ?? [],
+    website: derived.website ?? null,
+    address: derived.address ?? null,
+    postalAddresses: derived.postalAddresses ?? [],
+  };
 };
 
 /**
@@ -714,17 +718,11 @@ const fieldsFromLines = (lines) => {
     company: orNull(company),
     department: orNull(department),
     jobTitle: orNull(first("TITLE")?.value),
-    email: primaryOf(emailEntries)?.value ?? null,
-    emailAddresses: distinctValues(emailEntries),
+    ...legacyFieldsFor({ emailEntries, phoneEntries, websiteEntries, addressEntries }),
     emailEntries,
-    phone: primaryOf(phoneEntries)?.value ?? null,
-    phoneNumbers: distinctValues(phoneEntries),
     phoneEntries,
-    website: primaryOf(websiteEntries)?.value ?? null,
     websiteEntries,
     birthday: bdayLine ? parseVCardBirthday(bdayLine) : null,
-    address: primaryOf(addressEntries)?.formatted ?? null,
-    postalAddresses: addressEntries.map((entry) => ({ label: entry.label, formatted: entry.formatted })),
     addressEntries,
     notes: notes || null,
   };
@@ -832,6 +830,17 @@ export const buildDavContactWriteData = (text, options = {}) => {
     merged.phoneEntries = mergeStoredEntryMetadata(fields.phoneEntries, existing.phoneEntries);
     merged.emailEntries = mergeStoredEntryMetadata(fields.emailEntries, existing.emailEntries);
     merged.websiteEntries = mergeStoredEntryMetadata(fields.websiteEntries, existing.websiteEntries);
+    // P49A-10: re-derive the legacy columns from the merged entries (a kept
+    // phone `e164` is what the legacy `phoneNumbers` array holds).
+    Object.assign(
+      merged,
+      legacyFieldsFor({
+        emailEntries: merged.emailEntries,
+        phoneEntries: merged.phoneEntries,
+        websiteEntries: merged.websiteEntries,
+        addressEntries: fields.addressEntries,
+      }),
+    );
   }
 
   /** @type {ReadonlySet<string>} */
@@ -865,55 +874,36 @@ const stringField = (value, key) => {
   return typeof field === "string" ? field.trim() : "";
 };
 
-/** @param {unknown} value */
-const toStringArray = (value) =>
-  Array.isArray(value)
-    ? value.filter(/** @returns {entry is string} */ (entry) => typeof entry === "string" && entry.trim().length > 0)
-    : [];
-
 /**
- * Typed entries when the contact has them, else the legacy scalar + array.
+ * Entries to serialise, deduped on value + label to match the parser: two
+ * labels for one value are two entries the device must see, or its next PUT
+ * would drop one.
  *
- * @param {unknown} entries
- * @param {unknown} scalar
- * @param {unknown} legacy
+ * @param {Array<{ label: string, value: string, isPrimary: boolean }>} entries
  * @returns {DavValueEntry[]}
  */
-const resolveValueEntries = (entries, scalar, legacy) => {
-  /** @type {DavValueEntry[]} */
-  let resolved = Array.isArray(entries)
-    ? entries
-        .map((entry) => ({
-          label: stringField(entry, "label"),
-          value: stringField(entry, "value"),
-          isPrimary: isRecord(entry) && /** @type {Record<string, unknown>} */ (entry).isPrimary === true,
-        }))
-        .filter((entry) => entry.value.length > 0)
-    : [];
-
-  if (resolved.length === 0) {
-    const values = [...(typeof scalar === "string" && scalar.trim() ? [scalar.trim()] : []), ...toStringArray(legacy)];
-    resolved = values.map((value, index) => ({ label: "", value: value.trim(), isPrimary: index === 0 }));
-  }
-
-  // Dedupe on value + label, matching the parser: two labels for one value are
-  // two entries the device must see, or its next PUT would drop one.
+const serializableValueEntries = (entries) => {
   const seen = new Set();
-  return resolved.filter((entry) => {
-    const key = entryKey(entry.label, entry.value);
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  return entries
+    .map((entry) => ({ label: entry.label, value: entry.value, isPrimary: entry.isPrimary }))
+    .filter((entry) => {
+      const key = entryKey(entry.label, entry.value);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 };
+
+// P49A-10: a legacy value recovered for a row the backfill has not reached
+// serialises without a TYPE (as it always did), not as TYPE=OTHER.
+const LEGACY_READ = { legacyLabel: "" };
 
 /**
  * @param {Record<string, unknown>} contact
  * @returns {Array<{ label: string, isPrimary: boolean, components: string[] }>}
  */
-const resolveAddressEntries = (contact) => {
-  const entries = Array.isArray(contact.addressEntries) ? contact.addressEntries : [];
-  const resolved = entries
+const resolveAddressEntries = (contact) =>
+  readAddressEntries(contact, LEGACY_READ)
     .map((entry) => {
       // Web editor entries use street/city/state/country; imported ones use
       // streetLine1/cityOrTown/stateOrProvince/countryOrRegion.
@@ -924,38 +914,16 @@ const resolveAddressEntries = (contact) => {
       const postcode = stringField(entry, "postcode");
       const country = stringField(entry, "countryOrRegion") || stringField(entry, "country");
       const poBox = stringField(entry, "poBox");
-      const formatted = stringField(entry, "formatted");
       const structured = Boolean(street || streetLine2 || city || region || postcode || country || poBox);
       return {
-        label: stringField(entry, "label"),
-        isPrimary: isRecord(entry) && /** @type {Record<string, unknown>} */ (entry).isPrimary === true,
+        label: entry.label,
+        isPrimary: entry.isPrimary,
         components: structured
           ? [poBox, streetLine2, street, city, region, postcode, country]
-          : ["", "", formatted, "", "", "", ""],
+          : ["", "", entry.formatted, "", "", "", ""],
       };
     })
     .filter((entry) => entry.components.some(Boolean));
-
-  if (resolved.length > 0) return resolved;
-
-  const legacy = [];
-  if (typeof contact.address === "string" && contact.address.trim()) {
-    legacy.push({ label: "", formatted: contact.address.trim() });
-  }
-  if (Array.isArray(contact.postalAddresses)) {
-    for (const postal of contact.postalAddresses) {
-      const formatted = stringField(postal, "formatted");
-      if (formatted && !legacy.some((entry) => entry.formatted === formatted)) {
-        legacy.push({ label: stringField(postal, "label"), formatted });
-      }
-    }
-  }
-  return legacy.map((entry, index) => ({
-    label: entry.label,
-    isPrimary: index === 0,
-    components: ["", "", entry.formatted, "", "", "", ""],
-  }));
-};
 
 /**
  * Render a stored contact as the vCard 3.0 a device downloads. Every column
@@ -1016,11 +984,11 @@ export const serializeContactToVCard = (contact) => {
   const phoneticLastName = text("phoneticLastName");
   if (phoneticLastName) lines.push(`X-PHONETIC-LAST-NAME:${escapeVCardValue(phoneticLastName)}`);
 
-  for (const entry of resolveValueEntries(contact.emailEntries, contact.email, contact.emailAddresses)) {
+  for (const entry of serializableValueEntries(readEmailEntries(contact, LEGACY_READ))) {
     pushTyped("EMAIL", escapeVCardValue(entry.value), entry.label, entry.isPrimary);
   }
 
-  for (const entry of resolveValueEntries(contact.phoneEntries, contact.phone, contact.phoneNumbers)) {
+  for (const entry of serializableValueEntries(readPhoneEntries(contact, LEGACY_READ))) {
     pushTyped("TEL", escapeVCardValue(entry.value), entry.label, entry.isPrimary);
   }
 
@@ -1033,7 +1001,7 @@ export const serializeContactToVCard = (contact) => {
   const jobTitle = text("jobTitle");
   if (jobTitle) lines.push(`TITLE:${escapeVCardValue(jobTitle)}`);
 
-  for (const entry of resolveValueEntries(contact.websiteEntries, contact.website, null)) {
+  for (const entry of serializableValueEntries(readWebsiteEntries(contact, LEGACY_READ))) {
     pushTyped("URL", escapeVCardValue(entry.value), entry.label, entry.isPrimary);
   }
 
