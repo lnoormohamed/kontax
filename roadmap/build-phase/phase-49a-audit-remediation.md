@@ -46,16 +46,17 @@ Every ticket below was checked against production before it was written:
 | [P49A-14](p49a-14-pricing-truth-from-plan-data.md) | Pricing matrix rendered from plan data; correct false claims | P1 | A-31–A-34 | — |
 | [P49A-15](p49a-15-public-site-fixes.md) | Public site: /about & /contact public, dead links, mobile, titles | P1 | A-35–A-37 | — |
 | [P49A-16](p49a-16-runtime-ops-and-sync-performance.md) | Runtime & ops: Dockerfile, timeouts, health split, DAV/sync perf, export blobs | P1 | A-29, A-30, A-38–A-42 | P49A-04 |
-| [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, focus, loading states — **deferred: reassess after Phase 50** | P1 | A-43–A-47 | P50-06, P50-07 |
+| [P49A-17](p49a-17-ux-accessibility.md) | UX & accessibility: confirmations, labels, 2FA inputs, dialogs, loading states — **reassessed 2026-09-27, ready** | P1 | A-43–A-47 + follow-ups | — |
 | [P49A-18](p49a-18-hardening-and-debt-backlog.md) | Hardening & debt backlog | P2 | P2 list | — |
 | [P49A-19](p49a-19-bugs-found-during-content-work.md) | Bugs found while writing help/guides (2FA recovery codes, manual merge, …) | P0/P1 | — | — |
+| [P49A-20](p49a-20-focus-visible-sweep.md) | Focus-visible sweep for borderless inline-edit inputs (split from 17) | P2 | — | — |
 
 ## Suggested delivery order
 1. P49A-15 (S) — can ship with the pending P49 homepage release.
 2. P49A-01, -02, -04, -05, -08 — small, stop ongoing loss/stalls.
 3. P49A-06, -07, -09, -11.
 4. P49A-10 → -03 → -12 (data model first).
-5. P49A-13, -14, -16, then -18. P49A-17 is reassessed after Phase 50.
+5. P49A-13, -16, -17, -20, then -18. (P49A-14 shipped with Phase 50.)
 
 Model roles: Opus/Sonnet implement; Fable reviews every P0 ticket and all security tickets.
 Each ticket lands on `staging` first; nothing reaches `main` without an explicit go-ahead.

@@ -1,17 +1,13 @@
 # Phase 50 — Marketing redesign: Direction A (Evolved calm)
 
 ## Phase status
-Built on `staging` 2026-09-26 (P50-01…07); awaiting staging review. P50-08 not started (needs
-the owner's go-ahead). Production only with an explicit go-ahead.
-QA: [p50-07-qa-2026-09-26.md](../runbooks/p50-07-qa-2026-09-26.md).
-
-Open for the owner:
-- About: the "why Kontax exists" section needs owner copy (left out, nothing invented); approve
-  the new short labels on /about ("The problem", "What Kontax does", "Who makes it").
-- Homepage: P49's hero search demo was removed — the Direction A hero has no slot for it.
-- Pricing kept its current headings ("Simple, honest pricing") rather than the prototype's.
-- Staging checks not possible locally: signed-in header/hero, token pages (/reset-password,
-  /verify-email), Safari/Firefox/real devices.
+**Shipped to production 2026-09-27** (main 0886b69) as a merge of two builds: the owner chose
+page by page (homepage, pricing layout and About from one; security, changelog, help centre,
+guides and SEO from the other). QA: [p50-07-qa-2026-09-26.md](../runbooks/p50-07-qa-2026-09-26.md)
+plus a Chromium sweep of all 107 public URLs on production (clean apart from a pre-existing
+/privacy hydration warning caused by Cloudflare Email Address Obfuscation). Not yet covered:
+Safari/iPhone and Firefox, and the signed-in header/hero — check manually. P50-08 not started
+(needs the owner's go-ahead).
 
 ## Decision
 From the P50-DB01 exploration ([brief](../design-briefs/p50-db01-marketing-redesign-exploration.md),
