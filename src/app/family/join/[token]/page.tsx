@@ -67,7 +67,7 @@ export default async function FamilyJoinPage({
     return (
       <JoinCard>
         <FamCrest />
-        <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+        <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
           Family book
         </p>
         <h1 className="mt-1 text-[20px] font-semibold">
@@ -149,7 +149,7 @@ export default async function FamilyJoinPage({
         </span>
         <div className="text-left">
           <div className="text-[14px] font-semibold text-[#1d2823]">{ownerName}</div>
-          <div className="text-[12.5px] text-[#8b938c]">
+          <div className="text-[12.5px] text-[#646c65]">
             {member.group.owner.email}
           </div>
         </div>

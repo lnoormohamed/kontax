@@ -411,7 +411,7 @@ const AlwaysRowChips = memo(function AlwaysRowChips({
   labels: string[];
   labelColors: Record<string, string>;
 }) {
-  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
+  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#646c65";
   const shown = labels.slice(0, ALWAYS_INLINE_CAP);
   const overflow = labels.length - shown.length;
   return (
@@ -420,7 +420,7 @@ const AlwaysRowChips = memo(function AlwaysRowChips({
         <LabelChip key={`${name}-${i}`} name={name} col={col(name)} sz="sm" />
       ))}
       {overflow > 0 && (
-        <span style={{ color: "#8b938c", fontSize: 11, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>
+        <span style={{ color: "#646c65", fontSize: 11, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>
           +{overflow}
         </span>
       )}
@@ -449,7 +449,7 @@ const RowLabelChips = memo(function RowLabelChips({
   const [overlayStyle, setOverlayStyle] = useState<CSSProperties | null>(null);
   const anchorRef = useRef<HTMLSpanElement | null>(null);
 
-  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
+  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#646c65";
   const shown = labels.slice(0, 3);
   const hidden = labels.slice(3);
   const dotSize = isMobile ? 8 : 7;
@@ -534,7 +534,7 @@ const RowLabelChips = memo(function RowLabelChips({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              color: "#8b938c",
+              color: "#646c65",
               fontSize: isMobile ? 12 : 11,
               fontWeight: 700,
               lineHeight: 1,
@@ -684,7 +684,7 @@ const ContactRow = memo(function ContactRow({
         </span>
       </Link>
       {meta.length > 0 ? (
-        <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#8b938c]">
+        <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#646c65]">
           <Highlight query={query} text={meta[0]!} />
         </span>
       ) : (
@@ -720,18 +720,18 @@ const ContactRow = memo(function ContactRow({
             <RowLabelChips labels={contactLabels} labelColors={labelColors} mode={rowLabels} isMobile />
           )}
         </div>
-        <p className="truncate text-[12.5px] text-[#8b938c]">
+        <p className="truncate text-[12.5px] text-[#646c65]">
           {meta.length > 0
             ? meta.map((value, index) => (
                 <span key={index}>
-                  {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
+                  {index > 0 ? <span className="mx-1.5 text-[#646c65]">·</span> : null}
                   <Highlight query={query} text={value} />
                 </span>
               ))
             : "No details yet"}
         </p>
         {matchSnippet && (
-          <p className="mt-0.5 truncate text-[11.5px] text-[#8b938c]" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <p className="mt-0.5 truncate text-[11.5px] text-[#646c65]" style={{ display: "flex", alignItems: "center", gap: 4 }}>
             {matchSnippet.field === "label" ? (
               <>
                 <LabelDot col={labelColors[matchSnippet.snippet] ?? "#aeb4ac"} />
@@ -856,7 +856,7 @@ const GroupHeading = memo(function GroupHeading({ label, favorites }: { label: s
         paddingLeft: 16,
       }}
     >
-      <span style={{ fontSize: 11, fontWeight: 700, color: "#8b938c", lineHeight: 1 }}>
+      <span style={{ fontSize: 11, fontWeight: 700, color: "#646c65", lineHeight: 1 }}>
         {label}
       </span>
     </div>
@@ -1625,7 +1625,7 @@ export function ContactsWorkspaceTable({
 
       {/* Sticky column header — compact desktop only, sits above the virtual list */}
       {viewMode === "compact" ? (
-        <div className={`sticky top-0 z-[3] hidden ${GRID} items-center gap-4 border-b border-[#e9ece7] bg-white px-3 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#8b938c] lg:grid`}>
+        <div className={`sticky top-0 z-[3] hidden ${GRID} items-center gap-4 border-b border-[#e9ece7] bg-white px-3 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#646c65] lg:grid`}>
           <button
             aria-label={allSelected ? "Deselect all" : "Select all"}
             className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] border-[1.6px] text-[10px] transition ${

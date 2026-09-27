@@ -32,7 +32,7 @@ const HEAD_STYLE: CSSProperties = {
   fontWeight: 700,
   letterSpacing: "0.04em",
   textTransform: "uppercase",
-  color: "#8b938c",
+  color: "#646c65",
   background: "#f2f4f0",
   borderBottom: "1px solid #d8ddd6",
   whiteSpace: "nowrap",

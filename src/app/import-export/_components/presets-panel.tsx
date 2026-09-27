@@ -83,7 +83,7 @@ function RenameInput({
           onClick={onCancel}
           type="button"
         >
-          <WorkspaceIcon name="x" size={15} className="text-[#8b938c]" />
+          <WorkspaceIcon name="x" size={15} className="text-[#646c65]" />
         </button>
       </div>
       {isDup && <div className="text-[12px] text-[#b5472f]">A preset with this name already exists.</div>}
@@ -186,11 +186,11 @@ export function PresetsPanel({ kind }: { kind: "import" | "export" }) {
 
       <div className="rounded-[14px] border border-[#d8ddd6] bg-white overflow-hidden">
         {loading ? (
-          <div className="px-5 py-10 text-center text-[14px] text-[#8b938c]">Loading…</div>
+          <div className="px-5 py-10 text-center text-[14px] text-[#646c65]">Loading…</div>
         ) : presets.length === 0 ? (
           <div className="grid place-items-center gap-3 px-6 py-14 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-[12px] bg-[#f2f4f0]">
-              <WorkspaceIcon name={cfg.icon} size={22} className="text-[#8b938c]" strokeWidth={1.6} />
+              <WorkspaceIcon name={cfg.icon} size={22} className="text-[#646c65]" strokeWidth={1.6} />
             </span>
             <div className="text-[15px] font-semibold text-[#1d2823]">{cfg.emptyTitle}</div>
             <p className="max-w-[320px] text-[13.5px] leading-[1.5] text-[#5c655e]">{cfg.emptyBody}</p>
@@ -204,10 +204,10 @@ export function PresetsPanel({ kind }: { kind: "import" | "export" }) {
         ) : (
           <>
             <div className="flex items-center justify-between border-b border-[#e9ece7] px-5 py-3.5">
-              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">
+              <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#646c65]">
                 Saved presets
               </span>
-              <span className="tabular-nums text-[12.5px] text-[#8b938c]">{presets.length}</span>
+              <span className="tabular-nums text-[12.5px] text-[#646c65]">{presets.length}</span>
             </div>
             {presets.map((p) => (
               <div
@@ -229,12 +229,12 @@ export function PresetsPanel({ kind }: { kind: "import" | "export" }) {
                   <>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[14.5px] font-semibold text-[#1d2823]">{p.name}</div>
-                      <div className="tabular-nums text-[12.5px] text-[#8b938c]">{metaLine(p)}</div>
+                      <div className="tabular-nums text-[12.5px] text-[#646c65]">{metaLine(p)}</div>
                     </div>
                     <div className="flex shrink-0 gap-1.5">
                       <button
                         aria-label={`Rename ${p.name}`}
-                        className="grid h-8 w-8 place-items-center rounded-[8px] border border-[#d8ddd6] bg-white text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#1d2823]"
+                        className="grid h-8 w-8 place-items-center rounded-[8px] border border-[#d8ddd6] bg-white text-[#646c65] transition hover:bg-[#f2f4f0] hover:text-[#1d2823]"
                         onClick={() => setEditId(p.id)}
                         title="Rename"
                         type="button"
@@ -243,7 +243,7 @@ export function PresetsPanel({ kind }: { kind: "import" | "export" }) {
                       </button>
                       <button
                         aria-label={`Delete ${p.name}`}
-                        className="grid h-8 w-8 place-items-center rounded-[8px] border border-[#d8ddd6] bg-white text-[#8b938c] transition hover:border-[#e8b6a8] hover:bg-[#fff5f5] hover:text-[#b5472f]"
+                        className="grid h-8 w-8 place-items-center rounded-[8px] border border-[#d8ddd6] bg-white text-[#646c65] transition hover:border-[#e8b6a8] hover:bg-[#fff5f5] hover:text-[#b5472f]"
                         onClick={() => setDeleteTarget(p)}
                         title="Delete"
                         type="button"

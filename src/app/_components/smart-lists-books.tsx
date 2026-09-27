@@ -137,7 +137,7 @@ function Btn({ variant = "ghost", ...props }: React.ButtonHTMLAttributes<HTMLBut
 function FilterChips({ state, bookName }: { state: ContactFilterState; bookName: (id: string) => string | undefined }) {
   const chips = summarise(state, bookName);
   if (chips.length === 0) {
-    return <div style={{ fontSize: 13, color: "#8b938c" }}>No filters applied yet — apply one, then save it.</div>;
+    return <div style={{ fontSize: 13, color: "#646c65" }}>No filters applied yet — apply one, then save it.</div>;
   }
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
@@ -154,7 +154,7 @@ function FilterChips({ state, bookName }: { state: ContactFilterState; bookName:
 function SectionHeader({ label, action, onAction }: { label: string; action: string; onAction: () => void }) {
   return (
     <div className="flex items-center px-2.5 py-1">
-      <span className="flex-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">{label}</span>
+      <span className="flex-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">{label}</span>
       <button
         type="button"
         onClick={onAction}
@@ -246,7 +246,7 @@ function Row({
             <DotsIcon />
           </button>
           {count != null ? (
-            <span className={`text-[11.5px] tabular-nums text-[#8b938c] ${menuOpen ? "hidden" : "group-hover:hidden"}`}>{count}</span>
+            <span className={`text-[11.5px] tabular-nums text-[#646c65] ${menuOpen ? "hidden" : "group-hover:hidden"}`}>{count}</span>
           ) : null}
           {menuOpen ? (
             <div className="absolute right-1 top-8 z-30 min-w-[172px] rounded-[11px] border border-[rgba(20,30,25,0.06)] bg-white p-1.5 shadow-[0_14px_40px_rgba(20,30,25,0.22)]">
@@ -270,7 +270,7 @@ function Row({
           ) : null}
         </>
       ) : !renaming && count != null ? (
-        <span className="text-[11.5px] tabular-nums text-[#8b938c]">{count}</span>
+        <span className="text-[11.5px] tabular-nums text-[#646c65]">{count}</span>
       ) : null}
     </div>
   );
@@ -349,7 +349,7 @@ export function SmartListsBooks({ lists, books }: { lists: SmartList[]; books: P
       <div className="mt-3">
         <SectionHeader label="My Lists" action="+ New list" onAction={() => setShowSaveList(true)} />
         {lists.length === 0 ? (
-          <p className="px-2.5 pb-2 text-[12px] leading-snug text-[#8b938c]">Save any filter as a list to recall it in one click.</p>
+          <p className="px-2.5 pb-2 text-[12px] leading-snug text-[#646c65]">Save any filter as a list to recall it in one click.</p>
         ) : (
           lists.map((list) => {
             const state = fromJson(list.filterState);
@@ -560,7 +560,7 @@ function BookManageModal({
             {copied ? "Copied" : "Copy"}
           </Btn>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 7, fontSize: 11.5, color: "#8b938c" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 7, fontSize: 11.5, color: "#646c65" }}>
           Fixed at creation — renaming the book won’t change the slug, so device subscriptions keep working.
         </div>
       </div>

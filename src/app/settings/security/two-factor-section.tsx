@@ -84,7 +84,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
     return (
       <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
         <div className="text-[16px] font-semibold text-[#1d2823]">Two-factor authentication</div>
-        <p className="mt-3 text-[13.5px] text-[#8b938c]">Loading…</p>
+        <p className="mt-3 text-[13.5px] text-[#646c65]">Loading…</p>
       </section>
     );
   }
@@ -93,7 +93,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
     <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-[16px] font-semibold text-[#1d2823]">Two-factor authentication</span>
-        <span className={`rounded-full border px-[11px] py-1 text-[11px] font-bold uppercase tracking-[0.08em] ${enabled ? "border-[#bcdac9] bg-[#e7efe9] text-[#17352e]" : "border-[#e0e4dd] bg-[#f2f4f0] text-[#8b938c]"}`}>
+        <span className={`rounded-full border px-[11px] py-1 text-[11px] font-bold uppercase tracking-[0.08em] ${enabled ? "border-[#bcdac9] bg-[#e7efe9] text-[#17352e]" : "border-[#e0e4dd] bg-[#f2f4f0] text-[#646c65]"}`}>
           {enabled ? "Enabled" : "Disabled"}
         </span>
       </div>
@@ -116,7 +116,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
           <p className="mt-[10px] max-w-[580px] text-[14.5px] leading-[1.55] text-[#5c655e]">
             Authenticator app connected. You&apos;ll be asked for a code on each sign-in.{" "}
             {verifiedAt && (
-              <span className="text-[#8b938c]">
+              <span className="text-[#646c65]">
                 Enabled on {new Date(verifiedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.
               </span>
             )}
@@ -158,7 +158,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
           </div>
 
           {!disabling ? (
-            <button className="mt-4 border-none bg-transparent p-0 text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#b5472f]" onClick={() => setDisabling(true)} type="button">
+            <button className="mt-4 border-none bg-transparent p-0 text-[13.5px] font-medium text-[#646c65] transition hover:text-[#b5472f]" onClick={() => setDisabling(true)} type="button">
               Disable 2FA
             </button>
           ) : (
@@ -167,7 +167,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
                 To disable two-factor authentication, enter your password and a code from your authenticator app.
               </p>
               <label className="block">
-                <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Password</span>
+                <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Password</span>
                 <input
                   autoComplete="current-password"
                   className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe] ${err === "Incorrect password." ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
@@ -179,7 +179,7 @@ export function TwoFactorSection({ flash }: { flash: (msg: string) => void }) {
                 {err === "Incorrect password." && <p className="mt-[6px] text-[12.5px] text-[#9a3a23]">{err}</p>}
               </label>
               <div>
-                <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Authenticator code</span>
+                <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Authenticator code</span>
                 <input
                   className="mt-[6px] w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[16px] tracking-[0.1em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] md:text-[15px]"
                   inputMode="numeric"

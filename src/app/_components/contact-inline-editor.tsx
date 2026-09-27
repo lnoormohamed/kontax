@@ -193,7 +193,7 @@ function InlineField({
           </span>
         )}
         {status === "saving" ? (
-          <span className="ml-1 text-[11px] text-[#8b938c]">Saving…</span>
+          <span className="ml-1 text-[11px] text-[#646c65]">Saving…</span>
         ) : status === "error" ? (
           <span className="ml-1 text-[11px] text-[#b5472f]">Couldn&apos;t save</span>
         ) : null}
@@ -205,7 +205,7 @@ function InlineField({
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
-      <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+      <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
         {title}
       </h3>
       <div className="mt-3 h-px bg-[#e9ece7]" />
@@ -216,7 +216,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
 
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-0.5 ml-[13px] mt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+    <div className="mb-0.5 ml-[13px] mt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">
       {children}
     </div>
   );

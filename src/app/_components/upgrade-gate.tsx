@@ -222,7 +222,7 @@ export function LockedCard({ gate, planLabel = "Free", onUpgrade, compact }: Loc
           See all plans
         </Link>
       </div>
-      <p style={{ margin: "14px 0 0", fontSize: 12, color: "#8b938c" }}>
+      <p style={{ margin: "14px 0 0", fontSize: 12, color: "#646c65" }}>
         You&rsquo;re on the {planLabel} plan
       </p>
     </div>

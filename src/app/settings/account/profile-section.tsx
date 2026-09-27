@@ -154,7 +154,7 @@ export function ProfileSection({
             </button>
             {photo && !uploading && (
               <button
-                className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#b5472f]"
+                className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#646c65] transition hover:text-[#b5472f]"
                 onClick={() => { setPhoto(null); setPendingAvatarUrl(null); }}
                 type="button"
               >
@@ -169,9 +169,9 @@ export function ProfileSection({
       {/* display name */}
       <div className="mt-[22px] max-w-[520px] border-t border-[#e9ece7] pt-[22px]">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Display name</span>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Display name</span>
           {remaining < 20 && (
-            <span className={`tabular-nums text-[12px] ${remaining < 0 ? "text-[#9a3a23]" : "text-[#8b938c]"}`}>
+            <span className={`tabular-nums text-[12px] ${remaining < 0 ? "text-[#9a3a23]" : "text-[#646c65]"}`}>
               {name.length} / {MAX_NAME}
             </span>
           )}
@@ -188,7 +188,7 @@ export function ProfileSection({
         {touched && empty && (
           <p className="mt-[6px] text-[12.5px] text-[#9a3a23]">Please enter your name.</p>
         )}
-        <p className="mt-2 text-[13px] leading-[1.45] text-[#8b938c]">
+        <p className="mt-2 text-[13px] leading-[1.45] text-[#646c65]">
           Shown on shared contacts and inside family or team books.
         </p>
 

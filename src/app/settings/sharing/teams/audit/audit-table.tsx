@@ -74,8 +74,8 @@ function DiffRow({ diff }: { diff: AuditDiff }) {
       <span className="w-32 shrink-0 font-medium text-[#5c655e]">
         {formatFieldLabel(diff.field)}
       </span>
-      <span className="text-[#aeb4ac] line-through">{formatDiffValue(diff.before)}</span>
-      <span className="text-[#aeb4ac]">→</span>
+      <span className="text-[#646c65] line-through">{formatDiffValue(diff.before)}</span>
+      <span className="text-[#646c65]">→</span>
       <span className="font-medium text-[#1d2823]">{formatDiffValue(diff.after)}</span>
     </div>
   );
@@ -104,7 +104,7 @@ export function AuditTable({ rows }: { rows: TeamAuditRow[] }) {
   if (rows.length === 0) {
     return (
       <div className="overflow-hidden rounded-[12px] border border-[#d8ddd6] bg-white">
-        <p className="px-5 py-10 text-center text-sm text-[#8b938c]">
+        <p className="px-5 py-10 text-center text-sm text-[#646c65]">
           No audit events match these filters.
         </p>
       </div>
@@ -115,7 +115,7 @@ export function AuditTable({ rows }: { rows: TeamAuditRow[] }) {
     <div className="overflow-hidden rounded-[12px] border border-[#d8ddd6] bg-white">
       <table className="w-full text-[13px]">
         <thead>
-          <tr className="border-b border-[#e9ece7] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">
+          <tr className="border-b border-[#e9ece7] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[#646c65]">
             <th className="px-4 py-2.5">When</th>
             <th className="px-4 py-2.5">Member</th>
             <th className="px-4 py-2.5">Event</th>
@@ -145,7 +145,7 @@ export function AuditTable({ rows }: { rows: TeamAuditRow[] }) {
                     <span className="flex items-center gap-1.5">
                       <EvTag type={r.eventType} />
                       {r.diffs.length > 0 && (
-                        <span className="text-[#8b938c]">
+                        <span className="text-[#646c65]">
                           · {r.diffs.length} {r.diffs.length === 1 ? "field" : "fields"}
                         </span>
                       )}
@@ -153,7 +153,7 @@ export function AuditTable({ rows }: { rows: TeamAuditRow[] }) {
                   </td>
                   <td className="px-4 py-2.5 text-[#5c655e]">{r.contactName}</td>
                   <td className="px-4 py-2.5 text-[#5c655e]">{r.bookName}</td>
-                  <td className="px-4 py-2.5 text-[#aeb4ac]">
+                  <td className="px-4 py-2.5 text-[#646c65]">
                     {expandable && (
                       <svg
                         className={`h-4 w-4 transition-transform ${isOpen ? "rotate-90" : ""}`}

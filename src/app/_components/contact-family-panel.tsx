@@ -52,7 +52,7 @@ export function ContactFamilyPanel({
           <div className="flex items-center justify-between gap-3 text-[13px]" key={i}>
             <span className="min-w-0 truncate text-[#1d2823]">
               {m.name}
-              {m.you ? <span className="text-[#8b938c]"> · you</span> : null}
+              {m.you ? <span className="text-[#646c65]"> · you</span> : null}
             </span>
             <span
               className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${

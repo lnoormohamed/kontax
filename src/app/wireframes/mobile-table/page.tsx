@@ -30,7 +30,7 @@ const MEMBERS = [
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b938c", margin: "26px 16px 10px" }}>
+    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#646c65", margin: "26px 16px 10px" }}>
       {children}
     </p>
   );
@@ -53,7 +53,7 @@ export default function MobileTableWireframe() {
             <div style={{ border: "1px solid #d8ddd6", borderRadius: 14, background: "#fff", padding: "13px 16px", display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 15, fontWeight: 600, color: "#1d2823" }}>{row.name}</div>
-                <div style={{ fontSize: 12.5, color: "#8b938c" }}>{row.email}</div>
+                <div style={{ fontSize: 12.5, color: "#646c65" }}>{row.email}</div>
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#17352e", background: "#e7efe9", borderRadius: 6, padding: "3px 9px" }}>{row.role}</span>
             </div>

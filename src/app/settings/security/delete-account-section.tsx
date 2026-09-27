@@ -163,7 +163,7 @@ function DeleteAccountDialog({
 
         <div className="mt-5">
           <label className="block">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">To confirm, type your email address</span>
+            <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">To confirm, type your email address</span>
             <input
               className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[14px] text-[#1d2823] outline-none transition focus:ring-[3px] focus:ring-[#edf0fe] ${error ? "border-[#c98a76] focus:border-[#c98a76]" : "border-[#d8ddd6] focus:border-[#4158f4]"}`}
               onChange={(e) => onEmailChange(e.target.value)}

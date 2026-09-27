@@ -119,7 +119,7 @@ function Checklist({
         </div>
         <button
           aria-label="Dismiss checklist"
-          className="-mr-1.5 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-[9px] text-[#8b938c] transition hover:bg-[#f2f4f0]"
+          className="-mr-1.5 -mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-[9px] text-[#646c65] transition hover:bg-[#f2f4f0]"
           onClick={onDismiss}
           type="button"
         >
@@ -140,7 +140,7 @@ function Checklist({
             style={{ width: `${pct}%` }}
           />
         </span>
-        <span className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]">
+        <span className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#646c65]">
           Step {stepNo} of {total}
         </span>
       </div>

@@ -113,7 +113,7 @@ function MergePicker({
       ref={ref}
       className="absolute left-0 top-full z-50 mt-1 w-52 overflow-hidden rounded-[0.9rem] border border-[#d8ddd6] bg-white py-1 shadow-[0_12px_34px_rgba(20,30,25,0.16)]"
     >
-      <div className="px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">Merge into…</div>
+      <div className="px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#646c65]">Merge into…</div>
       {labels.filter((l) => l.id !== excludeId).map((l) => (
         <button
           key={l.id}
@@ -123,7 +123,7 @@ function MergePicker({
         >
           <LabelDot col={l.color} size={9} />
           <span className="flex-1">{l.name}</span>
-          <span className="tabular-nums text-[12px] text-[#8b938c]">{l.count}</span>
+          <span className="tabular-nums text-[12px] text-[#646c65]">{l.count}</span>
         </button>
       ))}
     </div>
@@ -213,7 +213,7 @@ function LabelRow({
               <DotsIcon />
             </button>
           ) : (
-            <span className="min-w-[20px] shrink-0 text-right tabular-nums text-[12px] text-[#8b938c]">
+            <span className="min-w-[20px] shrink-0 text-right tabular-nums text-[12px] text-[#646c65]">
               {label.count}
             </span>
           )
@@ -234,7 +234,7 @@ function LabelRow({
             className="absolute left-2 top-9 z-50 rounded-[0.9rem] border border-[#d8ddd6] bg-white p-3 shadow-[0_12px_34px_rgba(20,30,25,0.16)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">Recolor</div>
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#646c65]">Recolor</div>
             <RecolorSwatches
               value={label.color}
               onPick={(col) => {
@@ -338,7 +338,7 @@ export function LabelsSidebar({
     <div className="mt-3">
       {/* section header */}
       <div className="flex items-center gap-1 px-2.5 py-1">
-        <span className="flex-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">Labels</span>
+        <span className="flex-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">Labels</span>
         <button
           type="button"
           className="flex items-center gap-1 rounded px-1 py-0.5 text-[11px] font-semibold text-[#4158f4] transition hover:bg-[#edf0fe]"
@@ -369,7 +369,7 @@ export function LabelsSidebar({
 
       {/* empty state */}
       {labels.length === 0 && !creating && (
-        <p className="px-3 py-1 text-[12px] leading-relaxed text-[#8b938c]">
+        <p className="px-3 py-1 text-[12px] leading-relaxed text-[#646c65]">
           Tag a contact to start a label — it shows up here.
         </p>
       )}

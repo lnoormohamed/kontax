@@ -80,7 +80,7 @@ export function CancelPlanModal({
       {portal.modal}
       {!isControlled ? (
         <button
-          className="h-11 w-full rounded-2xl border border-[#d8ddd6] bg-white px-[18px] text-[13px] font-semibold text-[#8b938c] transition hover:text-[#5c655e] hover:underline md:h-auto md:w-auto md:border-none md:bg-transparent md:p-1"
+          className="h-11 w-full rounded-2xl border border-[#d8ddd6] bg-white px-[18px] text-[13px] font-semibold text-[#646c65] transition hover:text-[#5c655e] hover:underline md:h-auto md:w-auto md:border-none md:bg-transparent md:p-1"
           onClick={() => setOpen(true)}
           type="button"
         >
@@ -103,7 +103,7 @@ export function CancelPlanModal({
               </h2>
               <button
                 aria-label="Close"
-                className="-mr-1 -mt-1 grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg border-none bg-transparent text-[#8b938c] transition hover:bg-[#f2f4f0]"
+                className="-mr-1 -mt-1 grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg border-none bg-transparent text-[#646c65] transition hover:bg-[#f2f4f0]"
                 onClick={() => setOpen(false)}
                 type="button"
               >

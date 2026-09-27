@@ -54,7 +54,7 @@ function Radio({
       </span>
       <span>
         <span className="block text-[14px] font-medium text-[#1d2823]">{label}</span>
-        {hint && <span className="mt-0.5 block text-[12.5px] text-[#8b938c]">{hint}</span>}
+        {hint && <span className="mt-0.5 block text-[12.5px] text-[#646c65]">{hint}</span>}
       </span>
     </label>
   );
@@ -166,7 +166,7 @@ export function DisplayPreferencesSection({
 
           {/* Desktop */}
           <div className="flex flex-wrap items-center gap-3">
-            <span className="w-14 shrink-0 text-[13px] text-[#8b938c]">Desktop</span>
+            <span className="w-14 shrink-0 text-[13px] text-[#646c65]">Desktop</span>
             <div
               className="inline-flex overflow-hidden rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] p-0.5"
               role="group"
@@ -191,7 +191,7 @@ export function DisplayPreferencesSection({
 
           {/* Mobile */}
           <div className="mt-2.5 flex flex-wrap items-center gap-3">
-            <span className="w-14 shrink-0 text-[13px] text-[#8b938c]">Mobile</span>
+            <span className="w-14 shrink-0 text-[13px] text-[#646c65]">Mobile</span>
             <div
               className="inline-flex overflow-hidden rounded-xl border border-[#d8ddd6] bg-[#f6f7f4] p-0.5"
               role="group"
@@ -234,7 +234,7 @@ export function DisplayPreferencesSection({
             <option value="MM/DD/YYYY">06/14/2026 (Month/Day/Year)</option>
             <option value="YYYY-MM-DD">2026-06-14 (ISO)</option>
           </select>
-          <p className="mt-2 text-[12.5px] text-[#8b938c]">
+          <p className="mt-2 text-[12.5px] text-[#646c65]">
             Preview: {formatPreviewDate(prefs.dateFormat)}
           </p>
         </div>
@@ -300,7 +300,7 @@ export function DisplayPreferencesSection({
           </button>
 
           <button
-            className="text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#5c655e] disabled:opacity-50"
+            className="text-[13.5px] font-medium text-[#646c65] transition hover:text-[#5c655e] disabled:opacity-50"
             disabled={isPending}
             onClick={handleReset}
             type="button"

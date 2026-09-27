@@ -117,7 +117,7 @@ function CreateTokenForm({ onCreated }: { onCreated: (token: string) => void }) 
       <label className="grid gap-1.5 text-[13px] font-medium text-[#5c655e]">
         Token name
         <input
-          className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] text-[#1d2823] outline-none transition placeholder:text-[#8b938c] focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+          className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] text-[#1d2823] outline-none transition placeholder:text-[#646c65] focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
           disabled={isPending}
           maxLength={64}
           onChange={(e) => setName(e.target.value)}
@@ -146,7 +146,7 @@ function CreateTokenForm({ onCreated }: { onCreated: (token: string) => void }) 
               <span>
                 {s === "READ_ONLY" ? "Read only" : "Read / Write"}
               </span>
-              <span className="text-[12px] text-[#8b938c]">
+              <span className="text-[12px] text-[#646c65]">
                 {s === "READ_ONLY" ? "— list and read contacts" : "— create, update, delete contacts"}
               </span>
             </label>
@@ -245,7 +245,7 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
         <div className="grid gap-3">
           <TokenReveal token={newToken} />
           <button
-            className="w-fit text-[13px] text-[#8b938c] transition hover:text-[#5c655e]"
+            className="w-fit text-[13px] text-[#646c65] transition hover:text-[#5c655e]"
             onClick={() => setNewToken(null)}
             type="button"
           >
@@ -265,7 +265,7 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
         {activeTokens.length === 0 ? (
           <div className="px-5 py-10 text-center">
             <p className="text-[14px] font-semibold text-[#1d2823]">No active tokens</p>
-            <p className="mt-1 text-[13px] text-[#8b938c]">
+            <p className="mt-1 text-[13px] text-[#646c65]">
               Create a token above to start using the Kontax REST API.
             </p>
           </div>
@@ -283,13 +283,13 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
                     <span className="font-semibold text-[#1d2823]">{token.name}</span>
                     <ScopeBadge scope={token.scope} />
                   </div>
-                  <p className="mt-0.5 font-mono text-[12px] text-[#8b938c]">
+                  <p className="mt-0.5 font-mono text-[12px] text-[#646c65]">
                     {token.tokenPrefix}…
                   </p>
                 </div>
 
                 <div className="hidden shrink-0 text-right md:block">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8b938c]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#646c65]">
                     Last used
                   </p>
                   <p className="mt-0.5 text-[13px] text-[#5c655e]">
@@ -298,7 +298,7 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
                 </div>
 
                 <div className="hidden shrink-0 text-right md:block">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8b938c]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#646c65]">
                     This month
                   </p>
                   <p className="mt-0.5 text-[13px] text-[#5c655e]">
@@ -323,7 +323,7 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
       {revokedTokens.length > 0 && (
         <div className="rounded-[1.5rem] border border-[#d8ddd6] bg-white">
           <div className="border-b border-[#e9ece7] px-4 py-4 md:px-5">
-            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">
               Revoked tokens
             </p>
           </div>
@@ -339,7 +339,7 @@ export function ApiTokenManager({ tokens }: { tokens: ApiTokenSummary[] }) {
                   <span className="font-semibold text-[#1d2823] line-through">{token.name}</span>
                   <ScopeBadge scope={token.scope} />
                 </div>
-                <p className="mt-0.5 text-[12px] text-[#8b938c]">
+                <p className="mt-0.5 text-[12px] text-[#646c65]">
                   Revoked {formatRelativeDate(token.revokedAt)}
                 </p>
               </div>

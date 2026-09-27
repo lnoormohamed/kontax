@@ -120,7 +120,7 @@ export function ConfirmPasswordModal({
 
         <form onSubmit={handleSubmit}>
           <label style={{ display: "block" }}>
-            <span style={{ display: "block", fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.16em", color: "#8b938c", marginBottom: 6 }}>
+            <span style={{ display: "block", fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.16em", color: "#646c65", marginBottom: 6 }}>
               Your password
             </span>
             <input

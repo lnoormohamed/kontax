@@ -66,7 +66,7 @@ export default async function SettingsIndexPage({
                     </span>
                   ) : null}
                 </span>
-                <span className="block truncate text-[12.5px] text-[#8b938c]">{entry.sub}</span>
+                <span className="block truncate text-[12.5px] text-[#646c65]">{entry.sub}</span>
               </span>
               <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
             </Link>

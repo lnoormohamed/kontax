@@ -92,7 +92,7 @@ export function AddToKontaxButton({
   if (isOwnCard) {
     return (
       <div style={{ textAlign: "center" }}>
-        <p style={{ fontSize: 13, color: "#8b938c", marginBottom: 8 }}>This is your card.</p>
+        <p style={{ fontSize: 13, color: "#646c65", marginBottom: 8 }}>This is your card.</p>
         <Link
           href="/settings/account/card"
           style={{ fontSize: 13, color: "#4158f4", fontWeight: 500 }}

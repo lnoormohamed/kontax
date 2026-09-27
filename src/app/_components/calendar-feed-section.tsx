@@ -65,7 +65,7 @@ export function CalendarFeedSection({
 
   return (
     <div>
-      <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">
+      <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.1em] text-[#646c65]">
         Calendar feed
       </p>
       <section className="rounded-2xl border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.05)]">

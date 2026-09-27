@@ -50,7 +50,7 @@ export default async function SettingsSharingIndexPage() {
       {isGroupPlan ? (
         <div className="mb-4 mt-0 flex flex-wrap items-center justify-between gap-4 rounded-[14px] border border-[#d8ddd6] bg-white p-4 lg:mt-5">
           <div className="min-w-0">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#646c65]">
               {planSummary.plan === "FAMILY" ? "Family group" : "Team"}
             </p>
             <p className="mt-1.5 text-[14px] text-[#3a4540]">
@@ -88,7 +88,7 @@ export default async function SettingsSharingIndexPage() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[15px] font-medium text-[#1d2823]">{row.label}</span>
-              <span className="block truncate text-[12.5px] text-[#8b938c]">{row.sub}</span>
+              <span className="block truncate text-[12.5px] text-[#646c65]">{row.sub}</span>
             </span>
             <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
           </Link>

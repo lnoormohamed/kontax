@@ -67,14 +67,14 @@ function ShortcutRow({ row }: { row: Row }) {
       <div style={{ display: "flex", alignItems: "center", gap: 4, flex: "0 0 auto", whiteSpace: "nowrap" }}>
         {row.keys.map((k, i) =>
           k === "/" || k === "–" ? (
-            <span key={i} style={{ color: "#8b938c", fontSize: 12.5, padding: "0 1px" }}>
+            <span key={i} style={{ color: "#646c65", fontSize: 12.5, padding: "0 1px" }}>
               {k}
             </span>
           ) : (
             <KeyChip key={i} k={k} />
           ),
         )}
-        {row.glyph ? <span style={{ fontSize: 12.5, color: "#8b938c", marginLeft: 3 }}>{row.glyph}</span> : null}
+        {row.glyph ? <span style={{ fontSize: 12.5, color: "#646c65", marginLeft: 3 }}>{row.glyph}</span> : null}
       </div>
       <span style={{ fontSize: 13, color: "#5c655e", textAlign: "right", whiteSpace: "nowrap" }}>{row.action}</span>
     </div>
@@ -140,7 +140,7 @@ export function KeyboardShortcutsOverlay({ open, onClose }: { open: boolean; onC
         </div>
         {SHORTCUTS.map((g) => (
           <div key={g.group} style={{ marginTop: 18 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#8b938c", marginBottom: 4 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#646c65", marginBottom: 4 }}>
               {g.group}
             </div>
             {g.rows.map((r, i) => (

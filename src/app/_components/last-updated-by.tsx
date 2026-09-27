@@ -33,10 +33,10 @@ export function LastUpdatedBy({
   const icon = ACTOR_ICON[lastMutatedBy] ?? "people";
   return (
     <div className="flex items-center justify-between gap-3 text-[12px]">
-      <span className="shrink-0 text-[#8b938c]">Last edited</span>
+      <span className="shrink-0 text-[#646c65]">Last edited</span>
       <span className="flex min-w-0 items-center gap-1.5 text-[#5c655e]">
         <WorkspaceIcon
-          className="shrink-0 text-[#8b938c]"
+          className="shrink-0 text-[#646c65]"
           name={icon}
           size={13}
           strokeWidth={1.6}

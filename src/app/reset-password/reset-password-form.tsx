@@ -57,7 +57,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
       <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
         <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">New password</span>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">New password</span>
           <div className="relative mt-[6px]">
             <input
               autoComplete="new-password"
@@ -70,13 +70,13 @@ export function ResetPasswordForm({ token }: { token: string }) {
               type={showPw ? "text" : "password"}
               value={password}
             />
-            <button aria-label="Toggle visibility" className="absolute right-[10px] top-1/2 grid h-[30px] w-[30px] -translate-y-1/2 place-items-center rounded-lg text-[#8b938c] hover:text-[#5c655e]" onClick={() => setShowPw((s) => !s)} tabIndex={-1} type="button">
+            <button aria-label="Toggle visibility" className="absolute right-[10px] top-1/2 grid h-[30px] w-[30px] -translate-y-1/2 place-items-center rounded-lg text-[#646c65] hover:text-[#5c655e]" onClick={() => setShowPw((s) => !s)} tabIndex={-1} type="button">
               <EyeIcon visible={showPw} />
             </button>
           </div>
         </label>
         <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Confirm new password</span>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Confirm new password</span>
           <input
             autoComplete="new-password"
             className={`mt-[6px] w-full rounded-[10px] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:ring-[3px] focus:ring-[#edf0fe] ${mismatch ? "border-[#c98a76] focus:border-[#c98a76]" : "border-[#d4d9d0] focus:border-[#4158f4]"}`}

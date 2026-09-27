@@ -130,7 +130,7 @@ export default async function TeamJoinPage({
               </span>
               <div className="text-left">
                 <div className="text-[14px] font-semibold text-[#1d2823]">{ownerName}</div>
-                <div className="text-[12.5px] text-[#8b938c]">{ownerEmail}</div>
+                <div className="text-[12.5px] text-[#646c65]">{ownerEmail}</div>
               </div>
             </div>
 

@@ -85,7 +85,7 @@ export default async function SettingsAccountPage() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-[15px] font-medium text-[#1d2823]">{row.label}</span>
-              <span className="block truncate text-[12.5px] text-[#8b938c]">{row.sub}</span>
+              <span className="block truncate text-[12.5px] text-[#646c65]">{row.sub}</span>
             </span>
             <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
           </Link>

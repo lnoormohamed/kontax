@@ -120,7 +120,7 @@ export function QrCodeModal(props: QrCodeModalProps) {
         <div className="flex flex-col items-center px-6 pb-2 pt-5">
           <div className="rounded-2xl border border-[#e9ece7] bg-white p-4" style={{ boxShadow: "0 1px 2px rgba(20,30,25,0.04)" }}>
             {loading ? (
-              <div className="grid h-[200px] w-[200px] place-items-center rounded-xl bg-[#f2f4f0] text-[13px] text-[#8b938c]">
+              <div className="grid h-[200px] w-[200px] place-items-center rounded-xl bg-[#f2f4f0] text-[13px] text-[#646c65]">
                 Generating…
               </div>
             ) : error ? (
@@ -141,7 +141,7 @@ export function QrCodeModal(props: QrCodeModalProps) {
           {/* link scope (resolved decision: never-expires for paid; honest expiry for free) */}
           {shareUrl ? (
             <div className="mt-3 flex w-full items-center gap-2 rounded-[10px] border border-[#e9ece7] bg-[#f6f7f4] px-3 py-2 text-[12.5px] text-[#5c655e]">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9.5 14.5l5-5M8 12l-2 2a3.5 3.5 0 005 5l2-2M16 12l2-2a3.5 3.5 0 00-5-5l-2 2" />
               </svg>
               <span>

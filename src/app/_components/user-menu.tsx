@@ -50,7 +50,7 @@ export function UserMenu({
         >
           <div className="border-b border-[#e9ece7] px-4 py-3">
             <p className="truncate text-sm font-semibold text-[#1d2823]">{name}</p>
-            <p className="truncate text-xs text-[#8b938c]">{email}</p>
+            <p className="truncate text-xs text-[#646c65]">{email}</p>
           </div>
           <Link
             className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1d2823] transition hover:bg-[#f2f4f0]"

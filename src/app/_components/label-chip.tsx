@@ -85,7 +85,7 @@ export function LabelChip({ name, col, sz = "sm", ghost = false, onRemove, onCli
           borderRadius: 999,
           border: "1px dashed #d8ddd6",
           background: "transparent",
-          color: "#8b938c",
+          color: "#646c65",
           fontSize: fs,
           fontWeight: 600,
           whiteSpace: "nowrap",

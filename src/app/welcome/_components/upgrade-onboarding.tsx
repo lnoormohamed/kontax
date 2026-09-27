@@ -102,7 +102,7 @@ export function UpgradeOnboarding({ plan }: { plan: UpgradePlan }) {
                 <h1 className="text-[20px] font-semibold tracking-[-0.01em] text-[#1d2823]">
                   {copy.welcome}
                 </h1>
-                <p className="mt-0.5 text-[13px] text-[#8b938c]">
+                <p className="mt-0.5 text-[13px] text-[#646c65]">
                   {copy.sub} <span className="text-[#5c655e]">· Step 1 of 3</span>
                 </p>
               </div>
@@ -112,18 +112,18 @@ export function UpgradeOnboarding({ plan }: { plan: UpgradePlan }) {
             </div>
             <div className="mt-5">
               <h2 className="text-[15px] font-semibold text-[#1d2823]">{copy.inviteTitle}</h2>
-              <p className="mt-1 text-[13px] leading-[1.45] text-[#8b938c]">{copy.inviteHint}</p>
+              <p className="mt-1 text-[13px] leading-[1.45] text-[#646c65]">{copy.inviteHint}</p>
               <div className="mt-3.5 grid gap-2.5">
                 {emails.map((e, i) => (
                   <div
                     key={i}
                     className="flex h-11 items-center gap-2.5 rounded-[10px] border border-[#d8ddd6] bg-white px-3 focus-within:border-[#4158f4]"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M4 6.5h16v11H4z" /><path d="M4.5 7l7.5 6 7.5-6" />
                     </svg>
                     <input
-                      className="min-w-0 flex-1 bg-transparent text-[14px] text-[#1d2823] outline-none placeholder:text-[#aeb4ac]"
+                      className="min-w-0 flex-1 bg-transparent text-[14px] text-[#1d2823] outline-none placeholder:text-[#646c65]"
                       onChange={(ev) => setEmail(i, ev.target.value)}
                       placeholder="email@example.com"
                       type="email"
@@ -166,7 +166,7 @@ export function UpgradeOnboarding({ plan }: { plan: UpgradePlan }) {
                 <h1 className="text-[20px] font-semibold tracking-[-0.01em] text-[#1d2823]">
                   {copy.bookTitle}
                 </h1>
-                <p className="mt-0.5 text-[13px] text-[#8b938c]">Step 2 of 3</p>
+                <p className="mt-0.5 text-[13px] text-[#646c65]">Step 2 of 3</p>
               </div>
             </div>
             <div className="mt-4">

@@ -141,8 +141,8 @@ export function EmailSection({
   if (pendingEmail) {
     return (
       <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
-        <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Email address</span>
-        <div className="mt-2 break-all text-[18px] font-semibold text-[#8b938c]">{email}</div>
+        <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Email address</span>
+        <div className="mt-2 break-all text-[18px] font-semibold text-[#646c65]">{email}</div>
 
         <div className={`mt-4 rounded-[1.5rem] border p-4 ${isExpired ? "border-[#e6cabe] bg-[#f7ede9]" : "border-[#e6d3a3] bg-[#f6edd9]"}`}>
           <div className="flex items-center gap-[9px]">
@@ -169,7 +169,7 @@ export function EmailSection({
                 {isSending ? <Spinner size={13} light={false} /> : !isExpired && pendCooldown > 0 ? <span className="tabular-nums">Resend in {pendMmss}</span> : "Resend verification"}
               </button>
               <button
-                className="border-none bg-transparent p-0 text-[13px] font-medium text-[#8b938c] transition hover:text-[#b5472f] disabled:opacity-50"
+                className="border-none bg-transparent p-0 text-[13px] font-medium text-[#646c65] transition hover:text-[#b5472f] disabled:opacity-50"
                 disabled={isCancelling}
                 onClick={() => setConfirmCancel(true)}
                 type="button"
@@ -205,7 +205,7 @@ export function EmailSection({
   // ── NO PENDING CHANGE state ────────────────────────────────────────────────
   return (
     <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
-      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Email address</span>
+      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Email address</span>
 
       {!open ? (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
@@ -223,7 +223,7 @@ export function EmailSection({
           <div className="mt-2 break-all text-[18px] font-semibold text-[#1d2823]">{email}</div>
           <div className="mt-4 max-w-[520px] rounded-[1.5rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
             <label className="block">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">New email address</span>
+              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">New email address</span>
               <input
                 autoComplete="email"
                 className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe] ${sendErr ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
@@ -236,7 +236,7 @@ export function EmailSection({
               {sendErr && <p className="mt-[6px] text-[12.5px] leading-[1.45] text-[#9a3a23]">{sendErr}</p>}
             </label>
             <label className="mt-3 block">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Current password</span>
+              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Current password</span>
               <input
                 autoComplete="current-password"
                 className="mt-[6px] w-full rounded-[1.2rem] border border-[#d8ddd6] px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe]"
@@ -264,7 +264,7 @@ export function EmailSection({
                 Cancel
               </button>
             </div>
-            <p className="mt-3 text-[13px] leading-[1.45] text-[#8b938c]">
+            <p className="mt-3 text-[13px] leading-[1.45] text-[#646c65]">
               We&apos;ll send a confirmation link to the new address. Your current email stays active until you confirm.
             </p>
           </div>

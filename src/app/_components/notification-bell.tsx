@@ -65,7 +65,7 @@ function CategoryTile({ category, muted }: { category: NotificationCategory; mut
 
 function NotificationSectionLabel({ children }: { children: ReactNode }) {
   return (
-    <div className="px-4 pb-1.5 pt-4 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c] md:hidden">
+    <div className="px-4 pb-1.5 pt-4 text-[11px] font-bold uppercase tracking-[0.06em] text-[#646c65] md:hidden">
       {children}
     </div>
   );
@@ -222,7 +222,7 @@ export function NotificationBell({
                 // truncates *around* the tag instead of pushing it off-row.
                 <span
                   className={`ml-[7px] inline-flex h-[17px] flex-none items-center rounded-[5px] px-[7px] text-[9.5px] font-bold uppercase leading-none tracking-[0.05em] ${
-                    affix.disableAction ? "bg-[#f3e1da] text-[#7a2e1a]" : "bg-[#f2f4f0] text-[#8b938c]"
+                    affix.disableAction ? "bg-[#f3e1da] text-[#7a2e1a]" : "bg-[#f2f4f0] text-[#646c65]"
                   }`}
                 >
                   {affix.label}
@@ -231,14 +231,14 @@ export function NotificationBell({
             </div>
             <div
               className={`mt-0.5 line-clamp-2 text-[12px] leading-[1.4] max-md:mt-1 max-md:text-[13px] ${
-                muted ? "text-[#aeb4ac] max-md:text-[#aeb4ac]" : "text-[#5c655e] max-md:text-[#8b938c]"
+                muted ? "text-[#646c65] max-md:text-[#646c65]" : "text-[#5c655e] max-md:text-[#646c65]"
               }`}
             >
               {n.body}
             </div>
             <div
               className={`mt-1 hidden items-center gap-1.5 text-[11.5px] font-medium max-md:flex ${
-                muted ? "text-[#aeb4ac]" : "text-[#8b938c]"
+                muted ? "text-[#646c65]" : "text-[#646c65]"
               }`}
             >
               <span suppressHydrationWarning>{relativeTime(n.createdAt, referenceNow)}</span>
@@ -257,14 +257,14 @@ export function NotificationBell({
           </div>
           <div className="flex flex-none flex-col items-end gap-1.5 max-md:hidden">
             <span
-              className={`text-[11px] tabular-nums ${muted ? "text-[#aeb4ac]" : "text-[#8b938c]"}`}
+              className={`text-[11px] tabular-nums ${muted ? "text-[#646c65]" : "text-[#646c65]"}`}
               suppressHydrationWarning
             >
               {relativeTime(n.createdAt, referenceNow)}
             </span>
             <button
               aria-label="Dismiss"
-              className="grid h-5 w-5 place-items-center rounded-md text-[#8b938c] opacity-0 transition hover:bg-black/5 group-hover:opacity-100"
+              className="grid h-5 w-5 place-items-center rounded-md text-[#646c65] opacity-0 transition hover:bg-black/5 group-hover:opacity-100"
               onClick={(e) => {
                 e.stopPropagation();
                 dismiss(n.id);
@@ -336,8 +336,8 @@ export function NotificationBell({
                 <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f2f4f0] text-[#aeb4ac] md:bg-transparent md:text-[#d8ddd6]">
                   <WorkspaceIcon name="bell" size={32} strokeWidth={1.6} />
                 </span>
-                <div className="mt-3 text-[15px] font-semibold text-[#1d2823] md:text-[13px] md:font-normal md:text-[#8b938c]">No notifications</div>
-                <p className="mt-1 hidden max-w-[240px] text-center text-[12.5px] leading-5 text-[#8b938c] max-md:block">
+                <div className="mt-3 text-[15px] font-semibold text-[#1d2823] md:text-[13px] md:font-normal md:text-[#646c65]">No notifications</div>
+                <p className="mt-1 hidden max-w-[240px] text-center text-[12.5px] leading-5 text-[#646c65] max-md:block">
                   Security, sharing, sync, billing, reminders, and product updates will appear here.
                 </p>
               </div>
@@ -355,7 +355,7 @@ export function NotificationBell({
                     {renderRows(grouped.earlier)}
                   </>
                 ) : null}
-                <div className="py-4 text-center text-[12px] text-[#aeb4ac]">
+                <div className="py-4 text-center text-[12px] text-[#646c65]">
                   No more notifications
                 </div>
               </>

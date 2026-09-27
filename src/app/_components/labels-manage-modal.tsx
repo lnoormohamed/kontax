@@ -176,11 +176,11 @@ function EditPane({
       {/* chip header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
         <LabelChip name={label.name} col={label.color} sz="md" />
-        <span style={{ fontSize: 12.5, color: "#8b938c" }} className="tabular-nums">{label.count} contacts tagged</span>
+        <span style={{ fontSize: 12.5, color: "#646c65" }} className="tabular-nums">{label.count} contacts tagged</span>
       </div>
 
       {/* name */}
-      <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#8b938c", marginBottom: 6, display: "block" }}>Name</label>
+      <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#646c65", marginBottom: 6, display: "block" }}>Name</label>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -190,11 +190,11 @@ function EditPane({
       />
 
       {/* color */}
-      <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#8b938c", marginTop: 18, marginBottom: 8, display: "block" }}>Color</label>
+      <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#646c65", marginTop: 18, marginBottom: 8, display: "block" }}>Color</label>
       <RecolorSwatches value={color} onPick={setColor} size={28} />
 
       {/* merge */}
-      <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#8b938c", marginTop: 18, marginBottom: 6, display: "block" }}>Merge into…</label>
+      <label style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#646c65", marginTop: 18, marginBottom: 6, display: "block" }}>Merge into…</label>
       <div style={{ position: "relative" }} ref={mergePickerRef}>
         <button
           type="button"
@@ -207,9 +207,9 @@ function EditPane({
               <span style={{ flex: 1, textAlign: "left", fontSize: 14, color: "#1d2823" }}>{mergeTarget.name}</span>
             </>
           ) : (
-            <span style={{ flex: 1, textAlign: "left", fontSize: 14, color: "#8b938c" }}>Choose a label…</span>
+            <span style={{ flex: 1, textAlign: "left", fontSize: 14, color: "#646c65" }}>Choose a label…</span>
           )}
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="2" strokeLinecap="round"><path d="M6 9l6 6 6-6" /></svg>
         </button>
         {mergePickerOpen && (
           <div style={{ position: "absolute", top: 46, left: 0, right: 0, zIndex: 6, background: "#fff", borderRadius: 12, border: "1px solid #d8ddd6", boxShadow: "0 12px 34px rgba(20,30,25,0.16)", overflow: "hidden" }}>
@@ -222,7 +222,7 @@ function EditPane({
               >
                 <LabelDot col={l.color} size={9} />
                 <span style={{ flex: 1, textAlign: "left", fontSize: 13.5, color: "#1d2823" }}>{l.name}</span>
-                <span style={{ fontSize: 12.5, color: "#8b938c" }}>{l.count}</span>
+                <span style={{ fontSize: 12.5, color: "#646c65" }}>{l.count}</span>
               </button>
             ))}
           </div>
@@ -327,7 +327,7 @@ export function LabelsManageModal({
         <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
           {/* left rail */}
           <div style={{ width: 200, flexShrink: 0, borderRight: "1px solid #edf0ea", padding: "8px 8px", overflowY: "auto" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#8b938c", padding: "4px 8px 6px" }}>All labels</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "#646c65", padding: "4px 8px 6px" }}>All labels</div>
             {labels.map((l) => (
               <button
                 key={l.id}
@@ -339,7 +339,7 @@ export function LabelsManageModal({
               >
                 <LabelDot col={l.color} size={9} />
                 <span style={{ flex: 1, textAlign: "left", fontSize: 12.5, fontWeight: 500, color: selected?.id === l.id ? "#17352e" : "#5c655e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.name}</span>
-                <span style={{ fontSize: 12, color: "#8b938c" }}>{l.count}</span>
+                <span style={{ fontSize: 12, color: "#646c65" }}>{l.count}</span>
               </button>
             ))}
           </div>
@@ -357,7 +357,7 @@ export function LabelsManageModal({
               }}
             />
           ) : (
-            <div style={{ flex: 1, display: "grid", placeItems: "center", color: "#8b938c", fontSize: 14 }}>
+            <div style={{ flex: 1, display: "grid", placeItems: "center", color: "#646c65", fontSize: 14 }}>
               Select a label to manage it.
             </div>
           )}

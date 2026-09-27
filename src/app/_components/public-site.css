@@ -5,7 +5,7 @@
 .kx {
   --ink: #1d2823;
   --ink2: #5c655e;
-  --mute: #8b938c;
+  --mute: #646c65;
   --faint: #aeb4ac;
   --line: #d8ddd6;
   --line2: #e9ece7;
@@ -375,7 +375,7 @@
 .kx .plan-cta--ghost:hover { background: var(--wash); }
 .kx .plan-cta--destructive { background: #fff; color: #b5472f; border: 1px solid #dcae9f; }
 .kx .plan-cta--destructive:hover { background: #f9ece7; }
-.kx .plan-cta--current { background: #f2f4f0; color: #8b938c; border: 1px solid transparent; cursor: default; }
+.kx .plan-cta--current { background: #f2f4f0; color: #646c65; border: 1px solid transparent; cursor: default; }
 .kx .plan-cta-sub { margin: 8px 0 0; font-size: 11px; color: var(--mute); text-align: center; line-height: 1.35; }
 
 .kx .seat-picker { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
@@ -394,7 +394,7 @@
 .kx .cell-rec { border-left: 1px solid var(--green-t); border-right: 1px solid var(--green-t); background: rgba(23,53,46,0.018); }
 .kx .cell .val { font-weight: 500; color: var(--ink); }
 .kx .cell .ck { color: #3f7d6a; }
-.kx .cell .dash { color: var(--faint); }
+.kx .cell .dash { color: var(--mute); }
 .kx .cell .cell-note { font-size: 11.5px; color: var(--mute); }
 
 .kx .pfoot-note { max-width: 760px; margin: 36px auto 0; text-align: center; font-size: 12.5px; line-height: 1.6; color: var(--mute); }
@@ -428,7 +428,7 @@
 .kx .mob-plan__val .val { font-weight: 500; color: var(--ink); }
 .kx .mob-plan__val .cell-note { font-size: 11px; color: var(--mute); }
 .kx .mob-plan__val .ck { color: #3f7d6a; }
-.kx .mob-plan__val .dash { color: var(--faint); }
+.kx .mob-plan__val .dash { color: var(--mute); }
 
 .kx .mob-plan__cta { margin-top: 14px; }
 .kx .mob-plan__cta .plan-cta { margin-top: 0; }

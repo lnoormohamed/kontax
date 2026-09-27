@@ -498,7 +498,7 @@ export default async function TeamSettingsPage() {
                     <div className="flex items-center justify-between gap-3 px-5 py-3" key={m.id}>
                       <span className="min-w-0">
                         <span className="block truncate text-[14px] font-medium text-[#1d2823]">{label}</span>
-                        <span className="block text-[12.5px] text-[#8b938c]">
+                        <span className="block text-[12.5px] text-[#646c65]">
                           Invited as {m.role === "ADMIN" ? "Admin" : "Member"} · {declined ? "declined" : "pending"}
                         </span>
                       </span>
@@ -549,7 +549,7 @@ export default async function TeamSettingsPage() {
               >
                 <span className="min-w-0">
                   <span className="block text-[14px] font-semibold text-[#1d2823]">Team books</span>
-                  <span className="block text-[12.5px] text-[#8b938c]">
+                  <span className="block text-[12.5px] text-[#646c65]">
                     {activeBooks.length} active book{activeBooks.length === 1 ? "" : "s"} · create,
                     archive, link sync accounts
                   </span>
@@ -563,7 +563,7 @@ export default async function TeamSettingsPage() {
                 >
                   <span className="min-w-0">
                     <span className="block text-[14px] font-semibold text-[#1d2823]">Book permissions</span>
-                    <span className="block text-[12.5px] text-[#8b938c]">
+                    <span className="block text-[12.5px] text-[#646c65]">
                       Per-member, per-book access — edit, view, or none
                     </span>
                   </span>

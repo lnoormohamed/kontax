@@ -310,7 +310,7 @@ export default async function FamilySettingsPage() {
         <div>
           <SectionLabel>Members</SectionLabel>
           <SettingsCard className="!p-0">
-            <div className="hidden grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-[#e9ece7] px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c] sm:grid">
+            <div className="hidden grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-[#e9ece7] px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65] sm:grid">
               <span>Member</span>
               <span>Role</span>
               <span className="text-center">Can edit</span>
@@ -345,7 +345,7 @@ export default async function FamilySettingsPage() {
                     </span>
                     <span className="justify-self-center">
                       {isOwner ? (
-                        <span className="text-[12.5px] text-[#8b938c]">Always</span>
+                        <span className="text-[12.5px] text-[#646c65]">Always</span>
                       ) : (
                         <form action={setMemberCanEdit}>
                           <input name="memberId" type="hidden" value={m.id} />
@@ -401,11 +401,11 @@ export default async function FamilySettingsPage() {
                       <span className="flex min-w-0 items-center gap-3">
                         {/* ghost avatar for uninvited */}
                         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f2f4f0]">
-                          <WorkspaceIcon name={declined ? "x" : "people"} size={16} className="text-[#8b938c]" />
+                          <WorkspaceIcon name={declined ? "x" : "people"} size={16} className="text-[#646c65]" />
                         </span>
                         <span className="min-w-0">
                           <span className="block truncate text-[14px] font-medium text-[#1d2823]">{label}</span>
-                          <span className="block text-[12.5px] text-[#8b938c]">
+                          <span className="block text-[12.5px] text-[#646c65]">
                             {declined ? "Declined the invite" : "Invite pending"}
                           </span>
                         </span>

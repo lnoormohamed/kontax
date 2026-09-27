@@ -81,14 +81,14 @@ export function ContactBooksBlock({
 
   return (
     <div ref={wrapRef}>
-      <div className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">Books</div>
+      <div className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">Books</div>
       <div className="mt-2 flex flex-wrap items-center gap-1.5" data-testid="contact-books-block">
         {memberships.map((m) => {
           const open = chipMenu === m.bookId;
           return (
             <div key={m.bookId} className="relative inline-flex">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[#eef1ec] py-1 pl-2 pr-1 text-[12px] font-semibold text-[#1d2823]">
-                <span aria-hidden className="text-[9px] text-[#8b938c]">●</span>
+                <span aria-hidden className="text-[9px] text-[#646c65]">●</span>
                 {m.isPrimary ? (
                   <span className="text-[#17352e]" title="Home book"><HomeIcon /></span>
                 ) : null}
@@ -105,7 +105,7 @@ export function ContactBooksBlock({
                   type="button"
                   aria-label={isLast ? "A contact must stay in at least one book" : `Remove from ${m.name}`}
                   title={isLast ? "A contact must stay in at least one book. Delete the contact to remove it entirely." : `Remove from ${m.name}`}
-                  className="grid h-5 w-5 place-items-center rounded-full text-[#8b938c] transition hover:bg-[#e0e5dd] hover:text-[#1d2823] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  className="grid h-5 w-5 place-items-center rounded-full text-[#646c65] transition hover:bg-[#e0e5dd] hover:text-[#1d2823] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                   disabled={isLast || pending}
                   onClick={() =>
                     run(() => removeContactFromBook({ contactId, bookId: m.bookId }))
@@ -152,7 +152,7 @@ export function ContactBooksBlock({
                     className="flex w-full items-center gap-2 rounded-[7px] px-2.5 py-1.5 text-left text-[12.5px] text-[#1d2823] transition hover:bg-[#f2f4f0]"
                     onClick={() => run(() => addContactToBook({ contactId, bookId: b.id }))}
                   >
-                    <span aria-hidden className="text-[9px] text-[#8b938c]">●</span>
+                    <span aria-hidden className="text-[9px] text-[#646c65]">●</span>
                     <span className="truncate">{b.name}</span>
                   </button>
                 ))}

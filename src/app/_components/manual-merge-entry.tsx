@@ -20,7 +20,7 @@ type ManualMergeEntryProps = {
 const COLORS = {
   ink: "#1d2823",
   ink2: "#5c655e",
-  mute: "#8b938c",
+  mute: "#646c65",
   line: "#d8ddd6",
   line2: "#e9ece7",
   wash: "#f2f4f0",
@@ -190,7 +190,7 @@ function PickerField({
                   // aria-label below; dropping the attribute is the honest
                   // fix until this becomes a real ARIA combobox.
                   autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-[#8b938c]"
+                  className="min-w-0 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-[#646c65]"
                   onChange={(event) => {
                     if (selectedContact && event.target.value !== selectedContact.fullName) {
                       onSelect("");

@@ -164,7 +164,7 @@ function Field({
     <div className="flex flex-col">
       <label className="mb-[7px] text-[13px] font-medium text-[#3f4842]" htmlFor={id}>
         {label}
-        {hint ? <span className="font-normal text-[#8b938c]"> {hint}</span> : null}
+        {hint ? <span className="font-normal text-[#646c65]"> {hint}</span> : null}
       </label>
       <div className={`relative ${trailing ? "has-trailing" : ""}`}>
         <input
@@ -343,7 +343,7 @@ export function AuthCard({
   const eyeBtn = (
     <button
       aria-label={showPw ? "Hide password" : "Show password"}
-      className="absolute right-[4px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-[9px] text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
+      className="absolute right-[4px] top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-[9px] text-[#646c65] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
       onClick={() => setShowPw((v) => !v)}
       tabIndex={submitting ? -1 : 0}
       type="button"
@@ -503,7 +503,7 @@ export function AuthCard({
 
           {/* Terms — register only */}
           {!isLogin ? (
-            <p className="-mt-1 text-center text-[12px] text-[#8b938c]">
+            <p className="-mt-1 text-center text-[12px] text-[#646c65]">
               By creating an account, you agree to our{" "}
               <a className="text-[#5c655e] font-medium hover:text-[#17352e] hover:underline" href="/terms">
                 Terms

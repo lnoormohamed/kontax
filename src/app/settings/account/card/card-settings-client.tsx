@@ -80,7 +80,7 @@ function FieldRow({
       <div style={{ flex: 1 }}>
         <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: "#1d2823" }}>{label}</p>
         {description && (
-          <p style={{ margin: "1px 0 0", fontSize: 12, color: "#8b938c" }}>{description}</p>
+          <p style={{ margin: "1px 0 0", fontSize: 12, color: "#646c65" }}>{description}</p>
         )}
       </div>
       <Toggle checked={checked} onChange={onChange} disabled={disabled} />
@@ -138,7 +138,7 @@ export function CardSettingsClient({
 
       {/* No username prompt */}
       {!username && (
-        <p style={{ fontSize: 13, color: "#8b938c", marginBottom: 20 }}>
+        <p style={{ fontSize: 13, color: "#646c65", marginBottom: 20 }}>
           <a href="/settings/account" style={{ color: "#4158f4" }}>Claim a username</a> to get your public card URL.
         </p>
       )}
@@ -160,7 +160,7 @@ export function CardSettingsClient({
           fontWeight: 700,
           textTransform: "uppercase",
           letterSpacing: "0.18em",
-          color: "#8b938c",
+          color: "#646c65",
           margin: "20px 0 4px",
         }}
       >

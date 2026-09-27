@@ -36,7 +36,7 @@ const GROUP_CAP = 4;
 const T = {
   ink:   "#1d2823",
   ink2:  "#3d4d40",
-  mute:  "#8b938c",
+  mute:  "#646c65",
   faint: "#aeb4ac",
   line:  "#d8ddd6",
   line2: "#e9ece7",

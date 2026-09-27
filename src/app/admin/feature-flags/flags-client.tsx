@@ -81,7 +81,7 @@ export function FlagsTable({ flags }: { flags: Flag[] }) {
         {flags.length === 0 ? (
           <div className="ad-table-state">
             <span className="ad-state-icon">
-              <AdIcon name="flag" size={22} c="#8b938c" />
+              <AdIcon name="flag" size={22} c="#646c65" />
             </span>
             <div className="ad-state-title">No feature flags yet</div>
             <div className="ad-state-sub">Create a flag to start gating features behind a rollout.</div>

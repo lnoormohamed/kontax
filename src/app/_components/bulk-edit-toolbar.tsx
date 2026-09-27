@@ -78,7 +78,7 @@ function Pop({ children, onClose, width = 210 }: { children: React.ReactNode; on
   );
 }
 
-const popLabel = "px-2 pb-1.5 pt-1 text-[10.5px] font-bold uppercase tracking-[0.06em] text-[#8b938c]";
+const popLabel = "px-2 pb-1.5 pt-1 text-[10.5px] font-bold uppercase tracking-[0.06em] text-[#646c65]";
 const popItem = "flex h-9 w-full items-center gap-2.5 rounded-[7px] px-2.5 text-left text-[13px] font-medium text-[#1d2823] transition hover:bg-[#f2f4f0]";
 
 // tri-state checkbox glyph for the label manager
@@ -370,7 +370,7 @@ export function BulkEditToolbar({
                         </button>
                       ) : null}
                       {filteredLabels.length === 0 && !showCreateLabel ? (
-                        <div className="px-2.5 py-2 text-[12.5px] text-[#8b938c]">No labels yet.</div>
+                        <div className="px-2.5 py-2 text-[12.5px] text-[#646c65]">No labels yet.</div>
                       ) : null}
                     </div>
                     {pendingLabelChanges.length > 0 ? (

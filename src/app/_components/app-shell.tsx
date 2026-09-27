@@ -86,9 +86,9 @@ export async function AppShell({
       <span className="flex-1">{label}</span>
       {count != null ? (
         badge && count > 0 ? (
-          <span className="rounded-full bg-[#bf8526] px-1.5 text-[11px] font-semibold text-white">{count}</span>
+          <span className="rounded-full bg-[#9a6612] px-1.5 text-[11px] font-semibold text-white">{count}</span>
         ) : (
-          <span className="text-[12px] text-[#8b938c]">{count}</span>
+          <span className="text-[12px] text-[#646c65]">{count}</span>
         )
       ) : null}
     </Link>
@@ -156,7 +156,7 @@ export async function AppShell({
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-semibold text-[#1d2823]">{account.name}</span>
-              <span className="block truncate text-[11px] text-[#8b938c]">{account.email}</span>
+              <span className="block truncate text-[11px] text-[#646c65]">{account.email}</span>
             </span>
             <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#17352e]">
               {account.plan}
@@ -180,7 +180,7 @@ export async function AppShell({
               ] as const
             ).map(([href, icon, label]) => (
               <Link
-                className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
+                className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#646c65] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
                 href={href}
                 key={label}
               >

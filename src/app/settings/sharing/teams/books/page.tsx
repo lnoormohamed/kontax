@@ -77,8 +77,8 @@ export default async function TeamBooksPage() {
                 <div className="flex items-center justify-between gap-3 py-2.5" key={b.id}>
                   <span className="min-w-0">
                     <span className="text-[14px] font-semibold text-[#1d2823]">{b.name}</span>
-                    {b.archivedAt ? <span className="ml-2 text-[12px] font-semibold text-[#8b938c]">Archived</span> : null}
-                    <span className="block text-[12.5px] text-[#8b938c]">
+                    {b.archivedAt ? <span className="ml-2 text-[12px] font-semibold text-[#646c65]">Archived</span> : null}
+                    <span className="block text-[12.5px] text-[#646c65]">
                       {b.description ? `${b.description} · ` : ""}{b._count.contacts.toLocaleString()} contacts
                     </span>
                   </span>
@@ -147,7 +147,7 @@ export default async function TeamBooksPage() {
                   <div className="flex items-center justify-between gap-3 py-2.5 text-[13px]" key={l.id}>
                     <span className="min-w-0">
                       <span className="text-[#1d2823]">{l.syncAccount.label}</span>
-                      <span className="text-[#8b938c]"> → {l.addressBook.name}</span>
+                      <span className="text-[#646c65]"> → {l.addressBook.name}</span>
                     </span>
                     {!isLocked && (
                       <form action={unlinkTeamSyncAccount}>
@@ -175,7 +175,7 @@ export default async function TeamBooksPage() {
                     </option>
                   ))}
                 </select>
-                <span className="text-[13px] text-[#8b938c]">→</span>
+                <span className="text-[13px] text-[#646c65]">→</span>
                 <select
                   className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px]"
                   name="bookId"
@@ -195,7 +195,7 @@ export default async function TeamBooksPage() {
                 </button>
               </form>
             ) : (
-              <p className="mt-3 text-[12.5px] text-[#8b938c]">
+              <p className="mt-3 text-[12.5px] text-[#646c65]">
                 {activeBooks.length === 0
                   ? "Create an address book first."
                   : "Connect a CardDAV account under Sync to link it here."}

@@ -202,7 +202,7 @@ export function ContactExportButton({
           className="absolute right-0 z-50 mt-1 w-[308px] rounded-[13px] border border-[#d8ddd6] bg-white p-1.5 shadow-lg"
           role="menu"
         >
-          <p className="px-2.5 pt-2 pb-1 text-[10.5px] font-bold tracking-[0.08em] text-[#8b938c] uppercase">
+          <p className="px-2.5 pt-2 pb-1 text-[10.5px] font-bold tracking-[0.08em] text-[#646c65] uppercase">
             Export this contact
           </p>
 

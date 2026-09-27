@@ -91,14 +91,14 @@ function ReadOnlyTable({ a, b }: { a: ContactSnap; b: ContactSnap }) {
       <table className="w-full border-collapse text-[12.5px]">
         <thead>
           <tr className="border-b border-[#edf0ea]">
-            <th className="w-[70px] py-1.5 pr-3 text-left text-[12px] font-semibold text-[#8b938c]">Field</th>
+            <th className="w-[70px] py-1.5 pr-3 text-left text-[12px] font-semibold text-[#646c65]">Field</th>
             <th className="py-1.5 pr-3 text-left">
-              <div className="text-[12px] font-semibold text-[#8b938c] truncate max-w-[160px]">{a.fullName ?? "Contact A"}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Contact A</div>
+              <div className="text-[12px] font-semibold text-[#646c65] truncate max-w-[160px]">{a.fullName ?? "Contact A"}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#646c65]">Contact A</div>
             </th>
             <th className="py-1.5 text-left">
-              <div className="text-[12px] font-semibold text-[#8b938c] truncate max-w-[160px]">{b.fullName ?? "Contact B"}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Contact B</div>
+              <div className="text-[12px] font-semibold text-[#646c65] truncate max-w-[160px]">{b.fullName ?? "Contact B"}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#646c65]">Contact B</div>
             </th>
           </tr>
         </thead>
@@ -114,11 +114,11 @@ function ReadOnlyTable({ a, b }: { a: ContactSnap; b: ContactSnap }) {
                 className="border-b border-[#f2f4f0] last:border-b-0"
                 style={{ background: differs ? "#fff0bf" : "transparent" }}
               >
-                <td className="py-1.5 pr-3 font-medium text-[#8b938c]">{label}</td>
-                <td className="py-1.5 pr-3" style={{ color: differs ? "#1d2823" : "#8b938c" }}>
+                <td className="py-1.5 pr-3 font-medium text-[#646c65]">{label}</td>
+                <td className="py-1.5 pr-3" style={{ color: differs ? "#1d2823" : "#646c65" }}>
                   {truncate(aVal, 60) ?? "—"}
                 </td>
-                <td className="py-1.5" style={{ color: differs ? "#1d2823" : "#8b938c" }}>
+                <td className="py-1.5" style={{ color: differs ? "#1d2823" : "#646c65" }}>
                   {truncate(bVal, 60) ?? "—"}
                 </td>
               </tr>
@@ -242,12 +242,12 @@ function MergePickerOverlay({
               {/* Search input */}
               <div className="px-4 pt-3 pb-2">
                 <div className="flex items-center gap-2 rounded-[10px] border border-[#d8ddd6] bg-white px-3 py-2.5">
-                  <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                  <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" />
                   </svg>
                   <input
                     ref={inputRef}
-                    className="flex-1 bg-transparent text-[14px] text-[#1d2823] placeholder:text-[#8b938c] outline-none"
+                    className="flex-1 bg-transparent text-[14px] text-[#1d2823] placeholder:text-[#646c65] outline-none"
                     placeholder="Search contacts…"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -258,9 +258,9 @@ function MergePickerOverlay({
               {/* Results */}
               <div className="max-h-[280px] overflow-y-auto">
                 {loading ? (
-                  <p className="px-5 py-4 text-[13px] text-[#8b938c]">Searching…</p>
+                  <p className="px-5 py-4 text-[13px] text-[#646c65]">Searching…</p>
                 ) : results.length === 0 && query.trim() ? (
-                  <p className="px-5 py-4 text-[13px] text-[#8b938c]">No contacts found</p>
+                  <p className="px-5 py-4 text-[13px] text-[#646c65]">No contacts found</p>
                 ) : (
                   results.map((r, i) => (
                     <button
@@ -273,7 +273,7 @@ function MergePickerOverlay({
                       <Avatar name={r.name} size={36} />
                       <div className="min-w-0">
                         <p className="truncate text-[14px] font-semibold text-[#1d2823]">{r.name}</p>
-                        <p className="truncate text-[12px] text-[#8b938c]">
+                        <p className="truncate text-[12px] text-[#646c65]">
                           {r.email ?? r.phone ?? r.company ?? ""}
                         </p>
                       </div>
@@ -282,7 +282,7 @@ function MergePickerOverlay({
                 )}
               </div>
 
-              <p className="px-5 py-3 text-[11px] text-[#8b938c] border-t border-[#f2f4f0]">
+              <p className="px-5 py-3 text-[11px] text-[#646c65] border-t border-[#f2f4f0]">
                 Search your contacts — current contact excluded.
               </p>
             </>

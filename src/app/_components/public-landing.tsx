@@ -47,7 +47,7 @@ export function PublicLanding({ isAuthenticated }: { isAuthenticated?: boolean }
                     <span className="chrome__dot" style={{ background: "#61c454" }}></span>
                   </div>
                   <div className="chrome__url">
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
                     vexon.co
                   </div>
                 </div>
@@ -68,7 +68,7 @@ export function PublicLanding({ isAuthenticated }: { isAuthenticated?: boolean }
                   </div>
                 </div>
                 <div className="app-search">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" /></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" /></svg>
                   Search by name, email, phone…
                 </div>
                 <div className="list">
@@ -192,7 +192,7 @@ export function PublicLanding({ isAuthenticated }: { isAuthenticated?: boolean }
               <div className="frow__media">
                 <div className="mini">
                   <div className="mini__label">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9a8 8 0 0114-3l2 2" /><path d="M20 15a8 8 0 01-14 3l-2-2" /><path d="M20 4v4h-4" /><path d="M4 20v-4h4" /></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9a8 8 0 0114-3l2 2" /><path d="M20 15a8 8 0 01-14 3l-2-2" /><path d="M20 4v4h-4" /><path d="M4 20v-4h4" /></svg>
                     Synced 5h ago
                   </div>
                   <div className="sync-grid">

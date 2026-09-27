@@ -456,7 +456,7 @@ export function MobileContactDetail({
           {labels.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 10 }}>
               {labels.map((name) => (
-                <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#8b938c"} sz="sm" />
+                <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#646c65"} sz="sm" />
               ))}
             </div>
           )}
@@ -571,7 +571,7 @@ export function MobileContactDetail({
               textDecoration: "none",
               fontSize: 14,
               fontWeight: detailTab === key ? 700 : 500,
-              color: detailTab === key ? "#17352e" : "#8b938c",
+              color: detailTab === key ? "#17352e" : "#646c65",
               borderBottom: detailTab === key ? "2px solid #17352e" : "2px solid transparent",
               whiteSpace: "nowrap",
             }}
@@ -608,13 +608,13 @@ function ReadOnlyChip() {
         marginRight: 4,
         borderRadius: 8,
         background: "#f2f4f0",
-        color: "#8b938c",
+        color: "#646c65",
         fontSize: 12.5,
         fontWeight: 600,
         whiteSpace: "nowrap",
       }}
     >
-      <WorkspaceIcon name="lock" size={13} className="text-[#8b938c]" />
+      <WorkspaceIcon name="lock" size={13} className="text-[#646c65]" />
       Read-only
     </span>
   );

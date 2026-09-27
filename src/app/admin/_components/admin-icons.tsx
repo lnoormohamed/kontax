@@ -7,7 +7,7 @@
 export const AD = {
   ink: "#1d2823",
   ink2: "#5c655e",
-  mute: "#8b938c",
+  mute: "#646c65",
   faint: "#aeb4ac",
   line: "#d8ddd6",
   blue: "#4158f4",

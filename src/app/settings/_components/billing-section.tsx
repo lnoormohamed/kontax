@@ -177,7 +177,7 @@ export function BillingSection({
             <span className="text-[22px] font-semibold tabular-nums tracking-[-0.01em] text-[#1d2823]">
               {surface.price}
             </span>
-            <i className="ml-[3px] text-[13.5px] not-italic text-[#8b938c]">{surface.per}</i>
+            <i className="ml-[3px] text-[13.5px] not-italic text-[#646c65]">{surface.per}</i>
           </div>
         ) : null}
       </div>
@@ -251,7 +251,7 @@ export function BillingSection({
       {/* trial countdown row */}
       {state === "trial" && surface.trial ? (
         <div className="mt-[18px] flex flex-wrap items-center gap-3 rounded-[14px] border border-[#e9ece7] bg-[#f6f7f4] px-4 py-3.5">
-          <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">Trial ends</span>
+          <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#646c65]">Trial ends</span>
           <span className="text-[15px] font-semibold text-[#1d2823]">{surface.trial.endsOn}</span>
           <TrialPill days={surface.trial.daysRemaining} />
         </div>
@@ -330,8 +330,8 @@ export function BillingSection({
       state === "familyOwner" ||
       state === "trial" ||
       (isGranted && surface.personalSubscription) ? (
-        <p className="mt-4 flex items-center gap-[7px] text-[12.5px] leading-[1.4] text-[#8b938c]">
-          <svg className="h-[13px] w-[13px] shrink-0" fill="none" stroke="#8b938c" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24">
+        <p className="mt-4 flex items-center gap-[7px] text-[12.5px] leading-[1.4] text-[#646c65]">
+          <svg className="h-[13px] w-[13px] shrink-0" fill="none" stroke="#646c65" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24">
             <rect height="13" rx="2" width="19.5" x="2.25" y="5.5" />
             <path d="M2.25 10h19.5M6 14.5h3" />
           </svg>

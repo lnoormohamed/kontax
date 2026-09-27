@@ -89,7 +89,7 @@ export default async function ShareOgImage({ params }: { params: Promise<{ token
         </div>
 
         {/* Footer accent */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, color: "#8b938c" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, color: "#646c65" }}>
           <div style={{ width: 14, height: 14, borderRadius: 4, background: "#4158f4" }} />
           Save this contact to your address book
         </div>

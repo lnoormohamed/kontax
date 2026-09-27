@@ -57,7 +57,7 @@ export function BottomNav({ unreadCount = 0, syncErrorCount = 0, duplicatesCount
     >
       {TABS.map(({ key, label, icon, href }) => {
         const isActive = key === activeKey;
-        const color = isActive ? "#17352e" : "#8b938c";
+        const color = isActive ? "#17352e" : "#646c65";
         const badge =
           key === "activity" ? unreadCount : key === "duplicates" ? duplicatesCount : key === "settings" ? syncErrorCount : 0;
 

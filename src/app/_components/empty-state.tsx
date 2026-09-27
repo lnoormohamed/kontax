@@ -16,7 +16,7 @@ export function EmptyState({
 }) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center px-6 py-14 text-center">
-      <span className="mb-[18px] grid h-16 w-16 place-items-center rounded-[18px] bg-[#f2f4f0] text-[#8b938c]">
+      <span className="mb-[18px] grid h-16 w-16 place-items-center rounded-[18px] bg-[#f2f4f0] text-[#646c65]">
         <WorkspaceIcon name={icon} size={30} strokeWidth={1.6} />
       </span>
       <h2 className="text-[18px] font-semibold tracking-[-0.01em] text-[#1d2823]">{title}</h2>

@@ -45,7 +45,7 @@ export function EmailVerificationBanner({ email }: { email: string }) {
         {sent ? (
           <span className="font-semibold text-[#17352e]">Link sent ✓</span>
         ) : cooldown > 0 ? (
-          <span className="text-[#8b938c]">
+          <span className="text-[#646c65]">
             Resend in {Math.floor(cooldown / 60)}:{String(cooldown % 60).padStart(2, "0")}
           </span>
         ) : (
@@ -62,7 +62,7 @@ export function EmailVerificationBanner({ email }: { email: string }) {
       </p>
       <button
         aria-label="Dismiss"
-        className="ml-2 shrink-0 text-[#bf8526] transition hover:text-[#7c5511]"
+        className="ml-2 shrink-0 text-[#7c5511] transition hover:text-[#7c5511]"
         onClick={() => setDismissed(true)}
         type="button"
       >

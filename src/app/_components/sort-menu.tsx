@@ -39,9 +39,9 @@ export function SortMenu({
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
-        <span className="text-[#8b938c]">Sort</span>
+        <span className="text-[#646c65]">Sort</span>
         <span className="font-semibold text-[#1d2823]">{label}</span>
-        <span className="text-[#8b938c]">▾</span>
+        <span className="text-[#646c65]">▾</span>
       </button>
       {open ? (
         <div className="absolute left-0 top-9 z-30 w-48 overflow-hidden rounded-[0.8rem] border border-[#d8ddd6] bg-white py-1 shadow-[0_12px_34px_rgba(20,30,25,0.16)]">

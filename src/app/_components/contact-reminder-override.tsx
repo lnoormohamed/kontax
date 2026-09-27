@@ -32,13 +32,13 @@ export function ContactReminderOverride({
 
   return (
     <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
-      <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+      <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
         Dates & reminders
       </h3>
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
         <div className="min-w-0">
           <p className="text-[13.5px] text-[#1d2823]">Remind me before dates on this contact</p>
-          <p className="mt-0.5 text-[12px] text-[#8b938c]">
+          <p className="mt-0.5 text-[12px] text-[#646c65]">
             {override == null
               ? `Using your default (${labelFor(userDefault)}) for birthdays and other saved dates`
               : "Overrides your account default for birthdays and other saved dates on this contact"}

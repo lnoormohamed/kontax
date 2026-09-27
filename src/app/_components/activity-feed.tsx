@@ -103,7 +103,7 @@ function DiffTable({ diffs }: { diffs: FieldDiff[] }) {
             borderTop: i > 0 ? "1px solid #e9ece7" : "none",
           }}
         >
-          <span className="pt-px font-medium text-[#8b938c]">{formatFieldLabel(diff.field)}</span>
+          <span className="pt-px font-medium text-[#646c65]">{formatFieldLabel(diff.field)}</span>
           <span className="flex min-w-0 flex-wrap items-center gap-2">
             <span
               className="max-w-[42ch] overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12px] text-[#b5472f]"
@@ -166,7 +166,7 @@ function EventRow({ event }: { event: ActivityEventRow }) {
                   href={`/contacts/${event.contactId}`}
                 >{event.contactName}</Link>{" "}</>
               ) : (
-                <><span className="font-semibold text-[#8b938c]" title="This contact was permanently deleted">{event.contactName}</span>{" "}</>
+                <><span className="font-semibold text-[#646c65]" title="This contact was permanently deleted">{event.contactName}</span>{" "}</>
               )
             )}
             {/* summary (lowercase first letter when contact name precedes it) */}
@@ -177,14 +177,14 @@ function EventRow({ event }: { event: ActivityEventRow }) {
             </span>
           </p>
           <span
-            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]"
+            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#646c65]"
             title={formatAbsoluteTime(event.createdAt)}
           >
             {formatRelativeTime(event.createdAt)}
           </span>
         </div>
 
-        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#8b938c]">
+        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#646c65]">
           <span>{event.actorLabel}</span>
           {expandable && (
             <>
@@ -290,7 +290,7 @@ function FilterBar({
         className="mx-auto flex flex-nowrap items-center gap-[7px] overflow-x-auto px-[18px] py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-x-visible"
         style={{ maxWidth: 760 }}
       >
-        <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#8b938c]">
+        <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#646c65]">
           Type
         </span>
         {CATEGORY_OPTIONS.map((o) => (
@@ -298,7 +298,7 @@ function FilterBar({
         ))}
         {/* divider between groups */}
         <span className="mx-1 h-[18px] w-px shrink-0 bg-[#e9ece7]" />
-        <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#8b938c]">
+        <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#646c65]">
           By
         </span>
         {ACTOR_OPTIONS.map((o) => (
@@ -570,7 +570,7 @@ export function ActivityLocked({ planLabel }: { planLabel: string }) {
         >
           Upgrade to Pro
         </Link>
-        <p className="mt-4 text-[12.5px] text-[#8b938c]">
+        <p className="mt-4 text-[12.5px] text-[#646c65]">
           You&apos;re on the {planLabel} plan.
         </p>
       </div>

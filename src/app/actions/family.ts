@@ -116,7 +116,7 @@ const sendInviteEmail = async (opts: {
   const html =
     `<p>${escapeHtml(opts.ownerName)} invited you to share the <strong>${escapeHtml(opts.groupName)}</strong> family contact book on Kontax.</p>` +
     `<p><a href="${link}">${cta}</a></p>` +
-    `<p style="color:#8b938c;font-size:12px">This invite expires in 48 hours.</p>`;
+    `<p style="color:#646c65;font-size:12px">This invite expires in 48 hours.</p>`;
   await sendEmail({ to: opts.email, subject, html, text });
 };
 

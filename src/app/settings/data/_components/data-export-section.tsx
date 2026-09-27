@@ -212,7 +212,7 @@ export function DataExportSection({ hasPassword }: { hasPassword: boolean }) {
           <SpinnerDark size={16} />
           <div>
             <p className="text-[13.5px] font-semibold text-[#1d2823]">Preparing your export…</p>
-            <p className="mt-0.5 text-[12px] text-[#8b938c]">
+            <p className="mt-0.5 text-[12px] text-[#646c65]">
               This usually takes less than a minute. This page updates automatically.
             </p>
           </div>

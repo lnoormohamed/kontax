@@ -114,7 +114,7 @@ export function ForgotPasswordCard() {
             </fieldset>
           </form>
 
-          <p className="mt-4 text-center text-[13px] leading-[1.5] text-[#8b938c]">
+          <p className="mt-4 text-center text-[13px] leading-[1.5] text-[#646c65]">
             We&apos;ll only send the link if the address matches an existing
             account.
           </p>

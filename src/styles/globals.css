@@ -26,7 +26,7 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .st-otp-box:focus { border-color: #4158f4; box-shadow: 0 0 0 3px #edf0fe; }
-.st-otp-box:disabled { background: #f6f7f4; color: #8b938c; }
+.st-otp-box:disabled { background: #f6f7f4; color: #646c65; }
 @media (max-width: 560px) { .st-otp-box { width: 40px; height: 50px; font-size: 20px; } }
 
 /* Live-share status pill pulse — matches the design system keyframe */
@@ -115,7 +115,7 @@ html[data-motion="off"] *::after {
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #8b938c;
+  color: #646c65;
   font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
   font-size: 11px;
   font-weight: 600;

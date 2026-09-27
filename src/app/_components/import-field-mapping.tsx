@@ -116,7 +116,7 @@ function CustomKeyInput({
       {duplicate ? (
         <div className="text-[12px] text-[#b5472f]">Custom field name must be unique.</div>
       ) : (
-        <div className="text-[12px] text-[#8b938c]">
+        <div className="text-[12px] text-[#646c65]">
           Values stored as &ldquo;{value.trim() || "…"}&rdquo; on each contact.
         </div>
       )}
@@ -138,7 +138,7 @@ function SuggestionChips({
 
   return (
     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-      <span className="text-[11.5px] font-medium text-[#8b938c]">Did you mean:</span>
+      <span className="text-[11.5px] font-medium text-[#646c65]">Did you mean:</span>
       {visible.map((s) => (
         <button
           key={s.field}
@@ -151,7 +151,7 @@ function SuggestionChips({
       ))}
       {suggestions.length > 3 && !expanded ? (
         <button
-          className="rounded-full border border-[#d8ddd6] bg-[#f2f4f0] px-2.5 py-1 text-[12px] font-medium text-[#8b938c] transition hover:bg-[#e9ece7]"
+          className="rounded-full border border-[#d8ddd6] bg-[#f2f4f0] px-2.5 py-1 text-[12px] font-medium text-[#646c65] transition hover:bg-[#e9ece7]"
           onClick={() => setExpanded(true)}
           type="button"
         >
@@ -183,7 +183,7 @@ function FieldSelect({
       style={{
         height: 36,
         borderColor: dupField ? "#b5472f" : borderColor,
-        color: isSkip ? "#b5472f" : isUnmapped || isCustomField ? "#8b938c" : "#1d2823",
+        color: isSkip ? "#b5472f" : isUnmapped || isCustomField ? "#646c65" : "#1d2823",
       }}
       value={value}
     >
@@ -252,7 +252,7 @@ function SplitToggle({
             <span
               className="grid h-[16px] w-[16px] shrink-0 place-items-center rounded"
               style={{
-                border: `1.5px solid ${col.splitMultiValue ? "#1f8a5b" : "#8b938c"}`,
+                border: `1.5px solid ${col.splitMultiValue ? "#1f8a5b" : "#646c65"}`,
                 background: col.splitMultiValue ? "#1f8a5b" : "#fff",
               }}
             >
@@ -384,7 +384,7 @@ function MappingRow({
           <span
             className="font-mono text-[12px]"
             style={{
-              color: isSkip ? "#d8ddd6" : "#8b938c",
+              color: isSkip ? "#d8ddd6" : "#646c65",
               textDecoration: isSkip ? "line-through" : "none",
             }}
           >
@@ -556,7 +556,7 @@ export function FieldMappingStep({
   return (
     <div className="grid gap-4">
       <div className="flex items-baseline justify-between gap-3">
-        <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">
+        <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#646c65]">
           Map your columns
         </div>
         {unmappedCount > 0 && !blocked ? (
@@ -567,7 +567,7 @@ export function FieldMappingStep({
         ) : null}
       </div>
 
-      <div className="hidden grid-cols-[1.7fr_1.9fr_2.5fr_0.9fr] gap-x-3.5 border-b border-[#e9ece7] pb-2 text-[11px] font-bold uppercase tracking-[0.04em] text-[#8b938c] sm:grid">
+      <div className="hidden grid-cols-[1.7fr_1.9fr_2.5fr_0.9fr] gap-x-3.5 border-b border-[#e9ece7] pb-2 text-[11px] font-bold uppercase tracking-[0.04em] text-[#646c65] sm:grid">
         <span>Column</span>
         <span>Sample value</span>
         <span>Maps to</span>

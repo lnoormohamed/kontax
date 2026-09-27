@@ -109,7 +109,7 @@ function Radio({
       </span>
       <span>
         <span className="block text-[14px] font-medium text-[#1d2823]">{label}</span>
-        {hint && <span className="mt-0.5 block text-[12.5px] leading-[1.45] text-[#8b938c]">{hint}</span>}
+        {hint && <span className="mt-0.5 block text-[12.5px] leading-[1.45] text-[#646c65]">{hint}</span>}
       </span>
     </label>
   );
@@ -120,7 +120,7 @@ function LivePreviewRow({ mode }: { mode: RowLabels }) {
   return (
     <div className="mt-3 overflow-hidden rounded-[11px] border border-[#e9ece7] bg-white">
       <div className="flex items-center justify-between bg-[#f2f4f0] px-3.5 py-2">
-        <span className="text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#8b938c]">
+        <span className="text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#646c65]">
           Live preview
         </span>
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#1c6b48]">
@@ -149,7 +149,7 @@ function LivePreviewRow({ mode }: { mode: RowLabels }) {
             </span>
           )}
           {mode === "off" && (
-            <span className="text-[12.5px] text-[#aeb4ac]">No labels on rows</span>
+            <span className="text-[12.5px] text-[#646c65]">No labels on rows</span>
           )}
         </div>
       </div>
@@ -264,7 +264,7 @@ export function InterfacePreferencesSection({
           </div>
 
           {labelsDisabled ? (
-            <div className="mt-2 flex items-center gap-2 text-[12.5px] text-[#8b938c]">
+            <div className="mt-2 flex items-center gap-2 text-[12.5px] text-[#646c65]">
               <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="15">
                 <rect height="18" rx="2" width="12" x="6" y="3" />
                 <path d="M11 18h2" />
@@ -309,7 +309,7 @@ export function InterfacePreferencesSection({
 
         {/* Cross-link to Display density */}
         <div className="flex items-center gap-2 border-t border-[#f2f4f0] pt-4 text-[12.5px] text-[#5c655e]">
-          <svg fill="none" height="15" stroke="#8b938c" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="15">
+          <svg fill="none" height="15" stroke="#646c65" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="15">
             <path d="M3 12h18" />
             <path d="M3 6h18" />
             <path d="M3 18h18" />

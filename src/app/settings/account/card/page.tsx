@@ -16,7 +16,7 @@ function StatTile({ value, label }: { value: number; label: string }) {
       <p style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#1d2823", letterSpacing: "-0.02em" }}>
         {value.toLocaleString()}
       </p>
-      <p style={{ margin: "2px 0 0", fontSize: 12, color: "#8b938c" }}>{label}</p>
+      <p style={{ margin: "2px 0 0", fontSize: 12, color: "#646c65" }}>{label}</p>
     </div>
   );
 }
@@ -76,7 +76,7 @@ export default async function CardSettingsPage() {
               fontWeight: 700,
               textTransform: "uppercase",
               letterSpacing: "0.18em",
-              color: "#8b938c",
+              color: "#646c65",
               margin: "0 0 12px",
             }}
           >
@@ -98,7 +98,7 @@ export default async function CardSettingsPage() {
               fontWeight: 700,
               textTransform: "uppercase",
               letterSpacing: "0.18em",
-              color: "#8b938c",
+              color: "#646c65",
               margin: "0 0 4px",
             }}
           >
@@ -125,7 +125,7 @@ export default async function CardSettingsPage() {
 
           <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
             <div className="rounded-2xl border border-[#e9ece7] bg-[#fbfcf9] p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
                 Views over time
               </p>
               <div className="mt-3 flex h-[120px] items-end gap-1.5">
@@ -143,7 +143,7 @@ export default async function CardSettingsPage() {
                   );
                 })}
               </div>
-              <div className="mt-2 flex items-center justify-between text-[11px] text-[#8b938c]">
+              <div className="mt-2 flex items-center justify-between text-[11px] text-[#646c65]">
                 <span>30 days ago</span>
                 <span>Today</span>
               </div>
@@ -151,7 +151,7 @@ export default async function CardSettingsPage() {
 
             <div className="grid gap-4">
               <div className="rounded-2xl border border-[#e9ece7] bg-[#fbfcf9] p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
                   Engagement
                 </p>
                 <p className="mt-3 text-[14px] font-semibold text-[#1d2823]">
@@ -165,7 +165,7 @@ export default async function CardSettingsPage() {
               </div>
 
               <div className="rounded-2xl border border-[#e9ece7] bg-[#fbfcf9] p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
                   Top sources
                 </p>
                 {analytics.topSources.length > 0 ? (
@@ -180,13 +180,13 @@ export default async function CardSettingsPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="mt-3 text-[13px] text-[#8b938c]">No recent source data yet.</p>
+                  <p className="mt-3 text-[13px] text-[#646c65]">No recent source data yet.</p>
                 )}
               </div>
             </div>
           </div>
 
-          <p style={{ fontSize: 11, color: "#8b938c", marginTop: 10 }}>
+          <p style={{ fontSize: 11, color: "#646c65", marginTop: 10 }}>
             View history is kept for 90 days. Bot traffic is excluded. Today the only tracked CTA is Add to Kontax, so the analytics stay honest about what they can and cannot measure.
           </p>
         </section>

@@ -40,7 +40,7 @@ function PwField({
   const [show, setShow] = useState(false);
   return (
     <label className="block">
-      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">{label}</span>
+      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">{label}</span>
       <div className="relative mt-[6px]">
         <input
           autoComplete={autoComplete}
@@ -53,7 +53,7 @@ function PwField({
         />
         <button
           aria-label={show ? "Hide password" : "Show password"}
-          className="absolute right-[10px] top-1/2 grid h-[30px] w-[30px] -translate-y-1/2 place-items-center rounded-lg text-[#8b938c] transition hover:text-[#5c655e]"
+          className="absolute right-[10px] top-1/2 grid h-[30px] w-[30px] -translate-y-1/2 place-items-center rounded-lg text-[#646c65] transition hover:text-[#5c655e]"
           onClick={() => setShow((s) => !s)}
           tabIndex={-1}
           type="button"
@@ -114,7 +114,7 @@ export function PasswordChangeForm({ oauthOnly = false }: { oauthOnly?: boolean 
 
   return (
     <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
-      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Password</span>
+      <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">Password</span>
 
       {!open ? (
         <div className="mt-2">

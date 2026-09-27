@@ -12,7 +12,7 @@ import {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b938c", margin: "26px 16px 8px" }}>
+    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#646c65", margin: "26px 16px 8px" }}>
       {children}
     </p>
   );
@@ -67,7 +67,7 @@ export default function VarianceWireframe() {
             Invite member
           </button>
         </PermissionGate>
-        <PermissionGate allow={false} fallback={<span style={{ fontSize: 12.5, fontWeight: 600, color: "#8b938c" }}>Member (no controls)</span>}>
+        <PermissionGate allow={false} fallback={<span style={{ fontSize: 12.5, fontWeight: 600, color: "#646c65" }}>Member (no controls)</span>}>
           <button type="button">Invite member</button>
         </PermissionGate>
       </div>

@@ -45,7 +45,7 @@ export default async function RevertEmailPage({
       <div className="w-full max-w-[440px] rounded-[2rem] border border-[#d8ddd6] bg-white p-8 text-center shadow-[0_2px_12px_rgba(20,30,25,0.08)]">
         <RevertEmailForm token={typeof token === "string" ? token : ""} />
       </div>
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
+      <p className="text-[12px] text-[#646c65]">© Kontax · Your contacts, organized and yours.</p>
     </main>
   );
 }

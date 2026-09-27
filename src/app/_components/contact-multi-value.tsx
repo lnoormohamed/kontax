@@ -286,7 +286,7 @@ function MultiRow({
       {editable ? (
         <button
           aria-label="Remove"
-          className={`grid h-6 w-6 shrink-0 place-items-center rounded-[6px] text-[#8b938c] transition-opacity hover:bg-[#f2f4f0] ${
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-[6px] text-[#646c65] transition-opacity hover:bg-[#f2f4f0] ${
             hover && !editing ? "opacity-100" : "opacity-0"
           }`}
           onClick={(e) => {
@@ -461,7 +461,7 @@ function AddressBlock({
         {editable ? (
           <button
             aria-label="Remove"
-            className={`grid h-6 w-6 shrink-0 place-items-center rounded-[6px] text-[#8b938c] transition-opacity hover:bg-[#f2f4f0] ${
+            className={`grid h-6 w-6 shrink-0 place-items-center rounded-[6px] text-[#646c65] transition-opacity hover:bg-[#f2f4f0] ${
               hover && !editing ? "opacity-100" : "opacity-0"
             }`}
             onClick={onRemove}

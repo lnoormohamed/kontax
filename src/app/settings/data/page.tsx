@@ -50,10 +50,10 @@ export default async function SettingsDataIndexPage() {
               <span className="block text-[15px] font-medium text-[#1d2823]">
                 {row.label}
                 {"external" in row && row.external ? (
-                  <span className="ml-1.5 text-[12px] text-[#8b938c]">↗</span>
+                  <span className="ml-1.5 text-[12px] text-[#646c65]">↗</span>
                 ) : null}
               </span>
-              <span className="block truncate text-[12.5px] text-[#8b938c]">{row.sub}</span>
+              <span className="block truncate text-[12.5px] text-[#646c65]">{row.sub}</span>
             </span>
             {row.icon === "sync" && syncErrorCount > 0 ? (
               <span className="shrink-0 rounded-full bg-[#f3e1da] px-2 py-0.5 text-[11px] font-semibold text-[#b5472f]">

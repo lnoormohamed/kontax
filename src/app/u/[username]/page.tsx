@@ -146,7 +146,7 @@ function FieldRow({
         borderBottom: "1px solid #f0f2ee",
       }}
     >
-      <span style={{ color: "#8b938c", flexShrink: 0 }}>{icon}</span>
+      <span style={{ color: "#646c65", flexShrink: 0 }}>{icon}</span>
       <span style={{ flex: 1, fontSize: 14, color: "#1d2823", wordBreak: "break-all" }}>
         {href ? (
           <a href={href} rel="nofollow noopener noreferrer" style={{ color: "#1d2823" }}>
@@ -250,9 +250,9 @@ function PublicCard({
 
       <AddToKontaxButton card={card} isLoggedIn={isLoggedIn} isOwnCard={isOwnCard} />
 
-      <p style={{ fontSize: 12, color: "#8b938c", textAlign: "center", marginTop: 20 }}>
+      <p style={{ fontSize: 12, color: "#646c65", textAlign: "center", marginTop: 20 }}>
         Shared via{" "}
-        <a href={SITE_URL} style={{ color: "#8b938c" }}>
+        <a href={SITE_URL} style={{ color: "#646c65" }}>
           Kontax
         </a>
       </p>

@@ -45,7 +45,7 @@ function DiffStack({ diffs }: { diffs: FieldDiff[] }) {
   const Val = ({ raw, color }: { raw: unknown; color: string }) => {
     const text = fullValue(raw);
     return text === "—" ? (
-      <span className="font-sans text-[#aeb4ac]">—</span>
+      <span className="font-sans text-[#646c65]">—</span>
     ) : (
       <span className="min-w-0 whitespace-pre-wrap break-words font-mono text-[12px] [overflow-wrap:anywhere]" style={{ color }}>
         {text}
@@ -56,7 +56,7 @@ function DiffStack({ diffs }: { diffs: FieldDiff[] }) {
     <div className="mt-[9px] overflow-hidden rounded-[10px] border border-[#e9ece7] bg-[#f2f4f0]">
       {diffs.map((d, i) => (
         <div className="px-3 py-[9px]" key={i} style={{ borderTop: i > 0 ? "1px solid #e9ece7" : "none" }}>
-          <div className="text-[11.5px] font-semibold tracking-[0.01em] text-[#8b938c]">
+          <div className="text-[11.5px] font-semibold tracking-[0.01em] text-[#646c65]">
             {formatFieldLabel(d.field)}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -95,14 +95,14 @@ function EventRow({ event, last }: { event: ActivityEventRow; last: boolean }) {
                   <Link className="text-[14.5px] font-semibold text-[#4158f4] hover:underline" href={`/contacts/${event.contactId}`}>
                     {event.contactName}
                   </Link>{" "}
-                  <span className="text-[#aeb4ac]">·</span>{" "}
+                  <span className="text-[#646c65]">·</span>{" "}
                 </>
               ) : (
                 <>
-                  <span className="text-[14.5px] font-semibold text-[#8b938c]" title="This contact was permanently deleted">
+                  <span className="text-[14.5px] font-semibold text-[#646c65]" title="This contact was permanently deleted">
                     {event.contactName}
                   </span>{" "}
-                  <span className="text-[#aeb4ac]">·</span>{" "}
+                  <span className="text-[#646c65]">·</span>{" "}
                 </>
               ))}
             {event.contactName
@@ -110,18 +110,18 @@ function EventRow({ event, last }: { event: ActivityEventRow; last: boolean }) {
               : event.summary}
           </p>
           <span
-            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]"
+            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#646c65]"
             title={formatAbsoluteTime(event.createdAt)}
           >
             {formatRelativeTime(event.createdAt)}
           </span>
         </div>
 
-        <div className="mt-[3px] flex flex-wrap items-center gap-2 text-[12px] text-[#8b938c]">
+        <div className="mt-[3px] flex flex-wrap items-center gap-2 text-[12px] text-[#646c65]">
           <span>{event.actorLabel}</span>
           {expandable && (
             <>
-              <span className="text-[#aeb4ac]">·</span>
+              <span className="text-[#646c65]">·</span>
               <button
                 aria-expanded={open}
                 className="inline-flex items-center gap-1 font-semibold text-[#4158f4]"
@@ -166,7 +166,7 @@ function SkeletonRow({ last }: { last: boolean }) {
 function GroupHeader({ label }: { label: string }) {
   return (
     <div className="sticky top-0 z-[1] flex h-7 items-center bg-[#f6f7f4] px-4">
-      <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#8b938c]">{label}</span>
+      <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#646c65]">{label}</span>
     </div>
   );
 }
@@ -210,12 +210,12 @@ function FilterBar({
 }) {
   return (
     <div className="sticky top-0 z-30 flex shrink-0 items-center gap-[7px] overflow-x-auto border-b border-[#d8ddd6] bg-white px-4 py-[11px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <span className="shrink-0 pr-px text-[10px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">Type</span>
+      <span className="shrink-0 pr-px text-[10px] font-bold uppercase tracking-[0.06em] text-[#646c65]">Type</span>
       {CATEGORY_OPTIONS.map((o) => (
         <Chip active={category === o.key} key={o.key} label={o.label} onClick={() => onCategory(o.key)} />
       ))}
       <span className="mx-[3px] h-[18px] w-px shrink-0 bg-[#e9ece7]" />
-      <span className="shrink-0 pr-px text-[10px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">By</span>
+      <span className="shrink-0 pr-px text-[10px] font-bold uppercase tracking-[0.06em] text-[#646c65]">By</span>
       {ACTOR_OPTIONS.map((o) => (
         <Chip active={actor === o.key} key={o.key} label={o.label} onClick={() => onActor(o.key)} />
       ))}
@@ -248,7 +248,7 @@ function FilteredEmpty({ onClear }: { onClear: () => void }) {
         </svg>
       </span>
       <div className="text-[16px] font-semibold text-[#1d2823]">No activity matches these filters</div>
-      <p className="mx-auto mt-[7px] max-w-[240px] text-[13px] leading-[1.5] text-[#8b938c]">
+      <p className="mx-auto mt-[7px] max-w-[240px] text-[13px] leading-[1.5] text-[#646c65]">
         Try a different category or actor.
       </p>
       <button
@@ -361,13 +361,13 @@ export function MobileActivityFeed({ retentionDays = 90 }: { retentionDays?: num
             {/* sentinel + load-more spinner */}
             <div ref={sentinel} />
             {status === "loadingMore" && (
-              <div className="flex items-center justify-center gap-[9px] px-0 pb-3.5 pt-1.5 text-[#8b938c]">
+              <div className="flex items-center justify-center gap-[9px] px-0 pb-3.5 pt-1.5 text-[#646c65]">
                 <span className="h-[18px] w-[18px] animate-spin rounded-full border-2 border-[#d8ddd6] border-t-[#17352e]" />
                 <span className="text-[12.5px] font-medium">Loading more…</span>
               </div>
             )}
             {!hasMore && status !== "loadingMore" && (
-              <div className="px-4 pb-1 pt-1.5 text-center text-[12px] text-[#aeb4ac]">— {retentionLabel} —</div>
+              <div className="px-4 pb-1 pt-1.5 text-center text-[12px] text-[#646c65]">— {retentionLabel} —</div>
             )}
           </>
         )}

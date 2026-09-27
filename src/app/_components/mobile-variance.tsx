@@ -92,7 +92,7 @@ export function UpsellCard({
           Upgrade to {plan}
         </Link>
       )}
-      <p style={{ margin: "14px 0 0", fontSize: 12, color: "#8b938c" }}>You&apos;re on the {currentPlan} plan.</p>
+      <p style={{ margin: "14px 0 0", fontSize: 12, color: "#646c65" }}>You&apos;re on the {currentPlan} plan.</p>
     </div>
   );
 }
@@ -123,7 +123,7 @@ export function GenuineEmpty({
         <WorkspaceIcon name={icon} size={24} strokeWidth={1.6} className="text-[#aeb4ac]" />
       </span>
       <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#5c655e" }}>{title}</h3>
-      <p style={{ margin: "7px auto 0", fontSize: 13, color: "#8b938c", lineHeight: 1.5, maxWidth: 260 }}>{body}</p>
+      <p style={{ margin: "7px auto 0", fontSize: 13, color: "#646c65", lineHeight: 1.5, maxWidth: 260 }}>{body}</p>
     </div>
   );
 }
@@ -235,7 +235,7 @@ export function PendingChip({ label = "Pending" }: { label?: string }) {
         padding: "0 8px",
         borderRadius: 6,
         background: "#f2f4f0",
-        color: "#8b938c",
+        color: "#646c65",
         fontSize: 10.5,
         fontWeight: 700,
         letterSpacing: "0.02em",

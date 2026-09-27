@@ -104,7 +104,7 @@ export default async function SharesPage() {
               <Link className="text-[13px] font-medium text-[#4158f4] hover:underline" href={HELP_LINKS.shareAContact}>
                 Learn about sharing →
               </Link>
-              <Link className="text-[13px] font-medium text-[#8b938c] hover:underline" href="/contacts">
+              <Link className="text-[13px] font-medium text-[#646c65] hover:underline" href="/contacts">
                 ← Back to contacts
               </Link>
             </EmptyState>
@@ -140,7 +140,7 @@ export default async function SharesPage() {
                     </p>
                   </div>
                   {readOnly ? (
-                    <span className="shrink-0 rounded-[0.8rem] border border-[#d8ddd6] bg-[#f2f4f0] px-3.5 py-2 text-sm font-semibold text-[#8b938c]">
+                    <span className="shrink-0 rounded-[0.8rem] border border-[#d8ddd6] bg-[#f2f4f0] px-3.5 py-2 text-sm font-semibold text-[#646c65]">
                       Read-only
                     </span>
                   ) : (
@@ -175,10 +175,10 @@ export default async function SharesPage() {
         {history.length > 0 ? (
           <div className="mt-8">
             <div className="mb-1.5 flex items-baseline gap-2">
-              <h2 className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+              <h2 className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
                 Earlier
               </h2>
-              <span className="text-[12px] text-[#aeb4ac]">· accepted &amp; declined</span>
+              <span className="text-[12px] text-[#646c65]">· accepted &amp; declined</span>
             </div>
             <ul>
               {history.map((row) => {
@@ -206,7 +206,7 @@ export default async function SharesPage() {
                         <span className="font-semibold text-[#1d2823]">{contactName}</span>
                         {" · "}shared by {ownerName}
                       </p>
-                      <p className="mt-px text-[12px] text-[#8b938c]">
+                      <p className="mt-px text-[12px] text-[#646c65]">
                         {accepted ? "Accepted" : "Declined"} · {relativeTime(row.updatedAt)}
                       </p>
                     </div>
@@ -218,7 +218,7 @@ export default async function SharesPage() {
                         View contact →
                       </Link>
                     ) : (
-                      <span className="shrink-0 text-[12.5px] text-[#8b938c]">Declined</span>
+                      <span className="shrink-0 text-[12.5px] text-[#646c65]">Declined</span>
                     )}
                   </li>
                 );

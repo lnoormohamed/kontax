@@ -54,13 +54,13 @@ export default async function ContactsPrintPage({
           * { box-sizing: border-box; }
           body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; color: #1d2823; margin: 32px; }
           h1 { font-size: 18px; margin: 0 0 4px; }
-          .meta { color: #8b938c; font-size: 12px; margin-bottom: 20px; }
+          .meta { color: #646c65; font-size: 12px; margin-bottom: 20px; }
           .c { padding: 12px 0; border-top: 1px solid #e2e6e0; break-inside: avoid; }
           .c:first-of-type { border-top: 2px solid #1d2823; }
           .name { font-size: 15px; font-weight: 600; }
           .sub { font-size: 12.5px; color: #5c655e; margin-top: 1px; }
           .row { font-size: 13px; margin-top: 3px; }
-          .row b { color: #8b938c; font-weight: 600; display: inline-block; min-width: 58px; }
+          .row b { color: #646c65; font-weight: 600; display: inline-block; min-width: 58px; }
           @media print { body { margin: 14mm; } .noprint { display: none; } }
         `}</style>
       </head>

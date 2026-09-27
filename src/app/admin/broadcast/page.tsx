@@ -49,7 +49,7 @@ export default async function AdminBroadcastPage({
           ) : (
             <>
           <form className="ad-filter-search" method="get" style={{ marginBottom: 14, maxWidth: 520 }}>
-            <AdIcon name="search" size={15} c="#8b938c" />
+            <AdIcon name="search" size={15} c="#646c65" />
             <input
               name="q"
               type="search"

@@ -156,12 +156,12 @@ function VerifyTwoFaInner() {
         )}
         <div className="mt-4 text-center">
           <form action={signOutAction}>
-            <button className="text-[12px] text-[#8b938c] hover:text-[#5c655e]" type="submit">← Back to login</button>
+            <button className="text-[12px] text-[#646c65] hover:text-[#5c655e]" type="submit">← Back to login</button>
           </form>
         </div>
       </div>
 
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>
+      <p className="text-[12px] text-[#646c65]">© Kontax · Your contacts, organised and yours.</p>
     </main>
   );
 }

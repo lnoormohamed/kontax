@@ -30,12 +30,12 @@ const MONTHS = [
 // into a field on an iPhone doesn't trigger Safari's auto-zoom; sm: restores
 // the original 14px on larger viewports.
 const FIELD =
-  "w-full rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2.5 text-[16px] sm:text-sm text-[#1d2823] outline-none transition placeholder:text-[#aeb4ac] focus:border-[#4158f4]";
+  "w-full rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2.5 text-[16px] sm:text-sm text-[#1d2823] outline-none transition placeholder:text-[#646c65] focus:border-[#4158f4]";
 const LABEL_SELECT =
   "rounded-[0.7rem] border border-[#d8ddd6] bg-[#f6f7f4] px-2.5 py-2.5 text-[16px] sm:text-xs font-semibold text-[#5c655e] outline-none focus:border-[#4158f4]";
 // Compact small-caps field label, matching the "Related people" /
 // "Significant dates" section headers already used further down this form.
-const FIELD_LABEL = "mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]";
+const FIELD_LABEL = "mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65]";
 
 const initials = (name: string) =>
   name
@@ -58,7 +58,7 @@ const linePairs = (rows: Array<[string, string]>) =>
 function Group({ icon, children }: { icon?: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-3.5">
-      <div className="flex w-7 shrink-0 justify-center pt-2.5 text-[#8b938c]">
+      <div className="flex w-7 shrink-0 justify-center pt-2.5 text-[#646c65]">
         {icon ? <WorkspaceIcon name={icon} size={18} /> : null}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2.5">{children}</div>
@@ -140,7 +140,7 @@ function MultiValue({
               <PhoneCountryInput
                 aria-label={rowAriaLabel}
                 id={inputId}
-                numberInputClassName="h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-[16px] sm:text-sm text-[#1d2823] outline-none placeholder:text-[#aeb4ac]"
+                numberInputClassName="h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-[16px] sm:text-sm text-[#1d2823] outline-none placeholder:text-[#646c65]"
                 onChange={(value) => update(i, { value })}
                 placeholder={placeholder}
                 value={row.value}
@@ -160,7 +160,7 @@ function MultiValue({
             {rows.length > 1 ? (
               <button
                 aria-label={`Remove ${fieldLabel.toLowerCase()} ${i + 1}`}
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#b5472f]"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#646c65] transition hover:bg-[#f2f4f0] hover:text-[#b5472f]"
                 onClick={() => setRows(rows.filter((_, idx) => idx !== i))}
                 type="button"
               >
@@ -372,13 +372,13 @@ export function CreateContactForm({
           {(familyBookName || teamBooks.length > 0) && !familyCanEdit ? (
             // View-only members can't add to the family book
             <div className="flex items-center justify-center gap-2 rounded-[10px] bg-[#f6f7f4] px-3.5 py-2.5 text-[13px] text-[#5c655e]">
-              <WorkspaceIcon name="people" size={15} strokeWidth={1.7} className="shrink-0 text-[#8b938c]" />
+              <WorkspaceIcon name="people" size={15} strokeWidth={1.7} className="shrink-0 text-[#646c65]" />
               Saving to your <strong className="mx-0.5 font-semibold text-[#1d2823]">private</strong> contacts.
               View-only members can&apos;t add to the family book.
             </div>
           ) : familyBookName || teamBooks.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-2 text-[13px]">
-              <span className="font-medium text-[#8b938c]">Save to</span>
+              <span className="font-medium text-[#646c65]">Save to</span>
               <div className="inline-flex flex-wrap rounded-[0.9rem] bg-[#f2f4f0] p-1 gap-1">
                 {[
                   { key: "private", label: "Private", sub: "Only you" },
@@ -391,7 +391,7 @@ export function CreateContactForm({
                     className={`flex flex-col items-center rounded-[0.65rem] px-3.5 py-1.5 transition leading-tight ${
                       target === key
                         ? "bg-white text-[#1d2823] shadow-sm"
-                        : "text-[#8b938c] hover:text-[#5c655e]"
+                        : "text-[#646c65] hover:text-[#5c655e]"
                     }`}
                     key={key}
                     onClick={() => setTarget(key)}
@@ -426,7 +426,7 @@ export function CreateContactForm({
               {(["person", "org"] as const).map((m) => (
                 <button
                   className={`rounded-[0.6rem] px-3.5 py-1.5 transition ${
-                    mode === m ? "bg-white text-[#1d2823] shadow-sm" : "text-[#8b938c]"
+                    mode === m ? "bg-white text-[#1d2823] shadow-sm" : "text-[#646c65]"
                   }`}
                   key={m}
                   onClick={() => setMode(m)}

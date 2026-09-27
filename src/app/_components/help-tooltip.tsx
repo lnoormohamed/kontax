@@ -54,7 +54,7 @@ export function HelpTooltip({
         className={`grid h-[18px] w-[18px] place-items-center rounded-full border text-[11px] font-bold leading-none transition ${
           open
             ? "border-[#cdd4cc] bg-[#e9ece7] text-[#5c655e]"
-            : "border-[#d8ddd6] bg-[#f2f4f0] text-[#8b938c] hover:bg-[#e9ece7] hover:text-[#5c655e]"
+            : "border-[#d8ddd6] bg-[#f2f4f0] text-[#646c65] hover:bg-[#e9ece7] hover:text-[#5c655e]"
         }`}
         onClick={() => setOpen((v) => !v)}
         type="button"

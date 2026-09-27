@@ -336,9 +336,9 @@ export function ContactDashboard({
       <span className="flex-1">{label}</span>
       {count != null ? (
         badge && count > 0 ? (
-          <span className="rounded-full bg-[#bf8526] px-1.5 text-[11px] font-semibold text-white">{count}</span>
+          <span className="rounded-full bg-[#9a6612] px-1.5 text-[11px] font-semibold text-white">{count}</span>
         ) : (
-          <span className="text-[12px] text-[#8b938c]">{count}</span>
+          <span className="text-[12px] text-[#646c65]">{count}</span>
         )
       ) : null}
     </Link>
@@ -362,7 +362,7 @@ export function ContactDashboard({
 
   const sideLink = (href: string, icon: string, label: string, dot?: boolean) => (
     <Link
-      className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
+      className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#646c65] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
       href={href}
     >
       <WorkspaceIcon name={icon} size={15} />
@@ -382,7 +382,7 @@ export function ContactDashboard({
   const segment = (label: string, active: boolean, href: string) => (
     <Link
       className={`rounded-md px-2.5 py-1 text-[12px] font-semibold transition ${
-        active ? "bg-white text-[#1d2823] shadow-[0_1px_2px_rgba(0,0,0,0.08)]" : "text-[#8b938c] hover:text-[#5c655e]"
+        active ? "bg-white text-[#1d2823] shadow-[0_1px_2px_rgba(0,0,0,0.08)]" : "text-[#646c65] hover:text-[#5c655e]"
       }`}
       href={href}
     >
@@ -421,7 +421,7 @@ export function ContactDashboard({
       <span className="min-w-0 flex-1">
         <span className="flex items-center justify-between gap-2 text-[12.5px] font-semibold text-[#1d2823]">
           <span>{label}</span>
-          {count ? <span className="text-[11px] font-medium text-[#8b938c]">{count}</span> : null}
+          {count ? <span className="text-[11px] font-medium text-[#646c65]">{count}</span> : null}
         </span>
         <span className="mt-0.5 block text-[11.5px] leading-5 text-[#6f786f]">{detail}</span>
       </span>
@@ -452,7 +452,7 @@ export function ContactDashboard({
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[13px] font-semibold text-[#1d2823]">{account.name}</span>
-            <span className={`truncate text-[11px] text-[#8b938c] ${useCondensedTabletOverviewRail ? "hidden lg:block" : "block"}`}>
+            <span className={`truncate text-[11px] text-[#646c65] ${useCondensedTabletOverviewRail ? "hidden lg:block" : "block"}`}>
               {account.email}
             </span>
           </span>
@@ -522,7 +522,7 @@ export function ContactDashboard({
             </div>
 
             <div className="mt-auto border-t border-[#e9ece7] pt-2 lg:hidden">
-              <div className="px-2.5 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+              <div className="px-2.5 pb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">
                 Quick links
               </div>
               {sideLink("/import-export", "upload", "Import")}
@@ -538,7 +538,7 @@ export function ContactDashboard({
                   here, not mixed into the personal Favorites/Emergency filters */}
               {hasShared ? (
                 <div className="mt-3">
-                  <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+                  <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">
                     Shared
                   </div>
                   {(["family", "team"] as const).map((kind) => {
@@ -586,7 +586,7 @@ export function ContactDashboard({
                 here, not mixed into the personal Favorites/Emergency filters */}
             {hasShared ? (
               <div className="mt-3">
-                <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+                <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#646c65]">
                   Shared
                 </div>
                 {(["family", "team"] as const).map((kind) => {
@@ -711,7 +711,7 @@ export function ContactDashboard({
             </>
           )}
           {currentTab !== "duplicates" ? (
-            <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
+            <span className="ml-auto text-[12.5px] text-[#646c65]">{countLabel}</span>
           ) : null}
         </div>
         )}
@@ -721,7 +721,7 @@ export function ContactDashboard({
           <>
             {(() => {
               const labelMeta = sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase());
-              const labelColor = labelMeta?.color ?? "#8b938c";
+              const labelColor = labelMeta?.color ?? "#646c65";
               const labelCount = labelMeta?.count ?? 0;
               return (
                 <>
@@ -750,7 +750,7 @@ export function ContactDashboard({
         {currentTab === "people" && currentHealthTitle ? (
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e9ece7] bg-[#fbfcf9] px-4 py-3">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
                 Contact health queue
               </p>
               <p className="mt-1 text-[13.5px] text-[#5c655e]">
@@ -801,7 +801,7 @@ export function ContactDashboard({
               <section className="overflow-hidden rounded-[1.6rem] border border-[#d8ddd6] bg-[linear-gradient(135deg,#f7f8f3_0%,#eef5f0_55%,#f7f4ec_100%)] p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="max-w-2xl">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7d877f]">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
                       Overview
                     </p>
                     <h1 className="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-[#1d2823]">
@@ -829,7 +829,7 @@ export function ContactDashboard({
                 <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   {overviewStats.map((card) => (
                     <div className="rounded-[1.25rem] border border-white/70 bg-white/80 p-4 shadow-[0_12px_32px_rgba(23,53,46,0.04)] backdrop-blur" key={card.label}>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7d877f]">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#646c65]">
                         {card.label}
                       </p>
                       <p className="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-[#1d2823]">
@@ -844,7 +844,7 @@ export function ContactDashboard({
               <section className="rounded-[1.6rem] border border-[#d8ddd6] bg-white p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
                       Contact health
                     </p>
                     <p className="mt-1 text-[14px] text-[#5c655e]">
@@ -892,7 +892,7 @@ export function ContactDashboard({
                         <p className="text-[16px] font-semibold text-[#1d2823]">{action.title}</p>
                         <p className="mt-2 max-w-xl text-[13.5px] leading-6 text-[#5c655e]">{action.body}</p>
                       </div>
-                      <WorkspaceIcon className="mt-0.5 text-[#8b938c]" name="chevronRight" size={18} />
+                      <WorkspaceIcon className="mt-0.5 text-[#646c65]" name="chevronRight" size={18} />
                     </div>
                   </Link>
                 ))}
@@ -1042,9 +1042,9 @@ export function ContactDashboard({
                             <Link className="hover:underline" href={`/contacts/${merge.survivorContactId}`}>
                               {merge.survivorName}
                             </Link>{" "}
-                            <span className="text-[#8b938c]">←</span> {merge.absorbedName}
+                            <span className="text-[#646c65]">←</span> {merge.absorbedName}
                           </p>
-                          <p className="text-xs text-[#8b938c]">
+                          <p className="text-xs text-[#646c65]">
                             {mergeDateFormatter.format(merge.decidedAt)}
                             {merge.source === "bulk-accept" ? " · bulk" : ""}
                           </p>
@@ -1056,7 +1056,7 @@ export function ContactDashboard({
                             survivorName={merge.survivorName}
                           />
                         ) : (
-                          <span className="text-xs font-medium text-[#aeb4ac]">Expired</span>
+                          <span className="text-xs font-medium text-[#646c65]">Expired</span>
                         )}
                       </div>
                     ))}

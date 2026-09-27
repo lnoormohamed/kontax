@@ -82,7 +82,7 @@ function SearchPanel({
     >
       {q && status === "done" && total > 0 && (
         <div style={{ padding: "11px 14px 4px" }}>
-          <span style={{ fontSize: 11.5, fontWeight: 600, color: "#8b938c" }}>
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "#646c65" }}>
             {total} result{total === 1 ? "" : "s"}
           </span>
         </div>
@@ -269,7 +269,7 @@ export function SearchDropdown({ labelRegistry = [] }: { labelRegistry?: LabelEn
         <WorkspaceIcon
           name="search"
           size={18}
-          className={q ? "text-[#5c655e]" : "text-[#8b938c]"}
+          className={q ? "text-[#5c655e]" : "text-[#646c65]"}
         />
         <input
           ref={inputRef}
@@ -309,7 +309,7 @@ export function SearchDropdown({ labelRegistry = [] }: { labelRegistry?: LabelEn
               minWidth: 20, height: 20, padding: "0 4px",
               borderRadius: 5, border: "1px solid #d8ddd6",
               fontFamily: "ui-monospace, monospace",
-              fontSize: 11, color: "#8b938c", lineHeight: 1, flexShrink: 0,
+              fontSize: 11, color: "#646c65", lineHeight: 1, flexShrink: 0,
             }}
           >
             /

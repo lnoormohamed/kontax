@@ -29,7 +29,7 @@ export function CopyMonoRow({ label, value }: { label: string; value: string }) 
       </span>
       <button
         aria-label={`Copy ${label}`}
-        className="grid h-7 w-7 shrink-0 place-items-center rounded-[7px] text-[#8b938c] transition hover:bg-[#f2f4f0]"
+        className="grid h-7 w-7 shrink-0 place-items-center rounded-[7px] text-[#646c65] transition hover:bg-[#f2f4f0]"
         onClick={handleCopy}
         title={`Copy ${label}`}
         type="button"
@@ -68,7 +68,7 @@ export function CopyField({
 
   return (
     <div className="rounded-[12px] border border-[#e9ece7] bg-[#f6f7f4] p-4">
-      <p className="text-[10.5px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">{label}</p>
+      <p className="text-[10.5px] font-bold uppercase tracking-[0.13em] text-[#646c65]">{label}</p>
       <div className="mt-2 flex items-center gap-3">
         <p className="min-w-0 flex-1 break-all font-mono text-sm text-[#1d2823]">{value}</p>
         <button
@@ -80,7 +80,7 @@ export function CopyField({
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      {helper ? <p className="mt-2 text-xs leading-5 text-[#8b938c]">{helper}</p> : null}
+      {helper ? <p className="mt-2 text-xs leading-5 text-[#646c65]">{helper}</p> : null}
     </div>
   );
 }

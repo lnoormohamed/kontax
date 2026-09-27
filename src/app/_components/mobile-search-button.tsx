@@ -197,7 +197,7 @@ export function MobileSearchButton({ labelRegistry = [] }: { labelRegistry?: Lab
                   background: "#f2f4f0", borderRadius: 12, border: "1px solid #e9ece7",
                 }}
               >
-                <WorkspaceIcon name="search" size={17} className="text-[#8b938c]" />
+                <WorkspaceIcon name="search" size={17} className="text-[#646c65]" />
                 <input
                   ref={inputRef}
                   value={value}
@@ -223,7 +223,7 @@ export function MobileSearchButton({ labelRegistry = [] }: { labelRegistry?: Lab
                       padding: 0, display: "grid", placeItems: "center", cursor: "pointer",
                     }}
                   >
-                    <WorkspaceIcon name="close" size={15} className="text-[#8b938c]" strokeWidth={2} />
+                    <WorkspaceIcon name="close" size={15} className="text-[#646c65]" strokeWidth={2} />
                   </button>
                 ) : null}
               </div>
@@ -260,7 +260,7 @@ export function MobileSearchButton({ labelRegistry = [] }: { labelRegistry?: Lab
             {/* ── result count ───────────────────────────────────────────── */}
             {trimmed && status === "done" && total > 0 ? (
               <div style={{ padding: "11px 14px 4px", flexShrink: 0 }}>
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: "#8b938c" }}>
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: "#646c65" }}>
                   {total} result{total === 1 ? "" : "s"}
                 </span>
               </div>

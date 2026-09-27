@@ -97,7 +97,7 @@ export function PendingDeletionPanel({ scheduledDeleteAt }: { scheduledDeleteAt:
         </p>
       )}
 
-      <p className="mt-5 text-center text-[12px] leading-[1.55] text-[#8b938c]">
+      <p className="mt-5 text-center text-[12px] leading-[1.55] text-[#646c65]">
         Before your account is deleted, you can{" "}
         <a className="font-medium text-[#4158f4] hover:underline" href="/import-export">
           export your contacts

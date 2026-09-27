@@ -120,46 +120,46 @@ export function SecurityAlertDrawer({
           <h2 className="mt-3.5 text-[20px] font-bold leading-tight tracking-[-0.01em] text-[#1d2823]">
             Security Alert — {alert.title}
           </h2>
-          <div className="mt-1.5 text-[13px] text-[#8b938c]">{formatWhen(alert.createdAt)}</div>
+          <div className="mt-1.5 text-[13px] text-[#646c65]">{formatWhen(alert.createdAt)}</div>
 
           <hr className="my-[22px] border-t border-[#f2f4f0]" />
 
-          <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">
+          <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#646c65]">
             What happened
           </div>
           <p className="mt-2 text-[14px] leading-[1.55] text-[#38423c]">{alert.summary}</p>
 
           {alert.kind === "bulk" ? (
             <>
-              <div className="mt-[22px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">
+              <div className="mt-[22px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#646c65]">
                 Affected contacts
               </div>
               <div className="mt-3 flex flex-col gap-0.5">
                 {events.map((ev, i) => (
                   <div className="flex items-center gap-2 py-[7px] text-[13px] text-[#5c655e]" key={i}>
-                    <span className="text-[#8b938c]">
+                    <span className="text-[#646c65]">
                       <WorkspaceIcon name="trash" size={14} strokeWidth={1.8} />
                     </span>
                     <span className="font-semibold text-[#1d2823]">&ldquo;{ev.name}&rdquo;</span>
-                    <span className="text-[#8b938c]">deleted</span>
+                    <span className="text-[#646c65]">deleted</span>
                     <span className="text-[#cfd5cd]">·</span>
-                    <span className="text-[#8b938c] tabular-nums">{ev.at}</span>
+                    <span className="text-[#646c65] tabular-nums">{ev.at}</span>
                   </div>
                 ))}
                 {more > 0 && (
-                  <div className="pt-2 text-[13px] italic text-[#8b938c]">… and {more} more</div>
+                  <div className="pt-2 text-[13px] italic text-[#646c65]">… and {more} more</div>
                 )}
               </div>
             </>
           ) : (
             <>
-              <div className="mt-[22px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">
+              <div className="mt-[22px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#646c65]">
                 Device info
               </div>
               <div className="mt-3 flex flex-col gap-[9px] rounded-lg bg-[#f4f6f2] px-4 py-3">
                 {deviceRows.map(([k, v]) => (
                   <div className="flex gap-3.5 text-[13px]" key={k}>
-                    <span className="w-[92px] flex-none text-[#8b938c]">{k}</span>
+                    <span className="w-[92px] flex-none text-[#646c65]">{k}</span>
                     <span className="font-medium text-[#1d2823]">{v}</span>
                   </div>
                 ))}

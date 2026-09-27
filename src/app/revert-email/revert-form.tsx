@@ -91,7 +91,7 @@ export function RevertEmailForm({ token }: { token: string }) {
       </div>
       <h1 className="m-0 text-[22px] font-semibold tracking-[-0.01em] text-[#1d2823]">{body.title}</h1>
       <p className="mt-3 text-[14px] leading-[1.55] text-[#5c655e]">{body.message}</p>
-      {body.footer && <p className="mt-3 text-[13px] leading-[1.55] text-[#8b938c]">{body.footer}</p>}
+      {body.footer && <p className="mt-3 text-[13px] leading-[1.55] text-[#646c65]">{body.footer}</p>}
       <Link
         className="mt-5 inline-flex h-10 items-center rounded-full bg-[#17352e] px-5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
         href="/forgot-password"

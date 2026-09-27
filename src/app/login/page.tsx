@@ -66,7 +66,7 @@ export default async function LoginPage({
         />
       </div>
       <AuthCard expired={expired} message={message} mode="login" next={next} />
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>
+      <p className="text-[12px] text-[#646c65]">© Kontax · Your contacts, organised and yours.</p>
     </main>
   );
 }

@@ -49,7 +49,7 @@ export default async function TeamAuditPage({
         <Link className="text-sm font-semibold text-[#5c655e]" href="/settings/sharing/teams">
           ← Team
         </Link>
-        <p className="mt-6 rounded-2xl border border-[#d8ddd6] bg-white p-6 text-center text-sm text-[#8b938c]">
+        <p className="mt-6 rounded-2xl border border-[#d8ddd6] bg-white p-6 text-center text-sm text-[#646c65]">
           Only the team owner or an admin can view the audit log.
         </p>
       </div>
@@ -75,7 +75,7 @@ export default async function TeamAuditPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-[22px] font-semibold tracking-[-0.01em]">Audit log</h1>
-          <p className="mt-1 text-[13px] text-[#8b938c]">
+          <p className="mt-1 text-[13px] text-[#646c65]">
             Every change to {data.team.name}&rsquo;s address books · full retention
           </p>
         </div>

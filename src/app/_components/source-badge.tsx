@@ -35,7 +35,7 @@ export function SourceBadge({
       title={label}
     >
       <WorkspaceIcon
-        className="shrink-0 text-[#8b938c]"
+        className="shrink-0 text-[#646c65]"
         name={ICON_BY_SOURCE[sourceType] ?? "people"}
         size={13}
         strokeWidth={1.6}

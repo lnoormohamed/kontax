@@ -228,7 +228,7 @@ export function PhoneCountryInput({
             autoFocus={autoFocus}
             className={
               numberInputClassName ??
-              "h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-sm text-[#1d2823] outline-none placeholder:text-[#aeb4ac]"
+              "h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-sm text-[#1d2823] outline-none placeholder:text-[#646c65]"
             }
             id={id}
             inputMode="tel"

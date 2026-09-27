@@ -33,7 +33,7 @@ function statusVisual(a: SyncAccountData): StatusVisual {
             ? `Synced ${a.lastSyncedAtRelative.toLowerCase()}`
             : "Connected"),
         dot: "#2f9e5e",
-        tone: "#8b938c",
+        tone: "#646c65",
       };
     case "PAUSED":
       return { sub: `${cardDavPrefix}Paused`, dot: "#bf8526", tone: "#bf8526" };
@@ -231,7 +231,7 @@ export function MobileSyncScreen({
             </span>
             <div>
               <div style={{ fontSize: 16, fontWeight: 700, color: "#1d2823" }}>No sync connections yet</div>
-              <div style={{ fontSize: 13.5, color: "#8b938c", marginTop: 5, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13.5, color: "#646c65", marginTop: 5, lineHeight: 1.5 }}>
                 Connect iCloud, Google, or any CardDAV account to keep your contacts in sync.
               </div>
             </div>
@@ -245,7 +245,7 @@ export function MobileSyncScreen({
             {/* Surface 6A: Book / Provider toggle in the summary header. */}
             {hasBookModel ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "0 16px 12px" }}>
-                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b938c" }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#646c65" }}>
                   Group by
                 </span>
                 <div style={{ display: "inline-flex", background: "#f2f4f0", borderRadius: 8, padding: 2, gap: 2 }}>
@@ -264,7 +264,7 @@ export function MobileSyncScreen({
                           fontSize: 12,
                           fontWeight: 600,
                           background: on ? "#fff" : "transparent",
-                          color: on ? "#1d2823" : "#8b938c",
+                          color: on ? "#1d2823" : "#646c65",
                           boxShadow: on ? "0 1px 2px rgba(20,30,25,0.08)" : "none",
                         }}
                       >
@@ -279,7 +279,7 @@ export function MobileSyncScreen({
             {useBook ? (
               mobileGroups.map((g) => (
                 <div key={g.key} style={{ marginBottom: 18 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8b938c", margin: "0 18px 6px" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#646c65", margin: "0 18px 6px" }}>
                     {g.label}
                   </div>
                   <div style={{ margin: "0 16px", border: "1px solid #d8ddd6", borderRadius: 14, background: "#fff", overflow: "hidden" }}>
@@ -318,7 +318,7 @@ export function MobileSyncScreen({
                 Add connection
               </div>
               {addReason ? (
-                <p style={{ margin: "8px 2px 0", fontSize: 12, color: "#8b938c", textAlign: "center", lineHeight: 1.45 }}>
+                <p style={{ margin: "8px 2px 0", fontSize: 12, color: "#646c65", textAlign: "center", lineHeight: 1.45 }}>
                   {addReason}
                   {capUpgrade ? (
                     <>

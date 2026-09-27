@@ -17,7 +17,7 @@ export function SettingsPageHead({
   return (
     <div className="mb-4 flex flex-wrap items-start justify-between gap-4 md:mb-5">
       <div className="min-w-0">
-        <p className="hidden text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c] md:block">
+        <p className="hidden text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65] md:block">
           Settings
         </p>
         <h1 className="hidden text-[26px] font-semibold tracking-[-0.01em] text-[#1d2823] md:mt-1.5 md:block">
@@ -63,7 +63,7 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
 export function StSecLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-[14px] px-0.5 pb-0.5 pt-[10px] md:pt-[14px]">
-      <span className="whitespace-nowrap text-[12px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">
+      <span className="whitespace-nowrap text-[12px] font-bold uppercase tracking-[0.08em] text-[#646c65]">
         {children}
       </span>
       <span className="h-px flex-1 bg-[#d8ddd6]" />

@@ -705,7 +705,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
             >
               <WorkspaceIcon name="bell" size={18} />
               {incomingShares > 0 ? (
-                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#bf8526] px-1 text-[10px] font-bold text-white">
+                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#9a6612] px-1 text-[10px] font-bold text-white">
                   {incomingShares}
                 </span>
               ) : null}

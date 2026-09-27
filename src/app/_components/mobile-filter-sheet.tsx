@@ -34,7 +34,7 @@ function FilterIcon({ active }: { active?: boolean }) {
 function SheetSection({ title, action }: { title: string; action?: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", padding: "14px 16px 6px" }}>
-      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#8b938c", flex: 1 }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#646c65", flex: 1 }}>
         {title}
       </span>
       {action}
@@ -88,7 +88,7 @@ function SheetRow({
         {name}
       </span>
       {count != null && (
-        <span style={{ fontSize: 13, color: "#8b938c" }}>{count}</span>
+        <span style={{ fontSize: 13, color: "#646c65" }}>{count}</span>
       )}
       {active && (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#17352e" strokeWidth="2.5" strokeLinecap="round">
@@ -149,19 +149,19 @@ function MobileEditSheet({
       {/* header — part of the swipe-down zone */}
       <div {...drag.handlers} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 16px 14px", ...drag.zoneStyle }}>
         <LabelChip name={label.name} col={label.color} sz="md" />
-        <span style={{ fontSize: 12.5, color: "#8b938c" }}>{label.count} contacts tagged</span>
+        <span style={{ fontSize: 12.5, color: "#646c65" }}>{label.count} contacts tagged</span>
         <button type="button" onClick={onClose} style={{ marginLeft: "auto", width: 32, height: 32, borderRadius: "50%", background: "#f2f4f0", border: "none", display: "grid", placeItems: "center", cursor: "pointer", fontSize: 16, color: "#5c655e" }}>✕</button>
       </div>
       {/* fields */}
       <div style={{ padding: "0 16px 24px" }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color: "#8b938c", marginBottom: 7 }}>Name</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "#646c65", marginBottom: 7 }}>Name</div>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={{ height: 48, width: "100%", borderRadius: 12, border: "1.5px solid #d8ddd6", padding: "0 14px", fontSize: 16, color: "#1d2823", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
         />
 
-        <div style={{ fontSize: 12, fontWeight: 600, color: "#8b938c", marginTop: 18, marginBottom: 9 }}>Color</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "#646c65", marginTop: 18, marginBottom: 9 }}>Color</div>
         <RecolorSwatches value={color} onPick={setColor} size={32} />
 
         <button
@@ -172,10 +172,10 @@ function MobileEditSheet({
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5c655e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 4v5a4 4 0 004 4h8M14 9l4 4-4 4M6 20v-3" />
           </svg>
-          <span style={{ flex: 1, textAlign: "left", fontSize: 15, color: mergeTarget ? "#1d2823" : "#8b938c" }}>
+          <span style={{ flex: 1, textAlign: "left", fontSize: 15, color: mergeTarget ? "#1d2823" : "#646c65" }}>
             {mergeTarget ? mergeTarget.name : "Merge into…"}
           </span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#646c65" strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6" /></svg>
         </button>
 
         <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
@@ -225,7 +225,7 @@ function MobileEditSheet({
               >
                 <LabelDot col={l.color} size={11} />
                 <span style={{ flex: 1, textAlign: "left", fontSize: 15, color: "#1d2823" }}>{l.name}</span>
-                <span style={{ fontSize: 13, color: "#8b938c" }}>{l.count}</span>
+                <span style={{ fontSize: 13, color: "#646c65" }}>{l.count}</span>
               </button>
             ))}
           </div>
@@ -321,12 +321,12 @@ function MobileManagePanel({
             >
               <LabelDot col={l.color} size={11} />
               <span style={{ flex: 1, textAlign: "left", fontSize: 15, fontWeight: 500, color: "#1d2823" }}>{l.name}</span>
-              <span style={{ fontSize: 13, color: "#8b938c" }}>{l.count}</span>
+              <span style={{ fontSize: 13, color: "#646c65" }}>{l.count}</span>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#d8ddd6" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6" /></svg>
             </button>
           ))}
         </div>
-        <p style={{ padding: "12px 20px 0", fontSize: 12.5, color: "#8b938c", lineHeight: 1.5 }}>
+        <p style={{ padding: "12px 20px 0", fontSize: 12.5, color: "#646c65", lineHeight: 1.5 }}>
           Tap a label to rename, recolor, merge or delete it.
         </p>
       </div>
@@ -531,7 +531,7 @@ export function MobileFilterButton({
                 }
               />
               {labels.length === 0 ? (
-                <p style={{ padding: "4px 16px 8px", fontSize: 13, color: "#8b938c" }}>
+                <p style={{ padding: "4px 16px 8px", fontSize: 13, color: "#646c65" }}>
                   Tag a contact to start a label.
                 </p>
               ) : (

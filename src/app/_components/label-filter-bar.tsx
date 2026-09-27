@@ -77,7 +77,7 @@ export function LabelFilterBar({ name, color, count, clearHref }: LabelFilterBar
       </span>
 
       <div className="ml-auto flex items-center gap-3">
-        <span className="tabular-nums text-[12.5px] text-[#8b938c]">{count} contacts</span>
+        <span className="tabular-nums text-[12.5px] text-[#646c65]">{count} contacts</span>
 
         {save.open ? (
           <span className="flex items-center gap-1.5">
@@ -102,7 +102,7 @@ export function LabelFilterBar({ name, color, count, clearHref }: LabelFilterBar
             <button
               type="button"
               onClick={() => save.setOpen(false)}
-              className="text-[12px] text-[#8b938c] transition hover:text-[#1d2823]"
+              className="text-[12px] text-[#646c65] transition hover:text-[#1d2823]"
             >
               Cancel
             </button>
@@ -147,7 +147,7 @@ export function MobileLabelFilterBar({ name, color, count, clearHref }: LabelFil
           ✕
         </button>
       </span>
-      <span className="tabular-nums text-[12.5px] text-[#8b938c]">{count}</span>
+      <span className="tabular-nums text-[12.5px] text-[#646c65]">{count}</span>
 
       {save.open ? (
         <span className="ml-auto flex items-center gap-1.5">
@@ -168,7 +168,7 @@ export function MobileLabelFilterBar({ name, color, count, clearHref }: LabelFil
           >
             {save.isPending ? "…" : "Save"}
           </button>
-          <button type="button" onClick={() => save.setOpen(false)} className="text-[12px] text-[#8b938c]">✕</button>
+          <button type="button" onClick={() => save.setOpen(false)} className="text-[12px] text-[#646c65]">✕</button>
         </span>
       ) : (
         <button

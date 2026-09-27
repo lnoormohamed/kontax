@@ -157,7 +157,7 @@ function UpcomingDatesPanel({
   return (
     <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
       <div className={compact ? "px-4 py-3" : "px-5 pt-3.5"}>
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
           Upcoming dates
         </h3>
       </div>
@@ -890,7 +890,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </form>
               ) : null}
               {isSharedContact ? (
-                <p className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#8b938c]">
+                <p className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#646c65]">
                   <WorkspaceIcon name="users" size={14} />
                   In {familyContext?.groupName ?? "a family book"}
                 </p>
@@ -957,14 +957,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </p>
             ) : null}
             {contact.birthday ? (
-              <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#8b938c]">
+              <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#646c65]">
                 <WorkspaceIcon name="gift" size={14} />
                 {formatStoredDate(contact.birthday, dateFormat) || "Not added yet"}
               </p>
             ) : null}
             {upcomingDateEvents.length > 0 ? (
               <div className="mt-3 rounded-[14px] border border-[#e9ece7] bg-[#fbfcf9] px-3 py-3">
-                <div className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+                <div className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
                   Upcoming dates
                 </div>
                 <div className="mt-2 grid gap-2">
@@ -1013,7 +1013,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </span>
               ) : null}
               {contactLabels.map((name) => (
-                <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#8b938c"} sz="sm" />
+                <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#646c65"} sz="sm" />
               ))}
             </div>
 
@@ -1108,15 +1108,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             {/* metadata */}
             <dl className="grid gap-2 text-[12px]">
               <div className="flex justify-between gap-3">
-                <dt className="text-[#8b938c]">Added</dt>
+                <dt className="text-[#646c65]">Added</dt>
                 <dd className="text-right text-[#5c655e]">{formatDate(contact.createdAt, dateFormat)}</dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt className="text-[#8b938c]">Modified</dt>
+                <dt className="text-[#646c65]">Modified</dt>
                 <dd className="text-right text-[#5c655e]">{formatDate(contact.updatedAt, dateFormat)}</dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt className="text-[#8b938c]">UID</dt>
+                <dt className="text-[#646c65]">UID</dt>
                 <dd className="text-right font-mono text-[#5c655e]" title={contact.syncUid}>
                   {contact.syncUid.slice(0, 8)}…
                 </dd>
@@ -1173,7 +1173,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               className={`-mb-px flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-[14px] transition ${
                 detailTab === key
                   ? "border-[#17352e] font-bold text-[#1d2823]"
-                  : "border-transparent font-medium text-[#8b938c] hover:text-[#5c655e]"
+                  : "border-transparent font-medium text-[#646c65] hover:text-[#5c655e]"
               }`}
               href={`/contacts/${contact.id}?tab=${key}`}
               key={key}
@@ -1212,7 +1212,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             ) : null}
 
             <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white" style={{ contentVisibility: "auto", containIntrinsicSize: "0 auto" }}>
-              <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+              <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
                 Sync
               </h3>
               <div className="mt-3 h-px bg-[#e9ece7]" />
@@ -1242,11 +1242,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                             {link.syncAccount.label ??
                               link.syncAccount.addressBookDisplayName ??
                               "CardDAV account"}
-                            <span className="font-normal text-[12.5px] text-[#8b938c]">
+                            <span className="font-normal text-[12.5px] text-[#646c65]">
                               {" · CardDAV"}
                             </span>
                           </p>
-                          <p className="mt-px text-[12px] text-[#8b938c]">
+                          <p className="mt-px text-[12px] text-[#646c65]">
                             {getSyncLinkStatusLabel(link)} ·{" "}
                             {link.lastSyncedAt
                               ? `last synced ${formatTimestamp(link.lastSyncedAt)}`

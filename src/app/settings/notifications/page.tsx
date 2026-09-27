@@ -73,7 +73,7 @@ function CategoryRow({
     <div className="flex flex-col gap-3 py-4 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-5">
       <div className="min-w-0 flex-1">
         <div className="text-[14px] font-semibold text-[#1d2823]">{name}</div>
-        {note ? <div className="mt-0.5 text-[12px] text-[#8b938c]">{note}</div> : null}
+        {note ? <div className="mt-0.5 text-[12px] text-[#646c65]">{note}</div> : null}
       </div>
       <div className="grid gap-2 md:flex md:flex-none md:gap-7">
         <Toggle label="In-app" locked={locked} name={inAppName} on={inApp} />
@@ -180,7 +180,7 @@ export default async function NotificationSettingsPage() {
         </SettingsCard>
 
         <div>
-          <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">
+          <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.1em] text-[#646c65]">
             Email digest
           </p>
           <SettingsCard lazy>
@@ -203,7 +203,7 @@ export default async function NotificationSettingsPage() {
                   </span>
                   <span>
                     <span className="block text-[14px] font-medium text-[#1d2823]">{d.name}</span>
-                    <span className="mt-0.5 block text-[12.5px] text-[#8b938c]">{d.note}</span>
+                    <span className="mt-0.5 block text-[12.5px] text-[#646c65]">{d.note}</span>
                   </span>
                 </label>
               ))}

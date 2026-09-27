@@ -91,7 +91,7 @@ function IndexRow({
           style={{
             display: "block",
             fontSize: 12.5,
-            color: "#8b938c",
+            color: "#646c65",
             marginTop: 1,
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -153,7 +153,7 @@ export function MobileSettingsNav({
             <div style={{ fontSize: 16, fontWeight: 700, color: "#1d2823", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {name}
             </div>
-            <div style={{ fontSize: 13, color: "#8b938c", marginTop: 1 }}>
+            <div style={{ fontSize: 13, color: "#646c65", marginTop: 1 }}>
               {email} · {plan}
             </div>
           </div>

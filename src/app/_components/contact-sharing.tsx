@@ -78,10 +78,10 @@ const formatDate = (iso: string) =>
 function GroupLabel({ children, note, id }: { children: React.ReactNode; note?: string; id?: string }) {
   return (
     <div className="flex items-baseline gap-2 px-3 pb-1 pt-4" id={id}>
-      <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">
+      <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#646c65]">
         {children}
       </p>
-      {note ? <span className="text-[11px] font-medium text-[#aeb4ac]">{note}</span> : null}
+      {note ? <span className="text-[11px] font-medium text-[#646c65]">{note}</span> : null}
     </div>
   );
 }
@@ -104,9 +104,9 @@ function StatusPill({ status }: { status: string }) {
     Pending:  { bg: "#f2f4f0", fg: "#5c655e",  dot: "#aeb4ac" },
     Accepted: { bg: "#eef5ef", fg: "#1c6b48",  dot: "#1f8a5b" },
     Live:     { bg: "#eef5ef", fg: "#17352e",  dot: "#1f8a5b" },
-    Declined: { bg: "#f2f4f0", fg: "#8b938c",  dot: "#aeb4ac" },
+    Declined: { bg: "#f2f4f0", fg: "#646c65",  dot: "#aeb4ac" },
     Revoked:  { bg: "#f3e1da", fg: "#b5472f",  dot: "#b5472f" },
-    Expired:  { bg: "#f2f4f0", fg: "#8b938c",  dot: "#aeb4ac" },
+    Expired:  { bg: "#f2f4f0", fg: "#646c65",  dot: "#aeb4ac" },
   };
   const s = styles[status] ?? styles.Pending!;
   return (
@@ -169,7 +169,7 @@ function ActionRow({
         <IconTile icon={icon} tone={active ? "green" : "default"} />
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-[#1d2823]">{title}</span>
-          <span className="mt-px block text-xs leading-[1.45] text-[#8b938c]">{subtitle}</span>
+          <span className="mt-px block text-xs leading-[1.45] text-[#646c65]">{subtitle}</span>
         </span>
         {trailing}
       </button>
@@ -201,7 +201,7 @@ function LinkRow({
       <IconTile icon={icon} />
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-[#1d2823]">{title}</span>
-        <span className="mt-px block text-xs leading-[1.45] text-[#8b938c]">{subtitle}</span>
+        <span className="mt-px block text-xs leading-[1.45] text-[#646c65]">{subtitle}</span>
       </span>
       <WorkspaceIcon className="shrink-0 text-[#aeb4ac]" name="chevronRight" size={16} strokeWidth={1.9} />
     </a>
@@ -307,12 +307,12 @@ function SharedBookCard({ book, mobile = false }: { book: SharedBook; mobile?: b
           <h4 className="truncate text-[14px] font-semibold leading-snug text-[#1d2823]">
             {book.name}
           </h4>
-          <p className="mt-0.5 text-[12px] leading-snug text-[#8b938c]">
+          <p className="mt-0.5 text-[12px] leading-snug text-[#646c65]">
             {typeLabel} · {book.memberCount} {book.memberCount === 1 ? "member" : "members"}
           </p>
         </div>
       </div>
-      <p className={`px-4 pb-3 ${calloutSize} leading-[1.45] text-[#8b938c]`}>{callout}</p>
+      <p className={`px-4 pb-3 ${calloutSize} leading-[1.45] text-[#646c65]`}>{callout}</p>
       <div className="mx-4 h-px bg-[#edf0ea]" />
       <ul className="m-0 list-none py-1 pb-2">
         {visible.map((m) => <MemberRow key={m.id} member={m} rowHeight={rowHeight} />)}
@@ -331,7 +331,7 @@ function EmptySharingState({ contactId, hasBooks }: { contactId: string; hasBook
       </span>
       <div>
         <p className="text-[15px] font-semibold text-[#1d2823]">This contact isn&apos;t shared yet</p>
-        <p className="mt-1 text-[13px] text-[#8b938c]">
+        <p className="mt-1 text-[13px] text-[#646c65]">
           Share with a family member or generate a share link
         </p>
       </div>
@@ -367,7 +367,7 @@ function UpgradeNote({ children }: { children: React.ReactNode }) {
         <WorkspaceIcon name="lock" size={14} strokeWidth={1.8} className="shrink-0 text-[#bf8526]" />
         {children}
       </span>
-      <Link className="shrink-0 font-semibold text-[#bf8526] underline" href="/pricing">
+      <Link className="shrink-0 font-semibold text-[#7c5511] underline" href="/pricing">
         Upgrade
       </Link>
     </div>
@@ -482,13 +482,13 @@ function RecipientList({
               <span className="block truncate font-medium text-[#1d2823]">{share.recipientEmail}</span>
               {live && share.accepted && share.status === "ACTIVE" ? (
                 share.lastErrorCode === "RECIPIENT_LOCKED" ? (
-                  <span className="block text-[12px] text-[#bf8526]">
+                  <span className="block text-[12px] text-[#7c5511]">
                     Sync paused — recipient account issue
                   </span>
                 ) : share.lastErrorCode ? (
-                  <span className="block text-[12px] text-[#bf8526]">Sync error — will retry</span>
+                  <span className="block text-[12px] text-[#7c5511]">Sync error — will retry</span>
                 ) : share.lastPushedAt ? (
-                  <span className="block text-[12px] text-[#8b938c]">
+                  <span className="block text-[12px] text-[#646c65]">
                     Last synced {formatDate(share.lastPushedAt)}
                   </span>
                 ) : null
@@ -617,7 +617,7 @@ export function ContactSharing({
 
   return (
     <section className="rounded-[14px] border border-[#d8ddd6] bg-white" id="contact-sharing">
-      <h3 className="px-5 pt-4 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+      <h3 className="px-5 pt-4 text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">
         Share this contact
       </h3>
       <div className="mt-3 h-px bg-[#e9ece7]" />
@@ -681,7 +681,7 @@ export function ContactSharing({
                   </button>
                 </form>
               </div>
-              <p className="text-[12px] text-[#8b938c]">
+              <p className="text-[12px] text-[#646c65]">
                 One-time use links expire after a single download.
               </p>
             </div>
@@ -744,7 +744,7 @@ export function ContactSharing({
           <IconTile icon="qr" />
           <span className="min-w-0 flex-1">
             <span className="block text-[14px] font-semibold text-[#1d2823]">Show QR code</span>
-            <span className="block text-[12.5px] text-[#8b938c]">Scan to add this contact to any phone</span>
+            <span className="block text-[12.5px] text-[#646c65]">Scan to add this contact to any phone</span>
           </span>
           <WorkspaceIcon name="chevronRight" size={16} />
         </button>
@@ -787,7 +787,7 @@ export function ContactSharing({
           >
             {liveShareEnabled ? (
               <>
-                <p className="mb-2.5 text-[12.5px] leading-[1.5] text-[#8b938c]">
+                <p className="mb-2.5 text-[12.5px] leading-[1.5] text-[#646c65]">
                   The recipient gets a linked copy that updates whenever you edit. Both of you must
                   be on a paid plan.
                 </p>
@@ -811,7 +811,7 @@ export function ContactSharing({
         ) : (
           <div className="mx-3 my-1 rounded-[12px] border border-dashed border-[#d8ddd6] px-4 py-4 text-center">
             <p className="text-[13.5px] font-semibold text-[#1d2823]">No shared books yet</p>
-            <p className="mx-auto mt-0.5 max-w-sm text-[12.5px] text-[#8b938c]">
+            <p className="mx-auto mt-0.5 max-w-sm text-[12.5px] text-[#646c65]">
               Create or join a family or team book to keep shared contacts up to date in one
               place.
             </p>

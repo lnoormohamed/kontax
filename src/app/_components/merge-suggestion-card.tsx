@@ -72,16 +72,16 @@ function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact 
       <table className="mt-3 hidden w-full border-collapse text-[12.5px] md:table">
         <thead>
           <tr className="border-b border-[#edf0ea]">
-            <th className="w-[80px] py-1.5 pr-3 text-left text-[12px] font-semibold text-[#8b938c]">
+            <th className="w-[80px] py-1.5 pr-3 text-left text-[12px] font-semibold text-[#646c65]">
               Field
             </th>
             <th className="py-1.5 pr-3 text-left">
-              <div className="text-[12px] font-semibold text-[#8b938c] truncate">{nameA}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Base record</div>
+              <div className="text-[12px] font-semibold text-[#646c65] truncate">{nameA}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#646c65]">Base record</div>
             </th>
             <th className="py-1.5 text-left">
-              <div className="text-[12px] font-semibold text-[#8b938c] truncate">{nameB}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Merged from</div>
+              <div className="text-[12px] font-semibold text-[#646c65] truncate">{nameB}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#646c65]">Merged from</div>
             </th>
           </tr>
         </thead>
@@ -97,16 +97,16 @@ function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact 
                 className="border-b border-[#f2f4f0] last:border-b-0"
                 style={{ background: differs ? "#fff0bf" : "transparent" }}
               >
-                <td className="py-1.5 pr-3 font-medium text-[#8b938c]">{label}</td>
+                <td className="py-1.5 pr-3 font-medium text-[#646c65]">{label}</td>
                 <td
                   className="py-1.5 pr-3"
-                  style={{ color: differs ? "#1d2823" : "#8b938c" }}
+                  style={{ color: differs ? "#1d2823" : "#646c65" }}
                 >
                   {truncate(aVal, 80) ?? "—"}
                 </td>
                 <td
                   className="py-1.5"
-                  style={{ color: differs ? "#1d2823" : "#8b938c" }}
+                  style={{ color: differs ? "#1d2823" : "#646c65" }}
                 >
                   {truncate(bVal, 80) ?? "—"}
                 </td>
@@ -125,7 +125,7 @@ function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact 
           const differs = aVal !== bVal;
           return (
             <div key={key}>
-              <dt className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8b938c] mb-1">
+              <dt className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#646c65] mb-1">
                 {label}
               </dt>
               {differs ? (
@@ -135,15 +135,15 @@ function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact 
                 >
                   <span className="text-[13px] text-[#1d2823]">
                     {truncate(aVal, 80) ?? "—"}{" "}
-                    <span className="text-[11.5px] text-[#8b938c]">· Base record</span>
+                    <span className="text-[11.5px] text-[#646c65]">· Base record</span>
                   </span>
                   <span className="text-[13px] text-[#1d2823]">
                     {truncate(bVal, 80) ?? "—"}{" "}
-                    <span className="text-[11.5px] text-[#8b938c]">· Merged from</span>
+                    <span className="text-[11.5px] text-[#646c65]">· Merged from</span>
                   </span>
                 </dd>
               ) : (
-                <dd className="text-[13px] text-[#8b938c]">{aVal ?? "—"}</dd>
+                <dd className="text-[13px] text-[#646c65]">{aVal ?? "—"}</dd>
               )}
             </div>
           );
@@ -161,7 +161,7 @@ function ConfidencePill({ confidence }: { confidence: string }) {
       ? "bg-[#eef5ef] text-[#17352e]"
       : confidence === "medium"
         ? "bg-[#f6edd9] text-[#7a5a1a]"
-        : "bg-[#f2f4f0] text-[#8b938c]";
+        : "bg-[#f2f4f0] text-[#646c65]";
   return (
     <span
       className={`inline-flex h-[22px] items-center rounded-[6px] px-2 text-[11.5px] font-bold uppercase tracking-[0.02em] ${styles}`}
@@ -269,7 +269,7 @@ function LiteComparison({
 
   return (
     <div className="mt-3 rounded-[10px] border border-[#edf0ea] bg-[#f9faf8] px-3 py-2.5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8b938c]">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#646c65]">
         Quick merge will keep
       </p>
       <ul className="mt-2 grid gap-1.5 text-[12.5px] text-[#1d2823]">
@@ -281,7 +281,7 @@ function LiteComparison({
         ))}
       </ul>
       {summaries.length > 3 ? (
-        <p className="mt-2 text-[11.5px] text-[#8b938c]">
+        <p className="mt-2 text-[11.5px] text-[#646c65]">
           +{summaries.length - 3} more default field choices in full comparison
         </p>
       ) : null}
@@ -393,7 +393,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
             {leftDisplayName}
           </p>
-          <p className="truncate text-[12px] text-[#8b938c]">
+          <p className="truncate text-[12px] text-[#646c65]">
             {suggestion.leftContact.email ?? suggestion.leftContact.phone ?? ""}
           </p>
           {suggestion.quickMergePreview.survivorSide === "left" ? <BaseContactPill /> : null}
@@ -403,7 +403,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
             {rightDisplayName}
           </p>
-          <p className="truncate text-[12px] text-[#8b938c]">
+          <p className="truncate text-[12px] text-[#646c65]">
             {suggestion.rightContact.email ?? suggestion.rightContact.phone ?? ""}
           </p>
           {suggestion.quickMergePreview.survivorSide === "right" ? <BaseContactPill /> : null}
@@ -416,7 +416,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
             {leftDisplayName}
           </p>
-          <p className="truncate text-[12px] text-[#8b938c]">
+          <p className="truncate text-[12px] text-[#646c65]">
             {suggestion.leftContact.email ?? suggestion.leftContact.phone ?? ""}
           </p>
           {suggestion.quickMergePreview.survivorSide === "left" ? <BaseContactPill /> : null}
@@ -426,7 +426,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
             {rightDisplayName}
           </p>
-          <p className="truncate text-[12px] text-[#8b938c]">
+          <p className="truncate text-[12px] text-[#646c65]">
             {suggestion.rightContact.email ?? suggestion.rightContact.phone ?? ""}
           </p>
           {suggestion.quickMergePreview.survivorSide === "right" ? <BaseContactPill /> : null}
@@ -587,8 +587,8 @@ function MergeSuggestionGroup({
       {/* Identity */}
       <div className="mt-3">
         <p className="text-[14px] font-semibold text-[#1d2823]">{contactDisplayName}</p>
-        <p className="text-[12px] text-[#8b938c]">{contact.email ?? contact.phone ?? ""}</p>
-        <p className="mt-1 text-[12px] text-[#aeb4ac]">
+        <p className="text-[12px] text-[#646c65]">{contact.email ?? contact.phone ?? ""}</p>
+        <p className="mt-1 text-[12px] text-[#646c65]">
           {count + 1} copies detected · merging will collapse them into one contact
         </p>
       </div>
@@ -762,13 +762,13 @@ function MergeSuggestionCluster({
                 <span className="block truncate text-[13.5px] font-semibold text-[#1d2823]">
                   {getContactDisplayName(member, "(no name)")}
                   {index === 0 ? (
-                    <span className="ml-2 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">
+                    <span className="ml-2 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[#646c65]">
                       oldest
                     </span>
                   ) : null}
                 </span>
                 {detail ? (
-                  <span className="block truncate text-[12px] text-[#8b938c]">{detail}</span>
+                  <span className="block truncate text-[12px] text-[#646c65]">{detail}</span>
                 ) : null}
               </span>
               {selected ? (
@@ -781,7 +781,7 @@ function MergeSuggestionCluster({
         })}
       </div>
 
-      <p className="mt-2 text-[12px] text-[#aeb4ac]">
+      <p className="mt-2 text-[12px] text-[#646c65]">
         Merging keeps {survivorName} and preserves emails, phones, and labels from the
         other {members.length - 1} record{members.length === 2 ? "" : "s"}.
       </p>

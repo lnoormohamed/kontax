@@ -70,7 +70,7 @@ export default async function SharePage({ params }: Props) {
   return (
     <Shell>
       <div className="flex w-full max-w-[440px] flex-col items-center rounded-[18px] border border-[#e9ece7] bg-white px-7 py-10 text-center shadow-[0_20px_60px_rgba(20,30,25,0.08)]">
-        <div className="flex items-center gap-2 text-[13px] font-medium text-[#8b938c]">
+        <div className="flex items-center gap-2 text-[13px] font-medium text-[#646c65]">
           <span className="grid h-6 w-6 place-items-center rounded-md bg-[#17352e] text-[12px] font-bold text-[#dff0e7]">
             K
           </span>
@@ -96,7 +96,7 @@ export default async function SharePage({ params }: Props) {
           </svg>
           Save contact (.vcf)
         </a>
-        <p className="mt-3 text-[12.5px] text-[#8b938c]">
+        <p className="mt-3 text-[12.5px] text-[#646c65]">
           Adds {share.name} to your phone or address book.
         </p>
       </div>

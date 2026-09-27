@@ -70,7 +70,7 @@ export default async function RegisterPage({
       <PageViewBeacon path="/register" />
       {prefillParam && <CardRegisterContext prefillParam={prefillParam} />}
       <AuthCard mode="register" next={next} plan={plan} />
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>
+      <p className="text-[12px] text-[#646c65]">© Kontax · Your contacts, organised and yours.</p>
     </main>
   );
 }

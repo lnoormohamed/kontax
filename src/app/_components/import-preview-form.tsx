@@ -140,13 +140,13 @@ function StepDot({ n, label, state }: { n: number; label: string; state: "active
     <div className="flex shrink-0 flex-col items-center gap-1.5">
       <span
         className={`grid h-6 w-6 place-items-center rounded-full text-[12px] font-bold leading-none ${
-          state === "future" ? "border border-[#d8ddd6] text-[#8b938c]" : "text-white"
+          state === "future" ? "border border-[#d8ddd6] text-[#646c65]" : "text-white"
         }`}
         style={{ background: bg }}
       >
         {state === "done" ? <WorkspaceIcon name="check" size={13} strokeWidth={2.4} /> : n}
       </span>
-      <span className={`text-[12px] ${state === "future" ? "font-medium text-[#8b938c]" : "font-semibold text-[#1d2823]"}`}>
+      <span className={`text-[12px] ${state === "future" ? "font-medium text-[#646c65]" : "font-semibold text-[#1d2823]"}`}>
         {label}
       </span>
     </div>
@@ -178,7 +178,7 @@ function KontaxStat({ value, caption }: { value: string; caption: string }) {
   return (
     <div className="flex flex-col">
       <span className="font-mono text-[20px] font-semibold leading-tight tabular-nums text-[#1d2823]">{value}</span>
-      <span className="text-[11px] text-[#8b938c]">{caption}</span>
+      <span className="text-[11px] text-[#646c65]">{caption}</span>
     </div>
   );
 }
@@ -627,11 +627,11 @@ export function ImportPreviewForm({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[14px] font-semibold text-[#1d2823]">{fileName}</span>
-                <span className="block text-[12.5px] text-[#8b938c]">{formatSize(fileSize)}</span>
+                <span className="block text-[12.5px] text-[#646c65]">{formatSize(fileSize)}</span>
               </span>
               <button
                 aria-label="Remove file"
-                className="grid h-8 w-8 place-items-center rounded-lg text-[#8b938c] hover:bg-[#f2f4f0]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-[#646c65] hover:bg-[#f2f4f0]"
                 onClick={() => {
                   reset();
                   if (inputRef.current) inputRef.current.value = "";
@@ -660,11 +660,11 @@ export function ImportPreviewForm({
               ) : (
                 <>
                   <div className="hidden text-[16px] font-semibold text-[#5c655e] md:block">Drag &amp; drop your CSV file or Kontax export here</div>
-                  <div className="text-[14px] text-[#8b938c]">
+                  <div className="text-[14px] text-[#646c65]">
                     <span className="font-semibold text-[#4158f4]">Choose file</span>
                     <span className="hidden md:inline"> or drag &amp; drop</span>
                   </div>
-                  <div className="text-[12px] text-[#8b938c]">CSV, or a Kontax Archive (.zip) or contact (.json)</div>
+                  <div className="text-[12px] text-[#646c65]">CSV, or a Kontax Archive (.zip) or contact (.json)</div>
                 </>
               )}
             </button>
@@ -678,7 +678,7 @@ export function ImportPreviewForm({
           />
 
           {gate === "none" && quota.cap > 0 && !blocked ? (
-            <div className="text-[12.5px] text-[#8b938c] tabular-nums">
+            <div className="text-[12.5px] text-[#646c65] tabular-nums">
               {quota.used} of {quota.cap} imports used this month.
             </div>
           ) : null}
@@ -709,7 +709,7 @@ export function ImportPreviewForm({
           {/* source format — 2×2 on mobile, 4-col on sm+ (hidden in the Kontax flow) */}
           {kontaxInfo ? null : (
           <div className="grid gap-2.5" style={{ opacity: blocked ? 0.45 : 1, pointerEvents: blocked ? "none" : "auto" }}>
-            <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">Source format</div>
+            <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#646c65]">Source format</div>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               {SOURCES.map((s) => {
                 const on = profile === s.id;
@@ -807,10 +807,10 @@ export function ImportPreviewForm({
             </div>
             <div className="mt-1.5 text-[14.5px] font-semibold tabular-nums">
               <span className="text-[#1d2823]">{preview.contacts.length} contacts found</span>
-              <span className="text-[#8b938c]"> · </span>
-              <span style={{ color: warnings.length > 0 ? "#bf8526" : "#8b938c" }}>{warnings.length} with warnings</span>
-              <span className="text-[#8b938c]"> · </span>
-              <span style={{ color: preview.skippedCount > 0 ? "#b5472f" : "#8b938c" }}>{preview.skippedCount} will skip</span>
+              <span className="text-[#646c65]"> · </span>
+              <span style={{ color: warnings.length > 0 ? "#bf8526" : "#646c65" }}>{warnings.length} with warnings</span>
+              <span className="text-[#646c65]"> · </span>
+              <span style={{ color: preview.skippedCount > 0 ? "#b5472f" : "#646c65" }}>{preview.skippedCount} will skip</span>
             </div>
           </div>
 
@@ -821,7 +821,7 @@ export function ImportPreviewForm({
           >
             <table className="w-full min-w-[480px] border-collapse text-[13.5px]">
               <thead>
-                <tr className="text-left text-[11px] font-bold uppercase tracking-[0.05em] text-[#8b938c]">
+                <tr className="text-left text-[11px] font-bold uppercase tracking-[0.05em] text-[#646c65]">
                   <th className="sticky left-0 z-10 bg-white pb-2.5 pl-6 pr-3">Name</th>
                   <th className="sticky left-[184px] z-10 bg-white pb-2.5 pr-3">Email</th>
                   <th className="pb-2.5 pr-3">Phone</th>
@@ -864,7 +864,7 @@ export function ImportPreviewForm({
               </tbody>
             </table>
             {preview.contacts.length > 10 ? (
-              <div className="px-6 pt-2.5 text-[12.5px] text-[#8b938c]">
+              <div className="px-6 pt-2.5 text-[12.5px] text-[#646c65]">
                 Showing first 10 of {preview.contacts.length}
               </div>
             ) : null}
@@ -932,7 +932,7 @@ export function ImportPreviewForm({
             </div>
             {(kontaxResult?.skippedCount ?? preview?.skippedCount ?? 0) > 0 ? (
               <div>
-                <span className="font-semibold text-[#bf8526]">
+                <span className="font-semibold text-[#7c5511]">
                   {kontaxResult?.skippedCount ?? preview?.skippedCount} skipped
                 </span>
               </div>

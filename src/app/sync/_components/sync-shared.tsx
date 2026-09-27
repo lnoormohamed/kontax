@@ -12,7 +12,7 @@ export const ELEVATION_REQUIRED = "SYNC_SETTINGS_ELEVATION_REQUIRED";
 export const T = {
   ink: "#1d2823",
   ink2: "#5c655e",
-  mute: "#8b938c",
+  mute: "#646c65",
   line: "#d8ddd6",
   line2: "#e9ece7",
   wash: "#f2f4f0",

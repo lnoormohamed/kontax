@@ -147,7 +147,7 @@ export default async function BooksSettingsPage() {
             </div>
           </div>
           <div className="rounded-2xl border border-[#e9ece7] bg-[#f6f7f4] p-4">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#646c65]">
               Current default
             </p>
             <p className="mt-2 text-[16px] font-semibold text-[#1d2823]">
@@ -183,7 +183,7 @@ export default async function BooksSettingsPage() {
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-[12.5px] text-[#8b938c]">
+                      <p className="mt-1 text-[12.5px] text-[#646c65]">
                         Slug: {book.slug} · {book.count.toLocaleString()} contact{book.count === 1 ? "" : "s"} ·{" "}
                         {book.deviceWritable ? "Device writable" : "Read-only to devices"}
                       </p>
@@ -232,7 +232,7 @@ export default async function BooksSettingsPage() {
                       </button>
                     </form>
                   ) : (
-                    <p className="mt-3 text-[12.5px] text-[#8b938c]">
+                    <p className="mt-3 text-[12.5px] text-[#646c65]">
                       The default book keeps its stable name and slug so existing DAV clients and old unassigned contacts do not move unexpectedly.
                     </p>
                   )}
@@ -279,7 +279,7 @@ export default async function BooksSettingsPage() {
                       {familyMembership.isOwner ? "Owner" : familyMembership.canEdit ? "Editor" : "Viewer"}
                     </span>
                   </div>
-                  <p className="mt-3 text-[12.5px] text-[#8b938c]">
+                  <p className="mt-3 text-[12.5px] text-[#646c65]">
                     Changes to family editing access are managed under{" "}
                     <Link className="font-semibold text-[#4158f4]" href="/settings/sharing/family">
                       Family management
@@ -308,7 +308,7 @@ export default async function BooksSettingsPage() {
                         {book.linkedSyncs === 1 ? "" : "s"}
                       </p>
                       {book.description ? (
-                        <p className="mt-1 text-[12.5px] text-[#8b938c]">{book.description}</p>
+                        <p className="mt-1 text-[12.5px] text-[#646c65]">{book.description}</p>
                       ) : null}
                     </div>
                     <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${roleTone(book.role)}`}>
@@ -319,7 +319,7 @@ export default async function BooksSettingsPage() {
               ))}
 
               {!familyMembership && visibleTeamBooks.length === 0 ? (
-                <p className="text-[13.5px] text-[#8b938c]">
+                <p className="text-[13.5px] text-[#646c65]">
                   You do not currently belong to any shared books.
                 </p>
               ) : null}

@@ -6,7 +6,7 @@ export const tokens = {
   // Core palette
   ink: "#1d2823", // headings, primary body text
   secondary: "#5c655e", // body / descriptive copy
-  muted: "#8b938c", // meta, timestamps, footnotes
+  muted: "#646c65", // meta, timestamps, footnotes
   hairline: "#d8ddd6", // internal dividers
   blue: "#4158f4", // CTA buttons, links
   red: "#dc2626", // security / destructive labels & buttons

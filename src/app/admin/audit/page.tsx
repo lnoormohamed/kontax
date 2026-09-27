@@ -131,7 +131,7 @@ export default async function AdminAuditPage({
             {data.rows.length === 0 ? (
               <div className="ad-table-state">
                 <span className="ad-state-icon">
-                  <AdIcon name="audit" size={22} c="#8b938c" />
+                  <AdIcon name="audit" size={22} c="#646c65" />
                 </span>
                 <div className="ad-state-title">No matching audit events</div>
                 <div className="ad-state-sub">

@@ -32,7 +32,7 @@ export function SettingsSidebar({ account }: SettingsSidebarProps) {
 
   const eyebrow = (label: string) => (
     <div
-      className="mt-4 mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8b938c]"
+      className="mt-4 mb-1 px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#646c65]"
       key={`eyebrow-${label}`}
     >
       {label}
@@ -51,7 +51,7 @@ export function SettingsSidebar({ account }: SettingsSidebarProps) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] font-semibold text-[#1d2823]">{account.name}</span>
-          <span className="block truncate text-[11px] text-[#8b938c]">{account.email}</span>
+          <span className="block truncate text-[11px] text-[#646c65]">{account.email}</span>
         </span>
         <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#17352e]">
           {account.plan}

@@ -66,7 +66,7 @@ export default async function ResetPasswordPage({
         <span className="text-[20px] font-semibold tracking-[-0.018em] text-[#17352e]">Kontax</span>
       </Link>
       <ResetPasswordForm token={token} />
-      <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organised and yours.</p>
+      <p className="text-[12px] text-[#646c65]">© Kontax · Your contacts, organised and yours.</p>
     </main>
   );
 }

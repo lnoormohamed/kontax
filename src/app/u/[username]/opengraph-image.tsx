@@ -61,7 +61,7 @@ export default async function CardOgImage({
             justifyContent: "center",
             background: "#f4f6f2",
             fontSize: 40,
-            color: "#8b938c",
+            color: "#646c65",
           }}
         >
           Kontax
@@ -138,7 +138,7 @@ export default async function CardOgImage({
           <div
             style={{
               fontSize: 18,
-              color: "#8b938c",
+              color: "#646c65",
               letterSpacing: "0.05em",
               textTransform: "uppercase",
               marginTop: 20,

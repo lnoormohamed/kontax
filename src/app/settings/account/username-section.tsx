@@ -92,7 +92,7 @@ function ChangeUrlModal({
         <div className="px-5 py-4">
           {/* old → new */}
           <div className="flex items-center gap-2 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] px-3.5 py-2.5 text-[13px]">
-            <span className="font-mono text-[#8b938c]">u/{from}</span>
+            <span className="font-mono text-[#646c65]">u/{from}</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c4ccc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
@@ -198,7 +198,7 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
   return (
     <>
       <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
-        <p className="mb-[6px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">
+        <p className="mb-[6px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#646c65]">
           Public card URL
         </p>
         <p className="mb-4 text-[13px] leading-[1.5] text-[#5c655e]">
@@ -211,7 +211,7 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
             className={`flex h-11 flex-1 items-center overflow-hidden rounded-xl border bg-white transition ${ringClass}`}
             style={{ minWidth: 240 }}
           >
-            <span className="select-none whitespace-nowrap pl-3.5 pr-1 text-[13.5px] text-[#8b938c]">
+            <span className="select-none whitespace-nowrap pl-3.5 pr-1 text-[13.5px] text-[#646c65]">
               getkontax.com/u/
             </span>
             <input
@@ -244,12 +244,12 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
         {/* status hint */}
         <div className="mt-2 min-h-[20px]">
           {status === "checking" && (
-            <span className="flex items-center gap-1.5 text-[13px] text-[#8b938c]">
+            <span className="flex items-center gap-1.5 text-[13px] text-[#646c65]">
               <Spinner />Checking…
             </span>
           )}
           {status === "idle" && !savedUsername && (
-            <span className="text-[12.5px] text-[#8b938c]">3–30 characters · letters, numbers, hyphens, underscores</span>
+            <span className="text-[12.5px] text-[#646c65]">3–30 characters · letters, numbers, hyphens, underscores</span>
           )}
           {status === "idle" && savedUsername && isSameAsCurrent && (
             <a

@@ -64,7 +64,7 @@ function SessionRow({ s, onSignOut, flash }: { s: SessionSummary; onSignOut: (id
         <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-[14px] font-semibold text-[#1d2823]">
           {s.deviceHint ?? "Unknown device"}
         </span>
-        <span className="block overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12.5px] text-[#8b938c]">
+        <span className="block overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12.5px] text-[#646c65]">
           {s.ipAddress ?? "Unknown IP"} · {relativeTime(s.lastActiveAt)}
         </span>
       </span>
@@ -120,7 +120,7 @@ export function SessionsSection({ flash }: { flash: (msg: string) => void }) {
     return (
       <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.04)]">
         <div className="text-[16px] font-semibold text-[#1d2823]">Active sessions</div>
-        <p className="mt-4 text-[13.5px] text-[#8b938c]">Loading…</p>
+        <p className="mt-4 text-[13.5px] text-[#646c65]">Loading…</p>
       </section>
     );
   }
@@ -130,7 +130,7 @@ export function SessionsSection({ flash }: { flash: (msg: string) => void }) {
       <div className="text-[16px] font-semibold text-[#1d2823]">Active sessions</div>
 
       {sessions.length === 0 || others === 0 ? (
-        <p className="mt-[14px] mb-[2px] py-2 text-center text-[13.5px] text-[#8b938c]">
+        <p className="mt-[14px] mb-[2px] py-2 text-center text-[13.5px] text-[#646c65]">
           {sessions.length === 0 ? "No active sessions found." : "You’re only signed in on this device."}
         </p>
       ) : (
@@ -148,7 +148,7 @@ export function SessionsSection({ flash }: { flash: (msg: string) => void }) {
           </div>
           <div className="mt-[6px] border-t border-[#e9ece7] pt-[14px]">
             <button
-              className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#b5472f]"
+              className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#646c65] transition hover:text-[#b5472f]"
               onClick={() => setConfirm(true)}
               type="button"
             >

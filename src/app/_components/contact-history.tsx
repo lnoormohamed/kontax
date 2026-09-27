@@ -84,7 +84,7 @@ function DiffTable({ diffs }: { diffs: FieldDiff[] }) {
             borderTop: i > 0 ? "1px solid #e9ece7" : "none",
           }}
         >
-          <span className="pt-px font-medium text-[#8b938c]">
+          <span className="pt-px font-medium text-[#646c65]">
             {formatFieldLabel(diff.field)}
           </span>
           <span className="flex flex-wrap items-center gap-2 min-w-0">
@@ -145,14 +145,14 @@ function EventRow({ event }: { event: HistoryEvent }) {
             {event.summary}
           </span>
           <span
-            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]"
+            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#646c65]"
             title={formatAbsoluteTime(event.createdAt)}
           >
             {formatRelativeTime(event.createdAt)}
           </span>
         </div>
 
-        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#8b938c]">
+        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#646c65]">
           <span>{event.actorLabel}</span>
           {expandable && (
             <>
@@ -307,7 +307,7 @@ export function ContactHistory({ contactId }: { contactId: string }) {
 
       {/* footer */}
       <div className="mt-3 flex items-center justify-between gap-3">
-        <span className="text-[12px] text-[#8b938c]">
+        <span className="text-[12px] text-[#646c65]">
           History starts from {ACTIVITY_LOG_START}
         </span>
         {hasMore ? (

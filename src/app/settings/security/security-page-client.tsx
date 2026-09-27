@@ -94,7 +94,7 @@ function ConnectedAccountsSection({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[14px] font-semibold text-[#1d2823]">Email &amp; password</div>
-              <div className="mt-1 text-[12.5px] text-[#8b938c]">{data.primaryEmail}</div>
+              <div className="mt-1 text-[12.5px] text-[#646c65]">{data.primaryEmail}</div>
             </div>
             <span className="rounded-full border border-[#bcdac9] bg-[#e7efe9] px-[10px] py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#17352e]">
               {data.hasPassword ? "Active" : "Unavailable"}
@@ -110,7 +110,7 @@ function ConnectedAccountsSection({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[14px] font-semibold text-[#1d2823]">Recovery posture</div>
-              <div className="mt-1 text-[12.5px] text-[#8b938c]">
+              <div className="mt-1 text-[12.5px] text-[#646c65]">
                 Sessions, two-factor coverage, and app passwords
               </div>
             </div>
@@ -146,7 +146,7 @@ function ConnectedAccountsSection({
       <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-white px-4 py-4">
         <div className="flex flex-wrap items-center gap-[10px]">
           <span className="text-[14px] font-semibold text-[#1d2823]">Linked sign-in providers</span>
-          <span className="rounded-[6px] bg-[#f2f4f0] px-[7px] py-[2px] text-[10px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">
+          <span className="rounded-[6px] bg-[#f2f4f0] px-[7px] py-[2px] text-[10px] font-bold uppercase tracking-[0.06em] text-[#646c65]">
             Ready for rollout
           </span>
         </div>
@@ -178,9 +178,9 @@ function ConnectedAccountsSection({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-semibold text-[#1d2823]">{provider.name}</span>
-                <span className="block text-[12.5px] text-[#8b938c]">{provider.subtitle}</span>
+                <span className="block text-[12.5px] text-[#646c65]">{provider.subtitle}</span>
               </span>
-              <span className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-[7px] text-[13px] font-semibold text-[#8b938c]">
+              <span className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-[14px] py-[7px] text-[13px] font-semibold text-[#646c65]">
                 Not linked
               </span>
             </div>
@@ -229,7 +229,7 @@ export function SecurityPageClient({
           old root #plan-billing section — sign-out's home is with sessions. */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#d8ddd6] bg-white p-5">
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#646c65]">
             This device
           </p>
           <p className="mt-1.5 text-[14px] text-[#3a4540]">
@@ -251,7 +251,7 @@ export function SecurityPageClient({
           connect-a-device task page. */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#d8ddd6] bg-white p-5">
         <div className="min-w-0">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#646c65]">
             App passwords
           </p>
           <p className="mt-1.5 text-[14px] text-[#3a4540]">

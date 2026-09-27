@@ -28,7 +28,7 @@ export default async function DeveloperSettingsPage() {
       />
 
       <div className="mb-5 flex items-center justify-between gap-4">
-        <p className="text-[13px] text-[#8b938c]">
+        <p className="text-[13px] text-[#646c65]">
           Use the REST API to access your contacts programmatically from scripts and automations.
         </p>
         <Link

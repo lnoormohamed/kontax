@@ -74,11 +74,11 @@ export function SearchInput({
           value ? "border-[#4158f4] shadow-[0_0_0_3px_#edf0fe]" : "border-[#d8ddd6]"
         }`}
       >
-        <WorkspaceIcon className={value ? "text-[#5c655e]" : "text-[#8b938c]"} name="search" size={18} />
+        <WorkspaceIcon className={value ? "text-[#5c655e]" : "text-[#646c65]"} name="search" size={18} />
         <input
           aria-label="Search contacts"
           data-search-input
-          className="h-10 w-full bg-transparent text-sm text-[#1d2823] outline-none placeholder:text-[#8b938c]"
+          className="h-10 w-full bg-transparent text-sm text-[#1d2823] outline-none placeholder:text-[#646c65]"
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {

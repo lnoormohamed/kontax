@@ -117,7 +117,7 @@ function FieldPanel({
         );
         return (
           <div key={group.group} className="border-b border-[#e9ece7] last:border-0">
-            <div className="px-3.5 pt-2.5 pb-1 text-[10.5px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">
+            <div className="px-3.5 pt-2.5 pb-1 text-[10.5px] font-bold uppercase tracking-[0.08em] text-[#646c65]">
               {group.group}
             </div>
             {group.fields.map((gf) => {
@@ -250,7 +250,7 @@ const COMPARE_ROWS: CompareRow[] = [
 ];
 
 function FormatComparison() {
-  const th = "px-3 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c]";
+  const th = "px-3 py-2 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[#646c65]";
   return (
     <div className="mt-2.5 overflow-x-auto rounded-[11px] border border-[#d8ddd6]">
       <table className="w-full border-collapse text-[13px]">
@@ -269,7 +269,7 @@ function FormatComparison() {
             <tr className="border-b border-[#e9ece7] last:border-0" key={row.label}>
               <td className="px-3 py-2 text-[#1d2823]">
                 {row.label}
-                {row.sub ? <span className="block text-[11.5px] text-[#8b938c]">{row.sub}</span> : null}
+                {row.sub ? <span className="block text-[11.5px] text-[#646c65]">{row.sub}</span> : null}
               </td>
               <td className="bg-[#f4faf6] px-3 py-2"><Mark {...row.cells[0]} /></td>
               <td className="px-3 py-2"><Mark {...row.cells[1]} /></td>
@@ -489,7 +489,7 @@ export function ExportCard({
     <section className="rounded-2xl border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.03)]">
       <div className="mb-3.5 flex items-center gap-2.5">
         <WorkspaceIcon name="download" size={15} />
-        <span className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">Export</span>
+        <span className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#646c65]">Export</span>
       </div>
 
       {/* Format selection */}
@@ -525,7 +525,7 @@ export function ExportCard({
               <Switch on={includePhotos} onChange={setIncludePhotos} />
               <span className="min-w-0 flex-1">
                 <span className="block text-[13.5px] font-medium text-[#1d2823]">Include photos</span>
-                <span className="block text-[12.5px] text-[#8b938c]">Full-resolution, in a media/ folder</span>
+                <span className="block text-[12.5px] text-[#646c65]">Full-resolution, in a media/ folder</span>
               </span>
               <span className="whitespace-nowrap font-mono text-[12px] tabular-nums text-[#5c655e]">
                 {estimate
@@ -539,7 +539,7 @@ export function ExportCard({
               <Switch on={includeVcf} onChange={setIncludeVcf} />
               <span className="min-w-0 flex-1">
                 <span className="block text-[13.5px] font-medium text-[#1d2823]">Add a compatibility copy (.vcf)</span>
-                <span className="block text-[12.5px] text-[#8b938c]">A vCard fallback inside the zip for apps that can&apos;t read the archive</span>
+                <span className="block text-[12.5px] text-[#646c65]">A vCard fallback inside the zip for apps that can&apos;t read the archive</span>
               </span>
             </div>
           </div>
@@ -594,7 +594,7 @@ export function ExportCard({
           <Radio on={fmt === "csv"} />
           <span>
             <span className="text-[14px] font-semibold text-[#1d2823]">
-              CSV <span className="font-medium text-[#8b938c]">· all plans</span>
+              CSV <span className="font-medium text-[#646c65]">· all plans</span>
             </span>
             <span className="mt-0.5 block text-[13px] leading-[1.45] text-[#5c655e]">
               Spreadsheets. Text fields only.
@@ -637,7 +637,7 @@ export function ExportCard({
       {/* Fields section (CSV only) */}
       {fmt === "csv" ? (
         <div className="mt-4">
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">Fields</div>
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#646c65]">Fields</div>
           <div className="flex gap-4">
             {(["all", "choose"] as const).map((mode) => (
               <button
@@ -727,7 +727,7 @@ export function ExportCard({
                             </button>
                           ))}
                           <div className="border-t border-[#f2f4f0] px-3.5 py-1.5">
-                            <Link className="text-[12px] text-[#8b938c] underline underline-offset-2 hover:text-[#5c655e]" href="/import-export?tab=presets">
+                            <Link className="text-[12px] text-[#646c65] underline underline-offset-2 hover:text-[#5c655e]" href="/import-export?tab=presets">
                               Manage presets →
                             </Link>
                           </div>
@@ -737,7 +737,7 @@ export function ExportCard({
                   </div>
                 ) : null}
 
-                <span className="ml-auto tabular-nums text-[12.5px] text-[#8b938c]">
+                <span className="ml-auto tabular-nums text-[12.5px] text-[#646c65]">
                   {selectedCount} field{selectedCount !== 1 ? "s" : ""} selected
                 </span>
               </div>
@@ -768,7 +768,7 @@ export function ExportCard({
         </button>
       )}
       {!hasContacts ? (
-        <div className="mt-2 text-[13px] text-[#8b938c]">You have no contacts. Import or create some first.</div>
+        <div className="mt-2 text-[13px] text-[#646c65]">You have no contacts. Import or create some first.</div>
       ) : fmt === "csv" && fieldMode === "choose" && selectedCount === 0 ? (
         <div className="mt-2 text-[13px] text-[#b5472f]">Select at least one field to export.</div>
       ) : null}
@@ -786,7 +786,7 @@ export function ExportCard({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-semibold text-[#1d2823]">Preparing your archive…</span>
-                <span className="block text-[12.5px] text-[#8b938c]">You can leave this page — we&apos;ll notify you.</span>
+                <span className="block text-[12.5px] text-[#646c65]">You can leave this page — we&apos;ll notify you.</span>
               </span>
               <button
                 className="h-8 shrink-0 rounded-[7px] border border-[#d8ddd6] px-3 text-[12.5px] font-medium text-[#5c655e] transition hover:bg-[#f2f4f0]"
@@ -806,7 +806,7 @@ export function ExportCard({
                 }}
               />
             </div>
-            <div className="mt-2 text-[12px] tabular-nums text-[#8b938c]">
+            <div className="mt-2 text-[12px] tabular-nums text-[#646c65]">
               Packing contacts · {job.progressCount.toLocaleString()} of {(job.totalCount ?? 0).toLocaleString()}
             </div>
           </div>
@@ -820,13 +820,13 @@ export function ExportCard({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-semibold text-[#1d2823]">Your archive is ready</span>
-                <span className="block text-[12.5px] text-[#8b938c]">
+                <span className="block text-[12.5px] text-[#646c65]">
                   {job.exportedCount.toLocaleString()} contacts · {job.photoCount.toLocaleString()} photos · expires in 7 days
                 </span>
               </span>
               <span className="shrink-0 text-right font-mono text-[12px] tabular-nums text-[#5c655e]">
                 {Math.max(1, Math.round((job.fileSizeBytes ?? 0) / (1024 * 1024)))} MB
-                <span className="block text-[#8b938c]">.zip</span>
+                <span className="block text-[#646c65]">.zip</span>
               </span>
             </div>
             <a
@@ -848,7 +848,7 @@ export function ExportCard({
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-semibold text-[#1d2823]">Export didn&apos;t finish</span>
-                <span className="block text-[12.5px] text-[#8b938c]">Something interrupted the job — your contacts are untouched.</span>
+                <span className="block text-[12.5px] text-[#646c65]">Something interrupted the job — your contacts are untouched.</span>
               </span>
             </div>
             <div className="mt-3 flex items-center gap-3">
@@ -860,7 +860,7 @@ export function ExportCard({
               >
                 Try again
               </button>
-              <Link className="text-[12.5px] text-[#8b938c] underline underline-offset-2 transition hover:text-[#5c655e]" href="/help">
+              <Link className="text-[12.5px] text-[#646c65] underline underline-offset-2 transition hover:text-[#5c655e]" href="/help">
                 Contact support
               </Link>
             </div>
@@ -868,7 +868,7 @@ export function ExportCard({
         ) : null
       ) : null}
 
-      <p className="mt-4 border-t border-[#e9ece7] pt-3.5 text-[12.5px] leading-[1.5] text-[#8b938c]">
+      <p className="mt-4 border-t border-[#e9ece7] pt-3.5 text-[12.5px] leading-[1.5] text-[#646c65]">
         To export a specific selection, choose contacts in your{" "}
         <Link className="text-[#5c655e] underline underline-offset-2" href="/contacts">contacts list</Link> and use the bulk-export
         action.

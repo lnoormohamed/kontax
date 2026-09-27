@@ -116,7 +116,7 @@ const STATUS_LABELS: Record<BroadcastRow["status"], string> = {
 };
 
 const STATUS_STYLES: Record<BroadcastRow["status"], { bg: string; fg: string; dot: string }> = {
-  DRAFT: { bg: "#f4f6f2", fg: "#405046", dot: "#8b938c" },
+  DRAFT: { bg: "#f4f6f2", fg: "#405046", dot: "#646c65" },
   SCHEDULED: { bg: "#fff7e8", fg: "#a16207", dot: "#f59e0b" },
   SENT: { bg: "#eef8f1", fg: "#18794e", dot: "#22c55e" },
   RETRACTED: { bg: "#fff0f0", fg: "#b42318", dot: "#ef4444" },

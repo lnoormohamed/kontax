@@ -84,7 +84,7 @@ export function ContactBadgeCluster({
       ))}
       {overflow > 0 ? (
         <span
-          className="text-[11px] font-semibold text-[#8b938c]"
+          className="text-[11px] font-semibold text-[#646c65]"
           title={`${overflow} more`}
         >
           +{overflow}

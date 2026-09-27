@@ -81,7 +81,7 @@ async function Results({ q, view }: { q: string; view: string }) {
         {rows.length === 0 ? (
           <div className="ad-table-state">
             <span className="ad-state-icon">
-              <AdIcon name="search" size={22} c="#8b938c" />
+              <AdIcon name="search" size={22} c="#646c65" />
             </span>
             <div className="ad-state-title">No users found for “{q || "this query"}”</div>
             <div className="ad-state-sub">Try a different email or name.</div>

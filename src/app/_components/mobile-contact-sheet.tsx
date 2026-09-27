@@ -67,7 +67,7 @@ const DATE_LABELS = ["Anniversary", "Lunar birthday", "Other"];
 // ── shared styles (focus ring + error states need :focus, so inline <style>) ──
 const STYLES = `
 .mcs-field{ display:block; }
-.mcs-flabel{ display:block; font-size:12px; font-weight:600; color:#8b938c; margin:0 0 6px; }
+.mcs-flabel{ display:block; font-size:12px; font-weight:600; color:#646c65; margin:0 0 6px; }
 .mcs-input{ width:100%; min-height:48px; border:1.5px solid #d8ddd6; border-radius:11px; background:#fff;
   padding:13px 14px; font-size:16px; color:#1d2823; outline:none; line-height:1.35;
   transition:border-color .12s, box-shadow .12s, background .12s; -webkit-appearance:none; }
@@ -154,7 +154,7 @@ function LabelPill({ value, options, onChange }: { value: string; options: strin
 function Remove({ onClick }: { onClick: () => void }) {
   return (
     <button type="button" className="mcs-remove" aria-label="Remove" onClick={onClick}>
-      <WorkspaceIcon name="close" size={15} className="text-[#8b938c]" />
+      <WorkspaceIcon name="close" size={15} className="text-[#646c65]" />
     </button>
   );
 }
@@ -201,10 +201,10 @@ function Section({
           <span style={{ minWidth: 21, height: 21, padding: "0 6px", borderRadius: 11, background: "#e7efe9", color: "#17352e", fontSize: 11.5, fontWeight: 700, display: "grid", placeItems: "center" }}>{count}</span>
         ) : null}
         {locked ? (
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#8b938c" }}>Always on</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#646c65" }}>Always on</span>
         ) : (
           <span style={{ display: "grid", placeItems: "center", transition: "transform .18s", transform: isOpen ? "rotate(90deg)" : "none" }}>
-            <WorkspaceIcon name="chevronRight" size={19} className="text-[#8b938c]" />
+            <WorkspaceIcon name="chevronRight" size={19} className="text-[#646c65]" />
           </span>
         )}
       </button>
@@ -579,10 +579,10 @@ export function MobileContactSheet({
             onClick={() => setNameOpen((v) => !v)}
             style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, height: 46, padding: "0 13px", border: "none", background: "#f6f7f4", cursor: "pointer" }}
           >
-            <WorkspaceIcon name="person" size={17} className="text-[#8b938c]" />
+            <WorkspaceIcon name="person" size={17} className="text-[#646c65]" />
             <span style={{ flex: 1, textAlign: "left", fontSize: 13.5, fontWeight: 700, color: "#5c655e" }}>Name details</span>
             <span style={{ display: "grid", placeItems: "center", transition: "transform .18s", transform: nameOpen ? "rotate(90deg)" : "none" }}>
-              <WorkspaceIcon name="chevronRight" size={18} className="text-[#8b938c]" />
+              <WorkspaceIcon name="chevronRight" size={18} className="text-[#646c65]" />
             </span>
           </button>
           {nameOpen ? (
@@ -621,7 +621,7 @@ export function MobileContactSheet({
 
       {formError ? <p style={{ fontSize: 13, color: "#b5472f", margin: "0 2px 4px" }}>{formError}</p> : null}
 
-      <p style={{ textAlign: "center", fontSize: 13, color: "#8b938c", margin: "4px 0 0" }}>
+      <p style={{ textAlign: "center", fontSize: 13, color: "#646c65", margin: "4px 0 0" }}>
         Need every field?{" "}
         <Link href={isEdit && initial ? `/contacts/${initial.id}?full=1` : "/contacts/new?full=1"} style={{ color: "#4158f4", fontWeight: 600, textDecoration: "none" }}>
           Open full form

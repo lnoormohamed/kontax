@@ -183,7 +183,7 @@ export default async function SettingsBillingPage({
                   </div>
                   <p className="mt-2.5 flex-1 text-[12.5px] leading-5 text-[#5c655e]">{PLAN_SUMMARY[name]}</p>
                   {current ? (
-                    <span className="mt-3.5 inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#d8ddd6] text-[13.5px] font-semibold text-[#8b938c]">
+                    <span className="mt-3.5 inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#d8ddd6] text-[13.5px] font-semibold text-[#646c65]">
                       Your plan
                     </span>
                   ) : (
@@ -201,7 +201,7 @@ export default async function SettingsBillingPage({
         </div>
 
         <p className="px-0.5 text-[14px] leading-6 text-[#5c655e]">{planSummary.lifecyclePolicy.description}</p>
-        <p className="px-0.5 text-[12px] text-[#8b938c]">
+        <p className="px-0.5 text-[12px] text-[#646c65]">
           Activity log retained for 30 days on Free · 1 year on Pro · 90 days on Family · unlimited on Teams.
         </p>
       </div>
