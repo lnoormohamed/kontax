@@ -12,6 +12,7 @@ import {
   fetchCardDavPhotoBytes,
   pushCardDavContact,
   putCardDavVCard,
+  sameCardDavETag,
   toIfMatchValue,
 } from "~/server/carddav";
 import { replaceVCardPhoto } from "~/server/carddav-vcard-merge";
@@ -1627,7 +1628,7 @@ export const runQueuedSyncJobs = async ({
         const remoteCard = remoteEntry ? remoteCardByUid.get(remoteEntry.uid) : undefined;
         const localChanged =
           link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
-        const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
+        const remoteChanged = remoteEntry != null && !sameCardDavETag(remoteEntry.etag, link.remoteETag);
         const localSupportedShadow = buildProviderSupportedContactShadow(
           stripExcludedPortableFields(contactToPortable(link.contact), excludedFields),
           capabilityProfile,

@@ -1076,6 +1076,18 @@ export const toIfMatchValue = (etag: string | null | undefined): string | null =
   return decoded.startsWith('"') ? decoded : `"${decoded}"`;
 };
 
+/**
+ * P49A-03: whether two ETags name the same card version. A PUT response's
+ * `ETag` header (`"abc"`) and the same ETag in a later REPORT
+ * (`&quot;abc&quot;`, SabreDAV/Nextcloud) are equal — comparing them raw made
+ * every card Kontax pushed look remotely changed on the next run, and a second
+ * Kontax edit in between then opened a false conflict.
+ */
+export const sameCardDavETag = (left: string | null | undefined, right: string | null | undefined) => {
+  const normalize = (etag: string | null | undefined) => (etag == null ? null : decodeXmlEntities(etag).trim());
+  return normalize(left) === normalize(right);
+};
+
 const readEtagHeader = (response: SafeFetchResponse): string | null => {
   const etagHeader: unknown = response.headers.etag;
   return typeof etagHeader === "string" ? etagHeader : null;
