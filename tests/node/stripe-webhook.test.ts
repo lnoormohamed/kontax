@@ -23,6 +23,7 @@ const { familyInviteBlockedReason, familyJoinBlockedReason } = await import(
   "../../src/server/family-lifecycle"
 );
 const { isEligibleForProTrial } = await import("../../src/server/billing-trial");
+const { resolveEffectivePlan } = await import("../../src/server/dav/plan-entitlements.mjs");
 
 type WebhookDeps = Parameters<typeof processStripeWebhookEvent>[1];
 
@@ -99,6 +100,8 @@ type SubOpts = {
   quantity?: number;
   periodEnd?: number;
   cancelAtPeriodEnd?: boolean;
+  /** P49A-19: the (expanded) latest invoice, or its id. */
+  latestInvoice?: unknown;
 };
 
 function stripeSub(id: string, opts: SubOpts = {}): Stripe.Subscription {
@@ -112,6 +115,7 @@ function stripeSub(id: string, opts: SubOpts = {}): Stripe.Subscription {
     canceled_at: opts.status === "canceled" ? NOW_S : null,
     ended_at: opts.status === "canceled" ? NOW_S : null,
     trial_end: null,
+    latest_invoice: opts.latestInvoice ?? null,
     items: {
       data: [
         {
@@ -855,5 +859,200 @@ describe("Pro trial eligibility (A-24)", () => {
   test("a former Family subscriber doesn't get a Pro trial either", async () => {
     seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "FAMILY", status: "CANCELED" });
     assert.equal(await eligible(), false);
+  });
+});
+
+// ─── P49A-19: failed-payment grace enforced (owner decision 2026-09-27) ───────
+
+describe("failed-payment grace (P49A-19)", () => {
+  /** The user's effective plan from the fake's rows, exactly as loadEffectivePlan resolves it. */
+  const effectivePlan = (now = new Date(), userId = "user_1") =>
+    resolveEffectivePlan({
+      userId,
+      subscriptions: fake
+        .rows("subscription")
+        .filter((s) => s.userId === userId && ["ACTIVE", "TRIALING", "PAST_DUE"].includes(s.status as string))
+        .map((s) => ({
+          plan: s.plan as "FREE" | "PRO" | "FAMILY" | "TEAMS",
+          memberSlotsLimit: null,
+          status: s.status as string,
+          graceEndsAt: (s.graceEndsAt as Date | null) ?? null,
+        })),
+      teamGroups: [],
+      now,
+    });
+
+  /** An unpaid renewal invoice whose first charge (at finalization) failed `ageMs` ago. */
+  const openInvoice = (id: string, ageMs: number) => ({
+    id,
+    object: "invoice",
+    status: "open",
+    created: Math.floor((Date.now() - ageMs - 60 * 60 * 1000) / 1000),
+    status_transitions: { finalized_at: Math.floor((Date.now() - ageMs) / 1000) },
+    customer: "cus_1",
+    parent: { subscription_details: { subscription: "sub_1" } },
+  });
+  const graceEndsAt = () => (subRow("sub_1")!.graceEndsAt as Date).getTime();
+  const near = (actual: number, expected: number) => Math.abs(actual - expected) < 5_000;
+
+  test("the grace counts from the failing invoice's first attempt, not from webhook arrival", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    // The webhook endpoint was down: the first failure was 2 days ago.
+    const inv = openInvoice("in_fail", 2 * DAY);
+    stripeNow(stripeSub("sub_1", { status: "past_due", latestInvoice: inv }));
+
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+
+    assert.equal(subRow("sub_1")?.status, "PAST_DUE");
+    assert.ok(near(graceEndsAt(), Date.now() + 1 * DAY), "first failure + 3 days = 1 day left");
+  });
+
+  test("paid plan during days 0-3 after the first failure, Free after, back at once on payment", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    const inv = openInvoice("in_fail", 0);
+    stripeNow(stripeSub("sub_1", { status: "past_due", latestInvoice: inv }));
+    await processStripeWebhookEvent(event("invoice.payment_failed", inv), deps);
+    const failedAt = Date.now();
+
+    for (const offset of [0, 1 * DAY, 2 * DAY, 3 * DAY - 60_000]) {
+      const plan = effectivePlan(new Date(failedAt + offset));
+      assert.equal(plan.plan, "PRO", `day ${offset / DAY}: still Pro`);
+      assert.equal(plan.paymentLapse, null);
+    }
+    const after = effectivePlan(new Date(failedAt + 3 * DAY + 60_000));
+    assert.equal(after.plan, "FREE", "grace over: Free entitlements");
+    assert.equal(after.entitlements.contactsLimit, 500);
+    assert.equal(after.paymentLapse?.plan, "PRO");
+    assert.equal(subRow("sub_1")?.status, "PAST_DUE", "the Stripe subscription is left alone");
+
+    // Stripe's retry succeeds: paid entitlements return immediately.
+    stripeNow(stripeSub("sub_1", { status: "active", latestInvoice: { ...inv, status: "paid" } }));
+    await processStripeWebhookEvent(event("invoice.payment_succeeded", { ...inv, status: "paid" }), deps);
+    assert.equal(subRow("sub_1")?.graceEndsAt, null, "episode cleared");
+    const restored = effectivePlan(new Date(failedAt + 5 * DAY));
+    assert.equal(restored.plan, "PRO");
+    assert.equal(restored.paymentLapse, null);
+    assert.equal(user().lifecycleState, "ACTIVE");
+  });
+
+  test("duplicate and later retry failures never restart or extend the clock", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    const inv = openInvoice("in_fail", 1 * DAY);
+    stripeNow(stripeSub("sub_1", { status: "past_due", latestInvoice: inv }));
+    const evt = event("invoice.payment_failed", inv);
+
+    await processStripeWebhookEvent(evt, deps);
+    const deadline = graceEndsAt();
+    assert.ok(near(deadline, Date.now() + 2 * DAY));
+
+    assert.equal((await processStripeWebhookEvent(evt, deps)).status, "skipped", "same event id");
+    // Stripe's next attempt fails today: a new event for the same invoice.
+    await processStripeWebhookEvent(event("invoice.payment_failed", inv), deps);
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    assert.equal(graceEndsAt(), deadline);
+  });
+
+  test("out of order: subscription.updated (no invoice) first, invoice.payment_failed later — the earlier Stripe time wins", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    const inv = openInvoice("in_fail", 1 * DAY);
+    // Retrieved without the expanded invoice: only its id.
+    stripeNow(stripeSub("sub_1", { status: "past_due", latestInvoice: "in_fail" }));
+
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    assert.ok(near(graceEndsAt(), Date.now() + 3 * DAY), "arrival time is only the fallback");
+
+    await processStripeWebhookEvent(event("invoice.payment_failed", inv), deps);
+    assert.ok(near(graceEndsAt(), Date.now() + 2 * DAY), "moved earlier to the real first failure");
+  });
+
+  test("an older invoice's failure event cannot pull the current episode's start back", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    stripeNow(stripeSub("sub_1", { status: "past_due", latestInvoice: "in_new" }));
+    await processStripeWebhookEvent(event("invoice.payment_failed", openInvoice("in_new", 0)), deps);
+    const deadline = graceEndsAt();
+
+    // Last month's (since paid) invoice failure, redelivered late.
+    await processStripeWebhookEvent(event("invoice.payment_failed", openInvoice("in_old", 30 * DAY)), deps);
+    assert.equal(graceEndsAt(), deadline);
+  });
+
+  test("a stale failure delivered after recovery neither restarts the grace nor downgrades", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    const inv = openInvoice("in_fail", 5 * DAY);
+    stripeNow(stripeSub("sub_1", { status: "active", latestInvoice: { ...inv, status: "paid" } }));
+
+    await processStripeWebhookEvent(event("invoice.payment_failed", inv), deps);
+
+    assert.equal(subRow("sub_1")?.status, "ACTIVE");
+    assert.equal(subRow("sub_1")?.graceEndsAt, null);
+    assert.equal(effectivePlan().plan, "PRO");
+    assert.equal(effectsRun, 0, "no payment-failed email or notice");
+  });
+
+  test("a retry failing after the grace: no clean-up, no Family notice, in-app notice only", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE", plan: "FAMILY" });
+    fake.seed("syncAccount", { id: "sa_1", userId: "user_1", status: "ACTIVE", createdAt: new Date(1) });
+    fake.seed("syncAccount", { id: "sa_2", userId: "user_1", status: "ACTIVE", createdAt: new Date(2) });
+    fake.seed("group", { id: "fam_1", ownerId: "user_1", type: "FAMILY", name: "Smith Family", defaultAddressBookId: null });
+    fake.seed("groupMember", { id: "gm_owner", groupId: "fam_1", userId: "user_1", role: "OWNER", inviteStatus: "ACCEPTED" });
+    fake.seed("groupMember", { id: "gm_2", groupId: "fam_1", userId: "user_2", role: "MEMBER", inviteStatus: "ACCEPTED" });
+    const inv = openInvoice("in_fail", 4 * DAY);
+    stripeNow(stripeSub("sub_1", { status: "past_due", price: "price_family_m", latestInvoice: inv }));
+
+    await processStripeWebhookEvent(event("invoice.payment_failed", inv), deps);
+
+    assert.ok(graceEndsAt() < Date.now(), "grace already over");
+    assert.equal(effectivePlan().plan, "FREE");
+    assert.deepEqual(
+      fake.rows("syncAccount").map((s) => s.status),
+      ["ACTIVE", "ACTIVE"],
+      "irreversible clean-up waits for Stripe's final cancel",
+    );
+    const family = fake.rows("group").find((g) => g.id === "fam_1")!;
+    assert.equal(family.familyDissolveAt, null, "the Family 7-day clock does not start on past_due");
+    assert.deepEqual(familyNotices(), []);
+    assert.equal(effectsRun, 1, "in-app notice only — no 'update within N days' email with a past date");
+  });
+
+  test("an admin comp is not downgraded by an unpaid paid plan", async () => {
+    seedUser();
+    seedSubscriptionRow({
+      providerSubscriptionId: "manual_admin-override-user_1",
+      plan: "TEAMS",
+      status: "ACTIVE",
+      currentPeriodEnd: null,
+    });
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", plan: "PRO", status: "ACTIVE" });
+    const inv = openInvoice("in_fail", 10 * DAY);
+    stripeNow(stripeSub("sub_1", { status: "past_due", latestInvoice: inv }));
+    await processStripeWebhookEvent(event("invoice.payment_failed", inv), deps);
+
+    const plan = effectivePlan();
+    assert.equal(plan.plan, "TEAMS", "the comp still applies");
+    assert.equal(plan.paymentLapse, null, "nothing held back: the comp outranks the unpaid Pro");
+    assert.equal(subRow("manual_admin-override-user_1")?.status, "ACTIVE");
+
+    // A same-rank comp keeps Pro too.
+    subRow("manual_admin-override-user_1")!.plan = "PRO";
+    const same = effectivePlan();
+    assert.equal(same.plan, "PRO");
+    assert.equal(same.paymentLapse, null);
+  });
+
+  test("Stripe `unpaid` (dunning set to mark unpaid) lapses the same way after the grace", async () => {
+    seedUser();
+    seedSubscriptionRow({ providerSubscriptionId: "sub_1", status: "ACTIVE" });
+    const inv = { ...openInvoice("in_fail", 20 * DAY), status: "uncollectible" };
+    stripeNow(stripeSub("sub_1", { status: "unpaid", latestInvoice: inv }));
+    await processStripeWebhookEvent(event("customer.subscription.updated", stripeSub("sub_1")), deps);
+    assert.equal(subRow("sub_1")?.status, "PAST_DUE");
+    assert.equal(effectivePlan().plan, "FREE");
   });
 });

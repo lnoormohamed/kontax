@@ -28,7 +28,8 @@ Billing is driven entirely by Stripe webhooks hitting `POST /api/stripe/webhook`
               ▼                                 │
            ACTIVE ──payment fails──► GRACE ─payment succeeds─►  ACTIVE
               │                        │
-              │                        └─ 3-day window expires → write restricted
+              │                        └─ 3 days after the first failure → Free entitlements
+              │                           until paid (lifecycleState stays GRACE)
               │
               └─user requests deletion──► LOCKED ──30d cron──► (deleted)
 ```
@@ -36,10 +37,27 @@ Billing is driven entirely by Stripe webhooks hitting `POST /api/stripe/webhook`
 | `lifecycleState` | Meaning | Write access |
 |------------------|---------|-------------|
 | `ACTIVE` | Normal — free, trialing, or paid | Yes |
-| `GRACE` | Payment failed, retrying | Yes (3-day window) |
+| `GRACE` | Payment failed, Stripe retrying | Yes — paid plan for 3 days from the first failure, then Free limits until paid (P49A-19) |
 | `LOCKED` | User requested account deletion | No (read + export only) |
 
 `LOCKED` is **only** set by the account deletion flow — not by billing. When a subscription is fully cancelled and the user reverts to FREE, `lifecycleState` goes back to `ACTIVE`.
+
+### Failed-payment grace (P49A-19, owner decision 2026-09-27)
+
+- The grace is **enforced**: `Subscription.graceEndsAt` = the failing invoice's first attempt
+  (`status_transitions.finalized_at`) + 3 days, stamped by the webhook and only ever moved
+  earlier while PAST_DUE (duplicates / retries / out-of-order events can't restart it).
+- Past `graceEndsAt`, `subscriptionGrantsPlan` (`src/server/dav/plan-entitlements.mjs`) drops the
+  row from the effective plan — web app and CardDAV server alike. The user gets Free limits (or
+  an admin comp / Teams membership if they have one). Stripe is not touched; nothing is deleted.
+- `invoice.payment_succeeded` / status `active` → `graceEndsAt` cleared, paid plan back at once.
+- Downgrade clean-up, the Family 7-day notice and the Teams 14-day window still start only when
+  Stripe finally cancels / pauses the subscription.
+- Stripe `unpaid` maps to PAST_DUE and lapses the same way, so either dunning end state
+  ("cancel" or "mark unpaid") is safe for entitlements.
+- Check a user: `SELECT status, "graceEndsAt" FROM "Subscription" WHERE "userId" = …` — PAST_DUE
+  with `graceEndsAt` in the past = on Free until paid. Settings → Plan & billing shows
+  "Payment failed — your account moved to the Free plan on <date>".
 
 ---
 
@@ -50,7 +68,7 @@ Billing is driven entirely by Stripe webhooks hitting `POST /api/stripe/webhook`
 | `checkout.session.completed` | `handleCheckoutSessionCompleted` — creates the subscription row |
 | `customer.subscription.updated` | `handleSubscriptionUpserted` — updates plan/status |
 | `customer.subscription.deleted` | `handleSubscriptionDeleted` — reverts to FREE, `lifecycleState=ACTIVE` |
-| `invoice.payment_failed` | `handleInvoicePaymentFailed` — sets `GRACE`, sends email + in-app notification |
+| `invoice.payment_failed` | `handleInvoicePaymentFailed` — sets `GRACE`, stamps `graceEndsAt`, sends email + in-app notification (in-app only once the grace is over) |
 | `invoice.payment_succeeded` | `handleInvoicePaymentSucceeded` — clears `GRACE`, restores `ACTIVE` |
 | `customer.subscription.trial_will_end` | `handleTrialWillEnd` — sends trial-ending reminder email |
 

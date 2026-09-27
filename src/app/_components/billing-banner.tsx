@@ -88,7 +88,21 @@ export function BillingBanner({
       <div className="z-[18] flex shrink-0 items-center gap-[11px] border-b border-[#dcae9f] bg-[#f3e1da] py-[13px] pl-4 pr-[18px]" style={{ borderLeft: "4px solid #b5472f" }}>
         <AlertGlyph />
         <span className="flex-1 text-[14px] leading-[1.4] text-[#1d2823]">
-          Your plan expires soon. Update now to avoid losing sync and activity log access.
+          Payment failed. Update your payment method today to keep your plan — otherwise your account
+          moves to Free until the payment goes through.
+        </span>
+        <PortalLink label="Update payment method" solid />
+      </div>
+    );
+  }
+  if (variant === "ownerLapsed") {
+    // P49A-19: the 3-day grace is over and the invoice is still unpaid.
+    return (
+      <div className="z-[18] flex shrink-0 items-center gap-[11px] border-b border-[#dcae9f] bg-[#f3e1da] py-[13px] pl-4 pr-[18px]" style={{ borderLeft: "4px solid #b5472f" }}>
+        <AlertGlyph />
+        <span className="flex-1 text-[14px] leading-[1.4] text-[#1d2823]">
+          Payment failed. Your account is on the Free plan until you update your payment method. Nothing
+          has been deleted.
         </span>
         <PortalLink label="Update payment method" solid />
       </div>
@@ -121,7 +135,9 @@ export function BillingBanner({
     <div className="z-[18] flex shrink-0 items-center gap-[11px] border-b border-[#e6d3a3] bg-[#f6edd9] py-[13px] pl-4 pr-[18px]" style={{ borderLeft: "4px solid #bf8526" }}>
       <WarnGlyph />
       <span className="flex-1 text-[14px] leading-[1.4] text-[#1d2823]">
-        Payment failed. Update your payment method to keep your plan.
+        Payment failed. Update your payment method
+        {daysRemaining != null ? ` within ${daysRemaining} ${daysRemaining === 1 ? "day" : "days"}` : ""} to keep
+        your plan.
       </span>
       <PortalLink label="Update payment method" />
     </div>

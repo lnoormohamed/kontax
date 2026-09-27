@@ -10,7 +10,7 @@ needs confirming in code before the fix.
 | 1 | **Regenerating 2FA recovery codes discards the new codes** (the user is shown codes that were never saved, or the new set is thrown away) | `src/app/actions/totp.ts` `regenerateRecoveryCodes` + the settings 2FA UI | Users think they have backup codes and are locked out if they lose their phone (P0) |
 | 2 | Sync conflict **"Manual merge" ignores the fields the user picks** | sync conflict resolution in `src/app/actions/sync.ts` + the conflict review UI | **Fixed** 2026-09-27 with P49A-12 (branch `p49a-12`) — the picks are sent with MANUAL_MERGE keyed by field (`fieldPicks`, `src/lib/sync-conflict-picks.ts`), validated (zod, unknown keys / values rejected) and the merged contact is built from exactly the chosen side per field, multi-value families through the P49A-10 entries (`buildPickedMergeWriteData`, `src/server/sync-conflict-merge.ts`); the union helper is gone. Unpicked field = "Kontax" (the UI's preselection); a resolution with no picks (page loaded before the deploy) therefore saves what the user was shown, not the old union. Rows now also cover nickname, addresses, department and dates. Tests: `tests/node/sync-conflict-manual-merge.test.ts`. Still open (pre-existing): keep local / manual merge push through the CardDAV client, so they fail for Google / Outlook conflicts |
 | 3 | Data-export ready email links to the wrong settings page | `src/app/api/cron/data-export/route.ts` | **Fixed** 2026-09-27 — links to `/settings/data/export` via `DATA_EXPORT_SETTINGS_PATH` (also used for revalidation); test `tests/node/data-export-email-link.test.ts` |
-| 4 | Failed-payment grace (3 days) is not enforced — display only | `billing-surface.ts`, `stripe-handlers.ts` (P49A-05 notes: by policy, Stripe decides the lapse) | Decide: document as intended (Stripe dunning ends it) or enforce; tie to the owner's "Stripe → cancel" setting |
+| 4 | Failed-payment grace (3 days) is not enforced — display only | `billing-surface.ts`, `stripe-handlers.ts` (P49A-05 notes: by policy, Stripe decides the lapse) | **Fixed** 2026-09-27 — owner decision: enforce. Paid plan for 3 days from the first failure, then Free entitlements until paid (web + CardDAV), Stripe untouched, nothing deleted. See below. |
 | 5 | Free users can get a vCard file via the Kontax Archive ".vcf copy" option and the full data export, although vCard export is Pro | `src/server/export-format/*`, data export | Plan leak (low); decide whether the GDPR export should include vCard for everyone (arguably yes — data portability) and align the pricing copy |
 | 6 | Auto-pause after repeated sync failures defaults to 5, while copy says 3 | `src/server/sync-health.ts` | Copy/behaviour mismatch — pick one |
 | 7 | `DOWNGRADE_COPY` in `plan-data.ts` is never shown and is wrong in places; users see `cancel-plan-modal.tsx` | `src/app/_components/plan-data.ts`, `cancel-plan-modal.tsx` | Dead, misleading code — delete or wire up correctly |
@@ -35,3 +35,37 @@ transaction, after `lockUserForPlanCheck`, so concurrent imports at 2/3 let exac
 The CSV commit route claims a preview job atomically (only PENDING, or FAILED with nothing
 imported); a retry or double-submit of a job that already ran gets 409 instead of importing twice.
 Tests: `tests/node/monthly-import-limit.test.ts`.
+
+## Item 4 — fixed (2026-09-27, owner decision: enforce the 3-day grace)
+
+- **Rule** (`src/server/dav/plan-entitlements.mjs`, shared by `billing.ts` and `server.mjs`):
+  `subscriptionGrantsPlan` — ACTIVE / TRIALING grant; PAST_DUE (Stripe `past_due` and `unpaid`)
+  grants until `Subscription.graceEndsAt`; after that the row grants nothing, so
+  `loadEffectivePlan` resolves to Free (or a higher comp / Teams membership). Enforced at read
+  time — the grace running out is not a Stripe event. `PAYMENT_GRACE_DAYS = 3` is the single
+  constant (help FACTS read it). No schema change: the existing `graceEndsAt` column is the
+  episode marker.
+- **Grace start from Stripe data** (`stripe-handlers.ts` `paymentFailureStartedAt` /
+  `ensureGraceDeadline`): the failing invoice's `status_transitions.finalized_at` (the first
+  charge attempt) + 3 days, from the subscription's `latest_invoice` (every retrieve now expands
+  it) or the invoice event's own invoice when it is that latest invoice. Arrival time is only the
+  fallback. The stamp only moves earlier while PAST_DUE, so duplicate / retried / out-of-order
+  events never restart or extend the grace; leaving PAST_DUE clears it (next failure = new
+  episode). Recovery (`invoice.payment_succeeded` → status active) restores the plan at once.
+- **Structural steps unchanged:** downgrade clean-up (sync accounts paused, live shares made
+  static), the Family 7-day dissolve notice and the Teams 14-day read-only window still start
+  only when Stripe cancels / pauses — they are not reversible and a paid invoice must restore
+  everything. So during the unpaid period: Family members keep the shared book (membership
+  based) and the owner can't invite (plan is Free); a Teams org past its grace stops granting
+  Teams to members (they fall back to their own plan) but the team is not locked. Known gap
+  (follow-up): the sync-account and live-share limits are enforced on creation, so connections /
+  live shares beyond Free's keep running during the unpaid window until Stripe's final cancel.
+- **Admin comp (P49A-07):** a comp row is ACTIVE, so it still grants; max-rank keeps the higher.
+- **UI:** Settings → Plan & billing: grace card "Payment failed — update your payment method by
+  <date> to keep <Plan>…", new `paymentLapsed` card "…your account moved to the Free plan on
+  <date>… <Plan> comes back as soon as the payment goes through" with "Update payment method"
+  (never "Upgrade", which would start a second subscription); new `ownerLapsed` banner. A dunning
+  retry that fails after the grace sends only an in-app notice (the "update within N days" email
+  would show a past date). Help: "If a payment fails" rewritten.
+- Tests: `tests/node/payment-grace.test.ts` (rule, web + DAV path, contact cap, comp, Teams),
+  `stripe-webhook.test.ts` "failed-payment grace (P49A-19)", `billing-surface-grant.test.ts`.

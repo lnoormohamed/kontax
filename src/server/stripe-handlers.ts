@@ -14,6 +14,7 @@ import {
 } from "~/server/billing-emails";
 import { ADMIN_OVERRIDE_SUBSCRIPTION_PREFIX } from "~/server/admin/plan-override";
 import { isPlaceholderProviderId, REAL_STRIPE_SUBSCRIPTION_WHERE } from "~/server/billing-placeholders";
+import { PAYMENT_GRACE_MS } from "~/server/dav/plan-entitlements.mjs";
 import { db } from "~/server/db";
 import {
   FAMILY_DISSOLVE_NOTICE_MS,
@@ -52,8 +53,11 @@ export async function runAfterCommit(effects: AfterCommit): Promise<void> {
 // ─── Status / plan helpers ────────────────────────────────────────────────────
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** Payment-failure grace shown to the customer (lifecycle-policies.md §2b). */
-const PAYMENT_GRACE_MS = 3 * DAY_MS;
+// Payment-failure grace (lifecycle-policies.md §2b): PAYMENT_GRACE_MS, from
+// plan-entitlements.mjs. P49A-19 (owner decision 2026-09-27): enforced — past
+// `graceEndsAt` an unpaid PAST_DUE subscription grants Free entitlements until
+// it is paid (`subscriptionGrantsPlan`, applied at read time by the web app
+// and the CardDAV server alike).
 /** Read-only window for a lapsed team (lifecycle-policies.md §3e). */
 const TEAMS_GRACE_MS = 14 * DAY_MS;
 
@@ -84,9 +88,17 @@ function planRank(plan: SubscriptionPlan): number {
 }
 
 /**
- * Statuses that confer the plan's entitlements. Must match the filter in
- * `getUserBillingContext` (billing.ts) — anything else (INCOMPLETE, PAUSED,
- * EXPIRED, CANCELED) is a lapse back to Free.
+ * Statuses of a live Stripe subscription — anything else (INCOMPLETE, PAUSED,
+ * EXPIRED, CANCELED) is Stripe's final lapse back to Free. Same list as
+ * ACTIVE_SUBSCRIPTION_STATUSES (plan-entitlements.mjs).
+ *
+ * P49A-19: deliberately NOT grace-aware. Entitlements apply the 3-day
+ * failed-payment grace at read time (`subscriptionGrantsPlan`), but the
+ * webhook's structural lapse steps — downgrade clean-up, the Family 7-day
+ * dissolve notice, the Teams 14-day read-only window — key off Stripe's own
+ * status: a PAST_DUE subscription is still alive (Stripe keeps retrying, and
+ * a paid invoice must bring everything back), so those irreversible steps run
+ * only when Stripe finally cancels / pauses it.
  */
 const ACTIVE_BILLING_STATUSES: SubscriptionStatus[] = ["ACTIVE", "TRIALING", "PAST_DUE"];
 
@@ -139,15 +151,62 @@ function subscriptionFields(
   };
 }
 
+const INVOICE_AWAITING_PAYMENT = new Set<Stripe.Invoice.Status | null>(["open", "uncollectible"]);
+
+/**
+ * P49A-19: when the current dunning episode started — the failing invoice's
+ * first payment attempt — from Stripe's own data, not from when (or in what
+ * order) webhooks arrive. A renewal invoice is charged when it is finalized,
+ * so `status_transitions.finalized_at` is the first failed attempt. Candidates
+ * are the subscription's `latest_invoice` (expanded by every retrieve in the
+ * webhook / billing sync) and, for invoice events, the event's invoice when it
+ * IS that latest invoice (an older invoice's event says nothing about the
+ * current episode). Never later than `now`; `now` when Stripe gives nothing.
+ */
+export function paymentFailureStartedAt(
+  current: Stripe.Subscription,
+  now: Date,
+  invoice?: Stripe.Invoice | null,
+): Date {
+  const latest = current.latest_invoice;
+  const latestId = typeof latest === "string" ? latest : latest?.id ?? null;
+  const candidates = [
+    typeof latest === "object" ? latest : null,
+    invoice && latestId !== null && invoice.id === latestId ? invoice : null,
+  ];
+  let earliest = now;
+  for (const inv of candidates) {
+    if (!inv || !INVOICE_AWAITING_PAYMENT.has(inv.status)) continue;
+    const attemptedAt = fromUnix(inv.status_transitions?.finalized_at) ?? fromUnix(inv.created);
+    if (attemptedAt && attemptedAt.getTime() < earliest.getTime()) earliest = attemptedAt;
+  }
+  return earliest;
+}
+
+/**
+ * Stamp the failed-payment grace deadline (first failure + PAYMENT_GRACE_MS)
+ * on a PAST_DUE row. P49A-19: it only ever moves EARLIER while the row stays
+ * PAST_DUE (conditional update), so a duplicate, retried or out-of-order event
+ * — or a later dunning retry — can never restart or extend the grace, while a
+ * late-arriving event that carries the real failure time can correct a stamp
+ * made from arrival time. Leaving PAST_DUE clears it (`subscriptionFields`),
+ * so the next failure starts a new episode.
+ */
 async function ensureGraceDeadline(
-  subscriptionRowId: string,
+  where: { id: string } | { providerSubscriptionId: string },
   status: SubscriptionStatus,
+  failureStartedAt: Date,
   tx: Tx,
 ): Promise<void> {
   if (status !== "PAST_DUE") return;
+  const deadline = new Date(failureStartedAt.getTime() + PAYMENT_GRACE_MS);
   await tx.subscription.updateMany({
-    where: { id: subscriptionRowId, graceEndsAt: null },
-    data: { graceEndsAt: new Date(Date.now() + PAYMENT_GRACE_MS) },
+    where: {
+      ...where,
+      status: "PAST_DUE",
+      OR: [{ graceEndsAt: null }, { graceEndsAt: { gt: deadline } }],
+    },
+    data: { graceEndsAt: deadline },
   });
 }
 
@@ -284,7 +343,12 @@ async function upsertSubscription(
     rowId = created.id;
     if (subscriptionData.cancelAtPeriodEnd) endingFlip = true;
   }
-  await ensureGraceDeadline(rowId, subscriptionData.status, tx);
+  await ensureGraceDeadline(
+    { id: rowId },
+    subscriptionData.status,
+    paymentFailureStartedAt(stripeSubscription, new Date()),
+    tx,
+  );
 
   // Family owner scheduled (or withdrew) cancellation: tell the members now,
   // not at period end (lifecycle-policies.md §1a / §3a notification 1).
@@ -782,7 +846,12 @@ async function upsertGroupSubscription(
     });
     subscriptionId = created.id;
   }
-  await ensureGraceDeadline(subscriptionId, status, tx);
+  await ensureGraceDeadline(
+    { id: subscriptionId },
+    status,
+    paymentFailureStartedAt(stripeSubscription, new Date()),
+    tx,
+  );
 
   const group = await tx.group.findUnique({
     where: { id: groupId },
@@ -1002,6 +1071,15 @@ export async function handleInvoicePaymentFailed(
   // not tell the customer their payment failed.
   if (current.status !== "past_due" && current.status !== "unpaid") return;
 
+  // P49A-19: this event's invoice, when it is the subscription's current one,
+  // pins the episode's first failure even if latest_invoice wasn't expanded.
+  await ensureGraceDeadline(
+    { providerSubscriptionId: current.id },
+    "PAST_DUE",
+    paymentFailureStartedAt(current, new Date(), invoice),
+    tx,
+  );
+
   const customer = await findStripeCustomer(customerIdOf(invoice.customer) ?? "", tx);
   // P34F-02: org-anchored payment failure — no single user to notify;
   // billing-manager dunning is a later ticket.
@@ -1015,6 +1093,22 @@ export async function handleInvoicePaymentFailed(
   if (!row?.graceEndsAt) return;
   const graceEndsAt = row.graceEndsAt;
 
+  // P49A-19: a dunning retry that fails after the grace ran out — the account
+  // is already on Free until the payment goes through. The "update within N
+  // days" email would give a date in the past, so only the in-app notice.
+  if (graceEndsAt.getTime() <= Date.now()) {
+    effects.push(() =>
+      createNotification({
+        userId,
+        category: "BILLING",
+        title: "Payment failed",
+        body: "We still couldn't process your payment, so your account stays on the Free plan. Update your payment method to get your plan back.",
+        actionUrl: "/settings",
+      }),
+    );
+    return;
+  }
+
   // Prompt the user to update their payment method before grace ends (P20-08).
   effects.push(() =>
     sendPaymentFailedEmail({ userId, graceEndsAt, planName: row.plan }),
@@ -1026,7 +1120,7 @@ export async function handleInvoicePaymentFailed(
       userId,
       category: "BILLING",
       title: "Payment failed",
-      body: "We couldn't process your payment. Update your payment method before your grace period ends.",
+      body: "We couldn't process your payment. Update your payment method before your grace period ends, or your account moves to the Free plan until the payment goes through.",
       actionUrl: "/settings",
     }),
   );
@@ -1108,7 +1202,9 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
 
   if (localSubscription?.providerSubscriptionId) {
     try {
-      stripeSubscription = await stripe.subscriptions.retrieve(localSubscription.providerSubscriptionId);
+      stripeSubscription = await stripe.subscriptions.retrieve(localSubscription.providerSubscriptionId, {
+        expand: ["latest_invoice"],
+      });
     } catch {
       stripeSubscription = null;
     }
@@ -1119,6 +1215,7 @@ export async function syncStripeBillingState(userId: string): Promise<boolean> {
       customer: customer.providerCustomerId,
       status: "all",
       limit: 10,
+      expand: ["data.latest_invoice"],
     });
 
     stripeSubscription =

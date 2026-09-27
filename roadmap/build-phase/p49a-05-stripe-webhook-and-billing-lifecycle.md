@@ -64,9 +64,17 @@ entitlements consistent.
   owner's only view of those contacts).
 - Webhooks never change a `LOCKED` lifecycle. Emails/notifications run only after commit.
 - `graceEndsAt`: stamped once on entering PAST_DUE (retries no longer extend it), cleared on any
-  non-PAST_DUE state; read by `billing-surface.ts` (settings + banner). Not enforced on
+  non-PAST_DUE state; read by `billing-surface.ts` (settings + banner). ~~Not enforced on
   entitlements by design (policy §2a–2d: features stay on through Stripe dunning; the lapse is
-  Stripe's final `canceled`/`paused`). Open decision: Stripe `unpaid` still maps to PAST_DUE, so
-  a dunning config of "mark unpaid" would keep paid entitlements — set Stripe to cancel, or map it.
+  Stripe's final `canceled`/`paused`).~~ **Superseded — owner decision 2026-09-27 (P49A-19
+  item 4): the 3-day grace is enforced.** `graceEndsAt` is now first failure (the failing
+  invoice's `status_transitions.finalized_at`, from the `latest_invoice` every retrieve expands)
+  + 3 days, and only moves earlier while PAST_DUE; past it `subscriptionGrantsPlan`
+  (plan-entitlements.mjs) makes the unpaid subscription grant nothing, so `loadEffectivePlan`
+  returns Free entitlements (or a comp / Teams membership) on the web and over CardDAV until the
+  invoice is paid. Stripe is not touched and no data is changed. The downgrade clean-up, Family
+  7-day notice and Teams 14-day window still start only at Stripe's final lapse (they are not
+  reversible). The `unpaid` open decision is resolved for entitlements: `unpaid` lapses after the
+  grace like `past_due`.
 - Admin reprocess (step 4) not built: there is no admin page listing webhook events yet.
   `processStripeWebhookEvent(await stripe.events.retrieve(id), { db, stripe })` is the hook for it.

@@ -196,7 +196,6 @@ test("no help content promises an automatic or no-card trial", () => {
 test("mirrored product facts match their source", () => {
   const cases: Array<[string, RegExp, number]> = [
     ["src/app/actions/account.ts", /scheduledDeleteAt = new Date\(Date\.now\(\) \+ (\d+) \* 24 \* 60 \* 60 \* 1000\)/, FACTS.deletionGraceDays],
-    ["src/server/stripe-handlers.ts", /PAYMENT_GRACE_MS = (\d+) \* DAY_MS/, FACTS.paymentGraceDays],
     ["src/server/stripe-handlers.ts", /TEAMS_GRACE_MS = (\d+) \* DAY_MS/, FACTS.teamsGraceDays],
     ["src/server/family-lifecycle.ts", /FAMILY_DISSOLVE_NOTICE_MS = (\d+) \* 24 \* 60 \* 60 \* 1000/, FACTS.familyNoticeDays],
     ["src/app/actions/family.ts", /INVITE_TTL_MS = (\d+) \* 60 \* 60 \* 1000/, FACTS.inviteHours],

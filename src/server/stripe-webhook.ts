@@ -78,6 +78,10 @@ export function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   return idOf(invoice.parent?.subscription_details?.subscription);
 }
 
+// P49A-19: the failed-payment grace counts from the failing invoice's first
+// attempt (`paymentFailureStartedAt`), so every retrieve brings the invoice.
+const RETRIEVE_OPTIONS: Stripe.SubscriptionRetrieveParams = { expand: ["latest_invoice"] };
+
 /**
  * The subscription an event concerns, as it is in Stripe now. Runs before the
  * DB transaction so no network call holds a transaction open.
@@ -91,14 +95,14 @@ async function loadCurrentSubscription(
       const session = event.data.object;
       if (session.mode !== "subscription") return null;
       const id = idOf(session.subscription);
-      return id ? stripe.subscriptions.retrieve(id) : null;
+      return id ? stripe.subscriptions.retrieve(id, RETRIEVE_OPTIONS) : null;
     }
     case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted": {
       const payload = event.data.object;
       try {
-        return await stripe.subscriptions.retrieve(payload.id);
+        return await stripe.subscriptions.retrieve(payload.id, RETRIEVE_OPTIONS);
       } catch (err) {
         if (!isStripeNotFound(err)) throw err;
         // Gone from Stripe entirely: a deletion is terminal, so its payload is
@@ -109,7 +113,7 @@ async function loadCurrentSubscription(
     case "invoice.payment_succeeded":
     case "invoice.payment_failed": {
       const id = invoiceSubscriptionId(event.data.object);
-      return id ? stripe.subscriptions.retrieve(id) : null;
+      return id ? stripe.subscriptions.retrieve(id, RETRIEVE_OPTIONS) : null;
     }
     default:
       return null;

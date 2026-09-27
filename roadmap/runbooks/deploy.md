@@ -235,8 +235,10 @@ The P49A batch (P49A-01/-02/-04/-05/-08/-15) adds one migration,
 1. **Set `SES_SNS_TOPIC_ARN`** on the prod app in Coolify (comma-separated allow-list of our SES
    notification topic ARNs). Without it `/api/ses/events` fails closed: every bounce/complaint is
    rejected with 403 and suppression stops updating. The app still boots.
-2. **Confirm Stripe dunning** ends in *cancel*, not *mark unpaid* (`unpaid` maps to PAST_DUE and
-   keeps paid entitlements).
+2. **Confirm Stripe dunning** ends in *cancel*, not *mark unpaid* (`unpaid` maps to PAST_DUE).
+   Since P49A-19 (3-day grace enforced) an `unpaid` subscription no longer keeps paid
+   entitlements, but only *cancel* runs the downgrade clean-up and starts the Family / Teams
+   lapse windows.
 3. **Apply the migration out of band** on the prod DB (same procedure as P48-14), then record it in
    `_prisma_migrations` so `migrate status` is clean. The currently running (old) image is
    unaffected by the extra nullable column while it keeps running.

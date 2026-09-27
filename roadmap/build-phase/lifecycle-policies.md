@@ -69,6 +69,15 @@ When Stripe fires `invoice.payment_failed`:
 - Stripe marks the subscription `PAST_DUE`.
 - `User.lifecycleState` is set to `GRACE` (still accessible — we do not lock during the retry window).
 - The banner escalates.
+- **Owner decision 2026-09-27 (P49A-19): the 3-day grace is enforced.** From 3 days after the
+  first failure of the dunning episode until the invoice is paid, the account gets **Free
+  entitlements** (limits and features) — web app and CardDAV server alike. The Stripe
+  subscription is not cancelled or changed (Stripe keeps retrying) and nothing is deleted:
+  over-limit data stays, creating more is refused (§4d). An admin comp / Teams membership still
+  applies. Payment → paid plan back immediately (§2e). The irreversible downgrade steps (§4e
+  sync pause, §4f live-share conversion) and the Family / Teams lapse windows still wait for
+  §2d. Settings shows "Payment failed — update your payment method by <date> to keep <Plan>"
+  during the grace and a "moved to the Free plan on <date>" notice after it.
 
 ### 2d. Subscription expired (Stripe retries exhausted, ~day 14)
 

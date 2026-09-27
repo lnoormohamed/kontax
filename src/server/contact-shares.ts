@@ -1,6 +1,7 @@
 import { Prisma } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
 import { copyMultiValueWriteData } from "~/server/contact-multi-values";
+import { ACTIVE_SUBSCRIPTION_STATUSES, subscriptionGrantsPlan } from "~/server/dav/plan-entitlements.mjs";
 import { db } from "~/server/db";
 import { markSyncLinksDirty } from "~/server/sync-dirty";
 
@@ -44,13 +45,14 @@ const jsonOrNull = (value: Prisma.InputJsonValue | null): Prisma.InputJsonValue 
 
 const PAID_PLANS = new Set(["PRO", "FAMILY", "TEAMS"]);
 
+// P49A-19: a PAST_DUE subscription past its payment grace no longer counts.
 const recipientCanLiveSync = async (userId: string) => {
-  const sub = await db.subscription.findFirst({
-    where: { userId, status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] } },
-    orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
-    select: { plan: true },
+  const subs = await db.subscription.findMany({
+    where: { userId, status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
+    select: { plan: true, status: true, graceEndsAt: true },
   });
-  return PAID_PLANS.has(sub?.plan ?? "FREE");
+  const now = new Date();
+  return subs.some((sub) => PAID_PLANS.has(sub.plan) && subscriptionGrantsPlan(sub, now));
 };
 
 /**

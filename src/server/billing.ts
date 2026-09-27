@@ -42,6 +42,11 @@ type BillingContext = {
   /** Set when the effective Teams plan comes from a team membership. */
   teamEntitlement: TeamEntitlement | null;
   entitlements: PlanEntitlements;
+  /**
+   * P49A-19: the user's own higher plan that is held back because a payment
+   * failed more than PAYMENT_GRACE_DAYS ago (null when not in that state).
+   */
+  paymentLapse: EffectivePlan["paymentLapse"];
 };
 
 type LifecycleAccessPolicy = {
@@ -204,6 +209,7 @@ const toBillingContext = (
     planSource: effective.planSource,
     teamEntitlement: effective.teamEntitlement,
     entitlements: effective.entitlements,
+    paymentLapse: effective.paymentLapse,
   };
 };
 

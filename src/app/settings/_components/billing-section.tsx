@@ -112,16 +112,19 @@ export function BillingSection({
   hasPassword: boolean;
 }) {
   const { state } = surface;
+  // P49A-19: payment failed — inside the grace (still on the paid plan) or
+  // after it (on Free until the payment goes through).
+  const paymentFailed = state === "grace" || state === "paymentLapsed";
 
   // tone + badge + glyph per state
   const tone: Tone =
-    state === "trial" ? "trial" : state === "cancel" ? "grace" : state === "grace" ? "danger" : "active";
+    state === "trial" ? "trial" : state === "cancel" ? "grace" : paymentFailed ? "danger" : "active";
   const badgeLabel =
     state === "trial"
       ? "Trial"
       : state === "cancel"
         ? "Cancelling"
-        : state === "grace"
+        : paymentFailed
           ? "Payment failed"
           : state === "teamMember"
             ? "Via your team"
@@ -140,7 +143,7 @@ export function BillingSection({
         ? "gift"
         : state === "familyOwner"
           ? "home"
-          : state === "grace"
+          : paymentFailed
             ? "card"
             : "star";
   const badge = BADGE[tone];
@@ -192,9 +195,26 @@ export function BillingSection({
             <path d="M12 9v4M12 17h.01" />
           </svg>
           <p className="m-0 text-[14px] leading-[1.5] text-[#7a2f1d]">
-            Your last payment failed. Update your payment method
-            {surface.graceDeadline ? ` by ${surface.graceDeadline}` : ""} to keep your{" "}
-            {surface.planLabel} features.
+            Payment failed — update your payment method
+            {surface.graceDeadline ? ` by ${surface.graceDeadline}` : ""} to keep {surface.planLabel}. After
+            that your account moves to the Free plan until the payment goes through. Nothing is deleted.
+          </p>
+        </div>
+      ) : null}
+
+      {/* P49A-19: grace over, payment still outstanding */}
+      {state === "paymentLapsed" ? (
+        <div className="mb-5 flex items-start gap-[11px] rounded-[14px] border border-[#e7c9bd] bg-[#f9ece7] px-4 py-3.5">
+          <svg className="mt-px h-[18px] w-[18px] shrink-0" fill="none" stroke="#b5472f" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24">
+            <path d="M10.3 3.3L2 19h20L13.7 3.3a2 2 0 00-3.4 0z" />
+            <path d="M12 9v4M12 17h.01" />
+          </svg>
+          <p className="m-0 text-[14px] leading-[1.5] text-[#7a2f1d]">
+            Payment failed — your {surface.lapsedPlanLabel} payment is still outstanding, so your account
+            moved to the {surface.planLabel} plan
+            {surface.graceDeadline ? ` on ${surface.graceDeadline}` : ""}. Nothing has been deleted.
+            Update your payment method and {surface.lapsedPlanLabel} comes back as soon as the payment
+            goes through.
           </p>
         </div>
       ) : null}
@@ -295,7 +315,7 @@ export function BillingSection({
           </Link>
         ) : state === "trial" ? (
           <BillingPortalButton hasPassword={hasPassword} icon="card" label="Manage billing" variant="blue" />
-        ) : state === "grace" ? (
+        ) : paymentFailed ? (
           <BillingPortalButton hasPassword={hasPassword} icon="card" label="Update payment method" variant="red" />
         ) : state === "cancel" ? (
           <BillingPortalButton hasPassword={hasPassword} icon="none" label="Keep my plan" variant="green" />

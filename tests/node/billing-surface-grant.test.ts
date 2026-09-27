@@ -33,7 +33,7 @@ const stub = {
       lifecycleState: "ACTIVE",
       subscriptions: state.subscriptions
         .filter((s) => ACTIVE.includes(s.status as string))
-        .map((s) => ({ plan: s.plan, memberSlotsLimit: null })),
+        .map((s) => ({ plan: s.plan, memberSlotsLimit: null, status: s.status, graceEndsAt: s.graceEndsAt ?? null })),
       groupMemberships: state.teamGroups.map((group) => ({ group })),
     }),
   },
@@ -56,7 +56,7 @@ const stub = {
 mock.module("~/server/db", { namedExports: { db: stub } });
 mock.module("~/server/stripe-catalog", { namedExports: { getStripeCatalog: async () => null } });
 
-const { getBillingSurface } = await import("~/server/billing-surface");
+const { getBillingBanner, getBillingSurface } = await import("~/server/billing-surface");
 
 const teamGroup = (overrides: Row = {}) => ({
   id: "team_1",
@@ -152,4 +152,35 @@ test("a paying user (real subscription at the effective plan) keeps the normal a
   assert.notEqual(surface.state, "teamMember");
   assert.equal(surface.grant, null);
   assert.equal(surface.intervalLabel, "Monthly", "interval from the real subscription, not the comp row");
+});
+
+// ─── P49A-19: failed-payment grace (owner decision 2026-09-27) ────────────────
+
+const DAY = 24 * 60 * 60 * 1000;
+
+test("payment failed, inside the grace: the grace card with its deadline, still on the paid plan", async () => {
+  const graceEndsAt = new Date(Date.now() + 2 * DAY);
+  state.subscriptions = [sub({ providerSubscriptionId: "sub_pro", plan: "PRO", status: "PAST_DUE", graceEndsAt })];
+
+  const surface = await getBillingSurface("user_1");
+  assert.equal(surface.state, "grace");
+  assert.equal(surface.plan, "PRO");
+  assert.ok(surface.graceDeadline, "the update-by date is shown");
+  assert.equal(surface.lapsedPlanLabel, null);
+  assert.equal((await getBillingBanner("user_1"))?.variant, "ownerGrace");
+});
+
+test("payment still failing after the grace: on Free with a downgraded notice, never an upgrade CTA", async () => {
+  const graceEndsAt = new Date(Date.now() - DAY);
+  state.subscriptions = [sub({ providerSubscriptionId: "sub_pro", plan: "PRO", status: "PAST_DUE", graceEndsAt })];
+
+  const surface = await getBillingSurface("user_1");
+  assert.equal(surface.state, "paymentLapsed");
+  assert.equal(surface.plan, "FREE");
+  assert.equal(surface.planLabel, "Free");
+  assert.equal(surface.lapsedPlanLabel, "Pro");
+  assert.equal(surface.graceDeadline, graceEndsAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }));
+  assert.ok(surface.usage, "Free usage shown against the Free limits");
+  assert.equal(surface.usage?.find((r) => r.label === "Contacts")?.limit, 500);
+  assert.deepEqual(await getBillingBanner("user_1"), { variant: "ownerLapsed", daysRemaining: null });
 });

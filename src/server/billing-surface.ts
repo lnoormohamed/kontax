@@ -21,6 +21,9 @@ export type BillingSurfaceState =
   | "cancel"
   | "familyOwner"
   | "grace"
+  // P49A-19: payment still failing after the 3-day grace — on a lower plan
+  // (usually Free) until the invoice is paid.
+  | "paymentLapsed"
   // P49A-06/07 (Fable review): the plan is not paid for by this user —
   | "teamMember" // Teams via membership of an org-billed team
   | "comp"; // granted by Kontax (admin override / legacy comp), no Stripe subscription behind it
@@ -57,8 +60,10 @@ export type BillingSurface = {
     endsOn: string;
     daysRemaining: number;
   } | null;
-  /** GRACE state: when the card / banner deadline falls. */
+  /** grace: when the grace runs out; paymentLapsed: when it ran out. */
   graceDeadline: string | null;
+  /** paymentLapsed only: the plan that comes back once the payment goes through. */
+  lapsedPlanLabel: string | null;
   members: { used: number; total: number } | null;
   usage: BillingUsageRow[] | null;
   /** teamMember / comp only: who grants the plan. */
@@ -129,6 +134,30 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
   const summary = await getUserPlanSummary(userId);
   const { plan, planLabel, entitlements, lifecycleState } = summary;
 
+  // P49A-19: the payment grace ran out and the invoice is still unpaid — the
+  // user is on the lower plan's limits until it is. The only action that
+  // helps is fixing the payment method (a new checkout would start a second
+  // subscription next to the unpaid one).
+  if (summary.paymentLapse) {
+    return {
+      state: "paymentLapsed",
+      plan,
+      planLabel,
+      status: "PAST_DUE",
+      intervalLabel: null,
+      price: null,
+      per: null,
+      renewalDate: null,
+      trial: null,
+      graceDeadline: formatDate(summary.paymentLapse.graceEndedAt),
+      lapsedPlanLabel: PLAN_LABELS[summary.paymentLapse.plan],
+      members: null,
+      usage: buildUsage(summary),
+      grant: null,
+      personalSubscription: null,
+    };
+  }
+
   // Real Stripe subscriptions only (P49A-07 Fable review): a comp /
   // admin-override row has no interval, renewal, trial or portal behind it.
   // Prefer the real subscription AT the effective plan (a user can hold more
@@ -188,6 +217,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
         renewalDate: null,
         trial: null,
         graceDeadline: null,
+        lapsedPlanLabel: null,
         members: null,
         usage: buildUsage(summary),
         grant,
@@ -216,6 +246,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       renewalDate: null,
       trial: null,
       graceDeadline: null,
+      lapsedPlanLabel: null,
       members: null,
       usage: buildUsage(summary),
       grant: null,
@@ -239,6 +270,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       renewalDate: null,
       trial: null,
       graceDeadline: deadline ? formatDate(deadline) : null,
+      lapsedPlanLabel: null,
       members: null,
       usage: null,
       grant: null,
@@ -262,6 +294,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
         daysRemaining: daysUntil(subscription.trialEndsAt),
       },
       graceDeadline: null,
+      lapsedPlanLabel: null,
       members: null,
       usage: null,
       grant: null,
@@ -290,6 +323,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       renewalDate: formatDate(subscription.currentPeriodEnd),
       trial: null,
       graceDeadline: null,
+      lapsedPlanLabel: null,
       members: null,
       usage: null,
       grant: null,
@@ -314,6 +348,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       renewalDate: subscription?.currentPeriodEnd ? formatDate(subscription.currentPeriodEnd) : null,
       trial: null,
       graceDeadline: null,
+      lapsedPlanLabel: null,
       members: {
         used: membership?.group._count.members ?? 1,
         total: membership?.group.memberSlotsLimit ?? entitlements.memberSlotsLimit,
@@ -336,6 +371,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
     renewalDate: subscription?.currentPeriodEnd ? formatDate(subscription.currentPeriodEnd) : null,
     trial: null,
     graceDeadline: null,
+    lapsedPlanLabel: null,
     members: null,
     usage: buildUsage(summary),
     grant: null,
@@ -375,6 +411,7 @@ function buildUsage(summary: Awaited<ReturnType<typeof getUserPlanSummary>>): Bi
 export type BillingBannerVariant =
   | "ownerGrace"
   | "ownerCritical"
+  | "ownerLapsed" // P49A-19: grace over, on Free until the payment goes through
   | "familyMember"
   | "trialEnding";
 
@@ -409,6 +446,11 @@ export const getBillingBanner = async (userId: string): Promise<BillingBanner | 
     if (ownerState === "GRACE" || ownerState === "LOCKED") {
       return { variant: "familyMember", daysRemaining: null };
     }
+  }
+
+  // P49A-19: the grace ran out while the invoice is unpaid.
+  if (context.paymentLapse) {
+    return { variant: "ownerLapsed", daysRemaining: null };
   }
 
   const subscription = await db.subscription.findFirst({

@@ -5,7 +5,7 @@
 // the help centre can't drift from the product silently.
 
 import { TEAMS_SEAT_MIN } from "~/app/_components/plan-data";
-import { PLAN_DEFAULTS } from "~/server/dav/plan-entitlements.mjs";
+import { PAYMENT_GRACE_DAYS, PLAN_DEFAULTS } from "~/server/dav/plan-entitlements.mjs";
 import { DEFAULT_MAX_ATTEMPTS_BEFORE_PAUSE, MANUAL_CONFLICT_QUEUE_LIMIT } from "~/server/sync-health";
 
 const fmt = (n: number) => n.toLocaleString("en-GB");
@@ -32,6 +32,8 @@ export const FACTS = {
    *  minimum (src/app/actions/billing.ts, pinned by pricing-plan-data.test.ts).
    *  PLAN_DEFAULTS.TEAMS.memberSlotsLimit is only a fallback default. */
   teamsMinSeats: TEAMS_SEAT_MIN,
+  /** Failed-payment grace before the account uses Free limits (P49A-19: enforced). */
+  paymentGraceDays: PAYMENT_GRACE_DAYS,
 
   // ── Sync (src/server/sync-health.ts) ──
   conflictQueueLimit: MANUAL_CONFLICT_QUEUE_LIMIT,
@@ -40,8 +42,6 @@ export const FACTS = {
   // ── Mirrored (pinned by tests/node/help-centre.test.ts) ──
   /** src/app/actions/account.ts — scheduledDeleteAt = now + 30 days */
   deletionGraceDays: 30,
-  /** src/server/stripe-handlers.ts — PAYMENT_GRACE_MS */
-  paymentGraceDays: 3,
   /** src/server/stripe-handlers.ts — TEAMS_GRACE_MS */
   teamsGraceDays: 14,
   /** src/server/family-lifecycle.ts — FAMILY_DISSOLVE_NOTICE_MS */

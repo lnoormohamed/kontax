@@ -10,14 +10,18 @@
 // plain JavaScript (JSDoc types, checked by tsc via `checkJs`).
 //
 // Effective plan (A-10): the HIGHEST-ranked of
-//   · every active personal subscription (ACTIVE / TRIALING / PAST_DUE) — a
-//     user can hold more than one (e.g. a paid plan plus an admin comp plan,
-//     P49A-07), so this is max-by-rank, never "latest period end"; and
+//   · every personal subscription that grants its plan right now
+//     (`subscriptionGrantsPlan`: ACTIVE / TRIALING, or PAST_DUE inside the
+//     3-day failed-payment grace) — a user can hold more than one (e.g. a paid
+//     plan plus an admin comp plan, P49A-07), so this is max-by-rank, never
+//     "latest period end"; and
 //   · Teams, when the user is an accepted member of a TEAM group whose org
 //     entitlement is on (`teamsEnabled`), whose OWNER still holds a legacy
 //     user-anchored personal Teams subscription (pre-P34F-03 teams; the same
 //     fallback `isTeamLocked` applies), or that is still inside its lapse
-//     grace window (`teamsGraceEndsAt` in the future). Teams billing is
+//     grace window (`teamsGraceEndsAt` in the future). An org whose Teams
+//     subscription is PAST_DUE beyond the failed-payment grace grants
+//     nothing until it is paid (P49A-19). Teams billing is
 //     org-anchored (Subscription.userId = null, groupId set), so it never
 //     shows up in `user.subscriptions`.
 // Family is NOT inherited by family members: a member of someone else's
@@ -50,8 +54,71 @@
  * @property {boolean} apiAccessEnabled
  */
 
-/** Subscription statuses that grant a plan. */
+/**
+ * Subscription statuses that CAN grant a plan (the database pre-filter).
+ * PAST_DUE grants only inside the failed-payment grace — always pair a query
+ * on these statuses with `subscriptionGrantsPlan` before treating a row as
+ * an entitlement.
+ */
 export const ACTIVE_SUBSCRIPTION_STATUSES = /** @type {const} */ (["ACTIVE", "TRIALING", "PAST_DUE"]);
+
+// ── Failed-payment grace (P49A-19, owner decision 2026-09-27) ────────────────
+//
+// When a paid subscription's payment fails (Stripe `past_due` / `unpaid`, both
+// stored as PAST_DUE), the customer keeps the paid plan for PAYMENT_GRACE_DAYS
+// from the FIRST failure of that dunning episode. After that, until the
+// invoice is paid, the subscription grants nothing: the effective plan falls
+// to whatever else the user has (an admin comp row, a live Teams membership)
+// or Free. Nothing is cancelled in Stripe (it keeps retrying) and no data is
+// changed or deleted — the lower plan's limits simply apply (over-limit data
+// stays; creating more is refused). A successful payment turns the row
+// ACTIVE again and the paid plan is back at once.
+//
+// The deadline is `Subscription.graceEndsAt` (first failure + grace), stamped
+// by the Stripe webhook from the failing invoice's own timestamps and only
+// ever moved EARLIER while PAST_DUE (src/server/stripe-handlers.ts
+// `ensureGraceDeadline`), so duplicate or out-of-order events can't restart
+// the clock; it is cleared when the subscription leaves PAST_DUE. It is
+// enforced here, at read time, because the grace running out is not a Stripe
+// event: the web app (billing.ts) and the CardDAV server (server.mjs) both
+// resolve plans through this module, so they agree.
+//
+// Structural lapse steps still wait for Stripe's final state (canceled /
+// paused / incomplete_expired): the downgrade clean-up (sync accounts paused,
+// live shares made static), the Family 7-day dissolve notice and the Teams
+// 14-day read-only window are NOT started by an expired payment grace — they
+// are not reversible, and a paid invoice must restore everything at once.
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+export const PAYMENT_GRACE_DAYS = 3;
+export const PAYMENT_GRACE_MS = PAYMENT_GRACE_DAYS * DAY_MS;
+
+/**
+ * Is this row PAST_DUE with its failed-payment grace used up?
+ *
+ * @param {{ status?: string | null, graceEndsAt?: Date | null }} sub
+ * @param {Date} [now]
+ */
+export const isPaymentGraceOver = (sub, now = new Date()) =>
+  sub.status === "PAST_DUE" && sub.graceEndsAt != null && sub.graceEndsAt.getTime() <= now.getTime();
+
+/**
+ * Does this subscription row grant its plan at `now`? ACTIVE / TRIALING do;
+ * PAST_DUE does until `graceEndsAt` (a PAST_DUE row without a deadline —
+ * only possible for rows written before the webhook stamped one in the same
+ * transaction — keeps granting: there is no failure time to count from);
+ * anything else doesn't. A row without `status` is taken as already filtered
+ * by the caller.
+ *
+ * @param {{ status?: string | null, graceEndsAt?: Date | null }} sub
+ * @param {Date} [now]
+ */
+export const subscriptionGrantsPlan = (sub, now = new Date()) => {
+  if (sub.status == null) return true;
+  if (sub.status === "ACTIVE" || sub.status === "TRIALING") return true;
+  if (sub.status !== "PAST_DUE") return false;
+  return !isPaymentGraceOver(sub, now);
+};
 
 /** @type {Record<PlanName, number>} */
 export const PLAN_RANK = { FREE: 0, PRO: 1, FAMILY: 2, TEAMS: 3 };
@@ -137,14 +204,18 @@ export const PLAN_DEFAULTS = {
 };
 
 /**
+ * @typedef {{ memberSlotsLimit: number | null, status?: string | null, graceEndsAt?: Date | null }} TeamSubscriptionInput
+ */
+
+/**
  * @typedef {object} TeamGroupInput
  * @property {string} id
  * @property {string} ownerId
  * @property {boolean} teamsEnabled
  * @property {Date | null} teamsGraceEndsAt
  * @property {number | null} [memberSlotsLimit]
- * @property {Array<{ memberSlotsLimit: number | null }>} [subscriptions]  The org's active Teams subscription(s).
- * @property {{ subscriptions?: Array<{ memberSlotsLimit: number | null }> }} [owner]  The owner's active PERSONAL Teams subscription(s) — legacy user-anchored teams.
+ * @property {TeamSubscriptionInput[]} [subscriptions]  The org's newest ACTIVE_SUBSCRIPTION_STATUSES Teams subscription (take 1).
+ * @property {{ subscriptions?: TeamSubscriptionInput[] }} [owner]  The owner's active PERSONAL Teams subscription(s) — legacy user-anchored teams.
  */
 
 /**
@@ -155,6 +226,12 @@ export const PLAN_DEFAULTS = {
  */
 
 /**
+ * @typedef {object} PaymentLapse
+ * @property {PlanName} plan  The plan the unpaid subscription would grant.
+ * @property {Date} graceEndedAt  When the failed-payment grace ran out.
+ */
+
+/**
  * @typedef {object} EffectivePlan
  * @property {PlanName} plan  The effective plan (max rank).
  * @property {string} planLabel
@@ -162,6 +239,9 @@ export const PLAN_DEFAULTS = {
  * @property {"personal" | "team" | "none"} planSource
  * @property {TeamEntitlement | null} teamEntitlement  Set when Teams comes from a team membership.
  * @property {PlanEntitlements} entitlements
+ * @property {PaymentLapse | null} paymentLapse  P49A-19: set when one of the user's own
+ *   subscriptions is PAST_DUE beyond the failed-payment grace AND would rank above the
+ *   effective plan — i.e. the user is on a lower plan only because a payment is outstanding.
  */
 
 /**
@@ -171,13 +251,20 @@ export const PLAN_DEFAULTS = {
  * inside the post-lapse grace window. A pending team (never paid:
  * teamsEnabled false, no grace date, no legacy owner plan) grants nothing.
  *
- * @param {{ teamsEnabled: boolean, teamsGraceEndsAt: Date | null, owner?: { subscriptions?: unknown[] } }} group
+ * P49A-19: an org (or legacy owner) subscription that is PAST_DUE beyond the
+ * failed-payment grace grants nothing until it is paid. The team itself is
+ * not locked by that (`isTeamLocked` / the 14-day window start only when
+ * Stripe ends the subscription); its members just fall back to their own
+ * personal plan.
+ *
+ * @param {{ teamsEnabled: boolean, teamsGraceEndsAt: Date | null, subscriptions?: TeamSubscriptionInput[], owner?: { subscriptions?: TeamSubscriptionInput[] } }} group
  * @param {Date} [now]
  * @returns {"active" | "grace" | null}
  */
 export const teamEntitlementState = (group, now = new Date()) => {
-  if (group.teamsEnabled) return "active";
-  if ((group.owner?.subscriptions?.length ?? 0) > 0) return "active";
+  const orgSubscription = group.subscriptions?.[0];
+  if (group.teamsEnabled && !(orgSubscription && isPaymentGraceOver(orgSubscription, now))) return "active";
+  if ((group.owner?.subscriptions ?? []).some((sub) => subscriptionGrantsPlan(sub, now))) return "active";
   if (group.teamsGraceEndsAt != null && group.teamsGraceEndsAt > now) return "grace";
   return null;
 };
@@ -187,13 +274,17 @@ export const teamEntitlementState = (group, now = new Date()) => {
  *
  * @param {{
  *   userId: string,
- *   subscriptions: Array<{ plan: PlanName, memberSlotsLimit: number | null }>,
+ *   subscriptions: Array<{ plan: PlanName, memberSlotsLimit: number | null, status?: string | null, graceEndsAt?: Date | null }>,
  *   teamGroups: TeamGroupInput[],
  *   now?: Date,
- * }} input  `subscriptions` must already be filtered to ACTIVE_SUBSCRIPTION_STATUSES.
+ * }} input  `subscriptions`: the user's rows in ACTIVE_SUBSCRIPTION_STATUSES. Rows
+ *   carrying `status` / `graceEndsAt` are checked with `subscriptionGrantsPlan`
+ *   (P49A-19: PAST_DUE beyond the payment grace grants nothing); rows without a
+ *   status are taken as already granting.
  * @returns {EffectivePlan}
  */
-export const resolveEffectivePlan = ({ userId, subscriptions, teamGroups, now = new Date() }) => {
+export const resolveEffectivePlan = ({ userId, subscriptions: rows, teamGroups, now = new Date() }) => {
+  const subscriptions = rows.filter((sub) => subscriptionGrantsPlan(sub, now));
   // Highest personal plan; among equal-rank TEAMS rows, the larger seat count.
   /** @type {{ plan: PlanName, memberSlotsLimit: number | null } | null} */
   let personal = null;
@@ -248,6 +339,17 @@ export const resolveEffectivePlan = ({ userId, subscriptions, teamGroups, now = 
     entitlements.familyGroupEnabled = true;
   }
 
+  // P49A-19: the highest own subscription held back only by an unpaid invoice.
+  /** @type {PaymentLapse | null} */
+  let paymentLapse = null;
+  for (const sub of rows) {
+    if (!(sub.plan in PLAN_RANK) || !sub.graceEndsAt || !isPaymentGraceOver(sub, now)) continue;
+    if (PLAN_RANK[sub.plan] <= PLAN_RANK[plan]) continue;
+    if (!paymentLapse || PLAN_RANK[sub.plan] > PLAN_RANK[paymentLapse.plan]) {
+      paymentLapse = { plan: sub.plan, graceEndedAt: sub.graceEndsAt };
+    }
+  }
+
   return {
     plan,
     planLabel: PLAN_LABELS[plan],
@@ -256,6 +358,7 @@ export const resolveEffectivePlan = ({ userId, subscriptions, teamGroups, now = 
     teamEntitlement:
       teamWins && team ? { groupId: team.group.id, ownerId: team.group.ownerId, state: team.state } : null,
     entitlements,
+    paymentLapse,
   };
 };
 
@@ -263,7 +366,7 @@ const effectivePlanUserSelect = {
   lifecycleState: true,
   subscriptions: {
     where: { status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
-    select: { plan: true, memberSlotsLimit: true },
+    select: { plan: true, memberSlotsLimit: true, status: true, graceEndsAt: true },
   },
   groupMemberships: {
     where: { inviteStatus: "ACCEPTED", group: { type: "TEAM" } },
@@ -279,7 +382,7 @@ const effectivePlanUserSelect = {
             where: { plan: "TEAMS", status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
             orderBy: { createdAt: "desc" },
             take: 1,
-            select: { memberSlotsLimit: true },
+            select: { memberSlotsLimit: true, status: true, graceEndsAt: true },
           },
           // Legacy user-anchored Teams: the owner's own active Teams plan.
           owner: {
@@ -288,7 +391,7 @@ const effectivePlanUserSelect = {
                 where: { plan: "TEAMS", status: { in: [...ACTIVE_SUBSCRIPTION_STATUSES] } },
                 orderBy: { createdAt: "desc" },
                 take: 1,
-                select: { memberSlotsLimit: true },
+                select: { memberSlotsLimit: true, status: true, graceEndsAt: true },
               },
             },
           },
