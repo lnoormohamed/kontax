@@ -177,42 +177,55 @@ test("an empty remote list never clears values the provider did not hold at the 
   assert.equal(cleared.phone, null);
 });
 
-test("a phone added locally without a push survives an unrelated remote edit", async () => {
-  // Google contact with no phone.
-  const { phoneNumbers: _none, ...noPhone } = ada();
-  await runSync([noPhone], "t0");
-  const contact = fake.contactByRemoteUid("people/c1")!;
-  assert.deepEqual(readMultiValueEntries(contact).phoneEntries, []);
+const runSyncWith = (people: Person[], token: string, conflictPolicy: "MANUAL" | "SERVER_WINS") => {
+  api.onList = () => ({ data: { connections: people, nextSyncToken: token } });
+  return google.runGoogleSync({ ...account, conflictPolicy, lastSyncCursor: fake.lastCursorFor(account.id) ?? null });
+};
 
-  // A phone arrives through a non-MANUAL writer (Kontax CardDAV PUT / REST
-  // API): it is never pushed to Google (A-17), so Google still has none.
-  await new Promise((resolve) => setTimeout(resolve, 3));
-  Object.assign(contact, {
-    phoneEntries: [{ label: "Mobile", value: "+447700900555", isPrimary: true }],
-    phone: "+447700900555",
-    phoneNumbers: ["+447700900555"],
-    lastMutatedBy: "API",
-    updatedAt: new Date(),
+// Fable review scenario, end to end: Google has no phone; a phone arrives
+// through a non-web writer (Kontax CardDAV PUT / REST API) and has not reached
+// Google yet (this stub refuses pushes); then Google gets an unrelated edit.
+// Since P49A-12 (A-17) that edit is a pending local change, not anchored away,
+// so the outcome depends on the conflict policy — but the phone must survive
+// either way, because Google never held a phone (P49A-10 evidence guard).
+for (const policy of ["MANUAL", "SERVER_WINS"] as const) {
+  test(`a phone added locally without a push survives an unrelated remote edit (${policy})`, async () => {
+    const { phoneNumbers: _none, ...noPhone } = ada();
+    await runSyncWith([noPhone], "t0", policy);
+    const contact = fake.contactByRemoteUid("people/c1")!;
+    assert.deepEqual(readMultiValueEntries(contact).phoneEntries, []);
+
+    await new Promise((resolve) => setTimeout(resolve, 3));
+    Object.assign(contact, {
+      phoneEntries: [{ label: "Mobile", value: "+447700900555", isPrimary: true }],
+      phone: "+447700900555",
+      phoneNumbers: ["+447700900555"],
+      lastMutatedBy: "API",
+      updatedAt: new Date(),
+    });
+
+    await runSyncWith([noPhone], "t1", policy);
+    await runSyncWith(
+      [{ ...noPhone, etag: "e2", organizations: [{ name: "Analytical Engines Ltd" }] }],
+      "t2",
+      policy,
+    );
+    const after = fake.contactByRemoteUid("people/c1")!;
+    assert.deepEqual(
+      readMultiValueEntries(after).phoneEntries.map((e) => e.value),
+      ["+447700900555"],
+      "the unpushed phone is kept",
+    );
+    assert.equal(after.phone, "+447700900555");
+    if (policy === "MANUAL") {
+      // Both sides changed: surfaced for review, not silently resolved.
+      assert.equal(fake.conflicts.length, 1);
+    } else {
+      // Remote wins for the fields it changed; the phone it never held stays.
+      assert.equal(after.company, "Analytical Engines Ltd");
+    }
   });
-
-  // Run 1: Google unchanged → the link is anchored without a push.
-  await runSync([noPhone], "t1");
-  // Run 2: an unrelated Google edit (company) → applied as a remote update.
-  const result = await runSync(
-    [{ ...noPhone, etag: "e2", organizations: [{ name: "Analytical Engines Ltd" }] }],
-    "t2",
-  );
-  assert.equal(result.updated, 1);
-  const after = fake.contactByRemoteUid("people/c1")!;
-  assert.equal(after.company, "Analytical Engines Ltd");
-  assert.deepEqual(
-    readMultiValueEntries(after).phoneEntries.map((e) => e.value),
-    ["+447700900555"],
-    "the unpushed phone is kept",
-  );
-  assert.equal(after.phone, "+447700900555");
-  assert.equal(fake.conflicts.length, 0);
-});
+}
 
 test("Google's profile treats every multi-value family as authoritative", () => {
   const googleProfile = resolveSyncProviderCapabilityProfile({ provider: "GOOGLE" });

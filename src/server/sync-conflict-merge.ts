@@ -22,8 +22,8 @@ import {
 import {
   type MultiValueEntriesInput,
   multiValueWriteData,
+  familiesPresentIn,
   readMultiValueEntries,
-  snapshotCarriesFamily,
 } from "~/server/contact-multi-values";
 
 export type ConflictComparisonRowData = {
@@ -157,7 +157,7 @@ export const buildPickedMergeWriteData = (
   const families: MultiValueEntriesInput = {};
   for (const [key, family, column] of FAMILY_FIELDS) {
     const source = chosen(key);
-    if (snapshotCarriesFamily(source, family)) {
+    if (familiesPresentIn(source).includes(family)) {
       families[column] = readMultiValueEntries(source)[column];
     }
   }
