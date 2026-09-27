@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { isSessionError, requireUserId } from "~/server/auth/require-session";
 import { getImportCapacity, getImportCapacityTx, lockUserForPlanCheck } from "~/server/billing";
+import { copyMultiValueWriteData } from "~/server/contact-multi-values";
 import { parseCsvContacts } from "~/server/contact-portability";
 import {
   approximateCsvRowCount,
@@ -10,9 +11,6 @@ import {
   MAX_CSV_TEXT_LENGTH,
 } from "~/server/import/csv-bounds";
 import { db } from "~/server/db";
-
-const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
-  value && value.length > 0 ? value : undefined;
 
 const commitRequestSchema = z.object({
   // P48-11 item 4: same 10 MB / 50,000-row bounds as the preview route.
@@ -194,17 +192,15 @@ export async function POST(request: Request) {
             phoneticFirstName: contact.phoneticFirstName,
             phoneticLastName: contact.phoneticLastName,
             nickname: contact.nickname,
-            email: contact.email,
-            emailAddresses: getOptionalJsonArray(contact.emailAddresses),
-            phone: contact.phone,
-            phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
+            // P49A-10 (A-14): every email / phone / address / website becomes a
+            // typed entry and the legacy columns are derived from them. This
+            // used to write only the legacy arrays, so the editor showed just
+            // the first email and the first save deleted the rest.
+            ...copyMultiValueWriteData(contact),
             company: contact.company,
             phoneticCompany: contact.phoneticCompany,
             jobTitle: contact.jobTitle,
-            website: contact.website,
             birthday: contact.birthday,
-            address: contact.address,
-            postalAddresses: getOptionalJsonArray(contact.postalAddresses),
             notes: contact.notes,
             customFields: contact.customFields ?? undefined,
             sourceType: "IMPORT_CSV" as const,

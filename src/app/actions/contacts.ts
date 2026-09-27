@@ -30,6 +30,12 @@ import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { buildNormalizedPhoneEntries } from "~/lib/phone-normalization";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
+import {
+  multiValueWriteData,
+  normalizeAddressEntries,
+  normalizeValueEntries,
+  readMultiValueEntries,
+} from "~/server/contact-multi-values";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -356,9 +362,8 @@ const parseContactInput = (formData: FormData) => {
       parsed.data.postcode,
       parsed.data.countryOrRegion,
     ]).join(", ");
-  const postalAddresses = buildPostalAddresses(primaryAddress || undefined, additionalAddresses);
   const addressEntries =
-    postalAddresses?.map((entry, index) => ({
+    buildPostalAddresses(primaryAddress || undefined, additionalAddresses)?.map((entry, index) => ({
       label: index === 0 ? (parsed.data.addressLabel ?? "home") : "other",
       formatted: entry.formatted,
       isPrimary: index === 0,
@@ -403,30 +408,29 @@ const parseContactInput = (formData: FormData) => {
     namePrefix: parsed.data.namePrefix,
     nameSuffix: parsed.data.nameSuffix,
     nickname: parsed.data.nickname,
-    email: parsed.data.email,
-    emailAddresses: dedupeValues([parsed.data.email, parsed.data.secondaryEmail, ...additionalEmails]),
-    emailEntries: buildStructuredEntries(
-      parsed.data.email,
-      parsed.data.emailLabel,
-      dedupeValues([parsed.data.secondaryEmail, ...additionalEmails]),
-      "primary",
-    ),
-    phone: normalizedPhones.phone,
-    phoneNumbers: normalizedPhones.phoneNumbers,
-    phoneEntries: normalizedPhones.phoneEntries,
+    // P49A-10: the form is a full replacement of every multi-value family —
+    // typed entries are written and the legacy email/phone/address/website
+    // columns derived from them (an emptied family is cleared, not skipped).
+    ...multiValueWriteData({
+      emailEntries:
+        buildStructuredEntries(
+          parsed.data.email,
+          parsed.data.emailLabel,
+          dedupeValues([parsed.data.secondaryEmail, ...additionalEmails]),
+          "primary",
+        ) ?? [],
+      phoneEntries: normalizedPhones.phoneEntries,
+      addressEntries: addressEntries ?? [],
+      websiteEntries: websiteEntries ?? [],
+    }),
     company: parsed.data.company,
     phoneticCompany: parsed.data.phoneticCompany,
     jobTitle: parsed.data.jobTitle,
     department: parsed.data.department,
-    website: parsed.data.website,
-    websiteEntries,
     birthday: parsed.data.birthday,
-    address: primaryAddress || undefined,
     avatarUrl: parsed.data.avatarUrl,
     isFavorite: parsed.data.isFavorite === "true",
     labels: labels.length > 0 ? labels : undefined,
-    postalAddresses,
-    addressEntries,
     significantDates: significantDates.length > 0 ? significantDates : undefined,
     relatedPeople: relatedPeople.length > 0 ? relatedPeople : undefined,
     customFields: customFields.length > 0 ? customFields : undefined,
@@ -826,6 +830,45 @@ const deriveFullNameFromParts = (parts: {
   return parts.company?.trim() ?? "";
 };
 
+// P49A-10: inline scalar fields that are really "the primary entry" of a
+// multi-value family.
+const MULTI_VALUE_SCALAR_FIELDS: Partial<
+  Record<string, "emailEntries" | "phoneEntries" | "addressEntries" | "websiteEntries">
+> = {
+  email: "emailEntries",
+  phone: "phoneEntries",
+  address: "addressEntries",
+  website: "websiteEntries",
+};
+
+// Replace the primary entry's value (clearing it removes that entry), or add
+// the value as a new primary entry when the family has none. Other entries
+// are kept as they are.
+const replacePrimaryEntry = (
+  entries: Array<Record<string, unknown> & { isPrimary: boolean }>,
+  newValue: string | null,
+  valueKey: "value" | "formatted",
+): Array<Record<string, unknown>> => {
+  const primaryIndex = Math.max(
+    0,
+    entries.findIndex((entry) => entry.isPrimary),
+  );
+  const current = entries[primaryIndex];
+  if (!current) {
+    return newValue ? [{ label: "", [valueKey]: newValue, isPrimary: true }] : [];
+  }
+  if (!newValue) {
+    return entries.filter((_, index) => index !== primaryIndex);
+  }
+  // A new address replaces the structured components too — they described the
+  // old one.
+  const replacement =
+    valueKey === "formatted"
+      ? { label: current.label, formatted: newValue, isPrimary: true }
+      : { ...current, value: newValue, isPrimary: true };
+  return entries.map((entry, index) => (index === primaryIndex ? replacement : entry));
+};
+
 export const updateContactField = async (contactId: string, field: string, rawValue: string) => {
   const userId = await requireUserId({ write: true });
   if (!INLINE_EDITABLE_FIELDS.has(field)) {
@@ -851,8 +894,19 @@ export const updateContactField = async (contactId: string, field: string, rawVa
     if ((before as Record<string, unknown>)[field] === newValue) {
       return;
     }
+    const multiValue = MULTI_VALUE_SCALAR_FIELDS[field];
     const data: Record<string, unknown> = {
-      [field]: field === "fullName" ? trimmed : newValue,
+      // P49A-10: a primary email / phone / address / website edit rewrites the
+      // primary typed entry; the scalar is derived from it, never set alone.
+      ...(multiValue
+        ? multiValueWriteData({
+            [multiValue]: replacePrimaryEntry(
+              readMultiValueEntries(before)[multiValue],
+              newValue,
+              multiValue === "addressEntries" ? "formatted" : "value",
+            ),
+          })
+        : { [field]: field === "fullName" ? trimmed : newValue }),
       lastMutatedBy: "MANUAL",
       lastMutatedByDetail: null,
       syncVersion: { increment: 1 },
@@ -890,9 +944,10 @@ export const updateContactField = async (contactId: string, field: string, rawVa
 
 // --- Multi-value entry groups (P17-02 follow-up) -----------------------------
 // Emails / phones / websites / addresses / significant dates / related people
-// are stored as Json arrays. Each group maps to a Json column and, where it has
-// a "primary" scalar mirror (used by list views + search), keeps that in sync
-// with the first entry.
+// are stored as Json arrays. Each group maps to a Json column; for emails,
+// phones, websites and addresses that column is canonical (P49A-10) and the
+// "primary" scalar mirror (used by list views + search) plus the legacy arrays
+// are derived from it by src/server/contact-multi-values.ts.
 
 const simpleEntrySchema = z.object({
   label: z.string().trim().max(40),
@@ -938,18 +993,23 @@ export const updateContactEntries = async (
   if (!isEntryGroup(group)) {
     throw new Error("Unknown contact field group.");
   }
-  const { column, scalar } = ENTRY_GROUPS[group];
+  const { column } = ENTRY_GROUPS[group];
 
-  // Validate + normalise the incoming entries for this group.
-  let columnValue: Prisma.InputJsonValue | typeof Prisma.DbNull;
-  let scalarValue: string | null = null;
+  // Validate + normalise the incoming entries for this group. The editor's
+  // first entry is the primary one.
+  let columnData: Record<string, unknown>;
   if (group === "addresses") {
     const parsed = z.array(addressEntrySchema).parse(rawEntries);
     const entries = parsed
       .map((a) => ({ ...a, formatted: formatAddressEntry(a) }))
       .filter((a) => a.formatted.length > 0 || a.street || a.city);
-    columnValue = entries.length > 0 ? entries : Prisma.DbNull;
-    scalarValue = entries[0]?.formatted ?? null;
+    // P49A-10: typed entries + the derived legacy address / postalAddresses.
+    columnData = multiValueWriteData({
+      addressEntries: normalizeAddressEntries(entries).map((entry, index) => ({
+        ...entry,
+        isPrimary: index === 0,
+      })),
+    });
   } else {
     const parsed = z.array(simpleEntrySchema).parse(rawEntries);
     const entries = parsed
@@ -958,8 +1018,18 @@ export const updateContactEntries = async (
         value: group === "emails" ? e.value.toLowerCase() : e.value,
       }))
       .filter((e) => e.value.length > 0);
-    columnValue = entries.length > 0 ? entries : Prisma.DbNull;
-    scalarValue = entries[0]?.value ?? null;
+    if (column === "emailEntries" || column === "phoneEntries" || column === "websiteEntries") {
+      // P49A-10: typed entries + the legacy columns derived from them (the
+      // legacy emailAddresses / phoneNumbers arrays used to go stale here).
+      columnData = multiValueWriteData({
+        [column]: normalizeValueEntries(entries).map((entry, index) => ({
+          ...entry,
+          isPrimary: index === 0,
+        })),
+      });
+    } else {
+      columnData = { [column]: entries.length > 0 ? entries : Prisma.DbNull };
+    }
   }
 
   const access = await resolveContactEditAccess(userId, contactId);
@@ -973,14 +1043,11 @@ export const updateContactEntries = async (
       throw new Error("Contact not found.");
     }
     const data: Record<string, unknown> = {
-      [column]: columnValue,
+      ...columnData,
       lastMutatedBy: "MANUAL",
       lastMutatedByDetail: null,
       syncVersion: { increment: 1 },
     };
-    if (scalar) {
-      data[scalar] = scalarValue;
-    }
     const after = await tx.contact.update({ where: { id: contactId }, data });
     const diffs = computeContactDiff(before, after);
     if (diffs.length > 0) {

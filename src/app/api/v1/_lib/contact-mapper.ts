@@ -1,63 +1,41 @@
-import { Prisma } from "../../../../../generated/prisma";
 import type { Contact } from "../../../../../generated/prisma";
+import { multiValueWriteData, readMultiValueEntries } from "~/server/contact-multi-values";
 import type { ContactCreateInput, ContactUpdateInput } from "./schemas";
 
 type StructuredEntry = { label: string; value: string; isPrimary: boolean };
 
-function buildEmailEntries(emails: { value: string; label?: string }[] | undefined): {
-  email: string | undefined;
-  emailAddresses: string[] | undefined;
-  emailEntries: StructuredEntry[] | undefined;
-} {
-  if (!emails?.length) return { email: undefined, emailAddresses: undefined, emailEntries: undefined };
-
+// P49A-10: the API writes typed entries only; `multiValueWriteData` derives
+// the legacy email/emailAddresses and phone/phoneNumbers columns from them.
+function buildEmailEntries(emails: { value: string; label?: string }[] | undefined): StructuredEntry[] {
   const seen = new Set<string>();
-  const deduped = emails.filter((e) => {
+  const deduped = (emails ?? []).filter((e) => {
     const key = e.value.trim().toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
 
-  const entries: StructuredEntry[] = deduped.map((e, i) => ({
+  return deduped.map((e, i) => ({
     label: e.label ?? (i === 0 ? "primary" : "other"),
     value: e.value.trim(),
     isPrimary: i === 0,
   }));
-
-  return {
-    email: entries[0]?.value,
-    emailAddresses: entries.map((e) => e.value),
-    emailEntries: entries,
-  };
 }
 
-function buildPhoneEntries(phones: { value: string; label?: string }[] | undefined): {
-  phone: string | undefined;
-  phoneNumbers: string[] | undefined;
-  phoneEntries: StructuredEntry[] | undefined;
-} {
-  if (!phones?.length) return { phone: undefined, phoneNumbers: undefined, phoneEntries: undefined };
-
+function buildPhoneEntries(phones: { value: string; label?: string }[] | undefined): StructuredEntry[] {
   const seen = new Set<string>();
-  const deduped = phones.filter((p) => {
+  const deduped = (phones ?? []).filter((p) => {
     const key = p.value.trim();
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
 
-  const entries: StructuredEntry[] = deduped.map((p, i) => ({
+  return deduped.map((p, i) => ({
     label: p.label ?? (i === 0 ? "mobile" : "other"),
     value: p.value.trim(),
     isPrimary: i === 0,
   }));
-
-  return {
-    phone: entries[0]?.value,
-    phoneNumbers: entries.map((e) => e.value),
-    phoneEntries: entries,
-  };
 }
 
 export function deriveFullName(input: ContactCreateInput | ContactUpdateInput): string | null {
@@ -71,9 +49,6 @@ export function mapCreateInputToDb(input: ContactCreateInput, userId: string) {
   const fullName = deriveFullName(input);
   if (!fullName) throw new Error("FULL_NAME_REQUIRED");
 
-  const { email, emailAddresses, emailEntries } = buildEmailEntries(input.emails);
-  const { phone, phoneNumbers, phoneEntries } = buildPhoneEntries(input.phones);
-
   return {
     userId,
     fullName,
@@ -84,13 +59,10 @@ export function mapCreateInputToDb(input: ContactCreateInput, userId: string) {
     notes: input.notes ?? null,
     birthday: input.birthday ?? null,
     bookId: input.bookId ?? null,
-    email: email ?? null,
-    // Prisma requires JsonNull (not TS null) for nullable Json columns
-    emailAddresses: emailAddresses ?? Prisma.JsonNull,
-    emailEntries: emailEntries ?? Prisma.JsonNull,
-    phone: phone ?? null,
-    phoneNumbers: phoneNumbers ?? Prisma.JsonNull,
-    phoneEntries: phoneEntries ?? Prisma.JsonNull,
+    ...multiValueWriteData({
+      emailEntries: buildEmailEntries(input.emails),
+      phoneEntries: buildPhoneEntries(input.phones),
+    }),
     sourceType: "API" as const,
     lastMutatedBy: "API" as const,
   };
@@ -107,19 +79,15 @@ export function mapUpdateInputToDb(input: ContactUpdateInput) {
   if ("birthday" in input) patch.birthday = input.birthday ?? null;
   if ("bookId" in input) patch.bookId = input.bookId ?? null;
 
-  if ("emails" in input) {
-    const { email, emailAddresses, emailEntries } = buildEmailEntries(input.emails);
-    patch.email = email ?? null;
-    patch.emailAddresses = emailAddresses ?? Prisma.JsonNull;
-    patch.emailEntries = emailEntries ?? Prisma.JsonNull;
-  }
-
-  if ("phones" in input) {
-    const { phone, phoneNumbers, phoneEntries } = buildPhoneEntries(input.phones);
-    patch.phone = phone ?? null;
-    patch.phoneNumbers = phoneNumbers ?? Prisma.JsonNull;
-    patch.phoneEntries = phoneEntries ?? Prisma.JsonNull;
-  }
+  // A family named in the PATCH body replaces the stored list; an absent one
+  // is left untouched.
+  Object.assign(
+    patch,
+    multiValueWriteData({
+      emailEntries: "emails" in input ? buildEmailEntries(input.emails) : undefined,
+      phoneEntries: "phones" in input ? buildPhoneEntries(input.phones) : undefined,
+    }),
+  );
 
   // Recompute fullName if any name/company field changed
   if ("firstName" in input || "lastName" in input || "fullName" in input || "company" in input) {
@@ -135,10 +103,14 @@ type ApiContactRow = Pick<
   Contact,
   | "id" | "firstName" | "lastName" | "fullName" | "company" | "jobTitle"
   | "notes" | "birthday" | "emailEntries" | "phoneEntries"
+  | "email" | "emailAddresses" | "phone" | "phoneNumbers"
   | "createdAt" | "updatedAt" | "sourceType" | "bookId"
 >;
 
 export function formatContactForApi(contact: ApiContactRow) {
+  // P49A-10: entries through the canonical reader (legacy columns only for a
+  // row the backfill has not reached — a CSV contact used to read as []).
+  const { emailEntries, phoneEntries } = readMultiValueEntries(contact);
   return {
     id: contact.id,
     firstName: contact.firstName,
@@ -148,8 +120,8 @@ export function formatContactForApi(contact: ApiContactRow) {
     jobTitle: contact.jobTitle,
     notes: contact.notes,
     birthday: contact.birthday,
-    emails: contact.emailEntries ?? [],
-    phones: contact.phoneEntries ?? [],
+    emails: emailEntries,
+    phones: phoneEntries,
     bookId: contact.bookId,
     source: contact.sourceType,
     createdAt: contact.createdAt.toISOString(),
@@ -168,6 +140,10 @@ export const API_CONTACT_SELECT = {
   birthday: true,
   emailEntries: true,
   phoneEntries: true,
+  email: true,
+  emailAddresses: true,
+  phone: true,
+  phoneNumbers: true,
   bookId: true,
   sourceType: true,
   createdAt: true,

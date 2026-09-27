@@ -16,6 +16,7 @@ import {
   lockUserForPlanCheck,
 } from "~/server/billing";
 import { db } from "~/server/db";
+import { multiValueWriteData } from "~/server/contact-multi-values";
 import { normalizeContactPhoto } from "~/server/contact-photo-sync";
 import type { ImportedCardContact } from "./parse";
 
@@ -366,19 +367,20 @@ export async function commitKontaxImport(
               phoneticCompany: contact.phoneticCompany,
               department: contact.department,
               jobTitle: contact.jobTitle,
-              email: contact.emailEntries[0]?.value ?? null,
-              phone: contact.phoneEntries[0]?.value ?? null,
-              website: contact.websiteEntries[0]?.value ?? null,
-              address: contact.addressEntries[0]?.formatted ?? null,
+              // P49A-10: typed entries + every legacy column derived from them
+              // (the legacy emailAddresses / phoneNumbers / postalAddresses
+              // arrays used to be left empty here).
+              ...multiValueWriteData({
+                emailEntries: contact.emailEntries,
+                phoneEntries: contact.phoneEntries,
+                websiteEntries: contact.websiteEntries,
+                addressEntries: contact.addressEntries,
+              }),
               birthday: contact.birthday,
               notes: contact.notes,
               isFavorite: contact.isFavorite,
               isEmergency: contact.isEmergency,
               avatarUrl: avatarUrls[index],
-              emailEntries: asJsonArray(contact.emailEntries),
-              phoneEntries: asJsonArray(contact.phoneEntries),
-              websiteEntries: asJsonArray(contact.websiteEntries),
-              addressEntries: asJsonArray(contact.addressEntries),
               significantDates: asJsonArray(contact.significantDates),
               relatedPeople: asJsonArray(contact.relatedPeople),
               customFields: asJsonArray(contact.customFields),

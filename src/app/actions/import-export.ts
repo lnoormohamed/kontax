@@ -5,11 +5,9 @@ import { revalidatePath } from "next/cache";
 import { requireUserId } from "~/server/auth/require-session";
 import { assertCanImportContactsTx, lockUserForPlanCheck } from "~/server/billing";
 import { db } from "~/server/db";
+import { copyMultiValueWriteData } from "~/server/contact-multi-values";
 import { parseCsvContacts } from "~/server/contact-portability";
 import { csvRowCountExceedsCap, MAX_CSV_ROWS, MAX_CSV_TEXT_LENGTH } from "~/server/import/csv-bounds";
-
-const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
-  value && value.length > 0 ? value : undefined;
 
 // P48-11 item 4: this action had no size cap at all (csvText or the uploaded
 // file), unlike the API routes' zod .max() — a pasted or uploaded CSV of any
@@ -86,17 +84,12 @@ export const importContactsCsv = async (formData: FormData) => {
             phoneticFirstName: contact.phoneticFirstName,
             phoneticLastName: contact.phoneticLastName,
             nickname: contact.nickname,
-            email: contact.email,
-            emailAddresses: getOptionalJsonArray(contact.emailAddresses),
-            phone: contact.phone,
-            phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
+            // P49A-10: typed entries for every value, legacy columns derived.
+            ...copyMultiValueWriteData(contact),
             company: contact.company,
             phoneticCompany: contact.phoneticCompany,
             jobTitle: contact.jobTitle,
-            website: contact.website,
             birthday: contact.birthday,
-            address: contact.address,
-            postalAddresses: getOptionalJsonArray(contact.postalAddresses),
             notes: contact.notes,
           })),
         });

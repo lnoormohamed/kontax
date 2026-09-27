@@ -37,6 +37,7 @@ import { getUserPlanSummary } from "~/server/billing";
 import { shareDisplayToken, shareTokenDisplaySelect } from "~/server/capability-tokens";
 import { db } from "~/server/db";
 import { listMemberships } from "~/server/contact-book-membership";
+import { readMultiValueEntries } from "~/server/contact-multi-values";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
@@ -190,7 +191,8 @@ function UpcomingDatesPanel({
 
 // Normalise the contact's Json entry columns into the shapes the inline editor
 // expects. Tolerates legacy shapes ({relationship,name}, {date}, CardDAV postal
-// keys) and falls back to the scalar mirror column when no entries exist.
+// keys). Emails / phones / websites / addresses arrive already read through
+// readMultiValueEntries (P49A-10), which owns the legacy-column fallback.
 const asArray = (value: unknown): Record<string, unknown>[] =>
   Array.isArray(value) ? (value.filter((v) => v && typeof v === "object") as Record<string, unknown>[]) : [];
 
@@ -198,17 +200,11 @@ const str = (value: unknown): string => (typeof value === "string" ? value : "")
 
 const normaliseSimple = (
   raw: unknown,
-  scalar: string | null,
   fallbackLabel: string,
-): { label: string; value: string }[] => {
-  const items = asArray(raw)
+): { label: string; value: string }[] =>
+  asArray(raw)
     .map((e) => ({ label: str(e.label) || fallbackLabel, value: str(e.value) }))
     .filter((e) => e.value.length > 0);
-  if (items.length === 0 && scalar) {
-    return [{ label: fallbackLabel, value: scalar }];
-  }
-  return items;
-};
 
 const normaliseRelated = (raw: unknown): { label: string; value: string }[] =>
   asArray(raw)
@@ -225,7 +221,6 @@ const normaliseDates = (raw: unknown): { label: string; value: string }[] =>
 
 const normaliseAddresses = (
   raw: unknown,
-  scalar: string | null,
 ): {
   label: string;
   street: string;
@@ -234,7 +229,7 @@ const normaliseAddresses = (
   postcode: string;
   country: string;
 }[] => {
-  const items = asArray(raw).map((a) => {
+  return asArray(raw).map((a) => {
     const street = str(a.street) || [str(a.streetLine1), str(a.streetLine2)].filter(Boolean).join(", ");
     const city = str(a.city) || str(a.cityOrTown);
     const state = str(a.state) || str(a.region) || str(a.stateOrProvince);
@@ -250,10 +245,6 @@ const normaliseAddresses = (
       country,
     };
   });
-  if (items.length === 0 && scalar) {
-    return [{ label: "Home", street: scalar, city: "", state: "", postcode: "", country: "" }];
-  }
-  return items;
 };
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
@@ -618,11 +609,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     address: contact.address,
     notes: contact.notes,
   };
+  // P49A-10: the typed entries are canonical — read through the one reader
+  // (legacy columns only for a row the backfill has not reached), so a CSV
+  // contact's 2nd/3rd emails show up here and survive the next save.
+  const multiValues = readMultiValueEntries(contact);
   const editorEntries = {
-    emails: normaliseSimple(contact.emailEntries, contact.email, "Work"),
-    phones: normaliseSimple(contact.phoneEntries, contact.phone, "Mobile"),
-    websites: normaliseSimple(contact.websiteEntries, contact.website, "Portfolio"),
-    addresses: normaliseAddresses(contact.addressEntries, contact.address),
+    emails: normaliseSimple(multiValues.emailEntries, "Work"),
+    phones: normaliseSimple(multiValues.phoneEntries, "Mobile"),
+    websites: normaliseSimple(multiValues.websiteEntries, "Portfolio"),
+    addresses: normaliseAddresses(multiValues.addressEntries),
     dates: normaliseDates(contact.significantDates),
     related: normaliseRelated(contact.relatedPeople),
   };
