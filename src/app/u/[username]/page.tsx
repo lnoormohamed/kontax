@@ -7,6 +7,8 @@ import { JsonLd } from "~/app/_components/json-ld";
 import { auth } from "~/server/auth";
 import { buildPersonSchema, getPublicCard } from "~/server/public-card/get-card";
 import { recordCardView } from "~/server/public-card/analytics";
+import { getClientIp } from "~/lib/client-ip";
+import { safeExternalHref } from "~/lib/safe-url";
 import { SITE_URL } from "~/lib/site-url";
 import { AddToKontaxButton } from "./add-to-kontax";
 import type { PublicCardData } from "~/server/public-card/types";
@@ -240,8 +242,10 @@ function PublicCard({
           {card.phones.map((p) => (
             <FieldRow key={p} icon={<PhoneIcon />} value={p} href={`tel:${p}`} />
           ))}
+          {/* P49A-13: only http(s) becomes a link; anything else (a stored
+              javascript:/data: URL from an import or an older edit) is text. */}
           {card.websites.map((w) => (
-            <FieldRow key={w} icon={<GlobeIcon />} value={w} href={w} />
+            <FieldRow key={w} icon={<GlobeIcon />} value={w} href={safeExternalHref(w) ?? undefined} />
           ))}
         </>
       )}
@@ -282,6 +286,7 @@ export default async function PublicCardPage({
       card.userId,
       hdrs.get("referer") ?? undefined,
       hdrs.get("user-agent") ?? undefined,
+      getClientIp(hdrs),
     );
   }
 

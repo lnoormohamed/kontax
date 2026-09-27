@@ -75,17 +75,30 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
     return new Response("Share link not found.", { status: 404 });
   }
 
-  const newCount = share.downloadCount + 1;
-  await db.contactShare.update({
-    where: { id: share.id },
-    data: {
-      downloadCount: { increment: 1 },
-      // Expire single-use links immediately after serving.
-      ...(share.maxDownloads != null && newCount >= share.maxDownloads
-        ? { status: "EXPIRED" }
-        : {}),
+  // P49A-13: claim the download atomically. The check above and a plain
+  // `update` were two steps, so concurrent requests for a single-use link could
+  // all pass the check and all get the card. The claim only matches while the
+  // share is still ACTIVE and under its limit; a request that loses the race
+  // gets the same 410 as one that arrives afterwards.
+  const claimed = await db.contactShare.updateMany({
+    where: {
+      id: share.id,
+      status: "ACTIVE",
+      ...(share.maxDownloads != null ? { downloadCount: { lt: share.maxDownloads } } : {}),
     },
+    data: { downloadCount: { increment: 1 } },
   });
+  if (claimed.count === 0) {
+    return new Response("This share link has already been used.", { status: 410 });
+  }
+  if (share.maxDownloads != null) {
+    // Expire single-use links immediately after serving (whoever took the last
+    // download does this; the row's own count decides, not our stale read).
+    await db.contactShare.updateMany({
+      where: { id: share.id, status: "ACTIVE", downloadCount: { gte: share.maxDownloads } },
+      data: { status: "EXPIRED" },
+    });
+  }
 
   const c = share.contact;
   // P49A-10: the flat values are derived from the typed entries.

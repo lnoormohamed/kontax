@@ -1,3 +1,4 @@
+import { safeExternalHref } from "~/lib/safe-url";
 import { readPhoneEntries } from "~/server/contact-multi-values";
 import { db } from "~/server/db";
 import { SITE_URL } from "~/lib/site-url";
@@ -77,6 +78,9 @@ export async function getPublicCard(username: string): Promise<PublicCardData | 
 }
 
 export function buildPersonSchema(card: PublicCardData): Record<string, unknown> {
+  // P49A-13: only web links go into the structured data (a stored
+  // `javascript:` or `data:` website is dropped, as it is from the page).
+  const links = card.websites.map(safeExternalHref).filter((href): href is string => href !== null);
   return {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -85,7 +89,7 @@ export function buildPersonSchema(card: PublicCardData): Record<string, unknown>
     ...(card.company ? { worksFor: { "@type": "Organization", name: card.company } } : {}),
     ...(card.emails[0] ? { email: card.emails[0] } : {}),
     ...(card.phones[0] ? { telephone: card.phones[0] } : {}),
-    ...(card.websites[0] ? { url: card.websites[0], sameAs: card.websites } : {}),
+    ...(links.length > 0 ? { sameAs: links } : {}),
     url: `${SITE_URL}/u/${card.username}`,
   };
 }

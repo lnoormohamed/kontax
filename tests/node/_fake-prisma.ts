@@ -276,7 +276,10 @@ export function createFakePrisma(opts: FakePrismaOptions = {}) {
       get(_target, prop: string) {
         if (prop === "then") return undefined; // not a thenable
         if (prop === "$transaction") {
-          return async (fn: (tx: unknown) => Promise<unknown>) => {
+          return async (fn: ((tx: unknown) => Promise<unknown>) | Promise<unknown>[]) => {
+            // Array form: the operations were issued when the array was built
+            // (the fake runs them eagerly), so this only awaits them in order.
+            if (Array.isArray(fn)) return Promise.all(fn);
             await hooks.beforeTransaction?.();
             const snapshot = structuredClone(tables);
             try {

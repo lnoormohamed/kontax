@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { Prisma } from "../../../generated/prisma";
 import { safeInternalPath } from "~/lib/safe-internal-path";
+import { hasDangerousUrlScheme, isSafeWebUrl } from "~/lib/safe-url";
 import { requireUserId } from "~/server/auth/require-session";
 import { assertCanCreateContactsTx, lockUserForPlanCheck } from "~/server/billing";
 import { setPrimaryMembership } from "~/server/contact-book-membership";
@@ -65,9 +66,22 @@ const contactSchema = z.object({
   phoneticCompany: z.string().trim().max(120).optional(),
   jobTitle: z.string().trim().max(120).optional(),
   department: z.string().trim().max(120).optional(),
-  website: z.string().trim().url("Enter a valid website URL.").max(500).optional(),
+  // P49A-13: http(s) only — `.url()` alone accepts javascript: / data: URLs.
+  website: z
+    .string()
+    .trim()
+    .url("Enter a valid website URL.")
+    .max(500)
+    .refine(isSafeWebUrl, "Enter a website starting with http:// or https://.")
+    .optional(),
   websiteLabel: z.string().trim().max(40).optional(),
-  secondaryWebsite: z.string().trim().url("Enter a valid secondary website URL.").max(500).optional(),
+  secondaryWebsite: z
+    .string()
+    .trim()
+    .url("Enter a valid secondary website URL.")
+    .max(500)
+    .refine(isSafeWebUrl, "Enter a secondary website starting with http:// or https://.")
+    .optional(),
   secondaryWebsiteLabel: z.string().trim().max(40).optional(),
   additionalWebsites: z.string().trim().max(4000).optional(),
   birthday: z
@@ -198,14 +212,8 @@ const buildStructuredEntries = (
   }));
 };
 
-const isValidUrl = (value: string) => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
+// P49A-13: http(s) only. `new URL()` alone accepted `javascript:alert(1)`.
+const isValidUrl = (value: string) => isSafeWebUrl(value);
 
 const parseStructuredTextLines = (value: string | undefined, itemLabel: string) =>
   getLineSeparatedValues(value).map((line) => {
@@ -1028,6 +1036,12 @@ export const updateContactEntries = async (
         value: group === "emails" ? e.value.toLowerCase() : e.value,
       }))
       .filter((e) => e.value.length > 0);
+    // P49A-13: the inline editor takes free text ("example.com" is fine), but
+    // never a URL whose scheme would run or embed content when rendered.
+    if (group === "websites") {
+      const unsafe = entries.find((e) => hasDangerousUrlScheme(e.value));
+      if (unsafe) throw new Error("Websites must be web addresses (http:// or https://).");
+    }
     if (column === "emailEntries" || column === "phoneEntries" || column === "websiteEntries") {
       // P49A-10: typed entries + the legacy columns derived from them (the
       // legacy emailAddresses / phoneNumbers arrays used to go stale here).

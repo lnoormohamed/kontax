@@ -18,6 +18,7 @@ import {
   findMemberByInviteToken,
   inviteTokenColumns,
 } from "~/server/capability-tokens";
+import { INVITE_FOR_SOMEONE_ELSE, isInviteForUser } from "~/server/invite-recipient";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
@@ -292,12 +293,14 @@ export const acceptTeamInvite = async (formData: FormData) => {
 };
 
 export const declineTeamInvite = async (formData: FormData) => {
-  await requireUserId({ write: true });
+  const userId = await requireUserId({ write: true });
   const token = str(formData, "token");
   const member = await findMemberByInviteToken(token, (where) =>
     db.groupMember.findUnique({ where }),
   );
   if (member?.inviteStatus === "PENDING") {
+    // P49A-13: bound to the invitee, like acceptance (P48-17).
+    if (!(await isInviteForUser(member, userId))) throw new Error(INVITE_FOR_SOMEONE_ELSE);
     await db.groupMember.update({
       where: { id: member.id },
       data: { inviteStatus: "DECLINED", ...clearedInviteTokenColumns(), inviteExpiresAt: null },
