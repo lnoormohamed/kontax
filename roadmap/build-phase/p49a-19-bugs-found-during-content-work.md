@@ -58,8 +58,9 @@ Tests: `tests/node/monthly-import-limit.test.ts`.
   everything. So during the unpaid period: Family members keep the shared book (membership
   based) and the owner can't invite (plan is Free); a Teams org past its grace stops granting
   Teams to members (they fall back to their own plan) but the team is not locked. Known gap
-  (follow-up): the sync-account and live-share limits are enforced on creation, so connections /
-  live shares beyond Free's keep running during the unpaid window until Stripe's final cancel.
+  (follow-up): the sync-account limit is enforced on creation, so connections beyond Free's keep
+  running during the unpaid window until Stripe's final cancel. Live shares a lapsed user
+  *receives* are paused, not converted (see the review fixes below).
 - **Admin comp (P49A-07):** a comp row is ACTIVE, so it still grants; max-rank keeps the higher.
 - **UI:** Settings → Plan & billing: grace card "Payment failed — update your payment method by
   <date> to keep <Plan>…", new `paymentLapsed` card "…your account moved to the Free plan on
@@ -69,6 +70,36 @@ Tests: `tests/node/monthly-import-limit.test.ts`.
   would show a past date). Help: "If a payment fails" rewritten.
 - Tests: `tests/node/payment-grace.test.ts` (rule, web + DAV path, contact cap, comp, Teams),
   `stripe-webhook.test.ts` "failed-payment grace (P49A-19)", `billing-surface-grant.test.ts`.
+
+### Item 4 — Fable review fixes (2026-09-27)
+
+1. **Live shares received by a lapsed user are paused, not revoked** (`contact-shares.ts`
+   `classifyLiveShareRecipient`): past-grace PAST_DUE → `lastErrorCode RECIPIENT_PAYMENT_LAPSED`
+   (owner sees "Sync paused — recipient account issue"); the next propagation after payment
+   syncs again. Only a recipient with no paid plan is converted to a static copy.
+   Test: `live-share-payment-lapse.test.ts`.
+2. **No second subscription:** `findCheckoutBlockingSubscription`
+   (`src/server/billing-checkout-guard.ts`) refuses a new checkout (`USE_CUSTOMER_PORTAL`) when
+   a real Stripe subscription is ACTIVE / TRIALING / **PAST_DUE** (personal, or the owned team's).
+   `/api/billing/plan` returns `paymentLapse`, and /pricing then labels paid CTAs "Update payment
+   method" and opens the portal. Test: `checkout-guard-past-due.test.ts`.
+3. **Self-heal for a lost recovery webhook:** the nightly `POST /api/cron/delete-accounts`
+   (existing crontab entry — **nothing new to schedule**) also runs
+   `resyncLapsedPaymentSubscriptions` (`src/server/billing-lapse-resync.ts`): every real Stripe
+   subscription PAST_DUE past `graceEndsAt` (personal or org) is re-read via
+   `syncStripeSubscriptionById` and applied; 100 per night, least recently updated first, 250 ms
+   apart, per-subscription errors reported in the response (`paymentLapseResync`), never thrown.
+   The billing-portal return still resyncs at once. Test: `payment-lapse-resync.test.ts`.
+4. **Pre-deploy check** for PAST_DUE rows without `graceEndsAt` (fail-open legacy rows) in
+   `roadmap/runbooks/deploy.md` "P49A-19 deploy" (count, then stamp now() + 3 days).
+5. **Admin / team views:** admin user list + detail show "Pro — payment lapsed, on Free since
+   <date>" (`adminPlanLabel`); the Teams settings billing line shows "payment failed — Teams
+   features off since <date> until it's paid" (`getTeamBillingSummary.paymentLapsedSince`). The
+   data export's `account.json` is left as the subscription record (plan + PAST_DUE status in
+   `billing-summary.txt`). Test: `admin-payment-lapse-label.test.ts`.
+6. **No past "update by" date:** with a comp at the same rank, the billing card uses rows that
+   still grant (comp view + "Manage my Pro subscription" portal) and shows no grace card/banner.
+7. **UK dates:** billing card/banner and billing emails format dates in Europe/London.
 
 ## Item 5 — fixed (2026-09-27, owner decision: vCard in the data export for everyone)
 
